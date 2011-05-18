@@ -1134,7 +1134,14 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         if (refsetConcept.isAnnotationStyleRefex()) {
-            ConceptComponent<?, ?> referencedComponent = (ConceptComponent<?, ?>) Bdb.getComponent(referencedComponentNid);
+            ComponentBI component = Bdb.getComponent(referencedComponentNid);
+            ConceptComponent<?, ?> referencedComponent;
+            if (component instanceof ConceptComponent) {
+                referencedComponent = (ConceptComponent<?, ?>) component;
+            } else {
+                Concept concept = (Concept) component;
+                referencedComponent = concept.getConceptAttributes();
+            }
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
         } else {
