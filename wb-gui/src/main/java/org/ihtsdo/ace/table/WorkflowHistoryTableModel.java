@@ -145,7 +145,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
                 case FSN:
                 	// Get Pref to display
                 	I_DescriptionTuple tuple = concept.getDescTuple(config.getTableDescPreferenceList(), config);
-                	DescriptionVersionBI version = tuple.getVersion(config.getViewCoordinate());
+                	DescriptionVersionBI version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
                 	term = version.getText();
                 	break;
         /*
@@ -156,14 +156,14 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
                 	// Get State to display
                 	I_GetConceptData con = Terms.get().getConcept(UUID.fromString(result.getState()));
                 	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                	version = tuple.getVersion(config.getViewCoordinate());
+                	version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
                 	term = version.getText();
                 	break;
 
                 case EDITOR:
                 	con = Terms.get().getConcept(UUID.fromString(result.getModeler()));
                 	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                	version = tuple.getVersion(config.getViewCoordinate());
+                	version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
                 	term = version.getText();
                 	break;
 	
