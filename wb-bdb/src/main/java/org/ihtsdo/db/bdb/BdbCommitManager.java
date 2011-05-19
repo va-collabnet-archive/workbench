@@ -825,12 +825,11 @@ public class BdbCommitManager {
                     }
                 }
             }
+            c.modified();
+            Terms.get().addUncommittedNoChecks(c);
         } else {
-            // have to forget "all" references to component...
-            c.abort();
+            a.primordialSapNid = -1;
         }
-        c.modified();
-        Terms.get().addUncommittedNoChecks(c);
     }
 
     public static void forget(I_RelVersioned rel) throws IOException {
@@ -903,6 +902,7 @@ public class BdbCommitManager {
 
     public static void forget(I_GetConceptData concept) throws IOException {
         Concept c = (Concept) concept;
+        forget(c.getConceptAttributes());
         Bdb.getConceptDb().forget(c);
     }
 

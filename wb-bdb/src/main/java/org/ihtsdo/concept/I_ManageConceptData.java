@@ -133,4 +133,6 @@ public interface I_ManageConceptData {
     void cancel() throws IOException;
 
     void diet();
+
+    public boolean isCanceled();
 }

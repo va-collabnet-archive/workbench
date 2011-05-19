@@ -1012,6 +1012,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return sapMap;
     }
+    
+    public static boolean isCanceled(TupleInput input) {
+        int nid = input.readInt();
+        int primordialSapNid = input.readInt();
+        return primordialSapNid == -1;
+    }
+
 
     protected ConceptComponent(int enclosingConceptNid, TupleInput input) throws IOException {
         super();
