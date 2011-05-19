@@ -3,17 +3,27 @@ package org.ihtsdo.document.report.model;
 public class UserStatusCount {
 	private String date;
 	private String userName;
+	private String role;
 	private String status;
 
 	public UserStatusCount() {
 		super();
 	}
 
-	public UserStatusCount(String date, String userName, String status) {
+	public UserStatusCount(String date, String userName, String status, String role) {
 		super();
 		this.date = date;
 		this.userName = userName;
 		this.status = status;
+		this.role = role;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public String getDate() {
