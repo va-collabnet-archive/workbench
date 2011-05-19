@@ -67,7 +67,7 @@ public class SemanticTagEditor extends AbstractComboEditor {
 	    		if (!semTagConcepts.equals(con)) {
 		        	// Get Pref to display
 		        	I_DescriptionTuple tupleToDisplay = con.getDescTuple(Terms.get().getActiveAceFrameConfig().getTableDescPreferenceList(), Terms.get().getActiveAceFrameConfig());
-		        	DescriptionVersionBI versionToDisplay = tupleToDisplay.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		        	DescriptionVersionBI versionToDisplay = (DescriptionVersionBI) tupleToDisplay.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 		        	String semTag = versionToDisplay.getText();
 		
 		        	displayTags.add(semTag);
