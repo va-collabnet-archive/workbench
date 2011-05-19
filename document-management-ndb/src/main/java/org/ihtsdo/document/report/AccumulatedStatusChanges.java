@@ -11,8 +11,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import javax.swing.JFrame;
 
@@ -30,10 +32,12 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.model.UserStatusCount;
 import org.ihtsdo.document.report.model.UserStatusCountComparator;
+import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
@@ -49,15 +53,19 @@ public class AccumulatedStatusChanges implements I_Report {
 
 	private SimpleDateFormat formatter;
 	private I_TermFactory tf;
-
+	private ProjectPermissionsAPI projPermApi;
+	private HashMap<I_GetConceptData, String> userRolesCache;
+	
 	public AccumulatedStatusChanges() {
 		super();
 		formatter = new SimpleDateFormat("dd-MMM-yyyy");
+		userRolesCache = new HashMap<I_GetConceptData, String>();
 		tf = Terms.get();
 	}
 
 	@Override
 	public File getExcelSourceWorkbook() throws Exception {
+		userRolesCache = new HashMap<I_GetConceptData, String>();
 		File csvFile = this.getCsv();
 		if (csvFile == null) {
 			return null;
@@ -154,10 +162,11 @@ public class AccumulatedStatusChanges implements I_Report {
 		boolean dataFound = false;
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			projPermApi = new ProjectPermissionsAPI(config);
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy-mm-hh-ss");
 			csvFile = File.createTempFile("acumulated_status_changes_"+ sdf.format(new Date()), ".csv");
 			PrintWriter pw = new PrintWriter(csvFile);
-			pw.append("project|workset|worklist|date|author|status|count");
+			pw.append("project|workset|worklist|date|role|author|status|count");
 			pw.println();
 
 			TranslationProject project = new TranslationProjectDialog().showModalDialog();
@@ -228,7 +237,7 @@ public class AccumulatedStatusChanges implements I_Report {
 									e.printStackTrace();
 								}
 							}
-
+							
 							Set<WorkListMember> keys = workListMembers.keySet();
 							for (WorkListMember workListMember : keys) {
 								I_ExtendByRef history = workListMembers.get(workListMember);
@@ -240,8 +249,10 @@ public class AccumulatedStatusChanges implements I_Report {
 										dataFound = true;
 										UserStatusCount current = new UserStatusCount();
 										current.setDate(formatter.format(new Date(part.getTime())));
-										current.setUserName(tf.getConcept(part.getAuthorNid()) + "");
+										I_GetConceptData user = tf.getConcept(part.getAuthorNid());
+										current.setUserName(user + "");
 										current.setStatus(concept + "");
+										current.setRole(getUserRole(project, user));
 										results.add(current);
 									}
 
@@ -260,6 +271,7 @@ public class AccumulatedStatusChanges implements I_Report {
 											pw.append(worksetName + "|");
 											pw.append(worklistName + "|");
 											pw.append(userStatusCount.getDate() + "|");
+											pw.append(userStatusCount.getRole() + "|");
 											pw.append(userStatusCount.getUserName() + "|");
 											pw.append(userStatusCount.getStatus() + "|");
 											pw.append(count+"");
@@ -270,6 +282,7 @@ public class AccumulatedStatusChanges implements I_Report {
 										pw.append(worksetName + "|");
 										pw.append(worklistName + "|");
 										pw.append(userStatusCount.getDate() + "|");
+										pw.append(userStatusCount.getRole() + "|");
 										pw.append(userStatusCount.getUserName() + "|");
 										pw.append(userStatusCount.getStatus() + "|");
 										pw.append(count+"");
@@ -300,6 +313,46 @@ public class AccumulatedStatusChanges implements I_Report {
 
 		return csvFile;
 
+	}
+
+	private String getUserRole(TranslationProject project, I_GetConceptData user)
+			throws IOException, TerminologyException {
+		if(userRolesCache.containsKey(user)){
+			return userRolesCache.get(user).toString();
+		}else{
+			Set<I_GetConceptData> roles = getRolesForUser(user,project.getConcept());
+			if(roles.size() > 1){
+				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has more then one role, using the first one in report.",
+						new Exception("User: " + user.toString() + " has more then one role, using the first one in report."));
+			}else if(roles.size() < 1){
+				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has no roles in this project.",
+						new Exception("User: " + user.toString() + " has no roles in this project."));
+				userRolesCache.put(user, "No role");
+				return "No role";
+			}
+			StringBuilder sb = new StringBuilder();
+			for (I_GetConceptData i_GetConceptData : roles) {
+				sb.append(i_GetConceptData + " ");
+			}
+			userRolesCache.put(user, sb.toString().trim());
+			return sb.toString().trim();
+		}
+	}
+
+	public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project
+	) throws IOException, TerminologyException {
+
+		Set<I_GetConceptData> returnRoles = new HashSet<I_GetConceptData>();
+		Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
+		allRoles = ProjectPermissionsAPI.getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids()));
+
+		for (I_GetConceptData role : allRoles) {
+			if (projPermApi.checkPermissionForProject(user, project, role)) {
+				returnRoles.add(role);
+			}
+		}
+
+		return returnRoles;
 	}
 
 	@Override
