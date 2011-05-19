@@ -2929,10 +2929,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void addSearchLinkedComponent(I_ContainTermComponent component) {
         searchPanel.addLinkedComponent(component);
+        wfSearchPanel.addLinkedComponent(component);
     }
 
     public void removeSearchLinkedComponent(I_ContainTermComponent component) {
         searchPanel.removeLinkedComponent(component);
+        wfSearchPanel.removeLinkedComponent(component);
     }
     private static Timer swingTimer = new Timer(500, null);
 

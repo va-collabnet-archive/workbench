@@ -30,16 +30,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractSpinnerModel;
@@ -70,7 +67,8 @@ import javax.swing.table.TableColumn;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
-import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -80,12 +78,14 @@ import org.dwfa.ace.search.DescSearchResultsTablePopupListener;
 import org.dwfa.ace.search.I_MakeCriterionPanel;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
+import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.bpa.util.SortClickListener;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
@@ -99,12 +99,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
             //model.setDescriptions(new ArrayList<I_DescriptionVersioned>());
         }
 
-    }
-
-    private class FilterSearchActionListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            config.setSearchWithDescTypeFilter(searchWithDescTypeFilter.isSelected());
-        }
     }
 
     public class MaximizeSearchListener implements ActionListener {
@@ -209,7 +203,24 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 				    // no rows are selected
 				} else {
 				    int viewRowIndex = lsm.getMinSelectionIndex();
-				    lastSelectedRow = viewRowIndex;
+	                int modelRow = wfHistoryTable.convertRowIndexToModel(viewRowIndex);
+
+	                WorkflowStringWithConceptTuple result = (WorkflowStringWithConceptTuple) wfHistoryTable.getValueAt(modelRow, 0);
+	            	I_GetConceptData concept = Terms.get().getConcept(result.getTuple().getConceptNid());
+
+	                for (I_ContainTermComponent l : linkedComponents) {
+	                    l.setTermComponent(concept);
+	                }
+
+	                if (linkType == LINK_TYPE.TREE_LINK) {
+    	                try {
+	                        new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), 
+	                        								  config, concept);
+	                        config.setHierarchySelection(concept);
+	                    } catch (IOException e1) {
+	                        AceLog.getAppLog().alertAndLogException(e1);
+	                    }
+	                }
 				}
 			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
@@ -222,10 +233,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         ImageIcon[] items;
 
         int currentSelection = 0;
-
-        public LinkListModel(ImageIcon[] items) {
-            this(items, 0);
-        }
 
         public LinkListModel(ImageIcon[] items, int currentSelection) {
             super();
@@ -324,14 +331,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
      */
     private static final long serialVersionUID = 1L;
 
-	private static final int EXPECTED_YEAR_MONTH = 0;
-	private static final int EXPECTED_YEAR_DATE = 1;
-	private static final int EXPECTED_YEAR_LOCATION = 2;
-	private static final int REQUIRED_DATE_LENGTH = 2;
-	private static final int REQUIRED_YEAR_LENGTH = 4;
-	private static final int REQUIRED_MONTH_LENGTH = 2;
-	private static final int EXPECTED_DATE_PARTS = 3;
-
     private WorkflowHistoryTableModel model;
 
     private JButton searchButton;
@@ -342,7 +341,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     private JProgressBar progressBar;
 
-    private JTableWithDragImage WfHistoryTable;
+    private JTableWithDragImage wfHistoryTable;
 
     private Set<I_ContainTermComponent> linkedComponents = new HashSet<I_ContainTermComponent>();
 
@@ -376,8 +375,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     private JCheckBox workflowInProgress;
     private JCheckBox workflowCompleted;
-
-    private int lastSelectedRow = -1;
 
     public WorkflowHistorySearchPanel(I_ConfigAceFrame config, ACE ace) {
         super(new GridBagLayout());
@@ -571,21 +568,21 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 		 *       		config);
 		 */
 
-        WfHistoryTable = new JTableWithDragImage(model);
-        WfHistoryTable.setAutoCreateColumnsFromModel(true);
-        SortClickListener.setupSorter(WfHistoryTable);
-        WfHistoryTable.setDragEnabled(true);
-        WfHistoryTable.setTransferHandler(new TerminologyTransferHandler(this));
+        wfHistoryTable = new JTableWithDragImage(model);
+        wfHistoryTable.setAutoCreateColumnsFromModel(true);
+        SortClickListener.setupSorter(wfHistoryTable);
+        wfHistoryTable.setDragEnabled(true);
+        wfHistoryTable.setTransferHandler(new TerminologyTransferHandler(this));
         WorkflowHistoryTableRenderer renderer = new WorkflowHistoryTableRenderer(config, true);
-        WfHistoryTable.setDefaultRenderer(Number.class, renderer);
-        WfHistoryTable.setDefaultRenderer(String.class, renderer);
-        WfHistoryTable.setDefaultRenderer(Boolean.class, renderer);
-        WfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, workflowHistorySearchPanelId));
+        wfHistoryTable.setDefaultRenderer(Number.class, renderer);
+        wfHistoryTable.setDefaultRenderer(String.class, renderer);
+        wfHistoryTable.setDefaultRenderer(Boolean.class, renderer);
+        wfHistoryTable.addMouseListener(new DescSearchResultsTablePopupListener(config, ace, workflowHistorySearchPanelId));
         
         WORKFLOW_FIELD[] columnEnums = model.getColumnEnums();
 
-        for (int i = 0; i < WfHistoryTable.getColumnCount(); i++) {
-            TableColumn column = WfHistoryTable.getColumnModel().getColumn(i);
+        for (int i = 0; i < wfHistoryTable.getColumnCount(); i++) {
+            TableColumn column = wfHistoryTable.getColumnModel().getColumn(i);
             WORKFLOW_FIELD columnDesc = columnEnums[i];
             column.setIdentifier(columnDesc);
             column.setPreferredWidth(columnDesc.getPref());
@@ -599,7 +596,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         gbc.gridwidth = 14;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        JScrollPane scrollPane = new JScrollPane(WfHistoryTable);
+        JScrollPane scrollPane = new JScrollPane(wfHistoryTable);
         JToggleButton maximizeTable = new JToggleButton(new ImageIcon(
             ACE.class.getResource("/16x16/plain/fit_to_size.png")));
         maximizeTable.setToolTipText("show/hide search criterion");
@@ -609,7 +606,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         scrollPane.setCorner(JScrollPane.UPPER_RIGHT_CORNER, maximizeTable);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         add(scrollPane, gbc);
-        WfHistoryTable.getSelectionModel().addListSelectionListener(new SearchSelectionListener());
+        wfHistoryTable.getSelectionModel().addListSelectionListener(new SearchSelectionListener());
 
     }
 
@@ -664,7 +661,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     }
 
     private void startSearch() {
-        lastSelectedRow = -1;
         if (updateExtraCriterion()) {
 		    setShowProgress(true);
 		    ACE.threadPool.execute(new SearchWfHxWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected()));
@@ -684,52 +680,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 		return (extraCriterion.size() > 0);
     }
 
-    private boolean testDateFormat(String s) {
-
-    	try {
-    		// Simple two day, two month, four year date format
-	    	SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_TIME_STAMP);
-	    	sdf.setLenient(false);
-	    	Date d = sdf.parse(s);
-	    	
-	    	String[] dateParts = s.split("/");
-	    	if (dateParts.length != EXPECTED_DATE_PARTS)
-	    		throw new ParseException("Error: Month, Date, and Year must be specified and seperated by '/'", 0);
-	    	if (hasNonNumericValue(dateParts))
-	    		throw new ParseException("Error: Only digits seperated by '/' are allowed", 0);
-	    	if (dateParts[EXPECTED_YEAR_LOCATION].length() != REQUIRED_YEAR_LENGTH)
-	    		throw new ParseException("Error: Year must be four digits", 0);
-	    	if (dateParts[EXPECTED_YEAR_DATE].length() != REQUIRED_DATE_LENGTH)
-	    		throw new ParseException("Error: Day must be two digits", 0);
-			if (dateParts[EXPECTED_YEAR_MONTH].length() != REQUIRED_MONTH_LENGTH)
-	    		throw new ParseException("Error: Month must be two digits", 0);
-
-	    	return true;
-
-    	} catch (ParseException e) {
-            AceLog.getAppLog().log(Level.WARNING, "Error parsing date criterion with meassage: " + e.getMessage());
-		}
-    	
-		return false;
-    }
     
-    
-    
-    private boolean hasNonNumericValue(String[] dateParts) {
-    	for (int i = 0; i < dateParts.length; i++)
-    	{
-    		String part = dateParts[i];
-    		
-    		for (int j = 0; j < part.length(); j++)
-    		{
-    			if (!Character.isDigit(part.charAt(j)))
-    				return true;
-    		}
-    	}
-
-    	return false;
-	}
-
 	public void setProgressInfo(String string) {
         progressBar.setStringPainted(true);
         progressBar.setString(string);
@@ -813,17 +764,6 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         this.linkType = type;
     }
 
-    public I_DescriptionTuple getSearchResultsSelection() {
-        int selectedRow = lastSelectedRow;
-        if (WfHistoryTable.getSelectedRow() > 0) {
-            selectedRow = WfHistoryTable.getSelectedRow();
-        }
-        StringWithDescTuple swdt = (StringWithDescTuple) WfHistoryTable.getValueAt(selectedRow, 0);
-        if (swdt != null) {
-            return swdt.getTuple();
-        }
-        return null;
-    }
 
     public List<WorkflowHistoryCriterionPanel> getWorkflowHistoryCriterionPanels() {
         return criterionPanels;
