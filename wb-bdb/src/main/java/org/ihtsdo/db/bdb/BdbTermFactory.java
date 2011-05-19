@@ -1135,6 +1135,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
         if (refsetConcept.isAnnotationStyleRefex()) {
             ComponentBI component = Bdb.getComponent(referencedComponentNid);
+            assert component != null: "referencedComponentNid results in null: " + referencedComponentNid;
             ConceptComponent<?, ?> referencedComponent;
             if (component instanceof ConceptComponent) {
                 referencedComponent = (ConceptComponent<?, ?>) component;
