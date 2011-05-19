@@ -153,6 +153,30 @@ public class ProjectPermissionsAPI {
 			}
 		}
 
+		if (lastestTuple == null) {
+			for (I_GetConceptData parent : target.getSourceRelTargets(
+					config.getAllowedStatus(),
+					isaType,
+					config.getViewPositionSetReadOnly(),
+					Precedence.TIME,
+					config.getConflictResolutionStrategy())) {
+				relationships = user.getSourceRelTuples(
+						config.getAllowedStatus(),
+						allowedTypes,
+						config.getViewPositionSetReadOnly(),
+						Precedence.TIME,
+						config.getConflictResolutionStrategy());
+				for (I_RelTuple rel : relationships) {
+					if (rel.getC2Id() == parent.getConceptNid()) {
+						if (rel.getTime() > latestVersion) {
+							latestVersion = rel.getTime();
+							lastestTuple = rel;
+						}
+					}
+				}
+			}
+		}
+
 		if (lastestTuple != null) {
 			if (isActive(lastestTuple.getStatusNid())) {
 				permisionGranted = true;
@@ -176,7 +200,7 @@ public class ProjectPermissionsAPI {
 
 		return returnUsers;
 	}
-	
+
 	/**
 	 * Gets the descendants.
 	 * 
@@ -208,20 +232,20 @@ public class ProjectPermissionsAPI {
 		}
 		return descendants;
 	}
-	
+
 	public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project
 	) throws IOException, TerminologyException {
-		
+
 		Set<I_GetConceptData> returnRoles = new HashSet<I_GetConceptData>();
 		Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
 		allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
-		
+
 		for (I_GetConceptData role : allRoles) {
 			if (checkPermissionForProject(user, project, role)) {
 				returnRoles.add(role);
 			}
 		}
-		
+
 		return returnRoles;
 	}
 
@@ -330,7 +354,7 @@ public class ProjectPermissionsAPI {
 		try {
 			I_GetConceptData userParent =
 				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-			
+
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
 			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
