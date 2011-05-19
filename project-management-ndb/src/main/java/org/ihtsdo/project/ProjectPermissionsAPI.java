@@ -174,6 +174,52 @@ public class ProjectPermissionsAPI {
 						}
 					}
 				}
+				if(lastestTuple == null){
+					for (I_GetConceptData parent2 : parent.getSourceRelTargets(
+							config.getAllowedStatus(),
+							isaType,
+							config.getViewPositionSetReadOnly(),
+							Precedence.TIME,
+							config.getConflictResolutionStrategy())) {
+						relationships = user.getSourceRelTuples(
+								config.getAllowedStatus(),
+								allowedTypes,
+								config.getViewPositionSetReadOnly(),
+								Precedence.TIME,
+								config.getConflictResolutionStrategy());
+						for (I_RelTuple rel : relationships) {
+							if (rel.getC2Id() == parent2.getConceptNid()) {
+								if (rel.getTime() > latestVersion) {
+									latestVersion = rel.getTime();
+									lastestTuple = rel;
+								}
+							}
+						}
+						if(lastestTuple == null){
+							for (I_GetConceptData parent3 : parent2.getSourceRelTargets(
+									config.getAllowedStatus(),
+									isaType,
+									config.getViewPositionSetReadOnly(),
+									Precedence.TIME,
+									config.getConflictResolutionStrategy())) {
+								relationships = user.getSourceRelTuples(
+										config.getAllowedStatus(),
+										allowedTypes,
+										config.getViewPositionSetReadOnly(),
+										Precedence.TIME,
+										config.getConflictResolutionStrategy());
+								for (I_RelTuple rel : relationships) {
+									if (rel.getC2Id() == parent3.getConceptNid()) {
+										if (rel.getTime() > latestVersion) {
+											latestVersion = rel.getTime();
+											lastestTuple = rel;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
