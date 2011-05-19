@@ -1353,6 +1353,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             buff.append(getInitialText());
             buff.append("\" nid: ");
             buff.append(nid);
+            buff.append(" annotationRefset: ");
+            buff.append(isAnnotationStyleRefex());
             buff.append("\n  data version: ");
             buff.append(getDataVersion());
             buff.append("\n write version: ");
