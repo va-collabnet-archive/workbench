@@ -42,8 +42,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		try {
 			return Terms.get().getRefsetExtensionMembers(refsetId).size();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset members with error: " + e.getMessage());
 		}
 		
 		return 0;
@@ -72,7 +71,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			// Return Latest Bean of Workflow Set
 			return lastBean;
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset members with error: " + e.getMessage());
 		}
 		
 		return null;

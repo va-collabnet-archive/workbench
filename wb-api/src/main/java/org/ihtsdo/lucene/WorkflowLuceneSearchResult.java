@@ -3,7 +3,9 @@ package org.ihtsdo.lucene;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -43,7 +45,7 @@ public class WorkflowLuceneSearchResult {
     		concept = row[WorkflowHelper.conceptIdPosition];
     		fsn = row[WorkflowHelper.fsnPosition];
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().log(Level.WARNING, "Error in processing Workflow Search Result with error: " + e.getMessage());
 		}
 	}
 
@@ -60,7 +62,7 @@ public class WorkflowLuceneSearchResult {
 		try {
 			return WorkflowHelper.format.parse(time).getTime();
 		} catch (ParseException e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().log(Level.WARNING, "Error in parsing Timestamp from file for time: " + time + " with error: " + e.getMessage());
 		}
 		
 		return 0;

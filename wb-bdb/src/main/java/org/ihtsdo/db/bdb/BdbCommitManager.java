@@ -161,7 +161,7 @@ public class BdbCommitManager {
             try {
 				refset = new WorkflowHistoryRefset();
 			} catch (Exception e) {
-				e.printStackTrace();
+				AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
 			}
         }
 
@@ -278,16 +278,16 @@ public class BdbCommitManager {
         RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
         addUncommitted(member.getEnclosingConcept());
         
-        try {
-            if (wfHistoryRefsetId == 0) {
+        if (wfHistoryRefsetId == 0) {
+            try {
             	wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids());
+            } catch (Exception e) {
+            	AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: " + e.getMessage());
             }
-            
-            if (wfHistoryRefsetId == extension.getRefsetId()) {
-            	addUncommittedWfMemberId(extension);
-            }
-        } catch (Exception e) {
-        	e.printStackTrace();
+        }
+           
+        if (wfHistoryRefsetId == extension.getRefsetId()) {
+        	addUncommittedWfMemberId(extension);
         }
     }
 

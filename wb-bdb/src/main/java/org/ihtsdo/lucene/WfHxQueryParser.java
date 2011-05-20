@@ -2,6 +2,7 @@ package org.ihtsdo.lucene;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
@@ -11,6 +12,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
@@ -79,7 +81,7 @@ public class WfHxQueryParser {
 	    		}
 	    	}
 		} catch (Exception e) {
-			e.printStackTrace();
+        	AceLog.getAppLog().log(Level.WARNING, "Unable in creating Wf Lucene Query with error: " + e.getMessage());
 		}
     	
     	return booleanQuery;
