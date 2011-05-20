@@ -62,7 +62,7 @@ public class RetireAllMarkedParents extends AbstractTask {
 
         concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
-        concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
+        concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.getLenient().getNid()));
     }
 
     private void retireExistingMarkedParentMembers(I_GetConceptData memberRefsetConcept) throws Exception {

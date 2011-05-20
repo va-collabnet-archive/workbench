@@ -53,15 +53,16 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.spec.ValidationException;
 
 @AllowDataCheckSuppression
 public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
-    public RefsetHelper(I_ConfigAceFrame config) {
+    public RefsetHelper(I_ConfigAceFrame config) throws IOException {
         super(config);
     }
 
-    public RefsetHelper(I_ConfigAceFrame config, I_IntSet isARelTypes) {
+    public RefsetHelper(I_ConfigAceFrame config, I_IntSet isARelTypes) throws ValidationException, IOException {
         super(config, isARelTypes);
     }
 
@@ -553,7 +554,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         I_TermFactory termFactory = Terms.get();
 
         int currentStatusId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-        int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE.localize().getNid();
+        int memberRefsetPurposeId = ConceptConstants.REFSET_MEMBER_PURPOSE.getLenient().getNid();
         int refsetIdenityId = RefsetAuxiliary.Concept.REFSET_IDENTITY.localize().getNid();
 
         I_IntSet statuses = termFactory.newIntSet();
@@ -564,7 +565,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
         I_IntSet isATypes = termFactory.newIntSet();
         isATypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        isATypes.add(ConceptConstants.SNOMED_IS_A.localize().getNid());
+        isATypes.add(ConceptConstants.SNOMED_IS_A.getLenient().getNid());
 
         I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
 

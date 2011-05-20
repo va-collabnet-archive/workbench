@@ -73,7 +73,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
         ConcurrentHashMap<I_ConfigAceFrame, RefsetHelper> helperMap =
                 new ConcurrentHashMap<I_ConfigAceFrame, RefsetHelper>(7);
 
-        private RefsetHelper get(I_ConfigAceFrame frameConfig) {
+        private RefsetHelper get(I_ConfigAceFrame frameConfig) throws IOException {
             assert frameConfig != null : "frameConfig cannot be null";
             RefsetHelper helper = helperMap.get(frameConfig);
             if (helper == null) {

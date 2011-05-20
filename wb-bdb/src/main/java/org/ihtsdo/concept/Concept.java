@@ -1489,7 +1489,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     
     @Override
     public boolean isCanceled() throws IOException {
-        return data.isCanceled();
+        return false;
+        //return data.isCanceled();
     }
     
     @Override
