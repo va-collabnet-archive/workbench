@@ -46,8 +46,9 @@ public class WfHxLuceneManager extends LuceneManager {
 			
 			if (idx >= 0) {
 	            WorkflowHistoryJavaBean lastBean = ((WorkflowHistoryJavaBean)beans.toArray()[idx]);
-	            
 	            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
+	            WfHxIndexGenerator.initializeSemTags();
+
 	            for (WorkflowHistoryJavaBean bean : beans) {
 			        writerCopy.addDocument(WfHxIndexGenerator.createDoc(bean, vals));
 			    }

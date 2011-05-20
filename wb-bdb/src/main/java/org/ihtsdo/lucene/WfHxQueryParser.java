@@ -211,7 +211,7 @@ public class WfHxQueryParser {
 		case AbstractWorkflowHistorySearchTest.currentState:
 			return ((StateLastWorkflowHistory)wfCrit).getCurrentTestUUID().toString();
 		case AbstractWorkflowHistorySearchTest.semTag:
-			return ((SemanticTagWorkflowHistory)wfCrit).getTestHierarchy();
+			return WorkflowHelper.parseSpaces(((SemanticTagWorkflowHistory)wfCrit).getTestHierarchy());
 		case AbstractWorkflowHistorySearchTest.path:
 			return ((PathWorkflowHistory)wfCrit).getCurrentTestUUID().toString();
 		default:

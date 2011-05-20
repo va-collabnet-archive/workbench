@@ -102,8 +102,8 @@ public abstract class LuceneManager {
     	} else {
 	    	if (wfHxLuceneDir == null) {
 	    		wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true);
-        }
-        }
+	    	}
+    	}
     }
 
     private static Directory initDirectory(File luceneDirFile, boolean mutable)

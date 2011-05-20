@@ -863,14 +863,16 @@ public class WorkflowHelper {
     	return parseSemanticTag(s);
 	}
 
-	public static String parseSemanticTag(String s) {
-		int startIndex = s.lastIndexOf('(');
+	public static String parseSemanticTag(String potentialTag) {
+		
+		int startIndex = potentialTag.lastIndexOf('(');
 		
 		if (startIndex >= 0)
 		{
-			int endIndex = s.lastIndexOf(')');
-			
-			return s.substring(startIndex + 1, endIndex);
+			int endIndex = potentialTag.lastIndexOf(')');
+			String retTag = potentialTag.substring(startIndex + 1, endIndex);
+
+			return WorkflowHelper.parseSpaces(retTag);
 		} else {
 			return "";
 		}
@@ -986,5 +988,16 @@ public class WorkflowHelper {
  
 	public static boolean hasBeenInitialized() {
 		return (states != null && actions != null && modelers != null);
+	}
+
+	public static String parseSpaces(String semTag) {
+		semTag.trim();
+		
+		while (semTag.contains(" ")) {
+			int idx = semTag.indexOf(' ');
+			semTag = semTag.substring(0, idx) + semTag.substring(idx + 1);
+		}
+		
+		return semTag;
 	}
 }

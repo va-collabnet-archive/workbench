@@ -39,21 +39,13 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	private static File isFromInputFile;
     private static Set<WorkflowHistoryJavaBean> wfHxJavaBeansToWrite = Collections.synchronizedSet(new HashSet<WorkflowHistoryJavaBean>());
     private static Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap = Collections.synchronizedMap(new HashMap<UUID, WorkflowLuceneSearchResult>());
-    private static SortedSet<String> semanticTags = new TreeSet<String>();
-
+    private static SortedSet<String> semanticTags = null;
+    
 	public WfHxIndexGenerator(IndexWriter writer) throws IOException, ParseException {
 		super(writer);
 	
 		try {
-    		I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());
-        	Set<I_GetConceptData> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept);
-
-        	for (I_GetConceptData con : semTagConcepts) {
-        		// FSN & Pref Term Same Tag
-        		String semTag = con.getDescriptions().iterator().next().getText();
-        		
-        		semanticTags.add(semTag);
-        	}
+        	initializeSemTags();
 
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 	    	int searcherId = searcher.getRefsetId();
@@ -115,6 +107,27 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		}
 	}
 
+	public static void initializeSemTags() {
+		if (semanticTags == null) {
+			try {
+				I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());
+		    	Set<I_GetConceptData> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept);
+		    	semanticTags = new TreeSet<String>();
+		    	
+		    	for (I_GetConceptData con : semTagConcepts) {
+		    		// FSN & Pref Term Same Tag
+		    		String semTag = con.getDescriptions().iterator().next().getText();
+		    		
+		    		semTag = WorkflowHelper.parseSpaces(semTag);
+		
+		    		semanticTags.add(semTag);
+		    	}
+			} catch (Exception e) {
+			    AceLog.getAppLog().info("Error initializing semantic tags for search with error,: " + e.getMessage());
+			}
+		}
+	}
+	
 	private void updateResults() {
     	if (++memberCounter % feedbackInterval == 0) {
             System.out.print(".");
