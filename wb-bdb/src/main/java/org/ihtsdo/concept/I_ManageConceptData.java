@@ -134,5 +134,4 @@ public interface I_ManageConceptData {
 
     void diet();
 
-    public boolean isCanceled();
 }

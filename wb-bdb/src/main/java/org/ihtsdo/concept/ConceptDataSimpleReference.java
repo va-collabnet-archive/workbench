@@ -841,45 +841,4 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     public ConceptAttributes getConceptAttributesIfChanged() throws IOException {
         return attributes.get();
     }
-    
-    @Override
-    public boolean isCanceled() {
-        ConceptAttributes attr = attributes.get();
-        if (attr != null) {
-            if (attr.getSapNid() == -1) {
-                return true;
-            }
-        }
-        return getCanceled(OFFSETS.ATTRIBUTES);
-    }
-    
-    private boolean getCanceled(OFFSETS offset) {
-        try {
-            TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
-            if (readOnlyInput.available() > 0) {
-                checkFormatAndVersion(readOnlyInput);
-                readOnlyInput.mark(128);
-                readOnlyInput.skipFast(offset.offset);
-                int listStart = readOnlyInput.readInt();
-                readOnlyInput.reset();
-                readOnlyInput.skipFast(listStart);
-                return ConceptComponent.isCanceled(readOnlyInput);
-            }
-            
-            TupleInput readWriteInput = nidData.getMutableTupleInput();
-            if (readWriteInput.available() > 0) {
-                checkFormatAndVersion(readWriteInput);
-                readWriteInput.mark(128);
-                readWriteInput.skipFast(offset.offset);
-                int listStart = readWriteInput.readInt();
-                readWriteInput.reset();
-                readWriteInput.skipFast(listStart);
-                return ConceptComponent.isCanceled(readOnlyInput);
-            }
-            return true;
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } 
-        return true;
-    }
-}
+ }

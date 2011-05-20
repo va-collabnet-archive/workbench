@@ -801,10 +801,11 @@ public class BdbCommitManager {
         }
     }
 
-    public static void forget(I_ConceptAttributeVersioned attr) throws IOException {
+    public static boolean forget(I_ConceptAttributeVersioned attr) throws IOException {
         Concept c = Bdb.getConcept(attr.getConId());
         ConceptAttributes a = (ConceptAttributes) attr;
-        if (a.getTime() != Long.MAX_VALUE) {
+        if (a.getTime() != Long.MAX_VALUE &&
+                a.getTime() != Long.MIN_VALUE) {
             // Only need to forget additional versions;
             if (a.revisions == null) {
                 throw new UnsupportedOperationException(
@@ -829,7 +830,9 @@ public class BdbCommitManager {
             Terms.get().addUncommittedNoChecks(c);
         } else {
             a.primordialSapNid = -1;
+            return true;
         }
+        return false;
     }
 
     public static void forget(I_RelVersioned rel) throws IOException {
@@ -902,8 +905,7 @@ public class BdbCommitManager {
 
     public static void forget(I_GetConceptData concept) throws IOException {
         Concept c = (Concept) concept;
-        forget(c.getConceptAttributes());
-        Bdb.getConceptDb().forget(c);
+        c.cancel();
     }
 
     @SuppressWarnings("unchecked")
