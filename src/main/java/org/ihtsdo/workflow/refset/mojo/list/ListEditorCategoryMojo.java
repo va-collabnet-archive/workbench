@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,6 +18,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefset;
 
@@ -49,9 +51,7 @@ public class ListEditorCategoryMojo extends AbstractMojo {
             
             printRefsetMembers(members);
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Unable to read editor category refset with error: " + e.getMessage());
 		}
 	}
     public File getTargetDirectory() {

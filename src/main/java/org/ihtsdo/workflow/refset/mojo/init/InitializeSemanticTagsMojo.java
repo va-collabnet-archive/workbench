@@ -64,9 +64,7 @@ public class InitializeSemanticTagsMojo extends AbstractMojo {
        
 	        tf.addUncommitted(refset.getRefsetConcept());
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize semantic tag refset with error: " + e.getMessage());
 		}
 	}
 
