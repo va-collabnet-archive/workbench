@@ -151,7 +151,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private Set<LanguageMembershipRefset> sourceLangRefsets;
 	private LanguageMembershipRefset targetLangRefset;
 	private SimpleDateFormat formatter;
-	private I_GetConceptData description;
+	//private I_GetConceptData description;
 	private I_GetConceptData inactive;
 	private I_GetConceptData active;
 	private I_GetConceptData retired;
@@ -204,9 +204,7 @@ public class TranslationConceptEditor6 extends JPanel {
 							.getUids());
 
 			// TODO review!! previously was DESCRIPTION_DESCRIPTION_TYPE
-			description = Terms.get().getConcept(
-					ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids());
-
+			//description = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids());
 			notAcceptable = Terms.get().getConcept(
 					ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
 			inactive = Terms.get().getConcept(
@@ -255,7 +253,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		// bDescIssue.setEnabled(false);
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
 		comboBoxModel.addElement(fsn);
-		comboBoxModel.addElement(description);
+		comboBoxModel.addElement(synonym);
 
 		comboBox1.setModel(comboBoxModel);
 		comboBox1.setSelectedIndex(1);
@@ -660,6 +658,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		// rbInact.setEnabled(false);
 		// rbNo.setEnabled(false);
 		// rbAct.setEnabled(false);
+		tabTar.clearSelection();
 
 		if (clearAll) {
 			saveDesc = false;
@@ -798,7 +797,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			mSpellChk.setEnabled(true);
 			// button5.setEnabled(true);
 			// comboBox1.setEnabled(true);
-			comboBox1.setSelectedItem(description);
+			comboBox1.setSelectedItem(synonym);
 			// cmbAccep.setEnabled(true);
 			cmbAccep.setSelectedItem(preferred);
 			// rbNo.setEnabled(true);
@@ -820,7 +819,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			mSpellChk.setEnabled(true);
 			// button5.setEnabled(true);
 			// comboBox1.setEditable(true);
-			comboBox1.setSelectedItem(description);
+			comboBox1.setSelectedItem(synonym);
 			// cmbAccep.setEditable(true);
 			cmbAccep.setSelectedItem(acceptable);
 			// rbNo.setSelected(true);
@@ -946,14 +945,10 @@ public class TranslationConceptEditor6 extends JPanel {
 						.isSelected());
 
 				// set description type like RF1
-				if (((I_GetConceptData) comboBox1.getSelectedItem())
-						.equals(description)) {
-					if ((((I_GetConceptData) cmbAccep.getSelectedItem())
-							.equals(preferred))) {
-						descriptionInEditor
-								.setTypeId(preferred.getConceptNid());
-					} else if ((((I_GetConceptData) cmbAccep.getSelectedItem())
-							.equals(acceptable))) {
+				if (((I_GetConceptData) comboBox1.getSelectedItem()).equals(synonym)) {
+					if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(preferred))) {
+						descriptionInEditor.setTypeId(synonym.getConceptNid());
+					} else if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(acceptable))) {
 						descriptionInEditor.setTypeId(synonym.getConceptNid());
 					}
 				} else {
@@ -1473,10 +1468,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					ContextualizedDescription descrpt = (ContextualizedDescription) table
 							.getModel().getValueAt(rowModel,
 									TableTargetColumn.TERM.ordinal());
-
+					System.out.println("************ getting descrpt");
 					if (descrpt != null && !setByCode) {
+						System.out.println("************ descrpt= " + descrpt.getText() );
 						updatePropertiesPanel(descrpt, rowModel);
-					}
+					} else System.out.println("************  descrpt null");
 				}
 
 			}
@@ -2597,7 +2593,7 @@ public class TranslationConceptEditor6 extends JPanel {
 										termType_Status[0] = fsn;
 									} else {
 										// row[TableSourceColumn.TERM_TYPE.ordinal()]=this.description;
-										termType_Status[0] = this.description;
+										termType_Status[0] = this.synonym;
 									}
 									row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 									bNewNode = true;
@@ -2707,7 +2703,7 @@ public class TranslationConceptEditor6 extends JPanel {
 											.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
 								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = acceptable;
-								termType_Status[0] = this.description;
+								termType_Status[0] = this.synonym;
 								termType_Status[1] = active;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 								bNewNode = true;
@@ -2717,7 +2713,7 @@ public class TranslationConceptEditor6 extends JPanel {
 											.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
 								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
-								termType_Status[0] = this.description;
+								termType_Status[0] = this.synonym;
 								termType_Status[1] = active;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 								bNewNode = true;
@@ -2725,7 +2721,7 @@ public class TranslationConceptEditor6 extends JPanel {
 									.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
 								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
-								termType_Status[0] = this.description;
+								termType_Status[0] = this.synonym;
 								termType_Status[1] = inactive;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 								bNewNode = true;
@@ -3003,7 +2999,7 @@ public class TranslationConceptEditor6 extends JPanel {
 										.getConceptNid()) {
 									termType_Status[0] = fsn;
 								} else {
-									termType_Status[0] = this.description;
+									termType_Status[0] = this.synonym;
 								}
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 								bNewNode = true;
@@ -3028,7 +3024,7 @@ public class TranslationConceptEditor6 extends JPanel {
 										.contains(ConfigTranslationModule.TreeComponent.SYNONYM)) {
 							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
 							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = acceptable;
-							termType_Status[0] = this.description;
+							termType_Status[0] = this.synonym;
 							termType_Status[1] = active;
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 							bNewNode = true;
@@ -3038,7 +3034,7 @@ public class TranslationConceptEditor6 extends JPanel {
 										.contains(ConfigTranslationModule.TreeComponent.PREFERRED)) {
 							rowClass[0] = TreeEditorObjectWrapper.PREFERRED;
 							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = preferred;
-							termType_Status[0] = this.description;
+							termType_Status[0] = this.synonym;
 							termType_Status[1] = active;
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 							bHasPref = true;
@@ -3051,7 +3047,7 @@ public class TranslationConceptEditor6 extends JPanel {
 								.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
 							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
-							termType_Status[0] = this.description;
+							termType_Status[0] = this.synonym;
 							termType_Status[1] = inactive;
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 							bNewNode = true;
@@ -3552,7 +3548,8 @@ public class TranslationConceptEditor6 extends JPanel {
 		// if (obj instanceof ContextualizedDescription){
 		if (translConfig.getSelectedEditorMode().equals(
 				ConfigTranslationModule.EditorMode.PREFERRED_TERM_EDITOR)) {
-			if (descrpt.getTypeId() != preferred.getConceptNid()) {
+			if (!(descrpt.getTypeId() == synonym.getConceptNid() &&
+					descrpt.getAcceptabilityId() == preferred.getConceptNid())) {
 				if (editingRow != null) {
 					setByCode = true;
 					int selrow = tabTar.convertRowIndexToView(editingRow);
@@ -3564,7 +3561,8 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 		if (translConfig.getSelectedEditorMode().equals(
 				ConfigTranslationModule.EditorMode.SYNONYMS_EDITOR)) {
-			if (descrpt.getTypeId() != synonym.getConceptNid()) {
+			if ( !(descrpt.getTypeId() == synonym.getConceptNid() &&
+					descrpt.getAcceptabilityId() == acceptable.getConceptNid())) {
 				if (editingRow != null) {
 					setByCode = true;
 					int selrow = tabTar.convertRowIndexToView(editingRow);
@@ -3648,12 +3646,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					if (descrpt.getTypeId() == fsn.getConceptNid()
 							|| descrpt.getTypeId() == preferred.getConceptNid()
 							|| descrpt.getTypeId() == synonym.getConceptNid()) {
-
 						try {
 							if (fsn.getConceptNid() == descrpt.getTypeId()) {
 								comboBox1.setSelectedItem(fsn);
 							} else {
-								comboBox1.setSelectedItem(description);
+								comboBox1.setSelectedItem(synonym);
 							}
 							cmbAccep.setSelectedItem(Terms.get().getConcept(
 									descrpt.getAcceptabilityId()));
