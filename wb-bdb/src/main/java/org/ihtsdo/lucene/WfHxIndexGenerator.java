@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -127,7 +128,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 
 	@Override
     public void processConceptData(Concept concept) throws Exception {
-    	throw new Exception("Do not use I_ProcessConcept mechanism to load WfHx into Lucene");
+		AceLog.getAppLog().log(Level.WARNING, "Do not use I_ProcessConcept mechanism to load WfHx into Lucene");
     }
 
     public void initializeWfHxLucene() throws Exception {
