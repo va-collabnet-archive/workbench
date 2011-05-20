@@ -276,7 +276,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			if (writer.getProperties().valuesExist())
 				return writer.fieldsToRefsetString();
 			else
-				throw new Exception("Couldn't identify all values in refset row");
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't identify all values in refset row");
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Error in processing row: " + row.toString() + " with error: " + e.getMessage());
 		}
