@@ -1,7 +1,6 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -16,6 +15,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 
@@ -78,6 +78,12 @@ public class KindOfComputer {
             isaCache.remove(isaCoordinate);
         }
     }
+    
+    public static void updateIsaCaches(ConceptChronicleBI c) throws Exception {
+        for (IsaCache isac: isaCache.values()) {
+            isac.updateCache(c);
+        }
+    }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
         if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
@@ -88,9 +94,9 @@ public class KindOfComputer {
             try {
                 tempIsaCache.setup(isaCoordinate.getCoordinate());
             } catch (TerminologyException e) {
-                e.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(e);
             } catch (Exception e) {
-                e.printStackTrace();
+                AceLog.getAppLog().alertAndLogException(e);
             }
             AceLog.getAppLog().info("Saving cache reference...");
             isaCache.put(isaCoordinate, tempIsaCache);

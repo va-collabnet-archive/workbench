@@ -25,6 +25,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -238,6 +239,11 @@ public class BdbCommitManager {
 
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
         ((Concept) concept).modified();
+        try {
+            KindOfComputer.updateIsaCaches((Concept) concept);
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info(
                     "---@@@ Adding uncommitted NO checks: "
@@ -308,6 +314,7 @@ public class BdbCommitManager {
         if (wfHistoryRefsetId == extension.getRefsetId()) {
         	addUncommittedWfMemberId(extension);
         }
+        
     }
 
     private static class SetNidsForCid implements Runnable {
@@ -337,6 +344,12 @@ public class BdbCommitManager {
         if (igcd == null) {
             return;
         }
+        try {
+            KindOfComputer.updateIsaCaches(igcd);
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
         Concept concept = (Concept) igcd;
         dataCheckMap.remove(concept);
         if (concept.isUncommitted() == false) {

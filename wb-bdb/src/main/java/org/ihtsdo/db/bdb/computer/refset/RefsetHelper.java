@@ -45,14 +45,19 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTermFactory;
+import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.spec.ValidationException;
 
 @AllowDataCheckSuppression
@@ -73,7 +78,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         Concept memberRefset = Bdb.getConceptDb().getConcept(refsetNid);
         Set<? extends I_GetConceptData> requiredIsAType =
                 memberRefset.getSourceRelTargets(getAllowedStatuses(), isATypes, null, getConfig().getPrecedence(),
-                    getConfig().getConflictResolutionStrategy());
+                getConfig().getConflictResolutionStrategy());
 
         if (requiredIsAType != null && requiredIsAType.size() > 0) {
             // relationship exists so use the is-a specified by the
@@ -102,7 +107,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 for (I_ExtendByRefPart part : extension.getMutableParts()) {
                     if (part instanceof I_ExtendByRefPartCid && (latestPart == null)
-                        || (part.getTime() >= latestPart.getTime())) {
+                            || (part.getTime() >= latestPart.getTime())) {
                         latestPart = (I_ExtendByRefPartCid) part;
                     }
                 }
@@ -166,7 +171,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
             if (extension == null) {
                 AceLog.getAppLog().alertAndLogException(
-                    new Exception("Null extension in list: " + extensions + " from component: "
+                        new Exception("Null extension in list: " + extensions + " from component: "
                         + Bdb.getConceptForComponent(componentNid).toLongString()));
             }
             if (extension != null && extension.getCollectionNid() == refsetId) {
@@ -174,7 +179,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 // get the latest version
                 ComponentVersionBI latestPart = extension.getVersion(config.getViewCoordinate());
                 if (latestPart == null) {
-                   return false;
+                    return false;
                 }
                 if (extProps.validate((I_ExtendByRefPart) latestPart)) {
                     return true;
@@ -194,10 +199,29 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public I_ExtendByRef getRefsetExtension(int refsetId, int componentId, final RefsetPropertyMap extProps)
             throws Exception {
         access();
-        for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(componentId, true)) {
-
-            if (extension.getRefsetId() == refsetId && extProps.validate((I_ExtendByRefPart) extension)) {
-                return extension;
+        BdbTerminologyStore bts = (BdbTerminologyStore) Ts.get();
+        ComponentChroncileBI<?> component = bts.getComponent(componentId);
+       
+        for (RefexChronicleBI<?> extension : component.getRefexes()) {
+            if (extension.getCollectionNid() == refsetId) {
+                if (extProps.validate((I_ExtendByRefPart) extension)) {
+                    return (I_ExtendByRef) extension;
+                } else {
+                    if (extension.isUncommitted()) {
+                        for (RefexVersionBI part: extension.getVersions()) {
+                            if (part.getTime() == Long.MAX_VALUE) {
+                                extProps.setProperties((I_ExtendByRefPart) part);
+                            }
+                        }
+                        return (I_ExtendByRef) extension;
+                    } else {
+                        RefsetMember<?,?> m = (RefsetMember<?,?>) extension;
+                        RefsetRevision<?,?> r = (RefsetRevision<?,?>) m.makeAnalog(extProps.getInt(RefsetPropertyMap.REFSET_PROPERTY.STATUS), 
+                                extProps.getInt(RefsetPropertyMap.REFSET_PROPERTY.PATH), Long.MAX_VALUE);
+                        extProps.setPropertiesExceptSap(r);
+                        return m;
+                    }
+                }
             }
         }
         return null;
@@ -245,7 +269,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
         access();
         return BdbTermFactory.createMember(memberUuid, referencedComponentNid, type, Concept.get(refsetId),
-            getConfig(), propMap);
+                getConfig(), propMap);
     }
 
     @Override
@@ -292,8 +316,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     // found a member to retire
 
                     I_ExtendByRefPartCid clone =
-                            (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
-                                .getPathNid(), Long.MAX_VALUE);
+                            (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart.getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);
@@ -337,9 +360,8 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                     // found a member to retire
 
-                	I_ExtendByRefPartStr clone =
-                            (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
-                                .getPathNid(), Long.MAX_VALUE);
+                    I_ExtendByRefPartStr clone =
+                            (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart.getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);
@@ -375,7 +397,6 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         this.getConfig().getEditingPathSet().clear();
         this.getConfig().getEditingPathSet().addAll(editPathSet);
     }
-
     protected HashMap<Integer, HashSet<Integer>> refsetPurposeCache = new HashMap<Integer, HashSet<Integer>>();
 
     /*
@@ -418,6 +439,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     }
 
     protected class HasExtension implements LineageCondition {
+
         private int refsetId;
         private int memberTypeId;
 
@@ -429,7 +451,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return hasCurrentRefsetExtension(this.refsetId, concept.getConceptNid(), new RefsetPropertyMap().with(
-                RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, this.memberTypeId));
+                    RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, this.memberTypeId));
         }
     }
 
@@ -443,8 +465,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getCommentsRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMMENTS_REL.localize()
-            .getNid());
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMMENTS_REL.localize().getNid());
     }
 
     /*
@@ -457,8 +478,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getEditTimeRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.EDIT_TIME_REL.localize()
-            .getNid());
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.EDIT_TIME_REL.localize().getNid());
     }
 
     /*
@@ -471,8 +491,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getComputeTimeRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMPUTE_TIME_REL.localize()
-            .getNid());
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.COMPUTE_TIME_REL.localize().getNid());
     }
 
     /*
@@ -485,8 +504,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getMarkedParentRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.MARKED_PARENT_REFSET
-            .localize().getNid());
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
     }
 
     /*
@@ -499,8 +517,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getPromotionRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.PROMOTION_REL.localize()
-            .getNid());
+        return getSourceRelTarget(refsetIdentityConcept, config, RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
     }
 
     private Set<? extends I_GetConceptData> getSourceRelTarget(I_GetConceptData refsetIdentityConcept,
@@ -509,9 +526,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(refsetIdentityNid);
         Set<? extends I_GetConceptData> matchingConcepts =
-                refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config
-                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()
-                    .getConflictResolutionStrategy());
+                refsetIdentityConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         return matchingConcepts;
     }
 
@@ -525,8 +540,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public Set<? extends I_GetConceptData> getSpecificationRefsetForRefset(I_GetConceptData refsetIdentityConcept,
             I_ConfigAceFrame config) throws IOException, TerminologyException {
         access();
-        return getDestRelOrigins(refsetIdentityConcept, config, RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize()
-            .getNid());
+        return getDestRelOrigins(refsetIdentityConcept, config, RefsetAuxiliary.Concept.SPECIFIES_REFSET.localize().getNid());
     }
 
     private Set<? extends I_GetConceptData> getDestRelOrigins(I_GetConceptData refsetIdentityConcept,
@@ -535,9 +549,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         I_IntSet allowedTypes = Terms.get().newIntSet();
         allowedTypes.add(typeNid);
         Set<? extends I_GetConceptData> matchingConcepts =
-                refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config
-                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()
-                    .getConflictResolutionStrategy());
+                refsetIdentityConcept.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         return matchingConcepts;
     }
 
@@ -569,11 +581,9 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
         I_GetConceptData memberPurpose = termFactory.getConcept(memberRefsetPurposeId);
 
-        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, getConfig()
-            .getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+        for (I_GetConceptData origin : memberPurpose.getDestRelOrigins(statuses, purposeTypes, null, getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             // Check origin is a refset (ie. has not been retired as a refset)
-            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, getConfig()
-                .getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+            for (I_GetConceptData target : origin.getSourceRelTargets(statuses, isATypes, null, getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
                 if (target.getConceptNid() == refsetIdenityId) {
                     memberRefsets.add(origin.getConceptNid());
                 }
@@ -603,14 +613,11 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
     public List<Integer> getChildrenOfConcept(int conceptId) throws IOException, Exception {
         Concept c = Concept.get(conceptId);
         Collection<Concept> children =
-                c.getDestRelOrigins(getConfig().getAllowedStatus(), getConfig().getDestRelTypes(), getConfig()
-                    .getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig()
-                    .getConflictResolutionStrategy());
+                c.getDestRelOrigins(getConfig().getAllowedStatus(), getConfig().getDestRelTypes(), getConfig().getViewPositionSetReadOnly(), getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
         List<Integer> childNids = new ArrayList<Integer>(children.size());
         for (Concept child : children) {
             childNids.add(child.getNid());
         }
         return childNids;
     }
-
 }

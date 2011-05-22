@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,13 +10,19 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
 
@@ -87,6 +94,20 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
     @Override
     public boolean isKindOf(int childNid, int parentNid) throws Exception {
         return isKindOfNoLatch(childNid, parentNid);
+    }
+
+    @Override
+    public void updateCache(ConceptChronicleBI c) throws IOException, ContraditionException {
+        if (c.isUncommitted()) {
+            ConceptVersion cv = new ConceptVersion((Concept) c, coordinate);
+            NidSet parentSet = new NidSet();
+            for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+                if (types.contains(relv.getTypeNid())) {
+                    parentSet.add(relv.getDestinationNid());
+                }
+            }
+            typeMap.put(c.getNid(), parentSet.getSetValues());
+        }
     }
 
     public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
