@@ -9,5 +9,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public interface RelGroupVersionBI extends RelGroupChronicleBI, ComponentVersionBI {
 
 	public Collection<? extends RelationshipVersionBI> getCurrentRels() throws ContraditionException;
+        public Collection<? extends RelationshipVersionBI> getAllRels() throws ContraditionException;
 
 }

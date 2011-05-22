@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,7 +34,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -68,6 +68,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.spec.SpecBI;
@@ -452,6 +453,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpr.addPanelsChangedActionListener(pcal);
                     cpr.setAlertCount(0);
                     cpr.setRefexCount(0);
+                    cpr.setHistoryCount(0);
                     if (settings.showInferred()) {
                         cpr.setHistoryCount(cpr.historyCount + inactiveInferredRels.size());
                     }
@@ -494,9 +496,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
                             rc.setVisible(relHistoryIsShown);
                             seperatorComponents.add(rc);
-
                             cpr.addToggleComponent(rc);
                             cpr.getInactiveComponentPanels().add(rc);
+                            cpr.getRetiredPanels().add(rc);
                             cView.add(rc, gbc);
                             gbc.gridy++;
                             cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
@@ -632,13 +634,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         GuiUtil.tickle(cView);
         if (settings.getNavigator() != null) {
             SwingUtilities.invokeLater(new Runnable() {
+
                 @Override
                 public void run() {
                     if (stop) {
                         return;
                     }
                     settings.getNavigator().updateHistoryPanel();
-                    
+
                 }
             });
         }
@@ -655,9 +658,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return;
             }
-            Collection<? extends RelationshipVersionBI> currentRels =
+            Collection<? extends RelationshipVersionBI> rgRels =
                     rg.getCurrentRels(); //TODO getCurrentRels
-            if (!currentRels.isEmpty()) {
+            if (!rgRels.isEmpty()) {
                 if (!cprAdded) {
                     cView.add(cpr, gbc);
                     gbc.gridy++;
@@ -688,7 +691,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     private void setupHistoryPane() throws IOException, ContraditionException {
-    	if (paths == null) {
+        if (paths == null) {
             return;
         }
         int row = 0;
@@ -921,8 +924,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         cprg.setTemplateCount(0);
         relGroupPanel.add(cprg, gbc);
         gbc.gridy++;
-        for (RelationshipVersionBI r : group.getCurrentRels()) { //TODO getCurrentRels
-            DragPanelRel dpr = getRelComponent(r, parentCollapsePanel, r.isInferred());
+
+        HashSet<Integer> activeRelIds = new HashSet();
+        for (RelationshipVersionBI rv : group.getCurrentRels()) {
+            activeRelIds.add(rv.getNid());
+            DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
             cprg.addToggleComponent(dpr);
             dpr.setInGroup(true);
             relGroupPanel.add(dpr, gbc);
@@ -931,6 +937,23 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             cprg.setRefexCount(cprg.refexCount += dpr.getRefexSubpanelCount());
             cprg.setHistoryCount(cprg.historyCount += dpr.getHistorySubpanelCount());
             cprg.setTemplateCount(cprg.templateCount += dpr.getTemplateSubpanelCount());
+        }
+        boolean relHistoryIsShown = cpr.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+        for (RelationshipVersionBI rv : group.getAllRels()) {
+            if (!activeRelIds.contains(rv.getNid())) {
+                DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
+                dpr.setVisible(relHistoryIsShown);
+                cprg.addToggleComponent(dpr);
+                dpr.setInGroup(true);
+                relGroupPanel.add(dpr, gbc);
+                parentCollapsePanel.getHistoryPanels().add(dpr);
+                parentCollapsePanel.getInactiveComponentPanels().add(dpr);
+                gbc.gridy++;
+                cprg.setAlertCount(cprg.alertCount += dpr.getAlertSubpanelCount());
+                cprg.setRefexCount(cprg.refexCount += dpr.getRefexSubpanelCount());
+                cprg.setHistoryCount(cprg.historyCount += dpr.getHistorySubpanelCount());
+                cprg.setTemplateCount(cprg.templateCount += dpr.getTemplateSubpanelCount());
+            }
         }
 
         return relGroupPanel;
@@ -1117,7 +1140,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 public int compare(ComponentVersionDragPanel<?> o1, ComponentVersionDragPanel<?> o2) {
                     return o1.getId() - o2.getId();
                 }
-                
             });
             positionPanelMap.put(position, panels);
         }
@@ -1132,7 +1154,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         Timer t;
         I_GetConceptData c;
         boolean update = false;
-        I_ConfigAceFrame config; 
+        I_ConfigAceFrame config;
 
         public UpdateTextTemplateDocumentListener(FixedWidthJEditorPane editorPane,
                 DescriptionSpec desc, I_ConfigAceFrame config) throws TerminologyException, IOException {

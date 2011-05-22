@@ -111,6 +111,28 @@ public class RelGroupVersion
     }
 
     @Override
+    public Collection<? extends RelationshipVersionBI> getAllRels() throws ContraditionException {
+        ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
+        for (RelationshipChronicleBI relc : rg.getRels()) {
+            if (coordinate != null) {
+                RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
+                if (rv != null) {
+                    if (rv.getGroup() == rg.getRelGroup()) {
+                        results.add(rv);
+                    }
+                }
+            } else {
+                for (RelationshipVersionBI rv : relc.getVersions()) {
+                    if (rv.getGroup() == rg.getRelGroup()) {
+                        results.add(rv);
+                    }
+                }
+            }
+        }
+        return results;
+    }
+
+    @Override
     public int getConceptNid() {
         return rg.getConceptNid();
     }

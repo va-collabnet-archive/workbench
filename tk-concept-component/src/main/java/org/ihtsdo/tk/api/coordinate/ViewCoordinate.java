@@ -151,7 +151,11 @@ public class ViewCoordinate {
         StringBuilder sb = new StringBuilder();
         sb.append("precedence: ").append(precedence);
         sb.append(" \npositions: ").append(positionSet);
-        String statusStr = allowedStatusNids.toString();
+        String statusStr = "all";
+        if (allowedStatusNids != null) {
+            statusStr = allowedStatusNids.toString();
+        }
+        
         sb.append(" \nallowedStatus: ");
         if (statusStr.length() < 50) {
             sb.append(statusStr);

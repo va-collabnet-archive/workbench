@@ -797,8 +797,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     private void getRelGroups(ViewCoordinate vc, ArrayList<RelGroupChronicleBI> results) throws IOException {
         Map<Integer, HashSet<RelationshipChronicleBI>> groupMap =
                 new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
+        ViewCoordinate tempVc = new ViewCoordinate(vc);
+        tempVc.setAllowedStatusNids(null);
         for (RelationshipChronicleBI r : getRelsOutgoing()) {
-            for (RelationshipVersionBI rv : r.getVersions(vc)) {
+            for (RelationshipVersionBI rv : r.getVersions(tempVc)) {
                 int group = rv.getGroup();
                 if (group > 0) {
                     HashSet<RelationshipChronicleBI> relsInGroup = groupMap.get(group);
