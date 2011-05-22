@@ -95,6 +95,8 @@ public class ConceptViewRenderer extends JLayeredPane {
     final String NEW_WORKFLOW_STATE = "New";
     final String WORKFLOW_STATE_SUFFIX = " workflow state";
     final String WORKFLOW_ACTION_SUFFIX = " workflow action";
+    private final JButton cancelButton;
+    private final JButton commitButton;
 
     private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
 
@@ -365,106 +367,104 @@ public class ConceptViewRenderer extends JLayeredPane {
                     overrideButton.setAlignmentY(LEFT_ALIGNMENT);
 
                     overrideButton.addActionListener(new ActionListener() {
-	                    @Override
-	                    public void actionPerformed(ActionEvent e) 
-	                    {
-	                        JButton selectedOverrideButton = ((JButton) e.getSource());
-	
-	                        try 
-	                        {
-	                        	TreeSet<? extends I_GetConceptData> wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
-	                            Iterator<? extends I_GetConceptData> i = wfStates.iterator();
-	
-	                            int totalStatesCount = 0;
-	
-	                            String[] possibilities = new String[wfStates.size()];
-	
-	                            while (i.hasNext()) {
-	                                String currCon = i.next().toString();
-	                                if (!currCon.equalsIgnoreCase(CHANGED_WORKFLOW_STATE) &&
-	                                    !currCon.equalsIgnoreCase(CHANGED_IN_BATCH_WORKFLOW_STATE) && 
-	                                    !currCon.equalsIgnoreCase(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE) &&
-	                                    !currCon.equalsIgnoreCase(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE) &&
-	                                    !currCon.equalsIgnoreCase(NEW_WORKFLOW_STATE))
-	                                {
-	                                    possibilities[totalStatesCount++] = currCon;
-	                                }
-	                            }
-	
-	                            String[] actualPossibilities = new String[totalStatesCount];
-	                            int overrideStatesCount = 0; 
-	                            for (;overrideStatesCount < totalStatesCount; overrideStatesCount++)
-	                            {
-	                            	String s = possibilities[overrideStatesCount];
-	                            	
-	                            	if (s == null || s.length() == 0)
-	                            		break;
-	                            	
-	                            	actualPossibilities[overrideStatesCount] = s;
-	                            }
-	                            actualPossibilities = Arrays.copyOf(actualPossibilities, overrideStatesCount);
-	
-	
-	                            String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:",
-	                                    "Override",
-	                                    JOptionPane.PLAIN_MESSAGE,
-	                                    new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")),
-	                                    actualPossibilities,
-	                                    actualPossibilities[0]);
-	
-	                            if ((s != null) && (s.length() > 0)) 
-	 							{
-	                                I_GetConceptData currConcept = WorkflowHelper.lookupState(s + WORKFLOW_STATE_SUFFIX);
-	                                I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-	                                I_Work worker;
-	
-	                                if (config.getWorker().isExecuting()) {
-	                                    worker = config.getWorker().getTransactionIndependentClone();
-	                                } else {
-	                                    worker = config.getWorker();
-	                                }
-	
-	                                // TODO: REMOVE HARD CODING!!!
-	                                String action = getActionFromState(s);
-	                                
-	                                // TODO: Override Action Handler. . . Not sure how used
-	                                worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid());
-	
-	                                I_GetConceptData selectedConcept = settings.getConcept();
-	
-	                                workflowToggleButton.doClick();
-	                                updateOopsButton(selectedConcept);
-	
-	                                UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
-	                                WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
-	
-	                                WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
-	
-	                                bean.setConcept(selectedConcept.getUids().iterator().next());
 
-	                                bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
-	                                bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
-	                                bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept));
-	                                bean.setAction(selectedActionUid);
-	                                bean.setState(currConcept.getPrimUuid());
-	                                bean.setOverridden(true);
-	                                bean.setAutoApproved(false);
-	                                
-	                                java.util.Date today = new java.util.Date();
-	                                bean.setWorkflowTime(today.getTime());
-	
-	                                WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(selectedConcept);
-	    				            if (latestBean == null || !WorkflowHelper.getAcceptAction().equals(latestBean.getAction()))
-	                                    bean.setWorkflowId(UUID.randomUUID());
-	    				            else
-	                                    bean.setWorkflowId(latestBean.getWorkflowId());
-	
-	                                writer.updateWorkflowHistory(bean);
-	                            }
-	                        } catch (Exception e1) {
-	                        	AceLog.getAppLog().log(Level.WARNING, "Error in Executing Override in Workflow with error: " + e1.getMessage());
-	                        }
-	                    }
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            JButton selectedOverrideButton = ((JButton) e.getSource());
+
+                            try {
+                                TreeSet<? extends I_GetConceptData> wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
+                                Iterator<? extends I_GetConceptData> i = wfStates.iterator();
+
+                                int totalStatesCount = 0;
+
+                                String[] possibilities = new String[wfStates.size()];
+
+                                while (i.hasNext()) {
+                                    String currCon = i.next().toString();
+                                    if (!currCon.equalsIgnoreCase(CHANGED_WORKFLOW_STATE)
+                                            && !currCon.equalsIgnoreCase(CHANGED_IN_BATCH_WORKFLOW_STATE)
+                                            && !currCon.equalsIgnoreCase(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE)
+                                            && !currCon.equalsIgnoreCase(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE)
+                                            && !currCon.equalsIgnoreCase(NEW_WORKFLOW_STATE)) {
+                                        possibilities[totalStatesCount++] = currCon;
+                                    }
+                                }
+
+                                String[] actualPossibilities = new String[totalStatesCount];
+                                int overrideStatesCount = 0;
+                                for (; overrideStatesCount < totalStatesCount; overrideStatesCount++) {
+                                    String s = possibilities[overrideStatesCount];
+
+                                    if (s == null || s.length() == 0) {
+                                        break;
+                                    }
+
+                                    actualPossibilities[overrideStatesCount] = s;
+                                }
+                                actualPossibilities = Arrays.copyOf(actualPossibilities, overrideStatesCount);
+
+
+                                String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:",
+                                        "Override",
+                                        JOptionPane.PLAIN_MESSAGE,
+                                        new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")),
+                                        actualPossibilities,
+                                        actualPossibilities[0]);
+
+                                if ((s != null) && (s.length() > 0)) {
+                                    I_GetConceptData currConcept = WorkflowHelper.lookupState(s + WORKFLOW_STATE_SUFFIX);
+                                    I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+                                    I_Work worker;
+
+                                    if (config.getWorker().isExecuting()) {
+                                        worker = config.getWorker().getTransactionIndependentClone();
+                                    } else {
+                                        worker = config.getWorker();
+                                    }
+
+                                    // TODO: REMOVE HARD CODING!!!
+                                    String action = getActionFromState(s);
+
+                                    // TODO: Override Action Handler. . . Not sure how used
+                                    worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid());
+
+                                    I_GetConceptData selectedConcept = settings.getConcept();
+
+                                    workflowToggleButton.doClick();
+                                    updateOopsButton(selectedConcept);
+
+                                    UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
+                                    WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
+
+                                    WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
+
+                                    bean.setConcept(selectedConcept.getUids().iterator().next());
+
+                                    bean.setPath(Terms.get().nidToUuid(selectedConcept.getConceptAttributes().getPathNid()));
+                                    bean.setModeler(WorkflowHelper.getCurrentModeler().getPrimUuid());
+                                    bean.setFSN(WorkflowHelper.identifyFSN(selectedConcept));
+                                    bean.setAction(selectedActionUid);
+                                    bean.setState(currConcept.getPrimUuid());
+                                    bean.setOverridden(true);
+                                    bean.setAutoApproved(false);
+
+                                    java.util.Date today = new java.util.Date();
+                                    bean.setWorkflowTime(today.getTime());
+
+                                    WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(selectedConcept);
+                                    if (latestBean == null || !WorkflowHelper.getAcceptAction().equals(latestBean.getAction())) {
+                                        bean.setWorkflowId(UUID.randomUUID());
+                                    } else {
+                                        bean.setWorkflowId(latestBean.getWorkflowId());
+                                    }
+
+                                    writer.updateWorkflowHistory(bean);
+                                }
+                            } catch (Exception e1) {
+                                AceLog.getAppLog().log(Level.WARNING, "Error in Executing Override in Workflow with error: " + e1.getMessage());
+                            }
+                        }
                     });
 
                     conceptWorkflowPanel.add(overrideButton);
@@ -595,19 +595,21 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         gbc.weightx = 0;
         gbc.gridx++;
-        JButton cancelButton = new JButton(new ImageIcon(
+        cancelButton = new JButton(new ImageIcon(
                 ACE.class.getResource("/16x16/plain/delete.png")));
         cancelButton.setToolTipText("cancel changes to concept");
         cancelButton.addActionListener(new CancelActionListener(settings));
         cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+        cancelButton.setVisible(false);
         footerPanel.add(cancelButton, gbc);
 
         gbc.gridx++;
-        JButton commitButton = new JButton(new ImageIcon(
+        commitButton = new JButton(new ImageIcon(
                 ACE.class.getResource("/16x16/plain/check.png")));
         commitButton.setToolTipText("commit changes to concept");
         commitButton.addActionListener(new CommitActionListener(settings));
         commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+        commitButton.setVisible(false);
         footerPanel.add(commitButton, gbc);
 
         gbc.gridx++;
@@ -701,6 +703,20 @@ public class ConceptViewRenderer extends JLayeredPane {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateLabel();
+            updateCancelAndCommit();
+        }
+    }
+
+    protected void updateCancelAndCommit() {
+        if (settings != null && cancelButton != null && commitButton != null) {
+            if (settings.getConcept() != null
+                    && settings.getConcept().isUncommitted()) {
+                cancelButton.setVisible(true);
+                commitButton.setVisible(true);
+            } else {
+                cancelButton.setVisible(false);
+                commitButton.setVisible(false);
+            }
         }
     }
 
@@ -710,20 +726,20 @@ public class ConceptViewRenderer extends JLayeredPane {
             WorkflowHistoryJavaBean latestWfHxJavaBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(settings.getConcept());
 
             if (latestWfHxJavaBean == null) {
-            	enableOopsButton = false;
+                enableOopsButton = false;
             } else {
-	            UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
-	            UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
-	            boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
+                UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
+                UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
+                boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
 
-	            if (latestWfHxJavaBean == null ||
-	            	autoApproved ||
-		            	!currentModelerUUID.equals(latestModelerUUID) || 
-		            WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
-	                oopsButton.setEnabled(false);
-	            } else {
-	                oopsButton.setEnabled(true);
-	            }
+                if (latestWfHxJavaBean == null
+                        || autoApproved
+                        || !currentModelerUUID.equals(latestModelerUUID)
+                        || WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
+                    oopsButton.setEnabled(false);
+                } else {
+                    oopsButton.setEnabled(true);
+                }
             }
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in finding Undo-Button's State with error: " + e.getMessage());

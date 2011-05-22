@@ -423,6 +423,9 @@ public class ConceptView extends JPanel {
         this.settings.getNavigator().resetHistoryPanel();
         cvLayout = new ConceptViewLayout(this, concept);
         cvLayout.execute();
+        getCvRenderer().updateCancelAndCommit();
+        
+        
     }
 
     public JLabel getJLabel(String text) {

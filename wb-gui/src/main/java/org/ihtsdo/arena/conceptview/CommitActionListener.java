@@ -7,21 +7,21 @@ import org.dwfa.ace.log.AceLog;
 
 public class CommitActionListener implements ActionListener {
 
-   ConceptViewSettings settings;
+    ConceptViewSettings settings;
 
-   public CommitActionListener(ConceptViewSettings settings) {
-      this.settings = settings;
-   }
+    public CommitActionListener(ConceptViewSettings settings) {
+        this.settings = settings;
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			settings.getConcept().commit(
-                 settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                 settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-	}
-
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            settings.getConcept().commit(
+                    settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+                    settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
+            settings.getView().getCvRenderer().updateCancelAndCommit();
+        } catch (Exception e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
 }

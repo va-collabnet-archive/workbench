@@ -149,41 +149,44 @@ public class BdbCommitManager {
             luceneWriterPermit.release();
         }
     }
+
     private static class WfHxLuceneWriter implements Runnable {
 
-    	private static Set<I_ExtendByRef> wfExtensionsToUpdate;
-    	private WorkflowHistoryRefset refset;
+        private static Set<I_ExtendByRef> wfExtensionsToUpdate;
+        private WorkflowHistoryRefset refset;
         private int batchSize = 200;
 
         public WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
             super();
             wfExtensionsToUpdate = uncommittedWfMemberIds;
             try {
+
 				refset = new WorkflowHistoryRefset();
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
 			}
+
         }
 
         @Override
         public void run() {
             try {
-            	Set<UUID> workflowsUpdated = new HashSet<UUID>();
-            	
-            	for (I_ExtendByRef row : wfExtensionsToUpdate) {
-            		UUID workflowId = refset.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()); 
+                Set<UUID> workflowsUpdated = new HashSet<UUID>();
 
-            		// If two rows to commit, both will be caught by method below, so do this once per WfId
-            		if (!workflowsUpdated.contains(workflowId)) {
-	            		workflowsUpdated.add(workflowId);
-	            			
-	            		I_GetConceptData con = Terms.get().getConcept(row.getComponentNid());
-	            		SortedSet<WorkflowHistoryJavaBean> latestWorkflow = WorkflowHelper.getLatestWfHxForConcept(con, workflowId);
+                for (I_ExtendByRef row : wfExtensionsToUpdate) {
+                    UUID workflowId = refset.getWorkflowId(((I_ExtendByRefPartStr) row).getStringValue());
 
-	            		WfHxLuceneManager.setWorkflowId(workflowId);
-	            		LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY);
-	            	}
-            	}            	
+                    // If two rows to commit, both will be caught by method below, so do this once per WfId
+                    if (!workflowsUpdated.contains(workflowId)) {
+                        workflowsUpdated.add(workflowId);
+
+                        I_GetConceptData con = Terms.get().getConcept(row.getComponentNid());
+                        SortedSet<WorkflowHistoryJavaBean> latestWorkflow = WorkflowHelper.getLatestWfHxForConcept(con, workflowId);
+
+                        WfHxLuceneManager.setWorkflowId(workflowId);
+                        LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY);
+                    }
+                }
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -194,7 +197,6 @@ public class BdbCommitManager {
     private static I_RepresentIdSet uncommittedCNidsNoChecks = new IdentifierSet();
     private static I_RepresentIdSet uncommittedDescNids = new IdentifierSet();
     private static Set<I_ExtendByRef> uncommittedWfMemberIds = new HashSet<I_ExtendByRef>();
-    
     private static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> dataCheckMap = new ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>>();
     private static long lastCommit = Bdb.gVersion.incrementAndGet();
     private static long lastCancel = Integer.MIN_VALUE;
@@ -242,10 +244,27 @@ public class BdbCommitManager {
                     + concept.getNid() + " ---@@@ ");
         }
         Concept c = null;
-        uncommittedCNidsNoChecks.setMember(concept.getNid());
-        c = lastUncommitted.getAndSet((Concept) concept);
-        if (c == concept) {
-            c = null;
+        if (concept.isUncommitted()) {
+            uncommittedCNidsNoChecks.setMember(concept.getNid());
+            c = lastUncommitted.getAndSet((Concept) concept);
+            if (c == concept) {
+                c = null;
+            }
+        } else {
+            c = (Concept) concept;
+            if (Bdb.watchList.containsKey(concept.getNid())) {
+                AceLog.getAppLog().info(
+                        "--- Removing uncommitted concept: "
+                        + concept.getNid() + " --- ");
+            }
+            removeUncommitted(c);
+            try {
+                dbWriterPermit.acquire();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            dbWriterService.execute(new SetNidsForCid(c));
+            dbWriterService.execute(new ConceptWriter(c));
         }
         try {
             writeUncommitted(c);
@@ -277,10 +296,10 @@ public class BdbCommitManager {
     public static void addUncommitted(I_ExtendByRef extension) {
         RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
         addUncommitted(member.getEnclosingConcept());
-        
+
         if (wfHistoryRefsetId == 0) {
             try {
-            	wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids());
+                wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids());
             } catch (Exception e) {
             	AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: " + e.getMessage());
             }
@@ -321,12 +340,19 @@ public class BdbCommitManager {
         Concept concept = (Concept) igcd;
         dataCheckMap.remove(concept);
         if (concept.isUncommitted() == false) {
-            removeUncommitted(concept);
             if (Bdb.watchList.containsKey(concept.getNid())) {
                 AceLog.getAppLog().info(
                         "--- Removing uncommitted concept: "
                         + concept.getNid() + " --- ");
             }
+            removeUncommitted(concept);
+            try {
+                dbWriterPermit.acquire();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            dbWriterService.execute(new SetNidsForCid(concept));
+            dbWriterService.execute(new ConceptWriter(concept));
             return;
         }
         concept.modified();
@@ -420,7 +446,7 @@ public class BdbCommitManager {
             List<AlertToDataConstraintFailure> warningsAndErrors =
                     new ArrayList<AlertToDataConstraintFailure>();
             dataCheckMap.put(c, warningsAndErrors);
-            
+
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
             CountDownLatch latch = checkRunner.latch;
             latch.await();
@@ -545,148 +571,148 @@ public class BdbCommitManager {
 
     public static void commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-	        lastCommit = Bdb.gVersion.incrementAndGet();
-	        Svn.rwl.acquireUninterruptibly();
-	        boolean passedRelease = false;
-	        try {
-	            synchronized (uncommittedCNids) {
-	                synchronized (uncommittedCNidsNoChecks) {
-	                	synchronized (uncommittedWfMemberIds) {
-	                    flushUncommitted();
-	                    performCommit = true;
-	                    int errorCount = 0;
-	                    int warningCount = 0;
-	                    if (performCreationTests) {
-	                        NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
-	                        DataCheckRunner.cancelAll();
-	                        dataCheckMap.clear();
-	                        while (uncommittedCNidItr.next()) {
-	                            List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
-	                            Concept concept = Concept.get(uncommittedCNidItr.nid());
-	                            dataCheckMap.put(concept, warningsAndErrors);
-	
-	                            DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
-	                            checkRunner.latch.await();
-	                            warningsAndErrors.addAll(checkRunner.get());
-	                            for (AlertToDataConstraintFailure alert : warningsAndErrors) {
-	                                if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
-	                                    errorCount++;
-	                                } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
-	                                    warningCount++;
-	                                }
-	                            }
-	                        }
-	                    }
-	
-	                    if (errorCount + warningCount != 0) {
-	                        if (errorCount > 0) {
-	                            performCommit = false;
-	                            SwingUtilities.invokeLater(new Runnable() {
-	
-	                                @Override
-	                                public void run() {
-	                                    JOptionPane.showMessageDialog(new JFrame(),
-	                                            "Please fix data errors prior to commit.",
-	                                            "Data errors exist",
-	                                            JOptionPane.ERROR_MESSAGE);
-	                                }
-	                            });
-	                        } else {
-	                            if (SwingUtilities.isEventDispatchThread()) {
-	                                int selection = JOptionPane.showConfirmDialog(
-	                                        new JFrame(),
-	                                        "Do you want to continue with commit?",
-	                                        "Warnings Detected",
-	                                        JOptionPane.YES_NO_OPTION);
-	                                performCommit = selection == JOptionPane.YES_OPTION;
-	                            } else {
-	                                try {
-	                                    SwingUtilities.invokeAndWait(new Runnable() {
-	
-	                                        @Override
-	                                        public void run() {
-	                                            int selection = JOptionPane.showConfirmDialog(
-	                                                    new JFrame(),
-	                                                    "Do you want to continue with commit?",
-	                                                    "Warnings Detected",
-	                                                    JOptionPane.YES_NO_OPTION);
-	                                            performCommit = selection == JOptionPane.YES_OPTION;
-	                                        }
-	                                    });
-	                                } catch (InvocationTargetException e) {
-	                                    AceLog.getAppLog().alertAndLogException(e);
-	                                    performCommit = false;
-	                                }
-	                            }
-	                        }
-	                    }
-	
-	                    if (performCommit) {
-	                        KindOfComputer.reset();
-	                        NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
-	                        while (uncommittedCNidItr.next()) {
-								if (getActiveFrame() != null) {
-	                           		 KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
-								}
-	                        }
-	                        NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
-	                        while (uncommittedCNidItrNoChecks.next()) {
-	                        	if (getActiveFrame() != null) {
-	                        		KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItrNoChecks.nid());
-	                        	}
-	                        }
-	                        long commitTime = System.currentTimeMillis();
-	                        IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
-	                                commitTime);
-	
-	                        if (writeChangeSets && sapNidsFromCommit.size() > 0) {
-	                            if (changeSetPolicy == null) {
-	                                changeSetPolicy = ChangeSetPolicy.OFF;
-	                            }
-	                            if (changeSetWriterThreading == null) {
-	                                changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
-	                            }
-	                            switch (changeSetPolicy) {
-	                                case COMPREHENSIVE:
-	                                case INCREMENTAL:
-	                                case MUTABLE_ONLY:
-	                                    uncommittedCNidsNoChecks.or(uncommittedCNids);
-	                                    if (uncommittedCNidsNoChecks.cardinality() > 0) {
-	                                        ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-	                                                uncommittedCNidsNoChecks, commitTime,
-	                                                sapNidsFromCommit, changeSetPolicy.convert(),
-	                                                changeSetWriterThreading,
-	                                                Svn.rwl);
-	                                        changeSetWriterService.execute(handler);
-	                                        passedRelease = true;
-	                                    }
-	                                    break;
-	                                case OFF:
-	
-	                                    break;
-	
-	                                default:
-	                                    throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
-	                            }
-	                        }
-	                        uncommittedCNids.clear();
-	                        uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
-	
-	                        WorkflowHistoryRefsetWriter.unLockMutex();
-	
-	                        luceneWriterPermit.acquire();
-	                        IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
-	                        uncommittedDescNids.clear();
-		                        luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
-		
-		                        Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
-		                        wfMembersToCommit.addAll(uncommittedWfMemberIds);
-		                        luceneWriterService.execute(new WfHxLuceneWriter(wfMembersToCommit));
-		                        uncommittedWfMemberIds.clear();
-	                        dataCheckMap.clear();
-	                    }
-	                }
-	            }
+        lastCommit = Bdb.gVersion.incrementAndGet();
+        Svn.rwl.acquireUninterruptibly();
+        boolean passedRelease = false;
+        try {
+            synchronized (uncommittedCNids) {
+                synchronized (uncommittedCNidsNoChecks) {
+                    synchronized (uncommittedWfMemberIds) {
+                        flushUncommitted();
+                        performCommit = true;
+                        int errorCount = 0;
+                        int warningCount = 0;
+                        if (performCreationTests) {
+                            NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
+                            DataCheckRunner.cancelAll();
+                            dataCheckMap.clear();
+                            while (uncommittedCNidItr.next()) {
+                                List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+                                Concept concept = Concept.get(uncommittedCNidItr.nid());
+                                dataCheckMap.put(concept, warningsAndErrors);
+
+                                DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
+                                checkRunner.latch.await();
+                                warningsAndErrors.addAll(checkRunner.get());
+                                for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+                                    if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                                        errorCount++;
+                                    } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                                        warningCount++;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (errorCount + warningCount != 0) {
+                            if (errorCount > 0) {
+                                performCommit = false;
+                                SwingUtilities.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        JOptionPane.showMessageDialog(new JFrame(),
+                                                "Please fix data errors prior to commit.",
+                                                "Data errors exist",
+                                                JOptionPane.ERROR_MESSAGE);
+                                    }
+                                });
+                            } else {
+                                if (SwingUtilities.isEventDispatchThread()) {
+                                    int selection = JOptionPane.showConfirmDialog(
+                                            new JFrame(),
+                                            "Do you want to continue with commit?",
+                                            "Warnings Detected",
+                                            JOptionPane.YES_NO_OPTION);
+                                    performCommit = selection == JOptionPane.YES_OPTION;
+                                } else {
+                                    try {
+                                        SwingUtilities.invokeAndWait(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                int selection = JOptionPane.showConfirmDialog(
+                                                        new JFrame(),
+                                                        "Do you want to continue with commit?",
+                                                        "Warnings Detected",
+                                                        JOptionPane.YES_NO_OPTION);
+                                                performCommit = selection == JOptionPane.YES_OPTION;
+                                            }
+                                        });
+                                    } catch (InvocationTargetException e) {
+                                        AceLog.getAppLog().alertAndLogException(e);
+                                        performCommit = false;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (performCommit) {
+                            KindOfComputer.reset();
+                            NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
+                            while (uncommittedCNidItr.next()) {
+                                if (getActiveFrame() != null) {
+                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
+                                }
+                            }
+                            NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
+                            while (uncommittedCNidItrNoChecks.next()) {
+                                if (getActiveFrame() != null) {
+                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItrNoChecks.nid());
+                                }
+                            }
+                            long commitTime = System.currentTimeMillis();
+                            IntSet sapNidsFromCommit = Bdb.getSapDb().commit(
+                                    commitTime);
+
+                            if (writeChangeSets && sapNidsFromCommit.size() > 0) {
+                                if (changeSetPolicy == null) {
+                                    changeSetPolicy = ChangeSetPolicy.OFF;
+                                }
+                                if (changeSetWriterThreading == null) {
+                                    changeSetWriterThreading = ChangeSetWriterThreading.SINGLE_THREAD;
+                                }
+                                switch (changeSetPolicy) {
+                                    case COMPREHENSIVE:
+                                    case INCREMENTAL:
+                                    case MUTABLE_ONLY:
+                                        uncommittedCNidsNoChecks.or(uncommittedCNids);
+                                        if (uncommittedCNidsNoChecks.cardinality() > 0) {
+                                            ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                                    uncommittedCNidsNoChecks, commitTime,
+                                                    sapNidsFromCommit, changeSetPolicy.convert(),
+                                                    changeSetWriterThreading,
+                                                    Svn.rwl);
+                                            changeSetWriterService.execute(handler);
+                                            passedRelease = true;
+                                        }
+                                        break;
+                                    case OFF:
+
+                                        break;
+
+                                    default:
+                                        throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
+                                }
+                            }
+                            uncommittedCNids.clear();
+                            uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
+
+                            WorkflowHistoryRefsetWriter.unLockMutex();
+
+                            luceneWriterPermit.acquire();
+                            IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
+                            uncommittedDescNids.clear();
+                            luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
+
+                            Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
+                            wfMembersToCommit.addAll(uncommittedWfMemberIds);
+                            luceneWriterService.execute(new WfHxLuceneWriter(wfMembersToCommit));
+                            uncommittedWfMemberIds.clear();
+                            dataCheckMap.clear();
+                        }
+                    }
+                }
             }
             if (performCommit) {
                 Bdb.sync();
@@ -700,8 +726,8 @@ public class BdbCommitManager {
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (Exception e1) {
-        	AceLog.getAppLog().alertAndLogException(e1);
-		} finally {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } finally {
             if (!passedRelease) {
                 Svn.rwl.release();
             }
@@ -770,21 +796,21 @@ public class BdbCommitManager {
         lastCancel = Bdb.gVersion.incrementAndGet();
         synchronized (uncommittedCNids) {
             synchronized (uncommittedCNidsNoChecks) {
-            		synchronized (uncommittedWfMemberIds) {
-                try {
-                    KindOfComputer.reset();
-                    handleCanceledConcepts(uncommittedCNids);
-                    handleCanceledConcepts(uncommittedCNidsNoChecks);
-                    uncommittedCNidsNoChecks.clear();
-                    uncommittedCNids.clear();
-                    Bdb.getSapDb().commit(Long.MIN_VALUE);
-                    DataCheckRunner.cancelAll();
-                    dataCheckMap.clear();
-                } catch (IOException e1) {
-                    AceLog.getAppLog().alertAndLogException(e1);
+                synchronized (uncommittedWfMemberIds) {
+                    try {
+                        KindOfComputer.reset();
+                        handleCanceledConcepts(uncommittedCNids);
+                        handleCanceledConcepts(uncommittedCNidsNoChecks);
+                        uncommittedCNidsNoChecks.clear();
+                        uncommittedCNids.clear();
+                        Bdb.getSapDb().commit(Long.MIN_VALUE);
+                        DataCheckRunner.cancelAll();
+                        dataCheckMap.clear();
+                    } catch (IOException e1) {
+                        AceLog.getAppLog().alertAndLogException(e1);
+                    }
                 }
             }
-	        }
         }
         fireCancel();
         updateFrames();
@@ -804,13 +830,10 @@ public class BdbCommitManager {
     public static boolean forget(I_ConceptAttributeVersioned attr) throws IOException {
         Concept c = Bdb.getConcept(attr.getConId());
         ConceptAttributes a = (ConceptAttributes) attr;
-        if (a.getTime() != Long.MAX_VALUE &&
-                a.getTime() != Long.MIN_VALUE) {
+        if (a.getTime() != Long.MAX_VALUE
+                && a.getTime() != Long.MIN_VALUE) {
             // Only need to forget additional versions;
-            if (a.revisions == null) {
-                throw new UnsupportedOperationException(
-                        "Cannot forget a committed component.");
-            } else {
+            if (a.revisions != null) {
                 synchronized (a.revisions) {
                     List<ConceptAttributesRevision> toRemove = new ArrayList<ConceptAttributesRevision>();
                     Iterator<ConceptAttributesRevision> ri = a.revisions.iterator();
@@ -826,7 +849,6 @@ public class BdbCommitManager {
                     }
                 }
             }
-            c.modified();
             Terms.get().addUncommittedNoChecks(c);
         } else {
             a.primordialSapNid = -1;
@@ -937,12 +959,12 @@ public class BdbCommitManager {
             }
         } else {
             // have to forget "all" references to component...
-        	if (c.isAnnotationStyleRefex()) {
-        		comp.getAnnotationsMod().remove(m);
-        	} else {
+            if (c.isAnnotationStyleRefex()) {
+                comp.getAnnotationsMod().remove(m);
+            } else {
                 c.getRefsetMembers().remove(m);
                 c.getData().getMemberNids().remove(m.getMemberId());
-        	}
+            }
             m.setStatusAtPositionNid(-1);
         }
         c.modified();
@@ -1165,29 +1187,26 @@ public class BdbCommitManager {
         performCommitTests = enabled;
     }
 
-    public static class DataCheckRunner 
-        extends SwingWorker<Collection<AlertToDataConstraintFailure>, 
-            Collection<AlertToDataConstraintFailure>> {
-        
-        private static ConcurrentHashMap<Concept, DataCheckRunner> runners 
-                = new ConcurrentHashMap<Concept, DataCheckRunner>();
+    public static class DataCheckRunner
+            extends SwingWorker<Collection<AlertToDataConstraintFailure>, Collection<AlertToDataConstraintFailure>> {
 
+        private static ConcurrentHashMap<Concept, DataCheckRunner> runners = new ConcurrentHashMap<Concept, DataCheckRunner>();
         private CountDownLatch latch;
         private List<I_TestDataConstraints> tests;
         private Concept c;
         private boolean canceled = false;
 
         private DataCheckRunner(Concept c, List<I_TestDataConstraints> tests) {
-           this.c = c;
-           this.tests = tests;
-           latch = new CountDownLatch(tests.size());
-           DataCheckRunner oldRunner = runners.put(c, this);
-           if (oldRunner != null) {
-               oldRunner.cancel();
-           }
+            this.c = c;
+            this.tests = tests;
+            latch = new CountDownLatch(tests.size());
+            DataCheckRunner oldRunner = runners.put(c, this);
+            if (oldRunner != null) {
+                oldRunner.cancel();
+            }
         }
 
-        public static DataCheckRunner runDataChecks(Concept c, 
+        public static DataCheckRunner runDataChecks(Concept c,
                 List<I_TestDataConstraints> tests) {
             DataCheckRunner runner = new DataCheckRunner(c, tests);
             runner.execute();
@@ -1195,12 +1214,12 @@ public class BdbCommitManager {
         }
 
         public static void cancelAll() {
-            for (DataCheckRunner runner: runners.values()) {
+            for (DataCheckRunner runner : runners.values()) {
                 runner.cancel();
             }
             runners.clear();
         }
-                
+
         @Override
         protected void done() {
             super.done();
@@ -1209,30 +1228,39 @@ public class BdbCommitManager {
             }
         }
 
-        
         @Override
-        protected Collection<AlertToDataConstraintFailure> doInBackground() 
+        protected Collection<AlertToDataConstraintFailure> doInBackground()
                 throws Exception {
-            List<AlertToDataConstraintFailure> runnerAlerts = 
+            List<AlertToDataConstraintFailure> runnerAlerts =
                     new ArrayList<AlertToDataConstraintFailure>();
-            if (canceled) return runnerAlerts;
+            if (canceled) {
+                return runnerAlerts;
+            }
             if (c != null && tests != null) {
                 for (I_TestDataConstraints test : tests) {
-                    if (canceled) return runnerAlerts;
+                    if (canceled) {
+                        return runnerAlerts;
+                    }
                     try {
-                        Collection<AlertToDataConstraintFailure> result = 
+                        Collection<AlertToDataConstraintFailure> result =
                                 test.test(c, true);
                         runnerAlerts.addAll(result);
-                        if (canceled) return runnerAlerts;
+                        if (canceled) {
+                            return runnerAlerts;
+                        }
                         publish(result);
                         Collection<RefsetMember<?, ?>> extensions = c.getExtensions();
                         for (RefsetMember<?, ?> extension : extensions) {
-                            if (canceled) return runnerAlerts;
+                            if (canceled) {
+                                return runnerAlerts;
+                            }
                             if (extension.isUncommitted()) {
                                 result = test.test(extension, true);
                                 runnerAlerts.addAll(result);
                                 publish(result);
-                                if (canceled) return runnerAlerts;
+                                if (canceled) {
+                                    return runnerAlerts;
+                                }
                             }
                         }
                     } catch (Throwable e) {
@@ -1247,8 +1275,7 @@ public class BdbCommitManager {
         public CountDownLatch getLatch() {
             return latch;
         }
-        
-        
+
         public void cancel() {
             while (latch.getCount() > 0) {
                 latch.countDown();
@@ -1260,7 +1287,6 @@ public class BdbCommitManager {
             return canceled;
         }
 
-
         @Override
         protected void process(List<Collection<AlertToDataConstraintFailure>> chunks) {
             for (Collection<AlertToDataConstraintFailure> results : chunks) {
@@ -1271,7 +1297,9 @@ public class BdbCommitManager {
                 currentAlerts.addAll(results);
                 dataCheckMap.put(c, currentAlerts);
             }
-            if (canceled) return;
+            if (canceled) {
+                return;
+            }
             doUpdate();
         }
     }
