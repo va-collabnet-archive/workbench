@@ -160,8 +160,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
         buf.append("concept ");
         if (defined) {
             buf.append("is fully defined");
-        }
-        if (defined) {
+        } else {
             buf.append("is primitive");
         }
         return buf.toString();

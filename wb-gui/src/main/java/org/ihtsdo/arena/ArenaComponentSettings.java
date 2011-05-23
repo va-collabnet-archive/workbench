@@ -145,7 +145,7 @@ public abstract class ArenaComponentSettings implements Serializable,
         fontSizePanel.add(fontSizeSpinner);
 
         this.prefRoot.add(new PreferencesNode("Font Size", fontSizePanel));
-        setupSubtypes();
+        //setupSubtypes();
     }
 
     protected abstract void setupSubtypes();

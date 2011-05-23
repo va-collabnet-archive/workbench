@@ -68,7 +68,6 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.spec.SpecBI;

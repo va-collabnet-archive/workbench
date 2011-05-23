@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.ACE;
@@ -115,6 +116,8 @@ public class ConceptNavigator extends JPanel {
         super(new GridBagLayout());
         this.treeScroller = treeScroller;
         this.historyScroller = new JScrollPane(new JLabel("History panel"));
+        this.historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.historyScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         this.historyScroller.setVisible(false);
         this.statedInferredScroller = new JScrollPane(new JLabel("Stated inferred panel"));
         this.statedInferredScroller.setVisible(false);

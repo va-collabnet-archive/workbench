@@ -7,6 +7,9 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -162,7 +165,7 @@ public class HistoryPanel {
         }
     }
     ConceptView view;
-    JPanel topHistoryPanel = new JPanel(null);
+    JPanel topHistoryPanel = new JPanel(new GridBagLayout());
     JPanel historyHeaderPanel = new JPanel(null);
     JScrollPane historyHeaderScroller = new JScrollPane(historyHeaderPanel);
     JPanel versionPanel = new JPanel(null);
@@ -599,7 +602,14 @@ public class HistoryPanel {
                 view.getHistoryPanel().getHeight() - insetAdjustment);
         historyHeaderPanel.setBorder(BorderFactory.createEmptyBorder());
         historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
-        topHistoryPanel.add(historyHeaderScroller);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        topHistoryPanel.add(historyHeaderScroller, gbc);
         historyHeaderScroller.setLocation(0, 0);
         historyHeaderScroller.setBorder(BorderFactory.createEmptyBorder());
         historyHeaderScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -607,7 +617,8 @@ public class HistoryPanel {
         historyHeaderScroller.setSize(topHistoryPanel.getWidth(),
                 view.getHistoryPanel().getHeight());
         historyHeaderScroller.setLocation(0, 0);
-        topHistoryPanel.add(versionScroller);
+        gbc.gridy++;
+        topHistoryPanel.add(versionScroller, gbc);
         versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
         versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
         versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -616,6 +627,8 @@ public class HistoryPanel {
         versionPanel.setSize(hxWidth, view.getParent().getParent().getHeight()
                 + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
         versionPanel.setPreferredSize(versionPanel.getPreferredSize());
+//        topHistoryPanel.setSize(hxWidth, 
+//                historyHeaderPanel.getHeight() + versionPanel.getHeight());
         syncVerticalLayout();
     }
     private static final int xStartLoc = 5;
@@ -756,5 +769,6 @@ public class HistoryPanel {
                     new UpdateHistoryBorder(historyLabel, versionHistoryLabel));
         }
         hxWidth = locX;
+        System.out.println("hxWidth = " + locX);
     }
 }
