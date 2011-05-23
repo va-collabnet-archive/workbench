@@ -47,10 +47,10 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.tapi.spec.ConceptSpec;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.LineageHelper;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
 public abstract class RefsetUtilities extends LineageHelper implements
@@ -76,7 +76,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
 
     private void setup() throws ValidationException, IOException {
         if (parentMarker == Integer.MIN_VALUE) {
-            parentMarker = ConceptConstants.PARENT_MARKER.getLenient().getNid();
+            parentMarker = ConceptConstants.PARENT_MARKER.localize().getNid();
         }
     }
 
@@ -281,7 +281,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
         I_IntSet status = termFactory.newIntSet();
 
         for (ConceptSpec concept : concepts) {
-            status.add(concept.getLenient().getNid());
+            status.add(concept.localize().getNid());
         }
 
         return status;

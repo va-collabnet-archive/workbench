@@ -117,14 +117,8 @@ public final class RefsetUtilImpl implements RefsetUtil {
 
     @Override
     public int getLocalizedParentMarkerNid()  {
-        try {
-            return ConceptConstants.PARENT_MARKER.getLenient().getNid();
-        } catch (ValidationException ex) {
-           throw new RuntimeException(ex);
-        } catch (IOException ex) {
-           throw new RuntimeException(ex);
-        }
-    }
+            return ConceptConstants.PARENT_MARKER.localize().getNid();
+      }
 
     public int getLocalizedConceptExtensionNid() throws Exception {
         return RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize().getNid();

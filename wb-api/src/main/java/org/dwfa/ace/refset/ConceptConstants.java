@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.refset;
 
-import org.ihtsdo.tk.spec.ConceptSpec;
+import org.dwfa.tapi.spec.ConceptSpec;
+
+
 
 
 /**

@@ -88,11 +88,11 @@ public class MigrateAllSpecRefsets extends AbstractTask {
         concepts.put("CURRENT", termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()));
         concepts.put("RETIRED", termFactory.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()));
 
-        concepts.put("SNOMED_IS_A", termFactory.getConcept(ConceptConstants.SNOMED_IS_A.getLenient().getNid()));
-        concepts.put("REFSET_TYPE_REL", termFactory.getConcept(ConceptConstants.REFSET_TYPE_REL.getLenient().getNid()));
+        concepts.put("SNOMED_IS_A", termFactory.getConcept(ConceptConstants.SNOMED_IS_A.localize().getNid()));
+        concepts.put("REFSET_TYPE_REL", termFactory.getConcept(ConceptConstants.REFSET_TYPE_REL.localize().getNid()));
         concepts.put("EXCLUDE_MEMBERS_REL_TYPE",
-            termFactory.getConcept(ConceptConstants.EXCLUDE_MEMBERS_REL_TYPE.getLenient().getNid()));
-        concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.getLenient().getNid()));
+            termFactory.getConcept(ConceptConstants.EXCLUDE_MEMBERS_REL_TYPE.localize().getNid()));
+        concepts.put("PARENT_MARKER", termFactory.getConcept(ConceptConstants.PARENT_MARKER.localize().getNid()));
 
         concepts.put("REFSET_IDENTITY", termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids()));
         concepts.put("CONCEPT_EXTENSION", termFactory.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.localize()

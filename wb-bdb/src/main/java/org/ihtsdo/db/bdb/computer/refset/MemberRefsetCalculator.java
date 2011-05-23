@@ -245,7 +245,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                  * Add all members to the member refset so we know what was
                  * already there
                  */
-                int parent_marker_nid = ConceptConstants.PARENT_MARKER.getLenient().getNid();
+                int parent_marker_nid = ConceptConstants.PARENT_MARKER.localize().getNid();
 
                 System.out.println("collecting existing refset members for comparison");
                 int counter = 0;
@@ -642,7 +642,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                             if (!validateOnly) {
                                 if (useNonTxInterface) {
                                     nonTxWriter.addToRefset(null, parent.getConceptNid(),
-                                        ConceptConstants.PARENT_MARKER.getLenient().getNid(), refset, 
+                                        ConceptConstants.PARENT_MARKER.localize().getNid(), refset, 
                                         	ReferenceConcepts.CURRENT.getNid());
                                 } else {
                                     addToMemberSetAsParent(parent.getConceptNid(), refset);

@@ -30,7 +30,7 @@ public abstract class WorkflowRefsetCreator {
 		config = Terms.get().getActiveAceFrameConfig();
 		parentRefsetCon = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 		isAConcept = Terms.get().getConcept(ConceptConstants.SNOMED_IS_A
-				.getLenient().getNid()); // rel
+				.localize().getNid()); // rel
 	}
 
 	public int createRefsetConcept(String refsetName) throws IOException, TerminologyException 
@@ -92,7 +92,7 @@ public abstract class WorkflowRefsetCreator {
              */
 
             tf.newRelationship(UUID.randomUUID(), concept,
-                tf.getConcept(ConceptConstants.REFSET_TYPE_REL.getLenient().getNid()) // rel type
+                tf.getConcept(ConceptConstants.REFSET_TYPE_REL.localize().getNid()) // rel type
                 , tf.getConcept(RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid()) // dest concept
                 , relChar, parentRefsetCon, relStat, 0, config);
 
