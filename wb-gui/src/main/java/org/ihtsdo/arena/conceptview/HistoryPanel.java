@@ -6,11 +6,13 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -37,6 +39,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
@@ -168,8 +171,8 @@ public class HistoryPanel {
     JPanel topHistoryPanel = new JPanel(new GridBagLayout());
     JPanel historyHeaderPanel = new JPanel(null);
     JScrollPane historyHeaderScroller = new JScrollPane(historyHeaderPanel);
-    JPanel versionPanel = new JPanel(null);
-    JScrollPane versionScroller = new JScrollPane(versionPanel);
+    JPanel versionPanel;
+    JScrollPane versionScroller;
     Map<PositionBI, JCheckBox> positionCheckMap = new HashMap<PositionBI, JCheckBox>();
     Map<JCheckBox, PositionBI> checkPositionMap = new HashMap<JCheckBox, PositionBI>();
     Map<JCheckBox, List<JComponent>> checkComponentMap = new HashMap<JCheckBox, List<JComponent>>();
@@ -278,13 +281,15 @@ public class HistoryPanel {
             for (JLabel hxLabel : positionVersionPanelCheckLabelMap.values()) {
                 hxLabel.setLocation(hxLabel.getX(), eventModel.getValue());
             }
-            versionPanel.setSize(hxWidth, view.getHeight());
+            versionPanel.setSize(Math.max(hxWidth, 
+                        ConceptViewSettings.NAVIGATOR_WIDTH - 6), eventModel.getMaximum());
             versionPanel.setPreferredSize(versionPanel.getSize());
             BoundedRangeModel historyScrollModel =
                     versionScroller.getVerticalScrollBar().getModel();
             historyScrollModel.setMaximum(eventModel.getMaximum());
             historyScrollModel.setMinimum(eventModel.getMinimum());
             historyScrollModel.setValue(eventModel.getValue());
+            versionPanel.setLocation(0, -eventModel.getValue());
         }
     }
 
@@ -326,9 +331,45 @@ public class HistoryPanel {
     }
     private ApplyVersionChangesListener avcl = new ApplyVersionChangesListener();
 
+    private class ScrollableHxPanel extends JPanel implements Scrollable {
+
+        public ScrollableHxPanel() {
+            super(null);
+        }
+
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return new Dimension(Math.max(hxWidth, 
+                        ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 1;
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 1;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return false;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
+        
+    }
     public HistoryPanel(ConceptView view, JScrollPane historyScroller,
             ConceptNavigator navigator) throws IOException {
         this.view = view;
+        versionPanel = new ScrollableHxPanel();
+        versionScroller = new JScrollPane(versionPanel);
+
         positionPanelMap = view.getPositionPanelMap();
         this.navigator = navigator;
         navigator.getImplementButton().addActionListener(avcl);
@@ -344,7 +385,8 @@ public class HistoryPanel {
         historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight());
         historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
         historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
-        versionPanel.setSize(hxWidth, view.getHeight());
+        versionPanel.setSize(Math.max(hxWidth, 
+                        ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
         versionPanel.setPreferredSize(versionPanel.getSize());
         versionPanel.addHierarchyListener(new HistoryHierarchyListener());
         versionScroller.getHorizontalScrollBar().getModel().
@@ -621,10 +663,11 @@ public class HistoryPanel {
         topHistoryPanel.add(versionScroller, gbc);
         versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
         versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
-        versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         versionScroller.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
         versionPanel.setLocation(0, 0);
-        versionPanel.setSize(hxWidth, view.getParent().getParent().getHeight()
+        versionPanel.setSize(Math.max(hxWidth, 
+                        ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getParent().getParent().getHeight()
                 + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
         versionPanel.setPreferredSize(versionPanel.getPreferredSize());
 //        topHistoryPanel.setSize(hxWidth, 
