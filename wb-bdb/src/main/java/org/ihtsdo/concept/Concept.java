@@ -1495,7 +1495,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public ConcurrentSkipListSet<RefsetMember<?, ?>> getRefsetMembers()
             throws IOException {
-        return data.getRefsetMembers();
+        return data.getRefsetMembers(); 
     }
 
     @Override
@@ -1890,6 +1890,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Bdb.getConceptDb().forget(this);
             canceled = true;
         }
+        try {
+			KindOfComputer.updateIsaCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate(), this.getNid());
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
         BdbCommitManager.fireCancel();
     }
 
