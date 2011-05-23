@@ -350,7 +350,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             }
             for (int i = 0; i < additionalVersionCount; i++) {
                 R r = readMemberRevision(input);
-                if (r.getTime() != Long.MIN_VALUE) {
+                if (r.sapNid != -1 && r.getTime() != Long.MIN_VALUE) {
                     revisions.add(r);
                 }
             }
