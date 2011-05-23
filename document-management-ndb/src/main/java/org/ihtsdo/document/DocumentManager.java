@@ -417,12 +417,20 @@ public class DocumentManager {
 			if (!sharedDictionaryDir.exists()) {
 				sharedDictionaryDir.mkdirs();
 			}
+			
+			File[] sharedFiles = sharedDictionaryDir.listFiles();
+			for (File loopFile : sharedFiles) {
+				if (!loopFile.getName().startsWith("userDic-")) {
+					loopFile.delete();
+				}
+			}
+			
 			if(dictionaryTextFile != null){
-				File destFile = new File(sharedDictionaryDir, dictionaryTextFile.getName());
+				File destFile = new File(sharedDictionaryDir, "main-dictionary-" + UUID.randomUUID().toString() + ".txt");
 				copyfile(dictionaryTextFile, destFile);
 			}
 
-			File[] sharedFiles = sharedDictionaryDir.listFiles();
+			sharedFiles = sharedDictionaryDir.listFiles();
 			output = reindexDictionaries(overwrite, output, sharedFiles);
 
 			output = output + "<br><br>Done!<br>";
@@ -518,8 +526,23 @@ public class DocumentManager {
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			File dir = new File(PROFILES_SHARED_DICTIONARIES);
-			dir.mkdirs();
-			File file = new File(dir, "userDic-" + config.getUsername() + ".txt");
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			String userPrefix = "userDic-" + config.getUsername();
+			
+			File file = null;
+			
+			for (File loopFile : dir.listFiles()) {
+				if (loopFile.getName().startsWith(userPrefix)) {
+					file = loopFile;
+				}
+			}
+			
+			if (file == null) {
+				file = new File(dir, userPrefix + UUID.randomUUID().toString() + ".txt");
+			}
+			
 			FileOutputStream fos = new FileOutputStream(file, true);
 			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
 			bw = new BufferedWriter(osw);
