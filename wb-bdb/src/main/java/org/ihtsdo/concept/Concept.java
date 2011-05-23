@@ -1300,15 +1300,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public Set<Integer> getAllSapNids() throws IOException {
         Set<Integer> sapNids = new HashSet<Integer>();
-        sapNids.addAll(getConceptAttributes().getComponentSapNids());
-        for (Description d : getDescriptions()) {
-            sapNids.addAll(d.getComponentSapNids());
+        if (getConceptAttributes() != null) {
+            sapNids.addAll(getConceptAttributes().getComponentSapNids());
         }
-        for (Relationship r : getSourceRels()) {
-            sapNids.addAll(r.getComponentSapNids());
+        if (getDescriptions() != null) {
+            for (Description d : getDescriptions()) {
+                sapNids.addAll(d.getComponentSapNids());
+            }
         }
-        for (Image i : getImages()) {
-            sapNids.addAll(i.getComponentSapNids());
+        if (getRelsOutgoing() != null) {
+            for (Relationship r : getSourceRels()) {
+                sapNids.addAll(r.getComponentSapNids());
+            }
+        }
+        if (getImages() != null) {
+            for (Image i : getImages()) {
+                sapNids.addAll(i.getComponentSapNids());
+            }
         }
         return sapNids;
     }
