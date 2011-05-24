@@ -468,7 +468,7 @@ public class LanguageUtil {
 								if (sourceDesc.getLanguageExtension() != null) {
 									if (descTypes.contains(fsn) && sourceDesc.getTypeId() == fsn && (sourceDesc.getAcceptabilityId() == preferred || sourceDesc.getAcceptabilityId() == fsn)) {
 										sourceText = sourceDesc.getText();
-									} else if (descTypes.contains(preferred) && sourceDesc.getTypeId() == preferred && sourceDesc.getAcceptabilityId() == preferred) {
+									} else if (descTypes.contains(preferred) && (sourceDesc.getTypeId() == preferred || sourceDesc.getTypeId() == synonym) && sourceDesc.getAcceptabilityId() == preferred) {
 										sourceText = sourceDesc.getText();
 									}
 								}
@@ -491,7 +491,7 @@ public class LanguageUtil {
 							if (descTypes.contains(fsn) && targetDesc.getTypeId() == fsn && (targetDesc.getAcceptabilityId() == preferred || targetDesc.getAcceptabilityId() == fsn)) {
 								targetText = targetDesc.getText();
 								targetDescriptionId = targetDesc.getDescId();
-							} else if (descTypes.contains(preferred) && targetDesc.getTypeId() == preferred && targetDesc.getAcceptabilityId() == preferred) {
+							} else if (descTypes.contains(preferred) && (sourceDesc.getTypeId() == preferred || sourceDesc.getTypeId() == synonym) && targetDesc.getAcceptabilityId() == preferred) {
 								targetText = targetDesc.getText();
 								targetDescriptionId = targetDesc.getDescId();
 							}
