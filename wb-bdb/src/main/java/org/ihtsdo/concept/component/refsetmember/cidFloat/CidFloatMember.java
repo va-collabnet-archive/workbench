@@ -35,6 +35,13 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
     private int c1Nid;
     private float floatValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
+
+
     public CidFloatMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
     }

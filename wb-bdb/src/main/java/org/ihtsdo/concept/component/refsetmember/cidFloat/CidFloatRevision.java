@@ -25,11 +25,17 @@ import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevisio
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember> 
-	implements RefexCnidFloatAnalogBI<CidFloatRevision> {
+public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatMember>
+        implements RefexCnidFloatAnalogBI<CidFloatRevision> {
 
     private int c1Nid;
     private float floatValue;
+
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
@@ -202,35 +208,35 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
             ViewCoordinate c) {
         return ((CidFloatMember) primordialComponent).getVersions(c);
     }
-    
 
-	@Override
-	public void setCnid1(int cnid) throws PropertyVetoException {
-		this.c1Nid = cnid;
-		modified();
-	}
+    @Override
+    public void setCnid1(int cnid) throws PropertyVetoException {
+        this.c1Nid = cnid;
+        modified();
+    }
 
-	@Override
-	public int getCnid1() {
-		return c1Nid;
-	}
+    @Override
+    public int getCnid1() {
+        return c1Nid;
+    }
 
-	@Override
-	public void setFloat1(float f) throws PropertyVetoException {
-		this.floatValue = f;
-		modified();
-	}
+    @Override
+    public void setFloat1(float f) throws PropertyVetoException {
+        this.floatValue = f;
+        modified();
+    }
 
-	@Override
-	public float getFloat1() {
-		return this.floatValue;
-	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_FLOAT;
-	}
+    @Override
+    public float getFloat1() {
+        return this.floatValue;
+    }
 
-	protected void addSpecProperties(RefexCAB rcs) {
-		rcs.with(RefexProperty.CNID1, getCnid1());
-		rcs.with(RefexProperty.FLOAT1, getFloat1());
-	}
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_FLOAT;
+    }
+
+    protected void addSpecProperties(RefexCAB rcs) {
+        rcs.with(RefexProperty.CNID1, getCnid1());
+        rcs.with(RefexProperty.FLOAT1, getFloat1());
+    }
 }

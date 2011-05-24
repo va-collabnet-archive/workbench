@@ -39,12 +39,12 @@ public class DescriptionRevision
     public String toString() {
         StringBuffer buf = new StringBuffer();
 
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" text:" + "'" + this.getText() + "'");
-        buf.append(" initialCaseSignificant:" + isInitialCaseSignificant());
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" text:" + "'").append(this.getText()).append("'");
+        buf.append(" initialCaseSignificant:").append(isInitialCaseSignificant());
         buf.append(" typeNid:");
         ConceptComponent.addNidToBuffer(buf, typeNid);
-        buf.append(" lang:" + this.getLang());
+        buf.append(" lang:").append(this.getLang());
         buf.append(super.toString());
         return buf.toString();
     }
@@ -70,12 +70,10 @@ public class DescriptionRevision
      */
     public String validate(DescriptionRevision another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         if (this.initialCaseSignificant != another.initialCaseSignificant) {
-            buf.append("\tDescriptionRevision.initialCaseSignificant not equal: \n"
-                    + "\t\tthis.initialCaseSignificant = " + this.initialCaseSignificant + "\n"
-                    + "\t\tanother.initialCaseSignificant = " + another.initialCaseSignificant + "\n");
+            buf.append("\tDescriptionRevision.initialCaseSignificant not equal: \n" + "\t\tthis.initialCaseSignificant = ").append(this.initialCaseSignificant).append("\n" + "\t\tanother.initialCaseSignificant = ").append(another.initialCaseSignificant).append("\n");
         }
         if (!this.text.equals(another.text)) {
             buf.append("\tDescriptionRevision.text not equal: \n"
@@ -174,6 +172,15 @@ public class DescriptionRevision
     public DescriptionRevision() {
         super();
     }
+
+    @Override
+    public boolean readyToWriteRevision() {
+        assert text != null: assertionString();
+        assert lang != null: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        return true;
+    }
+
 
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {

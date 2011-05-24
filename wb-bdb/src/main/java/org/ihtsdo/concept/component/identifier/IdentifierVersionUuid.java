@@ -11,7 +11,14 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class IdentifierVersionUuid extends IdentifierVersion {
+
     private int uNid;
+
+    @Override
+    public final boolean readyToWriteIdentifier() {
+        assert uNid != Integer.MAX_VALUE: toString();
+        return true;
+    }
 
     public IdentifierVersionUuid(TupleInput input) {
         super(input);
@@ -33,11 +40,11 @@ public class IdentifierVersionUuid extends IdentifierVersion {
     }
 
     public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid,
-			long time) {
+            long time) {
         super(statusNid, authorNid, pathNid, time);
-	}
+    }
 
-	@Override
+    @Override
     public IDENTIFIER_PART_TYPES getType() {
         return IDENTIFIER_PART_TYPES.UUID;
     }
@@ -81,8 +88,9 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
             IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
             return this.uNid == another.uNid && super.equals(another);

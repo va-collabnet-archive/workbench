@@ -51,6 +51,13 @@ public class ConceptAttributes
 
     private boolean defined;
 
+    @Override
+    public boolean readyToWriteComponent() {
+        return true;
+    }
+    
+    
+
     public ConceptAttributes(Concept enclosingConcept, TupleInput input) throws IOException {
         super(enclosingConcept.getNid(), input);
     }

@@ -127,14 +127,22 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
             return new ERefsetCidCidCidRevision(this);
         }
 
-    	@Override
+        @Override
         public int hashCodeOfParts() {
-    		return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid(), getC3Nid()});
+            return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid(), getC3Nid()});
         }
     }
     private int c1Nid;
     private int c2Nid;
     private int c3Nid;
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        assert c2Nid != Integer.MAX_VALUE;
+        assert c3Nid != Integer.MAX_VALUE;
+        return true;
+    }
 
     public CidCidCidMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
@@ -167,9 +175,9 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
             CidCidCidMember another = (CidCidCidMember) obj;
             return this.c1Nid == another.c1Nid
                     && this.c2Nid == another.c2Nid
-                && this.c3Nid == another.c3Nid
-                && this.nid == another.nid
-                && this.referencedComponentNid == another.referencedComponentNid;
+                    && this.c3Nid == another.c3Nid
+                    && this.nid == another.nid
+                    && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }

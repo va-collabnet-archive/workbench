@@ -119,6 +119,11 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
     }
     private long longValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        return true;
+    }
+
     public LongMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
     }

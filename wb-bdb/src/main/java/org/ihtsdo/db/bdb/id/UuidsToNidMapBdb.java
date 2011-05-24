@@ -1,6 +1,5 @@
 package org.ihtsdo.db.bdb.id;
 
-import com.sleepycat.je.DatabaseException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,7 +25,6 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.PreloadConfig;
 
 public class UuidsToNidMapBdb extends ComponentBdb {
 
@@ -41,6 +39,16 @@ public class UuidsToNidMapBdb extends ComponentBdb {
 
         public final int getAndIncrement() {
             int next = sequence.getAndIncrement();
+            if (next == 0) {
+                try {
+                    // Skip 0 as a nid, since that is the initialization 
+                    // value for unset integers.
+                    Bdb.getNidCNidMap().setCNidForNid(0, 0);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                next = sequence.getAndIncrement();
+            }
             return next;
         }
 

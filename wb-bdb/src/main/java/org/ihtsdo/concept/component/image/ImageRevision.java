@@ -96,6 +96,15 @@ public class ImageRevision extends Revision<ImageRevision, Image>
     protected ImageRevision() {
         super();
     }
+    
+    
+    @Override
+    public boolean readyToWriteRevision() {
+        assert textDescription != null: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        return true;
+    }
+
 
     @Override
     public ImageRevision makeAnalog(int statusNid, int pathNid, long time) {

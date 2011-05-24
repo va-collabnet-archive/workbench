@@ -150,11 +150,17 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
 
         @Override
         public int hashCodeOfParts() {
-        	return HashFunction.hashCode(new int[]{getC1Nid(), getIntValue()});
+            return HashFunction.hashCode(new int[]{getC1Nid(), getIntValue()});
         }
     }
     private int c1Nid;
     private int intValue;
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
 
     public CidIntMember(int enclosingConceptNid,
             TupleInput input) throws IOException {

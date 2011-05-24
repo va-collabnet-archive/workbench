@@ -10,6 +10,11 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class IdentifierVersionLong extends IdentifierVersion {
     private long longDenotation;
 
+    @Override
+    public final boolean readyToWriteIdentifier() {
+        return true;
+    }
+
     public IdentifierVersionLong(TupleInput input) {
         super(input);
         longDenotation = input.readLong();

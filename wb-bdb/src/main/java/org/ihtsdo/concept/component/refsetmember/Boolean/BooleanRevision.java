@@ -29,14 +29,20 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
 
     private boolean booleanValue;
 
+            
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
-        buf.append(" booleanValue:" + this.booleanValue);
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
+        buf.append(" booleanValue:").append(this.booleanValue);
         buf.append(super.toString());
         return buf.toString();
     }

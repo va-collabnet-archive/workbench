@@ -132,6 +132,11 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     }
     private boolean booleanValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        return true;
+    }
+
     public BooleanMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
     }

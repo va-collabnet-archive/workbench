@@ -155,6 +155,13 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember> imp
     private int c1Nid;
     private String strValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        assert strValue != null;
+        return true;
+    }
+
     public CidStrMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
     }

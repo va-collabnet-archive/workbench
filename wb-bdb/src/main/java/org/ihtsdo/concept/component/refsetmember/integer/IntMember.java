@@ -29,8 +29,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IntMember extends RefsetMember<IntRevision, IntMember> 
-	implements I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
+public class IntMember extends RefsetMember<IntRevision, IntMember>
+        implements I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
 
     private static VersionComputer<RefsetMember<IntRevision, IntMember>.Version> computer =
             new VersionComputer<RefsetMember<IntRevision, IntMember>.Version>();
@@ -41,7 +41,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
     public class Version
             extends RefsetMember<IntRevision, IntMember>.Version
-            implements I_ExtendByRefVersion<IntRevision>, 
+            implements I_ExtendByRefVersion<IntRevision>,
             I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
 
         private Version() {
@@ -92,14 +92,14 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
         }
 
         @Override
-		public void setInt1(int value) throws PropertyVetoException {
+        public void setInt1(int value) throws PropertyVetoException {
             if (index >= 0) {
                 revisions.get(index).setInt1(value);
             }
             IntMember.this.setInt1(value);
-		}
+        }
 
-		@Override
+        @Override
         public ERefsetIntMember getERefsetMember() throws TerminologyException, IOException {
             return new ERefsetIntMember(this);
         }
@@ -108,13 +108,18 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
         public ERefsetIntRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetIntRevision(this);
         }
-    
+
         @Override
         public int hashCodeOfParts() {
             return HashFunction.hashCode(new int[]{getIntValue()});
         }
     }
     private int intValue;
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        return true;
+    }
 
     public IntMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
@@ -206,6 +211,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
     public int getIntValue() {
         return intValue;
     }
+
     public int getInt1() {
         return intValue;
     }
@@ -216,12 +222,12 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
     }
 
     @Override
-	public void setInt1(int intValue) throws PropertyVetoException {
+    public void setInt1(int intValue) throws PropertyVetoException {
         this.intValue = intValue;
         modified();
-	}
+    }
 
-	@Override
+    @Override
     public int getTypeId() {
         return REFSET_TYPES.INT.getTypeNid();
     }
@@ -267,13 +273,12 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
         }
         return (List<Version>) versions;
     }
-    
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.INT;
-	}
 
-	protected void addSpecProperties(RefexCAB rcs) {
-		rcs.with(RefexProperty.INTEGER1, this.intValue);
-	}
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.INT;
+    }
 
+    protected void addSpecProperties(RefexCAB rcs) {
+        rcs.with(RefexProperty.INTEGER1, this.intValue);
+    }
 }

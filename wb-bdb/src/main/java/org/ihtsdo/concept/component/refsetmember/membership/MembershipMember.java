@@ -11,7 +11,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
@@ -28,6 +27,11 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
     protected VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version> getVersionComputer() {
         return computer;
+    }
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        return true;
     }
 
     public MembershipMember(int enclosingConceptNid, TupleInput input) throws IOException {

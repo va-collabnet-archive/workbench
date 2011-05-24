@@ -191,6 +191,14 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
     private int c2Nid;
     private String strValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        assert c2Nid != Integer.MAX_VALUE;
+        assert strValue != null;
+        return true;
+    }
+
     public CidCidStrMember(int enclosingConceptNid,
             TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
@@ -222,8 +230,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
         if (CidCidStrMember.class.isAssignableFrom(obj.getClass())) {
             CidCidStrMember another = (CidCidStrMember) obj;
             return this.c1Nid == another.c1Nid
-                && this.c2Nid == another.c2Nid && this.nid == another.nid
-                && this.referencedComponentNid == another.referencedComponentNid;
+                    && this.c2Nid == another.c2Nid && this.nid == another.nid
+                    && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }

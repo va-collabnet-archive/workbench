@@ -42,14 +42,14 @@ public class AnnotationWriter {
     }
 
 	@SuppressWarnings("unchecked")
-	public ConcurrentSkipListSet<RefexChronicleBI<?>> entryToObject(TupleInput input, 
+	public ConcurrentSkipListSet<RefsetMember<?,?>> entryToObject(TupleInput input, 
             int enclosingConceptNid) {
         int listSize = input.readShort();
         if (listSize == 0) {
             return null;
         }
-        ConcurrentSkipListSet<RefexChronicleBI<?>> newRefsetMemberList = 
-                new ConcurrentSkipListSet<RefexChronicleBI<?>>(
+        ConcurrentSkipListSet<RefsetMember<?,?>> newRefsetMemberList = 
+                new ConcurrentSkipListSet<RefsetMember<?,?>>(
                     new Comparator<RefexChronicleBI<?>>() {
 
                 @Override
@@ -95,7 +95,7 @@ public class AnnotationWriter {
         return newRefsetMemberList;
     }
 
-    public void objectToEntry(Collection<RefexChronicleBI<?>> list,
+    public void objectToEntry(Collection<RefsetMember<?,?>> list,
             TupleOutput output, int maxReadOnlyStatusAtPositionId) {
         if (list == null) {
             output.writeShort(0); // List size

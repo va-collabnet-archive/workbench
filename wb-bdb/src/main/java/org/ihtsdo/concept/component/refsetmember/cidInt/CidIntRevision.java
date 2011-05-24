@@ -33,6 +33,13 @@ public class CidIntRevision
     private int c1Nid;
     private int intValue;
 
+    
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */

@@ -231,6 +231,15 @@ public class Image
     private String textDescription;
     private int typeNid;
 
+    @Override
+    public boolean readyToWriteComponent() {
+        assert textDescription != null: assertionString();
+        assert format != null: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        assert image != null: assertionString();
+        return true;
+    }
+
     protected Image(Concept enclosingConcept, TupleInput input) throws IOException {
         super(enclosingConcept.getNid(), input);
     }

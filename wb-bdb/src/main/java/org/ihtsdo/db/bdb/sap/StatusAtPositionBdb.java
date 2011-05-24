@@ -39,6 +39,12 @@ import com.sleepycat.je.OperationStatus;
  *
  */
 public class StatusAtPositionBdb extends ComponentBdb {
+    
+    private static int initialPosition;
+
+    public static int getInitialPosition() {
+        return initialPosition;
+    }
 
     private static PositionArrays readOnlyArray;
     private static PositionArrays mutableArray;
@@ -178,15 +184,17 @@ public class StatusAtPositionBdb extends ComponentBdb {
             int size = getPositionCount();
             int readOnlySize = readOnlyArray.getSize();
             int mutableSize = mutableArray.getSize();
-            sequence.set(size);
+            sequence.set(Math.max(size, 1));
             sapToIntMap = new SapToIntHashMap(sequence.get());
             for (int i = 0; i < readOnlySize; i++) {
+                if (readOnlyArray.commitTimes[i] != 0) {
                 sapToIntMap.put(
                         readOnlyArray.statusNids[i], 
                         readOnlyArray.authorNids[i], 
                         readOnlyArray.pathNids[i], 
                         readOnlyArray.commitTimes[i],
                         i);
+                }
             }
             closeReadOnly();
             for (int i = 0; i < mutableSize; i++) {
@@ -210,6 +218,15 @@ public class StatusAtPositionBdb extends ComponentBdb {
                         mutableArray.authorNids[i],
                         mutableArray.pathNids[i],
                         mutableArray.commitTimes[i], mutableIndex);
+            }
+            if (size == 0) {
+                initialPosition = 1;
+            } else if (readOnlyArray.size > 0 && readOnlyArray.pathNids[0] == 0) {
+                initialPosition = 1;
+            } else if (readOnlyArray.size == 0 && mutableArray.pathNids[0] == 0) {
+                initialPosition = 1;
+            } else {
+                initialPosition = 0;
             }
         } catch (DatabaseException e) {
             throw new IOException(e);
@@ -254,6 +271,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
     }
 
     public long getTime(int index) {
+        if (index == Integer.MAX_VALUE) {
+            throw new RuntimeException("index == Integer.MAX_VALUE");
+        }
         if (index < 0) {
             return Long.MIN_VALUE;
         }

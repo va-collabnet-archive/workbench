@@ -134,4 +134,6 @@ public interface I_ManageConceptData {
 
     void diet();
 
+    public boolean readyToWrite();
+
 }

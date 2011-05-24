@@ -423,6 +423,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     + " $$$$$$$$$$$$$$");
         }
     }
+    
+    public boolean readyToWrite() {
+        assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
+        assert data.readyToWrite(): toLongString();
+        return true;
+    }
 
     /**
      * For use in testing/test cases only.

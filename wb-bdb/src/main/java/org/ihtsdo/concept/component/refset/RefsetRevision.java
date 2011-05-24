@@ -18,6 +18,14 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
         extends Revision<V, C>
         implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
 
+    @Override
+    public final boolean readyToWriteRevision() {
+        assert readyToWriteRefsetRevision(): assertionString();
+        return true;
+    }
+
+    public abstract boolean readyToWriteRefsetRevision();
+
     public RefsetRevision(int statusNid, int pathNid, long time,
             C primordialComponent) {
         super(statusNid,

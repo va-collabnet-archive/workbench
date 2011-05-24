@@ -29,6 +29,12 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
     private String stringValue;
 
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        assert stringValue != null;
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -167,8 +173,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
     public ArrayIntList getVariableVersionNids() {
         return new ArrayIntList(2);
     }
-    
-        
+
     @Override
     public StrMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
@@ -186,22 +191,22 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
         return ((StrMember) primordialComponent).getVersions(c);
     }
 
-	@Override
-	public void setStr1(String str) throws PropertyVetoException {
-		this.stringValue = str;
-		modified();
-	}
+    @Override
+    public void setStr1(String str) throws PropertyVetoException {
+        this.stringValue = str;
+        modified();
+    }
 
-	@Override
-	public String getStr1() {
-		return stringValue;
-	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.STR;
-	}
+    @Override
+    public String getStr1() {
+        return stringValue;
+    }
 
-	protected void addSpecProperties(RefexCAB rcs) {
-		rcs.with(RefexProperty.STRING1, getStr1());
-	}
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.STR;
+    }
 
+    protected void addSpecProperties(RefexCAB rcs) {
+        rcs.with(RefexProperty.STRING1, getStr1());
+    }
 }

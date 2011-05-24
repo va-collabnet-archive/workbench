@@ -14,6 +14,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.I_AmPart;
@@ -828,27 +830,27 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             throw new UnsupportedOperationException("Use makeAnalog instead");
         }
     }
-    public int nid = Integer.MAX_VALUE;
-    public int enclosingConceptNid = Integer.MAX_VALUE;
+    public int nid;
+    public int enclosingConceptNid;
     /**
      * primordial: first created or developed Sap = Status At Position
      */
-    public int primordialSapNid = Integer.MAX_VALUE;
+    public int primordialSapNid;
     /**
      * primordial: first created or developed
      *
      */
-    public int primordialUNid = Integer.MIN_VALUE;
+    public int primordialUNid;
     public CopyOnWriteArrayList<R> revisions;
     protected ArrayList<IdentifierVersion> additionalIdVersions;
     private ArrayList<IdVersion> idVersions;
-    public ConcurrentSkipListSet<RefexChronicleBI<?>> annotations;
+    public ConcurrentSkipListSet<RefsetMember<?,?>> annotations;
 
     @SuppressWarnings("rawtypes")
     @Override
     public boolean addAnnotation(RefexChronicleBI annotation) {
         if (annotations == null) {
-            annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>(
+            annotations = new ConcurrentSkipListSet<RefsetMember<?,?>>(
                     new Comparator<RefexChronicleBI>() {
 
                         @Override
@@ -858,7 +860,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     });
         }
         modified();
-        return annotations.add(annotation);
+        return annotations.add((RefsetMember<?,?>) annotation);
     }
 
     @Override
@@ -885,7 +887,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return Collections.unmodifiableCollection(annotations);
     }
 
-    public ConcurrentSkipListSet<RefexChronicleBI<?>> getAnnotationsMod() {
+    public ConcurrentSkipListSet<? extends RefexChronicleBI<?>> getAnnotationsMod() {
         return annotations;
     }
 
@@ -1027,7 +1029,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
-        assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
     }
 
     // TODO move the EComponent constructors to a helper class or factory class...
@@ -1044,9 +1045,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         convertId(eComponent.additionalIds);
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
-        assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         if (eComponent.getAnnotations() != null) {
-            this.annotations = new ConcurrentSkipListSet<RefexChronicleBI<?>>();
+            this.annotations = new ConcurrentSkipListSet<RefsetMember<?,?>>();
             for (TkRefsetAbstractMember<?> eAnnot : eComponent.getAnnotations()) {
                 RefsetMember<?, ?> annot = RefsetMemberFactory.create(
                         eAnnot, enclosingConceptNid);
@@ -1058,6 +1058,30 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public ConceptComponent() {
         Bdb.gVersion.incrementAndGet();
     }
+    
+    public final boolean readyToWrite() {
+        assert nid != Integer.MAX_VALUE : assertionString();
+        assert nid != 0 : assertionString();
+        assert readyToWriteComponent();
+        if (revisions != null) {
+            for (R r: revisions) {
+                assert r.readyToWrite();
+            }
+        }
+        if (annotations != null) {
+            for (RefsetMember<?,?> m: annotations) {
+                assert m.readyToWrite();
+            }
+        }
+        if (additionalIdVersions != null) {
+            for (IdentifierVersion idv: additionalIdVersions) {
+                assert idv.readyToWrite();
+            }
+        }
+        return true;
+    }
+    
+    public abstract boolean readyToWriteComponent();
 
     public ConceptComponent<R, C> merge(C another) throws IOException {
         Set<Integer> currentSapNids = getComponentSapNids();
@@ -2152,5 +2176,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         return false;
+    }
+    
+    protected String assertionString() {
+        try {
+            return Ts.get().getConcept(enclosingConceptNid).toLongString();
+        } catch (IOException ex) {
+            Logger.getLogger(ConceptComponent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return toString();
     }
 }

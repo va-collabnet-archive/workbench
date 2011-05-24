@@ -11,7 +11,13 @@ public class IdentifierVersionString extends IdentifierVersion {
 
     private String stringDenotation;
 
-    public IdentifierVersionString(TupleInput input) {
+    @Override
+    public final boolean readyToWriteIdentifier() {
+        assert stringDenotation != null: toString();
+        return true;
+    }
+
+   public IdentifierVersionString(TupleInput input) {
         super(input);
         stringDenotation = input.readString();
     }

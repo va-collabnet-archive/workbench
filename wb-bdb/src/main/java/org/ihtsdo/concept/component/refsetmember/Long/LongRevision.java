@@ -30,6 +30,12 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
 
     private long longValue;
 
+            
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */

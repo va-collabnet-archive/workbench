@@ -23,6 +23,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -37,7 +39,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
 
     public static SimpleDateFormat fileDateFormat =
             new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
-    public int sapNid = Integer.MAX_VALUE;
+    public int sapNid;
 
     @Override
     public int getSapNid() {
@@ -89,6 +91,17 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         super();
     }
 
+        
+    public final boolean readyToWrite() {
+        assert primordialComponent != null: assertionString();
+        assert sapNid != Integer.MAX_VALUE: assertionString();
+        assert sapNid > 0 || sapNid  == -1;
+        return true;
+    }
+    
+    public abstract boolean readyToWriteRevision();
+
+    
     protected void modified() {
         if (primordialComponent != null) {
             primordialComponent.modified();
@@ -426,4 +439,15 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
                 && sapNid <= max;
 
     }
+    
+        
+    protected String assertionString() {
+        try {
+            return Ts.get().getConcept(primordialComponent.enclosingConceptNid).toLongString();
+        } catch (IOException ex) {
+            Logger.getLogger(ConceptComponent.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return toString();
+    }
+
 }

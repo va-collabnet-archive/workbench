@@ -25,7 +25,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -97,6 +96,7 @@ public class BdbCommitManager {
 
         public ConceptWriter(Concept c) {
             super();
+            assert c.readyToWrite();
             this.c = c;
         }
 

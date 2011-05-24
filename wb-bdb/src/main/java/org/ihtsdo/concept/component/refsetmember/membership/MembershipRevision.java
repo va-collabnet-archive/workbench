@@ -20,13 +20,19 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> {
 
+
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
+        StringBuilder buf = new StringBuilder();
+        buf.append(this.getClass().getSimpleName()).append(":{");
         buf.append(super.toString());
         return buf.toString();
     }

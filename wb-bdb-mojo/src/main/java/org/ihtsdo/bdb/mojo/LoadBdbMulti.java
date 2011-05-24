@@ -436,6 +436,7 @@ public class LoadBdbMulti extends AbstractMojo {
             }
             try {
                 newConcept = Concept.get(eConcept);
+                assert newConcept.readyToWrite();
                 Bdb.getConceptDb().writeConcept(newConcept);
                 Collection<Integer> nids = newConcept.getAllNids();
                 assert nidCnidMap.getCNid(newConcept.getNid()) == newConcept.getNid();

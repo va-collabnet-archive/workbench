@@ -367,6 +367,17 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     private int refinabilityNid;
     private int typeNid;
 
+    
+    @Override
+    public boolean readyToWriteComponent() {
+        assert c2Nid != Integer.MAX_VALUE: assertionString();
+        assert characteristicNid != Integer.MAX_VALUE: assertionString();
+        assert group != Integer.MAX_VALUE: assertionString();
+        assert refinabilityNid != Integer.MAX_VALUE: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        return true;
+    }
+
     public Relationship(Concept enclosingConcept,
             TupleInput input) throws IOException {
         super(enclosingConcept.getNid(),

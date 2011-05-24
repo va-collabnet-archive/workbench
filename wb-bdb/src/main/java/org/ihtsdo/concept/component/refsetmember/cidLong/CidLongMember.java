@@ -37,6 +37,12 @@ public class CidLongMember
     private int c1Nid;
     private long longValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
+
     public CidLongMember(int enclosingConceptNid,
             TupleInput input) throws IOException {
         super(enclosingConceptNid, input);

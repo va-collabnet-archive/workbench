@@ -29,6 +29,16 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion,
     private int statusAtPositionNid;
     private int authorityNid;
 
+    
+    public final boolean readyToWrite() {
+       assert statusAtPositionNid != Integer.MAX_VALUE: toString();
+       assert authorityNid != Integer.MAX_VALUE: toString();
+       assert readyToWriteIdentifier(): toString();
+       return true;
+    }
+    
+    public abstract boolean readyToWriteIdentifier();
+
     protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time) {
         this.statusAtPositionNid = sapBdb.getSapNid(statusNid, authorNid, pathNid, time);
     }

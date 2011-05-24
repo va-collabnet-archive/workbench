@@ -28,6 +28,18 @@ public class RelationshipRevision
     private int refinabilityNid;
     private int typeNid;
 
+    
+        
+    @Override
+    public boolean readyToWriteRevision() {
+        assert characteristicNid != Integer.MAX_VALUE: assertionString();
+        assert group != Integer.MAX_VALUE: assertionString();
+        assert refinabilityNid != Integer.MAX_VALUE: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        return true;
+    }
+
+    
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */

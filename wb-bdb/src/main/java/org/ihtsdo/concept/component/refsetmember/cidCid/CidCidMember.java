@@ -138,14 +138,21 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         public ERefsetCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
             return new ERefsetCidCidRevision(this);
         }
-        
-    	@Override
+
+        @Override
         public int hashCodeOfParts() {
-    		return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid()});
+            return HashFunction.hashCode(new int[]{getC1Nid(), getC2Nid()});
         }
     }
     private int c1Nid;
     private int c2Nid;
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        assert c2Nid != Integer.MAX_VALUE;
+        return true;
+    }
 
     public CidCidMember(int enclosingConceptNid,
             TupleInput input) throws IOException {
@@ -187,9 +194,9 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         }
         if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
             CidCidMember another = (CidCidMember) obj;
-            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid &&
-            this.nid == another.nid &&
-            this.referencedComponentNid == another.referencedComponentNid;
+            return this.c1Nid == another.c1Nid && this.c2Nid == another.c2Nid
+                    && this.nid == another.nid
+                    && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }

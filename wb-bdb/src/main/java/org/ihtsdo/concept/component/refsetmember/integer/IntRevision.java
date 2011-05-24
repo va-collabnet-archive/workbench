@@ -29,6 +29,12 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
 
     private int intValue;
 
+    
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */

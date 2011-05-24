@@ -40,6 +40,7 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class Description
@@ -254,6 +255,14 @@ public class Description
     private boolean initialCaseSignificant;
     int typeNid;
     private String lang;
+
+    @Override
+    public boolean readyToWriteComponent() {
+        assert text != null: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        assert lang != null: assertionString();
+        return true;
+    }
 
     public Description(Concept enclosingConcept, TupleInput input) throws IOException {
         super(enclosingConcept.getNid(), input);

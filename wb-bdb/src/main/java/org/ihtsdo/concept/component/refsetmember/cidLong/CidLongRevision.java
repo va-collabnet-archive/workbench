@@ -31,6 +31,13 @@ public class CidLongRevision extends RefsetRevision<CidLongRevision, CidLongMemb
     private int c1Nid;
     private long longValue;
 
+        
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */

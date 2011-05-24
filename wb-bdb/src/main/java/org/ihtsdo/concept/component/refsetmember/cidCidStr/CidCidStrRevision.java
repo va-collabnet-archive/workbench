@@ -26,19 +26,26 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidStrMember>
-	implements I_ExtendByRefPartCidCidString<CidCidStrRevision>, RefexCnidCnidStrAnalogBI<CidCidStrRevision> {
+        implements I_ExtendByRefPartCidCidString<CidCidStrRevision>, RefexCnidCnidStrAnalogBI<CidCidStrRevision> {
 
-	private int c1Nid;
-	private int c2Nid;
-	private String strValue;
-	
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    private int c1Nid;
+    private int c2Nid;
+    private String strValue;
+
+    @Override
+    public boolean readyToWriteRefsetRevision() {
+        assert c1Nid != Integer.MAX_VALUE;
+        assert c2Nid != Integer.MAX_VALUE;
+        assert strValue != null;
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuilder buf = new StringBuilder();
         buf.append(this.getClass().getSimpleName() + ":{");
         buf.append(" c1Nid:" + this.c1Nid);
         buf.append(" c2Nid:" + this.c2Nid);
@@ -47,67 +54,67 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         return buf.toString();
     }
 
-
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (CidCidStrRevision.class.isAssignableFrom(obj.getClass())) {
             CidCidStrRevision another = (CidCidStrRevision) obj;
-            return this.c1Nid == another.c1Nid && 
-        		this.c2Nid == another.c2Nid &&
-        		this.strValue.equals(another.strValue) &&
-        		super.equals(obj);
+            return this.c1Nid == another.c1Nid
+                    && this.c2Nid == another.c2Nid
+                    && this.strValue.equals(another.strValue)
+                    && super.equals(obj);
         }
         return false;
     }
 
     public CidCidStrRevision(int statusNid, int pathNid,
-			long time, 
-			CidCidStrMember primoridalMember) {
-		super(statusNid, pathNid, time, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		c2Nid = primoridalMember.getC2Nid();
-		strValue = primoridalMember.getStringValue();
-	}
+            long time,
+            CidCidStrMember primoridalMember) {
+        super(statusNid, pathNid, time,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        c2Nid = primoridalMember.getC2Nid();
+        strValue = primoridalMember.getStringValue();
+    }
 
     public CidCidStrRevision(int statusNid, int authorNid, int pathNid,
-			long time, CidCidStrMember primoridalMember) {
-		super(statusNid, authorNid, pathNid, time, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		c2Nid = primoridalMember.getC2Nid();
-		strValue = primoridalMember.getStringValue();
-	}
+            long time, CidCidStrMember primoridalMember) {
+        super(statusNid, authorNid, pathNid, time,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        c2Nid = primoridalMember.getC2Nid();
+        strValue = primoridalMember.getStringValue();
+    }
 
-	public CidCidStrRevision(int statusAtPositionNid, 
-			CidCidStrMember primoridalMember) {
-		super(statusAtPositionNid, 
-				primoridalMember);
-		c1Nid = primoridalMember.getC1Nid();
-		c2Nid = primoridalMember.getC2Nid();
-		strValue = primoridalMember.getStringValue();
-	}
+    public CidCidStrRevision(int statusAtPositionNid,
+            CidCidStrMember primoridalMember) {
+        super(statusAtPositionNid,
+                primoridalMember);
+        c1Nid = primoridalMember.getC1Nid();
+        c2Nid = primoridalMember.getC2Nid();
+        strValue = primoridalMember.getStringValue();
+    }
 
-	protected CidCidStrRevision(int statusNid, int pathNid, long time, 
-			CidCidStrRevision another) {
-		super(statusNid, pathNid, time, another.primordialComponent);
-		c1Nid = another.c1Nid;
-		c2Nid = another.c2Nid;
-		strValue = another.strValue;
-	}
+    protected CidCidStrRevision(int statusNid, int pathNid, long time,
+            CidCidStrRevision another) {
+        super(statusNid, pathNid, time, another.primordialComponent);
+        c1Nid = another.c1Nid;
+        c2Nid = another.c2Nid;
+        strValue = another.strValue;
+    }
 
-	protected CidCidStrRevision(int statusNid, int authorNid, int pathNid, long time, 
-			CidCidStrRevision another) {
-		super(statusNid, authorNid, pathNid, time, another.primordialComponent);
-		c1Nid = another.c1Nid;
-		c2Nid = another.c2Nid;
-		strValue = another.strValue;
-	}
+    protected CidCidStrRevision(int statusNid, int authorNid, int pathNid, long time,
+            CidCidStrRevision another) {
+        super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+        c1Nid = another.c1Nid;
+        c2Nid = another.c2Nid;
+        strValue = another.strValue;
+    }
 
-	@Override
-	public CidCidStrRevision makeAnalog(int statusNid, int pathNid, long time) {
+    @Override
+    public CidCidStrRevision makeAnalog(int statusNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
@@ -115,10 +122,10 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         CidCidStrRevision newR = new CidCidStrRevision(statusNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
+    }
 
-	@Override
-	public CidCidStrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+    @Override
+    public CidCidStrRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
         if (this.getTime() == time && this.getPathNid() == pathNid) {
             this.setStatusNid(statusNid);
             return this;
@@ -126,119 +133,118 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         CidCidStrRevision newR = new CidCidStrRevision(statusNid, authorNid, pathNid, time, this);
         primordialComponent.addRevision(newR);
         return newR;
-	}
-
-
+    }
 
     @Override
     public CidCidStrRevision makeAnalog() {
-         return new CidCidStrRevision(getStatusNid(), getPathNid(), getTime(), this);
+        return new CidCidStrRevision(getStatusNid(), getPathNid(), getTime(), this);
     }
 
-	public CidCidStrRevision(TupleInput input, 
-			CidCidStrMember primoridalMember) {
-		super(input, primoridalMember);
-		c1Nid = input.readInt();
-		c2Nid = input.readInt();
-		strValue = input.readString();
-	}
+    public CidCidStrRevision(TupleInput input,
+            CidCidStrMember primoridalMember) {
+        super(input, primoridalMember);
+        c1Nid = input.readInt();
+        c2Nid = input.readInt();
+        strValue = input.readString();
+    }
 
-	public CidCidStrRevision(TkRefsetCidCidStrRevision eVersion,
-			CidCidStrMember member) {
-		super(eVersion, member);
-		c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
-		c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
-		strValue = eVersion.getStringValue();
-	}
+    public CidCidStrRevision(TkRefsetCidCidStrRevision eVersion,
+            CidCidStrMember member) {
+        super(eVersion, member);
+        c1Nid = Bdb.uuidToNid(eVersion.getC1Uuid());
+        c2Nid = Bdb.uuidToNid(eVersion.getC2Uuid());
+        strValue = eVersion.getStringValue();
+    }
 
     public CidCidStrRevision() {
         super();
     }
-    
+
     @Override
-	public UniversalAceExtByRefPart getUniversalPart()
-			throws TerminologyException, IOException {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    public UniversalAceExtByRefPart getUniversalPart()
+            throws TerminologyException, IOException {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public I_ExtendByRefPart<CidCidStrRevision> makePromotionPart(PathBI promotionPath) {
-		// TODO
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public I_ExtendByRefPart<CidCidStrRevision> makePromotionPart(PathBI promotionPath) {
+        // TODO
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public String getStringValue() {
-		return strValue;
-	}
+    @Override
+    public String getStringValue() {
+        return strValue;
+    }
 
-	@Override
-	public void setStringValue(String value) {
-		this.strValue = value;
+    @Override
+    public void setStringValue(String value) {
+        this.strValue = value;
         modified();
-	}
+    }
 
-	public int getC1Nid() {
-		return c1Nid;
-	}
+    public int getC1Nid() {
+        return c1Nid;
+    }
 
-	public void setC1Nid(int c1Nid) {
-		this.c1Nid = c1Nid;
+    public void setC1Nid(int c1Nid) {
+        this.c1Nid = c1Nid;
         modified();
-	}
+    }
 
-	public int getC2Nid() {
-		return c2Nid;
-	}
+    public int getC2Nid() {
+        return c2Nid;
+    }
 
-	public void setC2Nid(int c2Nid) {
-		this.c2Nid = c2Nid;
+    public void setC2Nid(int c2Nid) {
+        this.c2Nid = c2Nid;
         modified();
-	}
+    }
 
-	public String getStrValue() {
-		return strValue;
-	}
+    public String getStrValue() {
+        return strValue;
+    }
 
-	public void setStrValue(String strValue) {
-		this.strValue = strValue;
+    public void setStrValue(String strValue) {
+        this.strValue = strValue;
         modified();
-	}
+    }
 
-	@Override
-	public int getC1id() {
-		return c1Nid;
-	}
+    @Override
+    public int getC1id() {
+        return c1Nid;
+    }
 
-	@Override
-	public int getC2id() {
-		return c2Nid;
-	}
+    @Override
+    public int getC2id() {
+        return c2Nid;
+    }
 
-	@Override
-	public void setC1id(int c1id) {
-		this.c1Nid = c1id;
+    @Override
+    public void setC1id(int c1id) {
+        this.c1Nid = c1id;
         modified();
-	}
+    }
 
-	@Override
-	public void setC2id(int c2id) {
-		this.c2Nid = c2id;
+    @Override
+    public void setC2id(int c2id) {
+        this.c2Nid = c2id;
         modified();
-	}
+    }
 
-	@Override
-	public CidCidStrRevision duplicate() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public CidCidStrRevision duplicate() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     protected void writeFieldsToBdb(TupleOutput output) {
         output.writeInt(c1Nid);
         output.writeInt(c2Nid);
         output.writeString(strValue);
     }
-    
+
     @Override
     public ArrayIntList getVariableVersionNids() {
         ArrayIntList variableNids = new ArrayIntList(4);
@@ -246,7 +252,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         variableNids.add(getC2id());
         return variableNids;
     }
-       
+
     @Override
     public CidCidStrMember.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
@@ -264,46 +270,44 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
         return ((CidCidStrMember) primordialComponent).getVersions(c);
     }
 
+    @Override
+    public String getStr1() {
+        return this.strValue;
+    }
 
-
-	@Override
-	public String getStr1() {
-		return this.strValue;
-	}
-
-
-	@Override
-	public void setStr1(String str) throws PropertyVetoException {
-		this.strValue = str;
+    @Override
+    public void setStr1(String str) throws PropertyVetoException {
+        this.strValue = str;
         modified();
-	}
+    }
 
-	@Override
-	public void setCnid1(int cnid) throws PropertyVetoException {
-		this.c1Nid = cnid;
+    @Override
+    public void setCnid1(int cnid) throws PropertyVetoException {
+        this.c1Nid = cnid;
         modified();
-	}
+    }
 
-
-	@Override
-	public void setCnid2(int cnid) throws PropertyVetoException {
-		this.c2Nid = cnid;
+    @Override
+    public void setCnid2(int cnid) throws PropertyVetoException {
+        this.c2Nid = cnid;
         modified();
-	}
+    }
 
-	public int getCnid1() {
-		return c1Nid;
-	}
-	public int getCnid2() {
-		return c2Nid;
-	}
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.CID_CID_STR;
-	}
+    public int getCnid1() {
+        return c1Nid;
+    }
 
-	protected void addSpecProperties(RefexCAB rcs) {
-		rcs.with(RefexProperty.CNID1, getCnid1());
-		rcs.with(RefexProperty.CNID2, getCnid2());
-		rcs.with(RefexProperty.STRING1, getStr1());
-	}
+    public int getCnid2() {
+        return c2Nid;
+    }
+
+    protected TK_REFSET_TYPE getTkRefsetType() {
+        return TK_REFSET_TYPE.CID_CID_STR;
+    }
+
+    protected void addSpecProperties(RefexCAB rcs) {
+        rcs.with(RefexProperty.CNID1, getCnid1());
+        rcs.with(RefexProperty.CNID2, getCnid2());
+        rcs.with(RefexProperty.STRING1, getStr1());
+    }
 }

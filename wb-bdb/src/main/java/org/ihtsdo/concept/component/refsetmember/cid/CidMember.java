@@ -119,10 +119,16 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
         @Override
         public int hashCodeOfParts() {
-        	return HashFunction.hashCode(new int[]{getC1Nid()});
+            return HashFunction.hashCode(new int[]{getC1Nid()});
         }
     }
     private int c1Nid;
+
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert c1Nid != Integer.MAX_VALUE;
+        return true;
+    }
 
     public CidMember(int enclosingConceptNid,
             TupleInput input) throws IOException {
@@ -162,9 +168,9 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         }
         if (CidMember.class.isAssignableFrom(obj.getClass())) {
             CidMember another = (CidMember) obj;
-            return this.c1Nid == another.c1Nid &&
-            this.nid == another.nid &&
-            this.referencedComponentNid == another.referencedComponentNid;
+            return this.c1Nid == another.c1Nid
+                    && this.nid == another.nid
+                    && this.referencedComponentNid == another.referencedComponentNid;
         }
         return false;
     }
@@ -282,8 +288,6 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
         ComponentVersionBI c1Component = snapshot.getComponentVersion(c1Nid);
         return super.toUserString(snapshot) + " c1: " + c1Component.toUserString(snapshot);
     }
-    
-    
 
     @SuppressWarnings("unchecked")
     @Override

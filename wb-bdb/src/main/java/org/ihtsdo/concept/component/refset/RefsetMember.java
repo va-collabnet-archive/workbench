@@ -54,6 +54,18 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public int referencedComponentNid;
     public int refsetNid;
 
+    @Override
+    public final boolean readyToWriteComponent() {
+        assert referencedComponentNid != Integer.MAX_VALUE: assertionString();
+        assert referencedComponentNid != 0: assertionString();
+        assert refsetNid != Integer.MAX_VALUE: assertionString();
+        assert refsetNid != 0: assertionString();
+        assert readyToWriteRefsetMember(): assertionString();
+        return true;
+    }
+
+    public abstract boolean readyToWriteRefsetMember();
+
     public class Version
             extends ConceptComponent<R, C>.Version
             implements I_ExtendByRefVersion<R>, I_ExtendByRefPart<R>, RefexAnalogBI<R> {

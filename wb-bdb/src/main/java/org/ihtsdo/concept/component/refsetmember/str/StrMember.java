@@ -117,6 +117,12 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
     }
     private String stringValue;
 
+    @Override
+    public boolean readyToWriteRefsetMember() {
+        assert stringValue != null;
+        return true;
+    }
+
     public StrMember(int enclosingConceptNid, TupleInput input) throws IOException {
         super(enclosingConceptNid, input);
     }
