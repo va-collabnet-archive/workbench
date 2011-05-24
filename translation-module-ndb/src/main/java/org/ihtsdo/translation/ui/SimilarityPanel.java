@@ -293,10 +293,12 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				String highlightedSourceText = "<html>" + item.getSourceText().toLowerCase();
+				String highlightedSourceText = "<html><body>" + item.getSourceText().toLowerCase();
 				
 				for (String word : query.toLowerCase().split("\\W")) {
+					if (!word.isEmpty()) {
 					highlightedSourceText = highlightedSourceText.replace(word, "<font style='background-color: yellow;'>" + word + "</font>");
+					}
 				}
 				
 				tableModel.addRow(new Object[] { highlightedSourceText, item.getTargetText(), transStatus, item });
