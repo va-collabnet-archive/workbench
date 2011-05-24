@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 public class XML_I_ImageVersioned extends XML_basic_getCon implements I_Handle_XML {
 
-	I_ImageVersioned img;
+	I_ImageVersioned<?> img;
 	int imageid = -1;
 	int con_id = -1;
 	String format = "test";

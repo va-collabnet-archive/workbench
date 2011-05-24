@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.rmi.MarshalledObject;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -33,70 +34,76 @@ import org.dwfa.tapi.TerminologyException;
 
 public class LineageHelper implements I_HelpLineage {
 
-    private Logger logger = Logger.getLogger(LineageHelper.class.getName());
-	protected I_ConfigAceFrame config;
-	private long lastAccess = System.currentTimeMillis();
-	private boolean clone = false;
+    private static final Logger logger = Logger.getLogger(LineageHelper.class.getName());
+    protected I_ConfigAceFrame config;
+    private long lastAccess = System.currentTimeMillis();
+    private boolean clone = false;
 
     public LineageHelper(I_ConfigAceFrame config) {
-    	this(config, null);
+        this(config, null);
     }
+
     public LineageHelper(I_ConfigAceFrame config, I_IntSet isARelTypes) {
-		this.config = config;
-		if (isARelTypes != null) {
-			useConfigClone();
-			this.config.getDestRelTypes().clear();
-			this.config.getDestRelTypes().addAll(isARelTypes.getSetValues());
-		}
+        this.config = config;
+        if (isARelTypes != null) {
+            useConfigClone();
+            this.config.getDestRelTypes().clear();
+            this.config.getDestRelTypes().addAll(isARelTypes.getSetValues());
+        }
     }
-	protected void useConfigClone()  {
-		try {
-			if (!clone) {
-				MarshalledObject<I_ConfigAceFrame> marshalledConfig = new MarshalledObject<I_ConfigAceFrame>(config);
-				this.config = marshalledConfig.get();
-				this.clone = true;
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-	}
+
+    protected void useConfigClone() {
+        try {
+            if (!clone) {
+                MarshalledObject<I_ConfigAceFrame> marshalledConfig = new MarshalledObject<I_ConfigAceFrame>(config);
+                this.config = marshalledConfig.get();
+                this.clone = true;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     protected void access() {
-    	lastAccess = System.currentTimeMillis();
+        lastAccess = System.currentTimeMillis();
     }
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#getParents(org.dwfa.ace.api.I_GetConceptData)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#getParents(org.dwfa.ace.api.I_GetConceptData)
+     */
+
+    @Override
     public Set<I_GetConceptData> getParents(I_GetConceptData concept) throws Exception {
-    	access();
-    	return getAllAncestors(concept, new FirstRelationOnly());
+        access();
+        return getAllAncestors(concept, new FirstRelationOnly());
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#getChildren(org.dwfa.ace.api.I_GetConceptData)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#getChildren(org.dwfa.ace.api.I_GetConceptData)
+     */
+    @Override
     public Set<I_GetConceptData> getChildren(I_GetConceptData concept) throws Exception {
-    	access();
+        access();
         return getAllDescendants(concept, new FirstRelationOnly());
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#getAllAncestors(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.LineageHelper.Condition)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#getAllAncestors(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.LineageHelper.Condition)
+     */
+    @Override
     public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept, LineageCondition... conditions) throws Exception {
-    	access();
+        access();
 
         if (conditions == null) {
-            conditions = new LineageCondition[] { new NotAlreadyVisited() };
+            conditions = new LineageCondition[]{new NotAlreadyVisited()};
         }
 
         // find all the parents
         Set<I_GetConceptData> parentConcepts = getAllAncestors(new HashSet<I_GetConceptData>(), concept,
-            getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
+                getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
 
-        logger.fine("Found " + parentConcepts.size() + " ancestors of concept '" + concept.getInitialText() + "'.");
+        logger.log(Level.FINE, "Found {0} ancestors of concept ''{1}''.", new Object[]{parentConcepts.size(), concept.getInitialText()});
 
         return parentConcepts;
     }
@@ -104,11 +111,12 @@ public class LineageHelper implements I_HelpLineage {
     protected Set<I_GetConceptData> getAllAncestors(Set<I_GetConceptData> resultSet, I_GetConceptData child,
             I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, LineageCondition... conditions)
             throws Exception {
-    	access();
+        access();
 
-        ITERATE_PARENTS: for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
-            positions,
-            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+        ITERATE_PARENTS:
+        for (I_RelTuple childTuple : child.getSourceRelTuples(allowedStatuses, allowedTypes,
+                positions,
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData parentConcept = Terms.get().getConcept(childTuple.getC2Id());
             if (parentConcept.getConceptNid() == child.getConceptNid()) {
                 continue ITERATE_PARENTS;
@@ -122,27 +130,28 @@ public class LineageHelper implements I_HelpLineage {
             }
             if (resultSet.add(parentConcept)) {
                 resultSet.addAll(getAllAncestors(resultSet, parentConcept, allowedStatuses, allowedTypes, positions,
-                    conditions));
+                        conditions));
             }
         }
         return resultSet;
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#getAllDescendants(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.LineageHelper.Condition)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#getAllDescendants(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.LineageHelper.Condition)
+     */
+    @Override
     public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept, LineageCondition... conditions) throws Exception {
-    	access();
+        access();
 
         if (conditions == null) {
-            conditions = new LineageCondition[] { new NotAlreadyVisited() };
+            conditions = new LineageCondition[]{new NotAlreadyVisited()};
         }
 
         // find all the children
         Set<I_GetConceptData> descendants = getAllDescendants(new HashSet<I_GetConceptData>(), concept,
-            getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
+                getAllowedStatuses(), getIsARelTypes(), getViewPositions(), conditions);
 
-        logger.fine("Found " + descendants.size() + " descendants of concept '" + concept.getInitialText() + "'.");
+        logger.log(Level.FINE, "Found {0} descendants of concept ''{1}''.", new Object[]{descendants.size(), concept.getInitialText()});
 
         return descendants;
     }
@@ -151,10 +160,11 @@ public class LineageHelper implements I_HelpLineage {
             I_IntSet allowedStatuses, I_IntSet allowedTypes, PositionSetReadOnly positions, LineageCondition... conditions)
             throws Exception {
 
-    	access();
-        ITERATE_CHILDREN: for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
-            positions,
-            getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
+        access();
+        ITERATE_CHILDREN:
+        for (I_RelTuple childTuple : parent.getDestRelTuples(allowedStatuses, allowedTypes,
+                positions,
+                getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy())) {
             I_GetConceptData childConcept = Terms.get().getConcept(childTuple.getC1Id());
             if (childConcept.getConceptNid() == parent.getConceptNid()) {
                 continue ITERATE_CHILDREN;
@@ -168,7 +178,7 @@ public class LineageHelper implements I_HelpLineage {
             }
             if (resultSet.add(childConcept)) {
                 resultSet.addAll(getAllDescendants(resultSet, childConcept, allowedStatuses, allowedTypes, positions,
-                    conditions));
+                        conditions));
             }
         }
 
@@ -176,10 +186,11 @@ public class LineageHelper implements I_HelpLineage {
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#hasAncestor(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#hasAncestor(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData)
+     */
+    @Override
     public boolean hasAncestor(I_GetConceptData concept, I_GetConceptData ancestor) throws TerminologyException {
-    	access();
+        access();
         try {
             CeaseWhenFound foundCondition = new CeaseWhenFound(ancestor);
             getAllAncestors(concept, foundCondition, new NotAlreadyVisited());
@@ -191,10 +202,11 @@ public class LineageHelper implements I_HelpLineage {
     }
 
     /* (non-Javadoc)
-	 * @see org.dwfa.ace.api.I_HelpLineage#hasDescendant(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData)
-	 */
+     * @see org.dwfa.ace.api.I_HelpLineage#hasDescendant(org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData)
+     */
+    @Override
     public boolean hasDescendant(I_GetConceptData concept, I_GetConceptData descendant) throws TerminologyException {
-    	access();
+        access();
         try {
             CeaseWhenFound foundCondition = new CeaseWhenFound(descendant);
             getAllDescendants(concept, foundCondition, new NotAlreadyVisited());
@@ -211,7 +223,7 @@ public class LineageHelper implements I_HelpLineage {
      *         positions.
      */
     protected PositionSetReadOnly getViewPositions() throws Exception {
-    	access();
+        access();
         return config.getViewPositionSetReadOnly();
     }
 
@@ -220,7 +232,7 @@ public class LineageHelper implements I_HelpLineage {
      *         Returns just "CURRENT" if no config set.
      */
     protected I_IntSet getAllowedStatuses() throws Exception {
-    	access();
+        access();
         return config.getAllowedStatus();
     }
 
@@ -229,28 +241,34 @@ public class LineageHelper implements I_HelpLineage {
      *         the SNOMED and ArchitectonicAuxiliary IS_A concepts.
      */
     protected I_IntSet getIsARelTypes() throws Exception {
-    	access();
+        access();
         return getConfig().getDestRelTypes();
     }
 
     protected class NotAlreadyVisited implements LineageCondition {
+
         private HashSet<Integer> visited = new HashSet<Integer>();
 
         public NotAlreadyVisited() {
-        };
+        }
 
+        ;
+
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             return visited.add(concept.getConceptNid());
         }
     }
 
     protected class OrOperator implements LineageCondition {
+
         private LineageCondition[] conditions;
 
         public OrOperator(LineageCondition... conditions) {
             this.conditions = conditions;
         }
 
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             for (LineageCondition condition : this.conditions) {
                 if (condition.evaluate(concept)) {
@@ -262,13 +280,17 @@ public class LineageHelper implements I_HelpLineage {
     }
 
     protected class CeaseWhenFound implements LineageCondition {
+
         private boolean found = false;
         private I_GetConceptData concept;
 
         public CeaseWhenFound(I_GetConceptData concept) {
             this.concept = concept;
-        };
+        }
 
+        ;
+
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             if (found) {
                 return false;
@@ -287,11 +309,13 @@ public class LineageHelper implements I_HelpLineage {
     }
 
     protected class FirstRelationOnly implements LineageCondition {
+
         private boolean firstTime = true;
 
         public FirstRelationOnly() {
         }
 
+        @Override
         public boolean evaluate(I_GetConceptData concept) throws Exception {
             if (firstTime) {
                 firstTime = false;
@@ -302,11 +326,11 @@ public class LineageHelper implements I_HelpLineage {
         }
     }
 
-	public I_ConfigAceFrame getConfig() {
-		return config;
-	}
-	public long getLastAccess() {
-		return lastAccess;
-	}
+    public I_ConfigAceFrame getConfig() {
+        return config;
+    }
 
+    public long getLastAccess() {
+        return lastAccess;
+    }
 }

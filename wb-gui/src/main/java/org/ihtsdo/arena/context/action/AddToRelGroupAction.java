@@ -62,7 +62,7 @@ public class AddToRelGroupAction extends AbstractAction {
 		Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(component.getConceptNid()), 
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
-				Terms.get().getConcept(descSpec.getDescTypeSpec().getNid()), 
+				Terms.get().getConcept(descSpec.getDescTypeSpec().get(config.getViewCoordinate()).getNid()), 
 				config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 		Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
 	}
@@ -76,8 +76,8 @@ public class AddToRelGroupAction extends AbstractAction {
 			I_GetConceptData originConcept = Terms.get().getConcept(component.getConceptNid());
 			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
 					originConcept, 
-					relSpec.getRelTypeSpec().getNid(), 
-					relSpec.getDestinationSpec().getNid(),
+					relSpec.getRelTypeSpec().get(config.getViewCoordinate()).getNid(), 
+					relSpec.getDestinationSpec().get(config.getViewCoordinate()).getNid(),
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					group.getRelGroup(), //set to relGroup

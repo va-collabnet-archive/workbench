@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api.ebr;
 
-public interface I_ExtendByRefPartCid extends I_ExtendByRefPart {
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
+
+public interface I_ExtendByRefPartCid<A extends RefexCnidAnalogBI<A>> extends I_ExtendByRefPart<A> {
 
     public int getC1id();
 

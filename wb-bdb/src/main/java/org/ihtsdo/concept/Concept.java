@@ -8,16 +8,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutionException;
 
 import jsr166y.ConcurrentReferenceHashMap;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -26,7 +26,6 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -37,7 +36,8 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
@@ -45,10 +45,12 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
+import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
@@ -57,9 +59,9 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.db.bdb.computer.kindof.KindOfSpec;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
@@ -67,21 +69,33 @@ import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidListBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.KindOfSpec;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
-import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.contradiction.ContradictionResult;
+import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -89,7 +103,8 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
-public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI {
+public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI,
+        Comparable<Concept> {
 
     public static ReferenceType refType = ReferenceType.WEAK;
     public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM =
@@ -100,6 +115,80 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             new ConcurrentReferenceHashMap<Integer, Object>(
             ConcurrentReferenceHashMap.ReferenceType.STRONG,
             ConcurrentReferenceHashMap.ReferenceType.WEAK);
+
+    static {
+        Bdb.addMemoryMonitorListener(new ConceptLowMemoryListener());
+    }
+
+    @Override
+    public int compareTo(Concept o) {
+        return getNid() - o.getNid();
+    }
+
+    @Override
+    public ConceptVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public static class ConceptLowMemoryListener implements LowMemoryListener {
+
+        @Override
+        public void memoryUsageLow(long usedMemory, long maxMemory) {
+            double percentageUsed = ((double) usedMemory) / maxMemory;
+            AceLog.getAppLog().
+                    warning("Memory low. Percent used: " + percentageUsed
+                    + " Concept trying to recover memory by dieting concepts. ");
+            new Thread(new Diet(maxMemory), "Diet").start();
+
+        }
+    }
+
+    public static class Diet implements Runnable {
+
+        long maxMemory;
+
+        public Diet(long maxMemory) {
+            this.maxMemory = maxMemory;
+        }
+
+        @Override
+        public void run() {
+            System.gc();
+            double usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+            double percentageUsed = ((double) usedMemory) / maxMemory;
+
+
+            if (percentageUsed > 0.85) {
+                for (int cNid : conceptsCRHM.keySet()) {
+                    Concept c = conceptsCRHM.get(cNid);
+                    if (c != null) {
+                        c.diet();
+                    }
+                }
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+
+                if (percentageUsed > 0.85) {
+                    KindOfComputer.trimCache();
+                    usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                    percentageUsed = ((double) usedMemory) / maxMemory;
+                    AceLog.getAppLog().
+                            info("Concept Diet + KindOfComputer.trimCache() finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                } else {
+                    AceLog.getAppLog().
+                            info("Concept Diet finished recover memory. "
+                            + "Percent used: " + percentageUsed);
+                }
+            } else {
+                usedMemory = maxMemory - Runtime.getRuntime().freeMemory();
+                percentageUsed = ((double) usedMemory) / maxMemory;
+                AceLog.getAppLog().
+                        info("GC ONLY Diet finished recover memory. "
+                        + "Percent used: " + percentageUsed);
+            }
+        }
+    }
 
     public static Concept mergeAndWrite(EConcept eConcept) throws IOException {
         int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
@@ -112,14 +201,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public static Concept get(EConcept eConcept) throws IOException {
         int conceptNid = Bdb.uuidToNid(eConcept.getConceptAttributes().getPrimordialComponentUuid());
+        Bdb.getNidCNidMap().setCNidForNid(conceptNid, conceptNid);
         assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
         Concept c = get(conceptNid);
         //return populateFromEConcept(eConcept, c);
         return mergeWithEConcept(eConcept, c, false);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
             throws IOException {
+        c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
         if (eAttr != null) {
             if (c.getConceptAttributes() == null) {
@@ -146,7 +238,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
             }
             if (updateLucene) {
-                LuceneManager.writeToLucene(c.getDescriptions());
+                LuceneManager.writeToLucene(c.getDescriptions(), LuceneSearchType.DESCRIPTION);
             }
         }
         if (eConcept.getRelationships() != null
@@ -193,9 +285,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     int rNid = Bdb.uuidToNid(er.primordialUuid);
                     RefsetMember<?, ?> r = c.getRefsetMember(rNid);
                     if (currentMemberNids.contains(rNid) && r != null) {
-                        r.merge(RefsetMemberFactory.create(er, c));
+                        r.merge((RefsetMember) RefsetMemberFactory.create(er, c.getNid()));
                     } else {
-                        c.getRefsetMembers().add(RefsetMemberFactory.create(er, c));
+                        c.getRefsetMembers().add(RefsetMemberFactory.create(er, c.getNid()));
                     }
                 }
             }
@@ -207,7 +299,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Concept c) throws IOException {
         for (TkRefsetAbstractMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
             RefsetMember<?, ?> refsetMember = RefsetMemberFactory.create(
-                    eRefsetMember, c);
+                    eRefsetMember, c.getConceptNid());
             c.data.add(refsetMember);
         }
     }
@@ -303,6 +395,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return c;
     }
+    private boolean canceled = false;
     private int nid;
     private I_ManageConceptData data;
     private static int fsDescNid = Integer.MIN_VALUE;
@@ -329,6 +422,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     "$$$$$$$$$$$$$$ Constructing concept: " + nid
                     + " $$$$$$$$$$$$$$");
         }
+    }
+    
+    public boolean readyToWrite() {
+        assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
+        assert data.readyToWrite(): toLongString();
+        return true;
     }
 
     /**
@@ -434,15 +533,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public void commit(int version, Set<TimePathId> values) throws IOException {
-        try {
-            if (ReadWriteDataVersion.get(nid) == data.getReadWriteDataVersion()) {
-            } else {
-            }
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        } catch (ExecutionException e) {
-            throw new IOException(e);
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -562,45 +653,121 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public int getConceptNid() {
         return nid;
     }
+    private static final NidSet rf2NidSet;
+
+    static {
+        rf2NidSet = new NidSet();
+        rf2NidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+        rf2NidSet.add(ReferenceConcepts.SYNONYM.getNid());
+    }
 
     @Override
-    public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-            I_IntList langPrefOrder, NidSetBI allowedStatus,
+    public I_DescriptionTuple<DescriptionRevision> getDescTuple(NidListBI typePrefOrder,
+            NidListBI langPrefOrder, NidSetBI allowedStatus,
             PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
-        NidSetBI typeSet = new IntSet();
-        for (int typeNid : typePrefOrder.getListArray()) {
-            typeSet.add(typeNid);
-        }
         switch (sortPref) {
             case LANG_B4_TYPE:
                 return getLangPreferredDesc(getDescriptionTuples(allowedStatus,
-                        typeSet, positionSet, precedencePolicy, contradictionManager), typePrefOrder, langPrefOrder,
-                        allowedStatus, positionSet, typeSet, true);
+                        new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
+                        typePrefOrder, langPrefOrder,
+                        allowedStatus, positionSet, true);
             case TYPE_B4_LANG:
                 return getTypePreferredDesc(getDescriptionTuples(allowedStatus,
-                        typeSet, positionSet, precedencePolicy, contradictionManager), typePrefOrder, langPrefOrder,
-                        allowedStatus, positionSet, typeSet, true);
+                        new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
+                        typePrefOrder, langPrefOrder,
+                        allowedStatus, positionSet, true);
+            case LANG_REFEX:
+                return getRefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
+                        rf2NidSet, positionSet, precedencePolicy, contradictionManager),
+                        typePrefOrder, langPrefOrder,
+                        allowedStatus, positionSet);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
         }
     }
 
-    private I_DescriptionTuple getLangPreferredDesc(
-            Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder,
-            NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet, boolean tryType) throws IOException, ToIoException {
+    private I_DescriptionTuple getRefexSpecifiedDesc(
+            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
+            NidListBI typePrefOrder, NidListBI langRefexOrder,
+            NidSetBI allowedStatus, PositionSetBI positionSet) throws IOException, ToIoException {
+        ViewCoordinate vc = new ViewCoordinate(Precedence.PATH,
+                positionSet,
+                allowedStatus, null,
+                new IdentifyAllConflictStrategy(), Integer.MIN_VALUE,
+                Integer.MIN_VALUE,
+                RelAssertionType.STATED,
+                langRefexOrder,
+                LANGUAGE_SORT.LANG_REFEX);
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
-                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+                for (int typePrefNid : typePrefOrder.getListArray()) {
+                    if (langRefexOrder != null
+                            && langRefexOrder.getListValues() != null) {
+                        for (int langRefexNid : langRefexOrder.getListValues()) {
+                            if (typePrefNid == ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid()) {
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions, typePrefNid, vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            } else {
+                                // get Preferred or other
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions, ReferenceConcepts.SYNONYM.getNid(), vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            }
+                        }
+                    }
+                }
+                return descriptions.iterator().next();
+            } else {
+                return descriptions.iterator().next();
+            }
+        }
+        return null;
+    }
+
+    private I_DescriptionTuple getPreferredAcceptability(
+            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
+            int typePrefNid, ViewCoordinate vc, int langRefexNid) throws IOException {
+        // get FSN
+        for (I_DescriptionTuple d : descriptions) {
+            if (d.getTypeNid() == typePrefNid) {
+                for (RefexVersionBI<?> refex : d.getCurrentRefexes(vc)) {
+                    if (refex.getCollectionNid() == langRefexNid) {
+                        RefexCnidVersionBI<?> langRefex =
+                                (RefexCnidVersionBI<?>) refex;
+                        if (langRefex.getCnid1()
+                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid()) {
+                            return d;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private I_DescriptionTuple getLangPreferredDesc(
+            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
+            NidListBI typePrefOrder, NidListBI langPrefOrder,
+            NidSetBI allowedStatus, PositionSetBI positionSet,
+            boolean tryType) throws IOException, ToIoException {
+        if (descriptions.size() > 0) {
+            if (descriptions.size() > 1) {
+                List<I_DescriptionTuple<DescriptionRevision>> matchedList =
+                        new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
                 if (langPrefOrder != null
                         && langPrefOrder.getListValues() != null) {
                     for (int langId : langPrefOrder.getListValues()) {
                         for (I_DescriptionTuple d : descriptions) {
                             try {
-                                int tupleLangId = ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
+                                int tupleLangId =
+                                        ArchitectonicAuxiliary.getLanguageConcept(d.getLang()).localize().getNid();
                                 if (tupleLangId == langId) {
                                     matchedList.add(d);
                                     if (matchedList.size() == 2) {
@@ -618,7 +785,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             if (tryType) {
                                 return getTypePreferredDesc(matchedList,
                                         typePrefOrder, langPrefOrder,
-                                        allowedStatus, positionSet, typeSet, false);
+                                        allowedStatus, positionSet, false);
                             } else {
                                 return matchedList.get(0);
                             }
@@ -633,14 +800,39 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return null;
     }
 
+    private void getRelGroups(ViewCoordinate vc, ArrayList<RelGroupChronicleBI> results) throws IOException {
+        Map<Integer, HashSet<RelationshipChronicleBI>> groupMap =
+                new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
+        ViewCoordinate tempVc = new ViewCoordinate(vc);
+        tempVc.setAllowedStatusNids(null);
+        for (RelationshipChronicleBI r : getRelsOutgoing()) {
+            for (RelationshipVersionBI rv : r.getVersions(tempVc)) {
+                int group = rv.getGroup();
+                if (group > 0) {
+                    HashSet<RelationshipChronicleBI> relsInGroup = groupMap.get(group);
+                    if (relsInGroup == null) {
+                        relsInGroup = new HashSet<RelationshipChronicleBI>();
+                        groupMap.put(group, relsInGroup);
+                    }
+                    relsInGroup.add(r);
+                }
+            }
+        }
+
+        for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry : groupMap.entrySet()) {
+            results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
+        }
+    }
+
     private I_DescriptionTuple getTypePreferredDesc(
-            Collection<I_DescriptionTuple> descriptions,
-            I_IntList typePrefOrder, I_IntList langPrefOrder,
+            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
+            NidListBI typePrefOrder, NidListBI langPrefOrder,
             NidSetBI allowedStatus, PositionSetBI positionSet,
-            NidSetBI typeSet, boolean tryLang) throws IOException, ToIoException {
+            boolean tryLang) throws IOException, ToIoException {
         if (descriptions.size() > 0) {
             if (descriptions.size() > 1) {
-                List<I_DescriptionTuple> matchedList = new ArrayList<I_DescriptionTuple>();
+                List<I_DescriptionTuple<DescriptionRevision>> matchedList =
+                        new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
                 for (int typeId : typePrefOrder.getListValues()) {
                     for (I_DescriptionTuple d : descriptions) {
                         if (d.getTypeNid() == typeId) {
@@ -655,9 +847,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             return matchedList.get(0);
                         }
                         if (tryLang) {
-                        	return getLangPreferredDesc(matchedList, typePrefOrder,
-                                langPrefOrder, allowedStatus, positionSet,
-                                typeSet, false);
+                            return getLangPreferredDesc(matchedList, typePrefOrder,
+                                    langPrefOrder, allowedStatus, positionSet,
+                                    false);
                         } else {
                             return matchedList.get(0);
                         }
@@ -672,18 +864,24 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Description.Version getDescTuple(I_IntList descTypePreferenceList,
+    public Description.Version getDescTuple(NidListBI descTypePreferenceList,
             I_ConfigAceFrame config) throws IOException {
         return (Version) getDescTuple(descTypePreferenceList, config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(), config.getLanguageSortPref(),
                 config.getPrecedence(), config.getConflictResolutionStrategy());
     }
+    NidSetBI allowedStatus;
+    NidSetBI allowedTypes;
+    PositionSetBI positions;
+    Precedence precedencePolicy;
+    ContradictionManagerBI contradictionManager;
 
     @Override
-    public List<I_DescriptionTuple> getDescriptionTuples(
+    public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(
             NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) throws IOException {
-        List<I_DescriptionTuple> returnDescriptions = new ArrayList<I_DescriptionTuple>();
+        List<I_DescriptionTuple<DescriptionRevision>> returnDescriptions =
+                new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
         for (Description desc : getDescriptions()) {
             desc.addTuples(allowedStatus, allowedTypes, positions,
                     returnDescriptions, precedencePolicy, contradictionManager);
@@ -692,13 +890,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public List<I_DescriptionTuple> getDescriptionTuples() throws IOException,
+    public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples() throws IOException,
             TerminologyException {
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+        return getDescriptionTuples(config.getAllowedStatus(),
+                config.getDescTypes(),
+                config.getViewPositionSetReadOnly(),
+                config.getPrecedence(),
+                config.getConflictResolutionStrategy());
     }
 
     @Override
@@ -718,6 +919,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             return new ArrayList<Relationship>();
         }
         return data.getDestRels();
+    }
+
+    public Collection<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+        if (isCanceled()) {
+            return new ArrayList<Relationship>();
+        }
+        return data.getDestRels(allowedTypes);
     }
 
     @Override
@@ -819,7 +1027,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 }
                 if (getDescriptions().size() > 0) {
                     I_DescriptionVersioned desc = getDescriptions().iterator().next();
-                    for (I_DescriptionVersioned d : getDescriptions()) {
+                    for (I_DescriptionVersioned<?> d : getDescriptions()) {
                         for (I_DescriptionPart part : d.getMutableParts()) {
                             if ((part.getTypeNid() == fsDescNid)
                                     || (part.getTypeNid() == fsXmlDescNid)) {
@@ -1012,19 +1220,24 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return returnRels;
     }
 
-       @Override
+    @Override
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException {
-    	
-        Coordinate coordinate = new Coordinate(precedencePolicy, 
-        		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
+                positions, allowedStatus, allowedTypes, contradictionManager,
+                Integer.MIN_VALUE, classifierNid, relAssertionType, null, null);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
         for (Relationship rel : getSourceRels()) {
-        	actualValues.addAll(rel.getVersions(coordinate));
-        }        
+            for (Relationship.Version rv : rel.getVersions(coordinate)) {
+                if (allowedTypes == null || allowedTypes.contains(rv.getTypeNid())) {
+                    actualValues.add(rv);
+                }
+            }
+        }
         return actualValues;
     }
 
@@ -1090,6 +1303,30 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.getAllNids();
     }
 
+    @Override
+    public Set<Integer> getAllSapNids() throws IOException {
+        Set<Integer> sapNids = new HashSet<Integer>();
+        if (getConceptAttributes() != null) {
+            sapNids.addAll(getConceptAttributes().getComponentSapNids());
+        }
+        if (getDescriptions() != null) {
+            for (Description d : getDescriptions()) {
+                sapNids.addAll(d.getComponentSapNids());
+            }
+        }
+        if (getRelsOutgoing() != null) {
+            for (Relationship r : getSourceRels()) {
+                sapNids.addAll(r.getComponentSapNids());
+            }
+        }
+        if (getImages() != null) {
+            for (Image i : getImages()) {
+                sapNids.addAll(i.getComponentSapNids());
+            }
+        }
+        return sapNids;
+    }
+
     /*
      * (non-Javadoc)
      * @see java.lang.Object#toString()
@@ -1122,7 +1359,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     /**
      * Returns a longer - more complete - string representation of the object.
-     * 
+     *
      * @return
      */
     @Override
@@ -1133,6 +1370,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             buff.append(getInitialText());
             buff.append("\" nid: ");
             buff.append(nid);
+            buff.append(" annotationRefset: ");
+            buff.append(isAnnotationStyleRefex());
             buff.append("\n  data version: ");
             buff.append(getDataVersion());
             buff.append("\n write version: ");
@@ -1207,6 +1446,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return data.isUncommitted();
     }
 
+    public NidSetBI setCommitTime(long time) {
+        return data.setCommitTime(time);
+    }
+
     public boolean isUnwritten() {
         return data.isUnwritten();
     }
@@ -1255,17 +1498,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.setLastWrite(version);
     }
 
+    @Override
     public ConcurrentSkipListSet<RefsetMember<?, ?>> getRefsetMembers()
             throws IOException {
-        return data.getRefsetMembers();
+        return data.getRefsetMembers(); 
     }
 
     @Override
     public boolean isCanceled() throws IOException {
-        if (getConceptAttributes() == null || getConceptAttributes().getTime() == Long.MIN_VALUE) {
-            return true;
-        }
-        return false;
+        return canceled;
     }
 
     @Override
@@ -1321,21 +1562,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame config) throws IOException {
         NidSetBI isATypes = config.getDestRelTypes();
         I_RepresentIdSet possibleChildOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-            if (isATypes.contains(pair.getTypeNid())) {
-                possibleChildOfConcepts.setMember(
-                        Bdb.getNidCNidMap().getCNid(pair.getRelNid()));
-            }
+        for (int cNid : Bdb.xref.getDestRelOrigins(nid, isATypes)) {
+            possibleChildOfConcepts.setMember(cNid);
         }
         return possibleChildOfConcepts;
     }
 
     public Set<Integer> getPossibleDestRelsOfTypes(NidSetBI relTypes) throws IOException {
         Set<Integer> possibleRelNids = new HashSet<Integer>();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
-            if (relTypes.contains(pair.getTypeNid())) {
-                possibleRelNids.add(pair.getRelNid());
-            }
+        for (NidPairForRel pair : Bdb.xref.getDestRelPairs(nid, relTypes)) {
+            possibleRelNids.add(pair.getRelNid());
         }
         return possibleRelNids;
     }
@@ -1368,13 +1604,18 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException {
-    	
-        Coordinate coordinate = new Coordinate(precedencePolicy, 
-        		positions, allowedStatus, allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid, relAssertionType);
+
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy,
+                positions, allowedStatus, allowedTypes, contradictionManager,
+                Integer.MIN_VALUE, classifierNid, relAssertionType, null, null);
         List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
-        for (Relationship rel : getDestRels()) {
-        	actualValues.addAll(rel.getVersions(coordinate));
-        }        
+        for (Relationship rel : getDestRels(coordinate.getIsaTypeNids())) {
+            for (Relationship.Version relv : rel.getVersions(coordinate)) {
+                if (coordinate.getIsaTypeNids().contains(relv.getTypeNid())) {
+                    actualValues.addAll(rel.getVersions(coordinate));
+                }
+            }
+        }
         return actualValues;
     }
 
@@ -1384,22 +1625,26 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             throws IOException {
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
         List<NidPairForRel> invalidPairs = new ArrayList<NidPairForRel>();
-        for (NidPairForRel pair : Bdb.getDestRelPairs(nid)) {
+        List<NidPairForRel> pairs;
+        if (allowedTypes != null && allowedTypes.size() > 0) {
+            pairs = Bdb.xref.getDestRelPairs(nid, allowedTypes);
+        } else {
+            pairs = Bdb.xref.getDestRelPairs(nid);
+        }
+
+        for (NidPairForRel pair : pairs) {
             int relNid = pair.getRelNid();
-            int typeNid = pair.getTypeNid();
-            if (allowedTypes == null || allowedTypes.contains(typeNid)) {
-                Concept relSource = Bdb.getConceptForComponent(relNid);
-                if (relSource != null) {
-                    Relationship r = relSource.getRelationship(relNid);
-                    if (r != null) {
-                        r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
-                                contradictionManager);
-                    } else {
-                        invalidPairs.add(pair);
-                    }
+            Concept relSource = Bdb.getConceptForComponent(relNid);
+            if (relSource != null) {
+                Relationship r = relSource.getRelationship(relNid);
+                if (r != null) {
+                    r.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
+                            contradictionManager);
                 } else {
                     invalidPairs.add(pair);
                 }
+            } else {
+                invalidPairs.add(pair);
             }
         }
 
@@ -1423,23 +1668,20 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         I_RepresentIdSet possibleKindOfConcepts = Bdb.getConceptDb().getEmptyIdSet();
         possibleKindOfConcepts.setMember(getNid());
 
-        collectKindOf(activity, isATypes, possibleKindOfConcepts, nid);
+        collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, nid);
 
         return possibleKindOfConcepts;
     }
 
-    private void collectKindOf(I_ShowActivity activity, NidSetBI isATypes,
+    private void collectPossibleKindOf(I_ShowActivity activity, NidSetBI isATypes,
             I_RepresentIdSet possibleKindOfConcepts, int cNid) throws IOException {
-        for (NidPairForRel pair : Bdb.getDestRelPairs(cNid)) {
+        for (int cNidForOrigin : Bdb.xref.getDestRelOrigins(cNid, isATypes)) {
             if (activity != null && activity.isCanceled()) {
                 return;
             }
-            if (isATypes.contains(pair.getTypeNid())) {
-                int cNidForOrigin = Bdb.getNidCNidMap().getCNid(pair.getRelNid());
-                if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
-                    possibleKindOfConcepts.setMember(cNidForOrigin);
-                    collectKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
-                }
+            if (possibleKindOfConcepts.isMember(cNidForOrigin) == false) {
+                possibleKindOfConcepts.setMember(cNidForOrigin);
+                collectPossibleKindOf(activity, isATypes, possibleKindOfConcepts, cNidForOrigin);
             }
         }
     }
@@ -1481,7 +1723,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Collection<? extends MediaChronicleBI> getMedia() throws IOException {
+    public Collection<Image> getMedia() throws IOException {
         return getImages();
     }
 
@@ -1498,28 +1740,186 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Collection<? extends RelGroupChronicleBI> getRelGroups()
+    public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc)
             throws IOException {
         ArrayList<RelGroupChronicleBI> results = new ArrayList<RelGroupChronicleBI>();
-        Map<Integer, HashSet<RelationshipChronicleBI>> groupMap = new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
 
+        if (vc.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
+            ViewCoordinate tempVc = new ViewCoordinate(vc);
+            tempVc.setRelAssertionType(RelAssertionType.STATED);
+            getRelGroups(tempVc, results);
+            tempVc.setRelAssertionType(RelAssertionType.INFERRED);
+            getRelGroups(tempVc, results);
+        } else {
+            getRelGroups(vc, results);
+        }
+
+        return results;
+    }
+
+    public Collection<? extends RelGroupChronicleBI> getAllRelGroups()
+            throws IOException {
+        ArrayList<RelGroupChronicleBI> results = new ArrayList<RelGroupChronicleBI>();
+        Map<Integer, HashSet<RelationshipChronicleBI>> statedGroupMap =
+                new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
+        Map<Integer, HashSet<RelationshipChronicleBI>> inferredGroupMap =
+                new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
         for (RelationshipChronicleBI r : getRelsOutgoing()) {
+            // Inferred
             for (RelationshipVersionBI rv : r.getVersions()) {
                 int group = rv.getGroup();
                 if (group > 0) {
-                    HashSet<RelationshipChronicleBI> relsInGroup = groupMap.get(group);
-                    if (relsInGroup == null) {
-                        relsInGroup = new HashSet<RelationshipChronicleBI>();
-                        groupMap.put(group, relsInGroup);
+                    if (rv.isInferred()) {
+                        HashSet<RelationshipChronicleBI> relsInGroup = inferredGroupMap.get(group);
+                        if (relsInGroup == null) {
+                            relsInGroup = new HashSet<RelationshipChronicleBI>();
+                            inferredGroupMap.put(group, relsInGroup);
+                        }
+                        relsInGroup.add(r);
+                    } else {
+                        HashSet<RelationshipChronicleBI> relsInGroup = statedGroupMap.get(group);
+                        if (relsInGroup == null) {
+                            relsInGroup = new HashSet<RelationshipChronicleBI>();
+                            statedGroupMap.put(group, relsInGroup);
+                        }
+                        relsInGroup.add(r);
                     }
-                    relsInGroup.add(r);
                 }
             }
         }
 
-        for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry : groupMap.entrySet()) {
+        for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry : statedGroupMap.entrySet()) {
             results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
         }
+
+        for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry : inferredGroupMap.entrySet()) {
+            results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
+        }
+
         return results;
+    }
+
+    @Override
+    public boolean isAnnotationStyleRefex() throws IOException {
+        return data.isAnnotationStyleRefset();
+    }
+
+    @Override
+    public void setAnnotationStyleRefex(boolean annotationStyleRefset) {
+        data.setAnnotationStyleRefset(annotationStyleRefset);
+    }
+
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+            throws IOException {
+        return getConceptAttributes().getRefexes();
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+            ViewCoordinate xyz) throws IOException {
+        return getConceptAttributes().getCurrentRefexes(xyz);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+        return getConceptAttributes().getInactiveRefexes(xyz);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
+            throws IOException {
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
+        List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(vc)) {
+                returnValues.add(version);
+            }
+        }
+        return Collections.unmodifiableCollection(returnValues);
+    }
+
+    @Override
+    public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
+        return getConceptAttributes().addAnnotation(annotation);
+    }
+
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+            throws IOException {
+        return getConceptAttributes().getAnnotations();
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+            ViewCoordinate vc) throws IOException {
+        return getConceptAttributes().getCurrentAnnotations(vc);
+    }
+
+    @Override
+    public ConceptVersion getVersion(ViewCoordinate c) {
+        return new ConceptVersion(this, c);
+    }
+
+    @Override
+    public Collection<ConceptVersion> getVersions(ViewCoordinate c) {
+        ArrayList<ConceptVersion> cvList = new ArrayList<ConceptVersion>(1);
+        cvList.add(new ConceptVersion(this, c));
+        return cvList;
+    }
+
+    @Override
+    public Collection<? extends ConceptVersionBI> getVersions() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void commit(ChangeSetPolicy changeSetPolicy,
+            ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
+        BdbCommitManager.commit(this, changeSetPolicy, changeSetWriterThreading);
+    }
+
+    @Override
+    public void commit(ChangeSetGenerationPolicy changeSetPolicy,
+            ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+        BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
+                ChangeSetWriterThreading.get(changeSetWriterThreading));
+    }
+
+    private void diet() {
+        data.diet();
+    }
+
+    @Override
+    public void cancel() throws IOException {
+        data.cancel();
+        if (BdbCommitManager.forget(getConceptAttributes())) {
+            Bdb.getConceptDb().forget(this);
+            canceled = true;
+        }
+        try {
+			KindOfComputer.updateIsaCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate(), this.getNid());
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+        BdbCommitManager.fireCancel();
+    }
+
+    @Override
+    public Set<PositionBI> getPositions() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc) {
+        try {
+            ContradictionIdentifier identifier = new ContradictionIdentifier(vc, true);
+            ContradictionResult result = identifier.isConceptInConflict(this);
+
+            return new FoundContradictionVersions(result, identifier.getReturnVersions());
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

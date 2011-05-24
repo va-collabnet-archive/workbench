@@ -78,7 +78,7 @@ public class ThinVersionHelper {
         return added * 1000;
     }
 
-    public static int convert(String dateStr) throws ParseException {
+    public static long convert(String dateStr) throws ParseException {
         if (dateStr.equalsIgnoreCase("latest")) {
             return Integer.MAX_VALUE;
         }
@@ -88,7 +88,7 @@ public class ThinVersionHelper {
             dateFormatterTL.set(formatter);
         }
         Date d = formatter.parse(dateStr);
-        return convert(d.getTime());
+        return d.getTime();
     }
 
     /*

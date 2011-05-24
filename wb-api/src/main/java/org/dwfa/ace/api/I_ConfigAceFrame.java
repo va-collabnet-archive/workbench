@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -44,21 +45,42 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 
 public interface I_ConfigAceFrame extends I_HandleSubversion {
-
+    
+    public enum CLASSIFIER_INPUT_MODE_PREF {
+        EDIT_PATH("edit path"),
+        VIEW_PATH("view path only"),
+        VIEW_PATH_WITH_EDIT_PRIORITY("view path with edit path priority");
+        
+        private String desc;
+        
+        private CLASSIFIER_INPUT_MODE_PREF(String desc){
+            this.desc = desc;
+        }
+        
+        @Override
+        public String toString() {
+            return desc;
+        }
+        
+    };
+    
     public enum SPECIAL_SVN_ENTRIES {
         PROFILE_CSU();
     };
 
     public enum LANGUAGE_SORT_PREF {
         LANG_B4_TYPE("language before type"),
-        TYPE_B4_LANG("type before language");
+        TYPE_B4_LANG("type before language"),
+        LANG_REFEX("use language refex");
 
         private String desc;
 
@@ -66,8 +88,32 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
             this.desc = desc;
         }
 
+        @Override
         public String toString() {
             return desc;
+        }
+
+        public LANGUAGE_SORT getLangSort() {
+            switch (this) {
+                case LANG_B4_TYPE:
+                    return LANGUAGE_SORT.LANG_BEFORE_TYPE;
+                case LANG_REFEX:
+                    return LANGUAGE_SORT.LANG_REFEX;
+                case TYPE_B4_LANG:
+                    return LANGUAGE_SORT.TYPE_BEFORE_LANG;
+            }
+            throw new UnsupportedOperationException("Can't handle: " + this);
+        }
+        public static LANGUAGE_SORT_PREF  getPref(LANGUAGE_SORT sort) {
+            switch (sort) {
+                case LANG_BEFORE_TYPE:
+                    return LANG_B4_TYPE;
+                case LANG_REFEX:
+                    return LANG_REFEX;
+                case TYPE_BEFORE_LANG:
+                    return TYPE_B4_LANG;
+            }
+            throw new UnsupportedOperationException("Can't handle: " + sort);
         }
     }
 
@@ -94,7 +140,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Description types for display when the concept view has the use
      * preferences toggle on.
-     * 
+     *
      * @return
      */
     public I_IntSet getDescTypes();
@@ -102,7 +148,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Relationship types for display when the concept view has the use
      * preferences toggle on.
-     * 
+     *
      * @return
      */
     public I_IntSet getPrefFilterTypesForRel();
@@ -318,6 +364,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setShowSearch(boolean shown);
 
+    public void setEnabledNewInboxButton(boolean enable);
+
+    public void setEnabledExistingInboxButton(boolean enable);
+
+    public void setEnabledMoveListenerButton(boolean enable);
+
+    public void setEnabledAllQueuesButton(boolean enable);
+
     public void performLuceneSearch(String query, I_GetConceptData root);
 
     public void performLuceneSearch(String query, List<I_TestSearchResults> extraCriterion);
@@ -341,6 +395,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public JPanel getSignpostPanel();
 
     public void setShowSignpostPanel(boolean show);
+
+    public void setShowWorkflowSignpostPanel(boolean show);
 
     public void setSignpostToggleVisible(boolean show);
 
@@ -388,8 +444,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public boolean isToggleVisible(TOGGLES toggle);
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException;
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException;
 
     public void setRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle, boolean visible);
 
@@ -425,21 +480,21 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     /**
      * Processes can add and remove I_OverrideTaxonomyRenderer objects.
-     * 
+     *
      * @return
      */
     public List<I_OverrideTaxonomyRenderer> getTaxonomyRendererOverrideList();
 
     /**
      * Processes can add and remove I_FilterTaxonomyRels objects.
-     * 
+     *
      * @return
      */
     public List<I_FilterTaxonomyRels> getTaxonomyRelFilterList();
 
     /**
      * For storing history of concepts viewed by each component viewer.
-     * 
+     *
      * @return
      */
     public Map<String, List<I_GetConceptData>> getTabHistoryMap();
@@ -463,14 +518,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy);
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass);
@@ -520,6 +575,10 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setClassifierIsaType(I_GetConceptData classifierIsaType);
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode();
+
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode);
+
     public I_GetConceptData getClassifierInputPath();
 
     public void setClassifierInputPath(I_GetConceptData inputPath);
@@ -531,11 +590,12 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_ManageContradiction[] getAllConflictResolutionStrategies();
 
     public void setTopActivity(I_ShowActivity activity);
+
     public I_ShowActivity getTopActivity();
 
     /**
      * Shows or hides as the activity viewer.
-     * 
+     *
      * @param show Whether to show the activity viewer.
      * @return
      */
@@ -570,7 +630,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public Collection<I_PluginToConceptPanel> getConceptPanelPlugins(HOST_ENUM host);
 
     /**
-     * 
+     *
      * @return A list of the default concept panel plugins for editing, that may
      *         be used to "reset the frame to defaults", or initialize a frame
      *         configuration. This list is static, and has no relationship to
@@ -579,7 +639,7 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public List<I_PluginToConceptPanel> getDefaultConceptPanelPluginsForEditor();
 
     /**
-     * 
+     *
      * @return A list of the default concept panel plugins for a viewer, that
      *         may be used to "reset the frame to defaults", or initialize a
      *         frame configuration. This list is static, and has no relationship
@@ -592,14 +652,14 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public I_DescriptionTuple getSearchResultsSelection();
 
     /**
-     * 
+     *
      * @param visible True if you wish to make the workflow details sheet
      *            visible. Otherwise false.
      */
     public void setShowWorkflowDetailSheet(boolean visible);
 
     /**
-     * 
+     *
      * @param dim dimensions of the workflow dimension sheet.
      */
     public void setWorkflowDetailSheetDimensions(Dimension dim);
@@ -607,13 +667,13 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     /**
      * Developers can place components on the details sheet for interaction with
      * the user.
-     * 
+     *
      * @return The JPanel that implements the workflow details sheet.
      */
     public JPanel getWorkflowDetailsSheet();
 
     /**
-     * 
+     *
      * @return a map of the path nids, and the color associated with that path.
      */
     public Map<Integer, Color> getPathColorMap();
@@ -624,21 +684,47 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public void fireUpdateHierarchyView();
 
     public void refreshRefsetTab();
-    
+
     public void setPrecedence(Precedence precedence);
-    
+
     public Precedence getPrecedence();
-    
-    public Coordinate getCoordinate();
-    
+
+    public ViewCoordinate getViewCoordinate();
+
+    public EditCoordinate getEditCoordinate();
+
     public void quit();
 
     public I_GetConceptData getClassifierConcept();
 
     public void setClassifierConcept(I_GetConceptData classifierConcept);
-    
+
     public RelAssertionType getRelAssertionType();
 
     public void setRelAssertionType(RelAssertionType relAssertionType);
 
+	// WOrkflow-Based
+    public boolean isAutoApproveOn();
+
+    public void setAutoApprove(boolean b);
+
+    public boolean isOverrideOn();
+
+    public void setOverride(boolean b);
+
+    public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles);
+
+    public TreeSet<? extends I_GetConceptData> getWorkflowRoles();
+
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states);
+
+    public TreeSet<? extends I_GetConceptData> getWorkflowStates();
+
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions);
+
+    public TreeSet<? extends I_GetConceptData> getWorkflowActions();
+
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids();
+
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions);
 }

@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -227,7 +228,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				selectedRefset = ((I_GetConceptData) refsetListModel.getElementAt(0));
 			}
 
-			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getCoordinate(), selectedRefset.getUids());
+			ConceptVersionBI refsetBI = Ts.get().getConceptVersion(config.getViewCoordinate(), selectedRefset.getUids());
 			Collection<? extends DescriptionVersionBI> guvnorDescriptionsSize = refsetBI.getDescsActive(ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.localize().getNid());
 			if (guvnorDescriptionsSize.size() < 1 || guvnorDescriptionsSize.size() > 1) {
 				JOptionPane.showMessageDialog(this, "Wrong guvnor property descriptions: ", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -259,6 +260,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 				for (I_GetConceptData member : members) {
 					droolsEnumListModel.addElement(member);
 				}
+				droolEnumList.revalidate();
 			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -423,6 +425,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 			//======== scrollPane2 ========
 			{
+				scrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 				scrollPane2.setViewportView(droolEnumList);
 			}
 			panel2.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,

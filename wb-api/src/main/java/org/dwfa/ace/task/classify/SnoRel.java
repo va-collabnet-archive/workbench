@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -63,6 +65,7 @@ public class SnoRel implements Comparable<Object> {
     }
 
     // default sort order [c1-group-type-c2]
+    @Override
     public int compareTo(Object o) {
         SnoRel other = (SnoRel) o;
         int thisMore = 1;
@@ -94,8 +97,9 @@ public class SnoRel implements Comparable<Object> {
         }
     } // SnoRel.compareTo()
 
+    @Override
     public String toString() {
-        return new String(relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group);
+        return relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group;
     }
 
     public String toStringHdr() {
@@ -155,6 +159,7 @@ public class SnoRel implements Comparable<Object> {
             }
             if (format == 5) { // "COMPARE": UUIDs, Initial Text
                 Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
+                    @Override
                     public int compare(SnoRel o1, SnoRel o2) {
                         int thisMore = 1;
                         int thisLess = -1;
@@ -213,10 +218,10 @@ public class SnoRel implements Comparable<Object> {
             bw.close();
         } catch (TerminologyException e) {
             // can be caused by tf.getConcept()
-            e.printStackTrace();
+            Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, e);
         } catch (IOException e) {
             // can be caused by new FileWriter
-            e.printStackTrace();
+            Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 

@@ -319,8 +319,13 @@ public class RefsetPopupListener extends MouseAdapter {
                             break;
                         case CONCEPT_ID:
                             popup.add(changeMenu);
-                            addSubmenuItems(changeMenu, field,
-                                ((RefsetDefaultsConcept) preferences).getConceptPopupIds());
+                            if (preferences instanceof RefsetDefaultsConcept) {
+                                addSubmenuItems(changeMenu, field,
+                                    ((RefsetDefaultsConcept) preferences).getConceptPopupIds());
+                            } else if (preferences instanceof RefsetDefaultsConConCon) {
+                                addSubmenuItems(changeMenu, field,
+                                    ((RefsetDefaultsConConCon) preferences).getConceptPopupIds());
+                            }
                             break;
                         case INTEGER_VALUE:
                             popup.add(changeMenu);

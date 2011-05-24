@@ -31,6 +31,7 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
         }
 
         return super.getValueAt(rowIndex, columnIndex);
+
     }
 
     public Set<Integer> getSelectedTuples() {
@@ -45,12 +46,14 @@ public class SelectableReflexiveTableModel extends ReflexiveRefsetTableModel {
     }
 
     public void setValueAt(Object value, int row, int col) {
+
         if (col == getColumnCount() - 1) {
             int tupleId = allTuples.get(row).getMemberId();
             selectedTuplesMap.put(tupleId, (Boolean) value);
         } else {
             super.setValueAt(value, row, col);
         }
+
     }
 
     public int getColumnCount() {

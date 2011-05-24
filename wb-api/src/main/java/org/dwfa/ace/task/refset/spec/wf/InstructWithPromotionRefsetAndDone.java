@@ -159,7 +159,7 @@ public class InstructWithPromotionRefsetAndDone extends AbstractTask {
                 }
 
             };
-            new Thread(r).start();
+            new Thread(r, "instruct with promotion refset and done").start();
 
             synchronized (InstructWithPromotionRefsetAndDone.this) {
                 InstructWithPromotionRefsetAndDone.this.notifyAll();

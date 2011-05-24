@@ -17,7 +17,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
     public String format;
 
-    public byte[] image;
+    public byte[] dataBytes;
 
     public String textDescription;
 
@@ -38,8 +38,8 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         conceptUuid = new UUID(in.readLong(), in.readLong());
         format = in.readUTF();
         int imageSize = in.readInt();
-        image = new byte[imageSize];
-        in.readFully(image);
+        dataBytes = new byte[imageSize];
+        in.readFully(dataBytes);
         textDescription = in.readUTF();
         typeUuid = new UUID(in.readLong(), in.readLong());
         int versionLength = in.readInt();
@@ -57,8 +57,8 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         out.writeLong(conceptUuid.getMostSignificantBits());
         out.writeLong(conceptUuid.getLeastSignificantBits());
         out.writeUTF(format);
-        out.writeInt(image.length);
-        out.write(image);
+        out.writeInt(dataBytes.length);
+        out.write(dataBytes);
         out.writeUTF(textDescription);
         out.writeLong(typeUuid.getMostSignificantBits());
         out.writeLong(typeUuid.getLeastSignificantBits());
@@ -72,6 +72,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         }
     }
 
+    @Override
     public List<TkMediaRevision> getRevisionList() {
         return revisions;
     }
@@ -92,12 +93,12 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
         this.format = format;
     }
 
-    public byte[] getImage() {
-        return image;
+    public byte[] getDataBytes() {
+        return dataBytes;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setDataBytes(byte[] data) {
+        this.dataBytes = data;
     }
 
     public String getTextDescription() {
@@ -119,17 +120,18 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" conceptUuid:");
         buff.append(this.conceptUuid);
         buff.append(" format:");
-        buff.append("'" + this.format + "'");
+        buff.append("'").append(this.format).append("'");
         buff.append(" image:");       
-        buff.append( new String(this.image));
+        buff.append( new String(this.dataBytes));
         buff.append(" textDescription:");
-        buff.append("'" + this.textDescription + "'");
+        buff.append("'").append(this.textDescription).append("'");
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
@@ -142,6 +144,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * 
      * @return a hash code value for this <tt>EImage</tt>.
      */
+    @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
@@ -156,6 +159,7 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -174,8 +178,8 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
                 return false;
             }
             // Compare image (had to loop through the array)
-            for (int i = 0; i < this.image.length; i++) {
-                if (this.image[i] != another.image[i])
+            for (int i = 0; i < this.dataBytes.length; i++) {
+                if (this.dataBytes[i] != another.dataBytes[i])
                     return false;
             }
             // Compare textDescription

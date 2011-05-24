@@ -16,7 +16,9 @@
  */
 package org.dwfa.ace.api;
 
-public interface I_AmTypedPart extends I_AmPart {
+import org.ihtsdo.tk.api.AnalogBI;
+
+public interface I_AmTypedPart<T extends AnalogBI> extends I_AmPart<T> {
 
     public int getTypeNid();
 

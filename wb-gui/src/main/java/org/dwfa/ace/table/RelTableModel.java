@@ -26,14 +26,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventObject;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultCellEditor;
@@ -74,8 +73,8 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
     List<I_RelTuple> allTuples;
     // protected ConceptPanel parentPanel;
     protected I_GetConceptData tableBean = null;
-    private Set<Integer> conceptsToFetch = Collections.synchronizedSet(new HashSet<Integer>());
-    Map<Integer, I_GetConceptData> referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, I_GetConceptData>());
+    private Set<Integer> conceptsToFetch = new ConcurrentSkipListSet<Integer>();
+    Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
     private TableChangedSwingWorker tableChangeWorker;
     private SmallProgressPanel progress = new SmallProgressPanel();
 
@@ -123,10 +122,10 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
 
         @Override
         protected Boolean construct() throws Exception {
-            referencedConcepts = Collections.synchronizedMap(new HashMap<Integer, I_GetConceptData>());
+            referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
-                fetchSet = new HashSet<Integer>(conceptsToFetch);
+                fetchSet = new ConcurrentSkipListSet<Integer>(conceptsToFetch);
             }
             for (Integer id : fetchSet) {
                 if (stopWork) {
@@ -459,8 +458,8 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         return false;
     }
 
-    public boolean allUncommitted(I_RelTuple rel) {
-        for (I_RelPart part : rel.getFixedPart().getMutableParts()) {
+    public boolean allUncommitted(I_RelTuple<?> rel) {
+        for (I_RelPart<?> part : rel.getFixedPart().getMutableParts()) {
             if (part.getTime() != Long.MAX_VALUE) {
                 return false;
             }

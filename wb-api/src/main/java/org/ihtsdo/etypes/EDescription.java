@@ -19,7 +19,7 @@ public class EDescription extends TkDescription {
         super(in, dataVersion);
     }
 
-    public EDescription(I_DescriptionVersioned desc) throws TerminologyException, IOException {
+    public EDescription(I_DescriptionVersioned<?> desc) throws TerminologyException, IOException {
         EConcept.convertId(Terms.get().getId(desc.getNid()), this);
         int partCount = desc.getMutableParts().size();
         I_DescriptionPart part = desc.getMutableParts().get(0);

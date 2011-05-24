@@ -1,19 +1,15 @@
 package org.ihtsdo.workflow.refset.mojo.init;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefset;
-import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefsetWriter;
+import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefsetWriter;
 
 /**
  * @author Jesse Efron
@@ -25,64 +21,59 @@ import org.ihtsdo.workflow.refset.semhier.SemanticAreaHierarchyRefsetWriter;
 public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
 
     /**
-     * Location of the build directory.
+     * The name of the database to create. All sql inserts will be against this
+     * database.
      * 
-     * @parameter expression="${project.build.directory}"
+     * @parameter
      * @required
      */
-    private File targetDirectory;
+    private String filePath;
     
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+
+    private static final int childSemanticAreaPosition = 0;							// 0
+    private static final int parentSemanticAreaPosition = childSemanticAreaPosition + 1;		// 1
+
+    private static final int numberOfColumns = parentSemanticAreaPosition + 1;			// 2
+
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
-        SemanticAreaHierarchyRefset refset = new SemanticAreaHierarchyRefset();
         System.setProperty("java.awt.headless", "true");
         try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-            }
-
-            I_TermFactory tf = Terms.get();
 
             SemanticAreaHierarchyRefsetWriter writer = new SemanticAreaHierarchyRefsetWriter();
 
-            File f= new File("src/main/resources/textRefset/semParRefset.txt");
-            Scanner scanner = new Scanner(f);
+            Scanner scanner = new Scanner(new File(filePath));
 
             while (scanner.hasNextLine())
             {
             	String line = scanner.nextLine();
             	String[] columns = line.split("\t");
             
-            	writer.setChildSemanticArea(columns[0]);
-            	writer.setParentSemanticArea(columns[1]);
+        		if (columns.length == numberOfColumns)
+        		{
+        			writer.setChildSemanticArea(columns[childSemanticAreaPosition]);
+        			writer.setParentSemanticArea(columns[parentSemanticAreaPosition]);
 
-            	writer.addMember();
+        			writer.addMember();
+        		} else if (reportErrors) {
+                	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into semantic area hierarchy refset"));
+    			}
+            }
 
-    	        Collection<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(refset.getRefsetId());
-    	        int size = extVersions.size();
-            };
-            
-	        tf.addUncommitted(tf.getConcept(refset.getRefsetConcept()));
+            // Single RefCompId, so commit at end
 
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
+            Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+        	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage());
 		}
 
 	}
-
-    public File getTargetDirectory() {
-        return targetDirectory;
-	}
-
-    public void setTargetDirectory(File targetDirectory) {
-        this.targetDirectory = targetDirectory;
-	}
-    
 }

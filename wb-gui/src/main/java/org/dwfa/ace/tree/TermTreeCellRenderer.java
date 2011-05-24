@@ -112,15 +112,18 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
     private Boolean highlightConflictsInTaxonomyView;
 
     private boolean showPathInfoInTaxonomy;
+    
+    private TermTreeHelper helper;
 
     /**
     * 
     */
     private static final long serialVersionUID = 1L;
 
-    public TermTreeCellRenderer(I_ConfigAceFrame aceConfig) throws TerminologyException, IOException {
+    public TermTreeCellRenderer(I_ConfigAceFrame aceConfig, TermTreeHelper helper) throws TerminologyException, IOException {
         super();
         this.aceConfig = aceConfig;
+        this.helper = helper;
         showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
         variableHeightTaxonomyView = this.aceConfig.getVariableHeightTaxonomyView();
         showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
@@ -215,17 +218,6 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                         htmlSuffixes.add("<font color='#669900'>&nbsp;[Promotion]</font>");
                                     }
                                 }
-
-                                if (aceConfig.getClassifierInputPath() != null && 
-                                        aceConfig.getClassifierInputPath().getConceptNid() == cb.getConceptNid()) {
-                                    htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Input]</font>");
-                                }
-
-                                if (aceConfig.getClassifierOutputPath() != null &&
-                                        aceConfig.getClassifierOutputPath().getConceptNid() == cb.getConceptNid()) {
-                                    htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Output]</font>");
-                                }
-
                                 for (PositionBI viewPosition : aceConfig.getViewPositionSet()) {
                                     if (viewPosition.getPath().getConceptNid() == cb.getConceptNid()) {
                                         String version =
@@ -385,7 +377,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 aceConfig.getViewPositionSetReadOnly(), 
                                 aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy(),
                                 aceConfig.getClassifierConcept().getConceptNid(),
-                                aceConfig.getRelAssertionType());
+                                helper.getAssertionType());
                     int sourceRelTupleSize = versions.size(); 
                     if (sourceRelTupleSize > 1) {
                         HashSet<I_RelTuple> unique = new HashSet<I_RelTuple>(versions);

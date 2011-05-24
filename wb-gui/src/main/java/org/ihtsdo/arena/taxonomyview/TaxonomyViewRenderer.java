@@ -18,68 +18,55 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.dwfa.ace.ACE;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
-public class TaxonomyViewRenderer  extends JComponent
-{
+public class TaxonomyViewRenderer extends JComponent {
 
     /**
      * 
      */
     private static final long serialVersionUID = 2106746763664760745L;
-
- 
     /**
      * 
      */
     protected static TaxonomyViewRenderer dragSource = null;
-
     /**
      * 
      */
     protected static int sourceRow = 0;
-
     /**
      * 
      */
     protected mxCell cell;
-
     /**
      * 
      */
     protected mxGraphComponent graphContainer;
-
     /**
      * 
      */
     protected mxGraph graph;
-
     /**
      * 
      */
     public JComponent renderedComponent;
+    private TaxonomyViewSettings settings;
+    private TaxonomyViewTitle title;
 
-	private TaxonomyViewSettings settings;
-
-
-	private TaxonomyViewTitle title;
-
-		
     /**
      * 
      */
     public TaxonomyViewRenderer(Object cellObj,
-            final mxGraphComponent graphContainer, ACE ace)
-    {
+            final mxGraphComponent graphContainer, I_ConfigAceFrame config) {
         this.cell = (mxCell) cellObj;
         this.graphContainer = graphContainer;
         this.graph = graphContainer.getGraph();
         this.settings = (TaxonomyViewSettings) this.cell.getValue();
-        this.settings.setup(ace, cell, graphContainer, graph, this);
+        this.settings.setup(config, cell, graphContainer, graph, this);
         this.settings.addHostListener(new HostListener());
         setLayout(new BorderLayout());
 
@@ -89,32 +76,32 @@ public class TaxonomyViewRenderer  extends JComponent
 
         JScrollPane scrollPane = null;
 
-         if (graph.getModel().getChildCount(cell) == 0)  {
-             renderedComponent = settings.getComponent(ace.getAceFrameConfig());
-             if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
-                 scrollPane = (JScrollPane) renderedComponent;
-             } else {
-                 scrollPane = new JScrollPane(renderedComponent);
-             }
+        if (graph.getModel().getChildCount(cell) == 0) {
+            renderedComponent = settings.getComponent(config);
+            if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
+                scrollPane = (JScrollPane) renderedComponent;
+            } else {
+                scrollPane = new JScrollPane(renderedComponent);
+            }
         }
 
-		if (scrollPane != null) {
+        if (scrollPane != null) {
             add(scrollPane, BorderLayout.CENTER);
             scrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             scrollPane.getViewport().setBackground(Color.WHITE);
             scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             setOpaque(true);
-			scrollPane.getVerticalScrollBar().addAdjustmentListener(
-					new AdjustmentListener() {
+            scrollPane.getVerticalScrollBar().addAdjustmentListener(
+                    new AdjustmentListener() {
 
-						public void adjustmentValueChanged(AdjustmentEvent e) {
-							graphContainer.refresh();
-						}
-
-					});
-			scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
-		}
+                        @Override
+                        public void adjustmentValueChanged(AdjustmentEvent e) {
+                            graphContainer.refresh();
+                        }
+                    });
+            scrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
+        }
 
 
         JPanel footerPanel = new JPanel();
@@ -128,13 +115,13 @@ public class TaxonomyViewRenderer  extends JComponent
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
 
-       
+
         gbc.weightx = 1;
         JPanel fillerPanel = new JPanel();
         fillerPanel.setBackground(footerPanel.getBackground());
-        
+
         footerPanel.add(fillerPanel, gbc);
-        
+
         gbc.weightx = 0;
 
         gbc.gridx++;
@@ -146,22 +133,16 @@ public class TaxonomyViewRenderer  extends JComponent
         setMinimumSize(new Dimension(40, 20));
     }
 
-
     private void updateLabel() {
-    	title.updateTitle();
+        title.updateTitle();
     }
-
-
 
     /**
      * 
      */
-    public static TaxonomyViewRenderer getVertex(Component component)
-    {
-        while (component != null)
-        {
-            if (component instanceof TaxonomyViewRenderer)
-            {
+    public static TaxonomyViewRenderer getVertex(Component component) {
+        while (component != null) {
+            if (component instanceof TaxonomyViewRenderer) {
                 return (TaxonomyViewRenderer) component;
             }
             component = component.getParent();
@@ -172,10 +153,9 @@ public class TaxonomyViewRenderer  extends JComponent
 
     private class HostListener implements PropertyChangeListener {
 
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			updateLabel();
-		}
-    	
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            updateLabel();
+        }
     }
- }
+}

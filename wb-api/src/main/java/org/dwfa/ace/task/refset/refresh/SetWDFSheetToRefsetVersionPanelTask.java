@@ -192,7 +192,7 @@ public class SetWDFSheetToRefsetVersionPanelTask extends AbstractTask {
                 Set<UniversalAcePosition> universalPositions = (Set<UniversalAcePosition>) process.getProperty(refsetVersionPropName);
                 for (UniversalAcePosition univPos : universalPositions) {
                     PathBI path = tf.getPath(univPos.getPathId());
-                    PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+                    PositionBI thinPos = tf.newPosition(path, univPos.getTime());
                     previousPositions.add(thinPos);
                 }
 

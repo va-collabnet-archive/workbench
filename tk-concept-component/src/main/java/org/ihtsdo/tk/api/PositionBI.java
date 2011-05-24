@@ -10,9 +10,13 @@ public interface PositionBI {
 
     public long getTime();
 
-    public boolean isSubsequentOrEqualTo(int version, int pathId);
+    public boolean isSubsequentOrEqualTo(int version, int pathNid);
 
-    public boolean isAntecedentOrEqualTo(int version, int pathId);
+    public boolean isAntecedentOrEqualTo(int version, int pathNid);
+
+    public boolean isSubsequentOrEqualTo(long time, int pathNid);
+
+    public boolean isAntecedentOrEqualTo(long time, int pathNid);
 
     public boolean isAntecedentOrEqualTo(PositionBI another);
 
@@ -20,7 +24,9 @@ public interface PositionBI {
 
     public boolean isSubsequentOrEqualTo(PositionBI another);
 
-    public boolean equals(int version, int pathId);
+    public boolean equals(int version, int pathNid);
+
+    public boolean equals(long time, int pathNid);
 
     public Collection<? extends PositionBI> getAllOrigins();
 

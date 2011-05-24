@@ -128,6 +128,12 @@ public class FileIO {
         BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(outName));
         copyFile(is, os, true);
     }
+    
+    public static void copyFile(InputStream is, File outFile) throws IOException {
+        outFile.getParentFile().mkdirs();
+        FileOutputStream fos = new FileOutputStream(outFile);
+        copyFile(is, fos, true);
+    }
 
     /** Copy a file from an opened InputStream to an opened OutputStream */
     public static void copyFile(InputStream is, OutputStream os, boolean close) throws IOException {
@@ -241,6 +247,7 @@ public class FileIO {
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             returnValue.setReturnValue(getObjFromFilesystemCore(parent, title, startDir, fileFilter));
@@ -255,19 +262,13 @@ public class FileIO {
 
                 });
             } catch (InterruptedException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             } catch (InvocationTargetException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             }
         }
         if (returnValue.getEx() != null) {
-            IOException ioe = new IOException(returnValue.getEx().getMessage());
-            ioe.initCause(returnValue.getEx());
-            throw ioe;
+            throw new IOException(returnValue.getEx());
         }
         return returnValue.getReturnValue();
     }
@@ -361,6 +362,7 @@ public class FileIO {
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             returnValue.setReturnValue(writeObjeToFilesystemCore(parent, title, startDir, defaultFile,
@@ -374,19 +376,13 @@ public class FileIO {
 
                 });
             } catch (InterruptedException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             } catch (InvocationTargetException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             }
         }
         if (returnValue.getEx() != null) {
-            IOException ioe = new IOException(returnValue.getEx().getMessage());
-            ioe.initCause(returnValue.getEx());
-            throw ioe;
+            throw new IOException(returnValue.getEx());
         }
         return returnValue.getReturnValue();
     }
@@ -423,6 +419,7 @@ public class FileIO {
         } else {
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             returnValue.setReturnValue(writeObjXmlToFilesystemCore(parent, title, startDir,
@@ -436,19 +433,13 @@ public class FileIO {
 
                 });
             } catch (InterruptedException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             } catch (InvocationTargetException e) {
-                IOException ioe = new IOException(returnValue.getEx().getMessage());
-                ioe.initCause(e);
-                throw ioe;
+                throw new IOException(returnValue.getEx().getMessage(), e);
             }
         }
         if (returnValue.getEx() != null) {
-            IOException ioe = new IOException(returnValue.getEx().getMessage());
-            ioe.initCause(returnValue.getEx());
-            throw ioe;
+            throw new IOException(returnValue.getEx());
         }
         return returnValue.getReturnValue();
 
@@ -470,6 +461,7 @@ public class FileIO {
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             XMLEncoder encoder = new XMLEncoder(bos);
             encoder.setExceptionListener(new ExceptionListener() {
+                @Override
                 public void exceptionThrown(Exception exception) {
                     exception.printStackTrace();
                 }
@@ -582,9 +574,9 @@ public class FileIO {
             depth++;
             parent = parent.getParentFile();
         }
-        StringBuffer relativePath = new StringBuffer();
+        StringBuilder relativePath = new StringBuilder();
         for (int i = 0; i < depth; i++) {
-            relativePath.append(".." + File.separator);
+            relativePath.append("..").append(File.separator);
         }
         relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
         return relativePath.toString();
@@ -604,6 +596,7 @@ public class FileIO {
             final boolean excludeHidden) {
         File[] children = rootFile.listFiles(new FileFilter() {
 
+            @Override
             public boolean accept(File child) {
                 if (excludeHidden) {
                     if (child.isHidden() || child.getName().startsWith(".")) {

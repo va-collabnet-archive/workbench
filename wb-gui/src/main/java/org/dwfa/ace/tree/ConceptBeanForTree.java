@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_Position;
@@ -52,19 +51,106 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
+        return bean.getInactiveRefexes(xyz);
+    }
+
+    public Set<PositionBI> getPositions() throws IOException {
+        return bean.getPositions();
+    }
+
+   public Set<Integer> getAllSapNids() throws IOException {
+      return bean.getAllSapNids();
+   }
+
+   public void cancel() throws IOException {
+      bean.cancel();
+   }
+
+   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+      bean.commit(changeSetPolicy, changeSetWriterThreading);
+   }
+
+   public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
+      return bean.getRefsetMembers();
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
+      return bean.getCurrentRefsetMembers(vc);
+   }
+
+    public boolean isUncommitted() {
+        return bean.isUncommitted();
+    }
+
+    public Collection<? extends ConceptVersionBI> getVersions() {
+        return bean.getVersions();
+    }
+
+    public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
+        return bean.getVersions(c);
+    }
+
+    public ConceptVersionBI getVersion(ViewCoordinate c) {
+        return bean.getVersion(c);
+    }
+
+    public Collection<? extends RefexChronicleBI<?>> getRefexes()
+			throws IOException {
+		return bean.getRefexes();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
+			ViewCoordinate xyz) throws IOException {
+		return bean.getCurrentRefexes(xyz);
+	}
+
+	public boolean addAnnotation(RefexChronicleBI<?> annotation)
+			throws IOException {
+		return bean.addAnnotation(annotation);
+	}
+
+	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
+			throws IOException {
+		return bean.getAnnotations();
+	}
+
+	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
+			ViewCoordinate xyz) throws IOException {
+		return bean.getCurrentAnnotations(xyz);
+	}
+
+    @Override
+    public void setAnnotationStyleRefex(boolean annotationSyleRefex) {
+        bean.setAnnotationStyleRefex(annotationSyleRefex);
+    }
+
+    @Override
+    public boolean isAnnotationStyleRefex() throws IOException {
+        return bean.isAnnotationStyleRefex();
+    }
 
     @Override
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus,
@@ -80,14 +166,14 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
     @Override
-    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus, 
+    public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus,
             NidSetBI allowedTypes,
             PositionSetBI positions,
             Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
             int classifierNid,
             RelAssertionType relAssertionType) throws IOException, TerminologyException {
-        return bean.getDestRelTuples(allowedStatus, 
+        return bean.getDestRelTuples(allowedStatus,
                 allowedTypes,
                 positions,
                 precedencePolicy,
@@ -95,9 +181,6 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                 classifierNid,
                 relAssertionType);
     }
-    public boolean isUncommitted() {
-		return bean.isUncommitted();
-	}
 
 	public String toUserString() {
 		return bean.toUserString();
@@ -107,9 +190,9 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getPrimUuid();
 	}
 
-	public Collection<? extends RelGroupChronicleBI> getRelGroups()
+	public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc)
 			throws IOException, ContraditionException {
-		return bean.getRelGroups();
+		return bean.getRelGroups(vc);
 	}
 
 	public List<UUID> getUUIDs() {
@@ -141,8 +224,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, precedencePolicy, contradictionManager);
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, NidSetBI allowedStatus,
+	public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder,
+			NidListBI langPrefOrder, NidSetBI allowedStatus,
 			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
 			Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException {
@@ -242,8 +325,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, precedencePolicy, contradictionManager);
 	}
 
-	public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder,
-			I_IntList langPrefOrder, NidSetBI allowedStatus,
+	public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder,
+			NidListBI langPrefOrder, NidSetBI allowedStatus,
 			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
 			Precedence precedencePolicy,
 			I_ManageContradiction contradictionManager) throws IOException {
@@ -456,7 +539,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
             contradictionManager);
     }
 
-    public I_DescriptionTuple getDescTuple(I_IntList typePrefOrder, I_IntList langPrefOrder, I_IntSet allowedStatus,
+    public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder, NidListBI langPrefOrder, I_IntSet allowedStatus,
             PositionSetReadOnly positionSet, LANGUAGE_SORT_PREF sortPref, Precedence precedencePolicy,
             I_ManageContradiction contradictionManager) throws IOException {
         return bean.getDescTuple(typePrefOrder, langPrefOrder, allowedStatus, positionSet, sortPref, precedencePolicy,
@@ -577,7 +660,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     public Collection<? extends I_RelVersioned> getSourceRels() throws IOException {
         return bean.getSourceRels();
     }
- 
+
     public List<UUID> getUids() throws IOException {
         return bean.getUids();
     }
@@ -626,7 +709,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
     }
 
-    public I_DescriptionTuple getDescTuple(I_IntList prefOrder, I_ConfigAceFrame config) throws IOException {
+    public I_DescriptionTuple getDescTuple(NidListBI prefOrder, I_ConfigAceFrame config) throws IOException {
         return bean.getDescTuple(prefOrder, config);
     }
 
@@ -638,7 +721,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getUniversalAceBean();
     }
 
- 
+
     public int getRelId() {
         return relId;
     }
@@ -701,6 +784,17 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException {
 		return bean.getCommonRelTuples(config);
+	}
+
+    @Override
+    public ConceptVersionBI getPrimordialVersion() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+	@Override
+	public FoundContradictionVersions getVersionsInContradiction(
+			ViewCoordinate vc) {
+        throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 }

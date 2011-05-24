@@ -20,6 +20,7 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EDescription;
@@ -44,11 +45,14 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
+
     private int minSapNid = Integer.MIN_VALUE;
     private int maxSapNid = Integer.MAX_VALUE;
     private NidSetBI commitSapNids;
     private ChangeSetGenerationPolicy policy;
+    private int classifier = ReferenceConcepts.SNOROCKET.getNid();
 
+    @Override
     public String toString() {
         return "EConceptChangeSetComputer: minSapNid: " + minSapNid + " maxSapNid: " + maxSapNid + " policy: " + policy;
     }
@@ -57,22 +61,22 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         super();
         this.policy = policy;
         switch (policy) {
-        case COMPREHENSIVE:
-            maxSapNid = commitSapNids.getMax();
-            break;
-        case INCREMENTAL:
-            if (!commitSapNids.contiguous()) {
-                this.commitSapNids = commitSapNids;
-            }
-            maxSapNid = commitSapNids.getMax();
-            minSapNid = commitSapNids.getMin();
-            break;
-        case MUTABLE_ONLY:
-            maxSapNid = Integer.MAX_VALUE;
-            minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
-            break;
-        default:
-            throw new RuntimeException("Can't handle policy: " + policy);
+            case COMPREHENSIVE:
+                maxSapNid = commitSapNids.getMax();
+                break;
+            case INCREMENTAL:
+                if (!commitSapNids.contiguous()) {
+                    this.commitSapNids = commitSapNids;
+                }
+                maxSapNid = commitSapNids.getMax();
+                minSapNid = commitSapNids.getMin();
+                break;
+            case MUTABLE_ONLY:
+                maxSapNid = Integer.MAX_VALUE;
+                minSapNid = Bdb.getSapDb().getReadOnlyMax() + 1;
+                break;
+            default:
+                throw new RuntimeException("Can't handle policy: " + policy);
         }
         assert minSapNid <= maxSapNid : "Min not <= max; min: " + minSapNid + " max: " + maxSapNid;
     }
@@ -83,16 +87,17 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
      * org.ihtsdo.cs.I_ComputeEConceptForChangeSet#getEConcept(org.ihtsdo.concept
      * .Concept)
      */
+    @Override
     public EConcept getEConcept(Concept c) throws IOException {
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
 
-			ec.setPrimordialUuid(c.getPrimUuid());
-			ec.setConceptAttributes(processConceptAttributes(c, changed));
-			ec.setDescriptions(processDescriptions(c, changed));
-			ec.setRelationships(processRelationships(c, changed));
-			ec.setImages(processMedia(c, changed));
-			ec.setRefsetMembers(processRefsetMembers(c, changed));
+        ec.setPrimordialUuid(c.getPrimUuid());
+        ec.setConceptAttributes(processConceptAttributes(c, changed));
+        ec.setDescriptions(processDescriptions(c, changed));
+        ec.setRelationships(processRelationships(c, changed));
+        ec.setImages(processMedia(c, changed));
+        ec.setRefsetMembers(processRefsetMembers(c, changed));
         if (changed.get()) {
             return ec;
         }
@@ -102,9 +107,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed) throws IOException {
         List<TkRefsetAbstractMember<?>> eRefsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
         for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
-        	TkRefsetAbstractMember<?> eMember = null;
+            TkRefsetAbstractMember<?> eMember = null;
             for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-                if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         changed.set(true);
                         try {
@@ -113,7 +118,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                                 eRefsetMembers.add(eMember);
                                 setupFirstVersion(eMember, v);
                             } else {
-                            	TkRevision eRevision = v.getERefsetRevision();
+                                TkRevision eRevision = v.getERefsetRevision();
                                 setupRevision(eMember, v, eRevision);
                             }
                         } catch (TerminologyException e) {
@@ -126,12 +131,12 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         return eRefsetMembers;
     }
 
-	private List<TkMedia> processMedia(Concept c, AtomicBoolean changed) throws IOException {
+    private List<TkMedia> processMedia(Concept c, AtomicBoolean changed) throws IOException {
         List<TkMedia> eImages = new ArrayList<TkMedia>();
         for (Image img : c.getImages()) {
             EImage eImg = null;
             for (Image.Version v : img.getTuples()) {
-                if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         changed.set(true);
                         if (eImg == null) {
@@ -139,7 +144,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                             eImages.add(eImg);
                             eImg.setConceptUuid(Bdb.getPrimUuidForConcept(v.getConceptNid()));
                             eImg.setFormat(v.getFormat());
-                            eImg.setImage(v.getImage());
+                            eImg.setDataBytes(v.getImage());
                             eImg.setTextDescription(v.getTextDescription());
                             eImg.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
                             setupFirstVersion(eImg, v);
@@ -159,35 +164,37 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private List<TkRelationship> processRelationships(Concept c, AtomicBoolean changed) throws IOException {
         List<TkRelationship> rels = new ArrayList<TkRelationship>(c.getSourceRels().size());
         for (Relationship r : c.getSourceRels()) {
-        	TkRelationship ecr = null;
+            TkRelationship ecr = null;
             for (Relationship.Version v : r.getTuples()) {
-                if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && 
+                        v.getTime() != Long.MIN_VALUE && 
+                        v.getAuthorNid() != classifier) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         try {
-							changed.set(true);
-							if (ecr == null) {
-							    ecr = new ERelationship();
-							    rels.add(ecr);
-							    ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
-							    ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
-							    ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-							    ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
-							    ecr.setRelGroup(v.getGroup());
-							    ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-							    setupFirstVersion(ecr, v);
-							} else {
-							    ERelationshipRevision ecv = new ERelationshipRevision();
-							    ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
-							    ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
-							    ecv.setRelGroup(v.getGroup());
-							    ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
-							    setupRevision(ecr, v, ecv);
-							}
-						} catch (AssertionError e) {
-							AceLog.getAppLog().alertAndLogException(new Exception(e.getLocalizedMessage() + "\n\n" +
-									c.toLongString(), e));
-							throw e;
-						}
+                            changed.set(true);
+                            if (ecr == null) {
+                                ecr = new ERelationship();
+                                rels.add(ecr);
+                                ecr.setC1Uuid(Bdb.getPrimUuidForConcept(v.getC1Id()));
+                                ecr.setC2Uuid(Bdb.getPrimUuidForConcept(v.getC2Id()));
+                                ecr.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+                                ecr.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+                                ecr.setRelGroup(v.getGroup());
+                                ecr.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                                setupFirstVersion(ecr, v);
+                            } else {
+                                ERelationshipRevision ecv = new ERelationshipRevision();
+                                ecv.setCharacteristicUuid(Bdb.getPrimUuidForConcept(v.getCharacteristicId()));
+                                ecv.setRefinabilityUuid(Bdb.getPrimUuidForConcept(v.getRefinabilityNid()));
+                                ecv.setRelGroup(v.getGroup());
+                                ecv.setTypeUuid(Bdb.getPrimUuidForConcept(v.getTypeNid()));
+                                setupRevision(ecr, v, ecv);
+                            }
+                        } catch (AssertionError e) {
+                            AceLog.getAppLog().alertAndLogException(new Exception(e.getLocalizedMessage() + "\n\n"
+                                    + c.toLongString(), e));
+                            throw e;
+                        }
                     }
                 }
             }
@@ -200,7 +207,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         for (Description d : c.getDescriptions()) {
             EDescription ecd = null;
             for (Description.Version v : d.getTuples()) {
-                if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
                     changed.set(true);
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         if (ecd == null) {
@@ -228,9 +235,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     }
 
     private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
-    	TkConceptAttributes eca = null;
+        TkConceptAttributes eca = null;
         for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
-            if (v.getSapNid() >= minSapNid && v.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+            if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
                 changed.set(true);
                 if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                     if (eca == null) {

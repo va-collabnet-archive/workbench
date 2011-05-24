@@ -71,6 +71,7 @@ import au.csiro.snorocket.snapi.I_Snorocket.I_EquivalentCallback;
 // import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataRoleCallback;
 
 /**
+ * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
  * 
  * SnorocketTask retrieves concepts and relationship from the stated edit path
  * and load the same to the IHTSDO (Snorocket) classifier.
@@ -378,7 +379,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 
 			cEditSnoCons = new ArrayList<SnoCon>();
 			cEditSnoRels = new ArrayList<SnoRel>();
-			SnoPathProcessConcepts pcEdit = new SnoPathProcessConcepts(logger,
+			SnoPathProcessStated pcEdit = new SnoPathProcessStated(logger,
 					cEditSnoCons, cEditSnoRels, allowedRoleTypes, statusSet,
 					cEditPosSet, gui, precedence, contradictionMgr);
 			tf.iterateConcepts(pcEdit);
@@ -1053,7 +1054,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 				.getDestRels();
 		while (thisLevel.size() > 0) {
 			ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-			for (I_RelVersioned rv : thisLevel) {
+			for (I_RelVersioned<?> rv : thisLevel) {
 				I_RelPart rPart1 = null;
 				for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
 					for (I_RelPart rPart : rv.getMutableParts()) {
@@ -1240,12 +1241,12 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			cEditPathNid = cEditPathObj.getConceptNid();
 			cEditIPath = tf.getPath(cEditPathObj.getUids());
 			cEditPosSet = new PositionSetReadOnly(tf.newPosition(cEditIPath,
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			// cEditPosSet = new
 			// PositionSetReadOnly(cEditIPath.getOrigins().get(0));
 
 			cEditPathPos = new ArrayList<PositionBI>();
-			cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+			cEditPathPos.add(tf.newPosition(cEditIPath, Long.MAX_VALUE));
 			setupPathOrigins(cEditPathPos, cEditIPath);
 
 			// GET ALL CLASSIFER_PATH ORIGINS
@@ -1259,12 +1260,12 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			cClassPathNid = cClassPathObj.getConceptNid();
 			cClassIPath = tf.getPath(cClassPathObj.getUids());
 			cClassPosSet = new PositionSetReadOnly(tf.newPosition(cClassIPath,
-					Integer.MAX_VALUE));
+					Long.MAX_VALUE));
 			// cClassPosSet = new
 			// PositionSetReadOnly(cClassIPath.getOrigins().get(0));
 
 			cClassPathPos = new ArrayList<PositionBI>();
-			cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+			cClassPathPos.add(tf.newPosition(cClassIPath, Long.MAX_VALUE));
 			setupPathOrigins(cClassPathPos, cClassIPath);
 
 		} catch (TerminologyException e) {
@@ -1538,7 +1539,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 					if (countRolesVerbose) {
 						debugSB.append("::: "
 								+ SnoTable.toStringIsaAncestry(debugSR.typeId,
-										cEditPathPos) + "\r\n");
+										cEditPathPos, true) + "\r\n");
 					}
 				}
 				debugLastRole = debugSR.typeId;

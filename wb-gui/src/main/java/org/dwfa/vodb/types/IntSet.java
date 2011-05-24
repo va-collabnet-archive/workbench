@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.event.ListDataEvent;
@@ -38,19 +39,22 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 
 public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
-    private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
+    private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
     private int[] setValues = new int[0];
-    
+
     private static class LastContains {
+
         public LastContains(int key, boolean result) {
             lastContains = key;
             lastResult = result;
         }
+
         public LastContains() {
         }
         private int lastContains = Integer.MAX_VALUE;
@@ -94,28 +98,29 @@ public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
         super();
         setValues = new int[pathSet.size()];
         int i = 0;
-        for (PathBI p: pathSet) {
-        	setValues[i++] = p.getConceptNid();
+        for (PathBI p : pathSet) {
+            setValues[i++] = p.getConceptNid();
         }
         Arrays.sort(setValues);
     }
 
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[");
         int count = 0;
         for (int i : setValues) {
             try {
-            	if (Terms.get().hasConcept(i)) {
+                if (Terms.get().hasConcept(i)) {
                     buf.append(Terms.get().getConcept(i).getInitialText());
-            	} else {
+                } else {
                     buf.append(i);
-            	}
+                }
             } catch (IOException e) {
                 buf.append(i);
             } catch (TerminologyException e) {
                 buf.append(i);
-			}
+            }
             if (count++ < setValues.length - 1) {
                 buf.append(", ");
             }
@@ -215,11 +220,11 @@ public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
      */
     public synchronized IntSet addAll(int[] keys) {
         lastContains = new LastContains();
-    	HashSet<Integer> members = getAsSet();
-    	for (int key: keys) {
-    		members.add(key);
-    	}
-    	replaceWithSet(members);
+        HashSet<Integer> members = getAsSet();
+        for (int key : keys) {
+            members.add(key);
+        }
+        replaceWithSet(members);
         intervalAdded(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
         return this;
     }
@@ -230,33 +235,33 @@ public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
      * @see org.dwfa.ace.api.I_IntSet#removeAll(int[])
      */
     public synchronized void removeAll(int[] keys) {
-    	HashSet<Integer> members = getAsSet();
-    	lastContains = new LastContains();
-    	for (int key: keys) {
-    		members.remove(key);
-    	}
-    	replaceWithSet(members);
-    	lastContains = new LastContains();
-    	intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
+        HashSet<Integer> members = getAsSet();
+        lastContains = new LastContains();
+        for (int key : keys) {
+            members.remove(key);
+        }
+        replaceWithSet(members);
+        lastContains = new LastContains();
+        intervalRemoved(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, setValues.length));
     }
 
-	public HashSet<Integer> getAsSet() {
-		HashSet<Integer> members = new HashSet<Integer>();
-    	for (int elem: setValues) {
-    		members.add(elem);
-    	}
-		return members;
-	}
+    public HashSet<Integer> getAsSet() {
+        HashSet<Integer> members = new HashSet<Integer>();
+        for (int elem : setValues) {
+            members.add(elem);
+        }
+        return members;
+    }
 
-	public void replaceWithSet(HashSet<Integer> members) {
+    public void replaceWithSet(HashSet<Integer> members) {
         lastContains = new LastContains();
-		setValues = new int[members.size()];
-    	int i = 0;
-    	for (int elem: members) {
-    		setValues[i++] = elem;
-    	}
-    	Arrays.sort(setValues);
-	}
+        setValues = new int[members.size()];
+        int i = 0;
+        for (int elem : members) {
+            setValues[i++] = elem;
+        }
+        Arrays.sort(setValues);
+    }
 
     /*
      * (non-Javadoc)
@@ -423,60 +428,61 @@ public class IntSet implements ListDataListener, I_IntSet, NidSetBI {
         return listeners.remove(o);
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (IntSet.class.isAssignableFrom(obj.getClass())) {
-			IntSet another = (IntSet) obj;
-			if (setValues.length != another.setValues.length) {
-				return false;
-			}
-			for (int i = 0; i < setValues.length; i++) {
-				if (setValues[i] != another.setValues[i]) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return super.equals(obj);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (IntSet.class.isAssignableFrom(obj.getClass())) {
+            IntSet another = (IntSet) obj;
+            if (setValues.length != another.setValues.length) {
+                return false;
+            }
+            for (int i = 0; i < setValues.length; i++) {
+                if (setValues[i] != another.setValues[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return super.equals(obj);
+    }
 
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-	
-	@Override
-	public int size() {
-		return setValues.length;
-	}
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 
-	@Override
-	public int getMax() {
-		if (setValues.length == 0) {
-			return Integer.MAX_VALUE;
-		}
-		return setValues[setValues.length - 1];
-	}
-	
-	@Override
-	public int getMin() {
-		if (setValues.length == 0) {
-			return Integer.MIN_VALUE;
-		}
-		return setValues[0];
-	}
+    @Override
+    public int size() {
+        return setValues.length;
+    }
 
-	public boolean contiguous() {
-		if (setValues.length == 0) {
-			return true;
-		}
-		int prev = setValues[0] -1;
-		for (int i: setValues) {
-			if (prev != i-1) {
-				return false;
-			}
-			prev = i;
-		}
-		return true;
-	}
+    @Override
+    public int getMax() {
+        if (setValues.length == 0) {
+            return Integer.MAX_VALUE;
+        }
+        return setValues[setValues.length - 1];
+    }
+
+    @Override
+    public int getMin() {
+        if (setValues.length == 0) {
+            return Integer.MIN_VALUE;
+        }
+        return setValues[0];
+    }
+
+    public boolean contiguous() {
+        if (setValues.length == 0) {
+            return true;
+        }
+        int prev = setValues[0] - 1;
+        for (int i : setValues) {
+            if (prev != i - 1) {
+                return false;
+            }
+            prev = i;
+        }
+        return true;
+    }
+    
 }

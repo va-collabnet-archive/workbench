@@ -110,6 +110,7 @@ public class OpenKnowledgePackagesBrowser extends AbstractTask {
 			signpostPanel.add(new RulesBrowserPanel(kbase, config), BorderLayout.CENTER);
 			signpostPanel.revalidate();
 			config.setShowSignpostPanel(true);
+			config.setShowWorkflowSignpostPanel(false);
 			
 			return Condition.CONTINUE;
 		} catch (Exception e) {

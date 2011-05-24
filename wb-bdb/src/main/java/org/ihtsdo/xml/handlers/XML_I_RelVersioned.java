@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 
 public class XML_I_RelVersioned extends XML_basic_getCon implements I_Handle_XML {
 
-	I_RelVersioned rel;
+	I_RelVersioned<?> rel;
 	/** If False then is a src relationship **/
 	boolean dest = false;
 	String relN;

@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -67,6 +68,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 
 /**
+ * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
  * 
  * SnorocketTaskOld retrieves concepts and relationship from the stated edit path
  * and load the same to the IHTSDO (Snorocket) classifier.
@@ -1073,7 +1075,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             cEditPathNid = cEditPathObj.getConceptNid();
             cEditIPath = tf.getPath(cEditPathObj.getUids());
             cEditPathPos = new ArrayList<PositionBI>();
-            cEditPathPos.add(tf.newPosition(cEditIPath, Integer.MAX_VALUE));
+            cEditPathPos.add(tf.newPosition(cEditIPath, Long.MAX_VALUE));
             getPathOrigins(cEditPathPos, cEditIPath);
 
             // GET ALL CLASSIFER_PATH ORIGINS
@@ -1086,7 +1088,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
             cClassPathNid = cClassPathObj.getConceptNid();
             cClassIPath = tf.getPath(cClassPathObj.getUids());
             cClassPathPos = new ArrayList<PositionBI>();
-            cClassPathPos.add(tf.newPosition(cClassIPath, Integer.MAX_VALUE));
+            cClassPathPos.add(tf.newPosition(cClassIPath, Long.MAX_VALUE));
             getPathOrigins(cClassPathPos, cClassIPath);
 
         } catch (TerminologyException e) {
@@ -1280,7 +1282,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
         Collection<? extends I_RelVersioned> thisLevel = rootConcept.getDestRels();
         while (thisLevel.size() > 0) {
             ArrayList<I_RelVersioned> nextLevel = new ArrayList<I_RelVersioned>();
-            for (I_RelVersioned rv : thisLevel) {
+            for (I_RelVersioned<?> rv : thisLevel) {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathPos) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
@@ -1389,7 +1391,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 roleCount += 1;
                 results.add(sr);
                 if (countRolesVerbose) {
-                    sb.append("::: " + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathPos)
+                    sb.append("::: " + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathPos, true)
                             + "\r\n");
                 }
             }
@@ -1448,7 +1450,7 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                 if (sr.typeId != lastRole) {
                     countRoles += 1;
                     if (countRolesVerboseFlag) {
-                        sb.append("::: " + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathPos)
+                        sb.append("::: " + SnoTable.toStringIsaAncestry(sr.typeId, cEditPathPos, true)
                                 + "\r\n");
                     }
                 }
@@ -1586,7 +1588,8 @@ public class SnorocketTaskOld extends AbstractTask implements ActionListener {
                     + c2.getInitialText() + "\t" + g + "\r\n");
 
             sb.append("\tc2 status: ** ");
-            for (I_ConceptAttributePart mp : c2.getConceptAttributes().getMutableParts())
+            I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
+            for (I_ConceptAttributePart mp : ca.getMutableParts())
                 sb.append(toStringCNid(mp.getStatusId()) + " ** ");
 
             return sb.toString();

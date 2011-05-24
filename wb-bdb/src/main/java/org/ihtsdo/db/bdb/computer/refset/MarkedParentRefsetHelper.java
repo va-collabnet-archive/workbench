@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_HelpMarkedParentRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -46,6 +47,10 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
         this.parentMemberTypeId = Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT.getUids())
             .getConceptNid();
         this.parentRefsetId = getParentRefset();
+    }
+
+    public int getParentRefsetId() {
+        return parentRefsetId;
     }
 
     /* (non-Javadoc)
@@ -148,16 +153,19 @@ public class MarkedParentRefsetHelper extends RefsetHelper implements I_HelpMark
             null,
             getConfig().getPrecedence(), getConfig().getConflictResolutionStrategy());
 
-        if (targetParentRefsets == null || targetParentRefsets.size() == 0) {
-            throw new TerminologyException("Unable to locate parent member refset for '"
+        if (targetParentRefsets == null || targetParentRefsets.isEmpty()) {
+        	AceLog.getAppLog().warning("Unable to locate parent member refset for '"
                 + memberRefset.getInitialText() + "'");
         }
         if (targetParentRefsets.size() > 1) {
             logger.warning("More than one parent member refset found for '" + memberRefset.getInitialText() + "'"
                 + "Defaulting to the first one found!");
         }
-        I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
-        return parentRefset.getConceptNid();
+        if (targetParentRefsets != null && !targetParentRefsets.isEmpty()) {
+            I_GetConceptData parentRefset = targetParentRefsets.iterator().next();
+            return parentRefset.getConceptNid();
+        }
+        return Integer.MIN_VALUE;
     }
 
     /* (non-Javadoc)

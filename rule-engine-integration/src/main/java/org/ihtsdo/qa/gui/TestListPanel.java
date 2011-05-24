@@ -1,8 +1,15 @@
 package org.ihtsdo.qa.gui;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -12,14 +19,17 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.ihtsdo.rules.RulesLibrary;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.ihtsdo.rules.CheckConceptTask;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
-import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 
@@ -32,7 +42,7 @@ public class TestListPanel extends JPanel {
 	private DefaultTableModel table1Model = null;
 	private I_ConfigAceFrame config;
 	private RulesContextHelper contextHelper = null;
-	
+
 	public TestListPanel(I_ConfigAceFrame config) {
 		initComponents();
 		this.config = config;
@@ -82,7 +92,7 @@ public class TestListPanel extends JPanel {
 	private void testConcepts() {
 		label4.setText("");
 		label4.revalidate();
-		
+
 		String[] columnNames = {"Concept",
 		"Alerts"};
 		String[][] data = null;
@@ -94,21 +104,51 @@ public class TestListPanel extends JPanel {
 		};
 		long start = Calendar.getInstance().getTimeInMillis();
 		for (int i = 0; i < list1Model.getSize(); i++) {
-			I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
+			final I_GetConceptData loopConcept = (I_GetConceptData) list1Model.getElementAt(i);
 			I_GetConceptData context = (I_GetConceptData) comboBox1.getSelectedItem();
 			try {
-				ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper);
-				for (ResultsItem resultsItem : results.getResultsItems()) {
-					table1Model.addRow(
-							new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
-				}
+				final CheckConceptTask checkTask = new CheckConceptTask();
+				//set fields
+				checkTask.setContext(context);
+				checkTask.setConcept(loopConcept);
+				checkTask.setConfig(config);
+				checkTask.setContextHelper(contextHelper);
+				checkTask.setInferredOrigin(INFERRED_VIEW_ORIGIN.FULL);
+				checkTask.setOnlyUncommittedContent(false);
+
+				PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+					public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+						String property = propertyChangeEvent.getPropertyName();
+						if ("state".equals(property)) {
+							StateValue value = (StateValue) propertyChangeEvent.getNewValue();
+							if (value.equals(StateValue.DONE)) {
+								try {
+									for (ResultsItem resultsItem : checkTask.get().getResultsItems()) {
+										table1Model.addRow(
+												new String[] {loopConcept.toString(), "[" + resultsItem.getErrorCode() + "] " + resultsItem.getMessage()});
+									}
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								} catch (ExecutionException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+				};
+
+				checkTask.addPropertyChangeListener(propertyChangeListener);
+
+				checkTask.execute();
+				//ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, false, config, contextHelper, INFERRED_VIEW_ORIGIN.FULL);
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		long end = Calendar.getInstance().getTimeInMillis();
-		label4.setText("Total test time: " + (end - start) + " milliseconds...");
-		label4.revalidate();
+		//		long end = Calendar.getInstance().getTimeInMillis();
+		//		label4.setText("Total test time: " + (end - start) + " milliseconds...");
+		//		label4.revalidate();
 		table1.setModel(table1Model);
 		table1.repaint();
 	}
@@ -126,6 +166,14 @@ public class TestListPanel extends JPanel {
 		contextHelper.clearCache();
 	}
 
+	private void button4ActionPerformed(ActionEvent e) {
+		try {
+			Terms.get().setupIsaCacheAndWait(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate());
+		} catch (Exception e2) {
+			e2.printStackTrace();
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
@@ -141,15 +189,17 @@ public class TestListPanel extends JPanel {
 		label4 = new JLabel();
 		label3 = new JLabel();
 		comboBox1 = new JComboBox();
-		button3 = new JButton();
 		button2 = new JButton();
+		panel4 = new JPanel();
+		button4 = new JButton();
+		button3 = new JButton();
 
 		//======== this ========
 		setLayout(new GridBagLayout());
 		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
 		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
 
 		//======== panel1 ========
 		{
@@ -240,19 +290,6 @@ public class TestListPanel extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- button3 ----
-			button3.setText("Clear KB Cache");
-			button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			button3.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					button3ActionPerformed(e);
-				}
-			});
-			panel3.add(button3, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-
 			//---- button2 ----
 			button2.setText("Test concepts");
 			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -267,6 +304,44 @@ public class TestListPanel extends JPanel {
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+			GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+			new Insets(0, 0, 5, 0), 0, 0));
+
+		//======== panel4 ========
+		{
+			panel4.setLayout(new GridBagLayout());
+			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
+			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- button4 ----
+			button4.setText("Create ISA cache for Config");
+			button4.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button4.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button4ActionPerformed(e);
+				}
+			});
+			panel4.add(button4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button3 ----
+			button3.setText("Clear KB File Cache");
+			button3.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			button3.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button3ActionPerformed(e);
+				}
+			});
+			panel4.add(button3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
+		}
+		add(panel4, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
 			GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 			new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -286,7 +361,9 @@ public class TestListPanel extends JPanel {
 	private JLabel label4;
 	private JLabel label3;
 	private JComboBox comboBox1;
-	private JButton button3;
 	private JButton button2;
+	private JPanel panel4;
+	private JButton button4;
+	private JButton button3;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }

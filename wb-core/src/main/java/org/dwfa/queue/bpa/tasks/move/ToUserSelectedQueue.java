@@ -25,6 +25,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import net.jini.core.entry.Entry;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
@@ -38,6 +41,7 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.QueueType;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
@@ -54,9 +58,10 @@ public class ToUserSelectedQueue extends AbstractTask {
 
     private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
 
     private TermEntry queueType = TermEntry.getQueueType();
+    private String message = "";
 
     private transient I_QueueProcesses q;
     
@@ -87,14 +92,19 @@ public class ToUserSelectedQueue extends AbstractTask {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(this.queueType);
+        out.writeObject(message);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
+        if (objDataVersion >= 1) {
             this.queueType = (TermEntry) in.readObject();
+        }
+
+        if (objDataVersion >= 2) {
+            message = (String) in.readObject();
         } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
+            message = "";
         }
 
     }
@@ -120,7 +130,8 @@ public class ToUserSelectedQueue extends AbstractTask {
 
             ServiceItemFilter filter = worker.getServiceProxyFilter();
             ServiceItem[] services = worker.lookup(template, 1, 500, filter, 1000 * 15);
-            ServiceItem service = (ServiceItem) worker.selectFromList(services, "Select queue",
+            ServiceItem service =
+                    (ServiceItem) worker.selectFromList(services, "Select queue",
                 "Select the queue you want this process placed in.");
             if (service == null) {
                 throw new TaskFailedException("User did not select a queue...");
@@ -151,6 +162,19 @@ public class ToUserSelectedQueue extends AbstractTask {
     		} catch (IOException e) {
     			throw new TaskFailedException(e);
     		}
+
+            if (message != null && !message.equals("")) {
+                JFrame parentFrame = null;
+                for (JFrame frame : OpenFrames.getFrames()) {
+                    if (frame.isActive()) {
+                        parentFrame = frame;
+                        break;
+                    }
+                }
+
+                JOptionPane.showMessageDialog(parentFrame, message);
+            }
+
             return Condition.STOP;
         } catch (Exception e) {
             throw new TaskFailedException(e);
@@ -186,6 +210,14 @@ public class ToUserSelectedQueue extends AbstractTask {
      */
     public int[] getDataContainerIds() {
         return new int[] {};
+    }
+
+    public String getMessage() {
+        return message;
+}
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

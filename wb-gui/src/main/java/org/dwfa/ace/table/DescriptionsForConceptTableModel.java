@@ -21,12 +21,11 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
@@ -56,16 +55,17 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
     }
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
+
         private boolean stopWork = false;
-        private HashMap<Integer, I_GetConceptData> concepts;
+        private Map<Integer, I_GetConceptData> concepts;
 
         @Override
         protected Boolean construct() throws Exception {
             getProgress().setActive(true);
-            concepts = new HashMap<Integer, I_GetConceptData>();
+            concepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
-            fetchSet = new HashSet<Integer>(conceptsToFetch.size());
-            for (Integer i: conceptsToFetch.keySet()) {
+            fetchSet = new ConcurrentSkipListSet<Integer>();
+            for (Integer i : conceptsToFetch.keySet()) {
                 fetchSet.add(i);
             }
             for (Integer id : fetchSet) {
@@ -93,7 +93,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                     }
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                         } else {
                             getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -117,12 +117,11 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         public void stop() {
             stopWork = true;
         }
-
     }
 
     public class TableChangedSwingWorker extends SwingWorker<Boolean> {
-        I_GetConceptData cb;
 
+        I_GetConceptData cb;
         private boolean stopWork = false;
 
         public TableChangedSwingWorker(I_GetConceptData cb) {
@@ -155,7 +154,7 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
                 if (get()) {
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                             getProgress().getProgressBar().setMaximum(1);
                         } else {
@@ -173,14 +172,18 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         }
 
         private void addToConceptsToFetch(Collection<? extends I_DescriptionVersioned> descs) {
-            for (I_DescriptionVersioned d : descs) {
+            for (I_DescriptionVersioned<?> d : descs) {
                 if (stopWork) {
                     return;
                 }
                 for (I_DescriptionPart descVersion : d.getMutableParts()) {
-                    conceptsToFetch.put(descVersion.getTypeId(), descVersion.getTypeId());
-                    conceptsToFetch.put(descVersion.getStatusId(), descVersion.getStatusId());
-                    conceptsToFetch.put(descVersion.getPathId(), descVersion.getPathId());
+                    try {
+                        conceptsToFetch.put(descVersion.getTypeNid(), descVersion.getTypeNid());
+                        conceptsToFetch.put(descVersion.getStatusNid(), descVersion.getStatusNid());
+                        conceptsToFetch.put(descVersion.getPathNid(), descVersion.getPathNid());
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        AceLog.getAppLog().warning(ex.getMessage());
+                    }
                 }
             }
         }
@@ -188,22 +191,15 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         public void stop() {
             stopWork = true;
         }
-
     }
-
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
-
     private TableChangedSwingWorker tableChangeWorker;
-
     private ReferencedConceptsSwingWorker refConWorker;
-
     private ConcurrentHashMap<Integer, Integer> conceptsToFetch = new ConcurrentHashMap<Integer, Integer>();
-
-    Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
-
+    Map<Integer, I_GetConceptData> referencedConcepts = new ConcurrentHashMap<Integer, I_GetConceptData>();
     I_HostConceptPlugins host;
 
     public DescriptionsForConceptTableModel(DESC_FIELD[] columns, I_HostConceptPlugins host) {
@@ -235,8 +231,8 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
         }
         try {
             for (I_DescriptionVersioned desc : cb.getDescriptions()) {
-                desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples, 
-                    host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
+                desc.addTuples(allowedStatus, allowedTypes, positions, selectedTuples,
+                        host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
             }
         } catch (TerminologyException e) {
             throw new ToIoException(e);
@@ -304,5 +300,4 @@ public class DescriptionsForConceptTableModel extends DescriptionTableModel impl
     public String getScore(int rowIndex) {
         return "";
     }
-
 }

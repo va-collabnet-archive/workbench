@@ -24,4 +24,6 @@ public interface I_ChangeTableInSwing {
 
     void start();
 
+    boolean isDone();
+
 }

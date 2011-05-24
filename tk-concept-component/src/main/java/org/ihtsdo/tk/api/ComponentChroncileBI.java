@@ -1,13 +1,26 @@
 package org.ihtsdo.tk.api;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
-public interface ComponentChroncileBI<T extends ComponentVersionBI> extends ComponentBI {
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-	public T getVersion(Coordinate c) throws ContraditionException;
-	public Collection<? extends T> getVersions(Coordinate c);
-	public Collection<? extends T> getVersions();
+public interface ComponentChroncileBI<T extends ComponentVersionBI>
+        extends ComponentBI {
 
-	public boolean isUncommitted();
+    T getVersion(ViewCoordinate c) throws ContraditionException;
+
+    Collection<? extends T> getVersions(ViewCoordinate c);
+
+    Collection<? extends T> getVersions();
+
+    boolean isUncommitted();
+
+    Set<Integer> getAllSapNids() throws IOException;
+    
+    Set<PositionBI> getPositions() throws IOException;
+    
+    T getPrimordialVersion();
 
 }

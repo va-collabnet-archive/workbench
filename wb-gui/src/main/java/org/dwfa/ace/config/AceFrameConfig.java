@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ package org.dwfa.ace.config;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeSupport;
@@ -41,9 +42,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JList;
@@ -124,11 +126,14 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.ihtsdo.tk.api.Coordinate;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
@@ -137,7 +142,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      */
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 48; // keep current with
+    private static final int dataVersion = 49; // keep current with
     // objDataVersion logic
 
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
@@ -334,7 +339,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 45
     private I_GetConceptData classificationRoleRoot;
-    
+
     // 46, 47
     private Precedence precedence;
 
@@ -342,6 +347,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      private I_GetConceptData classifierConcept;
      private RelAssertionType relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
 
+     // 49
+     private CLASSIFIER_INPUT_MODE_PREF classifierInputMode;
 
     // transient
     private transient MasterWorker worker;
@@ -355,6 +362,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private transient AceFrame aceFrame;
 
     private transient BundleType bundleType;
+
+    private boolean autoApprovedOn = false;
+
+    private boolean overrideOn = false;
+
+    private TreeSet<? extends I_GetConceptData> workflowRoles = null;
+
+    private TreeSet<? extends I_GetConceptData> workflowStates = null;
+
+    private TreeSet<? extends I_GetConceptData> workflowActions = null;
+
+    private TreeSet<UUID> availableWorkflowActions = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -541,13 +560,16 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
         // 45
         writeConceptAsId(classificationRoleRoot, out);
-        
+
         // 46; 47 changed implementation class
         out.writeObject(precedence);
 
         // 48
         writeConceptAsId(classifierConcept, out);
         out.writeObject(relAssertionType);
+
+        // 49
+        out.writeObject(classifierInputMode);
 
     }
 
@@ -1002,7 +1024,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             } else {
                 classificationRoleRoot = null;
             }
-            
+
             if (objDataVersion == 46) {
             	PRECEDENCE p = (PRECEDENCE) in.readObject();
             	precedence = p.getTkPrecedence();
@@ -1038,13 +1060,27 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
                     throw new IOException(ex);
                }
             }
-              
+
+            if (objDataVersion >= 49) {
+                classifierInputMode = (CLASSIFIER_INPUT_MODE_PREF) in.readObject();
+            } else {
+                classifierInputMode = CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH;
+            }
 
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
         addListeners();
     }
+
+   @Override
+   public EditCoordinate getEditCoordinate() {
+
+      NidSet editPaths = new NidSet(editingPathSet);
+      return new EditCoordinate(getDbConfig().getUserConcept().getNid(),
+              editPaths);
+   }
+
 
     @Override
     public I_GetConceptData getClassifierConcept() {
@@ -1476,8 +1512,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#fireCommit()
      */
+    public static AtomicLong propigationId = new AtomicLong();
     public void fireCommit() {
-        changeSupport.firePropertyChange("commit", null, null);
+        PropertyChangeEvent pce = new PropertyChangeEvent(this, "commit", null, null);
+        pce.setPropagationId(AceFrameConfig.propigationId.incrementAndGet());
+        changeSupport.firePropertyChange(pce);
     }
 
     /*
@@ -1777,6 +1816,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#setTreeTermDividerLoc(int)
      */
+    @Override
     public void setTreeTermDividerLoc(int termTreeDividerLoc) {
         this.termTreeDividerLoc = termTreeDividerLoc;
     }
@@ -1785,20 +1825,24 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      * (non-Javadoc)
      * @see org.dwfa.ace.config.I_ConfigAceFrame#getHierarchySelection()
      */
+    @Override
     public I_GetConceptData getHierarchySelection() {
         return hierarchySelection;
     }
 
+    @Override
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
         Object old = this.hierarchySelection;
         this.hierarchySelection = hierarchySelection;
         this.changeSupport.firePropertyChange("hierarchySelection", old, hierarchySelection);
     }
 
+    @Override
     public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
         setHierarchySelection(hierarchySelection);
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
@@ -1966,6 +2010,18 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {
+        if (aceFrame == null) {
+            return null;
+        }
+        if (aceFrame.getCdePanel() == null) {
+            return null;
+        }
+        if (aceFrame.getCdePanel().getConceptPanels() == null) {
+            return null;
+        }
+        if (index > aceFrame.getCdePanel().getConceptPanels().size()) {
+            return null;
+        }
         if (index == 0) {
             return aceFrame.getCdePanel().getConceptPanels().get(index);
         }
@@ -2240,6 +2296,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public void setShowSignpostPanel(boolean show) {
         aceFrame.setShowSignpostPanel(show);
+
+    }
+
+    public void setShowWorkflowSignpostPanel(boolean show) {
+        aceFrame.setShowWorkflowSignpostPanel(show);
 
     }
 
@@ -2670,7 +2731,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param conflictResolutionStrategy
      */
     public void setConflictResolutionStrategy(I_ManageContradiction conflictResolutionStrategy) {
@@ -2684,7 +2745,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     /**
      * Sets the conflict resolution strategy for this profile
-     * 
+     *
      * @param contradictionStrategy
      */
     public <T extends I_ManageContradiction> void setConflictResolutionStrategy(Class<T> conflictResolutionStrategyClass) {
@@ -2743,25 +2804,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     public I_GetConceptData getRefsetInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetInSpecEditor();
         return null;
     }
 
     public I_ExtendByRef getSelectedRefsetClauseInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getSelectedRefsetClauseInSpecEditor();
         return null;
     }
 
     public JTree getTreeInSpecEditor() {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getTreeInSpecEditor();
         return null;
     }
 
     public I_GetConceptData getRefsetSpecInSpecEditor() throws IOException, TerminologyException {
-        if (aceFrame != null && aceFrame.getCdePanel() != null) 
+        if (aceFrame != null && aceFrame.getCdePanel() != null)
             return aceFrame.getCdePanel().getRefsetSpecInSpecEditor();
         return null;
     }
@@ -2772,6 +2833,10 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     public I_GetConceptData getClassificationRoot() {
         return classificationRoot;
+    }
+
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return classifierInputMode;
     }
 
     public I_GetConceptData getClassifierInputPath() {
@@ -2798,7 +2863,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("classificationRoot", old, classificationRoot);
     }
 
-    public void setClassifierInputPath(I_GetConceptData inputPath) {
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+       Object old = this.classifierInputMode;
+       this.classifierInputMode = classifierInputMode;
+       changeSupport.firePropertyChange("classifierInputMode", old, classifierInputMode);
+    }
+
+   public void setClassifierInputPath(I_GetConceptData inputPath) {
         Object old = inputPath;
         classifierInputPathConcept = inputPath;
         changeSupport.firePropertyChange("classifierInputPath", old, inputPath);
@@ -2831,7 +2902,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public I_IntList getLanguagePreferenceList() {
         if (languagePreferenceList == null) {
             languagePreferenceList = new IntList();
-        } 
+        }
         if (languagePreferenceList.size() == 0) {
         	try {
 				languagePreferenceList.add(ArchitectonicAuxiliary.Concept.EN_US.localize().getNid());
@@ -3055,7 +3126,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.searchWithDescTypeFilter = searchWithDescTypeFilter;
         this.changeSupport.firePropertyChange("searchWithDescTypeFilter", old, searchWithDescTypeFilter);
     }
-    
+
     public Precedence getPrecedence() {
         return precedence;
     }
@@ -3064,7 +3135,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         Precedence old = this.precedence;
         this.precedence = precedence;
         this.changeSupport.firePropertyChange("precedence", old, precedence);
-        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);        
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);
     }
 
     public void setSelectedPreferencesTab(String tabName) {
@@ -3112,6 +3183,26 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
     @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        aceFrame.getCdePanel().setEnabledNewInboxButton(enable);
+    }
+
+    @Override
     public void setShowPromotionFilters(Boolean show) {
         aceFrame.getCdePanel().setShowPromotionFilters(show);
     }
@@ -3122,21 +3213,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
 
 	@Override
-	public Coordinate getCoordinate() {
+	public ViewCoordinate getViewCoordinate() {
 		if (languagePreferenceList != null && languagePreferenceList.size()>1) {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         languagePreferenceList.get(0),
                                         classifierConcept.getConceptNid(),
-                                        relAssertionType);
+                                        relAssertionType,
+                                        getLanguagePreferenceList(),
+                                        getLanguageSortPref().getLangSort());
 		} else {
-			return  new Coordinate(getPrecedence(), getViewPositionSetReadOnly(), 
+			return  new ViewCoordinate(getPrecedence(), getViewPositionSetReadOnly(),
 					getAllowedStatus(), getDestRelTypes(),
                                         getConflictResolutionStrategy(),
                                         Integer.MAX_VALUE,
                                         classifierConcept.getConceptNid(),
-                                        relAssertionType);
+                                        relAssertionType,
+                                        getLanguagePreferenceList(),
+                                        getLanguageSortPref().getLangSort());
 		}
 	}
 
@@ -3159,5 +3254,80 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     }
 
+	@Override
+	public boolean isAutoApproveOn() {
 
+		return autoApprovedOn;
+	}
+
+	@Override
+	public void setAutoApprove(boolean b) {
+
+			this.autoApprovedOn = b;
+	}
+
+
+	@Override
+	public boolean isOverrideOn() {
+
+		return overrideOn;
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+
+			this.overrideOn = b;
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		if (workflowRoles == null)
+			WorkflowHelper.updateWorkflowUserRoles();
+
+		return workflowRoles;
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		workflowRoles = roles;
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		if (workflowStates == null)
+			WorkflowHelper.updateWorkflowStates();
+
+		return workflowStates;
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		workflowStates = states;
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		if (workflowActions == null)
+			WorkflowHelper.updateWorkflowActions();
+
+		return workflowActions;
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		workflowActions = actions;
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		if (availableWorkflowActions == null)
+			WorkflowHelper.updateWorkflowActions();
+
+		return availableWorkflowActions;
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		availableWorkflowActions = actions;
+	}
 }

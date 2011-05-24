@@ -16,48 +16,22 @@
  */
 package org.dwfa.ace.search;
 
-import org.dwfa.ace.api.I_DescriptionVersioned;
 
-public class LuceneMatch implements Comparable<LuceneMatch> {
-	I_DescriptionVersioned desc;
-    Float score;
+public abstract class LuceneMatch implements Comparable<LuceneMatch> {
+    public Float score;
 
-    public LuceneMatch(I_DescriptionVersioned desc, Float score) {
+    public LuceneMatch(Float score) {
         super();
-        this.desc = desc;
         this.score = score;
-    }
-
-    public I_DescriptionVersioned getDesc() {
-        return desc;
     }
 
     public Float getScore() {
         return score;
     }
 
-    public int compareTo(LuceneMatch o) {
-        if (this.score.equals(o.score) == false) {
-            return Float.compare(this.score, o.score);
-        }
-        if (this.desc.getFirstTuple().getText().equals(o.desc.getFirstTuple().getText()) == false) {
-            return this.desc.getFirstTuple().getText().compareTo(o.desc.getFirstTuple().getText());
-        }
-        return this.desc.toString().compareTo(o.desc.toString());
-    }
+    public abstract int compareTo(LuceneMatch o);
 
-    @Override
-    public boolean equals(Object obj) {
-        if (LuceneMatch.class.isAssignableFrom(obj.getClass())) {
-            LuceneMatch another = (LuceneMatch) obj;
-            return desc.getDescId() == another.desc.getDescId();
-        }
-        return false;
-    }
+    public abstract boolean equals(Object obj);
 
-    @Override
-    public int hashCode() {
-        return desc.getDescId();
-    }
-
+    public abstract int hashCode();
 }

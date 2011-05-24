@@ -35,6 +35,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.tigris.subversion.javahl.ClientException;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/svn", type = BeanType.TASK_BEAN) })
 public class CheckoutSelectedProfile extends AbstractTask {
@@ -74,16 +75,19 @@ public class CheckoutSelectedProfile extends AbstractTask {
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            I_ConfigAceFrame config =
+                    (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             SubversionData svd = new SubversionData();
             svd.setRepositoryUrlStr(svnUrl);
             List<String> listing = config.svnList(svd);
-            String selectedProfile = (String) worker.selectFromList(listing.toArray(), "Select profile",
+            String selectedProfile =
+                    (String) worker.selectFromList(listing.toArray(), "Select profile",
                 "Please select the profile to checkout to your local bundle");
-            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Selected: "
-                + selectedProfile);
+            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Selected: " + selectedProfile);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (ClientException e) {
             throw new TaskFailedException(e);
         }
     }

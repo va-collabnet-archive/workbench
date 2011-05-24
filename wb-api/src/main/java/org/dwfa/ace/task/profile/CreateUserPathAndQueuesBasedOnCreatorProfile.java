@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
@@ -155,22 +156,9 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             if (creatorConfig.getEditingPathSet().size() > 1) {
                 throw new TaskFailedException("This task only supports a single editing path...\nFound: "
                     + creatorConfig.getPromotionPathSet().size());
-            	
             }
 
-            if (!creatorConfig.getEditingPathSet().contains(creatorConfig.getPromotionPathSet().iterator().next())) {
-                PathBI newPromotionPath = createPromotionPath(newConfig, promotePathProfile);
-                // Add new promotion paths as origins to developer path...
-                for (PathBI devPath : promotePathProfile.getEditingPathSet()) {
-                    for (PathBI devPathOrigin : Terms.get().getPathChildren(devPath.getConceptNid())) {
-                    	((I_Path)devPathOrigin).addOrigin(tf.newPosition(newPromotionPath, Integer.MAX_VALUE), 
-                        		creatorConfig);
-                    }
-                }
-            } else {
-            	JOptionPane.showMessageDialog(Terms.get().getActiveAceFrameConfig().getWorkflowPanel(), 
-            			"Promotion path not created because development path and promotion path are equal.");
-            }
+            newConfig.getPromotionPathSet().addAll(creatorConfig.getPromotionPathSet());
  
             List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
             process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
@@ -294,7 +282,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
                 + ".inbox");
 
         } catch (Exception e) {
-            AceLog.getAppLog().warning(e.getMessage());
+            AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
 
             List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
 
@@ -438,7 +426,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         newConfig.addEditingPath(userPath);
         I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         newConfig.setClassifierInputPath(userPathConcept);
-        newConfig.getViewPositionSet().add(Terms.get().newPosition(userPath, Integer.MAX_VALUE));
+        newConfig.getViewPositionSet().add(Terms.get().newPosition(userPath, Long.MAX_VALUE));
         newConfig.getDbConfig().setUserPath(userPathConcept);
     }
 
@@ -479,7 +467,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             throw new TaskFailedException();
         }
         AceLog.getAppLog().info(positionSet.toString());
-        if (positionSet.size() == 0) {
+        if (positionSet.isEmpty()) {
             throw new TaskFailedException("You must select at least one origin for path.");
         }
         UUID newPathUid = UUID.randomUUID();

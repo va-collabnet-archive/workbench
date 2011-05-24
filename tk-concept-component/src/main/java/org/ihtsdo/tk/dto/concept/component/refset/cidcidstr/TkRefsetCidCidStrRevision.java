@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -25,11 +26,11 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
         c2Uuid = new UUID(in.readLong(), in.readLong());
-        stringValue = in.readUTF();
+        stringValue = UtfHelper.readUtfV7(in, dataVersion);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
         out.writeLong(c1Uuid.getLeastSignificantBits());
         out.writeLong(c2Uuid.getMostSignificantBits());
         out.writeLong(c2Uuid.getLeastSignificantBits());
-        out.writeUTF(stringValue);
+        UtfHelper.writeUtf(out, stringValue);
     }
 
     public UUID getC1Uuid() {
@@ -69,16 +70,16 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append(" c2Uuid:");
         buff.append(this.c2Uuid);
         buff.append(" stringValue:");
-        buff.append("'" + this.stringValue + "'");
-        buff.append("; ");
+        buff.append("'").append(this.stringValue).append("' ");
         buff.append(super.toString());
         return buff.toString();
     }
@@ -93,6 +94,7 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

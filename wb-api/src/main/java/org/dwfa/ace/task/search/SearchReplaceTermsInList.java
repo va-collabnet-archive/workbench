@@ -51,6 +51,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.LANG_CODE;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -77,7 +78,8 @@ public class SearchReplaceTermsInList extends AbstractTask {
     private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
     private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
     private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
-
+    private String languageCodePropName = ProcessAttachmentKeys.LANGUAGE_CODE.getAttachmentKey();
+    
     private List<I_GetConceptData> statuses;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -90,6 +92,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
         out.writeObject(searchPftPropName);
         out.writeObject(searchSynonymPropName);
         out.writeObject(retireAsStatusPropName);
+        out.writeObject(languageCodePropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -103,6 +106,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
             searchPftPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
+            languageCodePropName = (String) in.readObject();
         } else if (objDataVersion >= 2) {
             searchStringPropName = (String) in.readObject();
             replaceStringPropName = (String) in.readObject();
@@ -112,6 +116,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
             searchPftPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = (String) in.readObject();
+            languageCodePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -138,6 +143,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
             String searchString = "" + process.getProperty(searchStringPropName);
             String replaceString = "" + process.getProperty(replaceStringPropName);
+            LANG_CODE selectedLangCode = (LANG_CODE)process.getProperty(languageCodePropName);
             boolean caseSensitive = Boolean.valueOf("" + process.getProperty(caseSensitivePropName));
             boolean searchAll = Boolean.valueOf("" + process.getProperty(searchAllPropName));
             boolean searchFsn = Boolean.valueOf("" + process.getProperty(searchFsnPropName));
@@ -187,7 +193,9 @@ public class SearchReplaceTermsInList extends AbstractTask {
 
                     // For the current description of this concept
                     for (I_DescriptionTuple description : descriptionTuples) {
-
+                    	if(!selectedLangCode.getFormatedLanguageCode().equals(description.getLang())){
+                    		continue;
+                    	}
                         if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
                             // If it contains the search string
                             if ((caseSensitive && description.getText().contains(searchString))
@@ -312,14 +320,14 @@ public class SearchReplaceTermsInList extends AbstractTask {
     }
 
     public String getSearchStringPropName() {
-        return searchStringPropName;
-    }
+		return searchStringPropName;
+	}
 
-    public void setSearchStringPropName(String searchStringPropName) {
-        this.searchStringPropName = searchStringPropName;
-    }
+	public void setSearchStringPropName(String searchStringPropName) {
+		this.searchStringPropName = searchStringPropName;
+	}
 
-    public String getReplaceStringPropName() {
+	public String getReplaceStringPropName() {
         return replaceStringPropName;
     }
 
@@ -374,6 +382,14 @@ public class SearchReplaceTermsInList extends AbstractTask {
     public void setRetireAsStatusPropName(String retireAsStatusPropName) {
         this.retireAsStatusPropName = retireAsStatusPropName;
     }
+    
+    public String getLanguageCodePropName() {
+		return languageCodePropName;
+	}
+
+	public void setLanguageCodePropName(String languageCodePropName) {
+		this.languageCodePropName = languageCodePropName;
+	}
 
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

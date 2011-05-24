@@ -80,12 +80,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			result = RulesLibrary.isIncludedInRefsetSpec(tf.getConcept(UUID.fromString(refsetUUID)), 
-					tf.getConcept(UUID.fromString(conceptUUID)), config);
+			I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString(refsetUUID));
+			I_GetConceptData concept = tf.getConcept(UUID.fromString(conceptUUID));
+			if (refsetConcept != null && concept != null) {
+				result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
+						concept, config);
+			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			// error, reported as not member
 		} catch (IOException e) {
-			e.printStackTrace();
+			// error, reported as not member
 		}
 		return result;
 	}
@@ -96,8 +100,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		int parentConceptNid = Terms.get().uuidToNative(UUID.fromString(parent));
 		int subtypeConceptNid = Terms.get().uuidToNative(UUID.fromString(subtype));
 		if (RulesLibrary.myStaticIsACache == null) { 
-			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getCoordinate(), parentConceptNid);
-			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getCoordinate(), subtypeConceptNid);
+			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
+			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
 			result = subtypeConcept.isKindOf(parentConcept);
 		} else {
 			//System.out.println("Using rules library isa cache!");
@@ -113,6 +117,80 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	}
 
 	@Override
+	public boolean isDescriptionTextNotUniqueInHierarchy(String descText, String conceptUuid) throws Exception{
+		boolean result = false;
+		I_TermFactory tf = Terms.get();
+		try {
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			int fsnTypeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			String originalSemTag = "";
+			String potentialMatchSemtag = "";
+
+			String query = "+\"" + QueryParser.escape(descText) + "\"";
+			SearchResult results = tf.doLuceneSearch(query);
+			TopDocs topDocs = results.topDocs;
+			ScoreDoc[] docs = topDocs.scoreDocs;
+			if (docs.length > 0) {
+				I_GetConceptData originalConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+				I_DescriptionTuple originalFsn = null;
+
+				for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
+						config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+						config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+						originalFsn = loopDescription;
+						originalSemTag = originalFsn.getText().substring(originalFsn.getText().lastIndexOf("(")).trim();
+					}
+				}
+				for (int i = 0 ; i < docs.length  ; i++) {
+					try{
+						Document doc = results.searcher.doc(docs[i].doc);
+						int cnid = Integer.parseInt(doc.get("cnid"));
+						int dnid = Integer.parseInt(doc.get("dnid"));
+
+						if (originalConcept.getConceptNid() != cnid) {
+
+							DescriptionVersionBI description = (DescriptionVersionBI) 
+							Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
+							//						System.out.println("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
+
+							if (description != null && description.getText().toLowerCase().equals(descText.toLowerCase())) { 
+
+								I_GetConceptData potentialMatchConcept = Terms.get().getConcept(Integer.parseInt(doc.get("cnid")));
+
+								I_DescriptionTuple potentialMatchFsn = null;
+
+								for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
+										config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+										config.getPrecedence(), config.getConflictResolutionStrategy())) {
+									if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+										potentialMatchFsn = loopDescription;
+										potentialMatchSemtag = potentialMatchFsn.getText().substring(potentialMatchFsn.getText().lastIndexOf("(")).trim();
+									}
+								}
+
+								if (originalSemTag.equals(potentialMatchSemtag)) {
+									result = true;
+									break;
+								}
+							}
+						}
+					}catch(Exception e){
+						//Do Nothing
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	@Override
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
@@ -124,14 +202,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			ScoreDoc[] docs = topDocs.scoreDocs;
 			for (int i = 0 ; i < docs.length  ; i++) {
 				try{
-					Document doc = results.searcher.doc(i);
+					Document doc = results.searcher.doc(docs[i].doc);
 					int cnid = Integer.parseInt(doc.get("cnid"));
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
 					if (potential_fsn != null) {
 
 						DescriptionVersionBI description = (DescriptionVersionBI) 
-						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), dnid);
+						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
 
 						if (description.getTypeNid() == fsnTypeNid
 								&& description.getText().equals(fsn)
@@ -158,8 +236,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 
 		try {
-			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getCoordinate(), UUID.fromString(conceptUUID));
-			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getCoordinate()).getStatusNid();
+			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(conceptUUID));
+			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate()).getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
 					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
 				result = true;

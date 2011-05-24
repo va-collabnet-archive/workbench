@@ -525,7 +525,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
             }
             try {
                 this.position = Terms.get().newPosition(this.path,
-                    Terms.get().convertToThinVersion(d.getTime()));
+                    d.getTime());
                 if (oldPosition.equals(this.position) == false) {
                     if (this.selectGlue != null) {
                         this.selectGlue.replaceObj(oldPosition, this.position);
@@ -567,7 +567,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
                             time = d.getTime();
                         }
                         this.position = Terms.get().newPosition(this.path,
-                            (Terms.get().convertToThinVersion(time)));
+                            time);
                         this.selectGlue.addObj(position);
                     }
                 }
@@ -616,6 +616,6 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
             d = new Date(Long.MAX_VALUE);
         }
         return Terms.get().newPosition(this.path,
-            Terms.get().convertToThinVersion(d.getTime()));
+            d.getTime());
     }
 }

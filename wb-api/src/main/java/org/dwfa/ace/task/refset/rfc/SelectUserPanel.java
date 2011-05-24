@@ -23,6 +23,7 @@ import java.awt.Insets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -41,7 +42,8 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
 /**
- * The select user panel allows the user to select a particular user from the drop down list.
+ * The select user panel allows the user to select a particular user from the
+ * drop down list.
  * 
  * @author Chrissy Hill
  * 
@@ -125,16 +127,16 @@ public class SelectUserPanel extends JPanel {
     }
 
     /**
-     * Calculates a set of valid users - a user is valid is they are a child of the User concept in the top hierarchy,
+     * Calculates a set of valid users - a user is valid is they are a child of
+     * the User concept in the top hierarchy,
      * and have a description of type "user inbox".
      * 
      * @return The set of valid users.
      */
-    private Set<I_GetConceptData> getValidUsers() {
-        HashSet<I_GetConceptData> validUsers = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getValidUsers() {
+        TreeSet<I_GetConceptData> validUsers = new TreeSet<I_GetConceptData>();
         try {
-            I_GetConceptData userParent =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+            I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -154,9 +156,9 @@ public class SelectUserPanel extends JPanel {
                 int latestVersion = Integer.MIN_VALUE;
 
                 List<? extends I_DescriptionTuple> descriptionResults =
-                        user.getDescriptionTuples(null, descAllowedTypes, Terms.get()
-                            .getActiveAceFrameConfig().getViewPositionSetReadOnly(),
-                            config.getPrecedence(), config.getConflictResolutionStrategy());
+                        user.getDescriptionTuples(null, descAllowedTypes, Terms.get().getActiveAceFrameConfig()
+                            .getViewPositionSetReadOnly(), config.getPrecedence(), config
+                            .getConflictResolutionStrategy());
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
 
                     if (descriptionTuple.getVersion() > latestVersion) {
@@ -184,7 +186,7 @@ public class SelectUserPanel extends JPanel {
         Set<PathBI> editingPaths = activeProfile.getEditingPathSet();
         Set<PositionBI> allPositions = new HashSet<PositionBI>();
         for (PathBI path : editingPaths) {
-            allPositions.add(termFactory.newPosition(path, Integer.MAX_VALUE));
+            allPositions.add(termFactory.newPosition(path, Long.MAX_VALUE));
             for (PositionBI position : path.getOrigins()) {
                 addOriginPositions(termFactory, position, allPositions);
             }

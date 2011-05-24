@@ -20,8 +20,10 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 
-public interface I_ExtendByRefVersion extends I_ExtendByRefPart, I_AmTuple, I_AmTermComponent {
+public interface I_ExtendByRefVersion<T extends RefexAnalogBI<T>> extends I_ExtendByRefPart<T>, 
+		I_AmTuple<T>, I_AmTermComponent {
 
     /**
      * @deprecated Use {@link #getStatusId()}
@@ -35,7 +37,7 @@ public interface I_ExtendByRefVersion extends I_ExtendByRefPart, I_AmTuple, I_Am
     @Deprecated
     public void setStatus(int idStatus);
 
-    public void addVersion(I_ExtendByRefPart part);
+    public void addVersion(I_ExtendByRefPart<T> part);
 
     public int getComponentId();
 
@@ -45,10 +47,11 @@ public interface I_ExtendByRefVersion extends I_ExtendByRefPart, I_AmTuple, I_Am
 
     public int getTypeId();
 
-    public List<? extends I_ExtendByRefPart> getVersions();
+    public List<? extends I_ExtendByRefPart<T>> getVersions();
 
     public I_ExtendByRef getCore();
 
-    public I_ExtendByRefPart getMutablePart();
+    public I_ExtendByRefPart<T> getMutablePart();
 
+    public int hashCodeOfParts(); 
 }

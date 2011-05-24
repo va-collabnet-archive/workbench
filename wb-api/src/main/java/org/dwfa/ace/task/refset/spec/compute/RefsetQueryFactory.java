@@ -30,8 +30,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -62,17 +62,17 @@ public class RefsetQueryFactory {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
         for (DefaultMutableTreeNode extNode : extensionMap.values()) {
             I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
-            if (ext.getComponentId() == refsetSpec.getConceptNid()) {
+            if (ext.getComponentNid() == refsetSpec.getConceptNid()) {
                 root.add(extNode);
             } else {
-                extensionMap.get(ext.getComponentId()).add(extNode);
+                extensionMap.get(ext.getComponentNid()).add(extNode);
             }
         }
 
         // create refset spec query
         I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
 
-        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, refsetSpec.getNid(), configFrame);
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, true, refsetSpec.getNid(), configFrame);
         query = processNode(root, query, refsetType, configFrame, termFactory, refsetSpec.getNid());
 
         return query;
@@ -85,7 +85,7 @@ public class RefsetQueryFactory {
         while (subQueryItr.hasNext()) {
             RefsetSpecQuery subQuery = subQueryItr.next();
             warningList.addAll(removeDangles(subQuery));
-            if (subQuery.getStatements().size() == 0 && subQuery.getSubqueries().size() == 0) {
+            if (subQuery.getStatements().isEmpty() && subQuery.getSubqueries().isEmpty()) {
                 warningList.add("Dangling subquery: " + subQuery);
                 query.getAllComponents().remove(subQuery);
                 subQueryItr.remove();
@@ -108,13 +108,17 @@ public class RefsetQueryFactory {
      * @throws ParseException
      */
     /*
-     * public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame configFrame, I_TermFactory termFactory,
-     * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException, TerminologyException,
+     * public static RefsetSpecQuery createPossibleQuery(I_ConfigAceFrame
+     * configFrame, I_TermFactory termFactory,
+     * I_GetConceptData refsetSpec, I_GetConceptData refset) throws IOException,
+     * TerminologyException,
      * ParseException {
      * // create tree object that corresponds to the database's refset spec
      * List<I_ExtendByRef> extensions =
-     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(), true);
-     * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+     * Terms.get().getAllExtensionsForComponent(refsetSpec.getConceptNid(),
+     * true);
+     * HashMap<Integer, DefaultMutableTreeNode> extensionMap = new
+     * HashMap<Integer, DefaultMutableTreeNode>();
      * HashSet<Integer> fetchedComponents = new HashSet<Integer>();
      * fetchedComponents.add(refsetSpec.getConceptNid());
      * addExtensionsToMap(extensions, extensionMap, fetchedComponents);
@@ -128,13 +132,14 @@ public class RefsetQueryFactory {
      * }
      * }
      * // create refset spec query
-     * I_GetConceptData orConcept = termFactory.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+     * I_GetConceptData orConcept =
+     * termFactory.getConcept(RefsetAuxiliary.Concept
+     * .REFSET_OR_GROUPING.getUids());
      * RefsetSpecQuery query = new RefsetSpecQuery(orConcept);
      * query = processNode(root, query, CONCEPT, configFrame, termFactory);
      * return query;
      * }
      */
-
     /**
      * Processes a node in our refset spec tree structure. For each child of the
      * node, we recursively determine the refset type (corresponds to a
@@ -168,9 +173,7 @@ public class RefsetQueryFactory {
             I_ExtendByRef currExt = (I_ExtendByRef) childNode.getUserObject();
 
             List<I_ExtendByRefVersion> extensions =
-                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), configFrame
-                        .getViewPositionSetReadOnly(), configFrame.getPrecedence(), configFrame
-                        .getConflictResolutionStrategy());
+                    (List<I_ExtendByRefVersion>) currExt.getTuples(configFrame.getAllowedStatus(), configFrame.getViewPositionSetReadOnly(), configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
             if (extensions.size() > 0) {
                 I_ExtendByRefPart thinPart = extensions.get(0).getMutablePart();
 
@@ -190,35 +193,35 @@ public class RefsetQueryFactory {
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
-                    case CONCEPT:
-                        if (computeType.equals(RefsetComputeType.CONCEPT)) {
-                            query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
-                                refsetSpecNid);
-                            break;
-                        } else {
-                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
-                                + "' within a " + computeType.toString() + " refset compute.");
-                        }
-                    case DESCRIPTION:
-                        if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
-                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
-                                refsetSpecNid);
-                            break;
-                        } else {
-                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
-                                + "' within a " + computeType.toString() + " refset compute.");
-                        }
-                    case RELATIONSHIP:
-                        if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
-                            query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
-                                refsetSpecNid);
-                            break;
-                        } else {
-                            throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
-                                + "' within a " + computeType.toString() + " refset compute.");
-                        }
-                    default:
-                        throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
+                        case CONCEPT:
+                            if (computeType.equals(RefsetComputeType.CONCEPT)) {
+                                query.addConceptStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                        refsetSpecNid);
+                                break;
+                            } else {
+                                throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                        + "' within a " + computeType.toString() + " refset compute.");
+                            }
+                        case DESCRIPTION:
+                            if (computeType.equals(RefsetComputeType.DESCRIPTION)) {
+                                query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                        refsetSpecNid);
+                                break;
+                            } else {
+                                throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                        + "' within a " + computeType.toString() + " refset compute.");
+                            }
+                        case RELATIONSHIP:
+                            if (computeType.equals(RefsetComputeType.RELATIONSHIP)) {
+                                query.addRelStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                        refsetSpecNid);
+                                break;
+                            } else {
+                                throw new TerminologyException("Badly formed spec: '" + groupingToken.getInitialText()
+                                        + "' within a " + computeType.toString() + " refset compute.");
+                            }
+                        default:
+                            throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
                     }
                 } else if (thinPart instanceof I_ExtendByRefPartCidCidString) {
                     // structural query with string value
@@ -230,48 +233,41 @@ public class RefsetQueryFactory {
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
-					case CONCEPT: {
-						if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
-								.localize().getNid()
-								|| part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS
-										.localize().getNid()) {
-							String pos_str = part.getStringValue();
-							// System.out.println("1:" + pos_str);
-							pos_str = pos_str.substring(pos_str
-									.lastIndexOf("(") + 1, pos_str
-									.lastIndexOf(")"));
-							// System.out.println("2:" + pos_str);
-							String p_str = pos_str.substring(0, pos_str
-									.indexOf(" "));
-							String v_str = pos_str.substring(pos_str
-									.indexOf(" ") + 1);
-							// System.out.println("p:" + p_str);
-							// System.out.println("v:" + v_str);
-							PathBI path = Terms.get().getPath(
-									UUID.fromString(p_str));
-							if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS
-									.localize().getNid()) {
-								query.setV1Is(Terms.get().newPosition(path,
-										Integer.parseInt(v_str)));
-							} else {
-								query.setV2Is(Terms.get().newPosition(path,
-										Integer.parseInt(v_str)));
-							}
-						} else {
-                        throw new TerminologyException(
-                            "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
-						}
-						break;
-					}
-                    case RELATIONSHIP:
-                        throw new TerminologyException(
-                            "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
-                    case DESCRIPTION:
-                        query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
-                            refsetSpecNid);
-                        break;
-                    default:
-                        throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
+                        case CONCEPT: {
+                            if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS.localize().getNid()
+                                    || part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS.localize().getNid()) {
+                                String pos_str = part.getStringValue();
+                                // System.out.println("1:" + pos_str);
+                                pos_str = pos_str.substring(pos_str.lastIndexOf("(") + 1, pos_str.lastIndexOf(")"));
+                                // System.out.println("2:" + pos_str);
+                                String p_str = pos_str.substring(0, pos_str.indexOf(" "));
+                                String v_str = pos_str.substring(pos_str.indexOf(" ") + 1);
+                                // System.out.println("p:" + p_str);
+                                // System.out.println("v:" + v_str);
+                                PathBI path = Terms.get().getPath(
+                                        UUID.fromString(p_str));
+                                if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS.localize().getNid()) {
+                                    query.setV1Is(new PositionSetReadOnly(Terms.get().newPosition(path,
+                                            Long.parseLong(v_str))));
+                                } else {
+                                    query.setV2Is(new PositionSetReadOnly(Terms.get().newPosition(path,
+                                            Long.parseLong(v_str))));
+                                }
+                            } else {
+                                throw new TerminologyException(
+                                        "Error: Concept statement type returned within a concept-concept-string ext. This should only be description.");
+                            }
+                            break;
+                        }
+                        case RELATIONSHIP:
+                            throw new TerminologyException(
+                                    "Error: Relationship statement type returned within a concept-concept-string ext. This should only be description.");
+                        case DESCRIPTION:
+                            query.addDescStatement(getNegation(truthToken, termFactory), groupingToken, constraint,
+                                    refsetSpecNid);
+                            break;
+                        default:
+                            throw new TerminologyException("Unknown type: " + groupingToken.getInitialText());
                     }
                 } else if (thinPart instanceof I_ExtendByRefPartCidCid) {
 
@@ -287,30 +283,36 @@ public class RefsetQueryFactory {
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromGrouping(groupingToken);
                     RefsetComputeType newComputeType;
                     switch (statementType) {
-                    case CONCEPT:
-                        newComputeType = computeType;
-                        break; // don't change compute type since it might be a concept-contains-desc followed by OR
-                    case DESCRIPTION:
-                        newComputeType = RefsetComputeType.DESCRIPTION;
-                        break;
-                    case RELATIONSHIP:
-                        newComputeType = RefsetComputeType.RELATIONSHIP;
-                        break;
-                    default:
-                        newComputeType = computeType;
-                        break;
+                        case CONCEPT:
+                            newComputeType = computeType;
+                            break; // don't change compute type since it might be a concept-contains-desc followed by OR
+                        case DESCRIPTION:
+                            newComputeType = RefsetComputeType.DESCRIPTION;
+                            break;
+                        case RELATIONSHIP:
+                            newComputeType = RefsetComputeType.RELATIONSHIP;
+                            break;
+                        default:
+                            newComputeType = computeType;
+                            break;
                     }
 
                     // add subquery
-                    RefsetSpecQuery subquery = query.addSubquery(groupingToken);
+                    boolean truth;
+                    if (truthToken.getNid() == RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.localize().getNid()) {
+                        truth = true;
+                    } else {
+                        truth = false;
+                    }
+                    RefsetSpecQuery subquery = query.addSubquery(groupingToken, truth);
 
                     // process each grandchild
                     if (!childNode.isLeaf()) {
                         processNode(childNode, subquery, newComputeType, configFrame, termFactory, refsetSpecNid);
                     }
-                    if (negate) {
-                        subquery.negateQuery();
-                    }
+                    //if (negate) {
+                    //    subquery.negateQuery();
+                    //}
                 } else if (thinPart instanceof I_ExtendByRefPartStr) {
                     // ignore - comments refset
                 } else if (thinPart instanceof I_ExtendByRefPartCid) {
@@ -365,7 +367,7 @@ public class RefsetQueryFactory {
                 if (fetchedComponents.contains(ext.getMemberId()) == false) {
                     fetchedComponents.add(ext.getMemberId());
                     addExtensionsToMap(Terms.get().getAllExtensionsForComponent(ext.getMemberId(), true), extensionMap,
-                        fetchedComponents, refsetNid);
+                            fetchedComponents, refsetNid);
                 }
             }
         }

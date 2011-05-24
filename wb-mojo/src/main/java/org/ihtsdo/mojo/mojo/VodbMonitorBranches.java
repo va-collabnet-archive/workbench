@@ -149,7 +149,7 @@ public class VodbMonitorBranches extends AbstractMojo {
             // get origins
             PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
-            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Integer.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);
             Set<PositionBI> origins = new HashSet<PositionBI>();
             origins.add(latestOnArchitectonicPath);
 
@@ -162,7 +162,7 @@ public class VodbMonitorBranches extends AbstractMojo {
             for (ConceptDescriptor branch : branchesToCompare) {
                 I_GetConceptData compareConcept = branch.getVerifiedConcept();
                 PositionBI comparePosition = termFactory.newPosition(termFactory.getPath(compareConcept.getUids()),
-                    Integer.MAX_VALUE);
+                    Long.MAX_VALUE);
                 positions.add(comparePosition);
             }
             List<I_ConceptAttributeTuple> allConceptAttributeTuples = new LinkedList<I_ConceptAttributeTuple>();

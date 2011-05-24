@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -74,11 +75,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
@@ -108,8 +111,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		frameConfig.quit();
 	}
 
-	public Coordinate getCoordinate() {
-		return frameConfig.getCoordinate();
+	public ViewCoordinate getViewCoordinate() {
+		return frameConfig.getViewCoordinate();
 	}
 
 	public Set<PathBI> getPromotionPathSet() {
@@ -132,8 +135,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		frameConfig.removeViewPosition(p);
 	}
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
 		frameConfig.replaceViewPosition(oldPosition, newPosition);
 	}
 
@@ -318,6 +320,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getClassificationRoot();
     }
 
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return frameConfig.getClassifierInputMode();
+    }
+
     public I_GetConceptData getClassifierInputPath() {
         return frameConfig.getClassifierInputPath();
     }
@@ -454,8 +460,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return frameConfig.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -476,8 +481,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 allowedTypes.add(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.localize().getNid());
                 List<? extends I_RelTuple> markedParentRefset =
                         refset.getSourceRelTuples(frameConfig.getAllowedStatus(), allowedTypes, frameConfig
-                            .getViewPositionSetReadOnly(), frameConfig.getPrecedence(),
-                            frameConfig.getConflictResolutionStrategy());
+                            .getViewPositionSetReadOnly(), frameConfig.getPrecedence(), frameConfig
+                            .getConflictResolutionStrategy());
                 for (I_RelTuple rel : markedParentRefset) {
                     if (!refsetsToShow.contains(rel.getC2Id())) {
                         refsetsToShow.add(rel.getC2Id());
@@ -503,8 +508,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
             I_IntList refsets = getRefsetsToShowInTaxonomy();
             for (int rootNid : frameConfig.getRoots().getSetValues()) {
                 I_GetConceptData rootConcept = Terms.get().getConcept(rootNid);
-                for (I_ExtendByRef ext: 
-                	Terms.get().getAllExtensionsForComponent(rootConcept.getNid())) {
+                for (I_ExtendByRef ext : Terms.get().getAllExtensionsForComponent(rootConcept.getNid())) {
                 	if (ext != null && refsets.contains(ext.getRefsetId())) {
                 		List<? extends I_ExtendByRefVersion> tuples =
                 			ext.getTuples(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
@@ -571,11 +575,15 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         return frameConfig.getTableDescPreferenceList();
     }
 
+   @Override
+   public EditCoordinate getEditCoordinate() {
+      return frameConfig.getEditCoordinate();
+   }
+
     private class RefsetParentOnlyFilter implements I_FilterTaxonomyRels {
 
-        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels,
-                List<? extends I_RelTuple> destRels, I_ConfigAceFrame frameConfig) throws TerminologyException,
-                IOException {
+        public void filter(I_GetConceptData node, List<? extends I_RelTuple> srcRels, List<? extends I_RelTuple> destRels,
+                I_ConfigAceFrame frameConfig) throws TerminologyException, IOException {
 
             List<I_RelTuple> relsToRemove = new ArrayList<I_RelTuple>();
             for (I_RelTuple rt : srcRels) {
@@ -611,8 +619,8 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
                 if (getRefsetsToShowInTaxonomy().contains(ext.getRefsetId())) {
                     if (EConcept.REFSET_TYPES.nidToType(ext.getTypeId()) == EConcept.REFSET_TYPES.CID) {
                         List<I_ExtendByRefVersion> returnTuples = new ArrayList<I_ExtendByRefVersion>();
-                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, 
-                            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+                        ext.addTuples(getAllowedStatus(), getViewPositionSetReadOnly(), returnTuples, frameConfig
+                            .getPrecedence(), frameConfig.getConflictResolutionStrategy());
                         if (returnTuples.size() > 0) {
                             return false;
                         }
@@ -665,7 +673,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public VetoableChangeSupport getVetoSupport() {
         return frameConfig.getVetoSupport();
     }
-
 
     public MasterWorker getWorker() {
         return frameConfig.getWorker();
@@ -807,6 +814,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setClassificationRoot(classificationRoot);
     }
 
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+        frameConfig.setClassifierInputMode(classifierInputMode);
+     }
+
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         frameConfig.setClassifierInputPath(inputPath);
     }
@@ -912,11 +923,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     }
 
     public void setHierarchySelection(I_GetConceptData hierarchySelection) {
-        frameConfig.setHierarchySelection(hierarchySelection);
+        //frameConfig.setHierarchySelection(hierarchySelection);
     }
 
     public void setHierarchySelectionAndExpand(I_GetConceptData hierarchySelection) throws IOException {
-        frameConfig.setHierarchySelectionAndExpand(hierarchySelection);
+        //frameConfig.setHierarchySelectionAndExpand(hierarchySelection);
     }
 
     public void setHierarchyToggleVisible(boolean visible) {
@@ -1003,6 +1014,10 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setShowSignpostPanel(show);
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+    	frameConfig.setShowWorkflowSignpostPanel(show);
+    }
+
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
 
     }
@@ -1055,7 +1070,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.setVetoSupport(vetoSupport);
     }
 
-
     public void setWorker(MasterWorker worker) {
         frameConfig.setWorker(worker);
     }
@@ -1104,7 +1118,7 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return frameConfig.svnList(svd);
     }
 
@@ -1145,11 +1159,11 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         frameConfig.svnUnlock(svd, toUnLock);
     }
 
@@ -1243,7 +1257,6 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
         frameConfig.addPromotionPath(p);
     }
 
-
     public void removePromotionPath(PathBI p) {
         frameConfig.removePromotionPath(p);
     }
@@ -1297,4 +1310,84 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         frameConfig.setShowPromotionTab(show);
     }
+
+	@Override
+	public boolean isAutoApproveOn() {
+		return frameConfig.isAutoApproveOn();
+	}
+
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        frameConfig.setEnabledAllQueuesButton(enable);
+    }
+
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        frameConfig.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        frameConfig.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        frameConfig.setEnabledNewInboxButton(enable);
+    }
+
+	@Override
+	public boolean isOverrideOn() {
+		return frameConfig.isOverrideOn();
+	}
+
+	@Override
+	public void setAutoApprove(boolean b) {
+		frameConfig.setAutoApprove(b);
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+		frameConfig.setOverride(b);
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		return frameConfig.getWorkflowRoles();
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		frameConfig.setWorkflowRoles(roles);
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		return frameConfig.getWorkflowStates();
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		frameConfig.setWorkflowStates(states);
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		return frameConfig.getWorkflowActions();
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		frameConfig.setWorkflowActions(actions);
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		return frameConfig.getAllAvailableWorkflowActionUids();
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		frameConfig.setAllAvailableWorkflowActionUids(actions);
+	}
 }

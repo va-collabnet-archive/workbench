@@ -17,12 +17,11 @@
 package org.ihtsdo.mojo.maven.rf1;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +34,8 @@ public class Rf1Dir {
     public static final String SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1 = "b7d13800-e38d-11df-bccf-0800200c9a66";
     public static final String SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
     public static final String SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 = "e1cff9e0-e395-11df-bccf-0800200c9a66";
+
+    public static final String HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1 = "22928260-08d8-11e0-81e0-0800200c9a66";
 
     private static final String FILE_SEPARATOR = File.separator;
 
@@ -63,6 +64,21 @@ public class Rf1Dir {
         this.fileNameContains = s.replace("/", FILE_SEPARATOR);
     }
 
+    public static List<RF1File> getRf1FileList(String wDir, String subDir, Rf1Dir[] inDirs,
+            ArrayList<String> filter, Date dateStart, Date dateStop) throws MojoFailureException {
+        
+        List<List<RF1File>> dirList = getRf1Files(wDir, subDir, inDirs, filter, dateStart, dateStop);
+        
+        // SORT FILES INTO DATE ORDER
+        List<RF1File> fileList = new ArrayList<RF1File>();
+        for (List<RF1File> a : dirList)
+            for (RF1File b : a)
+                fileList.add(b);
+        Collections.sort(fileList);
+        
+        return fileList;
+    }
+    
     public static List<List<RF1File>> getRf1Files(String wDir, String subDir, Rf1Dir[] inDirs,
             ArrayList<String> filter, Date dateStart, Date dateStop) throws MojoFailureException {
 

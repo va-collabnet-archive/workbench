@@ -27,24 +27,24 @@ import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
-
 public class TkConcept {
-    public static final long serialVersionUID = 1;
 
-    public static final int dataVersion = 4;
+    public static final long serialVersionUID = 1;
+    public static final int dataVersion = 7;
     public TkConceptAttributes conceptAttributes;
     public List<TkDescription> descriptions;
     public List<TkRelationship> relationships;
     public List<TkMedia> media;
     public List<TkRefsetAbstractMember<?>> refsetMembers;
     public UUID primordialUuid;
-    
+    public boolean annotationStyleRefex = false;
+
     public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
         super();
         readExternal(in);
     }
 
-    public void readExternal(DataInput in) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in) throws IOException, ClassNotFoundException {
         int readDataVersion = in.readInt();
         if (readDataVersion > dataVersion) {
             throw new IOException("Unsupported dataVersion: " + readDataVersion);
@@ -53,11 +53,11 @@ public class TkConcept {
             conceptAttributes = new TkConceptAttributes(in, readDataVersion);
             primordialUuid = conceptAttributes.primordialUuid;
         } else {
-        	primordialUuid = new UUID(in.readLong(), in.readLong());
-        	int attributeCount = in.readByte();
-        	if (attributeCount == 1) {
+            primordialUuid = new UUID(in.readLong(), in.readLong());
+            int attributeCount = in.readByte();
+            if (attributeCount == 1) {
                 conceptAttributes = new TkConceptAttributes(in, readDataVersion);
-        	}
+            }
         }
         int descCount = in.readInt();
         if (descCount > 0) {
@@ -86,47 +86,47 @@ public class TkConcept {
             for (int i = 0; i < refsetMemberCount; i++) {
                 TK_REFSET_TYPE type = TK_REFSET_TYPE.readType(in);
                 switch (type) {
-                case CID:
-                    refsetMembers.add(new TkRefsetCidMember(in, readDataVersion));
-                    break;
-                case CID_CID:
-                    refsetMembers.add(new TkRefsetCidCidMember(in, readDataVersion));
-                    break;
-                case MEMBER:
-                    refsetMembers.add(new TkRefsetMember(in, readDataVersion));
-                    break;
-                case CID_CID_CID:
-                    refsetMembers.add(new TkRefsetCidCidCidMember(in, readDataVersion));
-                    break;
-                case CID_CID_STR:
-                    refsetMembers.add(new TkRefsetCidCidStrMember(in, readDataVersion));
-                    break;
-                case INT:
-                    refsetMembers.add(new TkRefsetIntMember(in, readDataVersion));
-                    break;
-                case STR:
-                    refsetMembers.add(new TkRefsetStrMember(in, readDataVersion));
-                    break;
-                case CID_INT:
-                    refsetMembers.add(new TkRefsetCidIntMember(in, readDataVersion));
-                    break;
-                case BOOLEAN:
-                    refsetMembers.add(new TkRefsetBooleanMember(in, readDataVersion));
-                    break;
-                case CID_FLOAT:
-                    refsetMembers.add(new TkRefsetCidFloatMember(in, readDataVersion));
-                    break;
-                case CID_LONG:
-                    refsetMembers.add(new TkRefsetCidLongMember(in, readDataVersion));
-                    break;
-                case CID_STR:
-                    refsetMembers.add(new TkRefsetCidStrMember(in, readDataVersion));
-                    break;
-                case LONG:
-                    refsetMembers.add(new TkRefsetLongMember(in, readDataVersion));
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Can't handle refset type: " + type);
+                    case CID:
+                        refsetMembers.add(new TkRefsetCidMember(in, readDataVersion));
+                        break;
+                    case CID_CID:
+                        refsetMembers.add(new TkRefsetCidCidMember(in, readDataVersion));
+                        break;
+                    case MEMBER:
+                        refsetMembers.add(new TkRefsetMember(in, readDataVersion));
+                        break;
+                    case CID_CID_CID:
+                        refsetMembers.add(new TkRefsetCidCidCidMember(in, readDataVersion));
+                        break;
+                    case CID_CID_STR:
+                        refsetMembers.add(new TkRefsetCidCidStrMember(in, readDataVersion));
+                        break;
+                    case INT:
+                        refsetMembers.add(new TkRefsetIntMember(in, readDataVersion));
+                        break;
+                    case STR:
+                        refsetMembers.add(new TkRefsetStrMember(in, readDataVersion));
+                        break;
+                    case CID_INT:
+                        refsetMembers.add(new TkRefsetCidIntMember(in, readDataVersion));
+                        break;
+                    case BOOLEAN:
+                        refsetMembers.add(new TkRefsetBooleanMember(in, readDataVersion));
+                        break;
+                    case CID_FLOAT:
+                        refsetMembers.add(new TkRefsetCidFloatMember(in, readDataVersion));
+                        break;
+                    case CID_LONG:
+                        refsetMembers.add(new TkRefsetCidLongMember(in, readDataVersion));
+                        break;
+                    case CID_STR:
+                        refsetMembers.add(new TkRefsetCidStrMember(in, readDataVersion));
+                        break;
+                    case LONG:
+                        refsetMembers.add(new TkRefsetLongMember(in, readDataVersion));
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Can't handle refset type: " + type);
                 }
             }
         }
@@ -138,21 +138,26 @@ public class TkConcept {
             in.readInt(); //refsetUuidMemberUuidForImagesCount
             in.readInt(); //refsetUuidMemberUuidForRefsetMembersCount
         }
+        if (readDataVersion >= 5) {
+            annotationStyleRefex = in.readBoolean();
+        } else {
+            annotationStyleRefex = false;
+        }
     }
 
     public void writeExternal(DataOutput out) throws IOException {
         out.writeInt(dataVersion);
         if (primordialUuid == null) {
-        	primordialUuid = conceptAttributes.primordialUuid;
+            primordialUuid = conceptAttributes.primordialUuid;
         }
-    	out.writeLong(primordialUuid.getMostSignificantBits());
-    	out.writeLong(primordialUuid.getLeastSignificantBits());
-    	if (conceptAttributes == null) {
-    		out.writeByte(0);
-    	} else {
-    		out.writeByte(1);
+        out.writeLong(primordialUuid.getMostSignificantBits());
+        out.writeLong(primordialUuid.getLeastSignificantBits());
+        if (conceptAttributes == null) {
+            out.writeByte(0);
+        } else {
+            out.writeByte(1);
             conceptAttributes.writeExternal(out);
-    	}
+        }
         if (descriptions == null) {
             out.writeInt(0);
         } else {
@@ -186,8 +191,13 @@ public class TkConcept {
                 r.writeExternal(out);
             }
         }
+        out.writeBoolean(annotationStyleRefex);
+    }
+    public TkConcept() {
+        super();
     }
 
+    
     public List<TkDescription> getDescriptions() {
         return descriptions;
     }
@@ -211,13 +221,9 @@ public class TkConcept {
     public void setRefsetMembers(List<TkRefsetAbstractMember<?>> refsetMembers) {
         this.refsetMembers = refsetMembers;
     }
-    
+
     public TkConceptAttributes getConceptAttributes() {
         return conceptAttributes;
-    }
-
-    public TkConcept() {
-        super();
     }
 
     public List<TkMedia> getImages() {
@@ -235,11 +241,12 @@ public class TkConcept {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append("\n   primordial UUID: ");
+        buff.append(this.getClass().getSimpleName());
+        buff.append(": \n   primordial UUID: ");
         buff.append(this.primordialUuid);
         buff.append("\n   ConceptAttributes: \n\t");
         buff.append(this.conceptAttributes);
@@ -254,12 +261,12 @@ public class TkConcept {
         return buff.toString();
     }
 
-	
     /**
      * Returns a hash code for this <code>EConcept</code>.
      * 
      * @return a hash code value for this <tt>EConcept</tt>.
      */
+    @Override
     public int hashCode() {
         return this.conceptAttributes.primordialUuid.hashCode();
     }
@@ -274,55 +281,62 @@ public class TkConcept {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (TkConcept.class.isAssignableFrom(obj.getClass())) {
             TkConcept another = (TkConcept) obj;
-            
+
             // =========================================================
             // Compare properties of 'this' class to the 'another' class
             // =========================================================
             // Compare ConceptAttributes
             if (this.conceptAttributes == null) {
-                if (this.conceptAttributes != another.conceptAttributes)
+                if (this.conceptAttributes != another.conceptAttributes) {
                     return false;
+                }
             } else if (!this.conceptAttributes.equals(another.conceptAttributes)) {
                 return false;
             }
             // Compare Descriptions
             if (this.descriptions == null) {
                 if (another.descriptions == null) { // Equal!
-                } else if (another.descriptions.size() == 0) { // Equal!
-                } else
+                } else if (another.descriptions.isEmpty()) { // Equal!
+                } else {
                     return false;
+                }
             } else if (!this.descriptions.equals(another.descriptions)) {
                 return false;
             }
             // Compare Relationships
             if (this.relationships == null) {
                 if (another.relationships == null) { // Equal!
-                } else if (another.relationships.size() == 0) { // Equal!
-                } else
+                } else if (another.relationships.isEmpty()) { // Equal!
+                } else {
                     return false;
+                }
             } else if (!this.relationships.equals(another.relationships)) {
                 return false;
             }
             // Compare Images
             if (this.media == null) {
                 if (another.media == null) { // Equal!
-                } else if (another.media.size() == 0) { // Equal!
-                } else
+                } else if (another.media.isEmpty()) { // Equal!
+                } else {
                     return false;
+                }
             } else if (!this.media.equals(another.media)) {
                 return false;
             }
             // Compare Refset Members
             if (this.refsetMembers == null) {
                 if (another.refsetMembers == null) { // Equal!
-                } else if (another.refsetMembers.size() == 0) { // Equal!
-                } else
+                } else if (another.refsetMembers.isEmpty()) { // Equal!
+                } else {
                     return false;
+                }
             } else if (!this.refsetMembers.equals(another.refsetMembers)) {
                 return false;
             }
@@ -332,14 +346,20 @@ public class TkConcept {
         return false;
     }
 
-	public UUID getPrimordialUuid() {
-		return primordialUuid;
-	}
+    public UUID getPrimordialUuid() {
+        return primordialUuid;
+    }
 
-	public void setPrimordialUuid(UUID primordialUuid) {
-		this.primordialUuid = primordialUuid;
-	}
+    public void setPrimordialUuid(UUID primordialUuid) {
+        this.primordialUuid = primordialUuid;
+    }
+    
+    public boolean isAnnotationStyleRefex() {
+        return annotationStyleRefex;
+    }
 
-
+    public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
+        this.annotationStyleRefex = annotationStyleRefex;
+    }
 
 }

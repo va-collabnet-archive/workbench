@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -27,10 +28,10 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
     }
 
 	@Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
-        strValue = in.readUTF();
+        strValue = UtfHelper.readUtfV7(in, dataVersion);
         int versionSize = in.readInt();
         if (versionSize > 0) {
             revisions = new ArrayList<TkRefsetCidStrRevision>(versionSize);
@@ -45,7 +46,7 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
         super.writeExternal(out);
         out.writeLong(c1Uuid.getMostSignificantBits());
         out.writeLong(c1Uuid.getLeastSignificantBits());
-        out.writeUTF(strValue);
+        UtfHelper.writeUtf(out, strValue);
         if (revisions == null) {
             out.writeInt(0);
         } else {
@@ -61,6 +62,7 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
         return TK_REFSET_TYPE.CID_STR;
     }
 
+    @Override
     public List<TkRefsetCidStrRevision> getRevisionList() {
         return revisions;
     }
@@ -81,6 +83,7 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
         this.strValue = strValue;
     }
 
+    @Override
     public List<TkRefsetCidStrRevision> getRevisions() {
         return revisions;
     }
@@ -88,13 +91,14 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append(" strValue:");
-        buff.append("'" + this.strValue + "'");
+        buff.append("'").append(this.strValue).append("'");
         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();
@@ -105,6 +109,7 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
      * 
      * @return a hash code value for this <tt>ERefsetCidStrMember</tt>.
      */
+    @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
@@ -119,6 +124,7 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

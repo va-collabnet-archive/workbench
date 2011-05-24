@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -63,13 +62,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     }
 
     @Override
-    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
-            throws TaskFailedException {
+    public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
 
             ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList =
-                    getDescriptionTupleList(concept, getFrameConfig());
+            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
@@ -95,18 +92,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                 getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
         if (fsn_type == null)
             return alertList;
-        I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-        if (snomedRoot == null)
-            return alertList;
-        if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-            .getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-            getFrameConfig().getConflictResolutionStrategy())) {
-            return alertList;
-        }
         I_IntSet actives = getActiveStatus(Terms.get());
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs =
-                new HashMap<String, ArrayList<I_DescriptionVersioned>>();
-        for (I_DescriptionVersioned desc : descriptions) {
+        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
+        for (I_DescriptionVersioned<?> desc : descriptions) {
             for (I_DescriptionPart part : desc.getMutableParts()) {
                 if (!actives.contains(part.getStatusNid()))
                     continue;
@@ -114,8 +102,8 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                            "<html>Unedited semantic tag: " + part.getText(), concept));
+                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
+                                + part.getText(), concept));
                     }
                     String lang = part.getLang();
                     if (langs.get(lang) != null) {
@@ -135,20 +123,17 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                     }
                     if (part.getTime() == Long.MAX_VALUE && !part.getText().equals("New Fully Specified Description")) {
                         String filteredDescription = part.getText();
-                        // remove all non-alphanumeric characters and replace with a space - this is to stop these
-                        // characters causing issues with the lucene search
-                        // filteredDescription = filteredDescription.replaceAll("[^a-zA-Z0-9]", " ");
-                        // new removal using native lucene escaping 
+                        // new removal using native lucene escaping
                         filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
                         search: for (int i = 0; i < result.topDocs.totalHits; i++) {
-                            Document doc = result.searcher.doc(i);
+                            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
                             if (cnid == concept.getConceptNid())
                                 continue;
                             try {
-                                I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
+                                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
                                 if (potential_fsn != null) {
                                     for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                                         if (actives.contains(part_search.getStatusNid())
@@ -172,9 +157,9 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             }
         }
         if (langs.get("en") == null)
-            alertList.add(new AlertToDataConstraintFailure(
-                (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                          : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>No FSN for en", concept));
+            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                "<html>No FSN for en", concept));
         return alertList;
     }
 }

@@ -4,34 +4,41 @@ package org.ihtsdo.arena.drools
 #list any import classes here.
 import java.util.Map;
 
+
+import org.ihtsdo.helper.dialect.DialectHelper;
+
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
+import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.example.binding.ConceptInactivationType;
+
+import org.ihtsdo.tk.spec.RelSpec;
+import org.ihtsdo.tk.example.binding.HistoricalRelType;
+import java.util.ArrayList;
+import org.ihtsdo.tk.spec.RelSpecFromConcept;
+import javax.swing.JOptionPane;
+
 
 
 #declare any global variables here
 
 global Map templates;
+global ViewCoordinate vc;
 
 // Parameters for satisfiesConstraint: x = don't care, e = equals, k = kind of, r = regex
-
-rule "isKindOf refset concept"
-	
-	when
-		$c : ConceptVersionBI(
-				this isKindOf Taxonomies.REFSET_AUX);
-	then 
-   		System.out.println("isKindOf refset concept found: \n" + $c.toString());
-end
 
 rule "not satisfies FINDING_SITE_OUT constraint"
 	
@@ -40,7 +47,6 @@ rule "not satisfies FINDING_SITE_OUT constraint"
 				this isKindOf Snomed.FINDING_SITE,
 				this not satisfiesConstraint[k,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());	
 end
 
@@ -52,15 +58,13 @@ rule "FSN not satisfies desc constraint"
 							  this satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.getNid())) {
-   		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
+		   for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.FULLY_SPECIFIED.get($c.getViewCoordinate()).getNid())) {
+   		    	templates.put(new  DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG)"), 
    		    									  $d.getNid());
 		   } 	
-		
-   		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
 end
 
 rule "no FSN"
@@ -70,16 +74,42 @@ rule "no FSN"
 		$c : ConceptVersionBI(this not satisfiesConstraint[x,e,x] SnomedConstraints.FS_SEMANTIC_TAG);
 	then 
 
-		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.getNid())) {
+		for (DescriptionVersionBI $d : $c.getDescsActive(WbDescType.PREFERRED.get($c.getViewCoordinate()).getNid())) {
    		    	templates.put(new DescriptionSpec($d.getUUIDs(), #from c
    		    									  SpecFactory.get($c), 
    		    									  WbDescType.FULLY_SPECIFIED, 
    		    									  $d.getText() + " (ADD TAG (NO FSN))"), 
-   		    									  $d.getNid());
+   		    									  $c.getNid());
 		} 	
-   		System.out.println("concept failing FS_SEMANTIC_TAG constraint found: \n" + $c.toString());
 end
 
+rule "missing Dialect description EN_UK"
+	
+	when
+		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
+	then 
+		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+         if (DialectHelper.isMissingDescForDialect($d,
+              Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
+               Language.EN_UK, $c.getViewCoordinate()), $c.getNid());
+         }
+		} 	
+end
+
+rule "missing Dialect description EN_US"
+	
+	when
+		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
+	then 
+		for (DescriptionVersionBI $d : $c.getDescsActive()) {
+         if (DialectHelper.isMissingDescForDialect($d,
+              Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
+               Language.EN_US, $c.getViewCoordinate()), $c.getNid());
+         }
+		} 	
+end
 
 rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 	
@@ -87,33 +117,96 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 		$c : ConceptVersionBI(this isKindOf Taxonomies.REFSET_AUX,
 							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
-   		System.out.println("isKindOf refset concept failing FINDING_SITE_OUT constraint found: \n" + $c.toString());
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
 end
 
-
-rule "isKindOf workbench auxiliary concept"
-	
+rule "isKindOf duplicate"
 	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.WB_AUX);
-	then 
-   		System.out.println("isKindOf workbench auxiliary concept found: \n" + $c.toString());
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.DUPLICATE_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+									ConceptInactivationType.DUPLICATE_CONCEPT),
+									$c.getNid());
 end
 
-rule "isKindOf queue type concept"
-	
+
+rule "isKindOf ambiguous"
 	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.QUEUE_TYPE);
-	then 
-   		System.out.println("isKindOf queue type concept found: \n" + $c.toString());
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.AMBIGUOUS_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+			templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MAY_BE_A,
+									ConceptInactivationType.AMBIGUOUS_CONCEPT),
+									$c.getNid());
 end
 
-rule "isKindOf SNOMED concept"
-	
+rule "isKindOf erroneous"
 	when
-		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
-	then 
-   		System.out.println("isKindOf SNOMED concept found: \n" + $c.toString());
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.ERRONEOUS_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+									ConceptInactivationType.ERRONEOUS_CONCEPT),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									ConceptInactivationType.ERRONEOUS_CONCEPT),
+									$c.getNid());
+end
+
+rule "isKindOf outdated"
+	when
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.OUTDATED_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+									ConceptInactivationType.OUTDATED_CONCEPT),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									ConceptInactivationType.OUTDATED_CONCEPT),
+									$c.getNid());
+end
+
+rule "isKindOf reason not stated"
+	when
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.REASON_NOT_STATED_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+									ConceptInactivationType.REASON_NOT_STATED_CONCEPT),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									ConceptInactivationType.REASON_NOT_STATED_CONCEPT),
+									$c.getNid());
+end
+
+rule "isKindOf moved elswhere"
+	when
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.MOVED_ELSEWHERE,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MOVED_TO,
+									ConceptInactivationType.MOVED_ELSEWHERE),
+									$c.getNid());
+end
+
+rule "isKindOf limited status"
+	when
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.LIMITED_STATUS_CONCEPT,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+									ConceptInactivationType.LIMITED_STATUS_CONCEPT),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									ConceptInactivationType.LIMITED_STATUS_CONCEPT),
+									$c.getNid());
 end
 
 rule "double spaces"
@@ -122,8 +215,7 @@ rule "double spaces"
 		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
 		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
 	then 
-   		System.out.println("Double spaces found: \n" + $c.toString());
-   		DescriptionSpec dSpec = SpecFactory.get($d);
+   		DescriptionSpec dSpec = SpecFactory.get($d, vc);
    		dSpec.setDescText($d.getText().replace("  ", " "));
    		templates.put(dSpec, $c.getNid());
 end

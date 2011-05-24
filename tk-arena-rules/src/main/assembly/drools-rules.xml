@@ -7,6 +7,10 @@
       <directory>src/main/drools</directory>
       <outputDirectory>/drools-rules</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>src/main/rules</directory>
+      <outputDirectory>/rules</outputDirectory>
+    </fileSet>
   </fileSets>
   <includeBaseDirectory>false</includeBaseDirectory>
 </assembly>

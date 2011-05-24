@@ -13,7 +13,8 @@ public class Sct1Dir {
     private Boolean keepHistoricalFromInferred; // 2
     private Boolean keepAdditionalFromInferred; // 3
 
-    private Boolean mapSctIdInferredToStated;
+    private Boolean mapSctIdInferredToStated; // :OLD: old mapping approach
+    private Boolean statedSctRelIdPresent;
 
     private String wbPathUuidCoreFromName; // Workbench Path Name
     private String wbPathUuidStatedFromName; // Workbench Path Name
@@ -26,6 +27,7 @@ public class Sct1Dir {
         this.directoryName = "";
 
         this.mapSctIdInferredToStated = false;
+        this.statedSctRelIdPresent = false;
 
         this.keepQualifierFromInferred = false; // 1
         this.keepHistoricalFromInferred = false; // 2
@@ -62,6 +64,25 @@ public class Sct1Dir {
         return keepQualifierFromInferred;
     }
 
+    public Boolean isStatedSctRelIdPresent() {
+        return statedSctRelIdPresent;
+    }
+
+    public Boolean getStatedSctRelIdPresent() {
+        return statedSctRelIdPresent;
+    }
+
+    public void setStatedSctRelIdPresent(Boolean statedHasSctRelId) {
+        this.statedSctRelIdPresent = statedHasSctRelId;
+    }
+
+    public void setStatedSctRelIdPresent(String s) {
+        if (s.equalsIgnoreCase("true"))
+            this.statedSctRelIdPresent = true;
+        else
+            this.statedSctRelIdPresent = false;
+    }
+    
     /*
      * String setter is required because POM passes in String
      */

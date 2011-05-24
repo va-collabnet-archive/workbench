@@ -103,24 +103,22 @@ public class AddOriginToPath extends AbstractTask {
             }
 
             I_TermFactory termFactory = Terms.get();
-            int version;
+            long time;
 
-            try {
+            
                 if (LATEST_VERSION_STR.equalsIgnoreCase(originPositionStr)) {
-                    version = Integer.MAX_VALUE;
+                    time = Long.MAX_VALUE;
                 } else if (PRESENT_TIME_STR.equalsIgnoreCase(originPositionStr)) {
-                    version = termFactory.convertToThinVersion(System.currentTimeMillis());
+                    time = System.currentTimeMillis();
                 } else {
-                    version = termFactory.convertToThinVersion(originPositionStr);
+                    time = termFactory.convertToThickVersion(originPositionStr);
                 }
-            } catch (ParseException e) {
-                throw new TaskFailedException("Invalid position (time): '" + originPositionStr + "'.", e);
-            }
+
 
             PathBI subjectPath = termFactory.getPath(subjectPathConcept.getUids());
             PathBI originPath = termFactory.getPath(originPathConcept.getUids());
 
-            ((I_Path)subjectPath).addOrigin(termFactory.newPosition(originPath, version),
+            ((I_Path)subjectPath).addOrigin(termFactory.newPosition(originPath, time),
             		Terms.get().getActiveAceFrameConfig());
 
             return Condition.CONTINUE;

@@ -5,6 +5,7 @@ package org.ihtsdo.arena.drools
 import java.util.Collection;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import org.ihtsdo.arena.context.action.CopyDescAction;
@@ -24,6 +25,7 @@ import org.ihtsdo.tk.example.binding.WbDescType;
 #declare any global variables here
 
 global Collection actions;
+global ViewCoordinate vc;
 
 rule "add simple actions"
 	

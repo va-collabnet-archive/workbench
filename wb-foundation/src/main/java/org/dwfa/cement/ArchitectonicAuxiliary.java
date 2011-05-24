@@ -90,6 +90,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
         		new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
         	WORKFLOW_COMMENT("comment",
         			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
+        			WORKFLOW_STANDARD_COMMENT("standard comment",
+                			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT }),
         	WORKFLOW_REJECTION("rejection",
         			new I_ConceptualizeUniversally[] { WORKFLOW_COMMENT_TYPE }),
         			SPELLING_REJECTION("spelling",
@@ -120,34 +122,70 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { USER_PERMISSION }),
               UNIVERSAL_VIEW("universal view permission",
                     new I_ConceptualizeUniversally[] { USER_PERMISSION }),
-        USER("user",
-              new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
-              SNOROCKET(new String[] {"Snorocket (classifier)", "Snorocket"}, null,
+
+
+        	  USER("user", new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+              SNOROCKET(new String[] {"IHTSDO Classifier", "classifier"}, null,
                       new I_ConceptualizeUniversally[] { USER }),
               KEITH_CAMPBELL(new String[] {"Keith Campbell (Informatics, Inc.)", "KEC"}, null,
                       new I_ConceptualizeUniversally[] { USER }),
               SUSAN_CASTILLO(new String[] {"Susan Castillo (Informatics, Inc.)", "SC"}, null,
                       new I_ConceptualizeUniversally[] { USER }),
-              CAP(new String[] {"College of American Pathologists", "CAP"}, null,
+              IHTSDO(new String[] {"IHTSDO", "IHTSDO"}, null,
                       new I_ConceptualizeUniversally[] { USER }),
-              KENT_SPACKMAN(new String[] {"Kent Spackman (IHTSDO)", "Kent Spackman"}, null,
-                      new I_ConceptualizeUniversally[] { USER }),
-              MONIQUE_VAN_BERKUM(new String[] {"Monique Van Berkum (College of American Pathologists)", "Monique Van Berkum"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              KIRSTEN_HAAKE(new String[] {"Kirsten Haake (College of American Pathologists)", "Kirsten Haake"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              JALEH_MIZRA(new String[] {"Jaleh Mizra (College of American Pathologists)", "Jaleh Mizra"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              PENNY_LIVESAY(new String[] {"Penny Livesay (College of American Pathologists)", "Penny Livesay"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              MARY_GERARD(new String[] {"Mary Gerard (College of American Pathologists)", "Mary Gerard"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              MIKE_SMITH(new String[] {"Mike Smith (College of American Pathologists)", "Mike Smith"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              PATRICIA_HOUGHTON(new String[] {"Patricia Houghton (College of American Pathologists)", "Patricia Houghton"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
-              PHILLIP_BROTTMAN(new String[] {"Phillip Brottman (College of American Pathologists)", "Phillip Brottman"}, null,
-                      new I_ConceptualizeUniversally[] { CAP }),
+              KENT_SPACKMAN(new String[] {"Kent Spackman (IHTSDO)", "spackman"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              MONIQUE_VAN_BERKUM(new String[] {"Monique Van Berkum", "mvanber"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              KIRSTEN_HAAKE(new String[] {"Kirsten Haake", "khaake"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              JALEH_MIZRA(new String[] {"Jaleh Mizra", "jmirza"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              PENNY_LIVESAY(new String[] {"Penny Livesay", "llivesa"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              MARY_GERARD(new String[] {"Mary Gerard", "mgerard"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              MIKE_SMITH(new String[] {"Mike Smith", "msmith"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              PATRICIA_HOUGHTON(new String[] {"Patricia Houghton", "phought"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              PHILLIP_BROTTMAN(new String[] {"Phillip Brottman", "pbrottm"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              GUILLERMO_REYNOSO(new String[] {"Guillermo Reynoso", "greynos"}, null,
+            		  new I_ConceptualizeUniversally[] { IHTSDO }),
+              ALEJANDRO_LOPEZ(new String[] {"Alejandro Lopez Osornio", "alopez"}, null,
+            		  new I_ConceptualizeUniversally[] { IHTSDO }), 
+              EMMA_MELHUISH(new String[] {"Emma Melhuish", "emme"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              DEBORAH_KONICEK(new String[] {"Deborah Konicek", "dkonice"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+              JO_GOULDING(new String[] {"Jo Goulding", "jogo"}, null,
+            		  new I_ConceptualizeUniversally[] { IHTSDO }),
+		      CYNDIE_LUNDBERG(new String[] {"Cyndie Lundberg", "clundbe"}, null,
+					  new I_ConceptualizeUniversally[] { IHTSDO }),
+			  RICHARD_MOLDWIN(new String[] {"Richard Moldwin", "rmoldwi"}, null,
+					  new I_ConceptualizeUniversally[] { IHTSDO }),
+			  ROBERT_TURNBULL(new String[] {"Robert Turnbull", "rturnbu"}, null,
+					  new I_ConceptualizeUniversally[] { IHTSDO }),
+        	  NARCISO_ALBARRACIN(new String[] {"Narciso Albarracin", "nalbarr"}, null,
+        			  new I_ConceptualizeUniversally[] { IHTSDO }),
+              VARSHA_PAREKH(new String[] {"Varsha Parekh", "vparekh"}, null,
+               		  new I_ConceptualizeUniversally[] { IHTSDO }),
+              CHRISTINE_SPISLA(new String[] {"Christine Spisla", "cspisla"}, null,
+               		  new I_ConceptualizeUniversally[] { IHTSDO }),
+              DORIS_MCGINNESS(new String[] {"Doris Mcginness", "dmcginn"}, null,
+	        		  new I_ConceptualizeUniversally[] { IHTSDO }),
+    		  ASIF_SYED(new String[] {"Asif Syed", "asyed"}, null,
+	        		  new I_ConceptualizeUniversally[] { IHTSDO }),
+    		  CECILIA_VALLESE(new String[] {"Cecilia Vallese", "cvalles"}, null,
+    				  new I_ConceptualizeUniversally[] { IHTSDO }),
+    		  ALEJANDRO_RODRIGUEZ(new String[] {"Alejandro Rodriguez", "alejandro"}, null,
+	        		  new I_ConceptualizeUniversally[] { IHTSDO }),
+	          NHS(new String[] {"National Health Service", "NHS"}, null,
+	        		  new I_ConceptualizeUniversally[] { USER }),
+    		  GENERIC_USER(new String[] {"Generic User", "generic-user"}, null,
+                      new I_ConceptualizeUniversally[] { IHTSDO }),
+
         TUPLE_TYPE("tuple type",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
                     ID_TUPLE(new String[] {"id tuple", "id tuple"}, null,
@@ -282,6 +320,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     	 		DA_DK(new String[] {"Danish-Denmark (language concept)","Danish-Denmark"}, null,
                     	 		 	    new I_ConceptualizeUniversally[] { DA }) ,
 
+        	 		 	    PL(new String[] {"Polish (language concept)","Polish"}, null,
+              	 		 	       new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
+                          	 		 	    
                 	 		SV(new String[] {"Swedish (language concept)","Swedish"}, null,
                 	 		 	    new I_ConceptualizeUniversally[] { LANGUAGE_SPECIFICATION }) ,
                     	 		SV_FI(new String[] {"Swedish-Finland (language concept)","Swedish-Finland"}, null,
@@ -349,6 +390,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                      NOT_RECOMMENDED("not recommended",
                            new I_ConceptualizeUniversally[] { ACCEPTABILITY, CORRECTNESS, }),
                      NOT_ACCEPTABLE("not acceptable",
+                           new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
+                     PREFERRED_ACCEPTABILITY("preferred acceptability",
                            new I_ConceptualizeUniversally[] { ACCEPTABILITY }),
               DESCRIPTION_TYPE("description type",
                       new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
@@ -453,6 +496,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                     new I_ConceptualizeUniversally[] { RELATIONSHIP }),        
  			SEMANTIC_PARENT_REL("is a Semantic Parent of (terminology constant)",
 		 			new I_ConceptualizeUniversally[] { RELATIONSHIP }),        
+		 	SEMTAG_UUID_REL("semantic tag maps to (terminology constant)",
+				 	new I_ConceptualizeUniversally[] { RELATIONSHIP }),                    
             IS_POT_DUP_REL("is-a potential duplicate rel (terminology constant)",
                     new I_ConceptualizeUniversally[] { DUP_REL_TYPE }),
             IS_NOT_A_DUP_REL("is NOT a dup rel (terminology constant)",
@@ -465,9 +510,6 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
                     GRANTED_PERMISSION("Granted permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP }),
-
-
-
                     MODIFY_CONFIG_PERMISSION("Modify configuration settings permission",
                           new I_ConceptualizeUniversally[] { GRANT_RELATIONSHIP, ADMIN_ROLE, SME_ROLE, REVIEWER_ROLE, AUTHOR_ROLE, OWNER_ROLE }),
                     CREATE_DELETE_USERS_PERMISSION("Create and delete users permission",
@@ -826,13 +868,15 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	    		PROJECT_CREATE_PERMISSION("project create permission",
     	    	    		new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     	    		PROJECT_VIEW_PERMISSION("project view permission",
-    	    				new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
+    	    				new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE, PROJECT_VIEWER_ROLE }),
     				PROJECT_UPDATE_PERMISSION("project update permission",
     						new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     				PROJECT_DELETE_PERMISSION("project delete permission",
     						new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     				VIEW_PROJECT_REPORTS_PERMISSION("view project reports permission",
     	    	    		new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
+    	    		REASSINGNMENTS_PERMISSION("reassignments permission",
+    	    				new I_ConceptualizeUniversally[] { PROJECT_MANAGER_ROLE }),
     	    CONFIGURATION_MANAGER_ROLE("configuration role",
     	    	    new I_ConceptualizeUniversally[] { USER_ROLE }),
     	    	    MODIFY_EDITOR_MODE_PERMISSION("editor mode permission", 
@@ -858,7 +902,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	    		WORKSET_CREATE_PERMISSION("workset create permission",
     	    	    		new I_ConceptualizeUniversally[] { WORKSET_MANAGER_ROLE }),
     	    		WORKSET_VIEW_PERMISSION("workset view permission",
-    	    				new I_ConceptualizeUniversally[] { WORKSET_MANAGER_ROLE }),
+    	    				new I_ConceptualizeUniversally[] { WORKSET_MANAGER_ROLE, PROJECT_VIEWER_ROLE }),
     				WORKSET_UPDATE_PERMISSION("workset update permission",
     						new I_ConceptualizeUniversally[] { WORKSET_MANAGER_ROLE }),
     				WORKSET_DELETE_PERMISSION("workset delete permission",
@@ -872,7 +916,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	    		PARTITION_CREATE_PERMISSION("partition create permission",
     	    	    		new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
     	    		PARTITION_VIEW_PERMISSION("partition view permission",
-    	    				new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
+    	    				new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE, PROJECT_VIEWER_ROLE }),
     				PARTITION_UPDATE_PERMISSION("partition update permission",
     						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
     				PARTITION_DELETE_PERMISSION("partition delete permission",
@@ -880,21 +924,24 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     				WORKLIST_CREATE_PERMISSION("worklist create permission",
     						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
     				WORKLIST_VIEW_PERMISSION("worklist view permission",
-    						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
+    						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE, PROJECT_VIEWER_ROLE }),
     				WORKLIST_UPDATE_PERMISSION("worklist update permission",
     						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
     				WORKLIST_DELETE_PERMISSION("worklist delete permission",
     						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
     				WORKLIST_DELIVER_PERMISSION("worklist deliver permission",
     						new I_ConceptualizeUniversally[] { PARTITIONING_MANAGER_ROLE }),
-		TRANSLATOR_ROLE(new String[] {"translation service provider translator role", 
-		"tsp translator role"}, null,
+		TRANSLATOR_ROLE(new String[] {"translation workflow role", 
+		"translation workflow role"}, null,
 		new I_ConceptualizeUniversally[] { USER_ROLE }),
 	    	TRANSLATOR_ONE_TSP_ROLE(new String[] {"translation service provider translator one role", 
 					"tsp translator one role"}, null,
 		    		new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
 			TRANSLATOR_TWO_TSP_ROLE(new String[] {"translation service provider translator two role", 
 					"tsp translator two role"}, null,
+					new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
+			TRANSLATOR_FAST_TRACK_ROLE(new String[] {"fast track translator role", 
+					"fast track translator role"}, null,
 					new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
 			TRANSLATION_TSP_REVIEWER_ROLE(new String[] {"translation service provider reviewer role",
 					"tsp reviewer role"}, null,
@@ -904,6 +951,9 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 					new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
 			TRANSLATION_SME_ROLE(new String[] {"translation subject matter expert role",
 					"translation sme role"}, null,
+					new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
+			TRANSLATION_SUPER_SME_ROLE(new String[] {"translation super subject matter expert role",
+					"translation super sme role"}, null,
 					new I_ConceptualizeUniversally[] { TRANSLATOR_ROLE }),
 			TRANSLATION_EDITORIAL_BOARD_ROLE(new String[] {"translation editorial board role",
 					"translation editorial board role"}, null,
@@ -1026,11 +1076,15 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),	
 						TRANSLATOR_TODO_STATUS("translator to-do status",
 								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						FAST_TRACK_TRANSLATOR_TODO_STATUS("fast track translator to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
 						TSP_REVIEWER_TODO_STATUS("TSP reviewer to-do status",
 								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
 						TPO_REVIEWER_TODO_STATUS("TPO reviewer to-do status",
 								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
 						SME_TODO_STATUS("SME to-do status",
+								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
+						SUPER_ME_TODO_STATUS("Super SME to-do status",
 								new I_ConceptualizeUniversally[] { TODO_STATUS }),	
 						EDITORIAL_BOARD_TODO_STATUS("editorial board pending issue status",
 								new I_ConceptualizeUniversally[] { TODO_STATUS }),
@@ -1048,14 +1102,95 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				REFERRED_TO_SME_STATUS("referred to SME status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				REFERRED_TO_SUPER_SME_STATUS("referred to Super SME status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				SME_FEEDBACK_COMPLETE_STATUS("SME feedback complete status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				SUPER_SME_FEEDBACK_COMPLETE_STATUS("Super SME feedback complete status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				APPROVED_FOR_PUBLICATION_STATUS("approved for publication status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 				ESCALATED_TO_EDITORIAL_BOARD_STATUS("escalated to editorial board status",
 						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
+				FAST_TRACK_TRANSLATED_STATUS("fast track translated status",
+						new I_ConceptualizeUniversally[] { TRANSLATION_STATUS }),
 
                 
+						
+				// WORKFLOW
+	            WORKFLOW_CONCEPTS("Workflow concepts", new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),
+	            	            
+	            // WOrkflow Attribute Values
+	            WORKFLOW_VALUES("Workflow values", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
+	            WORKFLOW_NEW_CONCEPT("Workflow new concept", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_EXISTING_CONCEPT("Workflow existing concept", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_SINGLE_COMMIT("Workflow single commit", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_BATCH_COMMIT("Workflow batch commit", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_BEGIN_WF_CONCEPT("Workflow begin action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_END_WF_CONCEPT("Workflow end action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_ACTIVE_MODELER("Workflow active editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_AUTOMOTAIC_APPROVAL("Workflow automatic approval", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_LEAD_MODELER("Workflow lead editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_DEFAULT_MODELER("Workflow default editor", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            WORKFLOW_USER_ACTION("Workflow user action", new I_ConceptualizeUniversally[] { WORKFLOW_VALUES }), 
+	            
+	            // Workflow Attribute Types
+	            WORKFLOW_ATTRIBUTES("Workflow attributes", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
+	            WORKFLOW_INITIAL_STATE("Initial workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_FINAL_STATE("Final workflow state", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_ACTION("Workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_EDITOR_CATEGORY("Workflow editor category", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_EDITOR_HIERARCHY("Workflow editory hierarchy", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_MODELER_VALUE("Workflow editor status", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+
+	            // Workflow Attribute Types (Driving Workflow)
+	            WORKFLOW_ACTION_VALUE("Workflow action value", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_ROLE_VALUE("Workflow role value", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_COMMIT_VALUE("Workflow commit value", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }),
+	            WORKFLOW_USE_CASE("Workflow use case", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+
+	            // Workflow States
+	            WORKFLOW_STATES("Workflow states", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
+	            WORKFLOW_APPROVED_STATE(new String[] {"Approved workflow state", "Approved"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHANGED_STATE(new String[] {"Changed workflow state", "Changed"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHANGED_IN_BATCH_STATE(new String[] {"Changed in batch workflow state", "Changed in batch"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE(new String[] {"For Chief Terminologist review workflow state", "For Chief Terminologist review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_EMPTY_NO_WFHX_STATE(new String[] {"Concept having no prior workflow state", "Concept having no prior"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_EMPTY_NOT_EXISTING_STATE(new String[] {"Concept not previously existing workflow state", "Concept not previously existing"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_ESCALATED_STATE(new String[] {"Escalated workflow state", "Escalated"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_NEW_STATE(new String[] {"New workflow state", "New"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_REVIEW_STATE(new String[] {"For review workflow state", "For review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+	            WORKFLOW_DISCUSSION_STATE(new String[] {"For discussion workflow state", "For discussion"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_STATES }), 
+
+	            // Workflow Actions
+	            WORKFLOW_ACTIONS("Workflow actions", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
+	            WORKFLOW_ACCEPT_ACTION(new String[] {"Accept workflow action", "Accept"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION(new String[] {"Chief Terminologist review workflow action", "Chief Terminologist review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_COMMIT_ACTION(new String[] {"Commit workflow action", "Commit"}, null,  new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_COMMIT_IN_BATCH_ACTION(new String[] {"Commit in batch workflow action", "Commit in batch"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_DISCUSS_ACTION(new String[] {"Discuss workflow action", "Discuss"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_ESCALATE_ACTION(new String[] {"Escalate workflow action", "Escalate"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_REVIEW_ACTION(new String[] {"Review workflow action", "Review"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            WORKFLOW_OVERRIDE_ACTION(new String[] {"Override workflow action", "Override"}, null, new I_ConceptualizeUniversally[] { WORKFLOW_ACTIONS }), 
+	            
+	            
+	            
+
+	            // WOrkflow Roles Driving WOrkflow
+	            WORKFLOW_ROLES("Workflow role", "admin role", new I_ConceptualizeUniversally[] { USER_ROLE }),
+	            WORKFLOW_ROLE_ALL("Clinical editor role All", new I_ConceptualizeUniversally[] { WORKFLOW_ROLES }), 
+	            WORKFLOW_ROLE_A("Clinical editor role A", new I_ConceptualizeUniversally[] { WORKFLOW_ROLES }), 
+	            WORKFLOW_ROLE_B("Clinical editor role B", new I_ConceptualizeUniversally[] { WORKFLOW_ROLES }), 
+	            WORKFLOW_ROLE_C("Clinical editor role C", new I_ConceptualizeUniversally[] { WORKFLOW_ROLES }), 
+	            WORKFLOW_ROLE_D("Clinical editor role D", new I_ConceptualizeUniversally[] { WORKFLOW_ROLES }), 
+
+	            
+	            // WORKFLOW ACCESSORY
+	            WORKFLOW_PERMISSION("Workflow user permission", new I_ConceptualizeUniversally[] { USER_PERMISSION }),
+	            WORKFLOW_STATE_TRANSITION("Workflow state transition", new I_ConceptualizeUniversally[] { WORKFLOW_CONCEPTS }), 
+	            WORKFLOW_EDIT_HIERARCHY_PERMISSION("Edit hierarchy workflow permission", new I_ConceptualizeUniversally[] { WORKFLOW_PERMISSION }), 
+	            WORKFLOW_VIEW_HIERARCHY_PERMISSION("View hierarchy workflow permission", new I_ConceptualizeUniversally[] { WORKFLOW_PERMISSION }), 
+	            
                 ;
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
 
@@ -1768,8 +1903,25 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
     	EN_TT, EN_US, EN_ZA, LIT, ES, ES_AR, ES_BO, ES_CL, ES_CO, ES_CR,
     	ES_DO, ES_EC, ES_ES, ES_GT, ES_HN, EX_MX, ES_NI, ES_PA, ES_PE,
     	ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR, FR_BE, FR_CA, FR_FR, FR_CH,
-    	FR_LU, FR_MC, DA, DA_DK, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
+    	FR_LU, FR_MC, DA, DA_DK, PL, SV, SV_FI, SV_SE, LT, LT_LT, ZH,
         ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
+    	
+    	public String getFormatedLanguageCode(){
+    		String result = "";
+    		String name = this.name();
+    		String [] nameArray = name.split("_");
+    		if(nameArray.length == 1){
+    			result = nameArray[0].toLowerCase();
+    		}else if(nameArray.length == 2){
+    			result = nameArray[0].toLowerCase() + "-" + nameArray[1].toUpperCase();
+    		}
+    		return result;
+    	}
+    	
+    	public String toString(){
+    		return this.name();
+    	}
+    	
     }
 
     public static I_ConceptualizeUniversally getLanguageConcept(String langCode) {
@@ -1857,6 +2009,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
             return ArchitectonicAuxiliary.Concept.LT;
     	case LT_LT:
             return ArchitectonicAuxiliary.Concept.LT_LT;
+    	case PL:
+    		return ArchitectonicAuxiliary.Concept.PL;    
     	case SV:
             return ArchitectonicAuxiliary.Concept.SV;
     	case SV_FI:

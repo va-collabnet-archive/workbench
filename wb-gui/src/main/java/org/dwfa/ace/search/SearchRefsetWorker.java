@@ -37,7 +37,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
     StopActionListener stopListener = new StopActionListener();
     CountDownLatch completeLatch;
     private int extensionCount;
-    private Collection<I_DescriptionVersioned> refsetMatches;
+    private Collection<I_DescriptionVersioned<?>> refsetMatches;
     private DescriptionsFromCollectionTableModel model;
     I_ConfigAceFrame config;
     private I_GetConceptData refsetConcept;
@@ -157,7 +157,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
     @Override
     protected I_UpdateProgress construct() throws Exception {
         I_UpdateProgress updater;
-        refsetMatches = new ConcurrentSkipListSet<I_DescriptionVersioned>(
+        refsetMatches = new ConcurrentSkipListSet<I_DescriptionVersioned<?>>(
                 new DescriptionComparator());
         updater = new RegexProgressUpdator();
         boolean alertForUnsupportedRc = true;
@@ -167,7 +167,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
             completeLatch = new CountDownLatch(extensionCount);
             new MatchUpdator();
             List<I_TestSearchResults> criterion = searchPanel.getExtraCriterion();
-            int fsnNid = Ts.get().uuidsToNid(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+            int fsnNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             nextExt:
             for (I_ExtendByRef ext : extensions) {
                 completeLatch.countDown();
@@ -187,7 +187,7 @@ public class SearchRefsetWorker extends SwingWorker<I_UpdateProgress> implements
                         if (ConceptChronicleBI.class.isAssignableFrom(referencedComponent.getClass())) {
                             ConceptChronicleBI conceptChr = (ConceptChronicleBI) referencedComponent;
                             for (DescriptionChronicleBI descChr : conceptChr.getDescs()) {
-                                for (DescriptionVersionBI descV : descChr.getVersions(config.getCoordinate())) {
+                                for (DescriptionVersionBI descV : descChr.getVersions(config.getViewCoordinate())) {
                                     if (descV.getTypeNid() == fsnNid) {
                                         refsetMatches.add((I_DescriptionVersioned) descChr);
                                         continue nextExt;

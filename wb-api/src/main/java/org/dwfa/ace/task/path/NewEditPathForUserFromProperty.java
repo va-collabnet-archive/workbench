@@ -114,7 +114,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
                 Set<PositionBI> origins = new HashSet<PositionBI>();
 
                 PathBI parentPath = tf.getPath(parentPathTermEntry.ids);
-                origins.add(tf.newPosition(parentPath, tf.convertToThinVersion(originTime)));
+                origins.add(tf.newPosition(parentPath, tf.convertToThickVersion(originTime)));
 
                 PathBI editPath = tf.newPath(origins, newPathConcept);
                 I_ConfigAceFrame profile = (I_ConfigAceFrame) process.getProperty(profilePropName);
@@ -124,7 +124,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
                 profile.getEditingPathSet().clear();
                 profile.addEditingPath(editPath);
                 profile.getViewPositionSet().clear();
-                profile.addViewPosition(tf.newPosition(editPath, Integer.MAX_VALUE));
+                profile.addViewPosition(tf.newPosition(editPath, Long.MAX_VALUE));
                 tf.commit();
 
             } catch (Exception e) {

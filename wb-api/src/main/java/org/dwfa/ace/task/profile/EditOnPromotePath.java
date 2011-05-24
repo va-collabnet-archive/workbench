@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import javax.swing.ImageIcon;
@@ -64,16 +65,23 @@ import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.tigris.subversion.javahl.ClientException;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
     I_ConfigAceFrame config;
 
+   public EditCoordinate getEditCoordinate() {
+      return config.getEditCoordinate();
+   }
+
+  
     @Override
     public void setRelAssertionType(RelAssertionType relAssertionType) {
         config.setRelAssertionType(relAssertionType);
@@ -99,8 +107,8 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		config.quit();
 	}
 
-	public Coordinate getCoordinate() {
-		return config.getCoordinate();
+	public ViewCoordinate getViewCoordinate() {
+		return config.getViewCoordinate();
 	}
 
 	public Set<PathBI> getPromotionPathSet() {
@@ -115,8 +123,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 		config.removeViewPosition(p);
 	}
 
-	public void replaceViewPosition(PositionBI oldPosition,
-			PositionBI newPosition) {
+    public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
 		config.replaceViewPosition(oldPosition, newPosition);
 	}
 
@@ -243,6 +250,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public I_GetConceptData getClassificationRoot() {
         return config.getClassificationRoot();
+    }
+
+    public CLASSIFIER_INPUT_MODE_PREF getClassifierInputMode() {
+        return config.getClassifierInputMode();
     }
 
     public I_GetConceptData getClassifierInputPath() {
@@ -433,8 +444,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getRefsetInSpecEditor();
     }
 
-    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException,
-            IOException {
+    public I_HoldRefsetPreferences getRefsetPreferencesForToggle(TOGGLES toggle) throws TerminologyException, IOException {
         return config.getRefsetPreferencesForToggle(toggle);
     }
 
@@ -722,6 +732,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setClassificationRoot(classificationRoot);
     }
 
+    public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
+        config.setClassifierInputMode(classifierInputMode);
+     }
+
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         config.setClassifierInputPath(inputPath);
     }
@@ -950,6 +964,10 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setShowSignpostPanel(show);
     }
 
+    public void setShowWorkflowSignpostPanel(boolean show) {
+    	config.setShowWorkflowSignpostPanel(show);
+    }
+    
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         config.setShowViewerImagesInTaxonomy(showViewerImagesInTaxonomy);
     }
@@ -1066,7 +1084,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.svnImport(svd);
     }
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException {
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException {
         return config.svnList(svd);
     }
 
@@ -1107,11 +1125,11 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     }
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException {
+            throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnlock, authenticator, interactive);
     }
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException {
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException {
         config.svnUnlock(svd, toUnLock);
     }
 
@@ -1174,4 +1192,82 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         config.setShowPromotionTab(show);
     }
+    @Override
+    public void setEnabledAllQueuesButton(boolean enable) {
+        config.setEnabledAllQueuesButton(enable);
+    }
+
+	@Override
+	public boolean isAutoApproveOn() {
+		return config.isAutoApproveOn();
+	}
+    @Override
+    public void setEnabledExistingInboxButton(boolean enable) {
+        config.setEnabledExistingInboxButton(enable);
+    }
+
+    @Override
+    public void setEnabledMoveListenerButton(boolean enable) {
+        config.setEnabledMoveListenerButton(enable);
+    }
+
+    @Override
+    public void setEnabledNewInboxButton(boolean enable) {
+        config.setEnabledNewInboxButton(enable);
+    }
+
+	@Override
+	public boolean isOverrideOn() {
+		return config.isOverrideOn();
+	}
+
+	@Override
+	public void setAutoApprove(boolean b) {
+		config.setAutoApprove(b);
+	}
+
+	@Override
+	public void setOverride(boolean b) {
+		config.setOverride(b);
+	}
+
+	@Override
+	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+		return config.getAllAvailableWorkflowActionUids();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+		return config.getWorkflowActions();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+		return config.getWorkflowRoles();
+	}
+
+	@Override
+	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+		return config.getWorkflowStates();
+	}
+
+	@Override
+	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+		config.setAllAvailableWorkflowActionUids(actions);
+	}
+
+	@Override
+	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+		config.setWorkflowActions(actions);
+	}
+
+	@Override
+	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+		config.setWorkflowRoles(roles);
+	}
+
+	@Override
+	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+		config.setWorkflowStates(states);
+	}
 }

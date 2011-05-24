@@ -5,7 +5,7 @@ import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-import org.ihtsdo.qa.store.QAStoreStubImpl;
+import org.ihtsdo.qa.store.QAStoreBIImpl;
 
 public class QAFrameTester {
 	/*
@@ -19,7 +19,8 @@ public class QAFrameTester {
 		frame.setPreferredSize(new Dimension(1024,768));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		frame.getContentPane().add(new QAStorePanel(new QAStoreStubImpl()), BorderLayout.CENTER);
+		frame.getContentPane().add(new QAStorePanel(new QAStoreBIImpl()), BorderLayout.CENTER);
+		//frame.getContentPane().add(new QAStorePanel(new QAStoreStubImpl()), BorderLayout.CENTER);
 
 		//Display the window.
 		frame.pack();

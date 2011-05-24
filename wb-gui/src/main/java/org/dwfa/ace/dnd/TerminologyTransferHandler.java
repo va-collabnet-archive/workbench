@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.logging.Level;
 
@@ -47,6 +48,7 @@ import org.dwfa.ace.DropButton;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
@@ -65,6 +67,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.RelTableModel;
+import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
@@ -75,10 +78,14 @@ import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.ace.tree.ConceptBeanForTree;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_DescribeConceptUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.dnd.FixedTerminologyTransferable;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
+import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.arena.conceptview.ConceptViewTitle;
 import org.ihtsdo.arena.conceptview.FocusDrop;
 import org.ihtsdo.arena.conceptview.I_AcceptConcept;
@@ -98,6 +105,8 @@ public class TerminologyTransferHandler extends TransferHandler {
 
     public static DataFlavor[] supportedFlavors;
 
+    private static int fsnPrimoridalNid;
+    
     public JComponent thisComponent;
 
     public static JComponent transferringComponent;
@@ -108,6 +117,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 
         if (conceptBeanFlavor == null) {
             try {
+            	fsnPrimoridalNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getPrimoridalUid()).getNid();
                 conceptBeanFlavor = new DataFlavor(ConceptTransferable.conceptBeanType);
                 thinDescVersionedFlavor = new DataFlavor(DescriptionTransferable.thinDescVersionedType);
                 thinDescTupleFlavor = new DataFlavor(DescriptionTransferable.thinDescTupleType);
@@ -121,6 +131,12 @@ public class TerminologyTransferHandler extends TransferHandler {
             } catch (ClassNotFoundException e) {
                 // should never happen.
                 throw new RuntimeException(e);
+            } catch (TerminologyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
             }
         }
     }
@@ -304,7 +320,58 @@ public class TerminologyTransferHandler extends TransferHandler {
                     if (nid == Integer.MIN_VALUE)
                         return null;
                     return new ConceptTransferable(Terms.get().getConcept(nid));
+			    } else if (WorkflowHistoryTableModel.class.isAssignableFrom(tableModel.getClass())) {
+			        TableModel wftm = termTable.getModel();
+			        if (termTable.getSelectedRow() >= 0) 
+			        {
+			        	StringWithConceptTuple field = null;
+		            	WorkflowStringWithConceptTuple conField = null;
 
+		            	TableColumn column = termTable.getColumnModel().getColumn(termTable.getSelectedColumn());
+			            WORKFLOW_FIELD columnDesc = (WORKFLOW_FIELD) column.getIdentifier();
+
+			        	Object value = wftm.getValueAt(termTable.getSelectedRow(), termTable.getSelectedColumn());
+        	
+			        	if (columnDesc != WORKFLOW_FIELD.FSN)
+		            		field = (StringWithConceptTuple)value;
+
+			            switch (columnDesc) {
+				            case FSN:
+				            	int descId = 0;
+				            	conField = (WorkflowStringWithConceptTuple)value;
+				                //return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
+				            	
+				            	I_GetConceptData con = Terms.get().getConcept(conField.getTuple().getConceptNid());
+				            	Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
+				            	for (I_DescriptionVersioned version : descs)
+				            	{
+				            		if (version.getTypeNid() == fsnPrimoridalNid)
+				            		{
+				            			descId = version.getDescId();
+				            			break;
+				            		}
+				            	}
+				            	return new DescriptionTransferable(Terms.get().getDescription(descId));
+//				            case ACTION:
+//				                return new StringSelection(field.getCellText());
+				            case STATE:
+				                return new StringSelection(field.getCellText());
+				            case EDITOR:
+				                return new StringSelection(field.getCellText());
+//		                    case PATH:
+//				                return new StringSelection(field.getCellText());
+				            case TIMESTAMP:
+//				            	conField = (StringWithConceptTuple)value;
+//				                return new ConceptTransferable(Terms.get().getConcept(conField.getTuple().getConceptNid()));
+				                return new StringSelection(field.getCellText());
+			                default:
+				                throw new UnsupportedOperationException("Can't convert " + columnDesc + " to a concept bean");
+			            }
+			        } else {
+			            JOptionPane.showMessageDialog(termTable, "No row is selected.", "Copy error",
+			                JOptionPane.ERROR_MESSAGE);
+			            return null;
+			        }
                 } else {
                     throw new UnsupportedOperationException("JTable type: " + tableModel.getClass().toString());
                 }

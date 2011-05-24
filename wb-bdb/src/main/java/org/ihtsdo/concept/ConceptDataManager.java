@@ -25,6 +25,8 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import org.ihtsdo.concept.component.AnnotationStyleBinder;
+import org.ihtsdo.tk.api.NidSetBI;
 
 /**
  * File format:<br>
@@ -40,7 +42,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddDescriptionSet(Collection<? extends Description> c) {
             super(new ComponentComparator());
-            addAll(c);
+            for (Description d: c) {
+                addDirect(d);
+            }
         }
 
         @Override
@@ -53,8 +57,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        
-        public boolean addDirect(Description e) {
+
+        public final boolean addDirect(Description e) {
             return super.add(e);
         }
     }
@@ -65,7 +69,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddSrcRelSet(Collection<? extends Relationship> c) {
             super(new ComponentComparator());
-            addAll(c);
+            for (Relationship r: c) {
+                addDirect(r);
+            }
         }
 
         @Override
@@ -82,7 +88,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(Relationship e) {
+
+        public final boolean addDirect(Relationship e) {
             return super.add(e);
         }
     }
@@ -93,7 +100,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddImageSet(Collection<? extends Image> c) {
             super(new ComponentComparator());
-            addAll(c);
+            for (Image i: c) {
+                addDirect(i);
+            }
         }
 
         @Override
@@ -106,7 +115,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(Image e) {
+
+        public final boolean addDirect(Image e) {
             return super.add(e);
         }
     }
@@ -117,7 +127,9 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddMemberSet(Collection<? extends RefsetMember<?, ?>> c) {
             super(new ComponentComparator());
-            addAll(c);
+             for (RefsetMember m: c) {
+                addDirect(m);
+            }
         }
 
         @Override
@@ -131,7 +143,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 throw new RuntimeException(e1);
             }
         }
-        public boolean addDirect(RefsetMember<?, ?> e) {
+
+        public final boolean addDirect(RefsetMember<?, ?> e) {
             return super.add(e);
         }
     }
@@ -168,7 +181,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
             modified();
             return returnValue;
         }
-
 
         @Override
         public void clear() {
@@ -213,6 +225,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         this.lastWrite = this.lastChange;
     }
 
+    @Override
     public void resetNidData() {
         this.nidData.reset();
     }
@@ -233,6 +246,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
     protected long lastWrite = Long.MIN_VALUE;
     protected long lastExtinctRemoval = Long.MIN_VALUE;
 
+    @Override
     public void modified() {
         lastChange = Bdb.gVersion.incrementAndGet();
     }
@@ -242,6 +256,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * 
      * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getNid()
      */
+    @Override
     public int getNid() {
         return enclosingConcept.getNid();
     }
@@ -252,10 +267,25 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * @see
      * org.ihtsdo.db.bdb.concept.I_ManageConceptData#getReadWriteDataVersion()
      */
+    @Override
     public int getReadWriteDataVersion() throws InterruptedException,
             ExecutionException, IOException {
         DataVersionBinder binder = DataVersionBinder.getBinder();
         return binder.entryToObject(nidData.getMutableTupleInput());
+    }
+
+    public boolean getIsAnnotationStyleRefset() throws IOException {
+        AnnotationStyleBinder binder = AnnotationStyleBinder.getBinder();
+        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+        boolean isAnnotationStyle = false;
+        if (readOnlyInput.available() > 0) {
+            isAnnotationStyle = binder.entryToObject(readOnlyInput);
+        }
+        TupleInput readWriteInput = nidData.getMutableTupleInput();
+        if (readWriteInput.available() > 0) {
+            isAnnotationStyle = binder.entryToObject(readWriteInput);
+        }
+        return isAnnotationStyle;
     }
 
     /*
@@ -263,6 +293,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      * 
      * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
      */
+    @Override
     public List<Relationship> getDestRels() throws IOException {
 
         List<Relationship> destRels = new ArrayList<Relationship>();
@@ -274,6 +305,31 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 Relationship r = c.getRelationship(relNid);
                 if (r != null) {
                     destRels.add(r);
+                }
+            }
+        }
+        return destRels;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
+     */
+    @Override
+    public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+
+        List<Relationship> destRels = new ArrayList<Relationship>();
+        for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {
+            if (allowedTypes.contains(pair.getTypeNid())) {
+                int relNid = pair.getRelNid();
+                int conceptNid = Bdb.getNidCNidMap().getCNid(relNid);
+                Concept c = Bdb.getConceptForComponent(conceptNid);
+                if (c != null) {
+                    Relationship r = c.getRelationship(relNid);
+                    if (r != null) {
+                        destRels.add(r);
+                    }
                 }
             }
         }
@@ -342,20 +398,6 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
     void processNewImage(Image img) throws IOException {
         assert img.nid != 0 : "imgNid is 0: " + this;
         getImageNids().add(img.nid);
-        modified();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.ihtsdo.db.bdb.concept.I_ManageConceptData#add(org.ihtsdo.db.bdb.concept
-     * .component.refset.RefsetMember)
-     */
-    @Override
-    public void add(RefsetMember<?, ?> refsetMember) throws IOException {
-        getRefsetMembers().addDirect(refsetMember);
-        getMemberNids().add(refsetMember.nid);
         modified();
     }
 

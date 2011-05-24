@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.Execution;
 import org.ihtsdo.qa.store.model.Finding;
@@ -15,6 +17,7 @@ import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACaseVersion;
 import org.ihtsdo.qa.store.model.QACoordinate;
 import org.ihtsdo.qa.store.model.QADatabase;
+import org.ihtsdo.qa.store.model.QaCaseComment;
 import org.ihtsdo.qa.store.model.Rule;
 import org.ihtsdo.qa.store.model.Severity;
 import org.ihtsdo.qa.store.model.TerminologyComponent;
@@ -341,7 +344,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 	public List<QACasesReportLine> getQACasesReportLines(
 			QACoordinate qaCoordinate, UUID ruleUuid) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
-		Date time = Calendar.getInstance().getTime();
+		Calendar time = Calendar.getInstance();
 		Random randomGenerator = new Random();
 		for (TerminologyComponent loopComponent : getSampleComponents()) {
 			QACase loopCase = new QACase();
@@ -366,7 +369,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 
 	@Override
 	public RulesReportPage getRulesReportLinesByPage(
-			QACoordinate qaCoordinate, List<RulesReportColumn> sortBy,
+			QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn,Boolean> sortBy,
 			HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {
@@ -378,7 +381,7 @@ public class QAStoreStubImpl implements QAStoreBI {
 	@Override
 	public QACasesReportPage getQACasesReportLinesByPage(
 			QACoordinate qaCoordinate, UUID ruleUuid,
-			List<QACasesReportColumn> sortBy, HashMap<QACasesReportColumn, Object> filter, 
+			LinkedHashMap<QACasesReportColumn,Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, 
 			int startLine, int pageLenght) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 		for (int i = 1; i < pageLenght; i++) {
@@ -404,6 +407,30 @@ public class QAStoreStubImpl implements QAStoreBI {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<Category> getAllCategories() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Category getCategory(UUID categoryUuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void persistQACaseList(List<QACase> qaCaseList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void persistQAComment(QaCaseComment comment) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

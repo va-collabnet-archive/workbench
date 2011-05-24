@@ -16,15 +16,27 @@
  */
 package org.dwfa.ace.tree;
 
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import javax.swing.JScrollPane;
 import javax.swing.ToolTipManager;
@@ -37,7 +49,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -45,16 +56,22 @@ import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 public class TermTreeHelper implements PropertyChangeListener {
-	private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
-    private Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new HashMap<TreeIdPath, ExpandNodeSwingWorker>();
-    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1, new NamedThreadFactory(treeExpansionGroup, 
-	"tree expansion "));
 
-    private ACE ace;
+    private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
+    private final Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new ConcurrentHashMap<TreeIdPath, ExpandNodeSwingWorker>();
+    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1, new NamedThreadFactory(treeExpansionGroup,
+            "tree expansion "));
     private JTreeWithDragImage tree;
+    private JButton statedInferredButton;
+
+    public synchronized void addMouseListener(MouseListener ml) {
+        tree.addMouseListener(ml);
+    }
     private ActivityPanel activity;
     private TermTreeCellRenderer renderer;
     private I_ConfigAceFrame aceFrameConfig;
@@ -71,10 +88,10 @@ public class TermTreeHelper implements PropertyChangeListener {
         return tree;
     }
 
-    public TermTreeHelper(I_ConfigAceFrame aceFrameConfig, ACE ace) {
+    public TermTreeHelper(I_ConfigAceFrame config) {
         super();
-        this.ace = ace;
-        this.aceFrameConfig = aceFrameConfig;
+        this.aceFrameConfig = config;
+        this.assertionType = config.getRelAssertionType();
     }
 
     public JScrollPane getHierarchyPanel() throws TerminologyException, IOException {
@@ -91,13 +108,12 @@ public class TermTreeHelper implements PropertyChangeListener {
         }
         tree = new JTreeWithDragImage(aceFrameConfig, this);
         tree.putClientProperty("JTree.lineStyle", "None");
-        tree.addMouseListener(new TreeMouseListener(ace));
         tree.setLargeModel(true);
         // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         tree.setTransferHandler(new TerminologyTransferHandler(tree));
         tree.setDragEnabled(true);
         ToolTipManager.sharedInstance().registerComponent(tree);
-        renderer = new TermTreeCellRenderer(aceFrameConfig);
+        renderer = new TermTreeCellRenderer(aceFrameConfig, this);
         tree.setCellRenderer(renderer);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
@@ -117,10 +133,13 @@ public class TermTreeHelper implements PropertyChangeListener {
         model.setAsksAllowsChildren(true);
 
         tree.addTreeExpansionListener(new TreeExpansionListener() {
+
+            @Override
             public void treeExpanded(TreeExpansionEvent evt) {
                 treeTreeExpanded(evt);
             }
 
+            @Override
             public void treeCollapsed(TreeExpansionEvent evt) {
                 treeTreeCollapsed(evt, aceFrameConfig);
             }
@@ -128,10 +147,10 @@ public class TermTreeHelper implements PropertyChangeListener {
 
         tree.addTreeSelectionListener(new TreeSelectionListener() {
 
+            @Override
             public void valueChanged(TreeSelectionEvent evt) {
                 treeValueChanged(evt);
             }
-
         });
         JScrollPane treeView = new JScrollPane(tree);
         tree.setScroller(treeView);
@@ -143,7 +162,79 @@ public class TermTreeHelper implements PropertyChangeListener {
                 tree.expandPath(new TreePath(node.getPath()));
             }
         }
+        statedInferredButton = new JButton(new AbstractAction("", statedView) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch (assertionType) {
+                    case INFERRED:
+                        assertionType = RelAssertionType.INFERRED_THEN_STATED;
+                        statedInferredButton.setIcon(inferredThenStatedView);
+                        statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+                        updateHierarchyView("changed from stated to inferred then stated");
+                        break;
+                    case INFERRED_THEN_STATED:
+                        assertionType = RelAssertionType.STATED;
+                        statedInferredButton.setIcon(statedView);
+                        statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+                        updateHierarchyView("changed from inferred to stated");
+                        break;
+                    case STATED:
+                        assertionType = RelAssertionType.INFERRED;
+                        statedInferredButton.setIcon(inferredView);
+                        statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+                        updateHierarchyView("changed from stated to inferred");
+                        break;
+                }
+            }
+        });
+        switch (assertionType) {
+            case INFERRED:
+                statedInferredButton.setIcon(inferredView);
+                statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+                break;
+            case INFERRED_THEN_STATED:
+                statedInferredButton.setIcon(inferredThenStatedView);
+                statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+                break;
+            case STATED:
+                statedInferredButton.setIcon(inferredView);
+                statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+                break;
+        }
+        statedInferredButton.setSelected(true);
+        statedInferredButton.setPreferredSize(new Dimension(20, 16));
+        statedInferredButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        statedInferredButton.setOpaque(false);
+        statedInferredButton.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.WEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.NONE;
+        c.weightx = 0;
+        c.weighty = 0;
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(statedInferredButton, c);
+        treeView.setColumnHeaderView(buttonPanel);
+        c.gridx++;
+        c.weightx = 1;
+        JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString());
+        buttonPanel.add(view, c);
+
         return treeView;
+    }
+    private static ImageIcon statedView = new ImageIcon(
+            ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
+    private static ImageIcon inferredView = new ImageIcon(
+            ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
+    private static ImageIcon inferredThenStatedView = new ImageIcon(
+            ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
+    private RelAssertionType assertionType;
+
+    public RelAssertionType getAssertionType() {
+        return assertionType;
     }
 
     public TermTreeCellRenderer getRenderer() {
@@ -173,7 +264,7 @@ public class TermTreeHelper implements PropertyChangeListener {
 
         for (int rootId : aceFrameConfig.getRoots().getSetValues()) {
             root.add(new DefaultMutableTreeNode(ConceptBeanForTree.get(rootId, Integer.MIN_VALUE, 0, false,
-                aceFrameConfig), true));
+                    aceFrameConfig), true));
         }
         model.setRoot(root);
         return model;
@@ -200,18 +291,19 @@ public class TermTreeHelper implements PropertyChangeListener {
     protected void treeTreeExpanded(TreeExpansionEvent evt) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
         TreeIdPath idPath = new TreeIdPath(evt.getPath());
-        synchronized (expansionWorkers) {
-            stopWorkersOnPath(idPath, "stopping before expansion");
-            I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
-            if (userObject != null) {
-                aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
-                FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
-                ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
-                    node, new CompareConceptBeansForTree(configSnap), this, configSnap);
-                treeExpandThread.execute(worker);
-                expansionWorkers.put(idPath, worker);
-            }
+        stopWorkersOnPath(idPath, "stopping before expansion");
+        I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
+        if (userObject != null) {
+
+            aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
+            FrameConfigSnapshot configSnap = new FrameConfigSnapshot(aceFrameConfig);
+            ExpandNodeSwingWorker worker = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(), tree,
+                    node, new CompareConceptBeansForTree(configSnap), this, configSnap,
+                    assertionType);
+            treeExpandThread.execute(worker);
+            expansionWorkers.put(idPath, worker);
         }
+
     }
 
     private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
@@ -237,54 +329,50 @@ public class TermTreeHelper implements PropertyChangeListener {
     }
 
     private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
-        synchronized (expansionWorkers) {
-            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-            if (foundWorker != null) {
-                foundWorker.stopWork(message);
-                expansionWorkers.remove(key);
-            }
+        ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+        if (foundWorker != null) {
+            foundWorker.stopWork(message);
+            expansionWorkers.remove(key);
         }
+
     }
 
     protected void removeExpansionWorker(TreeIdPath key, ExpandNodeSwingWorker worker, String message) {
-        synchronized (expansionWorkers) {
-            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-            if ((worker != null) && (foundWorker == worker)) {
-                worker.stopWork(message);
-                expansionWorkers.remove(key);
-            }
+        ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+        if ((worker != null) && (foundWorker == worker)) {
+            worker.stopWork(message);
+            expansionWorkers.remove(key);
         }
+
     }
 
     protected void removeStaleExpansionWorker(TreeIdPath key) {
-        synchronized (expansionWorkers) {
-            ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
-            if (foundWorker.getContinueWork() == false) {
-                expansionWorkers.remove(key);
-            }
+        ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+        if (foundWorker.getContinueWork() == false) {
+            expansionWorkers.remove(key);
         }
+
     }
 
     private void stopWorkersOnPath(TreeIdPath idPath, String message) {
-        synchronized (expansionWorkers) {
-            if (idPath == null) {
-                List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
-                for (TreeIdPath key : allKeys) {
-                    removeAnyMatchingExpansionWorker(key, message);
-                }
-            } else {
-                if (expansionWorkers.containsKey(idPath)) {
-                    removeAnyMatchingExpansionWorker(idPath, message);
-                }
+        if (idPath == null) {
+            List<TreeIdPath> allKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+            for (TreeIdPath key : allKeys) {
+                removeAnyMatchingExpansionWorker(key, message);
+            }
+        } else {
+            if (expansionWorkers.containsKey(idPath)) {
+                removeAnyMatchingExpansionWorker(idPath, message);
+            }
 
-                List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
-                for (TreeIdPath key : otherKeys) {
-                    if (key.initiallyEqual(idPath)) {
-                        removeAnyMatchingExpansionWorker(key, message);
-                    }
+            List<TreeIdPath> otherKeys = new ArrayList<TreeIdPath>(expansionWorkers.keySet());
+            for (TreeIdPath key : otherKeys) {
+                if (key.initiallyEqual(idPath)) {
+                    removeAnyMatchingExpansionWorker(key, message);
                 }
             }
         }
+
     }
 
     public void addTreeSelectionListener(TreeSelectionListener tsl) {
@@ -303,13 +391,13 @@ public class TermTreeHelper implements PropertyChangeListener {
         return treeExpandThread;
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         try {
-			setRoots();
-		} catch (Throwable e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+            setRoots();
+        } catch (Throwable e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         updateHierarchyView(evt.getPropertyName());
     }
-
 }

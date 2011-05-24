@@ -11,7 +11,7 @@ import org.ihtsdo.tk.api.ext.I_VersionExternally;
 
 public class TkRevision implements I_VersionExternally {
 
-    public static final long serialVersionUID = 1;
+    private static final long serialVersionUID = 1;
     public static UUID unspecifiedUserUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
     
     public UUID statusUuid;

@@ -3,7 +3,6 @@ package org.ihtsdo.mojo.maven.sct;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
@@ -14,15 +13,19 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoFailureException;
+
 public class Sct1File implements Comparable<Object> {
     private static final String TAB_CHARACTER = "\t";
 
     File file;
     Date revDate;
-
+    long time;
+    
     public Sct1File(File f, Date d) {
         this.file = f;
         this.revDate = d;
+        this.time = d.getTime();
     }
 
     public String toString() {
@@ -60,8 +63,20 @@ public class Sct1File implements Comparable<Object> {
         // lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
         return lineCount - 1;
     }
+    
+    private static boolean inDateRange(Date revDate, Date dateStart, Date dateStop)
+            throws MojoFailureException {
 
-    public static Date getFileRevDate(File f) throws ParseException {
+        if (dateStart != null && revDate.compareTo(dateStart) < 0)
+            return false; // precedes start date
+
+        if (dateStop != null && revDate.compareTo(dateStop) > 0)
+            return false; // after end date
+
+        return true;
+    }
+
+   private static Date getFileRevDate(File f) throws ParseException {
         int pos;
         Date d1 = null;
         Date d2 = null;
@@ -131,6 +146,35 @@ public class Sct1File implements Comparable<Object> {
 
         return listOfFiles;
     }
+    
+    public static List<Sct1File> getSctFiles(String wDir, String subDir, String rootDir,
+            String prefix, String postfix, Date dateStart, Date dateStop) throws ParseException,
+            MojoFailureException {
+
+        ArrayList<Sct1File> listOfFiles = new ArrayList<Sct1File>();
+
+        File f1 = new File(new File(wDir, subDir), rootDir);
+        ArrayList<File> fv = new ArrayList<File>();
+        listFilesRecursive(fv, f1, "sct1_" + prefix, postfix);
+
+        File[] files = new File[0];
+        files = fv.toArray(files);
+        Arrays.sort(files);
+
+        for (File f2 : files) {
+            // ADD Sct1File Entry
+            Date revDate = Sct1File.getFileRevDate(f2);
+            if (inDateRange(revDate, dateStart, dateStop)) {
+                Sct1File fo = new Sct1File(f2, revDate);
+                listOfFiles.add(fo);
+            }
+        }
+
+        Collections.sort(listOfFiles);
+
+        return listOfFiles;
+    }
+
 
     private static void listFilesRecursive(ArrayList<File> list, File root, String prefix,
             String postfix) {
@@ -144,62 +188,13 @@ public class Sct1File implements Comparable<Object> {
             String name = files[i].getName().toUpperCase();
 
             if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
-                    && name.startsWith(prefix.toUpperCase())) {
+                    && name.contains(prefix.toUpperCase())) {
                 list.add(files[i]);
             }
             if (files[i].isDirectory()) {
                 listFilesRecursive(list, files[i], prefix, postfix);
             }
         }
-    }
-
-    public static SctYDesRecord[] parseDescriptions(Sct1File sct1File) throws IOException {
-
-        int count = countFileLines(sct1File);
-        SctYDesRecord[] a = new SctYDesRecord[count];
-
-        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(
-                sct1File.file), "UTF-8"));
-        int descriptions = 0;
-
-        int DESCRIPTIONID = 0;
-        int DESCRIPTIONSTATUS = 1;
-        int CONCEPTID = 2;
-        int TERM = 3;
-        int INITIALCAPITALSTATUS = 4;
-        int DESCRIPTIONTYPE = 5;
-        int LANGUAGECODE = 6;
-
-        // Header row
-        r.readLine();
-
-        while (r.ready()) {
-            String[] line = r.readLine().split(TAB_CHARACTER);
-
-            // DESCRIPTIONID
-            long descriptionId = Long.parseLong(line[DESCRIPTIONID]);
-            // DESCRIPTIONSTATUS
-            int status = Integer.parseInt(line[DESCRIPTIONSTATUS]);
-            // CONCEPTID
-            long conSnoId = Long.parseLong(line[CONCEPTID]);
-            // TERM
-            String text = line[TERM];
-            // INITIALCAPITALSTATUS
-            int capStatus = Integer.parseInt(line[INITIALCAPITALSTATUS]);
-            // DESCRIPTIONTYPE
-            int typeInt = Integer.parseInt(line[DESCRIPTIONTYPE]);
-            // LANGUAGECODE
-            String lang = line[LANGUAGECODE];
-
-            // Save to sortable array
-            a[descriptions] = new SctYDesRecord(descriptionId, status, conSnoId, text, capStatus,
-                    typeInt, lang);
-            descriptions++;
-
-        }
-        Arrays.sort(a);
-        
-        return a;
     }
 
 }

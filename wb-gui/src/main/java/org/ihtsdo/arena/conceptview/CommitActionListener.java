@@ -3,18 +3,25 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 
 public class CommitActionListener implements ActionListener {
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			Terms.get().commit();
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-	}
+    ConceptViewSettings settings;
 
+    public CommitActionListener(ConceptViewSettings settings) {
+        this.settings = settings;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            settings.getConcept().commit(
+                    settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+                    settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
+            settings.getView().getCvRenderer().updateCancelAndCommit();
+        } catch (Exception e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
 }

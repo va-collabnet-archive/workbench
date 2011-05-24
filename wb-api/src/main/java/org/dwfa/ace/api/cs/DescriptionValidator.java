@@ -48,7 +48,7 @@ public class DescriptionValidator extends SimpleValidator {
          */
         for (UniversalAceDescription desc : bean.getDescriptions()) {
             Set<I_DescriptionPart> startParts = new HashSet<I_DescriptionPart>();
-            I_DescriptionVersioned thinDesc = tf.getDescription(getNativeId(desc.getDescId()),
+            I_DescriptionVersioned<?> thinDesc = tf.getDescription(getNativeId(desc.getDescId()),
                 getNativeId(desc.getConceptNid()));
             if (thinDesc.getConceptNid() != getNativeId(desc.getConceptNid())) {
                 failureReport.append("description concept ids don't match " + thinDesc + " and " + desc);
@@ -89,7 +89,7 @@ public class DescriptionValidator extends SimpleValidator {
         return true;
     }
 
-    private boolean containsPart(I_DescriptionVersioned thinDesc, I_DescriptionPart newPart) {
+    private boolean containsPart(I_DescriptionVersioned<?> thinDesc, I_DescriptionPart newPart) {
         if (!timeLenient) {
             return thinDesc.getMutableParts().contains(newPart);
         } else {

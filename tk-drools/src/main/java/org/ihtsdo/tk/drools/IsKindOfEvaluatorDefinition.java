@@ -30,188 +30,192 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
-
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
-	public static class IsKindOfEvaluator extends BaseEvaluator  {
 
-	    /**
-		 * 
-		 */
-	    private static final long serialVersionUID = 1L;
+    public static class IsKindOfEvaluator extends BaseEvaluator {
 
-	    private static final int dataVersion = 1;
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private static final int dataVersion = 1;
 
-		@Override
-		public void readExternal(ObjectInput in) throws IOException,
-				ClassNotFoundException {
-			init();
-			super.readExternal(in);
-	        int objDataVersion = in.readInt();
-	        if (objDataVersion == dataVersion) {
-	        	// Nothing to do
-	        } else {
-	            throw new IOException("Can't handle dataversion: " + objDataVersion);
-	        }
-		}
+        @Override
+        public void readExternal(ObjectInput in) throws IOException,
+                ClassNotFoundException {
+            init();
+            super.readExternal(in);
+            int objDataVersion = in.readInt();
+            if (objDataVersion == dataVersion) {
+                // Nothing to do
+            } else {
+                throw new IOException("Can't handle dataversion: " + objDataVersion);
+            }
+        }
 
-		@Override
-		public void writeExternal(ObjectOutput out) throws IOException {
-			super.writeExternal(out);
-	        out.writeInt(dataVersion);
-		}
+        @Override
+        public void writeExternal(ObjectOutput out) throws IOException {
+            super.writeExternal(out);
+            out.writeInt(dataVersion);
+        }
 
-	    public IsKindOfEvaluator() {
-	    	super();
-			// No arg constructor for serialization. 
-		}
-		public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
-			super(type, isNegated ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : IsKindOfEvaluatorDefinition.IS_KIND_OF);
-		}
+        public IsKindOfEvaluator() {
+            super();
+            // No arg constructor for serialization. 
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor extractor, Object object, FieldValue value) {
-			return testKindOf(object, value.getValue());
-		}
+        public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
+            super(type, isNegated ? 
+                    IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : 
+                    IsKindOfEvaluatorDefinition.IS_KIND_OF);
+        }
 
-		@Override
-		public boolean evaluate(InternalWorkingMemory workingMemory,
-				InternalReadAccessor leftExtractor, Object left,
-				InternalReadAccessor rightExtractor, Object right) {
-			final Object value1 = leftExtractor.getValue(workingMemory, left);
-			final Object value2 = rightExtractor.getValue(workingMemory, right);
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor extractor, Object object, FieldValue value) {
+            return testKindOf(object, value.getValue());
+        }
 
-			return testKindOf(value1, value2);
-		}
+        @Override
+        public boolean evaluate(InternalWorkingMemory workingMemory,
+                InternalReadAccessor leftExtractor, Object left,
+                InternalReadAccessor rightExtractor, Object right) {
+            final Object value1 = leftExtractor.getValue(workingMemory, left);
+            final Object value2 = rightExtractor.getValue(workingMemory, right);
 
-		private boolean testKindOf(final Object value1, final Object value2) {
-			try {
-				ConceptVersionBI possibleKind = null;
-				if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
-					possibleKind = (ConceptVersionBI) value1;
-				} else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
-					possibleKind = ((ConceptFact) value1).getConcept();
-				} else {
-					throw new UnsupportedOperationException("Can't convert: " + value1);
-				}
-				Coordinate coordinate = possibleKind.getCoordinate();	
-				ConceptVersionBI parentKind = null;
-				
-				if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
-					parentKind = (ConceptVersionBI) value2;
-				} else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
-					parentKind = ((ConceptSpec) value2).get(coordinate);
-				} else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
-					ConceptFact fact = (ConceptFact) value2;
-					parentKind = (ConceptVersionBI) fact.getConcept();
-				}
-				return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
+            return testKindOf(value1, value2);
+        }
+        
+        private boolean testKindOf(final Object value1, final Object value2) {
+            try {
+                ConceptVersionBI possibleKind = null;
+                if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
+                    possibleKind = (ConceptVersionBI) value1;
+                } else if (ConceptFact.class.isAssignableFrom(value1.getClass())) {
+                    possibleKind = ((ConceptFact) value1).getConcept();
+                } else {
+                    throw new UnsupportedOperationException("Can't convert: " + value1);
+                }
+                ViewCoordinate coordinate = possibleKind.getViewCoordinate();
+                ConceptVersionBI parentKind = null;
 
-		@Override
-		public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object right) {
-			return testKindOf(((ObjectVariableContextEntry) context).left, right);
-		}
+                if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+                    parentKind = (ConceptVersionBI) value2;
+                } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    try {
+                        parentKind = ((ConceptSpec) value2).getStrict(coordinate);
+                    } catch (ValidationException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+                    ConceptFact fact = (ConceptFact) value2;
+                    parentKind = (ConceptVersionBI) fact.getConcept();
+                }
+                return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-		@Override
-		public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
-				VariableContextEntry context, Object left) {
-			return testKindOf(left, ((ObjectVariableContextEntry) context).right);
-		}
+        @Override
+        public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object right) {
+            return testKindOf(((ObjectVariableContextEntry) context).left, right);
+        }
 
-		@Override
-		public String toString() {
-			return "IsKindOf isKindOf";
-		}
+        @Override
+        public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
+                VariableContextEntry context, Object left) {
+            return testKindOf(left, ((ObjectVariableContextEntry) context).right);
+        }
 
-	}
+        @Override
+        public String toString() {
+            return "IsKindOf isKindOf";
+        }
+    }
+    public static Operator IS_KIND_OF = null;
+    public static Operator NOT_IS_KIND_OF = null;
+    private static String[] SUPPORTED_IDS = null;
 
-	public static Operator IS_KIND_OF = null;
-	public static Operator NOT_IS_KIND_OF = null;
-	private static String[] SUPPORTED_IDS = null;
-	
-	private static void init() {
-		if (IS_KIND_OF == null) {
-			IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
-			NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);
-			SUPPORTED_IDS = new String[] { IS_KIND_OF.getOperatorString() };
-		}
-	}
+    private static void init() {
+        if (IS_KIND_OF == null) {
+            IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
+            NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);
+            SUPPORTED_IDS = new String[]{IS_KIND_OF.getOperatorString()};
+        }
+    }
 
-	static {
-		init();
-	}
-	
-	private Evaluator[] evaluator;
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
-	}
+    static {
+        init();
+    }
+    private Evaluator[] evaluator;
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, Operator operator,
-			String parameterText) {
-		return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
-	}
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), null);
+    }
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText) {
-		return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
-	}
+    @Override
+    public Evaluator getEvaluator(ValueType type, Operator operator,
+            String parameterText) {
+        return this.getEvaluator(type, operator.getOperatorString(), operator.isNegated(), parameterText);
+    }
 
-	@Override
-	public Evaluator getEvaluator(ValueType type, String operatorId,
-			boolean isNegated, String parameterText, Target leftTarget,
-			Target rightTarget) {
-		if (evaluator == null) {
-			evaluator = new Evaluator[2];
-		}
-		int index = isNegated ?  0 : 1;
-		if (evaluator[index] == null) {
-			evaluator[index] = new IsKindOfEvaluator(type, isNegated);
-		}
-		return evaluator[index];
-	}
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText) {
+        return getEvaluator(type, operatorId, isNegated, parameterText, Target.FACT, Target.FACT);
+    }
 
-	@Override
-	public String[] getEvaluatorIds() {
-		return SUPPORTED_IDS;
-	}
+    @Override
+    public Evaluator getEvaluator(ValueType type, String operatorId,
+            boolean isNegated, String parameterText, Target leftTarget,
+            Target rightTarget) {
+        if (evaluator == null) {
+            evaluator = new Evaluator[2];
+        }
+        int index = isNegated ? 0 : 1;
+        if (evaluator[index] == null) {
+            evaluator[index] = new IsKindOfEvaluator(type, isNegated);
+        }
+        return evaluator[index];
+    }
 
-	@Override
-	public Target getTarget() {
-		return Target.FACT;
-	}
+    @Override
+    public String[] getEvaluatorIds() {
+        return SUPPORTED_IDS;
+    }
 
-	@Override
-	public boolean isNegatable() {
-		return true;
-	}
+    @Override
+    public Target getTarget() {
+        return Target.FACT;
+    }
 
-	@Override
-	public boolean supportsType(ValueType type) {
-		return true;
-	}
+    @Override
+    public boolean isNegatable() {
+        return true;
+    }
 
-	@Override
-	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
-		evaluator = (Evaluator[]) in.readObject();
-	}
+    @Override
+    public boolean supportsType(ValueType type) {
+        return true;
+    }
 
-	@Override
-	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(evaluator);
-	}
-	
+    @Override
+    public void readExternal(ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        evaluator = (Evaluator[]) in.readObject();
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(evaluator);
+    }
 }

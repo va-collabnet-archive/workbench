@@ -20,8 +20,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -39,8 +39,10 @@ import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.RefsetAuxiliary;
 
 /**
- * This panel allows the user to input data required for a new refset grouping concept. e.g. they wish to create a new
- * child of refset, called "Opthamology". This form will gather all the information required to do this.
+ * This panel allows the user to input data required for a new refset grouping
+ * concept. e.g. they wish to create a new
+ * child of refset, called "Opthamology". This form will gather all the
+ * information required to do this.
  * 
  * @author Chrissy Hill
  * 
@@ -151,13 +153,14 @@ public class NewRefsetGroupingPanel extends JPanel {
     }
 
     /**
-     * Calculates a set of valid parents. Valid parents include the "refset" concept in the refset hierarchy as well as
+     * Calculates a set of valid parents. Valid parents include the "refset"
+     * concept in the refset hierarchy as well as
      * its children.
      * 
      * @return The set of valid parents.
      */
-    private Set<I_GetConceptData> getValidParents() {
-        HashSet<I_GetConceptData> validParents = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getValidParents() {
+        TreeSet<I_GetConceptData> validParents = new TreeSet<I_GetConceptData>();
         try {
             I_GetConceptData refset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_IDENTITY.getUids());
 
@@ -175,8 +178,8 @@ public class NewRefsetGroupingPanel extends JPanel {
      * 
      * @return The set of valid parents.
      */
-    private Set<I_GetConceptData> getChildren(I_GetConceptData parent) {
-        HashSet<I_GetConceptData> results = new HashSet<I_GetConceptData>();
+    private TreeSet<I_GetConceptData> getChildren(I_GetConceptData parent) {
+        TreeSet<I_GetConceptData> results = new TreeSet<I_GetConceptData>();
         try {
 
             // TODO replace with passed in config...
@@ -193,7 +196,8 @@ public class NewRefsetGroupingPanel extends JPanel {
             for (I_GetConceptData child : children) {
                 RefsetSpec spec = new RefsetSpec(child, true, config);
                 if (spec.getRefsetSpecConcept() == null) {
-                    // only add the children if this is a grouping concept and not an actual refset
+                    // only add the children if this is a grouping concept and
+                    // not an actual refset
                     results.add(child);
                     results.addAll(getChildren(child));
                 }

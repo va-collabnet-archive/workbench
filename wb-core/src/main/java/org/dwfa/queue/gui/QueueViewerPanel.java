@@ -81,9 +81,9 @@ import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.util.SortClickListener;
-import org.dwfa.bpa.util.SwingWorker;
 import org.dwfa.jini.TransactionParticipantAggregator;
 import org.dwfa.queue.ObjectServerCore;
+import org.dwfa.swing.SwingWorker;
 
 /**
  * @author kec
@@ -256,7 +256,7 @@ public class QueueViewerPanel extends JPanel {
                 }
 
             };
-            new Thread(r).start();
+            new Thread(r, this.getClass().getCanonicalName()).start();
 
         }
 
@@ -337,7 +337,7 @@ public class QueueViewerPanel extends JPanel {
                     }
 
                 };
-                new Thread(r).start();
+                new Thread(r, this.getClass().getCanonicalName()).start();
             }
 
         }

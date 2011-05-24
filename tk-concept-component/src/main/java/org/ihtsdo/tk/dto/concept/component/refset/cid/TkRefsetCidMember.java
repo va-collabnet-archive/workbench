@@ -13,7 +13,6 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevision> {
 
     public static final long serialVersionUID = 1;
-
     public UUID c1Uuid;
 
     public TkRefsetCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -21,12 +20,11 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
         readExternal(in, dataVersion);
     }
 
-
     public TkRefsetCidMember() {
         super();
     }
 
-	@Override
+    @Override
     public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         c1Uuid = new UUID(in.readLong(), in.readLong());
@@ -59,6 +57,7 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
         return TK_REFSET_TYPE.CID;
     }
 
+    @Override
     public List<TkRefsetCidRevision> getRevisionList() {
         return revisions;
     }
@@ -74,9 +73,10 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" c1Uuid:");
         buff.append(this.c1Uuid);
         buff.append("; ");
@@ -89,6 +89,7 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
      * 
      * @return a hash code value for this <tt>ERefsetCidMember</tt>.
      */
+    @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
@@ -103,9 +104,11 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (TkRefsetCidMember.class.isAssignableFrom(obj.getClass())) {
             TkRefsetCidMember another = (TkRefsetCidMember) obj;
 
@@ -121,5 +124,4 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
         }
         return false;
     }
-
 }

@@ -19,6 +19,7 @@ package org.dwfa.ace.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
 import org.apache.lucene.queryParser.ParseException;
+import org.drools.KnowledgeBase;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
@@ -41,16 +43,17 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.Condition;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 
 public interface I_TermFactory {
 
@@ -214,6 +217,7 @@ public interface I_TermFactory {
     LogWithAlerts getEditLog();
 
     PathBI getPath(int nid) throws TerminologyException, IOException;
+
     PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
     PathBI getPath(UUID... ids) throws TerminologyException, IOException;
@@ -225,7 +229,7 @@ public interface I_TermFactory {
     PathBI newPath(Collection<? extends PositionBI> positionSet, I_GetConceptData pathConcept, I_ConfigAceFrame commitConfig)
             throws TerminologyException, IOException;
 
-    PositionBI newPosition(PathBI path, int version) throws TerminologyException, IOException;
+    PositionBI newPosition(PathBI path, long time) throws TerminologyException, IOException;
 
     I_IntSet newIntSet();
 
@@ -261,7 +265,6 @@ public interface I_TermFactory {
      * 
      * @return Data Constraint failures that would be encountered if <code>commit()</code> is called.
      */
-
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
     public void commit() throws Exception;
@@ -379,6 +382,7 @@ public interface I_TermFactory {
     int convertToThinVersion(long time);
 
     int convertToThinVersion(String dateStr) throws java.text.ParseException;
+    long convertToThickVersion(String dateStr) throws ParseException;
 
     long convertToThickVersion(int version);
 
@@ -399,7 +403,6 @@ public interface I_TermFactory {
      * 
      * @throws IOException
      */
-
     void cancel() throws IOException;
 
     /**
@@ -492,9 +495,9 @@ public interface I_TermFactory {
     List<? extends I_ExtendByRef> getAllExtensionsForComponent(int componentId, boolean addUncommitted)
             throws IOException;
 
-    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, 
-   		 int nid) throws IOException;
-    
+    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid,
+            int nid) throws IOException;
+
     String getStats() throws IOException;
 
     /**
@@ -569,11 +572,10 @@ public interface I_TermFactory {
     /**
      * Add or update an origin position to a path
      */
-    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void writePathOrigin(PathBI path, PositionBI origin, I_ConfigAceFrame config) throws IOException;
 
     public List<UUID> nativeToUuid(int nid) throws IOException;
- 
-    
+
     public UUID nidToUuid(int nid) throws IOException;
 
     public I_ImageVersioned getImage(UUID fromString) throws IOException;
@@ -585,6 +587,7 @@ public interface I_TermFactory {
             throws IOException, ParseException;
 
     public boolean pathExists(int pathConceptId) throws TerminologyException, IOException;
+
     public boolean pathExistsFast(int pathConceptId) throws TerminologyException, IOException;
 
     /**
@@ -650,11 +653,23 @@ public interface I_TermFactory {
 
     public int getCachePercent();
 
-    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws TerminologyException;
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException;
 
     public I_GetConceptData getConceptForNid(int componentNid) throws IOException;
 
-	public int getAuthorNid();
+    public int getAuthorNid();
 
+    public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
 
+    public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate) throws IOException, InterruptedException;
+
+    public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
+
+    public void persistIsaCache() throws Exception;
+
+    public void loadIsaCacheFromFile() throws Exception;
+
+    public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
+
+    public void setKnowledgeBaseCache(HashMap<Integer, KnowledgeBase> kbCache);
 }

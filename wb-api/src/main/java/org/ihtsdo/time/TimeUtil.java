@@ -4,13 +4,29 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @deprecated use TimeHelper instead.
+ * @author kec
+ */
 public class TimeUtil {
 
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-    private static SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+    
+     private static final ThreadLocal <SimpleDateFormat> localDateFormat = 
+         new ThreadLocal < SimpleDateFormat > () {
+             @Override protected SimpleDateFormat initialValue() {
+                 return new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+         }
+     };
+ 
+     private static final ThreadLocal <SimpleDateFormat> localFileFormat = 
+         new ThreadLocal < SimpleDateFormat > () {
+             @Override protected SimpleDateFormat initialValue() {
+                 return new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+         }
+     };
 
 	public static String getRemainingTimeString(int completedCount, int totalCount, long elapsed) {
-		float conceptCountFloat = totalCount; 
+		float conceptCountFloat = totalCount;
 		float completedFloat = completedCount;
 		float percentComplete = completedFloat / conceptCountFloat;
 		float estTotalTime = elapsed / percentComplete;
@@ -20,20 +36,20 @@ public class TimeUtil {
 	}
 
 	public static String getElapsedTimeString(long elapsed) {
-		String elapsedStr = String.format("%d min, %d sec", 
+		String elapsedStr = String.format("%d min, %d sec",
 			    TimeUnit.MILLISECONDS.toMinutes(elapsed),
-			    TimeUnit.MILLISECONDS.toSeconds(elapsed) - 
+			    TimeUnit.MILLISECONDS.toSeconds(elapsed) -
 			    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed))
 			);
 		return elapsedStr;
 	}
 
 	public static SimpleDateFormat getDateFormat() {
-		return dateFormat;
+		return localDateFormat.get();
 	}
 
 	public static SimpleDateFormat getFileDateFormat() {
-		return fileDateFormat;
+		return localFileFormat.get();
 	}
 
 	public static String formatDateForFile(long time) {
@@ -43,7 +59,7 @@ public class TimeUtil {
 		if (time == Long.MAX_VALUE) {
 			return "end of time";
 		}
-		return fileDateFormat.format(new Date(time));
+		return localFileFormat.get().format(new Date(time));
 	}
 
 	public static String formatDate(long time) {
@@ -53,6 +69,6 @@ public class TimeUtil {
 		if (time == Long.MAX_VALUE) {
 			return "end of time";
 		}
-		return dateFormat.format(new Date(time));
+		return localDateFormat.get().format(new Date(time));
 	}
 }

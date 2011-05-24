@@ -44,6 +44,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.RulesResultsPanel;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 
@@ -106,8 +107,11 @@ public class TestListUsingLibrary extends AbstractTask {
 		try {
 			HashMap<I_GetConceptData, List<AlertToDataConstraintFailure>> results = 
 				new HashMap<I_GetConceptData, List<AlertToDataConstraintFailure>>();
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config = null;
+			if (worker != null) {
+				config = (I_ConfigAceFrame) worker
+				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			}
 			if (config == null) {
 				config = Terms.get().getActiveAceFrameConfig();
 			}
@@ -123,12 +127,13 @@ public class TestListUsingLibrary extends AbstractTask {
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				I_GetConceptData conceptInList = model.getElementAt(i);
-				
+
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
-						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, config);
+						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, 
+						config, INFERRED_VIEW_ORIGIN.FULL);
 
 				results.put(conceptInList, resultsCollector.getAlertList());
-				
+
 			}
 
 			config.setStatusMessage("Testing complete...");
@@ -136,6 +141,8 @@ public class TestListUsingLibrary extends AbstractTask {
 			signpostPanel.add(new RulesResultsPanel(results), BorderLayout.CENTER);
 			signpostPanel.revalidate();
 			config.setShowSignpostPanel(true);
+			config.setShowWorkflowSignpostPanel(false);
+
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);

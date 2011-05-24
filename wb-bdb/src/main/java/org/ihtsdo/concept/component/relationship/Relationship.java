@@ -28,12 +28,12 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
@@ -42,11 +42,30 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
-        implements I_RelVersioned, I_RelPart, RelationshipAnalogBI {
+        implements I_RelVersioned<RelationshipRevision>,
+        I_RelPart<RelationshipRevision>,
+        RelationshipAnalogBI<RelationshipRevision> {
+
+    private static int classifierAuthorNid = Integer.MIN_VALUE;
+
+    public static int getClassifierAuthorNid() {
+        if (classifierAuthorNid == Integer.MIN_VALUE) {
+            try {
+                classifierAuthorNid = org.dwfa.cement.ArchitectonicAuxiliary.Concept.SNOROCKET.localize().getNid();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (TerminologyException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return classifierAuthorNid;
+    }
 
     public class Version
             extends ConceptComponent<RelationshipRevision, Relationship>.Version
-            implements I_RelTuple, I_RelPart, RelationshipAnalogBI {
+            implements I_RelTuple<RelationshipRevision>,
+            I_RelPart<RelationshipRevision>,
+            RelationshipAnalogBI<RelationshipRevision> {
 
         public Version() {
             super();
@@ -57,6 +76,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
+        public Relationship getPrimordialVersion() {
+            return Relationship.this;
+        }
+
+        @Override
         public int getC1Id() {
             return getEnclosingConcept().getNid();
         }
@@ -64,6 +88,19 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         @Override
         public int getC2Id() {
             return c2Nid;
+        }
+
+        @Override
+        public boolean isInferred() {
+            if (index >= 0) {
+                return revisions.get(index).isInferred();
+            }
+            return Relationship.this.isInferred();
+        }
+
+        @Override
+        public boolean isStated() {
+            return !isInferred();
         }
 
         @Override
@@ -218,21 +255,23 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public Relationship.Version getVersion(Coordinate c)
+        public Relationship.Version getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return Relationship.this.getVersion(c);
         }
 
         @Override
         public Collection<Relationship.Version> getVersions(
-                Coordinate c) {
+                ViewCoordinate c) {
             return Relationship.this.getVersions(c);
         }
 
+        @Override
         public List<? extends Version> getVersions() {
             return Relationship.this.getVersions();
         }
 
+        @Override
         public void setTypeNid(int type) {
             if (index >= 0) {
                 revisions.get(index).setTypeNid(type);
@@ -242,10 +281,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         }
 
+        @Override
         public Relationship getFixedPart() {
             return Relationship.this;
         }
 
+        @Override
         public ArrayIntList getVariableVersionNids() {
             if (index >= 0) {
                 ArrayIntList resultList = new ArrayIntList(7);
@@ -275,20 +316,22 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         @Override
         public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+            RelationshipRevision newR;
             if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
                 if (rev.getTime() == Long.MAX_VALUE && rev.getPathNid() == pathNid) {
                     rev.setStatusNid(statusNid);
                     rev.setAuthorNid(authorNid);
-                    return rev;
+                    newR = rev;
+                } else {
+                    newR = rev.makeAnalog(statusNid, authorNid, pathNid, time);
                 }
-                return rev.makeAnalog(statusNid, authorNid, pathNid, time);
             } else {
-                return Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
+                newR = Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
             }
+            return newR;
         }
 
-        @Override
         public RelationshipRevision makeAnalog() {
             if (index >= 0) {
                 RelationshipRevision rev = revisions.get(index);
@@ -324,14 +367,25 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     private int refinabilityNid;
     private int typeNid;
 
+    
+    @Override
+    public boolean readyToWriteComponent() {
+        assert c2Nid != Integer.MAX_VALUE: assertionString();
+        assert characteristicNid != Integer.MAX_VALUE: assertionString();
+        assert group != Integer.MAX_VALUE: assertionString();
+        assert refinabilityNid != Integer.MAX_VALUE: assertionString();
+        assert typeNid != Integer.MAX_VALUE: assertionString();
+        return true;
+    }
+
     public Relationship(Concept enclosingConcept,
             TupleInput input) throws IOException {
-        super(enclosingConcept,
+        super(enclosingConcept.getNid(),
                 input);
     }
 
     public Relationship(TkRelationship eRel, Concept enclosingConcept) throws IOException {
-        super(eRel, enclosingConcept);
+        super(eRel, enclosingConcept.getNid());
         c2Nid = Bdb.uuidToNid(eRel.getC2Uuid());
         setCharacteristicNid(Bdb.uuidToNid(eRel.getCharacteristicUuid()));
         group = eRel.getRelGroup();
@@ -398,11 +452,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     /**
-     * Test method to check to see if two objects are equal in all respects. 
+     * Test method to check to see if two objects are equal in all respects.
      * @param another
      * @return either a zero length String, or a String containing a description of the
-     * validation failures. 
-     * @throws IOException 
+     * validation failures.
+     * @throws IOException
      */
     public String validate(Relationship another) throws IOException {
         assert another != null;
@@ -434,7 +488,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                     + "\t\tanother.typeNid = " + another.getTypeNid() + "\n");
         }
 
-        // Compare the parents 
+        // Compare the parents
         buf.append(super.validate(another));
 
         return buf.toString();
@@ -686,7 +740,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             PositionSetBI positions, List<I_RelTuple> relTupleList,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
         List<Version> tuplesToReturn = new ArrayList<Version>();
-        computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
+        computer.addSpecifiedRelVersions(allowedStatus, allowedTypes, positions, tuplesToReturn,
                 getVersions(), precedencePolicy, contradictionManager);
         relTupleList.addAll(tuplesToReturn);
     }
@@ -753,9 +807,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         RelationshipRevision newR = new RelationshipRevision(this, statusNid, Terms.get().getAuthorNid(), pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -763,9 +814,6 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (getTime() == time && getPathNid() == pathNid) {
-            throw new UnsupportedOperationException("Cannot make an analog on same time and path...");
-        }
         RelationshipRevision newR = new RelationshipRevision(this, statusNid, authorNid, pathNid, time, this);
         addRevision(newR);
         return newR;
@@ -776,6 +824,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         throw new UnsupportedOperationException("Use makeAnalog instead");
     }
 
+    @Override
     public Relationship getFixedPart() {
         return this;
     }
@@ -791,30 +840,36 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    protected void clearVersions() {
+    public void clearVersions() {
         versions = null;
     }
 
+    @Override
     public void setCharacteristicNid(int characteristicNid) {
         this.characteristicNid = characteristicNid;
     }
 
+    @Override
     public int getCharacteristicNid() {
         return characteristicNid;
     }
 
+    @Override
     public void setRefinabilityNid(int refinabilityNid) {
         this.refinabilityNid = refinabilityNid;
     }
 
+    @Override
     public int getRefinabilityNid() {
         return refinabilityNid;
     }
 
+    @Override
     public void setTypeNid(int typeNid) {
         this.typeNid = typeNid;
     }
 
+    @Override
     public int getTypeNid() {
         return typeNid;
     }
@@ -854,10 +909,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public Relationship.Version getVersion(Coordinate c)
+    public Relationship.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Relationship.Version> vForC = getVersions(c);
-        if (vForC.size() == 0) {
+        if (vForC.isEmpty()) {
             return null;
         }
         if (vForC.size() > 1) {
@@ -867,53 +922,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public List<Relationship.Version> getVersions(Coordinate c) {
-        List<Version> possibleValues = new ArrayList<Version>(2);
-        computer.addSpecifiedRelVersions(possibleValues,
+    public List<Relationship.Version> getVersions(ViewCoordinate c) {
+        List<Version> returnValues = new ArrayList<Version>(2);
+        computer.addSpecifiedRelVersions(returnValues,
                 getVersions(),
                 c);
-
-        List<Relationship.Version> actualValues =
-                new ArrayList<Relationship.Version>(possibleValues.size());
-        switch (c.getRelAssertionType()) {
-            case INFERRED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() == c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            case INFERRED_THEN_STATED:
-                if (possibleValues.isEmpty() || possibleValues.size() == 1) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() == c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                if (actualValues.size() > 0) {
-                    return actualValues;
-                }
-                return possibleValues;
-            case STATED:
-                if (possibleValues.isEmpty()) {
-                    return possibleValues;
-                }
-                for (Relationship.Version rt : possibleValues) {
-                    if (rt.getAuthorNid() != c.getClassifierNid()) {
-                        actualValues.add(rt);
-                    }
-                }
-                return actualValues;
-            default:
-                throw new RuntimeException("Can't handle relAssertionType: "
-                        + c.getRelAssertionType());
-
-        }
+        return returnValues;
     }
 
     @Override
@@ -923,5 +937,20 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         buf.append(": ");
         ConceptComponent.addTextToBuffer(buf, c2Nid);
         return buf.toString();
+    }
+
+    @Override
+    public boolean isInferred() {
+        return getAuthorNid() == Relationship.getClassifierAuthorNid();
+    }
+
+    @Override
+    public boolean isStated() {
+        return !isInferred();
+    }
+
+    @Override
+    public Relationship getPrimordialVersion() {
+        return Relationship.this;
     }
 }

@@ -91,9 +91,16 @@ public class SearchReplaceTermsInListBeanInfo extends SimpleBeanInfo {
             retireAsStatusPropName.setDisplayName("<html><font color='green'>Retire as status Prop Name");
             retireAsStatusPropName.setShortDescription("");
 
+            PropertyDescriptor languageCodePropName = new PropertyDescriptor("languageCodePropName",
+            		SearchReplaceTermsInList.class);
+            languageCodePropName.setBound(true);
+            languageCodePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            languageCodePropName.setDisplayName("<html><font color='green'>Language code Prop Name");
+            languageCodePropName.setShortDescription("");
+            
             PropertyDescriptor rv[] = { searchStringPropName, replaceStringPropName, caseSensitivePropName,
                                        searchAllPropName, searchFsnPropName, searchPftPropName, searchSynonymPropName,
-                                       retireAsStatusPropName };
+                                       retireAsStatusPropName, languageCodePropName };
             return rv;
 
         } catch (IntrospectionException e) {

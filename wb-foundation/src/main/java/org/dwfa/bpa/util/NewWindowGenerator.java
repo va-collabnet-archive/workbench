@@ -37,10 +37,11 @@ import com.sun.jini.start.LifeCycle;
 
 public class NewWindowGenerator implements I_InitComponentMenus {
 
-    protected static Logger logger = Logger.getLogger(NewWindowGenerator.class.getName());
+    protected static final Logger logger = Logger.getLogger(NewWindowGenerator.class.getName());
 
     public class NewFrame implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Constructor<?> c = classToMake.getConstructor(new Class[] { String[].class, LifeCycle.class });
@@ -66,20 +67,24 @@ public class NewWindowGenerator implements I_InitComponentMenus {
         OpenFrames.addNewWindowMenuItemGenerator(this);
     }
 
+    @Override
     public JMenuItem[] getNewWindowMenu() {
         JMenuItem newWindow = new JMenuItem(this.title);
         newWindow.addActionListener(new NewFrame());
         return new JMenuItem[] { newWindow };
     }
 
+    @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public JMenu getQuitMenu() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void addInternalFrames(JMenu menu) {
         throw new UnsupportedOperationException();
     }

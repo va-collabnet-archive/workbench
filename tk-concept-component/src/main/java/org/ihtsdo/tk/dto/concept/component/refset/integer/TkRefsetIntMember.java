@@ -15,8 +15,6 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
 
     public int intValue;
 
-    public List<TkRefsetIntRevision> extraVersions;
-
     public TkRefsetIntMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super();
         readExternal(in, dataVersion);
@@ -32,9 +30,9 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
         intValue = in.readInt();
         int versionSize = in.readInt();
         if (versionSize > 0) {
-            extraVersions = new ArrayList<TkRefsetIntRevision>(versionSize);
+            revisions = new ArrayList<TkRefsetIntRevision>(versionSize);
             for (int i = 0; i < versionSize; i++) {
-                extraVersions.add(new TkRefsetIntRevision(in, dataVersion));
+                revisions.add(new TkRefsetIntRevision(in, dataVersion));
             }
         }
     }
@@ -43,11 +41,11 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
         out.writeInt(intValue);
-        if (extraVersions == null) {
+        if (revisions == null) {
             out.writeInt(0);
         } else {
-            out.writeInt(extraVersions.size());
-            for (TkRefsetIntRevision rmv : extraVersions) {
+            out.writeInt(revisions.size());
+            for (TkRefsetIntRevision rmv : revisions) {
                 rmv.writeExternal(out);
             }
         }
@@ -59,7 +57,7 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
     }
 
     public List<TkRefsetIntRevision> getRevisionList() {
-        return extraVersions;
+        return revisions;
     }
 
     public int getIntValue() {
@@ -78,9 +76,7 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
         buff.append(this.getClass().getSimpleName() + ": ");
         buff.append(" intValue:");
         buff.append(this.intValue);
-        buff.append(" extraVersions:");
-        buff.append(this.extraVersions);
-        buff.append("; ");
+         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();
     }
@@ -104,6 +100,7 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -118,13 +115,13 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
                 return false;
             }
             // Compare extraVersions
-            if (this.extraVersions == null) {
-                if (another.extraVersions == null) { // Equal!
-                } else if (another.extraVersions.size() == 0) { // Equal!
+            if (this.revisions == null) {
+                if (another.revisions == null) { // Equal!
+                } else if (another.revisions.isEmpty()) { // Equal!
                 } else {
                     return false;
                 }
-            } else if (!this.extraVersions.equals(another.extraVersions)) {
+            } else if (!this.revisions.equals(another.revisions)) {
                 return false;
             }
             // Compare their parents

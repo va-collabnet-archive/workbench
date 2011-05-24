@@ -22,11 +22,11 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTable;
@@ -99,7 +99,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
     private ReferencedConceptsSwingWorker refConWorker;
 
-    private Set<Integer> conceptsToFetch = new HashSet<Integer>();
+    private Set<Integer> conceptsToFetch = new ConcurrentSkipListSet<Integer>();
 
     Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
@@ -113,7 +113,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             concepts = new HashMap<Integer, I_GetConceptData>();
             Set<Integer> fetchSet = null;
             synchronized (conceptsToFetch) {
-                fetchSet = new HashSet<Integer>(conceptsToFetch);
+                fetchSet = new ConcurrentSkipListSet<Integer>(conceptsToFetch);
             }
             for (Integer id : fetchSet) {
                 if (stopWork) {
@@ -139,7 +139,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                     }
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                         } else {
                             getProgress().getProgressBar().setValue(conceptsToFetch.size());
@@ -187,6 +187,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             for (I_ConceptAttributeTuple conVersion : tuples) {
                 conceptsToFetch.add(conVersion.getStatusNid());
                 conceptsToFetch.add(conVersion.getPathNid());
+                conceptsToFetch.add(conVersion.getAuthorNid());
                 if (stopWork) {
                     return false;
                 }
@@ -204,7 +205,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                 if (get()) {
                     if (getProgress() != null) {
                         getProgress().getProgressBar().setIndeterminate(false);
-                        if (conceptsToFetch.size() == 0) {
+                        if (conceptsToFetch.isEmpty()) {
                             getProgress().getProgressBar().setValue(1);
                             getProgress().getProgressBar().setMaximum(1);
                         } else {
@@ -296,10 +297,12 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         }
     }
 
+    @Override
     public int getColumnCount() {
         return columns.length;
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         try {
             if (rowIndex >= getRowCount()) {
@@ -319,10 +322,10 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
             case CON_ID:
                 return new StringWithConceptTuple(Integer.toString(conTuple.getNid()), conTuple, inConflict);
             case STATUS:
-                if (getReferencedConcepts().containsKey(conTuple.getStatusId())) {
-                    return new StringWithConceptTuple(getPrefText(conTuple.getStatusId()), conTuple, inConflict);
+                if (getReferencedConcepts().containsKey(conTuple.getStatusNid())) {
+                    return new StringWithConceptTuple(getPrefText(conTuple.getStatusNid()), conTuple, inConflict);
                 }
-                return new StringWithConceptTuple(Integer.toString(conTuple.getStatusId()), conTuple, inConflict);
+                return new StringWithConceptTuple(Integer.toString(conTuple.getStatusNid()), conTuple, inConflict);
             case DEFINED:
                 return new StringWithConceptTuple(Boolean.toString(conTuple.isDefined()), conTuple, inConflict);
             case VERSION:
@@ -333,14 +336,24 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
                 }
                 return new StringWithConceptTuple(ThinVersionHelper.format(conTuple.getVersion()), conTuple, inConflict);
             case PATH:
-                if (getReferencedConcepts().containsKey(conTuple.getPathId())) {
+                if (getReferencedConcepts().containsKey(conTuple.getPathNid())) {
                     try {
-                        return new StringWithConceptTuple(getPrefText(conTuple.getPathId()), conTuple, inConflict);
+                        return new StringWithConceptTuple(getPrefText(conTuple.getPathNid()), conTuple, inConflict);
                     } catch (Exception e) {
-                        return new StringWithConceptTuple(Integer.toString(conTuple.getPathId()), conTuple, inConflict);
+                        return new StringWithConceptTuple(Integer.toString(conTuple.getPathNid()), conTuple, inConflict);
                     }
                 }
-                return new StringWithConceptTuple(Integer.toString(conTuple.getPathId()), conTuple, inConflict);
+                return new StringWithConceptTuple(Integer.toString(conTuple.getPathNid()), conTuple, inConflict);
+            case AUTHOR:
+                if (getReferencedConcepts().containsKey(conTuple.getAuthorNid())) {
+                    try {
+                        return new StringWithConceptTuple(getPrefText(conTuple.getAuthorNid()), conTuple, inConflict);
+                    } catch (Exception e) {
+                        return new StringWithConceptTuple(Integer.toString(conTuple.getAuthorNid()), conTuple, inConflict);
+                    }
+                }
+                return new StringWithConceptTuple(Integer.toString(conTuple.getAuthorNid()), conTuple, inConflict);
+                
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -387,10 +400,12 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         }
     }
 
+    @Override
     public String getColumnName(int col) {
         return columns[col].getColumnName();
     }
 
+    @Override
     public boolean isCellEditable(int row, int col) {
         if (ACE.editMode == false) {
             return false;
@@ -421,6 +436,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         return false;
     }
 
+    @Override
     public void setValueAt(Object value, int row, int col) {
         boolean changed = false;
         try {
@@ -503,6 +519,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
 
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         allTuples = null;
         if (getProgress() != null) {
@@ -524,6 +541,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         return referencedConcepts;
     }
 
+    @Override
     public Class<?> getColumnClass(int c) {
         switch (columns[c]) {
         case CON_ID:
@@ -563,6 +581,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
          * 
          * @see org.dwfa.ace.table.I_CellTextWithTuple#getTuple()
          */
+        @Override
         public I_ConceptAttributeTuple getTuple() {
             return tuple;
         }
@@ -572,6 +591,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         return columns;
     }
 
+    @Override
     public int getRowCount() {
         if (allTuples == null) {
             try {

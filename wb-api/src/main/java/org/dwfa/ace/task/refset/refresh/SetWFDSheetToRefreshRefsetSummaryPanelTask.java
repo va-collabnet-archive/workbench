@@ -282,7 +282,7 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 					(Set<UniversalAcePosition>) process.getProperty(refsetSpecVersionPropName);
 		        for (UniversalAcePosition univPos: universalPositions) {
 		           PathBI path = tf.getPath(univPos.getPathId());
-		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PositionBI thinPos = tf.newPosition(path, univPos.getTime());
 		           currentRefsetSpecVersion.add(thinPos);
 		        }
 
@@ -314,7 +314,7 @@ public class SetWFDSheetToRefreshRefsetSummaryPanelTask extends AbstractTask {
 					(Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);
 		        for (UniversalAcePosition univPos: universalPositions) {
 		           PathBI path = tf.getPath(univPos.getPathId());
-		           PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+		           PositionBI thinPos = tf.newPosition(path, univPos.getTime());
 		           currentSnomedVersion.add(thinPos);
 		        }
 

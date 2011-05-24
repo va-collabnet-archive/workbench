@@ -18,14 +18,17 @@ package org.dwfa.ace.gui.concept;
 
 import java.awt.Color;
 import java.awt.ComponentOrientation;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,18 +36,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+import javax.swing.AbstractAction;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_RelTuple;
@@ -55,17 +59,19 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.ace.tree.LineageTreeCellRenderer;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.util.swing.GuiUtil;
 
-public class LineagePlugin extends AbstractPlugin 
-	implements HierarchyListener {
+public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
-
     private transient JTreeWithDragImage lineageTree;
     private transient JComponent lineagePanel;
     private transient LineageTreeCellRenderer lineageRenderer;
+    private JToggleButton statedInferredButton;
+    private ViewCoordinate coordinate;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -78,10 +84,25 @@ public class LineagePlugin extends AbstractPlugin
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
+    private static ImageIcon statedViewIcon = null;
+    private static ImageIcon inferredViewIcon = null;
+    
 
+    private ImageIcon getStatedIcon() {
+        if (statedViewIcon == null) {
+            statedViewIcon = new ImageIcon(LineagePlugin.class.getResource("/16x16/plain/graph_edge.png"));
+        }
+        return statedViewIcon;
+    }
+    private ImageIcon getInferredIcon() {
+        if (inferredViewIcon == null) {
+            inferredViewIcon = new ImageIcon(LineagePlugin.class.getResource("/16x16/plain/chrystal_ball.png"));
+        }
+        return inferredViewIcon;
+    }
     public LineagePlugin(boolean shownByDefault, int sequence) {
         super(shownByDefault, sequence);
-    }
+     }
 
     @Override
     protected ImageIcon getImageIcon() {
@@ -95,6 +116,7 @@ public class LineagePlugin extends AbstractPlugin
         }
     }
 
+    @Override
     public JComponent getComponent(I_HostConceptPlugins host) throws TerminologyException {
         if (lineagePanel == null) {
             setHost(host);
@@ -112,8 +134,8 @@ public class LineagePlugin extends AbstractPlugin
 
     private JComponent getLineagePanel(I_HostConceptPlugins host) throws IOException, TerminologyException {
         setHost(host);
-        JPanel lineagePanel = new JPanel(new GridBagLayout());
-        lineagePanel.addHierarchyListener(this);
+        JPanel newLineagePanel = new JPanel(new GridBagLayout());
+        newLineagePanel.addHierarchyListener(this);
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.WEST;
         c.gridx = 0;
@@ -122,18 +144,45 @@ public class LineagePlugin extends AbstractPlugin
         c.gridwidth = 2;
         JLabel lineageLabel = new JLabel("Lineage:");
         lineageLabel.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 0));
-        lineagePanel.add(lineageLabel, c);
-
-        SmallProgressPanel lineageProgress = new SmallProgressPanel();
-        lineageProgress.setVisible(false);
+        newLineagePanel.add(lineageLabel, c);
         c.gridwidth = 1;
-        c.anchor = GridBagConstraints.SOUTHEAST;
-        c.gridx++;
-        lineagePanel.add(lineageProgress, c);
 
+        statedInferredButton = new JToggleButton(new AbstractAction("", getStatedIcon()) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton button = (JToggleButton) e.getSource();
+                if (button.isSelected()) {
+                    button.setIcon(getStatedIcon());
+                    button.setToolTipText("showing stated, toggle to show inferred...");
+                    try {
+                        update();
+                    } catch (Exception ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                } else {
+                    button.setIcon(getInferredIcon());
+                    button.setToolTipText("showing inferred, toggle to show stated...");
+                    try {
+                        update();
+                    } catch (Exception ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                }
+            }
+        });
+        statedInferredButton.setSelected(true);
+        statedInferredButton.setPreferredSize(new Dimension(21, 16));
+        statedInferredButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        statedInferredButton.setOpaque(false);
+        statedInferredButton.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+
+        c.gridx++;
+        c.gridx++;
+        newLineagePanel.add(statedInferredButton, c);
+        c.anchor = GridBagConstraints.SOUTHEAST;
         lineageTree = new JTreeWithDragImage(host.getConfig());
         lineageTree.putClientProperty("JTree.lineStyle", "Angled");
-        // lineageTree.putClientProperty("JTree.lineStyle", "None");
         lineageTree.setLargeModel(true);
         lineageTree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         lineageTree.setTransferHandler(new TerminologyTransferHandler(lineageTree));
@@ -155,42 +204,46 @@ public class LineagePlugin extends AbstractPlugin
         filler.setMaximumSize(new Dimension(40, 20));
         filler.setMinimumSize(new Dimension(40, 20));
         filler.setPreferredSize(new Dimension(40, 20));
-        lineagePanel.add(filler, c);
+        newLineagePanel.add(filler, c);
         c.gridx++;
         c.weightx = 0.1;
         c.weighty = 0.0;
-        lineagePanel.add(lineageTree, c);
+        newLineagePanel.add(lineageTree, c);
         lineageTree.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.GRAY));
 
-        c.weightx = 1.0;
         JPanel eastFiller = new JPanel();
         eastFiller.setMaximumSize(new Dimension(40, 20));
         eastFiller.setMinimumSize(new Dimension(40, 20));
         eastFiller.setPreferredSize(new Dimension(40, 20));
         eastFiller.setBackground(Color.white);
         eastFiller.setOpaque(true);
-        c.weightx = 1.0;
+        c.weightx = 0.0;
         c.gridx++;
         eastFiller.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.GRAY));
-        lineagePanel.add(eastFiller, c);
+        newLineagePanel.add(eastFiller, c);
 
-        lineagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
-            BorderFactory.createLineBorder(Color.GRAY)));
-        return lineagePanel;
+        newLineagePanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3), BorderFactory.createLineBorder(Color.GRAY)));
+        return newLineagePanel;
     }
- 
+
     private void updateLineageModel() throws IOException, TerminologyException {
         DefaultTreeModel model = (DefaultTreeModel) lineageTree.getModel();
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("ROOT");
         model.setRoot(root);
- 
+        RelAssertionType relAssertionType = RelAssertionType.INFERRED;
+        if (statedInferredButton.isSelected()) {
+            relAssertionType = RelAssertionType.STATED;
+        }
+        coordinate = new ViewCoordinate(getHost().getConfig().getViewCoordinate());
+        coordinate.setRelAssertionType(relAssertionType);
+
         I_GetConceptData bean = (I_GetConceptData) getHost().getTermComponent();
         if (bean != null) {
             lineageRenderer.setFocusBean(bean);
             List<List<I_GetConceptData>> lineage = getLineage(bean, 0);
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                StringBuffer buf = new StringBuffer();
-                buf.append("Lineage for: " + bean);
+                StringBuilder buf = new StringBuilder();
+                buf.append("Lineage for: ").append(bean);
                 for (List<I_GetConceptData> parentLine : lineage) {
                     buf.append("\n");
                     buf.append(parentLine);
@@ -203,13 +256,13 @@ public class LineagePlugin extends AbstractPlugin
                 lineageTree.expandRow(i);
             }
             SwingUtilities.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
-			        GuiUtil.tickle(lineageTree);
-			        GuiUtil.tickle(lineagePanel);
-				}
-			});
+
+                @Override
+                public void run() {
+                    GuiUtil.tickle(lineageTree);
+                    GuiUtil.tickle(lineagePanel);
+                }
+            });
         } else {
             root.add(new DefaultMutableTreeNode(" "));
             model.nodeStructureChanged(root);
@@ -217,8 +270,10 @@ public class LineagePlugin extends AbstractPlugin
     }
 
     private void addLineageToNode(List<List<I_GetConceptData>> lineage, DefaultMutableTreeNode root) {
-        Map<I_GetConceptData, DefaultMutableTreeNode> childrenNodes = new HashMap<I_GetConceptData, DefaultMutableTreeNode>();
-        Map<I_GetConceptData, List<List<I_GetConceptData>>> childrenLineage = new HashMap<I_GetConceptData, List<List<I_GetConceptData>>>();
+        Map<I_GetConceptData, DefaultMutableTreeNode> childrenNodes =
+                new HashMap<I_GetConceptData, DefaultMutableTreeNode>();
+        Map<I_GetConceptData, List<List<I_GetConceptData>>> childrenLineage =
+                new HashMap<I_GetConceptData, List<List<I_GetConceptData>>>();
         for (List<I_GetConceptData> parentLine : lineage) {
             childrenNodes.put(parentLine.get(0), new DefaultMutableTreeNode(parentLine.get(0)));
             if (childrenLineage.get(parentLine.get(0)) == null) {
@@ -239,17 +294,16 @@ public class LineagePlugin extends AbstractPlugin
         }
     }
 
-    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth) throws IOException, TerminologyException {
+    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth) throws IOException,
+            TerminologyException {
         List<List<I_GetConceptData>> lineage = new ArrayList<List<I_GetConceptData>>();
 
-        List<? extends I_RelTuple> sourceRelTuples = bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
-            getHost().getConfig().getDestRelTypes(), getHost().getConfig().getViewPositionSetReadOnly(), 
-            getHost().getConfig().getPrecedence(), getHost().getConfig().getConflictResolutionStrategy());
+        List<? extends I_RelTuple> sourceRelTuples =
+                bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(), getHost().getConfig().getDestRelTypes(),
+                getHost().getConfig().getViewPositionSetReadOnly(), getHost().getConfig().getPrecedence(),
+                getHost().getConfig().getConflictResolutionStrategy(),
+                coordinate.getClassifierNid(), coordinate.getRelAssertionType());
         if ((sourceRelTuples.size() > 0) && (depth < 40)) {
-            if (depth > 3) {
-                String test = "test";
-                test.compareTo(test);
-            }
             for (I_RelTuple rel : sourceRelTuples) {
                 I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
                 List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);
@@ -259,7 +313,7 @@ public class LineagePlugin extends AbstractPlugin
                 }
             }
         } else {
-            lineage.add(new ArrayList<I_GetConceptData>(Arrays.asList(new I_GetConceptData[] { bean })));
+            lineage.add(new ArrayList<I_GetConceptData>(Arrays.asList(new I_GetConceptData[]{bean})));
         }
         return lineage;
     }
@@ -274,24 +328,25 @@ public class LineagePlugin extends AbstractPlugin
         return Integer.MIN_VALUE;
     }
 
+    @Override
     public UUID getId() {
         return TOGGLES.LINEAGE.getPluginId();
     }
 
-	@Override
-	public void hierarchyChanged(HierarchyEvent e) {
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				try {
-					updateLineageModel();
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				} catch (TerminologyException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
-		});
-	}
+    @Override
+    public void hierarchyChanged(HierarchyEvent e) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    updateLineageModel();
+                } catch (IOException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                } catch (TerminologyException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }
+        });
+    }
 }

@@ -4,9 +4,10 @@ import java.beans.PropertyVetoException;
 
 public interface AnalogBI {
 
-    public void setStatusNid(int nid) throws PropertyVetoException;
-    public void setAuthorNid(int nid) throws PropertyVetoException;
-    public void setPathNid(int nid) throws PropertyVetoException;
-    public void setTime(long time) throws PropertyVetoException;
+    void setNid(int nid) throws PropertyVetoException;
+    void setStatusNid(int nid) throws PropertyVetoException;
+    void setAuthorNid(int nid) throws PropertyVetoException;
+    void setPathNid(int nid) throws PropertyVetoException;
+    void setTime(long time) throws PropertyVetoException;
 
 }

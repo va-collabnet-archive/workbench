@@ -30,6 +30,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.cement.ArchitectonicAuxiliary.LANG_CODE;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -55,6 +56,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
     private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
     private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
     private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
+    private String languageCodePropName = ProcessAttachmentKeys.LANGUAGE_CODE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -66,6 +68,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         out.writeObject(searchPftPropName);
         out.writeObject(searchSynonymPropName);
         out.writeObject(retireAsStatusPropName);
+        out.writeObject(languageCodePropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -79,6 +82,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             searchPftPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
+            languageCodePropName = (String) in.readObject();
         } else if (objDataVersion == 2) {
             searchStringPropName = (String) in.readObject();
             replaceStringPropName = (String) in.readObject();
@@ -88,6 +92,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             searchPftPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = (String) in.readObject();
+            languageCodePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -126,6 +131,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         // Get the values from the dialog
         String searchString = dialog.getSearchString();
         String replaceString = dialog.getReplaceString();
+        LANG_CODE selectedLanguageCode = dialog.getLanguageCode();
         boolean caseSensitive = dialog.isCaseSensitive();
         boolean searchAll = dialog.isAll();
         boolean searchFsn = dialog.isFullySpecifiedName();
@@ -147,6 +153,8 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             process.setProperty(searchPftPropName, searchPft);
             process.setProperty(searchSynonymPropName, searchSynonym);
             process.setProperty(retireAsStatusPropName, retireAsStatus);
+            process.setProperty(languageCodePropName, selectedLanguageCode);
+            
 
         } catch (IntrospectionException e) {
             throw new TaskFailedException("Can't bind variables from Find and Replace dialog: " + e);
@@ -159,7 +167,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         return Condition.ITEM_COMPLETE;
     }
 
-    public String getSearchStringPropName() {
+	public String getSearchStringPropName() {
         return searchStringPropName;
     }
 
@@ -222,6 +230,14 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
     public void setRetireAsStatusPropName(String retireAsStatusPropName) {
         this.retireAsStatusPropName = retireAsStatusPropName;
     }
+    
+    public String getLanguageCodePropName() {
+		return languageCodePropName;
+	}
+
+	public void setLanguageCodePropName(String languageCodePropName) {
+		this.languageCodePropName = languageCodePropName;
+	}
 
     public Collection<Condition> getConditions() {
         return AbstractTask.ITEM_CANCELED_OR_COMPLETE;

@@ -7,6 +7,10 @@ public class Severity {
 	private String name;
 	private String description;
 	
+	public Severity(){
+		super();
+	}
+	
 	public Severity(UUID severityUuid, String name, String description) {
 		super();
 		this.severityUuid = severityUuid;

@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -41,8 +44,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -54,7 +59,11 @@ public class RulesContextHelper {
 
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
-		this.kbCache = new HashMap<Integer, KnowledgeBase>();
+		if (Terms.get().getKnowledgeBaseCache() != null) {
+			this.kbCache = Terms.get().getKnowledgeBaseCache();
+		} else {
+			this.kbCache = new HashMap<Integer, KnowledgeBase>();
+		}
 	}
 
 	//	public void updateKbCacheFromFiles() {
@@ -92,16 +101,31 @@ public class RulesContextHelper {
 		return getKnowledgeBaseForContext(context, config, false);
 	}
 	public KnowledgeBase getKnowledgeBaseForContext(I_GetConceptData context, I_ConfigAceFrame config, boolean recreate) throws Exception {
+		KnowledgeBase returnBase = null;
+		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		I_ShowActivity activity =
+			Terms.get().newActivityPanel(true, config, 
+					"<html>Generating KnowledgeBase for context...", true);
+		activities.add(activity);
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		activity.setProgressInfoLower("Generating KnowledgeBase for context...");
+		long startTime = System.currentTimeMillis();
 		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
 		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
-			return kbCache.get(context.getConceptNid());
-		} else if (serializedKbFile.exists() && !recreate){
+			returnBase = kbCache.get(context.getConceptNid());
+		} 
+
+		if (returnBase == null && serializedKbFile.exists() && !recreate){
 			KnowledgeBase kbase = null;
 			try {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
 				kbase = (KnowledgeBase) in.readObject();
 				in.close();
 				kbCache.put(context.getConceptNid(), kbase);
+				Terms.get().setKnowledgeBaseCache(kbCache);
+			} catch (StreamCorruptedException e0) {
+				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -109,8 +133,10 @@ public class RulesContextHelper {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-			return kbase;
-		} else {
+			returnBase = kbase;
+		}
+		
+		if (returnBase == null) {
 			//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
 
 			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
@@ -139,11 +165,23 @@ public class RulesContextHelper {
 					e.printStackTrace();
 				}
 				kbCache.put(context.getConceptNid(), kbase);
+				Terms.get().setKnowledgeBaseCache(kbCache);
 				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
 			}
-
-			return kbase;
+			returnBase = kbase;
 		}
+		long endTime = System.currentTimeMillis();
+		long elapsed = endTime - startTime;
+		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+		String result = "Done";
+		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		try {
+			activity.complete();
+			activity.removeActivityFromViewer();
+		} catch (ComputationCanceled e) {
+			e.printStackTrace();
+		}
+		return returnBase;
 	}
 
 	public KnowledgeBase filterForContext(KnowledgeBase kbase, I_GetConceptData context, I_ConfigAceFrame config) throws TerminologyException, IOException {
@@ -466,16 +504,18 @@ public class RulesContextHelper {
 
 	public void setKbCache(HashMap<Integer, KnowledgeBase> kbCache) {
 		this.kbCache = kbCache;
+		Terms.get().setKnowledgeBaseCache(kbCache);
 	}
 
 	public void clearCache() {
 		File dir = new File("rules");
 		for (File loopFile : dir.listFiles()) {
-			if (loopFile.getName().endsWith(".bkb")) {
+			if (loopFile.getName().endsWith(".bkb") || loopFile.getName().endsWith(".pkg")) {
 				loopFile.delete();
 			}
 		}
 		kbCache = new HashMap<Integer, KnowledgeBase>();
+		Terms.get().setKnowledgeBaseCache(kbCache);
 		//updateKbCacheFromFiles();
 	}
 

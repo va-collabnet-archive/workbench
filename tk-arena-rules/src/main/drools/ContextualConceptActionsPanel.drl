@@ -6,8 +6,9 @@ import java.io.File;
 import java.lang.String;
 import java.util.Collection;
 
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
 
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.context.action.CopyDescAction;
@@ -21,33 +22,32 @@ import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
 import org.ihtsdo.tk.example.binding.WbDescType;
-
-
+import org.ihtsdo.arena.spec.Refsets; 
 
 #declare any global variables here
 
 global Collection actions;
 global BpActionFactory actionFactory;
+global ViewCoordinate vc;
 
-rule "add from directory"
-	when
-		$c : ConceptVersionBI();
-	then 
-		actions.addAll(actionFactory.fromDir("plugins/component"));
-end
-
-rule "add from other directory"
-	when
-		$c : ConceptVersionBI(
-				this isKindOf Taxonomies.REFSET_AUX);
-	then 
-		actions.addAll(actionFactory.fromDir("plugins/component-test"));
-end
 
 rule "add if null concept in host"
 	when
-		String(this == "null concept");
+		$c: ConceptFact(component == null)
 	then 
-		actions.add(actionFactory.make(new File("plugins/component/new_concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp"))); 
 end
+
+rule "retire or move"
+	when
+		$c: ConceptFact(component != null); 
+	then
+		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
+		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+end
+
+
+
+
 

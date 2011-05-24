@@ -8,7 +8,7 @@ import org.w3c.dom.Element;
 public class XML_I_ConceptAttributeVersioned extends XML_basic_getCon implements
 		I_Handle_XML {
 
-	public I_ConceptAttributeVersioned conAttV;
+	public I_ConceptAttributeVersioned<?> conAttV;
 	int con_id = -1;
 	int numVer = -1;
 	

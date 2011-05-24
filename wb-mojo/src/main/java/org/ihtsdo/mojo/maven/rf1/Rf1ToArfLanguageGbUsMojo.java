@@ -164,6 +164,25 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
     private Rf1SubsetId[] rf1SubsetIds;
 
     /**
+     * @parameter default-value="false"
+     */
+    private boolean rf2Mapping;
+    
+    /**
+     * language concept -> acceptability -> acceptable UUID
+     * 
+     * @parameter default-value="51b45763-09c4-34eb-a303-062ba8e0c0e9"
+     */
+    private String uuidAcceptable;
+
+    /**
+     * language concept -> acceptability -> preferred acceptability UUID
+     * 
+     * @parameter default-value="15877c09-60d7-3464-bed8-635a98a7e5b2"
+     */
+    private String uuidPrefAccept;
+
+    /**
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      * 
@@ -208,6 +227,7 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
 
     public void executeMojo(String tDir, String tSubDir, Rf1Dir[] inDirs, Rf1SubsetId[] subsetIds,
             String outDir) throws MojoFailureException, MojoExecutionException {
+        getLog().info("::: RF2 Mapping: " + rf2Mapping);
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
@@ -381,6 +401,9 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         Rf1ToArfSubsetsMojo mojo = new Rf1ToArfSubsetsMojo();
         mojo.setDateStart(dateStart);
         mojo.setDateStop(dateStop);
+        mojo.setRf2Mapping(rf2Mapping);
+        mojo.setUuidAcceptable(uuidAcceptable);
+        mojo.setUuidPrefAccept(uuidPrefAccept);
 
         // KEEP LOGIC
         if (keepUS) {

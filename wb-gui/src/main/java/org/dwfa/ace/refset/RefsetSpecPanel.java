@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,6 +51,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
 
 import org.dwfa.ace.ACE;
@@ -60,7 +63,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
@@ -82,6 +84,7 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
+import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
@@ -90,6 +93,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.PathBI;
 
 public class RefsetSpecPanel extends JPanel {
@@ -163,15 +167,15 @@ public class RefsetSpecPanel extends JPanel {
         split.setOneTouchExpandable(true);
 
         hierarchicalTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false), ace);
-
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), false));
         refsetAndParentOnlyTreeHelper =
-                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true), ace);
-
+                new TermTreeHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(), new IntSet(), true));
         bottomPanelVerticalBox = new Box(BoxLayout.Y_AXIS);
         bottomTabs = new JTabbedPane();
         bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
         bottomTabs.addTab(REFSET_AND_PARENT_ONLY_VIEW, refsetAndParentOnlyTreeHelper.getHierarchyPanel());
+        hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
+        refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
 
         editor = new RefsetSpecEditor(ace, hierarchicalTreeHelper, refsetAndParentOnlyTreeHelper, this);
         split.setTopComponent(editor.getContentPanel());
@@ -267,7 +271,7 @@ public class RefsetSpecPanel extends JPanel {
         return (ReflexiveRefsetCommentTableModel) commentTable.getModel();
     }
 
-    protected static JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
+    protected JTableWithDragImage createCommentTable(I_ConfigAceFrame aceFrameConfig, RefsetSpecEditor editor)
             throws NoSuchMethodException, Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
 
@@ -349,8 +353,8 @@ public class RefsetSpecPanel extends JPanel {
         }
 
         ReflexiveRefsetCommentTableModel commentTableModel =
-                new ReflexiveRefsetCommentTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns
-                    .size()]));
+                new ReflexiveRefsetCommentTableModel(editor, columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
+
         aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
         aceFrameConfig.addPropertyChangeListener("commitEnabled", commentTableModel);
@@ -365,6 +369,8 @@ public class RefsetSpecPanel extends JPanel {
         commentTableModel.getRowCount();
 
         JTableWithDragImage commentTable = new JTableWithDragImage(commentTableModel);
+        commentTable.getColumnModel().addColumnModelListener(new CommentTableColumnModelListener(commentTable));
+
         SortClickListener.setupSorter(commentTable);
         for (int i = 0; i < commentTable.getColumnModel().getColumnCount(); i++) {
             TableColumn column = commentTable.getColumnModel().getColumn(i);
@@ -387,8 +393,8 @@ public class RefsetSpecPanel extends JPanel {
         return commentTable;
     }
 
-    public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel)
-            throws NoSuchMethodException, Exception {
+    public void setupRefsetMemberTable(ReflexiveRefsetCommentTableModel commentTableModel) throws NoSuchMethodException,
+            Exception {
         List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
 
         columns.add(ReflexiveRefsetFieldData.getRowColumn());
@@ -403,7 +409,7 @@ public class RefsetSpecPanel extends JPanel {
         column1.setMax(1000);
         column1.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.CONCEPT_COMPONENT);
         column1
-            .setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", I_IntList.class, I_ConfigAceFrame.class));
+            .setReadMethod(I_GetConceptData.class.getMethod("getDescTuple", NidListBI.class, I_ConfigAceFrame.class));
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(aceFrameConfig.getTableDescPreferenceList());
         parameters.add(aceFrameConfig);
@@ -524,8 +530,7 @@ public class RefsetSpecPanel extends JPanel {
         CheckBoxCellRenderer checkBoxRenderer = new CheckBoxCellRenderer();
 
         selectAllCheckBoxListener = new SelectAllCheckBoxListener();
-        checkBoxHeaderRenderer =
-                new CheckBoxHeaderRenderer(selectAllCheckBoxListener, this, refsetTable.getTableHeader());
+        checkBoxHeaderRenderer = new CheckBoxHeaderRenderer(selectAllCheckBoxListener, this, refsetTable.getTableHeader());
 
         checkBoxColumn = new TableColumn();
         checkBoxColumn.setCellRenderer(checkBoxRenderer);
@@ -566,10 +571,8 @@ public class RefsetSpecPanel extends JPanel {
                 filterLabel = new JLabel("Filter view:");
                 promotionTypes = new HashSet<Object>();
                 promotionTypes.add("All");
-                promotionTypes.add(Terms.get().getConcept(
-                    ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids()));
-                promotionTypes.add(Terms.get().getConcept(
-                    ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION.getUids()));
+                promotionTypes.add(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION.getUids()));
                 promotionTypes.add(Terms.get().getConcept(
                     ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION.getUids()));
                 promotionTypes.add(Terms.get().getConcept(
@@ -672,12 +675,7 @@ public class RefsetSpecPanel extends JPanel {
     private static HashMap<Integer, PROMOTION_STATUS> promotionStatusMap = new HashMap<Integer, PROMOTION_STATUS>();
 
     private enum PROMOTION_STATUS {
-        REVIEWED_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION),
-        REVIEWED_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION),
-        REVIEWED_NOT_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION),
-        REVIEWED_NOT_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION),
-        UNREVIEWED_NEW_ADDITION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION),
-        UNREVIEWED_NEW_DELETION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION);
+        REVIEWED_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_ADDITION), REVIEWED_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_APPROVED_DELETION), REVIEWED_NOT_APPROVED_ADDITION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_ADDITION), REVIEWED_NOT_APPROVED_DELETION(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION), UNREVIEWED_NEW_ADDITION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_ADDITION), UNREVIEWED_NEW_DELETION(ArchitectonicAuxiliary.Concept.UNREVIEWED_NEW_DELETION);
 
         private int nid;
 
@@ -703,7 +701,8 @@ public class RefsetSpecPanel extends JPanel {
     }
 
     /**
-     * @TODO modify implementation to report progress using the swing worker methods.
+     * @TODO modify implementation to report progress using the swing worker
+     *       methods.
      * @author kec
      * 
      */
@@ -781,13 +780,13 @@ public class RefsetSpecPanel extends JPanel {
 
                                     if (newStatus != null) {
                                         I_ExtendByRefPartCid analog =
-                                                (I_ExtendByRefPartCid) partToPromote.makeAnalog(promotionPart
-                                                    .getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
+                                                (I_ExtendByRefPartCid) partToPromote.makeAnalog(
+                                                    promotionPart.getStatusNid(), p.getConceptNid(), Long.MAX_VALUE);
                                         analog.setC1id(newStatus.getNid());
 
                                         extForMember.addVersion(analog);
-                                        extForMember.promote(new Position(Integer.MAX_VALUE, p), promotionPath,
-                                            currentSet, aceFrameConfig.getPrecedence());
+                                        extForMember.promote(new Position(Long.MAX_VALUE, p), promotionPath, currentSet,
+                                            aceFrameConfig.getPrecedence());
                                     }
                                 }
                             }
@@ -1083,8 +1082,7 @@ public class RefsetSpecPanel extends JPanel {
         try {
             I_Identify idVersioned = Terms.get().getId(componentId);
             int snomedIntegerId =
-                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
-                        .getNid();
+                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
             I_IdPart latestPart = null;
 
@@ -1116,8 +1114,7 @@ public class RefsetSpecPanel extends JPanel {
         try {
             I_Identify idVersioned = Terms.get().getId(componentId);
             int snomedIntegerId =
-                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next())
-                        .getNid();
+                    Terms.get().getId(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids().iterator().next()).getNid();
 
             List<? extends I_IdPart> parts = idVersioned.getMutableIdParts();
             I_IdPart latestPart = null;
@@ -1154,5 +1151,76 @@ public class RefsetSpecPanel extends JPanel {
         int rowIndex = refsetTable.getSelectedRow();
         StringWithExtTuple selectedComponent = (StringWithExtTuple) refsetTable.getValueAt(rowIndex, 1);
         return selectedComponent.getId();
+    }
+
+    private class CommentTableColumnModelListener implements TableColumnModelListener {
+
+        JTableWithDragImage table;
+
+        public CommentTableColumnModelListener(JTableWithDragImage table) {
+            super();
+            this.table = table;
+        }
+
+        @Override
+        public void columnAdded(TableColumnModelEvent arg0) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void columnMarginChanged(ChangeEvent arg0) {
+
+            int rowCount = table.getRowCount();
+            int columnCount = table.getColumnCount();
+
+            if (table.getModel().getRowCount() == table.getRowCount()
+                && table.getModel().getColumnCount() == table.getColumnCount()) {
+                for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+                    double rowPreferredHeight = 0;
+                    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+                        Component comp =
+                                table.getCellRenderer(rowIndex, columnIndex).getTableCellRendererComponent(table,
+                                    table.getModel().getValueAt(rowIndex, columnIndex), false, false, rowIndex, columnIndex);
+
+                        int currentRowHeight = table.getRowHeight(rowIndex);
+                        int currentRowWidth = table.getColumnModel().getColumn(columnIndex).getWidth();
+
+                        comp.setSize(currentRowWidth, currentRowHeight);
+
+                        double dPreferredHeight = comp.getPreferredSize().getHeight();
+                        if (dPreferredHeight > rowPreferredHeight && rowIndex >= 0 &&
+                                rowIndex < table.getRowCount()) {
+                            rowPreferredHeight = dPreferredHeight;
+                            // set the new row height based on the preferred height of the cell component
+                            try {
+                                table.setRowHeight(rowIndex, (int) dPreferredHeight);
+                            } catch (IndexOutOfBoundsException e) {
+                                AceLog.getAppLog().warning("columnMarginChanged ex: " + e.toString());
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        @Override
+        public void columnMoved(TableColumnModelEvent arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void columnRemoved(TableColumnModelEvent arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void columnSelectionChanged(ListSelectionEvent arg0) {
+            // TODO Auto-generated method stub
+
+        }
+
     }
 }

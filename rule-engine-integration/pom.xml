@@ -3,10 +3,10 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-icd-1-SNAPSHOT</version>
+		<version>2.6.0-trek-14-SNAPSHOT</version>
 	</parent>
 	<artifactId>rule-engine-integration</artifactId>
-	<name>Rules engine integration</name>
+	<name>${branch}: Rules engine integration</name>
 	<url>http://maven.apache.org</url>
 	<!--   <repositories>
 		<repository>
@@ -24,28 +24,24 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
-			<version>${drools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-api</artifactId>
-			<version>${drools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-compiler</artifactId>
-			<version>${drools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-templates</artifactId>
-			<version>${drools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
 			<version>${project.version}</version>
-			<scope>compile</scope>
+		 <type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -53,9 +49,13 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.mvel</groupId>
+			<artifactId>mvel2</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>lucene-core</artifactId>
-			<version>3.0.2</version>
+			<version>3.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
@@ -86,6 +86,16 @@
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpcore</artifactId>
 		    <version>4.0.1</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.ihtsdo</groupId>
+		    <artifactId>tk-qa-ws-client</artifactId>
+		    <version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 	<build>

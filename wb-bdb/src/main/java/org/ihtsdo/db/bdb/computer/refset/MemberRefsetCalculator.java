@@ -684,7 +684,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
 
             }
 
-            new Thread(conflictWriter).start();
+            new Thread(conflictWriter, this.getClass().getCanonicalName()).start();
         }
     }
 

@@ -93,7 +93,9 @@ public interface I_HelpRefsets extends I_HelpLineage {
 	 */
 	public boolean retireRefsetExtension(int refsetId, int conceptId,
 			final RefsetPropertyMap extProps) throws Exception;
-
+	public boolean retireRefsetStrExtension(int refsetId, int conceptId,
+			final RefsetPropertyMap extProps) throws Exception;
+	
 	public void setEditPaths(PathBI... editPaths);
 
 	public boolean hasPurpose(int refsetId, int purposeId) throws Exception;

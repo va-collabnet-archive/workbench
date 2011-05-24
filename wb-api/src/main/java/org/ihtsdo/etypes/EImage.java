@@ -19,13 +19,13 @@ public class EImage extends TkMedia {
         super(in, dataVersion);
     }
 
-    public EImage(I_ImageVersioned imageVer) throws TerminologyException, IOException {
+    public EImage(I_ImageVersioned<?> imageVer) throws TerminologyException, IOException {
         EConcept.convertId(Terms.get().getId(imageVer.getNid()), this);
         int partCount = imageVer.getMutableParts().size();
         I_ImagePart part = imageVer.getMutableParts().get(0);
         conceptUuid = Terms.get().nidToUuid(imageVer.getConceptNid());
         format = imageVer.getFormat();
-        image = imageVer.getImage();
+        dataBytes = imageVer.getImage();
         textDescription = part.getTextDescription();
         typeUuid = Terms.get().nidToUuid(part.getTypeId());
         pathUuid = Terms.get().nidToUuid(part.getPathId());

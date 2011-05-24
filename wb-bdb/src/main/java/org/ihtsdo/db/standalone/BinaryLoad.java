@@ -118,7 +118,7 @@ public class BinaryLoad {
 	            		" written: " + DescriptionBinder.written);    
 	            AceLog.getAppLog().info("Relationships encountered: " + RelationshipBinder.encountered +
 	            		" written: " + RelationshipBinder.written);    
-	            AceLog.getAppLog().info("Reset members encountered: " + RefsetMemberBinder.encountered +
+	            AceLog.getAppLog().info("Refexes encountered: " + RefsetMemberBinder.encountered +
 	            		" written: " + RefsetMemberBinder.written);    
 	            
 	            AceLog.getAppLog().info("Starting ValidateNidCidMap");	            

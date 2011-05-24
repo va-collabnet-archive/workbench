@@ -92,7 +92,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
             writer.setMergeFactor(10000);
         }
 
-        public void processDescription(I_DescriptionVersioned desc) throws Exception {
+        public void processDescription(I_DescriptionVersioned<?> desc) throws Exception {
             Document doc = new Document();
             doc.add(new Field("dnid", Integer.toString(desc.getDescId()), Field.Store.YES, Field.Index.NOT_ANALYZED));
             doc.add(new Field("cnid", Integer.toString(desc.getConceptNid()), Field.Store.YES, Field.Index.NOT_ANALYZED));

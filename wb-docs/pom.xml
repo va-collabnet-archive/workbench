@@ -5,11 +5,11 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>2.6.0-icd-1-SNAPSHOT</version>
+		<version>2.6.0-trek-14-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
-	<name>BP task dita files for Guidebook</name>
+	<name>${branch}: BP task dita files for Guidebook</name>
 
 	<description>Generate Workbench Guidebook DITA topic files for Business Process 
                 Tasks by parsing collections of java bean source files. Package all DITA topic files
@@ -99,7 +99,6 @@
 
 						<configuration>
 							<timestampFormat>{0,date,MMMMM dd yyyy}</timestampFormat>
-							<revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
 						</configuration>
 					</execution>
 				</executions>

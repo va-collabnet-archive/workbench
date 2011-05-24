@@ -19,18 +19,18 @@ import com.mxgraph.view.mxGraph;
 
 public class ConceptViewTitle extends JPanel implements I_AcceptConcept {
 
-	public static Color TITLE_COLOR = new Color(255, 213, 162);
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private JLabel label;
-	private ArenaComponentSettings settings;
+    public static Color TITLE_COLOR = new Color(255, 213, 162);
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private JLabel label;
+    private ArenaComponentSettings settings;
 
-	public ConceptViewTitle(mxGraph graph, mxCell cell, 
-			ArenaComponentSettings settings) {
-		super();
-		this.settings = settings;
+    public ConceptViewTitle(mxGraph graph, mxCell cell,
+            ArenaComponentSettings settings) {
+        super();
+        this.settings = settings;
         setBackground(TITLE_COLOR);
         setOpaque(true);
         setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
@@ -45,19 +45,18 @@ public class ConceptViewTitle extends JPanel implements I_AcceptConcept {
         JPanel toolBar2 = new JPanel();
         toolBar2.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
         toolBar2.setOpaque(false);
-        
-        for (AbstractButton ab: settings.getButtons()) {
+
+        for (AbstractButton ab : settings.getButtons()) {
             toolBar2.add(ab);
         }
         add(toolBar2, BorderLayout.EAST);
-	}
+    }
 
-	public void updateTitle() {
-		label.setText(settings.getTitle());
-	}
-	
-	public void sendConcept(I_GetConceptData c) {
-		settings.getHost().setTermComponent(c);
-	}
+    public void updateTitle() {
+        label.setText(settings.getTitle());
+    }
 
+    public void sendConcept(I_GetConceptData c) {
+        settings.getHost().setTermComponent(c);
+    }
 }

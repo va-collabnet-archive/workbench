@@ -22,11 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,14 +43,14 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.drools.runtime.Calendars;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 
+
 /**
-  * <b>DESCRIPTION: </b><br>
+ * <b>DESCRIPTION: </b><br>
  * 
  * Rf1ToArfLanguage is a maven mojo which creates intermediate ARF files for ingestion by Sct1ArfToEConceptsMojo.<br>
  * <br>
@@ -111,6 +109,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
     private static UUID uuidCurrent;
     private static String uuidCurrentStr;
     private static UUID uuidRetired;
+    private static String uuidRetiredStr;
 
     /**
      * Start date (inclusive)
@@ -159,6 +158,25 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
      * @required
      */
     private Rf1SubsetId[] rf1SubsetIds;
+    
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean rf2Mapping;
+    
+    /**
+     * language concept -> acceptability -> acceptable UUID
+     * 
+     * @parameter default-value="51b45763-09c4-34eb-a303-062ba8e0c0e9"
+     */
+    private String uuidAcceptable;
+
+    /**
+     * language concept -> acceptability -> preferred acceptability UUID
+     * 
+     * @parameter default-value="15877c09-60d7-3464-bed8-635a98a7e5b2"
+     */
+    private String uuidPrefAccept;
 
     /**
      * Directory used to output the eConcept format files
@@ -233,7 +251,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
         uuidCurrentStr = uuidCurrent.toString();
         uuidRetired = ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next();
+        uuidRetiredStr = uuidRetired.toString();
 
+        getLog().info("::: RF2 Mapping: " + rf2Mapping);
         getLog().info("::: Target Directory: " + tDir);
         getLog().info("::: Target Sub Directory:     " + tSubDir);
 
@@ -339,10 +359,10 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
     private int compareMember(Rf1SubsetMember m1, Rf1SubsetMember m2) {
         if ((m1.origSubsetId == m2.origSubsetId) && (m1.memberId == m2.memberId)) {
-            if (m1.memberValue == m2.memberValue)
+            if (m1.memberValue == m2.memberValue && m1.status == m2.status)
                 return 1; // SAME
             else
-                return 2; // SAME COMPONENT, DIFFERENT VALUE
+                return 2; // SAME COMPONENT, MODIFIED VALUE or STATUS
         } else if (m1.origSubsetId == m2.origSubsetId) {
             if (m1.memberId > m2.memberId)
                 return 3; // ADDED
@@ -370,9 +390,9 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         sb.append(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
         if (m.getStatus() == 0)
-            sb.append(uuidCurrent + TAB_CHARACTER);
+            sb.append(uuidCurrentStr + TAB_CHARACTER);
         else
-            sb.append(uuidRetired + TAB_CHARACTER);
+            sb.append(uuidRetiredStr + TAB_CHARACTER);
         // COMPONENT_UUID ... of member's referenced (concept, description, ...) component
         uuid = Type3UuidFactory.fromSNOMED(m.memberId);
         sb.append(uuid.toString() + TAB_CHARACTER);
@@ -383,17 +403,35 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
         if (sid.getSubsetTypeInt() == 1 || sid.getSubsetTypeInt() == 3)
             // Language (1) or Description (3) Subset Type
-            switch (m.memberValue) {
-            case 1: // Preferred Name
-                sb.append(PFT_UUID + LINE_TERMINATOR);
-                break;
-            case 2: // Synonym Name
-                sb.append(SYNONYM_UUID + LINE_TERMINATOR);
-                break;
-            case 3: // Fully Specified Name
-                sb.append(FSN_UUID + LINE_TERMINATOR);
-                break;
+            if (rf2Mapping) {
+                switch (m.memberValue) {
+                case 1: // Preferred Name --> "preferred acceptability"
+                    sb.append(uuidPrefAccept + LINE_TERMINATOR);
+                    break;
+                case 2: // Synonym Name --> "acceptable"
+                    sb.append(uuidAcceptable + LINE_TERMINATOR);
+                    break;
+                case 3: // Fully Specified Name -> "preferred acceptability"
+                    sb.append(uuidPrefAccept + LINE_TERMINATOR);
+                    break;
+                }
+            } else {
+                switch (m.memberValue) {
+                case 1: // Preferred Name
+                    sb.append(PFT_UUID + LINE_TERMINATOR);
+                    break;
+                case 2: // Synonym Name
+                    sb.append(SYNONYM_UUID + LINE_TERMINATOR);
+                    break;
+                case 3: // Fully Specified Name
+                    sb.append(FSN_UUID + LINE_TERMINATOR);
+                    break;
+                }
+
             }
+        else if (sid.getSubsetTypeInt() == -1)
+            // SNOMED_CONCEPT_VALUE
+            sb.append(Type3UuidFactory.fromSNOMED(m.memberValue).toString() + LINE_TERMINATOR);
         else
             // INTEGER_EXTENSION_VALUE
             sb.append(m.memberValue + LINE_TERMINATOR);
@@ -425,32 +463,6 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                             + " = " + (same + modified + added) + " != " + count2);
         }
 
-    }
-
-    private static int countFileLines(String fileName) throws MojoFailureException {
-        int lineCount = 0;
-        BufferedReader br = null;
-
-        try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
-            try {
-                while (br.readLine() != null) {
-                    lineCount++;
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                throw new MojoFailureException("FAILED: error counting lines in " + fileName, ex);
-            } finally {
-                br.close();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            throw new MojoFailureException("FAILED: error open BufferedReader for " + fileName, ex);
-        }
-
-        // lineCount NOTE: COUNT -1 BECAUSE FIRST LINE SKIPPED
-        // lineCount NOTE: REQUIRES THAT LAST LINE IS VALID RECORD
-        return lineCount - 1;
     }
 
     private void logFileListList(Rf1Dir[] dirs, List<List<RF1File>> fileListList) {
@@ -540,46 +552,11 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         } // for
     } // setupSubsetIdToOriginalUuidMap
 
-    private void parseSubsetMembers(String fName, Rf1SubsetMember[] a, int count1)
-            throws IOException {
-        long start = System.currentTimeMillis();
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fName),
-                "UTF-8"));
-        int members = 0;
-
-        int SUBSETID = 0;
-        int MEMBERID = 1;
-        int MEMBERSTATUS = 2; // NOTE: status is used as a "value"
-        // int LINKEDID = 3;
-
-        // Header row
-        br.readLine();
-
-        while (br.ready()) {
-            String[] line = br.readLine().split(TAB_CHARACTER);
-            long subsetId = Long.parseLong(line[SUBSETID]);
-            long memberId = Long.parseLong(line[MEMBERID]);
-            int memberValue = Integer.parseInt(line[MEMBERSTATUS]);
-
-            a[members] = new Rf1SubsetMember(subsetId, memberId, memberValue);
-
-            members++;
-        }
-        Arrays.sort(a);
-
-        getLog().info(
-                "Subset Member Parse & sort time: " + members + " concepts, "
-                        + (System.currentTimeMillis() - start) + " milliseconds");
-    }
-
     private void processSubsetMembers(List<List<RF1File>> fileListList, BufferedWriter bwi,
             BufferedWriter bwc) throws MojoFailureException, IOException, NoSuchAlgorithmException {
-        // :!!!: does "Collections.sort(fileListList);" need to be added?
 
         int count1, count2; // records in arrays 1 & 2
-        String fName1, fName2; // file path name
-        String yRevDateStr; // :!!!: int in processConcepts
+        String yRevDateStr;
         Rf1SubsetId tmpSid;
         String tmpArf;
 
@@ -590,6 +567,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         Iterator<List<RF1File>> dit = fileListList.iterator(); // Directory Iterator
         while (dit.hasNext()) {
             List<RF1File> fl = dit.next(); // File List
+            Collections.sort(fl);
             Iterator<RF1File> fit = fl.iterator(); // File Iterator
 
             if (fit == null || fit.hasNext() == false)
@@ -607,7 +585,8 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 // Write history
                 tmpSid = mapSubsetIdToOriginal.get(a1[i].origSubsetId);
                 tmpArf = convertMemberToArf(a1[i], tmpSid, yRevDateStr);
-                if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3)
+                if (tmpSid.getSubsetTypeInt() == 1 || tmpSid.getSubsetTypeInt() == 3
+                        || tmpSid.getSubsetTypeInt() == -1)
                     bwc.write(tmpArf);
                 else
                     bwi.write(tmpArf);
@@ -627,7 +606,24 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                 int nSame = 0, nMod = 0, nAdd = 0, nDrop = 0; // counters
                 a3 = new Rf1SubsetMember[count2]; // max3
                 while ((r1 < count1) && (r2 < count2)) {
-                    
+
+                    // :DEBUG
+//                    if (a1[r1].memberId == 370698009 || a2[r2].memberId == 370698009) {
+//                        System.out.println(":DEBUG: ... " + yRevDateStr);
+//                        System.out.println(":DEBUG: origSubsetId a1[r1]=" + a1[r1].origSubsetId
+//                                + " , a2[r2]=" + a2[r2].origSubsetId);
+//                        System.out.println(":DEBUG: memberId a1[r1]=" + a1[r1].memberId + " ,a2[r2]="
+//                                + a2[r2].memberId);
+//                        System.out.println(":DEBUG: status " + a1[r1].status + " , "
+//                                + a2[r2].status);
+//                        System.out.println(":DEBUG: a1[r1].memberId=="
+//                                + Type3UuidFactory.fromSNOMED(a1[r1].memberId));
+//                        System.out.println(":DEBUG: a2[r2].memberId=="
+//                                + Type3UuidFactory.fromSNOMED(a2[r2].memberId));
+//                        System.out.println(":DEBUG: compare == "
+//                                + compareMember(a1[r1], a2[r2]));
+//                    }
+
                     switch (compareMember(a1[r1], a2[r2])) {
                     case 1: // SAME, skip to next
                         r1++;
@@ -737,14 +733,14 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             infix = infix.replace("-", "");
 
             Writer concepts;
-            concepts = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(arfDir, "concepts_" + infix
-                    + ".txt")), "UTF-8"));
-            Writer descriptions = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(arfDir,
-                    "descriptions_" + infix + ".txt")), "UTF-8"));
-            Writer relationships = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(arfDir,
-                    "relationships_" + infix + ".txt")), "UTF-8"));
-            Writer ids = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    new File(arfDir, "ids_" + infix + ".txt")), "UTF-8"));
+            concepts = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
+                    arfDir, "concepts_" + infix + ".txt")), "UTF-8"));
+            Writer descriptions = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    new File(arfDir, "descriptions_" + infix + ".txt")), "UTF-8"));
+            Writer relationships = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    new File(arfDir, "relationships_" + infix + ".txt")), "UTF-8"));
+            Writer ids = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
+                    arfDir, "ids_" + infix + ".txt")), "UTF-8"));
 
             for (Rf1SubsetId sid : subsetIds) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
@@ -817,7 +813,7 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
                     descriptions.append("1"); // primitive
                     descriptions.append("\t");
                     descriptions
-                            .append(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
+                            .append(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE
                                     .getUids().iterator().next().toString()); // description type uuid
                     descriptions.append("\t");
                     descriptions.append("en"); // language code
@@ -874,6 +870,30 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
             throw new MojoFailureException("RefToArfSubsetsMojo parse exception", e);
         }
 
+    }
+
+    public boolean isRf2Mapping() {
+        return rf2Mapping;
+    }
+
+    public void setRf2Mapping(boolean rf2Mapping) {
+        this.rf2Mapping = rf2Mapping;
+    }
+
+    public String getUuidAcceptable() {
+        return uuidAcceptable;
+    }
+
+    public void setUuidAcceptable(String uuidAcceptable) {
+        this.uuidAcceptable = uuidAcceptable;
+    }
+
+    public String getUuidPrefAccept() {
+        return uuidPrefAccept;
+    }
+
+    public void setUuidPrefAccept(String uuidPrefAccept) {
+        this.uuidPrefAccept = uuidPrefAccept;
     }
 
     public void setSubsetIds(Rf1SubsetId[] subsetIds) {

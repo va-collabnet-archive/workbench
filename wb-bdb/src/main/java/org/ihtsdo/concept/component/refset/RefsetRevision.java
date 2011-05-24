@@ -1,90 +1,103 @@
 package org.ihtsdo.concept.component.refset;
 
+import java.beans.PropertyVetoException;
+
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import java.io.IOException;
 
-public abstract class RefsetRevision<V extends RefsetRevision<V, C>, 
-                                              C extends RefsetMember<V, C>> 
-	extends Revision<V, C> 
-	implements I_ExtendByRefPart {
+public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends RefsetMember<V, C>>
+        extends Revision<V, C>
+        implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
 
+    @Override
+    public final boolean readyToWriteRevision() {
+        assert readyToWriteRefsetRevision(): assertionString();
+        return true;
+    }
 
-	public RefsetRevision(int statusNid, int pathNid, long time, 
-			C primordialComponent) {
-		super(statusNid, 				
-				Terms.get().getAuthorNid(), 
-				pathNid, time, primordialComponent);
-	}
+    public abstract boolean readyToWriteRefsetRevision();
 
-	public RefsetRevision(int statusNid, int authorNid, int pathNid, long time, 
-			C primordialComponent) {
-		super(statusNid, authorNid, 
-				pathNid, time, primordialComponent);
-	}
+    public RefsetRevision(int statusNid, int pathNid, long time,
+            C primordialComponent) {
+        super(statusNid,
+                Terms.get().getAuthorNid(),
+                pathNid, time, primordialComponent);
+    }
 
-	public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
-		super(statusAtPositionNid, primordialComponent);
-	}
+    public RefsetRevision(int statusNid, int authorNid, int pathNid, long time,
+            C primordialComponent) {
+        super(statusNid, authorNid,
+                pathNid, time, primordialComponent);
+    }
 
-	public RefsetRevision(TupleInput input, C primordialComponent) {
-		super(input, primordialComponent);
-	}
+    public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
+        super(statusAtPositionNid, primordialComponent);
+    }
 
-	public RefsetRevision(TkRevision eVersion,
-			C member) {
-		super(Bdb.uuidToNid(eVersion.getStatusUuid()), 
-				Bdb.uuidToNid(eVersion.getAuthorUuid()),
-				Bdb.uuidToNid(eVersion.getPathUuid()),
-				eVersion.getTime(),
-				member);
-	}
+    public RefsetRevision(TupleInput input, C primordialComponent) {
+        super(input, primordialComponent);
+    }
+
+    public RefsetRevision(TkRevision eVersion,
+            C member) {
+        super(Bdb.uuidToNid(eVersion.getStatusUuid()),
+                Bdb.uuidToNid(eVersion.getAuthorUuid()),
+                Bdb.uuidToNid(eVersion.getPathUuid()),
+                eVersion.getTime(),
+                member);
+    }
 
     public RefsetRevision() {
         super();
     }
-    
+
     @Override
-    public final int compareTo(I_ExtendByRefPart o) {
+    public final int compareTo(I_ExtendByRefPart<V> o) {
         return this.toString().compareTo(o.toString());
     }
 
     @Override
     @Deprecated
-	public final int getStatus() {
-		return getStatusNid();
-	}
+    public final int getStatus() {
+        return getStatusNid();
+    }
 
-	@Override
-	@Deprecated
-	public final void setStatus(int idStatus) {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    @Deprecated
+    public final void setStatus(int idStatus) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	@Deprecated
-	public I_ExtendByRefPart duplicate() {
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    @Deprecated
+    public I_ExtendByRefPart<V> duplicate() {
+        throw new UnsupportedOperationException();
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();  
+        StringBuffer buf = new StringBuffer();
         buf.append(super.toString());
         return buf.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (RefsetRevision.class.isAssignableFrom(obj.getClass())) {
             RefsetRevision<?, ?> another = (RefsetRevision<?, ?>) obj;
             if (this.sapNid == another.sapNid) {
@@ -93,12 +106,50 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>,
         }
         return false;
     }
-    
-    public abstract V makeAnalog();
-    
-    @Override
-	public String toUserString() {
-        return toString();
-	}
 
+    public abstract V makeAnalog();
+
+    @Override
+    public String toUserString() {
+        return toString();
+    }
+
+    @Override
+    public int getCollectionNid() {
+        return primordialComponent.refsetNid;
+    }
+
+    @Override
+    public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+        primordialComponent.setCollectionNid(collectionNid);
+    }
+
+    @Override
+    public RefexCAB getRefexEditSpec() throws IOException {
+        RefexCAB rcs = new RefexCAB(getTkRefsetType(),
+                primordialComponent.getReferencedComponentNid(),
+                primordialComponent.getRefsetId(),
+                getPrimUuid());
+        addSpecProperties(rcs);
+        return rcs;
+    }
+
+    protected abstract TK_REFSET_TYPE getTkRefsetType();
+
+    protected abstract void addSpecProperties(RefexCAB rcs);
+
+    @Override
+    public int getReferencedComponentNid() {
+        return primordialComponent.getReferencedComponentNid();
+    }
+
+    @Override
+    public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
+        primordialComponent.setReferencedComponentNid(componentNid);
+    }
+
+    @Override
+    public RefsetMember getPrimordialVersion() {
+        return primordialComponent;
+    }
 }

@@ -195,7 +195,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
                     (Set<UniversalAcePosition>) process.getProperty(refsetSpecVersionPropName);
             for (UniversalAcePosition univPos : universalRefsetPositions) {
                 PathBI path = termFactory.getPath(univPos.getPathId());
-                PositionBI thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+                PositionBI thinPos = termFactory.newPosition(path, univPos.getTime());
                 refsetPositionSet.add(thinPos);
             }
 
@@ -206,7 +206,7 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
                     (Set<UniversalAcePosition>) process.getProperty(snomedVersionPropName);
             for (UniversalAcePosition univPos : universalSnomedPositions) {
                 PathBI path = termFactory.getPath(univPos.getPathId());
-                PositionBI thinPos = termFactory.newPosition(path, termFactory.convertToThinVersion(univPos.getTime()));
+                PositionBI thinPos = termFactory.newPosition(path, univPos.getTime());
                 positionSet.add(thinPos);
             }
             PositionSetReadOnly snomedPositionSet = new PositionSetReadOnly(positionSet);

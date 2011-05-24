@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.List;
 
 import org.dwfa.bpa.process.TaskFailedException;
+import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public interface I_HandleSubversion {
@@ -44,11 +45,11 @@ public interface I_HandleSubversion {
 
     public void svnLock(SubversionData svd, File toLock) throws TaskFailedException;
 
-    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException;
+    public void svnUnlock(SubversionData svd, File toUnLock) throws TaskFailedException, ClientException;
 
     public void svnCompleteRepoInfo(SubversionData svd) throws TaskFailedException;
 
-    public List<String> svnList(SubversionData svd) throws TaskFailedException;
+    public List<String> svnList(SubversionData svd) throws TaskFailedException, ClientException;
 
     public void svnCheckout(SubversionData svd, PromptUserPassword3 authenticator, boolean interactive)
             throws TaskFailedException;
@@ -81,6 +82,6 @@ public interface I_HandleSubversion {
             throws TaskFailedException;
 
     public void svnUnlock(SubversionData svd, File toUnlock, PromptUserPassword3 authenticator, boolean interactive)
-            throws TaskFailedException;
+            throws TaskFailedException, ClientException;
 
 }

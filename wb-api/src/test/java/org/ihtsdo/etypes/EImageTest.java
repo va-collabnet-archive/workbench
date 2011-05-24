@@ -131,7 +131,7 @@ public class EImageTest {
         EImage img = new EImage();
         img.conceptUuid = new UUID(120, 130);
         img.format = "jpg";
-        img.image = new byte[] {0, 2, 3, 4, 5, 6, 7, 8, 9 };
+        img.dataBytes = new byte[] {0, 2, 3, 4, 5, 6, 7, 8, 9 };
         img.textDescription = "interesting image";
         img.typeUuid = new UUID(121, 132);
         img.pathUuid = new UUID(450, 569);
@@ -154,7 +154,7 @@ public class EImageTest {
         EImage img = new EImage();
         img.conceptUuid = new UUID(112, 113);
         img.format = "png";
-        img.image = new byte[] {0, 1, 2, 3, 5, 8, 13, 21, 34 };
+        img.dataBytes = new byte[] {0, 1, 2, 3, 5, 8, 13, 21, 34 };
         img.textDescription = "over-exposed image";
         img.typeUuid = new UUID(114, 115);
         img.pathUuid = new UUID(116, 117);

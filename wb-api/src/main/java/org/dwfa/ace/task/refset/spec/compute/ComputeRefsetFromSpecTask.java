@@ -99,6 +99,14 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         try {
             RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
             I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            if (refsetSpec == null) {
+                if (!DwfaEnv.isHeadless()) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Error computing nested refset. Skipping compute. Not a valid refset: " + refset.getInitialText(),
+                        "", JOptionPane.ERROR_MESSAGE);
+                }
+                return Condition.ITEM_CANCELED;
+            }
             AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
             AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
             RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
@@ -119,9 +127,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 AceLog.getAppLog().info(
                     "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.");
                 if (!DwfaEnv.isHeadless()) {
-                    JOptionPane
-                        .showMessageDialog(
-                            LogWithAlerts.getActiveFrame(null),
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "Invalid refset spec to compute - unable to get spec from the refset currently in the spec panel.",
                             "", JOptionPane.ERROR_MESSAGE);
                 }
@@ -136,8 +142,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 getLogger().info("Refset spec has dangling AND/OR. These must have sub-statements.");
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Refset spec has dangling AND/OR. These must have sub-statements.", "",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Refset spec has dangling AND/OR. These must have sub-statements.", "", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
@@ -190,14 +195,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         for (Integer nestedRefsetId : nestedRefsets) {
             if (excludedRefsets == null || !excludedRefsets.contains(nestedRefsetId)) {
 
-                Condition condition =
-                        computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
+                Condition condition = computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
                 if (condition == Condition.ITEM_CANCELED) {
                     if (!DwfaEnv.isHeadless()) {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "Error computing dependant refset: "
-                                + Terms.get().getConcept(nestedRefsetId).getInitialText() + ". Re-run separately.", "",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Error computing dependant refset: " + Terms.get().getConcept(nestedRefsetId).getInitialText()
+                                + ". Re-run separately.", "", JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 getNestedRefsets().addAll(nestedRefsets);

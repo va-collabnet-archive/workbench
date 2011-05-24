@@ -88,7 +88,7 @@ public class SetEditPathFromProperty extends AbstractTask {
             frameConfig.addEditingPath(editPath);
 
             Set<PositionBI> viewPositionSet = frameConfig.getViewPositionSet();
-            viewPositionSet.add(tf.newPosition(editPath, Integer.MAX_VALUE));
+            viewPositionSet.add(tf.newPosition(editPath, Long.MAX_VALUE));
 
             frameConfig.fireUpdateHierarchyView();
 

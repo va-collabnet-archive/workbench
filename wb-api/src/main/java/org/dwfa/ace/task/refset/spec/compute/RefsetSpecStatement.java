@@ -23,30 +23,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ShowActivity;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PRECEDENCE;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
+import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 
 /**
  * Represents partial information contained in a refset spec. An example of a
@@ -58,76 +51,72 @@ import org.ihtsdo.tk.api.PositionBI;
 public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected enum QUERY_TOKENS {
-		CONCEPT_IS(RefsetAuxiliary.Concept.CONCEPT_IS), CONCEPT_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.CONCEPT_IS_CHILD_OF), CONCEPT_IS_KIND_OF(
-				RefsetAuxiliary.Concept.CONCEPT_IS_KIND_OF), CONCEPT_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.CONCEPT_IS_DESCENDENT_OF), CONCEPT_IS_MEMBER_OF(
-				RefsetAuxiliary.Concept.CONCEPT_IS_MEMBER_OF), CONCEPT_STATUS_IS(
-				RefsetAuxiliary.Concept.CONCEPT_STATUS_IS), CONCEPT_STATUS_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_CHILD_OF), CONCEPT_STATUS_IS_KIND_OF(
-				RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_KIND_OF), CONCEPT_STATUS_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.CONCEPT_STATUS_IS_DESCENDENT_OF),
 
-		DESC_IS(RefsetAuxiliary.Concept.DESC_IS), DESC_IS_MEMBER_OF(
-				RefsetAuxiliary.Concept.DESC_IS_MEMBER_OF), DESC_STATUS_IS(
-				RefsetAuxiliary.Concept.DESC_STATUS_IS), DESC_STATUS_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.DESC_STATUS_IS_CHILD_OF), DESC_STATUS_IS_KIND_OF(
-				RefsetAuxiliary.Concept.DESC_STATUS_IS_KIND_OF), DESC_STATUS_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.DESC_STATUS_IS_DESCENDENT_OF), DESC_TYPE_IS(
-				RefsetAuxiliary.Concept.DESC_TYPE_IS), DESC_TYPE_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.DESC_TYPE_IS_CHILD_OF), DESC_TYPE_IS_KIND_OF(
-				RefsetAuxiliary.Concept.DESC_TYPE_IS_KIND_OF), DESC_TYPE_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.DESC_TYPE_IS_DESCENDENT_OF), DESC_REGEX_MATCH(
-				RefsetAuxiliary.Concept.DESC_REGEX_MATCH), DESC_LUCENE_MATCH(
-				RefsetAuxiliary.Concept.DESC_LUCENE_MATCH),
-
-		REL_IS(RefsetAuxiliary.Concept.REL_IS), REL_RESTRICTION_IS(
-				RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_IS_MEMBER_OF(
-				RefsetAuxiliary.Concept.REL_IS_MEMBER_OF), REL_STATUS_IS(
-				RefsetAuxiliary.Concept.REL_STATUS_IS), REL_STATUS_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_STATUS_IS_KIND_OF), REL_STATUS_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_STATUS_IS_CHILD_OF), REL_STATUS_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_STATUS_IS_DESCENDENT_OF), REL_TYPE_IS(
-				RefsetAuxiliary.Concept.REL_TYPE_IS), REL_TYPE_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_TYPE_IS_KIND_OF), REL_TYPE_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_TYPE_IS_CHILD_OF), REL_TYPE_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_TYPE_IS_DESCENDENT_OF), REL_LOGICAL_QUANTIFIER_IS(
-				RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS), REL_LOGICAL_QUANTIFIER_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF), REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_CHILD_OF), REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF), REL_CHARACTERISTIC_IS(
-				RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS), REL_CHARACTERISTIC_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_KIND_OF), REL_CHARACTERISTIC_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_CHILD_OF), REL_CHARACTERISTIC_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_CHARACTERISTIC_IS_DESCENDENT_OF), REL_REFINABILITY_IS(
-				RefsetAuxiliary.Concept.REL_REFINABILITY_IS), REL_REFINABILITY_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_REFINABILITY_IS_KIND_OF), REL_REFINABILITY_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_REFINABILITY_IS_CHILD_OF), REL_REFINABILITY_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_REFINABILITY_IS_DESCENDENT_OF), REL_DESTINATION_IS(
-				RefsetAuxiliary.Concept.REL_DESTINATION_IS), REL_DESTINATION_IS_KIND_OF(
-				RefsetAuxiliary.Concept.REL_DESTINATION_IS_KIND_OF), REL_DESTINATION_IS_CHILD_OF(
-				RefsetAuxiliary.Concept.REL_DESTINATION_IS_CHILD_OF), REL_DESTINATION_IS_DESCENDENT_OF(
-				RefsetAuxiliary.Concept.REL_DESTINATION_IS_DESCENDENT_OF),
-        
-		V1_IS(RefsetAuxiliary.Concept.DIFFERENCE_V1_IS), V2_IS(
-				RefsetAuxiliary.Concept.DIFFERENCE_V2_IS), ADDED_CONCEPT(
-				RefsetAuxiliary.Concept.ADDED_CONCEPT), ADDED_DESCRIPTION(
-				RefsetAuxiliary.Concept.ADDED_DESCRIPTION), ADDED_RELATIONSHIP(
-				RefsetAuxiliary.Concept.ADDED_RELATIONSHIP), CHANGED_CONCEPT_STATUS(
-				RefsetAuxiliary.Concept.CHANGED_CONCEPT_STATUS), CHANGED_CONCEPT_DEFINED(
-				RefsetAuxiliary.Concept.CHANGED_DEFINED), CHANGED_DESCRIPTION_CASE(
-				RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_CASE), CHANGED_DESCRIPTION_LANGUAGE(
-				RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_LANGUAGE), CHANGED_DESCRIPTION_STATUS(
-				RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_STATUS), CHANGED_DESCRIPTION_TERM(
-				RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_TERM), CHANGED_DESCRIPTION_TYPE(
-				RefsetAuxiliary.Concept.CHANGED_DESCRIPTION_TYPE), CHANGED_RELATIONSHIP_CHARACTERISTIC(
-				RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_CHARACTERISTIC), CHANGED_RELATIONSHIP_GROUP(
-				RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_GROUP), CHANGED_RELATIONSHIP_REFINABILITY(
-				RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_REFINABILITY), CHANGED_RELATIONSHIP_STATUS(
-				RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_STATUS), CHANGED_RELATIONSHIP_TYPE(
-				RefsetAuxiliary.Concept.CHANGED_RELATIONSHIP_TYPE);
-        
-
+        CONCEPT_IS(Concept.CONCEPT_IS), 
+        CONCEPT_IS_CHILD_OF(Concept.CONCEPT_IS_CHILD_OF), 
+        CONCEPT_IS_KIND_OF(Concept.CONCEPT_IS_KIND_OF), 
+        CONCEPT_IS_DESCENDENT_OF(Concept.CONCEPT_IS_DESCENDENT_OF), 
+        CONCEPT_IS_MEMBER_OF(Concept.CONCEPT_IS_MEMBER_OF), 
+        CONCEPT_STATUS_IS(Concept.CONCEPT_STATUS_IS), 
+        CONCEPT_STATUS_IS_CHILD_OF(Concept.CONCEPT_STATUS_IS_CHILD_OF), 
+        CONCEPT_STATUS_IS_KIND_OF(Concept.CONCEPT_STATUS_IS_KIND_OF), 
+        CONCEPT_STATUS_IS_DESCENDENT_OF(Concept.CONCEPT_STATUS_IS_DESCENDENT_OF),
+        DESC_IS(Concept.DESC_IS), 
+        DESC_IS_MEMBER_OF(Concept.DESC_IS_MEMBER_OF), 
+        DESC_STATUS_IS(Concept.DESC_STATUS_IS), 
+        DESC_STATUS_IS_CHILD_OF(Concept.DESC_STATUS_IS_CHILD_OF), 
+        DESC_STATUS_IS_KIND_OF(Concept.DESC_STATUS_IS_KIND_OF), 
+        DESC_STATUS_IS_DESCENDENT_OF(Concept.DESC_STATUS_IS_DESCENDENT_OF), 
+        DESC_TYPE_IS(Concept.DESC_TYPE_IS), 
+        DESC_TYPE_IS_CHILD_OF(Concept.DESC_TYPE_IS_CHILD_OF), 
+        DESC_TYPE_IS_KIND_OF(Concept.DESC_TYPE_IS_KIND_OF), 
+        DESC_TYPE_IS_DESCENDENT_OF(Concept.DESC_TYPE_IS_DESCENDENT_OF), 
+        DESC_REGEX_MATCH(Concept.DESC_REGEX_MATCH), 
+        DESC_LUCENE_MATCH(Concept.DESC_LUCENE_MATCH),
+        REL_IS(Concept.REL_IS), 
+        REL_RESTRICTION_IS(Concept.REL_IS_MEMBER_OF), 
+        REL_IS_MEMBER_OF(Concept.REL_IS_MEMBER_OF), 
+        REL_STATUS_IS(Concept.REL_STATUS_IS), 
+        REL_STATUS_IS_KIND_OF(Concept.REL_STATUS_IS_KIND_OF), 
+        REL_STATUS_IS_CHILD_OF(Concept.REL_STATUS_IS_CHILD_OF), 
+        REL_STATUS_IS_DESCENDENT_OF(Concept.REL_STATUS_IS_DESCENDENT_OF), 
+        REL_TYPE_IS(Concept.REL_TYPE_IS), 
+        REL_TYPE_IS_KIND_OF(Concept.REL_TYPE_IS_KIND_OF), 
+        REL_TYPE_IS_CHILD_OF(Concept.REL_TYPE_IS_CHILD_OF), 
+        REL_TYPE_IS_DESCENDENT_OF(Concept.REL_TYPE_IS_DESCENDENT_OF), 
+        REL_LOGICAL_QUANTIFIER_IS(Concept.REL_LOGICAL_QUANTIFIER_IS), 
+        REL_LOGICAL_QUANTIFIER_IS_KIND_OF(Concept.REL_LOGICAL_QUANTIFIER_IS_KIND_OF), 
+        REL_LOGICAL_QUANTIFIER_IS_CHILD_OF(Concept.REL_LOGICAL_QUANTIFIER_IS_CHILD_OF), 
+        REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF(Concept.REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF), 
+        REL_CHARACTERISTIC_IS(Concept.REL_CHARACTERISTIC_IS), 
+        REL_CHARACTERISTIC_IS_KIND_OF(Concept.REL_CHARACTERISTIC_IS_KIND_OF), 
+        REL_CHARACTERISTIC_IS_CHILD_OF(Concept.REL_CHARACTERISTIC_IS_CHILD_OF), 
+        REL_CHARACTERISTIC_IS_DESCENDENT_OF(Concept.REL_CHARACTERISTIC_IS_DESCENDENT_OF), 
+        REL_REFINABILITY_IS(Concept.REL_REFINABILITY_IS), 
+        REL_REFINABILITY_IS_KIND_OF(Concept.REL_REFINABILITY_IS_KIND_OF), 
+        REL_REFINABILITY_IS_CHILD_OF(Concept.REL_REFINABILITY_IS_CHILD_OF), 
+        REL_REFINABILITY_IS_DESCENDENT_OF(Concept.REL_REFINABILITY_IS_DESCENDENT_OF), 
+        REL_DESTINATION_IS(Concept.REL_DESTINATION_IS), 
+        REL_DESTINATION_IS_KIND_OF(Concept.REL_DESTINATION_IS_KIND_OF), 
+        REL_DESTINATION_IS_CHILD_OF(Concept.REL_DESTINATION_IS_CHILD_OF), 
+        REL_DESTINATION_IS_DESCENDENT_OF(Concept.REL_DESTINATION_IS_DESCENDENT_OF),
+        V1_IS(Concept.DIFFERENCE_V1_IS), 
+        V2_IS(Concept.DIFFERENCE_V2_IS), 
+        ADDED_CONCEPT(Concept.ADDED_CONCEPT), 
+        ADDED_DESCRIPTION(Concept.ADDED_DESCRIPTION), 
+        ADDED_RELATIONSHIP(Concept.ADDED_RELATIONSHIP), 
+        CHANGED_CONCEPT_STATUS(Concept.CHANGED_CONCEPT_STATUS), 
+        CHANGED_CONCEPT_DEFINED(Concept.CHANGED_DEFINED), 
+        CHANGED_DESCRIPTION_CASE(Concept.CHANGED_DESCRIPTION_CASE), 
+        CHANGED_DESCRIPTION_LANGUAGE(Concept.CHANGED_DESCRIPTION_LANGUAGE), 
+        CHANGED_DESCRIPTION_STATUS(Concept.CHANGED_DESCRIPTION_STATUS), 
+        CHANGED_DESCRIPTION_TERM(Concept.CHANGED_DESCRIPTION_TERM), 
+        CHANGED_DESCRIPTION_TYPE(Concept.CHANGED_DESCRIPTION_TYPE), 
+        CHANGED_RELATIONSHIP_CHARACTERISTIC(Concept.CHANGED_RELATIONSHIP_CHARACTERISTIC), 
+        CHANGED_RELATIONSHIP_GROUP(Concept.CHANGED_RELATIONSHIP_GROUP), 
+        CHANGED_RELATIONSHIP_REFINABILITY(Concept.CHANGED_RELATIONSHIP_REFINABILITY), 
+        CHANGED_RELATIONSHIP_STATUS(Concept.CHANGED_RELATIONSHIP_STATUS), 
+        CHANGED_RELATIONSHIP_TYPE(Concept.CHANGED_RELATIONSHIP_TYPE);
         protected int nid;
 
         private QUERY_TOKENS(I_ConceptualizeUniversally concept) {
@@ -140,28 +129,22 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
             }
         }
     };
-
     protected QUERY_TOKENS tokenEnum = null;
-
     /**
      * Whether to use the NOT qualifier.
      */
     protected boolean useNotQualifier;
-
     /**
      * The type of query - e.g. "Concept is", "Concept is member of" etc.
      */
     protected I_GetConceptData queryToken;
-
     /**
-	 * The component to which the query type is applied. e.g. if query type is
-	 * "concept is" and query destination is "paracetamol", then the statement
-	 * would be "concept is":"paracetamol".
+     * The component to which the query type is applied. e.g. if query type is
+     * "concept is" and query destination is "paracetamol", then the statement
+     * would be "concept is":"paracetamol".
      */
     protected Object queryConstraint;
-
     protected I_TermFactory termFactory;
-
     protected I_IntSet allowedTypes;
     protected I_IntSet currentStatuses;
 
@@ -222,12 +205,13 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return useNotQualifier;
     }
 
-	public boolean execute(I_AmTermComponent component,
-			 GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is, Collection<I_ShowActivity> activities) throws IOException, TerminologyException {
+    @Override
+    public boolean execute(I_AmTermComponent component,
+            GROUPING_TYPE version, PositionSetBI v1_is,
+            PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException, TerminologyException {
 
-		boolean statementResult = getStatementResult(component, 
-				version, v1_is, v2_is);
+        boolean statementResult = getStatementResult(component,
+                version, v1_is, v2_is);
 
         if (useNotQualifier) {
             // if the statement has a negation associated with it then we need
@@ -238,9 +222,9 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
- public abstract boolean getStatementResult(I_AmTermComponent component,
-		 GROUPING_TYPE version, I_Position v1Is,
-			I_Position v2Is) throws IOException, TerminologyException;
+    public abstract boolean getStatementResult(I_AmTermComponent component,
+            GROUPING_TYPE version, PositionSetBI v1Is,
+            PositionSetBI v2Is) throws IOException, TerminologyException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 
@@ -287,9 +271,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
             // get list of all children of input concept
             Set<? extends I_GetConceptData> childStatuses =
-                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory
-                        .getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config
-									.getConflictResolutionStrategy());
+                    ((I_GetConceptData) queryConstraint).getDestRelOrigins(currentStatuses, allowedTypes, termFactory.getActiveAceFrameConfig().getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             // call conceptStatusIs on each
             for (I_GetConceptData childStatus : childStatuses) {
@@ -300,8 +282,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new TerminologyException(e);
         }
     }
 
@@ -356,8 +337,9 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return toString();
     }
 
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(!useNotQualifier);
         buff.append(" ");
         buff.append(getTokenEnum());
@@ -366,154 +348,154 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         return buff.toString();
     }
 
-	private Set<? extends I_GetConceptData> getChildren2(I_GetConceptData c,
-			I_Position pos) throws TerminologyException, IOException {
-		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-		System.out.println("\t" + c.getInitialText());
-		HashSet<I_GetConceptData> ret = new HashSet<I_GetConceptData>();
-		I_TermFactory tf = Terms.get();
-		for (I_RelVersioned d : c.getDestRels()) {
-			I_RelPart dm = null;
-			for (I_RelPart dd : d.getMutableParts()) {
-				System.out.println("\tpos:" + dd.getPathId() + " "
-						+ pos.getPath().getConceptNid());
-				if (dd.getPathId() != pos.getPath().getConceptNid())
-					continue;
-				// if (!getIsAIds().contains(dd.getTypeId()))
-				// continue;
-				System.out.println("\ttyp:"
-						+ dd.getTypeId()
-						+ " "
-						+ tf.getConcept(SNOMED.Concept.IS_A.getUids())
-								.getConceptNid());
-				if (dd.getTypeId() != tf.getConcept(
-						SNOMED.Concept.IS_A.getUids()).getConceptNid())
-					continue;
-				// Find the greatest version <= the one of interest
-				System.out.println("\tver:" + dd.getVersion() + " "
-						+ pos.getVersion());
-				if (dd.getVersion() <= pos.getVersion()
-						&& (dm == null || dm.getVersion() < dd.getVersion()))
-					dm = dd;
-			}
-			if (dm != null)
-				System.out.println("\tsta:"
-						+ dm.getStatusId()
-						+ " "
-						+ tf.getConcept(
-								ArchitectonicAuxiliary.Concept.CURRENT
-										.getUids()).getConceptNid());
-			if (dm != null
-					&& dm.getStatusId() == tf.getConcept(
-							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
-							.getConceptNid())
-				ret.add(tf.getConcept(d.getC1Id()));
-		}
-		return ret;
-	}
+//	private Set<? extends I_GetConceptData> getChildren2(I_GetConceptData c,
+//			PositionSetBI pos) throws TerminologyException, IOException {
+//		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//		System.out.println("\t" + c.getInitialText());
+//		HashSet<I_GetConceptData> ret = new HashSet<I_GetConceptData>();
+//		I_TermFactory tf = Terms.get();
+//		for (I_RelVersioned<?> d : c.getDestRels()) {
+//			I_RelPart dm = null;
+//			for (I_RelPart dd : d.getMutableParts()) {
+//				System.out.println("\tpos:" + dd.getPathId() + " "
+//						+ pos.getPath().getConceptNid());
+//				if (dd.getPathId() != pos.getPath().getConceptNid())
+//					continue;
+//				// if (!getIsAIds().contains(dd.getTypeId()))
+//				// continue;
+//				System.out.println("\ttyp:"
+//						+ dd.getTypeId()
+//						+ " "
+//						+ tf.getConcept(SNOMED.Concept.IS_A.getUids())
+//								.getConceptNid());
+//				if (dd.getTypeId() != tf.getConcept(
+//						SNOMED.Concept.IS_A.getUids()).getConceptNid())
+//					continue;
+//				// Find the greatest version <= the one of interest
+//				System.out.println("\tver:" + dd.getVersion() + " "
+//						+ pos.getVersion());
+//				if (dd.getVersion() <= pos.getVersion()
+//						&& (dm == null || dm.getVersion() < dd.getVersion()))
+//					dm = dd;
+//			}
+//			if (dm != null)
+//				System.out.println("\tsta:"
+//						+ dm.getStatusId()
+//						+ " "
+//						+ tf.getConcept(
+//								ArchitectonicAuxiliary.Concept.CURRENT
+//										.getUids()).getConceptNid());
+//			if (dm != null
+//					&& dm.getStatusId() == tf.getConcept(
+//							ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+//							.getConceptNid())
+//				ret.add(tf.getConcept(d.getC1Id()));
+//		}
+//		return ret;
+//	}
+    private I_IntSet getCurrentStatuses() throws TerminologyException {
+        if (currentStatuses == null) {
+            try {
+                I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+                I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(
+                        config);
+                currentStatuses = helper.getCurrentStatusIntSet();
+            } catch (Exception e) {
+                throw new TerminologyException(e);
+            }
+        }
+        return currentStatuses;
+    }
 
-	private I_IntSet getCurrentStatuses() throws TerminologyException {
-		if (currentStatuses == null) {
-			try {
-				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-				I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(
-						config);
-				currentStatuses = helper.getCurrentStatusIntSet();
-			} catch (Exception e) {
-				throw new TerminologyException(e);
-			}
-		}
-		return currentStatuses;
-	}
+    protected Set<? extends I_GetConceptData> getChildren(
+            I_GetConceptData concept, PositionSetBI pos)
+            throws TerminologyException, IOException {
+        return concept.getDestRelOrigins(getCurrentStatuses(), getIsAIds(),
+                new PositionSetReadOnly(pos), config.getPrecedence(),
+                config.getConflictResolutionStrategy());
+    }
 
-	protected Set<? extends I_GetConceptData> getChildren(
-			I_GetConceptData concept, I_Position pos)
-			throws TerminologyException, IOException {
-		return concept.getDestRelOrigins(getCurrentStatuses(), getIsAIds(),
-				new PositionSetReadOnly(pos), config.getPrecedence(),
-				config.getConflictResolutionStrategy());
-	}
+    protected boolean conceptIsChildOf(I_GetConceptData c1,
+            I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
+            IOException {
+        for (I_GetConceptData child : getChildren(c2, pos)) {
+            if (c1.getConceptNid() == child.getConceptNid()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private HashSet<Integer> descendants = null;
 
-	protected boolean conceptIsChildOf(I_GetConceptData c1,
-			I_GetConceptData c2, I_Position pos) throws TerminologyException,
-			IOException {
-		for (I_GetConceptData child : getChildren(c2, pos)) {
-			if (c1.getConceptNid() == child.getConceptNid())
-				return true;
-		}
-		return false;
-	}
+    private void getDescendants(I_GetConceptData c2, PositionSetBI pos)
+            throws TerminologyException, IOException {
+        if (descendants.contains(new Integer(c2.getConceptNid()))) {
+            return;
+        }
+        for (I_GetConceptData child : getChildren(c2, pos)) {
+            getDescendants(child, pos);
+            descendants.add(new Integer(child.getConceptNid()));
+        }
+    }
 
-	private HashSet<Integer> descendants = null;
+    protected boolean conceptIsDescendantOf(I_GetConceptData c1,
+            I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
+            IOException {
+        if (descendants == null) {
+            descendants = new HashSet<Integer>();
+            getDescendants(c2, pos);
+        }
+        return descendants.contains(new Integer(c1.getConceptNid()));
+    }
 
-	private void getDescendants(I_GetConceptData c2, I_Position pos)
-			throws TerminologyException, IOException {
-		if (descendants.contains(new Integer(c2.getConceptNid())))
-			return;
-		for (I_GetConceptData child : getChildren(c2, pos)) {
-			getDescendants(child, pos);
-			descendants.add(new Integer(child.getConceptNid()));
-		}
-	}
-
-	protected boolean conceptIsDescendantOf(I_GetConceptData c1,
-			I_GetConceptData c2, I_Position pos) throws TerminologyException,
-			IOException {
-		if (descendants == null) {
-			descendants = new HashSet<Integer>();
-			getDescendants(c2, pos);
-		}
-		return descendants.contains(new Integer(c1.getConceptNid()));
-	}
-
-	protected I_Position getVersion(GROUPING_TYPE version, I_Position v1_is,
-			I_Position v2_is) throws TerminologyException {
-		if (version == GROUPING_TYPE.V1)
-			return v1_is;
-		if (version == GROUPING_TYPE.V2)
-			return v2_is;
-		throw new TerminologyException("Version error:" + version);
-	}
-
-	protected I_AmPart getVersion(List<I_AmPart> parts, I_Position vn_is,
-			boolean trace_p) throws TerminologyException {
-		try {
-			I_AmPart an = null;
-			Set<? extends PositionBI> origins = vn_is.getPath().getInheritedOrigins();
-			for (I_AmPart a : parts) {
-				if (trace_p) {
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-					System.out.println("\t" + a.getPathId() + " "
-							+ a.getVersion() + " "
-							+ vn_is.getPath().getConceptNid() + " "
-							+ vn_is.getVersion());
-				}
-				// Must be on the path
-				// Find the greatest version <= the one of interest
-				for (PositionBI origin : origins) {
-					if (trace_p) {
-						System.out.println("\t" + a.getPathId() + " "
-								+ origin.getPath().getConceptNid());
-						System.out.println("\t" + a.getVersion() + " "
-								+ origin.getVersion());
-					}
-					if ((a.getPathId() == vn_is.getPath().getConceptNid() || (a
-							.getPathId() == origin.getPath().getConceptNid()
-					// &&
-					// a.getVersion()
-					// >=
-					// origin.getVersion()
-					))
-							&& a.getVersion() <= vn_is.getVersion()
-							&& (an == null || an.getVersion() < a.getVersion()))
-						an = a;
-				}
-			}
-			return an;
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
-		}
-	}
-
+    protected PositionSetBI getVersion(GROUPING_TYPE version, PositionSetBI v1_is,
+            PositionSetBI v2_is) throws TerminologyException {
+        if (version == GROUPING_TYPE.V1) {
+            return v1_is;
+        }
+        if (version == GROUPING_TYPE.V2) {
+            return v2_is;
+        }
+        throw new TerminologyException("Version error:" + version);
+    }
+//	protected I_AmPart getVersion(List<I_AmPart> parts, PositionSetBI vn_is,
+//			boolean trace_p) throws TerminologyException {
+//		try {
+//			I_AmPart an = null;
+//			Set<? extends PositionBI> origins = vn_is.getPath().getInheritedOrigins();
+//			for (I_AmPart a : parts) {
+//				if (trace_p) {
+//					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+//					System.out.println("\t" + a.getPathId() + " "
+//							+ a.getVersion() + " "
+//							+ vn_is.getPath().getConceptNid() + " "
+//							+ vn_is.getVersion());
+//				}
+//				// Must be on the path
+//				// Find the greatest version <= the one of interest
+//				for (PositionBI origin : origins) {
+//					if (trace_p) {
+//						System.out.println("\t" + a.getPathId() + " "
+//								+ origin.getPath().getConceptNid());
+//						System.out.println("\t" + a.getVersion() + " "
+//								+ origin.getVersion());
+//					}
+//					if ((a.getPathId() == vn_is.getPath().getConceptNid() || (a
+//							.getPathId() == origin.getPath().getConceptNid()
+//					// &&
+//					// a.getVersion()
+//					// >=
+//					// origin.getVersion()
+//					))
+//							&& a.getVersion() <= vn_is.getVersion()
+//							&& (an == null || an.getVersion() < a.getVersion()))
+//						an = a;
+//				}
+//			}
+//			return an;
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new TerminologyException(e.getMessage());
+//		}
+//	}
 }

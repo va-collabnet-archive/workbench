@@ -110,7 +110,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
                 importConfig.getViewPositionSet().clear();
                 UUID pathUuid  = (UUID) pathObj;
                 importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
-                importConfig.getViewPositionSet().add(Terms.get().newPosition(Terms.get().getPath(pathUuid), Integer.MAX_VALUE));
+                importConfig.getViewPositionSet().add(Terms.get().newPosition(Terms.get().getPath(pathUuid), Long.MAX_VALUE));
                 importConfig.setProperty("override", true);
                 importConfig.setProperty("pathUuid", pathUuid);
             } else {

@@ -1,0 +1,133 @@
+#created on: Sep 1, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+import java.lang.String;
+import java.io.File;
+
+import org.ihtsdo.concept.Concept;
+
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+
+import org.ihtsdo.arena.context.action.AddFromSpecAction;
+import org.ihtsdo.arena.context.action.AddToRelGroupAction;
+import org.ihtsdo.arena.context.action.CopyAction;
+import org.ihtsdo.arena.context.action.CopyDescAction;
+import org.ihtsdo.arena.context.action.CopyRelAction;
+import org.ihtsdo.arena.context.action.CopyRelGroupAction;
+import org.ihtsdo.arena.context.action.CopyToRelGroupAction;
+import org.ihtsdo.arena.context.action.CloneAction;
+import org.ihtsdo.arena.context.action.CloneRelAction;
+import org.ihtsdo.arena.context.action.CloneAndRetireAction;
+import org.ihtsdo.arena.context.action.CloneToRelGroupAction;
+import org.ihtsdo.arena.context.action.CloneRelGroupAction;
+import org.ihtsdo.arena.context.action.CreateRelAction;
+import org.ihtsdo.arena.context.action.MoveAction;
+import org.ihtsdo.arena.context.action.MoveDescAction;
+import org.ihtsdo.arena.context.action.MoveToRelGroupAction;
+import org.ihtsdo.arena.context.action.MoveRelAction;
+import org.ihtsdo.arena.context.action.MoveRelGroupAction;
+import org.ihtsdo.arena.context.action.RetireAction;
+import org.ihtsdo.arena.context.action.UngroupRelAction;
+import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
+import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
+import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
+
+import org.ihtsdo.tk.drools.facts.ComponentFact;
+import org.ihtsdo.tk.drools.facts.ConAttrFact;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.DescSpecFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
+import org.ihtsdo.tk.drools.facts.RelSpecFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
+import org.ihtsdo.tk.Ts;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+
+import org.ihtsdo.tk.spec.DescriptionSpec;
+
+import org.ihtsdo.tk.example.binding.Snomed;
+import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedRelType;
+import org.ihtsdo.tk.example.binding.SnomedRelSpec;
+import org.ihtsdo.tk.example.binding.Taxonomies;
+import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.arena.spec.Refsets; 
+
+
+
+#declare any global variables here
+
+global Collection conceptActions;
+global Collection descriptionActions;
+global Collection relActions;
+global BpActionFactoryNoPanel actionFactory;
+global ViewCoordinate vc;
+
+rule "add if not in refset: Non-Human refset"
+	when
+ 			$c: ConceptFact(this not isMemberOf Refsets.NON_HUMAN,
+ 							this not isParentMemberOf Refsets.NON_HUMAN,
+ 							context == Context.FOCUS_CONCEPT)
+
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_Non-Human_refset.bp")));
+end
+
+
+rule "remove if in refset: Non-Human refset"
+	when
+		$c: ConceptFact(this isMemberOf Refsets.NON_HUMAN,
+ 						context == Context.FOCUS_CONCEPT)
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_Non-Human_refset.bp")));
+end
+
+rule "add if not in refset: VMP refset"
+	when 
+		$c: ConceptFact(this not isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_VMP_refset.bp")));
+end
+
+
+rule "remove if in refset: VMP refset"
+	when
+		$c:ConceptFact(this isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
+						context == Context.FOCUS_CONCEPT)
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_VMP_refset.bp")));
+end
+
+rule "add if not in refset: VTM refset"
+	when 
+		$c: ConceptFact(this not isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/add-concept/add_to_VTM_refset.bp")));
+end
+
+
+rule "remove if in refset: VTM refset"
+	when
+		$c: ConceptFact(this isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+		conceptActions.add(actionFactory.make(
+			new File("plugins/remove-concept/remove_from_VTM_refset.bp")));
+end
+

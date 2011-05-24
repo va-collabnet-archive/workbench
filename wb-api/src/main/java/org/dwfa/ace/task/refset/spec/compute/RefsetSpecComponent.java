@@ -29,6 +29,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.PositionSetBI;
 
 public abstract class RefsetSpecComponent {
     private int possibleConceptsCount;
@@ -66,7 +67,7 @@ public abstract class RefsetSpecComponent {
     }
 
 	public abstract boolean execute(I_AmTermComponent component,
-			GROUPING_TYPE version, I_Position v1Is, I_Position v2Is,
+			GROUPING_TYPE version, PositionSetBI v1Is, PositionSetBI v2Is,
 			Collection<I_ShowActivity> activities) throws IOException,
 			TerminologyException;
 

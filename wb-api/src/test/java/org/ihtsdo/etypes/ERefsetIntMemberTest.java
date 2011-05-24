@@ -148,13 +148,13 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.extraVersions = new ArrayList<TkRefsetIntRevision>();
+        member.revisions = new ArrayList<TkRefsetIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
         rsv.intValue = 3; 
         rsv.pathUuid = new UUID(4350, 5469);
         rsv.statusUuid = new UUID(5386, 4497);
         rsv.time = this.myTime;
-        member.extraVersions.add(rsv);
+        member.revisions.add(rsv);
         
         return member;
     }
@@ -179,13 +179,13 @@ public class ERefsetIntMemberTest {
         ac.time = this.myTime;
         member.additionalIds.add(ac);       
         // Add extraVersions
-        member.extraVersions = new ArrayList<TkRefsetIntRevision>();
+        member.revisions = new ArrayList<TkRefsetIntRevision>();
         ERefsetIntRevision rsv = new ERefsetIntRevision();
         rsv.intValue = 3; 
         rsv.pathUuid = new UUID(222, 222);
         rsv.statusUuid = new UUID(333, 333);
         rsv.time = this.myTime;
-        member.extraVersions.add(rsv);
+        member.revisions.add(rsv);
         
         return member;
 

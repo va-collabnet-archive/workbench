@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_Position;
+import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
@@ -26,24 +26,28 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
-import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
- * Assumptions: 1. Each path can participate as an origin only once 2. The
- * version/time element of each position reflects actual calendar time, and
- * future dates can be no greater than 1 year in the future.
- * 
+ * Assumptions: <br>
+ * 1. Each path can participate as an origin only once <br>
+ * 2. The version/time element of each position reflects actual calendar time, and
+ * future dates can be no greater than 1 year in the future. <br>
+ * <br>
  * Thoughts: a. Should the conflict matrix be a sparse matrix? Space vs
  * efficiency tradeoff.
- * 
+ *
  * @author kec
- * 
+ *
  */
 public class PositionMapper {
 
     public static final BigInteger BIG_MINUS_ONE = BigInteger.valueOf(-1);
+    public static final int INT_MINUS_ONE = -1;
+    private static final int initialIndex = StatusAtPositionBdb.getInitialPosition();
 
     /**
      * Possible results when comparing two positions with respect to a
@@ -81,9 +85,33 @@ public class PositionMapper {
                         return;
                     }
                     m.setup();
+                    //m.setup__int();
                 } catch (Throwable e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
+            }
+        }
+    }
+
+    public class SortableDistance implements Comparable<SortableDistance> {
+
+        public int idx;
+        public long distance;
+
+        public SortableDistance(int i, long d) {
+            idx = i;
+            distance = d;
+        }
+
+        @Override
+        public int compareTo(SortableDistance o) {
+            SortableDistance other = (SortableDistance) o;
+            if (this.distance > other.distance) {
+                return 1; // this is greater than received
+            } else if (this.distance < other.distance) {
+                return -1; // this is less than received
+            } else {
+                return 0; // this == received
             }
         }
     }
@@ -118,10 +146,39 @@ public class PositionMapper {
         assert version.getSapNid() < positionDistance.length : "sapNid: " + version.getSapNid()
                 + " length: " + positionDistance.length + " version: " + version;
         if (version.getTime() < Long.MAX_VALUE) {
-            return positionDistance[version.getSapNid()] >= 0
-                    && version.getTime() <= destination.getTime();
+            return positionDistance[version.getSapNid()] >= 0;
         } else if (destination.getTime() > System.currentTimeMillis()) {
             return positionDistance[version.getSapNid()] >= 0;
+        }
+        return false;
+    }
+
+    public boolean idsOnRoute(I_IdPart idVersion) {
+        queryCount++;
+        if (Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
+                idVersion.getPathNid(), idVersion.getTime()) < 0) {
+            return false;
+        }
+        // Forms a barrier to ensure that the setup is complete prior to use
+        try {
+            completeLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        lastRequestTime = System.currentTimeMillis();
+        if (idVersion.getTime() == Long.MAX_VALUE) {
+            return true;
+        }
+        assert Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
+                idVersion.getPathNid(), idVersion.getTime()) < positionDistance.length : "sapNid: "
+                + Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(), idVersion.getPathNid(), idVersion.getTime())
+                + " length: " + positionDistance.length + " version: " + idVersion;
+        if (idVersion.getTime() < Long.MAX_VALUE) {
+            return positionDistance[Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
+                    idVersion.getPathNid(), idVersion.getTime())] >= 0;
+        } else if (destination.getTime() > System.currentTimeMillis()) {
+            return positionDistance[Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
+                    idVersion.getPathNid(), idVersion.getTime())] >= 0;
         }
         return false;
     }
@@ -262,6 +319,69 @@ public class PositionMapper {
                 throw new RuntimeException("Can't handle policy: " + precedencePolicy);
         }
     }
+
+    public RELATIVE_POSITION fastRelativeIdPartsPosition(I_IdPart part1, I_IdPart part2, Precedence precedencePolicy) {
+        queryCount++;
+        lastRequestTime = System.currentTimeMillis();
+        // Forms a barrier to ensure that the setup is complete prior to use
+        try {
+            completeLatch.await();
+            assert Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
+                    "SapNid: " + Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
+                    + " rows: " + conflictMatrix.length
+                    + " columns: " + conflictMatrix.length
+                    + " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " destination: " + destination + " latch: " + completeLatch.getCount()
+                    + " positionCount: " + positionCount;
+            assert Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
+                    "SapNid: " + Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
+                    + " rows: " + conflictMatrix.length
+                    + " columns: " + conflictMatrix.length
+                    + " time: " + new Date(Bdb.getSapDb().getTime(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " status: " + Concept.get(Bdb.getSapDb().getStatusNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " path: " + Concept.get(Bdb.getSapDb().getPathNid(Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())))
+                    + " destination: " + destination + " latch: " + completeLatch.getCount()
+                    + " positionCount: " + positionCount;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        switch (precedencePolicy) {
+            case PATH:
+                if (inConflict(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()), Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()))) {
+                    return RELATIVE_POSITION.CONTRADICTION;
+                } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+                        > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+                    return RELATIVE_POSITION.BEFORE;
+                } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+                        < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+                    return RELATIVE_POSITION.AFTER;
+                }
+                if (part1.getAuthorNid() != part2.getAuthorNid()) {
+                    return RELATIVE_POSITION.CONTRADICTION;
+                }
+                return RELATIVE_POSITION.EQUAL;
+            case TIME:
+                if (part1.getTime() == part2.getTime()) {
+                    if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+                            > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+                        return RELATIVE_POSITION.BEFORE;
+                    } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
+                            < positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
+                        return RELATIVE_POSITION.AFTER;
+                    }
+                    return RELATIVE_POSITION.CONTRADICTION;
+                } else if (part1.getTime() < part2.getTime()) {
+                    return RELATIVE_POSITION.BEFORE;
+                }
+                return RELATIVE_POSITION.AFTER;
+            default:
+                throw new RuntimeException("Can't handle policy: " + precedencePolicy);
+        }
+    }
     /**
      * A bit matrix of the combinations of position identifiers that are
      * unreachable from each other. Hence, these combinations result in a
@@ -320,7 +440,7 @@ public class PositionMapper {
                             "Creating new PositionMapper for: "
                             + pathConcept.getNid() + ": "
                             + pathDesc + " time: "
-                            + TimeUtil.formatDate(destination.getTime())
+                            + TimeHelper.formatDate(destination.getTime())
                             + " thread: " + Thread.currentThread().getName());
                 }
                 Collection<PositionBI> origins =
@@ -354,9 +474,9 @@ public class PositionMapper {
                 BigInteger[] positionComputedDistance = new BigInteger[positionCount];
                 Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
                 conflictMatrix = new BitSet[positionCount];
-                for (int p1index = 0; p1index < positionCount; p1index++) {
+                for (int p1index = initialIndex; p1index < positionCount; p1index++) {
                     try {
-                        I_Position p1 = Bdb.getSapDb().getPosition(p1index);
+                        PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
                         Integer p1pathId = p1.getPath().getConceptNid();
                         Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
                         // see if position may be in route to the destination
@@ -379,8 +499,8 @@ public class PositionMapper {
                                         BigInteger.valueOf(p1.getTime()));
 
                                 // iterate to compute conflicts...
-                                for (int p2index = 0; p2index < positionCount; p2index++) {
-                                    I_Position p2 = Bdb.getSapDb().getPosition(p2index);
+                                for (int p2index = initialIndex; p2index < positionCount; p2index++) {
+                                    PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
                                     Integer p2pathId = p2.getPath().getConceptNid();
                                     if (originMap.containsKey(p2pathId)
                                             && p2.getTime() <= originMap.get(p2pathId).getTime()) {
@@ -430,7 +550,7 @@ public class PositionMapper {
 
                 // Step 2: copy: if neg, distance = -1 if positive, distance = sort
                 // sequence.
-                for (int pid = 0; pid < positionCount; pid++) {
+                for (int pid = initialIndex; pid < positionCount; pid++) {
                     if (positionComputedDistance[pid].compareTo(BigInteger.ZERO) < 0) {
                         positionDistance[pid] = -1;
                     } else {
@@ -440,11 +560,225 @@ public class PositionMapper {
                     }
                 }
                 completeLatch.countDown();
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine(
+                            "Finished setup for new PositionMapper for: "
+                            + pathConcept.getNid() + ": "
+                            + pathDesc + " time: "
+                            + TimeHelper.formatDate(destination.getTime())
+                            + " thread: " + Thread.currentThread().getName());
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        } else {
+            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().info(
-                        "Finished setup for new PositionMapper for: "
+                        "Suppressed reinitilization of PositionMapper for: "
                         + pathConcept.getNid() + ": "
                         + pathDesc + " time: "
-                        + TimeUtil.formatDate(destination.getTime())
+                        + destination.getTime()
+                        + " thread: " + Thread.currentThread().getName());
+            }
+
+        }
+        writeLock.unlock();
+    }
+
+    private void setup__int() throws IOException, PathNotExistsException, TerminologyException {
+        if (Bdb.getConceptDb() == null) {
+            return;
+        }
+        Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptNid());
+        String pathDesc = pathConcept.getPrimUuid().toString();
+        if (pathConcept.getDescriptions() != null && pathConcept.getDescriptions().size() > 0) {
+            pathDesc = pathConcept.getDescriptions().iterator().next().getText();
+        }
+        writeLock.lock();
+        if (completeLatch.getCount() == 1) {
+            try {
+                if (pathManager == null) {
+                    pathManager = BdbPathManager.get();
+                }
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine(
+                            "Creating new PositionMapper for: " + pathConcept.getNid() + ": "
+                            + pathDesc + " time: "
+                            + TimeHelper.formatDate(destination.getTime()) + " thread: "
+                            + Thread.currentThread().getName());
+                }
+                Collection<PositionBI> origins = pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
+                origins.add(this.destination);
+
+                // Map of the origin position's path id, to the origin position... See
+                // assumption 1.
+                Map<Integer, PositionBI> originMap = new TreeMap<Integer, PositionBI>();
+
+                // Map of the origin position's path to it's 'depth' (how many origins
+                // below the destination it is)
+                TreeMap<Integer, Integer> depthMap = new TreeMap<Integer, Integer>();
+
+                // Map of the origin's position path to the set of paths that precede it
+                // (including itself).
+                TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
+                for (PositionBI o : origins) {
+                    originMap.put(o.getPath().getConceptNid(), o);
+                    if (depthMap.containsKey(o.getPath().getConceptNid()) == false) {
+                        depthMap.put(o.getPath().getConceptNid(), getDepth__int(o, destination, 1));
+                    }
+                    precedingPathIdMap.put(o.getPath().getConceptNid(), getPreceedingPathSet(o));
+                }
+
+                positionCount = Bdb.getSapDb().getPositionCount();
+
+                // COMPUTE timeMax, timeMin, timeDelta
+                long[] unscaledTimeData = new long[positionCount];
+                for (int pIdx = initialIndex; pIdx < positionCount; pIdx++) {
+                    unscaledTimeData[pIdx] = Bdb.getSapDb().getPosition(pIdx).getTime();
+                }
+                Arrays.sort(unscaledTimeData);
+
+                long timeMax = unscaledTimeData[positionCount - 1];
+                long timeMin = unscaledTimeData[1];
+                long timeDelta = Long.MAX_VALUE;
+
+                for (int i = initialIndex; i < positionCount - 1; i++) {
+                    long delta = unscaledTimeData[i + 1] - unscaledTimeData[i];
+                    if (delta < timeDelta) {
+                        timeDelta = delta;
+                    }
+                }
+
+                if (timeDelta >= 4) {
+                    timeDelta = timeDelta / 2; // over sample to insure unique "time slot" after scaling
+                } else if (timeDelta == 0) {
+                    timeDelta = 1;
+                }
+                unscaledTimeData = null;
+
+                // COMPUTE DISTANCES
+                long timeUpperBound = ((timeMax - timeMin) * 4) / timeDelta;
+
+                AceLog.getAppLog().info(
+                        "::: PositionMapper " + "\ttimeMax=" + timeMax + "\ttimeMin=" + timeMin
+                        + "\ttimeDelta=" + timeDelta + "\ttimeUpperBound="
+                        + timeUpperBound);
+
+                positionDistance = new int[positionCount];
+                Arrays.fill(positionDistance, Integer.MIN_VALUE);
+                long[] positionComputedDistance__long = new long[positionCount];
+                Arrays.fill(positionComputedDistance__long, INT_MINUS_ONE);
+                conflictMatrix = new BitSet[positionCount];
+                for (int p1index = initialIndex; p1index < positionCount; p1index++) {
+                    try {
+                        PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
+                        Integer p1pathId = p1.getPath().getConceptNid();
+                        Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
+                        // see if position may be in route to the destination
+                        if (originMap.containsKey(p1pathId)) {
+                            // compute the distance to the destination
+                            int pathDepth = depthMap.get(p1.getPath().getConceptNid());
+
+                            if (destination.getPath().getConceptNid() == p1.getPath().getConceptNid()) {
+                                // On the same path as the destination...
+                                if (p1.getTime() <= destination.getTime()) {
+                                    long scaledTime = (p1.getTime() - timeMin) / timeDelta;
+                                    positionComputedDistance__long[p1index] = timeUpperBound - scaledTime;
+                                } else {
+                                    conflictMatrix[p1index] = null;
+                                }
+                                conflictMatrix[p1index] = null;
+                            } else {
+                                // On a different path than the destination
+                                // compute the distance to the destination
+                                long scaledTime = (p1.getTime() - timeMin) / timeDelta;
+                                positionComputedDistance__long[p1index] = (timeUpperBound * pathDepth)
+                                        - scaledTime;
+
+                                // iterate to compute conflicts...
+                                for (int p2index = initialIndex; p2index < positionCount; p2index++) {
+                                    PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
+                                    Integer p2pathId = p2.getPath().getConceptNid();
+                                    if (originMap.containsKey(p2pathId)
+                                            && p2.getTime() <= originMap.get(p2pathId).getTime()) {
+                                        Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
+                                        if (precedingPathIdSet.contains(p2pathId)
+                                                || p2PrecedingPathIdSet.contains(p1pathId)) {
+                                            if (conflictMatrix[p1index] != null) {
+                                                // technically not required as default is to false.
+                                                conflictMatrix[p1index].set(p2index, false);
+                                            }
+                                            if (conflictMatrix[p2index] != null) {
+                                                // technically not required as default is to false.
+                                                conflictMatrix[p2index].set(p1index, false);
+                                            }
+                                        } else {
+                                            if (p1index < p2index) {
+                                                if (conflictMatrix[p1index] == null) {
+                                                    conflictMatrix[p1index] = new BitSet(
+                                                            positionCount);
+                                                }
+                                                conflictMatrix[p1index].set(p2index, true);
+                                            } else {
+                                                if (conflictMatrix[p2index] == null) {
+                                                    conflictMatrix[p2index] = new BitSet(
+                                                            positionCount);
+                                                }
+                                                conflictMatrix[p2index].set(p1index, true);
+                                            }
+                                        }
+                                    } else {
+                                        conflictMatrix[p1index] = null;
+                                    }
+                                }
+                            }
+                        } else {
+                            conflictMatrix[p1index] = null;
+                        }
+                    } catch (Exception e) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
+
+                }
+
+                /*
+                // STEP 1: SORT DISTANCES
+                SortableDistance[] distSortArray = new SortableDistance[positionCount];
+                for (int p1index = 0; p1index < positionCount; p1index++)
+                distSortArray[p1index] = new SortableDistance(p1index,
+                positionComputedDistance__long[p1index]);
+                Arrays.sort(distSortArray);
+                
+                // STEP 2:ASSIGN RELATIVE DISTANCES
+                for (int pid = 0; pid < positionCount; pid++) {
+                SortableDistance sd = distSortArray[pid];
+                if (sd.distance < 0)
+                positionDistance[sd.idx] = -1;
+                else
+                positionDistance[sd.idx] = pid;
+                }
+                 */
+
+                // STEP 1: SORT DISTANCES
+                long[] positionComputedDistanceSorted__long = new long[positionCount];
+                System.arraycopy(positionComputedDistance__long, 0, positionComputedDistanceSorted__long, 0, positionCount);
+                Arrays.sort(positionComputedDistanceSorted__long);
+
+                // STEP 2:ASSIGN RELATIVE DISTANCES
+                for (int pid = initialIndex; pid < positionCount; pid++) {
+                    if (positionComputedDistance__long[pid] < 0) {
+                        positionDistance[pid] = -1;
+                    } else {
+                        positionDistance[pid] = Arrays.binarySearch(positionComputedDistanceSorted__long,
+                                positionComputedDistance__long[pid]);
+                    }
+                }
+
+                completeLatch.countDown();
+                AceLog.getAppLog().info(
+                        "Finished setup for new PositionMapper for: " + pathConcept.getNid() + ": "
+                        + pathDesc + " time: " + TimeHelper.formatDate(destination.getTime())
                         + " thread: " + Thread.currentThread().getName());
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -452,11 +786,9 @@ public class PositionMapper {
             }
         } else {
             AceLog.getAppLog().info(
-                    "Suppressed reinitilization of PositionMapper for: "
-                    + pathConcept.getNid() + ": "
-                    + pathDesc + " time: "
-                    + destination.getTime()
-                    + " thread: " + Thread.currentThread().getName());
+                    "Suppressed reinitilization of PositionMapper for: " + pathConcept.getNid()
+                    + ": " + pathDesc + " time: " + destination.getTime() + " thread: "
+                    + Thread.currentThread().getName());
 
         }
         writeLock.unlock();
@@ -512,7 +844,21 @@ public class PositionMapper {
                 return depth;
             }
         }
-        return BIG_MINUS_ONE;
+        return BIG_MINUS_ONE; // not on path
+    }
+
+    private Integer getDepth__int(PositionBI testPath, PositionBI depthFinder,
+            int depthSeed) {
+        if (testPath.getPath().getConceptNid() == depthFinder.getPath().getConceptNid()) {
+            return depthSeed;
+        }
+        for (PositionBI child : depthFinder.getPath().getOrigins()) {
+            int depth = getDepth__int(testPath, child, depthSeed + 1);
+            if (depth > 0) {
+                return depth;
+            }
+        }
+        return INT_MINUS_ONE; // not on path
     }
 
     /**
@@ -535,13 +881,13 @@ public class PositionMapper {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Formatter f = new Formatter(buf);
-        buf.append(this.getClass().getSimpleName() + ": ");
+        buf.append(this.getClass().getSimpleName()).append(": ");
         buf.append(" destination:");
         buf.append(destination);
         buf.append("\nsapNid|distance|time|path|status\n");
-        for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+        for (int i = initialIndex; i < lengthToPrint && i < positionDistance.length; i++) {
             f.format("%1$2d|", i); // sapNid
             f.format("%1$2d|", positionDistance[i]); // distance
             try {
@@ -565,13 +911,13 @@ public class PositionMapper {
         buf.append("\nconflict matrix: \n");
         buf.append("   ");
 
-        for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+        for (int i = initialIndex; i < lengthToPrint && i < positionDistance.length; i++) {
             f.format("%1$2d ", i);
         }
         buf.append("\n");
-        for (int i = 0; i < lengthToPrint && i < positionDistance.length; i++) {
+        for (int i = initialIndex; i < lengthToPrint && i < positionDistance.length; i++) {
             f.format("%1$2d ", i);
-            for (int j = 0; j < lengthToPrint && j < positionDistance.length; j++) {
+            for (int j = initialIndex; j < lengthToPrint && j < positionDistance.length; j++) {
                 buf.append(" ");
                 buf.append(Boolean.toString(inConflict(i, j)).charAt(0));
                 buf.append(" ");

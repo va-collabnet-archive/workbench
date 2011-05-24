@@ -2,24 +2,20 @@ package org.ihtsdo.workflow.refset.mojo.init;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.cement.WorkflowAuxiliary;
-import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.workflow.refset.strans.StateTransitionRefset;
-import org.ihtsdo.workflow.refset.strans.StateTransitionRefsetWriter;
-import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetHelper;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
+
 
 /**
  * @author Jesse Efron
@@ -31,79 +27,77 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetHelper;
 public class InitializeStateTransitionMojo extends AbstractMojo {
 
     /**
-     * Location of the build directory.
+     * The name of the database to create. All sql inserts will be against this
+     * database.
      * 
-     * @parameter expression="${project.build.directory}"
+     * @parameter
      * @required
      */
-    private File targetDirectory;
+    private String filePath;
+
+    /**
+     * Whether to alert user of a bad row that can't be imported into the database
+     * 
+     * @parameter
+     * default-value=true
+     * @required
+     */
+    private boolean reportErrors;
+
+    private static final int categoryPosition = 0;								// 0
+    private static final int initialStatePosition = categoryPosition + 1;		// 1
+    private static final int actionPosition = initialStatePosition + 1;			// 2
+    private static final int finalStatePosition = actionPosition + 1;			// 3
+
+    private static final int numberOfColumns = finalStatePosition + 1;			// 4
 
     private StateTransitionRefsetWriter writer = null;
-    private HashMap<String, I_GetConceptData> modelers = null;
     
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
-    	StateTransitionRefset refset = new StateTransitionRefset();
         System.setProperty("java.awt.headless", "true");
         try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-            }
-
-            I_TermFactory tf = Terms.get();
-            
             writer = new StateTransitionRefsetWriter();
-
-            modelers = new HashMap<String, I_GetConceptData>();
-            modelers = WorkflowRefsetHelper.getModelers();
-
-            processNewStateTransitions();
-            processEditStateTransitions();
-                                
-	        tf.addUncommitted(tf.getConcept(refset.getRefsetConcept()));
-	        //RefsetReaderUtility.getContents(refset.getRefsetId());
+            processStateTransitions(filePath);
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize state transition refset with error: " + e.getMessage());
 		}
 	}
 
-    private void processNewStateTransitions() throws TerminologyException, IOException {
-    	File f = new File("src/main/resources/textRefset/newStateTransRefset.txt");
-    	processTransitions(f, Terms.get().getConcept(WorkflowAuxiliary.Concept.NEW_USE_CASE.getUids()));
+    private void processStateTransitions(String resourceFilePath) throws TerminologyException, IOException {
+    	processTransitions(new File(resourceFilePath), Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
     }
 
-    private void processEditStateTransitions() throws TerminologyException, IOException {
-    	File f = new File("src/main/resources/textRefset/editStateTransRefset.txt");
-    	processTransitions(f, Terms.get().getConcept(WorkflowAuxiliary.Concept.EDIT_USE_CASE.getUids()));
-    }
-    
     private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException {
-    	StateTransitionRefset refset = new StateTransitionRefset();
         Scanner scanner = new Scanner(f);
     	writer.setWorkflowType(useType);
 
         while (scanner.hasNextLine())
         {
         	String line = scanner.nextLine();
+        	
+        	if (line.trim().length() == 0)
+        		continue;
+        	
+        	
         	String[] columns = line.split("\t");
-        
-        	writer.setEditorCategory(WorkflowRefsetHelper.getModelerCategory(columns[0]));
-        	writer.setInitialState(WorkflowRefsetHelper.getState(columns[1]));
-        	writer.setAction(WorkflowRefsetHelper.getAction(columns[2]));
-        	writer.setFinalState(WorkflowRefsetHelper.getState(columns[3]));
 
-        	writer.addMember();
+        	if (columns.length == numberOfColumns)
+        	{
+	        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition]);
+    			
+	        	writer.setCategory(category);
+    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition]));
+	        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition]));
+	        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition]));
 
-	        Collection<? extends I_ExtendByRef> extVersions = Terms.get().getRefsetExtensionMembers(refset.getRefsetId());
-	        int size = extVersions.size();
-        };
+	        	writer.addMember();
+        	}
+    		else if (reportErrors) {
+            	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
+        	}
+        }
         
-        writer.setWorkflowType(null);
+        Terms.get().addUncommitted(writer.getRefsetConcept());
     }
 }

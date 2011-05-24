@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.api.ext.I_DescribeExternally;
+import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
@@ -33,12 +34,12 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     }
 
     @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public final void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super.readExternal(in, dataVersion);
         conceptUuid = new UUID(in.readLong(), in.readLong());
         initialCaseSignificant = in.readBoolean();
         lang = in.readUTF();
-        text = in.readUTF();
+        text = UtfHelper.readUtfV6(in, dataVersion);
         typeUuid = new UUID(in.readLong(), in.readLong());
         int versionLength = in.readInt();
         if (versionLength > 0) {
@@ -56,7 +57,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         out.writeLong(conceptUuid.getLeastSignificantBits());
         out.writeBoolean(initialCaseSignificant);
         out.writeUTF(lang);
-        out.writeUTF(text);
+        UtfHelper.writeUtf(out, text);
         out.writeLong(typeUuid.getMostSignificantBits());
         out.writeLong(typeUuid.getLeastSignificantBits());
         if (revisions == null) {
@@ -77,6 +78,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.conceptUuid = conceptUuid;
     }
 
+    @Override
     public boolean isInitialCaseSignificant() {
         return initialCaseSignificant;
     }
@@ -85,6 +87,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.initialCaseSignificant = initialCaseSignificant;
     }
 
+    @Override
     public String getLang() {
         return lang;
     }
@@ -93,6 +96,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.lang = lang;
     }
 
+    @Override
     public String getText() {
         return text;
     }
@@ -101,10 +105,12 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
         this.text = text;
     }
 
+    @Override
     public List<TkDescriptionRevision> getRevisionList() {
         return revisions;
     }
 
+    @Override
     public UUID getTypeUuid() {
         return typeUuid;
     }
@@ -116,17 +122,18 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" text:");
-        buff.append("'" + this.text + "'");
+        buff.append("'").append(this.text).append("'");
         buff.append(" conceptUuid:");
         buff.append(this.conceptUuid);
         buff.append(" initialCaseSignificant:");
         buff.append(this.initialCaseSignificant);
         buff.append(" lang:");
-        buff.append("'" + this.lang + "'");
+        buff.append("'").append(this.lang).append("'");
         buff.append(" typeUuid:");
         buff.append(this.typeUuid);
         buff.append("; ");
@@ -144,6 +151,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

@@ -188,7 +188,7 @@ public class SetWFDSheetToSnomedVersionPanelTask extends AbstractTask {
 
                 for (UniversalAcePosition univPos : universalPositions) {
                     PathBI path = tf.getPath(univPos.getPathId());
-                    PositionBI thinPos = tf.newPosition(path, tf.convertToThinVersion(univPos.getTime()));
+                    PositionBI thinPos = tf.newPosition(path, univPos.getTime());
                     previousPositions.add(thinPos);
                 }
 

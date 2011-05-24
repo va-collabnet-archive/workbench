@@ -42,8 +42,8 @@ import org.ihtsdo.tk.api.PositionBI;
  * @author Marc E. Campbell
  * 
  */
-
 public class SnoPathProcess implements I_ProcessConcepts {
+
     private List<PositionBI> fromPathPos;
     private Logger logger;
     private List<SnoRel> snorels;
@@ -51,7 +51,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // Do not filter 'Is a' on classifier path
     // The classifier itself is a "filter" what gets dropped.
     private boolean doNotCareIfHasSnomedIsa;
-
     // STATISTICS COUNTERS
     private int countConSeen = 0;
     private int countConRoot = 0;
@@ -61,16 +60,13 @@ public class SnoPathProcess implements I_ProcessConcepts {
     public int countRelAdded = 0; // ADDED TO SNOROCKET
     private int countRelAddedGroups = 0; // Count rels with non-zero group
     private int countRelDuplVersion = 0; // SAME PATH, SAME VERSION
-
     private int countRelCharStated = 0;
     private int countRelCharDefining = 0;
     private int countRelCharStatedInferred = 0;
     private int countRelCharStatedSubsumed = 0;
-
     private int countRelRefNot = 0;
     private int countRelRefOpt = 0;
     private int countRelRefMand = 0;
-
     // CORE NID CONSTANTS
     private static int isaNid = Integer.MIN_VALUE;
     private static int rootNid = Integer.MIN_VALUE;
@@ -84,7 +80,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
     private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private int[] allowedRoles;
-
     // GUI
     I_ShowActivity gui = null;
 
@@ -128,14 +123,15 @@ public class SnoPathProcess implements I_ProcessConcepts {
         }
         int cNid = concept.getNid();
 
-        // :!!!:???:
-        if (concept.getConceptNid() != cNid)
+        if (concept.getConceptNid() != cNid) {
             logger.info("::: [SnoPathProcess] concept.getConceptNid(" + concept.getConceptNid()
                     + ") != concept.getNid(" + cNid + ")");
+        }
 
         if (cNid == rootNid) {
-            if (snocons != null)
+            if (snocons != null) {
                 snocons.add(new SnoCon(cNid, false));
+            }
 
             countConAdded++;
             countConRoot++;
@@ -163,12 +159,12 @@ public class SnoPathProcess implements I_ProcessConcepts {
             }
         } // for PATHS_IN_PRIORITY_ORDER
 
-        if (cPart1 == null)
+        if (cPart1 == null) {
             return; // not relevant to the "visible path"
-
-        if (cPart1.getStatusId() != isCURRENT)
+        }
+        if (cPart1.getStatusId() != isCURRENT) {
             return; // IF (NOT_CURRENT) RETURN; "active" in "visible path"
-
+        }
         if (snocons != null) {
             snocons.add(new SnoCon(cNid, cPart1.isDefined()));
             countSnoCon++;
@@ -187,10 +183,12 @@ public class SnoPathProcess implements I_ProcessConcepts {
                     gui.setValue(countRelAdded);
                     gui.setProgressInfoLower("rels processed " + countRelAdded);
                 }
-                if (x.group >= 0)
+                if (x.group >= 0) {
                     countRelAddedGroups++;
-                if (snorels != null)
+                }
+                if (snorels != null) {
                     snorels.add(x); // Add to master input set
+                }
             }
         }
     }
@@ -210,7 +208,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         List<SnoRel> keepRels = new ArrayList<SnoRel>();
 
         // FOR ALL SOURCE RELS
-        for (I_RelVersioned rel : concept.getSourceRels()) {
+        for (I_RelVersioned<?> rel : concept.getSourceRels()) {
             // FIND MOST_RECENT REL PART, ON HIGHEST_PRIORITY_PATH
             I_RelPart rPart1 = null;
             for (PositionBI pos : fromPathPos) { // PATHS_IN_PRIORITY_ORDER
@@ -222,8 +220,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
                             rPart1 = rPart; // ... KEEP MORE_RECENT PART
                         } else if (rPart1.getVersion() == rPart.getVersion()) {
                             countRelDuplVersion++;
-                            if (rPart.getStatusId() == isCURRENT)
+                            if (rPart.getStatusId() == isCURRENT) {
                                 rPart1 = rPart; // KEEP CURRENT PART
+                            }
                         }
                     }
                 }
@@ -261,23 +260,26 @@ public class SnoPathProcess implements I_ProcessConcepts {
                     boolean isAllowed = false;
                     int i = 0;
                     while (isAllowed == false && i < allowedRoles.length) {
-                        if (typeNid == allowedRoles[i])
+                        if (typeNid == allowedRoles[i]) {
                             isAllowed = true;
+                        }
                         i++;
                     }
-                    if (isAllowed == false)
+                    if (isAllowed == false) {
                         keep = false;
+                    }
                 }
 
                 if (keep) {
                     // UPDATE STATS
                     int p1rfn = rPart1.getRefinabilityId();
-                    if (p1rfn == isOPTIONAL_REFINABILITY)
+                    if (p1rfn == isOPTIONAL_REFINABILITY) {
                         tmpCountRelRefOpt++;
-                    else if (p1rfn == isNOT_REFINABLE)
+                    } else if (p1rfn == isNOT_REFINABLE) {
                         tmpCountRelRefNot++;
-                    else if (p1rfn == isMANDATORY_REFINABILITY)
+                    } else if (p1rfn == isMANDATORY_REFINABILITY) {
                         tmpCountRelRefMand++;
+                    }
 
                     // ADD TO STATED
                     SnoRel relationship = new SnoRel(rel.getC1Id(), rel.getC2Id(), rPart1.getTypeId(), rPart1.getGroup(), rel.getNid());
@@ -297,8 +299,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
             countRelRefMand += tmpCountRelRefMand;
 
             return keepRels;
-        } else
+        } else {
             return null;
+        }
     }
 
     private void setupCoreNids() {
@@ -312,72 +315,61 @@ public class SnoPathProcess implements I_ProcessConcepts {
             isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
             // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-            isOPTIONAL_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                    .getUids());
-            isMANDATORY_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
 
             // Characteristic
-            isCh_STATED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                            .getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                            .getUids());
+            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
+            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
         } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)
     public String getStats(long startTime) {
-        StringBuffer s = new StringBuffer(1500);
+        StringBuilder s = new StringBuilder(1500);
         s.append("\r\n::: [SnoPathProcess] ProcessPath()");
         if (startTime > 0) {
             long lapseTime = System.currentTimeMillis() - startTime;
-            s.append("\r\n::: [Time] get vodb data: \t" + lapseTime + "\t(mS)\t"
-                    + (((float) lapseTime / 1000) / 60) + "\t(min)");
+            s.append("\r\n::: [Time] get vodb data: \t").append(lapseTime);
+            s.append("\t(mS)\t").append(((float) lapseTime / 1000) / 60);
+            s.append("\t(min)");
             s.append("\r\n:::");
         }
 
-        s.append("\r\n::: concepts viewed:      \t" + countConSeen);
-        s.append("\r\n::: concepts total current:\t" + countSnoCon);
-        s.append("\r\n::: concepts w/rel added:  \t" + countConAdded);
-        s.append("\r\n::: relationships added:   \t" + countRelAdded);
+        s.append("\r\n::: concepts viewed:      \t").append(countConSeen);
+        s.append("\r\n::: concepts total current:\t").append(countSnoCon);
+        s.append("\r\n::: concepts w/rel added:  \t").append(countConAdded);
+        s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
-        s.append("\r\n::: rel group TOTAL:\t" + countRelAddedGroups);
+        s.append("\r\n::: rel group TOTAL:\t").append(countRelAddedGroups);
 
         s.append("\r\n::: ");
-        s.append("\r\n::: concept root added:  \t" + countConRoot);
-        s.append("\r\n::: con version conflict:\t" + countConDuplVersion);
-        s.append("\r\n::: rel version conflict:\t" + countRelDuplVersion);
+        s.append("\r\n::: concept root added:  \t").append(countConRoot);
+        s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
+        s.append("\r\n::: rel version conflict:\t").append(countRelDuplVersion);
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t" + countRelCharDefining);
-        s.append("\r\n::: Stated:           \t" + countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t" + countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t" + countRelCharStatedSubsumed);
+        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
+        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
+        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
+        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
         int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
                 + countRelCharStatedSubsumed;
-        s.append("\r\n:::            TOTAL=\t" + total);
+        s.append("\r\n:::            TOTAL=\t").append(total);
         s.append("\r\n::: ");
-        s.append("\r\n::: Optional Refinability: \t" + countRelRefOpt);
-        s.append("\r\n::: Not Refinable:         \t" + countRelRefNot);
-        s.append("\r\n::: Mandatory Refinability:\t" + countRelRefMand);
+        s.append("\r\n::: Optional Refinability: \t").append(countRelRefOpt);
+        s.append("\r\n::: Not Refinable:         \t").append(countRelRefNot);
+        s.append("\r\n::: Mandatory Refinability:\t").append(countRelRefMand);
         total = countRelRefNot + countRelRefOpt + countRelRefMand;
-        s.append("\r\n:::                  TOTAL=\t" + total);
+        s.append("\r\n:::                  TOTAL=\t").append(total);
         s.append("\r\n::: ");
         s.append("\r\n");
         return s.toString();
     }
-
 }

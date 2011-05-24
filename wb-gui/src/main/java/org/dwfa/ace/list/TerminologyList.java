@@ -29,6 +29,7 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 
 public class TerminologyList extends JList {
@@ -38,22 +39,29 @@ public class TerminologyList extends JList {
         public DeleteAction() {
             super("delete");
         }
-
         /**
          * 
          */
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (confirmDelete) {
                 int selectedIndex = getSelectedIndex();
                 if (selectedIndex >= 0) {
                     TerminologyListModel tm = (TerminologyListModel) getModel();
-                    int option = JOptionPane.showConfirmDialog(TerminologyList.this,
-                        "<html>Are you sure you want to erase item <font color='red'>" + tm.getElementAt(selectedIndex)
-                            + "</font> from the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
-                    if (option == JOptionPane.YES_OPTION) {
-                        delete();
+                    I_GetConceptData element = tm.getElementAt(selectedIndex);
+                    if (element.isUncommitted()) {
+                        JOptionPane.showMessageDialog(TerminologyList.this, 
+                                "<html>Uncommitted items cannot be removed from the list.<br><br>"
+                                + "Either cancel or commit changes prior to removal.");
+                    } else {
+                        int option = JOptionPane.showConfirmDialog(TerminologyList.this,
+                                "<html>Are you sure you want to erase item <font color='red'>" + element
+                                + "</font> from the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
+                        if (option == JOptionPane.YES_OPTION) {
+                            delete();
+                        }
                     }
                 }
             } else {
@@ -68,14 +76,11 @@ public class TerminologyList extends JList {
                 tm.removeElement(selectedIndex);
             }
         }
-
     }
-
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-
     private boolean confirmDelete = false;
 
     public TerminologyList(I_ConfigAceFrame config) {
@@ -107,10 +112,10 @@ public class TerminologyList extends JList {
         if (allowDelete) {
             DeleteAction delete = new DeleteAction();
             getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-                delete.getValue(Action.NAME));
+                    delete.getValue(Action.NAME));
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), delete.getValue(Action.NAME));
             getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-                delete.getValue(Action.NAME));
+                    delete.getValue(Action.NAME));
             getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), delete.getValue(Action.NAME));
 
             ActionMap map = this.getActionMap();
@@ -120,5 +125,4 @@ public class TerminologyList extends JList {
             map.put(delete.getValue(Action.NAME), delete);
         }
     }
-
 }

@@ -47,9 +47,13 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.worker.task.I_GetWorkFromQueue;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.queue.QueueServer;
+import org.dwfa.queue.QueueWorkerSpec;
+import org.dwfa.queue.bpa.worker.CollabInboxQueueWorker;
+import org.dwfa.queue.bpa.worker.CollabOutboxQueueWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -129,8 +133,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
             createClassifierPath(config, commitConfig, positionSet);
 
-            List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get()
-                .getCommitErrorsAndWarnings();
+            List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
             process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
             if (errorsAndWarnings.size() > 0) {
                 Terms.get().cancel();
@@ -163,8 +166,7 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
             // clear the user's path color
             if (commitConfig.getDbConfig().getUserPath() != null) {
-                Color userColor = config.getPathColorMap().remove(
-                    commitConfig.getDbConfig().getUserPath().getConceptNid());
+                Color userColor = config.getPathColorMap().remove(commitConfig.getDbConfig().getUserPath().getConceptNid());
                 config.setColorForPath(config.getDbConfig().getUserPath().getConceptNid(), userColor);
             }
 
@@ -183,14 +185,117 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
     String[] QueueTypes = new String[] { "aging", "archival", "compute", "inbox", "launcher", "outbox" };
 
-    private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot, String nodeInboxAddress) {
+    public void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot, String nodeInboxAddress) {
         config.getQueueAddressesToShow().add(inboxName);
         createQueue(config, "inbox", inboxName, userQueueRoot, nodeInboxAddress);
     }
 
-    private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot, String nodeInboxAddress) {
+    public boolean createCollabnetInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
+            String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
+        config.getQueueAddressesToShow().add(inboxName);
+        return createQueue(config, "collabnet.inbox", inboxName, userQueueRoot, nodeInboxAddress, newQueueName,
+            collabnetUsername, collabnetPassword);
+    }
+
+    public void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot, String nodeInboxAddress) {
         config.getQueueAddressesToShow().add(outboxName);
         createQueue(config, "outbox", outboxName, userQueueRoot, nodeInboxAddress);
+    }
+
+    public boolean createCollabnetOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
+            String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
+        config.getQueueAddressesToShow().add(outboxName);
+        return createQueue(config, "collabnet.outbox", outboxName, userQueueRoot, nodeInboxAddress, newQueueName,
+            collabnetUsername, collabnetPassword);
+    }
+
+    private boolean createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
+            String nodeInboxAddress, String newQueueName, String collabnetUsername, String collabnetPassword) {
+
+        try {
+
+            if (userQueueRoot.exists() == false) {
+                userQueueRoot.mkdirs();
+            }
+
+            File queueDirectory = new File(userQueueRoot, queueName);
+
+            queueDirectory.mkdirs();
+
+            Map<String, String> substitutionMap = new TreeMap<String, String>();
+
+            String fileName = "template.queue.config";
+            if (queueType.equals("collabnet.inbox")) {
+                substitutionMap.put("**queueName**", newQueueName);
+                substitutionMap.put("**collabnetUserName**", collabnetUsername);
+                substitutionMap.put("**collabnetPassword**", collabnetPassword);
+                fileName = "template.collabnetInbox.config";
+            } else if (queueType.equals("collabnet.outbox")) {
+                substitutionMap.put("**queueName**", newQueueName);
+                substitutionMap.put("**collabnetUserName**", collabnetUsername);
+                substitutionMap.put("**collabnetPassword**", collabnetPassword);
+                fileName = "template.collabnetOutbox.config";
+            }
+
+            File queueConfigTemplate = new File("config", fileName);
+            String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
+
+            for (String key : substitutionMap.keySet()) {
+                configTemplateString = configTemplateString.replace(key, substitutionMap.get(key));
+            }
+
+            File newQueueConfig = new File(queueDirectory, "queue.config");
+            FileWriter fw = new FileWriter(newQueueConfig);
+            fw.write(configTemplateString);
+            fw.close();
+
+            Configuration configuration =
+                    ConfigurationProvider.getInstance(new String[] { newQueueConfig.getCanonicalPath() }, getClass()
+                        .getClassLoader());
+            QueueWorkerSpec[] workerSpecs =
+                    (QueueWorkerSpec[]) configuration.getEntry(QueueServer.class.getName(), "workerSpecs",
+                        QueueWorkerSpec[].class);
+            for (int i = 0; i < workerSpecs.length; i++) {
+                I_GetWorkFromQueue worker = workerSpecs[i].create(configuration);
+
+                if (queueType.equals("collabnet.inbox")) {
+                    CollabInboxQueueWorker inboxWorker = (CollabInboxQueueWorker) worker;
+                    if (!inboxWorker.validLoginDetails()) {
+                        newQueueConfig.delete();
+                        return false;
+                    }
+                } else if (queueType.equals("collabnet.outbox")) {
+                    CollabOutboxQueueWorker outboxWorker = (CollabOutboxQueueWorker) worker;
+                    if (!outboxWorker.validLoginDetails()) {
+                        newQueueConfig.delete();
+                        return false;
+                    }
+                }
+            }
+
+            config.getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
+            Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
+            Entry[] entries =
+                    (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries", Entry[].class, new Entry[] {});
+            for (Entry entry : entries) {
+                if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
+                    ElectronicAddress ea = (ElectronicAddress) entry;
+                    config.getQueueAddressesToShow().add(ea.address);
+                    break;
+                }
+            }
+
+            if (QueueServer.started(newQueueConfig)) {
+                AceLog.getAppLog().info("Queue already started: " + newQueueConfig.toURI().toURL().toExternalForm());
+            } else {
+                new QueueServer(new String[] { newQueueConfig.getCanonicalPath() }, null);
+            }
+
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        return true;
+
     }
 
     private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
@@ -206,11 +311,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
             queueDirectory.mkdirs();
 
-            Map<String, String> substutionMap = new TreeMap<String, String>();
-            substutionMap.put("**queueName**", queueDirectory.getName());
-            substutionMap.put("**inboxAddress**", queueDirectory.getName());
-            substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
-            substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
+            Map<String, String> substitutionMap = new TreeMap<String, String>();
+            substitutionMap.put("**queueName**", queueDirectory.getName());
+            substitutionMap.put("**inboxAddress**", queueDirectory.getName());
+            substitutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
+            substitutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
 
             String fileName = "template.queue.config";
             if (queueType.equals("aging")) {
@@ -220,23 +325,23 @@ public class CreateUserPathAndQueues extends AbstractTask {
             } else if (queueType.equals("compute")) {
                 fileName = "template.queueCompute.config";
             } else if (queueType.equals("inbox")) {
-                substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
-                substutionMap.put("**mailUsername**", "**mailUsername**");
+                substitutionMap.put("**mailPop3Host**", "**mailPop3Host**");
+                substitutionMap.put("**mailUsername**", "**mailUsername**");
                 fileName = "template.queueInbox.config";
             } else if (queueType.equals("launcher")) {
                 fileName = "template.queueLauncher.config";
             } else if (queueType.equals("outbox")) {
-                substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
-                substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
-                substutionMap.put("**mailHost**", "**mailHost**");
+                substitutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
+                substitutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
+                substitutionMap.put("**mailHost**", "**mailHost**");
                 fileName = "template.queueOutbox.config";
             }
 
             File queueConfigTemplate = new File("config", fileName);
             String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
 
-            for (String key : substutionMap.keySet()) {
-                configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
+            for (String key : substitutionMap.keySet()) {
+                configTemplateString = configTemplateString.replace(key, substitutionMap.get(key));
             }
 
             File newQueueConfig = new File(queueDirectory, "queue.config");
@@ -246,8 +351,8 @@ public class CreateUserPathAndQueues extends AbstractTask {
 
             config.getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
             Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
-            Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries", Entry[].class,
-                new Entry[] {});
+            Entry[] entries =
+                    (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries", Entry[].class, new Entry[] {});
             for (Entry entry : entries) {
                 if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
                     ElectronicAddress ea = (ElectronicAddress) entry;
@@ -286,12 +391,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
             ArchitectonicAuxiliary.Concept.USER_INBOX.localize(), commitConfig);
 
         // Needs a relationship record...
-        tf.newRelationship(UUID.randomUUID(), userConcept,
-            tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
+        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+            tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
         config.getDbConfig().setUserConcept(userConcept);
     }
 
@@ -301,12 +405,12 @@ public class CreateUserPathAndQueues extends AbstractTask {
         config.addEditingPath(userPath);
         I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         config.setClassifierInputPath(userPathConcept);
-        config.getViewPositionSet().add(Terms.get().newPosition(userPath, Integer.MAX_VALUE));
+        config.getViewPositionSet().add(Terms.get().newPosition(userPath, Long.MAX_VALUE));
         config.getDbConfig().setUserPath(userPathConcept);
     }
 
-    private void createClassifierPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig,
-            Set<PositionBI> positionSet) throws Exception {
+    private void createClassifierPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, Set<PositionBI> positionSet)
+            throws Exception {
         PathBI classifierPath = createNewPath(config, commitConfig, positionSet, " classifier path");
         config.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
     }
@@ -336,12 +440,11 @@ public class CreateUserPathAndQueues extends AbstractTask {
             ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize(), commitConfig);
 
         // Needs a relationship record...
-        tf.newRelationship(UUID.randomUUID(), pathConcept,
-            tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-            tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
+        tf.newRelationship(UUID.randomUUID(), pathConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+            tf.getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
+                .getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, commitConfig);
 
         return tf.newPath(positionSet, pathConcept);
     }

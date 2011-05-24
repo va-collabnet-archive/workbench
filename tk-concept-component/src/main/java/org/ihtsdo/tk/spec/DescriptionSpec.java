@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.Coordinate;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class DescriptionSpec implements SpecBI {
@@ -93,7 +93,7 @@ public class DescriptionSpec implements SpecBI {
 
 
 
-	public DescriptionVersionBI get(Coordinate c) throws IOException {
+	public DescriptionVersionBI get(ViewCoordinate c) throws IOException {
 		ConceptVersionBI concept = conceptSpec.get(c);
 		DescriptionVersionBI desc = (DescriptionVersionBI) Ts.get().getComponent(descUuids);
 		if (concept.getNid() != desc.getConceptNid()) {

@@ -28,8 +28,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 
 public class DLNoGrpAddActionListener implements ActionListener {
-    private I_ContainTermComponent termContainer; // :!!!:
-    private I_ConfigAceFrame config; // :!!!:
+    private I_ContainTermComponent termContainer;
+    private I_ConfigAceFrame config;
 
     public DLNoGrpAddActionListener(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
         super();

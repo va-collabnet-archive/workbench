@@ -58,7 +58,7 @@ public class VodbSetViewPaths extends AbstractMojo {
                         .toString());
                 }
                 PathBI viewPath = tf.getPath(path.getVerifiedConcept().getUids());
-                activeConfig.addViewPosition(tf.newPosition(viewPath, Integer.MAX_VALUE));
+                activeConfig.addViewPosition(tf.newPosition(viewPath, Long.MAX_VALUE));
             }
         } catch (TerminologyException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);

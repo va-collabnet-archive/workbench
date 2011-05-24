@@ -22,32 +22,11 @@ import java.util.UUID;
 
 public interface I_IdVersion extends I_IdPart {
 
-    public int getNid();
-
-    public I_Identify getFixedIdPart();
-
     public Set<TimePathId> getTimePathSet();
 
     public List<UUID> getUUIDs();
 
-    public int getAuthorityNid();
-
-    /**
-     * Denotation: the act of pointing out by name. Used as an 
-     * alternative to the repeated use of identifier with different
-     * contextual meanings. 
-     * @return
-     */
-    public Object getDenotation();
-
-    public I_Identify getIdentifier();
-
     public I_IdPart getMutableIdPart();
 
-
-    /**
-     * @deprecated
-     */
-    public I_IdPart duplicateIdPart();
 
 }

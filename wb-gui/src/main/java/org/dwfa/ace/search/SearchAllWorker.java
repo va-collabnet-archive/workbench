@@ -48,7 +48,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements I_
 
     private int conceptCount;
 
-    private Collection<I_DescriptionVersioned> regexMatches;
+    private Collection<I_DescriptionVersioned<?>> regexMatches;
     private Collection<LuceneMatch> luceneMatches;
 
     private DescriptionsFromCollectionTableModel model;
@@ -172,7 +172,7 @@ public class SearchAllWorker extends SwingWorker<I_UpdateProgress> implements I_
 
     @Override
     protected I_UpdateProgress construct() throws Exception {
-        regexMatches = Collections.synchronizedCollection(new TreeSet<I_DescriptionVersioned>(
+        regexMatches = Collections.synchronizedCollection(new TreeSet<I_DescriptionVersioned<?>>(
             new DescriptionComparator()));
         conceptCount = Integer.MAX_VALUE;
         conceptCount = Terms.get().getConceptCount();

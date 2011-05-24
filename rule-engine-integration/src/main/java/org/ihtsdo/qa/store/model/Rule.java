@@ -1,9 +1,10 @@
 package org.ihtsdo.qa.store.model;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class Rule {
-	
+
 	private UUID ruleUuid;
 	private String name;
 	private String description;
@@ -24,8 +25,27 @@ public class Rule {
 	private String ditaDocumentationLinkUuid;
 	private String ditaGeneratedTopicUuid;
 	private String modifiedBy;
+	private Date effectiveTime;
+	private String documentationUrl;
 
 	public Rule() {
+		super();
+	}
+
+	public String getDocumentationUrl() {
+		return documentationUrl;
+	}
+
+	public void setDocumentationUrl(String documentationUrl) {
+		this.documentationUrl = documentationUrl;
+	}
+
+	public Date getEffectiveTime() {
+		return effectiveTime;
+	}
+
+	public void setEffectiveTime(Date effectiveTime) {
+		this.effectiveTime = effectiveTime;
 	}
 
 	public UUID getRuleUuid() {
@@ -188,6 +208,7 @@ public class Rule {
 		this.ruleCode = ruleCode;
 	}
 
+	@Override
 	public String toString() {
 		return name;
 	}

@@ -12,6 +12,7 @@ import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lucene.LuceneManager;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.Ts;
 
 /**
@@ -39,13 +40,15 @@ public class VodbMutableToReadOnly extends AbstractMojo {
 
     void executeMojo(File berkeleyDir) throws MojoExecutionException {
         try {
+        	LuceneManager.init(LuceneSearchType.DESCRIPTION);
+            LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
             File dirToMove = new File(berkeleyDir, "mutable");
             dirToMove.renameTo(new File(berkeleyDir, "read-only"));
             new File(berkeleyDir, "mutable").mkdir();
-            LuceneManager.setDbRootDir(berkeleyDir);
             Terms.createFactory(berkeleyDir, false, 0L, new DatabaseSetupConfig());
-            LuceneManager.writeToLucene((Collection<Description>) Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs());
+            LuceneManager.writeToLucene((Collection<Description>) 
+                    Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs(), LuceneSearchType.DESCRIPTION);
             I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
             termFactoryImpl.close();
 

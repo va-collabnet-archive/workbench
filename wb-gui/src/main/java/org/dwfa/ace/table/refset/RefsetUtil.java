@@ -190,8 +190,8 @@ public class RefsetUtil {
                     super.setSelectedItem(value);
                 }
             };
-            comboBox.addItem(new Boolean(true));
-            comboBox.addItem(new Boolean(false));
+            comboBox.addItem(Boolean.TRUE);
+            comboBox.addItem(Boolean.FALSE);
             extTable.getColumn(REFSET_FIELDS.BOOLEAN_VALUE).setCellEditor(new DefaultCellEditor(comboBox));
             break;
         case STRING:
@@ -220,6 +220,29 @@ public class RefsetUtil {
             setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
                 .getRefsetPreferencesForToggle(toggle)
                 .getConceptPreferences()
+                .getConceptPopupIds());
+
+            break;
+        case CID_CID_CID:
+            setComboForField(host, extTable, REFSET_FIELDS.REFSET_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getRefsetPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.STATUS, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getStatusPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID2, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
+                .getConceptPopupIds());
+            setComboForField(host, extTable, REFSET_FIELDS.CONCEPT_ID3, (IntList) host.getConfig()
+                .getRefsetPreferencesForToggle(toggle)
+                .getCidCidCidPreferences()
                 .getConceptPopupIds());
 
             break;

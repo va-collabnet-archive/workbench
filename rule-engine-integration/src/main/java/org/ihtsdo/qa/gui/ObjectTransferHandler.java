@@ -13,7 +13,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -210,11 +212,27 @@ public class ObjectTransferHandler extends TransferHandler {
 	}
 
 	protected Transferable createTransferable(JComponent c) {
-		JList list = (JList) c;
-		indices = list.getSelectedIndices();
-		Object[] values = list.getSelectedValues();
-		I_GetConceptData concept = (I_GetConceptData) values[0];
-
+		I_GetConceptData concept = null;
+		if(c instanceof JTable){
+			JTable table = (JTable) c;
+			indices = table.getSelectedRows();
+			TableModel model = table.getModel();
+			Object conceptUuid = model.getValueAt(indices[0], 0);
+			try {
+				concept = Terms.get().getConcept(conceptUuid.toString()).iterator().next();
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (ParseException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else{
+			JList list = (JList) c;
+			indices = list.getSelectedIndices();
+			Object[] values = list.getSelectedValues();
+			concept = (I_GetConceptData) values[0];
+		}
 		return new ConceptTransferable(concept);
 	}
 
@@ -225,20 +243,24 @@ public class ObjectTransferHandler extends TransferHandler {
 	protected void exportDone(JComponent c, Transferable data, int action) {
 		if (action == MOVE) {
 			if (indices != null) {
-				JList source = (JList) c;
-				DefaultListModel model = (DefaultListModel) source.getModel();
-				// If we are moving items around in the same list, we
-				// need to adjust the indices accordingly, since those
-				// after the insertion point have moved.
-				if (addCount > 0) {
-					for (int i = 0; i < indices.length; i++) {
-						if (indices[i] > addIndex) {
-							indices[i] += addCount;
+				if(c instanceof JTable){
+					
+				}else{
+					JList source = (JList) c;
+					DefaultListModel model = (DefaultListModel) source.getModel();
+					// If we are moving items around in the same list, we
+					// need to adjust the indices accordingly, since those
+					// after the insertion point have moved.
+					if (addCount > 0) {
+						for (int i = 0; i < indices.length; i++) {
+							if (indices[i] > addIndex) {
+								indices[i] += addCount;
+							}
 						}
 					}
-				}
-				for (int i = indices.length - 1; i >= 0; i--) {
-					model.remove(indices[i]);
+					for (int i = indices.length - 1; i >= 0; i--) {
+						model.remove(indices[i]);
+					}
 				}
 			}
 			indices = null;

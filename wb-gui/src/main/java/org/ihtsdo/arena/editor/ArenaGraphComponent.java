@@ -3,7 +3,6 @@ package org.ihtsdo.arena.editor;
 
 import java.awt.Component;
 
-import org.dwfa.ace.ACE;
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.taxonomyview.TaxonomyViewRenderer;
@@ -15,30 +14,31 @@ import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxGraphView;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 public class ArenaGraphComponent extends mxGraphComponent
 {
-	
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -1152655782652932774L;
-	private ACE ace;
 
     /**
-     * 
+     *
+     */
+    private static final long serialVersionUID = -1152655782652932774L;
+	private I_ConfigAceFrame config;
+
+    /**
+     *
      * @param graph
      */
-    public ArenaGraphComponent(mxGraph graph, ACE ace) {
+    public ArenaGraphComponent(mxGraph graph, I_ConfigAceFrame config) {
         super(graph);
-        this.ace = ace;
+        this.config = config;
         mxGraphView graphView = new mxGraphView(graph);
 
         graph.setView(graphView);
     }
 
     /**
-     * 
+     *
      * @param edge
      * @param isSource
      * @return the column number the edge is attached to
@@ -57,17 +57,18 @@ public class ArenaGraphComponent extends mxGraphComponent
 
 
     /**
-     * 
+     *
      */
+   @Override
     public Component[] createComponents(mxCellState state) {
         if (getGraph().getModel().isVertex(state.getCell())) {
         	mxCell cell = (mxCell) state.getCell();
         	Object cellValue = cell.getValue();
         	if (cellValue != null) {
             	if (ConceptViewSettings.class.isAssignableFrom(cellValue.getClass())) {
-                    return new Component[] { new ConceptViewRenderer(state.getCell(), this, ace) };
+                    return new Component[] { new ConceptViewRenderer(state.getCell(), this, config) };
             	} else  if (TaxonomyViewSettings.class.isAssignableFrom(cellValue.getClass())) {
-                    return new Component[] { new TaxonomyViewRenderer(state.getCell(), this, ace) };
+                    return new Component[] { new TaxonomyViewRenderer(state.getCell(), this, config) };
             	}
         	}
         }

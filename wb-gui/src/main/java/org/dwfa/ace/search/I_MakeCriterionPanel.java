@@ -20,6 +20,9 @@ import java.util.List;
 
 public interface I_MakeCriterionPanel {
 
+	int searchPanelId = 1;
+	int workflowHistorySearchPanelId = 2;
+	
     public void layoutCriterion();
 
     public List<CriterionPanel> getCriterionPanels();

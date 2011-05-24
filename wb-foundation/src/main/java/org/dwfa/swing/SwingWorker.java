@@ -27,11 +27,15 @@ import java.awt.EventQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * An abstract class that you subclass to perform GUI-related work
@@ -131,12 +135,28 @@ import java.util.concurrent.TimeoutException;
 @Deprecated
 public abstract class SwingWorker<V> implements Future<V>, Runnable {
 
+    private static ThreadGroup threadGroup = new ThreadGroup("Legacy SwingWorker ");
+    private static AtomicInteger count = new AtomicInteger();
+    
+        private static ExecutorService threadPool =
+            Executors.newCachedThreadPool( 
+            new ThreadFactory() {
+
+        @Override
+        public Thread newThread(Runnable r) {
+         String threadName = "LSW " + 
+                count.incrementAndGet();
+        return new Thread(threadGroup, r, threadName);
+       }
+    });
+
     /**
      * Default executor. Executes each task in a new thread.
      */
     private static final Executor EXECUTOR = new Executor() {
+        @Override
         public void execute(Runnable command) {
-            new Thread(command).start();
+            threadPool.submit(command);
         }
     };
 

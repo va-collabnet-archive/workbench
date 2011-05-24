@@ -82,7 +82,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
@@ -95,8 +94,6 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
-import org.dwfa.vodb.types.Position;
-import org.ihtsdo.tk.api.PathBI;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins, PropertyChangeListener, Scrollable {
 
@@ -105,8 +102,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         private class ShowHistoryAction extends AbstractAction {
 
             /**
-			 * 
-			 */
+             * 
+             */
             private static final long serialVersionUID = 1L;
             I_GetConceptData concept;
 
@@ -115,12 +112,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 this.concept = concept;
             }
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ConceptPanel.this.setTermComponent(concept);
             }
-
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (tabHistoryList.size() > 1) {
                 JPopupMenu popup = new JPopupMenu();
@@ -149,14 +147,15 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
     private class LabelListener implements PropertyChangeListener {
 
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateTab(label.getTermComponent());
             if (label.getTermComponent() != null) {
-                ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
+                config.setLastViewed((I_GetConceptData) label.getTermComponent());
                 if (tabHistoryList.size() == 0) {
                     tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
                 } else if ((tabHistoryList.size() > 0)
-                    && (label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
+                        && (label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
                     tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
                 }
                 while (tabHistoryList.size() > 20) {
@@ -165,130 +164,111 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
             firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
         }
-
     }
 
     private class ShowPluginComponentActionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
                 public void run() {
                     try {
                         contentScroller.setViewportView(getContentPane());
                     } catch (TerminologyException e) {
                         AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                                 "Database Exception: " + e.getLocalizedMessage(), e);
-					} catch (IOException e) {
+                    } catch (IOException e) {
                         AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                                 "Database Exception: " + e.getLocalizedMessage(), e);
-					}
+                    }
                 }
             });
         }
-
     }
 
     private class UncommittedChangeListener implements PropertyChangeListener {
 
+        @Override
         public void propertyChange(PropertyChangeEvent arg0) {
             setTermComponent(getTermComponent());
         }
-
     }
 
     private class FixedToggleChangeActionListener implements ActionListener, PropertyChangeListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             perform();
         }
 
         private void perform() {
             firePropertyChange(I_HostConceptPlugins.SHOW_HISTORY, !historyButton.isSelected(),
-                historyButton.isSelected());
+                    historyButton.isSelected());
             try {
                 contentScroller.setViewportView(getContentPane());
             } catch (TerminologyException e1) {
                 AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
                         "Database Exception: " + e1.getLocalizedMessage(), e1);
-			} catch (IOException e1) {
-	               AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
-	                       "Database Exception: " + e1.getLocalizedMessage(), e1);
-			}
+            } catch (IOException e1) {
+                AceLog.getAppLog().alertAndLog(ConceptPanel.this, Level.SEVERE,
+                        "Database Exception: " + e1.getLocalizedMessage(), e1);
+            }
         }
 
+        @Override
         public void propertyChange(PropertyChangeEvent arg0) {
             perform();
         }
     }
 
     private class UpdateTogglesPropertyChangeListener implements PropertyChangeListener {
+
+        @Override
         public void propertyChange(PropertyChangeEvent arg0) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     updateToggles();
                 }
-
             });
         }
     }
-
     private TermComponentLabel label;
-
     private JToggleButton historyButton;
-
     private JScrollPane contentScroller;
-
     private JToggleButton usePrefButton;
-
-    private ACE ace;
-
+    private I_ConfigAceFrame config;
     public static ImageIcon HISTORY_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/history2.png"));
-
     public static ImageIcon UNLINKED_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner.png"));
-
     public static ImageIcon SEARCH_LINK_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner_find.png"));
-
     public static ImageIcon TREE_LINK_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner_tree.png"));
-
     public static ImageIcon LIST_LINK_ICON = new ImageIcon(ACE.class.getResource("/24x24/plain/carabiner_up_arrow.png"));
-
     public static ImageIcon DATA_CHECK_LINK_ICON = new ImageIcon(
-        ACE.class.getResource("/24x24/plain/carabiner_alert.png"));
-
+            ACE.class.getResource("/24x24/plain/carabiner_alert.png"));
     public static ImageIcon SMALL_SEARCH_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/find.png"));
-
     public static ImageIcon SMALL_TREE_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/text_tree.png"));
-
     public static ImageIcon SMALL_LIST_LINK_ICON = new ImageIcon(
-        ACE.class.getResource("/16x16/plain/arrow_up_green.png"));
-
+            ACE.class.getResource("/16x16/plain/arrow_up_green.png"));
     public static ImageIcon SMALL_ALERT_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/warning.png"));
-
     public static ImageIcon ARENA_LINK_ICON = new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png"));
-
     public ImageIcon tabIcon;
-
     private JTabbedPane conceptTabs;
-
     private FixedToggleChangeActionListener fixedToggleChangeActionListener;
-
     private PropertyChangeListener labelListener = new LabelListener();
-
     private JToggleButton refsetToggleButton;
-
     private JButton componentHistoryButton;
-
     private Integer panelId;
-
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     private class LinkListModel extends AbstractSpinnerModel {
-        ImageIcon[] items;
 
+        ImageIcon[] items;
         int currentSelection = 0;
 
         public LinkListModel(ImageIcon[] items, int currentSelection) {
@@ -300,6 +280,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
         }
 
+        @Override
         public Object getNextValue() {
             currentSelection++;
             if (currentSelection >= items.length) {
@@ -308,6 +289,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             return getValue();
         }
 
+        @Override
         public Object getPreviousValue() {
             currentSelection--;
             if (currentSelection < 0) {
@@ -316,10 +298,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             return getValue();
         }
 
+        @Override
         public Object getValue() {
             return items[currentSelection];
         }
 
+        @Override
         public void setValue(Object value) {
             for (int i = 0; i < items.length; i++) {
                 if (items[i] == value) {
@@ -330,13 +314,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
             fireStateChanged();
         }
-
     }
 
     private class LinkEditor extends JLabel implements ChangeListener {
+
         /**
-		 * 
-		 */
+         * 
+         */
         private static final long serialVersionUID = 1L;
 
         public LinkEditor(JSpinner spinner) {
@@ -393,6 +377,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
         }
 
+        @Override
         public void stateChanged(ChangeEvent e) {
             JSpinner mySpinner = (JSpinner) (e.getSource());
             LinkListModel myModel = (LinkListModel) (mySpinner.getModel());
@@ -402,56 +387,59 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         }
     }
 
-    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, Integer panelId) throws 
+    public ConceptPanel(HOST_ENUM host_enum, I_ConfigAceFrame config, LINK_TYPE link, Integer panelId, String pluginRoot) throws
             IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
-        this(host_enum, ace, link, null, panelId);
+        this(host_enum, config, link, null, panelId, pluginRoot);
     }
 
-    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, boolean enableListLink, Integer panelId)
-            throws  IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
-        this(host_enum, ace, link, null, enableListLink, panelId);
-    }
-
-    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId)
+    public ConceptPanel(HOST_ENUM host_enum, I_ConfigAceFrame config, LINK_TYPE link, boolean enableListLink, Integer panelId, String pluginRoot)
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
-        this(host_enum, ace, link, conceptTabs, false, panelId);
+        this(host_enum, config, link, null, enableListLink, panelId, pluginRoot);
     }
 
+    public ConceptPanel(HOST_ENUM host_enum, I_ConfigAceFrame config, LINK_TYPE link, JTabbedPane conceptTabs, Integer panelId, String pluginRoot)
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+        this(host_enum, config, link, conceptTabs, false, panelId, pluginRoot);
+    }
     LinkedList<I_GetConceptData> tabHistoryList;
-
     private HOST_ENUM host_enum;
+    private LinkListModel linkSpinnerModel;
+    private JSpinner linkSpinner;
+    private LinkEditor linkEditor;
+    private String pluginRoot;
 
-	private LinkListModel linkSpinnerModel;
-
-	private JSpinner linkSpinner;
-
-	private LinkEditor linkEditor;
-
-    public ConceptPanel(HOST_ENUM host_enum, ACE ace, LINK_TYPE link, JTabbedPane conceptTabs, boolean enableListLink,
-            Integer panelId) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
+    public ConceptPanel(HOST_ENUM host_enum,
+            I_ConfigAceFrame config,
+            LINK_TYPE link,
+            JTabbedPane conceptTabs,
+            boolean enableListLink,
+            Integer panelId,
+            String pluginRoot)
+            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
-        this.ace = ace;
+        this.config = config;
+        this.pluginRoot = pluginRoot;
         this.panelId = panelId;
         this.host_enum = host_enum;
 
-        this.tabHistoryList = (LinkedList<I_GetConceptData>) ace.getAceFrameConfig().getTabHistoryMap().get(
-            "tab " + panelId);
+        this.tabHistoryList = (LinkedList<I_GetConceptData>) config.getTabHistoryMap().get(
+                "tab " + panelId);
         if (this.tabHistoryList == null) {
             this.tabHistoryList = new LinkedList<I_GetConceptData>();
-            ace.getAceFrameConfig().getTabHistoryMap().put("tab " + this.panelId, this.tabHistoryList);
+            config.getTabHistoryMap().put("tab " + this.panelId, this.tabHistoryList);
         }
         UpdateTogglesPropertyChangeListener updateListener = new UpdateTogglesPropertyChangeListener();
-        this.ace.getAceFrameConfig().addPropertyChangeListener("visibleComponentToggles", updateListener);
+        config.addPropertyChangeListener("visibleComponentToggles", updateListener);
 
         addPropertyChangeListener("conflictResolutionStrategy", this);
         addPropertyChangeListener("highlightConflictsInComponentPanel", this);
 
-        ace.getAceFrameConfig().addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
-        label = new TermComponentLabel(this.ace.getAceFrameConfig());
+        config.addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
+        label = new TermComponentLabel(config);
         label.setBackground(Color.RED);
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
-        this.ace.getAceFrameConfig().addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
-        this.ace.getAceFrameConfig().addPropertyChangeListener(this);
+        config.addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
+        config.addPropertyChangeListener(this);
         this.conceptTabs = conceptTabs;
         GridBagConstraints c = new GridBagConstraints();
 
@@ -467,7 +455,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         }
 
         linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]),
-            link.ordinal());
+                link.ordinal());
 
         linkSpinner = new JSpinner(linkSpinnerModel);
         linkSpinner.setBorder(BorderFactory.createEmptyBorder(3, 3, 2, 5));
@@ -488,7 +476,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         c.gridx++;
         componentHistoryButton = new JButton(HISTORY_ICON);
         componentHistoryButton.addActionListener(new ShowHistoryListener());
-         componentHistoryButton.setToolTipText("click to show history of concepts displayed in this viewer");
+        componentHistoryButton.setToolTipText("click to show history of concepts displayed in this viewer");
         add(componentHistoryButton, c);
 
         c.gridx = 0;
@@ -520,8 +508,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         c.weightx = 1.0;
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig()
-            .getConceptPanelPlugins(host_enum))) {
+        for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(config.getConceptPanelPlugins(host_enum))) {
             if (plugin.showComponent()) {
                 content.add(plugin.getComponent(this), c);
                 c.gridy++;
@@ -550,13 +537,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         JPanel rightTogglePane = new JPanel(new FlowLayout());
 
         ShowPluginComponentActionListener l = new ShowPluginComponentActionListener();
-        for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig()
-            .getConceptPanelPlugins(host_enum))) {
+        for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(config.getConceptPanelPlugins(host_enum))) {
             if (plugin != null) {
                 if (plugin.getToggleBarComponents() != null) {
                     for (JComponent component : plugin.getToggleBarComponents()) {
                         leftTogglePane.add(component);
-                        if (ace.getAceFrameConfig().isToggleVisible(TOGGLES.fromId(plugin.getId()))) {
+                        if (config.isToggleVisible(TOGGLES.fromId(plugin.getId()))) {
                             component.setVisible(true);
                             component.setEnabled(true);
                         } else {
@@ -569,12 +555,11 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     AceLog.getAppLog().warning(plugin + " has null components");
                 }
             } else {
-                AceLog.getAppLog()
-                    .warning(
+                AceLog.getAppLog().warning(
                         plugin
-                            + " is null: "
-                            + new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig().getConceptPanelPlugins(
-                                host_enum)));
+                        + " is null: "
+                        + new TreeSet<I_PluginToConceptPanel>(config.getConceptPanelPlugins(
+                        host_enum)));
             }
         }
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
@@ -587,7 +572,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         leftTogglePane.add(refsetToggleButton);
 
         usePrefButton = new JToggleButton(
-            new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
+                new ImageIcon(ACE.class.getResource("/24x24/plain/component_preferences.png")));
         usePrefButton.setSelected(false);
         usePrefButton.setVisible(ACE.editMode);
         usePrefButton.setToolTipText("use preferences to filter views");
@@ -600,8 +585,8 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         historyButton.setToolTipText("show/hide the history records");
         leftTogglePane.add(historyButton);
 
-        IdPlugin idPlugin = (IdPlugin) ace.getAceFrameConfig().getConceptPanelPlugin(host_enum,
-            TOGGLES.ID.getPluginId());
+        IdPlugin idPlugin = (IdPlugin) config.getConceptPanelPlugin(host_enum,
+                TOGGLES.ID.getPluginId());
         idPlugin.getToggleButton().addActionListener(fixedToggleChangeActionListener);
 
         c.gridx++;
@@ -609,12 +594,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         c.fill = GridBagConstraints.HORIZONTAL;
         toggleBar.add(new JPanel(), c);
 
-        File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "component");
+        File componentPluginDir = new File(pluginRoot + File.separator + "component");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+
+            @Override
             public boolean accept(File arg0, String fileName) {
                 return fileName.toLowerCase().endsWith(".bp");
             }
-
         });
         if (plugins != null) {
             c.weightx = 0.0;
@@ -623,7 +609,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             c.gridx++;
             toggleBar.add(rightTogglePane, c);
             boolean exceptions = false;
-            StringBuffer exceptionMessage = new StringBuffer();
+            StringBuilder exceptionMessage = new StringBuilder();
             exceptionMessage.append("<html>Exception(s) reading the following plugin(s): <p><p>");
             for (File f : plugins) {
                 try {
@@ -647,7 +633,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     }
                 } catch (Throwable e) {
                     exceptions = true;
-                    exceptionMessage.append("Exception reading plugin: " + f.getAbsolutePath() + "<p>");
+                    exceptionMessage.append("Exception reading plugin: ").append(f.getAbsolutePath()).append("<p>");
                     AceLog.getAppLog().log(Level.SEVERE, "Exception reading: " + f.getAbsolutePath(), e);
                 }
             }
@@ -665,38 +651,39 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
     private void updateToggles() {
         for (TOGGLES t : TOGGLES.values()) {
-            boolean visible = ((AceFrameConfig) ace.getAceFrameConfig()).isToggleVisible(t);
-            if (ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, t.getPluginId()) != null) {
-                I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum,
-                    t.getPluginId());
+            boolean visible = config.isToggleVisible(t);
+            if (config.getConceptPanelPlugin(host_enum, t.getPluginId()) != null) {
+                I_PluginToConceptPanel plugin = config.getConceptPanelPlugin(host_enum,
+                        t.getPluginId());
                 for (JComponent toggleComponent : plugin.getToggleBarComponents()) {
                     toggleComponent.setVisible(visible);
                     toggleComponent.setEnabled(visible);
                 }
             } else {
                 switch (t) {
-                case HISTORY:
-                    historyButton.setVisible(visible);
-                    historyButton.setEnabled(visible);
-                    break;
-                case PREFERENCES:
-                    if (ACE.editMode) {
-                        usePrefButton.setVisible(visible);
-                        usePrefButton.setEnabled(visible);
-                    }
-                    break;
-                case REFSETS:
-                    refsetToggleButton.setVisible(visible);
-                    refsetToggleButton.setEnabled(visible);
-                    break;
-                default:
-                    break;
+                    case HISTORY:
+                        historyButton.setVisible(visible);
+                        historyButton.setEnabled(visible);
+                        break;
+                    case PREFERENCES:
+                        if (ACE.editMode) {
+                            usePrefButton.setVisible(visible);
+                            usePrefButton.setEnabled(visible);
+                        }
+                        break;
+                    case REFSETS:
+                        refsetToggleButton.setVisible(visible);
+                        refsetToggleButton.setEnabled(visible);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
     }
 
     private class PluginListener implements ActionListener {
+
         File pluginProcessFile;
 
         private PluginListener(File pluginProcessFile) {
@@ -704,6 +691,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             this.pluginProcessFile = pluginProcessFile;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 FileInputStream fis = new FileInputStream(pluginProcessFile);
@@ -720,19 +708,21 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), label.getTermComponent());
                 worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), ConceptPanel.this);
                 Runnable r = new Runnable() {
+
                     private String exceptionMessage;
 
+                    @Override
                     public void run() {
                         I_EncodeBusinessProcess process = bp;
                         try {
-                            worker.getLogger().info(
-                                "Worker: " + worker.getWorkerDesc() + " (" + worker.getId() + ") executing process: "
-                                    + process.getName());
+                            worker.getLogger().log(
+                                    Level.INFO, "Worker: {0} ({1}) executing process: {2}",
+                                    new Object[]{worker.getWorkerDesc(), worker.getId(), process.getName()});
                             worker.execute(process);
                             SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
-                                process.getExecutionRecords());
+                                    process.getExecutionRecords());
                             Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
-                            StringBuffer buff = new StringBuffer();
+                            StringBuilder buff = new StringBuilder();
                             while (recordItr.hasNext()) {
                                 ExecutionRecord rec = recordItr.next();
                                 buff.append("\n");
@@ -745,36 +735,40 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                             exceptionMessage = e1.toString();
                         }
                         SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
                             public void run() {
                                 getConfig().setStatusMessage("<html><font color='#006400'>execute");
                                 if (exceptionMessage.equals("")) {
                                     getConfig().setStatusMessage(
-                                        "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
+                                            "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
                                 } else {
                                     getConfig().setStatusMessage(
-                                        "<html><font color='blue'>Process complete: <font color='red'>"
+                                            "<html><font color='blue'>Process complete: <font color='red'>"
                                             + exceptionMessage);
                                 }
                             }
                         });
                     }
-
                 };
-                new Thread(r).start();
+                new Thread(r, "Concept panel").start();
             } catch (Exception e1) {
                 getConfig().setStatusMessage("Exception during execution.");
                 AceLog.getAppLog().alertAndLogException(e1);
             }
         }
-
     }
 
+    @Override
     public I_AmTermComponent getTermComponent() {
         return label.getTermComponent();
     }
 
+    @Override
     public void setTermComponent(final I_AmTermComponent termComponent) {
         SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
             public void run() {
                 label.setTermComponent(termComponent);
                 contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
@@ -793,7 +787,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     String desc;
                     try {
                         I_DescriptionTuple tdt = cb.getDescTuple(getConfig().getShortLabelDescPreferenceList(),
-                            getConfig());
+                                getConfig());
                         if (tdt != null) {
                             desc = tdt.getText();
                         } else {
@@ -832,6 +826,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         removePropertyChangeListener(I_ContainTermComponent.TERM_COMPONENT, l);
     }
 
+    @Override
     public boolean getUsePrefs() {
         return usePrefButton.isSelected();
     }
@@ -841,63 +836,68 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
     }
 
     public I_ConfigAceFrame getConfig() {
-        return ace.getAceFrameConfig();
+        return config;
     }
-
     private TermComponentTreeSelectionListener treeListener;
-
     private TermComponentListSelectionListener listListener;
-
     private TermComponentDataCheckSelectionListener dataCheckListener;
-
     private JList linkedList;
+    private ACE ace;
+
+    public void setAce(ACE ace, LINK_TYPE link) {
+        this.ace = ace;
+        changeLinkListener(link);
+    }
 
     public void changeLinkListener(LINK_TYPE type) {
-        if (treeListener != null) {
-            ace.removeTaxonomySelectionListener(treeListener);
-            treeListener = null;
-        }
-        if (listListener != null) {
-            linkedList.removeListSelectionListener(listListener);
-            listListener = null;
-        }
-        if (dataCheckListener != null) {
-            ace.removeDataCheckListener(dataCheckListener);
-            dataCheckListener = null;
-        }
-        ace.removeSearchLinkedComponent(this);
-        switch (type) {
-        case TREE_LINK:
-            treeListener = new TermComponentTreeSelectionListener(this);
-            ace.addTaxonomySelectionListener(treeListener);
-            break;
-        case SEARCH_LINK:
-            ace.addSearchLinkedComponent(this);
-            break;
-        case UNLINKED:
-            break;
-        case LIST_LINK:
-            if (linkedList != null) {
-                listListener = new TermComponentListSelectionListener(this);
-                linkedList.addListSelectionListener(listListener);
+        if (ace != null) {
+            if (treeListener != null) {
+                ace.removeTaxonomySelectionListener(treeListener);
+                treeListener = null;
             }
-            break;
-        case DATA_CHECK_LINK:
-            dataCheckListener = new TermComponentDataCheckSelectionListener(this);
-            ace.addDataCheckListener(dataCheckListener);
-            break;
-        case ARENA_LINK:
+            if (listListener != null) {
+                linkedList.removeListSelectionListener(listListener);
+                listListener = null;
+            }
+            if (dataCheckListener != null) {
+                ace.removeDataCheckListener(dataCheckListener);
+                dataCheckListener = null;
+            }
+            ace.removeSearchLinkedComponent(this);
+            switch (type) {
+                case TREE_LINK:
+                    treeListener = new TermComponentTreeSelectionListener(this);
+                    ace.addTaxonomySelectionListener(treeListener);
+                    break;
+                case SEARCH_LINK:
+                    ace.addSearchLinkedComponent(this);
+                    break;
+                case UNLINKED:
+                    break;
+                case LIST_LINK:
+                    if (linkedList != null) {
+                        listListener = new TermComponentListSelectionListener(this);
+                        linkedList.addListSelectionListener(listListener);
+                    }
+                    break;
+                case DATA_CHECK_LINK:
+                    dataCheckListener = new TermComponentDataCheckSelectionListener(this);
+                    ace.addDataCheckListener(dataCheckListener);
+                    break;
+                case ARENA_LINK:
+            }
         }
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String propertyName = evt.getPropertyName();
         if (propertyName.equals("viewPositions") || propertyName.equals("conflictResolutionStrategy")
-            || propertyName.equals("highlightConflictsInComponentPanel")) {
+                || propertyName.equals("highlightConflictsInComponentPanel")) {
             fixedToggleChangeActionListener.actionPerformed(null);
         } else if (propertyName.equals("commit")) {
             if (label.getTermComponent() != null) {
-            	I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
+                I_GetConceptData cb = (I_GetConceptData) label.getTermComponent();
                 try {
                     if (cb.getConceptAttributes() == null) {
                         label.setTermComponent(null);
@@ -911,12 +911,14 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         }
     }
 
+    @Override
     public boolean getShowHistory() {
         return historyButton.isSelected();
     }
 
+    @Override
     public I_GetConceptData getHierarchySelection() {
-        return ace.getAceFrameConfig().getHierarchySelection();
+        return config.getHierarchySelection();
     }
 
     public LogWithAlerts getEditLog() {
@@ -931,25 +933,27 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         this.linkedList = linkedList;
     }
 
+    @Override
     public void unlink() {
-    	if (SwingUtilities.isEventDispatchThread()) {
-    		linkSpinnerModel.setValue(UNLINKED_ICON);
-	        linkSpinner.setValue(UNLINKED_ICON);
-    	} else {
-        	try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					@Override
-					public void run() {
-			    		linkSpinnerModel.setValue(UNLINKED_ICON);
-				        linkSpinner.setValue(UNLINKED_ICON);
-					}
-				});
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} catch (InvocationTargetException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-    	}
+        if (SwingUtilities.isEventDispatchThread()) {
+            linkSpinnerModel.setValue(UNLINKED_ICON);
+            linkSpinner.setValue(UNLINKED_ICON);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        linkSpinnerModel.setValue(UNLINKED_ICON);
+                        linkSpinner.setValue(UNLINKED_ICON);
+                    }
+                });
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            } catch (InvocationTargetException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
+        }
     }
 
     public I_GetConceptData getConcept(Collection<UUID> ids) throws TerminologyException, IOException {
@@ -960,10 +964,6 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         return Terms.get().getConcept(Arrays.asList(ids));
     }
 
-    public I_Position newPosition(PathBI path, int version) {
-        return new Position(version, path);
-    }
-
     public I_IntSet newIntSet() {
         return new IntSet();
     }
@@ -972,12 +972,13 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         Terms.get().addUncommitted(concept);
     }
 
+    @Override
     public void setAllTogglesToState(final boolean state) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
-                for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(ace.getAceFrameConfig()
-                    .getConceptPanelPlugins(host_enum))) {
+                for (I_PluginToConceptPanel plugin : new TreeSet<I_PluginToConceptPanel>(config.getConceptPanelPlugins(host_enum))) {
                     for (JComponent component : plugin.getToggleBarComponents()) {
                         if (JToggleButton.class.isAssignableFrom(component.getClass())) {
                             JToggleButton toggle = (JToggleButton) component;
@@ -993,16 +994,19 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         });
     }
 
+    @Override
     public void setLinkType(LINK_TYPE link) {
         changeLinkListener(link);
     }
 
+    @Override
     public void setToggleState(final TOGGLES toggle, final boolean state) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
-                I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum,
-                    toggle.getPluginId());
+                I_PluginToConceptPanel plugin = config.getConceptPanelPlugin(host_enum,
+                        toggle.getPluginId());
                 if (plugin != null) {
                     for (JComponent component : plugin.getToggleBarComponents()) {
                         if (JToggleButton.class.isAssignableFrom(component.getClass())) {
@@ -1016,63 +1020,69 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                     }
                 } else {
                     switch (toggle) {
-                    case HISTORY:
-                        if (historyButton.isSelected() == state) {
-                            // nothing to do...
-                        } else {
-                            historyButton.doClick();
-                        }
-                        break;
-                    case PREFERENCES:
-                        if (usePrefButton.isSelected() == state) {
-                            // nothing to do...
-                        } else {
-                            usePrefButton.doClick();
-                        }
-                        break;
-                    case REFSETS:
-                        if (refsetToggleButton.isSelected() == state) {
-                            // nothing to do...
-                        } else {
-                            refsetToggleButton.doClick();
-                        }
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
+                        case HISTORY:
+                            if (historyButton.isSelected() == state) {
+                                // nothing to do...
+                            } else {
+                                historyButton.doClick();
+                            }
+                            break;
+                        case PREFERENCES:
+                            if (usePrefButton.isSelected() == state) {
+                                // nothing to do...
+                            } else {
+                                usePrefButton.doClick();
+                            }
+                            break;
+                        case REFSETS:
+                            if (refsetToggleButton.isSelected() == state) {
+                                // nothing to do...
+                            } else {
+                                refsetToggleButton.doClick();
+                            }
+                            break;
+                        default:
+                            throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);
                     }
                 }
             }
-
         });
 
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return new Dimension(30, 30);
     }
 
+    @Override
     public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
         return 75;
     }
 
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
 
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         return true;
     }
 
+    @Override
     public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
         return 10;
     }
 
+    @Override
     public boolean getShowRefsets() {
         return refsetToggleButton.isSelected();
     }
 
+    @Override
     public boolean getToggleState(TOGGLES toggle) {
-        I_PluginToConceptPanel plugin = ace.getAceFrameConfig().getConceptPanelPlugin(host_enum, toggle.getPluginId());
+        I_PluginToConceptPanel plugin = config.getConceptPanelPlugin(host_enum, toggle.getPluginId());
         if (plugin != null) {
             for (JComponent component : plugin.getToggleBarComponents()) {
                 if (JToggleButton.class.isAssignableFrom(component.getClass())) {
@@ -1082,12 +1092,12 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             }
         } else {
             switch (toggle) {
-            case HISTORY:
-                return historyButton.isSelected();
-            case PREFERENCES:
-                return usePrefButton.isSelected();
-            case REFSETS:
-                return refsetToggleButton.isSelected();
+                case HISTORY:
+                    return historyButton.isSelected();
+                case PREFERENCES:
+                    return usePrefButton.isSelected();
+                case REFSETS:
+                    return refsetToggleButton.isSelected();
             }
         }
         throw new UnsupportedOperationException(" Can't handle toggle: " + toggle);

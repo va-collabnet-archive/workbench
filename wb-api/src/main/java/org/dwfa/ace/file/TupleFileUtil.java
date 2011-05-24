@@ -628,7 +628,7 @@ public class TupleFileUtil {
                     ext.getTuples(helper.getCurrentStatusIntSet(), null, configFrame.getPrecedence(), configFrame
                         .getConflictResolutionStrategy());
 
-            if (extensions.size() > 0) {
+            if (tuples.size() > 0) {
                 I_ExtendByRefVersion thinTuple = tuples.get(0);
                 I_ExtendByRefPart thinPart = thinTuple.getMutablePart();
 

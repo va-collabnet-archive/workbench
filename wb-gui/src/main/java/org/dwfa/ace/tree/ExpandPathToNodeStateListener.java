@@ -19,6 +19,7 @@ package org.dwfa.ace.tree;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -45,6 +46,9 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         super();
         this.tree = tree;
         this.focus = focus;
+        if (focus == null) {
+            return;
+        }
         config.getParentExpandedNodes().clear();
         config.getChildrenExpandedNodes().clear();
         tree.addWorkerFinishedListener(this);
@@ -57,7 +61,9 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
             for (I_RelTuple r : rels) {
                 I_GetConceptData parent = Terms.get().getConcept(r.getC2Id());
                 ancestors.add(0, parent);
-                AceLog.getAppLog().info("Adding parent: " + parent);
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine("Adding parent: " + parent);
+                }
                 rels = parent.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(),
                     config.getViewPositionSetReadOnly(), 
                     config.getPrecedence(), config.getConflictResolutionStrategy());
@@ -90,11 +96,17 @@ public class ExpandPathToNodeStateListener implements ChangeListener {
         // TreePath pathToShow;
         // tree.expandPath(pathToShow);
 
-        AceLog.getAppLog().info("Dropped on JTreeWithDragImage: " + focus);
-        AceLog.getAppLog().info("Expansion list: " + ancestors);
+        if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+            AceLog.getAppLog().info("Dropped on JTreeWithDragImage: " + focus);
+            AceLog.getAppLog().info("Expansion list: " + ancestors);
+        }
     }
 
+    @Override
     public void stateChanged(ChangeEvent e) {
+        if (focus == null) {
+            return;
+        }
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
 
         boolean allFound = true;

@@ -114,14 +114,14 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                                 I_ExtendByRef specPart = (I_ExtendByRef) node.getUserObject();
                                 Collection<? extends I_ExtendByRef> extensions =
-                                        Terms.get().getAllExtensionsForComponent(
-                                            aceConfig.getRefsetSpecInSpecEditor().getConceptNid(), true);
+                                        Terms.get().getRefsetExtensionMembers(
+                                            aceConfig.getRefsetSpecInSpecEditor().getConceptNid());
 
                                 HashMap<Integer, I_ExtendByRef> memberIdBasedExtensionMap =
                                         new HashMap<Integer, I_ExtendByRef>();
                                 memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
 
-                                switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeId())) {
+                                switch (EConcept.REFSET_TYPES.nidToType(specPart.getTypeNid())) {
                                 case CID_CID:
                                     boolean excludeDesc = true;
                                     boolean excludeConcept = true;
@@ -140,8 +140,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                                             // show AND, OR, !AND, !OR
                                             // show desc clauses
                                             excludeDesc = false;
-                                        } else if (clauseIsChildOfConceptContainsRel(specPart,
-                                            memberIdBasedExtensionMap)) {
+                                        } else if (clauseIsChildOfConceptContainsRel(specPart, memberIdBasedExtensionMap)) {
                                             // show AND, OR, !AND, !OR
                                             // show rel clauses
                                             excludeRel = false;
@@ -154,14 +153,12 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                                         }
                                     }
 
-                                    popup =
-                                            makePopup(e, specPart, excludeConcept, excludeDesc, excludeRel,
-                                                excludeContains);
+                                    popup = makePopup(e, specPart, excludeConcept, excludeDesc, excludeRel, excludeContains);
                                     break;
                                 case CID_CID_CID:
                                     popup =
-                                            makePopup(e, new File(AceFrame.pluginRoot,
-                                                "refsetspec/structural-query-popup"), specPart);
+                                            makePopup(e, new File(AceFrame.pluginRoot, "refsetspec/structural-query-popup"),
+                                                specPart);
                                     break;
                                 case CID_CID_STR:
                                     popup =
@@ -193,8 +190,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
     }
 
-    private HashMap<Integer, I_ExtendByRef> populateMemberIdBasedExtensionMap(
-            Collection<? extends I_ExtendByRef> extensions) {
+    private HashMap<Integer, I_ExtendByRef> populateMemberIdBasedExtensionMap(Collection<? extends I_ExtendByRef> extensions) {
         HashMap<Integer, I_ExtendByRef> extensionMap = new HashMap<Integer, I_ExtendByRef>();
 
         for (I_ExtendByRef extension : extensions) {
@@ -210,7 +206,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         if (cidCidPart.getC2id() == conceptContainsRelNid) {
             return true;
         } else {
-            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
             if (parentSpecPart == null) {
                 return false;
             } else {
@@ -222,12 +218,12 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
     private boolean clauseIsChildOfConceptContainsDesc(I_ExtendByRef specPart,
             HashMap<Integer, I_ExtendByRef> componentIdBasedExtensionMap) throws IOException, TerminologyException {
 
-        int conceptContainsRelNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
+        int conceptContainsDescNid = RefsetAuxiliary.Concept.CONCEPT_CONTAINS_DESC_GROUPING.localize().getNid();
         I_ExtendByRefPartCidCid cidCidPart = (I_ExtendByRefPartCidCid) specPart;
-        if (cidCidPart.getC2id() == conceptContainsRelNid) {
+        if (cidCidPart.getC2id() == conceptContainsDescNid) {
             return true;
         } else {
-            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentId());
+            I_ExtendByRef parentSpecPart = componentIdBasedExtensionMap.get(specPart.getComponentNid());
             if (parentSpecPart == null) {
                 return false;
             } else {
@@ -325,9 +321,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     popup.add(changeActionItem);
                 } else {
                     tuples =
-                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig
-                                .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
-                                .getConflictResolutionStrategy());
+                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig.getViewPositionSetReadOnly(),
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                 }
             }
 
@@ -381,9 +376,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     popup.add(changeActionItem);
                 } else {
                     tuples =
-                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig
-                                .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
-                                .getConflictResolutionStrategy());
+                            (List<I_ExtendByRefVersion>) specPart.getTuples(null, aceConfig.getViewPositionSetReadOnly(),
+                                aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
                 }
             }
 
@@ -417,10 +411,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                             RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.STR);
                             refsetMap.put(REFSET_PROPERTY.STRING_VALUE, commentText);
                             I_ExtendByRef newExtension =
-                                    refsetHelper
-                                        .getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(),
-                                            thinExtByRefTuple.getMemberId(), REFSET_TYPES.STR, refsetMap, UUID
-                                                .randomUUID());
+                                    refsetHelper.getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(),
+                                        thinExtByRefTuple.getMemberId(), REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
                             Terms.get().addUncommitted(newExtension);
                         }
                     }
@@ -457,12 +449,11 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
         public void actionPerformed(ActionEvent arg0) {
             try {
-                I_ExtendByRefPart currentPart = thinExtByRefTuple.getMutablePart();
 
                 I_ExtendByRef clauseBeingRetired = (I_ExtendByRef) thinExtByRefTuple.getCore();
                 Collection<? extends I_ExtendByRef> extensions =
-                        Terms.get().getAllExtensionsForComponent(aceConfig.getRefsetSpecInSpecEditor().getConceptNid(),
-                            true);
+                        Terms.get()
+                            .getAllExtensionsForComponent(aceConfig.getRefsetSpecInSpecEditor().getConceptNid(), true);
 
                 HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
                 HashSet<Integer> fetchedComponents = new HashSet<Integer>();
@@ -477,12 +468,12 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
                 for (DefaultMutableTreeNode extNode : extensionMap.values()) {
                     I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
-                    if (ext.getComponentId() == clauseBeingRetired.getMemberId()) {
+                    if (ext.getComponentNid() == clauseBeingRetired.getMemberId()) {
                         selectedRoot.add(extNode);
-                    } else if (ext.getComponentId() == aceConfig.getRefsetSpecInSpecEditor().getConceptNid()) {
+                    } else if (ext.getComponentNid() == aceConfig.getRefsetSpecInSpecEditor().getConceptNid()) {
                         // do nothing
                     } else {
-                        extensionMap.get(ext.getComponentId()).add(extNode);
+                        extensionMap.get(ext.getComponentNid()).add(extNode);
                     }
                 }
 
@@ -494,26 +485,15 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     int n =
                             JOptionPane.showOptionDialog(OpenFrames.getActiveFrame(),
                                 "The selected clause has child-clauses. How would you like to proceed?",
-                                "Multiple clause retirement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
-                                null, options, options[0]);
+                                "Multiple clause retirement", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                                options, options[0]);
                     if (n == JOptionPane.YES_OPTION) {
                         try {
                             // retire all children as well as the selected/current clause
                             retireClause(thinExtByRefTuple);
 
-                            for (int i = 0; i < childCount; i++) {
+                            retireAllDescendants(selectedRoot);
 
-                                DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) selectedRoot.getChildAt(i);
-                                I_ExtendByRef childClause = (I_ExtendByRef) childNode.getUserObject();
-                                List<? extends I_ExtendByRefVersion> childExtensions =
-                                        childClause.getTuples(aceConfig.getAllowedStatus(), aceConfig
-                                            .getViewPositionSetReadOnly(), aceConfig.getPrecedence(), aceConfig
-                                            .getConflictResolutionStrategy());
-                                if (childExtensions.size() > 0) {
-                                    I_ExtendByRefVersion thinPart = childExtensions.get(0);// .getMutablePart();
-                                    retireClause(thinPart);
-                                }
-                            }
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
@@ -541,11 +521,29 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             aceConfig.refreshRefsetTab();
         }
 
+        private void retireAllDescendants(DefaultMutableTreeNode selectedRoot) throws Exception {
+            int childCount = selectedRoot.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+
+                DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) selectedRoot.getChildAt(i);
+                I_ExtendByRef childClause = (I_ExtendByRef) childNode.getUserObject();
+                List<? extends I_ExtendByRefVersion> childExtensions =
+                        childClause.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
+                            aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                if (childExtensions.size() > 0) {
+                    I_ExtendByRefVersion thinPart = childExtensions.get(0);
+                    retireClause(thinPart);
+                }
+
+                retireAllDescendants(childNode);
+            }
+        }
+
         private void retireClause(I_ExtendByRefVersion currentExtVersion) throws Exception {
             I_ExtendByRefPart currentPart = currentExtVersion.getMutablePart();
             I_ExtendByRefPart newPart =
-                    (I_ExtendByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize()
-                        .getNid(), currentPart.getPathId(), Long.MAX_VALUE);
+                    (I_ExtendByRefPart) currentPart.makeAnalog(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                        currentPart.getPathNid(), Long.MAX_VALUE);
             currentExtVersion.getCore().addVersion(newPart);
 
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
@@ -574,6 +572,95 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
 
         public void actionPerformed(ActionEvent arg0) {
+            try {
+                Collection<? extends I_ExtendByRef> extensions =
+                        Terms.get()
+                            .getAllExtensionsForComponent(aceConfig.getRefsetSpecInSpecEditor().getConceptNid(), true);
+
+                HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+                HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+                fetchedComponents.add(aceConfig.getRefsetSpecInSpecEditor().getConceptNid());
+
+                addExtensionsToMap(extensions, extensionMap, fetchedComponents, aceConfig.getRefsetSpecInSpecEditor()
+                    .getConceptNid());
+
+                DefaultMutableTreeNode selectedRoot = new DefaultMutableTreeNode(specPart);
+                DefaultMutableTreeNode specRoot = new DefaultMutableTreeNode(specPart);
+                extensionMap.put(aceConfig.getRefsetSpecInSpecEditor().getConceptNid(), specRoot);
+
+                for (DefaultMutableTreeNode extNode : extensionMap.values()) {
+                    I_ExtendByRef ext = (I_ExtendByRef) extNode.getUserObject();
+                    if (ext.getComponentNid() == specPart.getMemberId()) {
+                        selectedRoot.add(extNode);
+                    } else if (ext.getComponentNid() == aceConfig.getRefsetSpecInSpecEditor().getConceptNid()) {
+                        // do nothing
+                    } else {
+                        extensionMap.get(ext.getComponentNid()).add(extNode);
+                    }
+                }
+
+                int childCount = selectedRoot.getChildCount();
+                if (childCount > 0) {
+                    // display dialog that alerts the user that there are children clauses which need to be retired
+
+                    Object[] options = { "Cancel all", "Cancel" };
+                    int n =
+                            JOptionPane.showOptionDialog(OpenFrames.getActiveFrame(),
+                                "The selected clause has child-clauses. How would you like to proceed?",
+                                "Multiple clause cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                                options, options[0]);
+                    if (n == JOptionPane.YES_OPTION) {
+                        try {
+                            // cancel all children as well as the selected/current clause
+                            forgetClause(specPart);
+
+                            forgetAllDescendants(selectedRoot);
+
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    } else if (n == JOptionPane.NO_OPTION) {
+                        return; // user has opted to cancel
+                    }
+
+                } else {
+                    // cancel only the clause as it has no children to deal with
+                    forgetClause(specPart);
+                }
+
+                specEditor.updateSpecTree(false);
+                aceConfig.refreshRefsetTab();
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            } catch (TerminologyException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+        }
+
+        private void forgetAllDescendants(DefaultMutableTreeNode selectedRoot) throws Exception {
+            int childCount = selectedRoot.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+
+                DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) selectedRoot.getChildAt(i);
+                I_ExtendByRef childClause = (I_ExtendByRef) childNode.getUserObject();
+                List<? extends I_ExtendByRefVersion> childExtensions =
+                        childClause.getTuples(aceConfig.getAllowedStatus(), aceConfig.getViewPositionSetReadOnly(),
+                            aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+                if (childExtensions.size() > 0) {
+                    I_ExtendByRef thinPart = childExtensions.get(0).getCore();
+                    forgetClause(thinPart);
+                }
+
+                forgetAllDescendants(childNode);
+            }
+        }
+
+        private void forgetClause(I_ExtendByRef specPart) throws Exception {
             specPart.cancel();
             try {
                 if (specPart.isUncommitted()) {
@@ -591,8 +678,6 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-            specEditor.updateSpecTree(false);
-            aceConfig.refreshRefsetTab();
         }
     }
 
@@ -608,7 +693,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
             I_ExtendByRefPart current = thinExtByRefTuple.getMutablePart();
             I_ExtendByRefPart newPart =
-                    (I_ExtendByRefPart) current.makeAnalog(current.getStatusId(), current.getPathId(), Long.MAX_VALUE);
+                    (I_ExtendByRefPart) current.makeAnalog(current.getStatusNid(), current.getPathNid(), Long.MAX_VALUE);
 
             thinExtByRefTuple.getCore().addVersion(newPart);
             Terms.get().addUncommitted(thinExtByRefTuple.getCore());

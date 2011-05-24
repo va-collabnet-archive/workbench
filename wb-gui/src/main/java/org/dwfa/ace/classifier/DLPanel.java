@@ -348,7 +348,7 @@ public class DLPanel extends JPanel {
         tc = table.getColumnModel().getColumn(0);
         tc.setCellRenderer(new Renderer_SnoDL());
 
-        // :!!!:NYI: DL, KRSS ComboBox
+        // :NYI: DL, KRSS ComboBox
         if (true) {
             TableColumn_SelectSyntax col;
             String[] items = {
@@ -547,7 +547,7 @@ public class DLPanel extends JPanel {
     }
 
     private class Listener_BtnAdd_DLLhs implements ActionListener {
-        private I_ConfigAceFrame config; // :!!!:
+        private I_ConfigAceFrame config;
 
         public Listener_BtnAdd_DLLhs(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
@@ -578,7 +578,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptNid();
-                int isRole = SnoTable.testIsRole(cNid);
+                int isRole = SnoTable.testIsRole(cNid, true);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
                             "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
@@ -597,7 +597,7 @@ public class DLPanel extends JPanel {
     }
 
     private class Listener_BtnAdd_DLList implements ActionListener {
-        private I_ConfigAceFrame config; // :!!!:
+        private I_ConfigAceFrame config;
 
         public Listener_BtnAdd_DLList(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
             super();
@@ -623,7 +623,7 @@ public class DLPanel extends JPanel {
             int cNid = Integer.MAX_VALUE;
             if (config.getHierarchySelection() != null) {
                 cNid = config.getHierarchySelection().getConceptNid();
-                int isRole = SnoTable.testIsRole(cNid);
+                int isRole = SnoTable.testIsRole(cNid, true);
                 if (isRole == 1) {
                     AceLog.getAppLog().log(Level.INFO,
                             "::: TAXONOMY NEW DL RHS: " + SnoTable.toString(cNid));
@@ -644,7 +644,7 @@ public class DLPanel extends JPanel {
     }
 
     private class Listener_BtnAdd_NeverGrp implements ActionListener {
-        private I_ConfigAceFrame config; // :!!!:
+        private I_ConfigAceFrame config;
 
         public Listener_BtnAdd_NeverGrp(I_ContainTermComponent termContainer,
                 I_ConfigAceFrame config) {
@@ -663,7 +663,7 @@ public class DLPanel extends JPanel {
                 int cNid = Integer.MAX_VALUE;
                 if (config.getHierarchySelection() != null) {
                     cNid = config.getHierarchySelection().getConceptNid();
-                    int isRole = SnoTable.testIsRole(cNid);
+                    int isRole = SnoTable.testIsRole(cNid, true);
                     if (isRole == 1) {
                         AceLog.getAppLog().log(Level.INFO,
                                 "::: TAXONOMY - NEVER GROUPED: " + SnoTable.toString(cNid));

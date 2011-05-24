@@ -12,7 +12,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 public class IntSetBinder extends TupleBinding<Set<Integer>> {
 
 	@Override
-	public Set<Integer> entryToObject(TupleInput input) {
+	public ConcurrentSkipListSet<Integer> entryToObject(TupleInput input) {
 		int size = input.readInt();
 		List<Integer> setValues = new ArrayList<Integer>(size);
 		for (int i = 0; i < size; i++) {

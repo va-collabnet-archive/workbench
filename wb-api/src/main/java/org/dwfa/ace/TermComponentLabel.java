@@ -39,6 +39,8 @@ import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -70,6 +72,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
@@ -78,56 +81,57 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     public class CommitListener implements PropertyChangeListener {
 
-		@Override
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (termComponent != null && 
-					I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-				try {
-					I_GetConceptData igcd = (I_GetConceptData) termComponent;
-					if (igcd.isCanceled()) {
-						setTermComponent(null);
-					}
-				} catch (IOException e) {
-					AceLog.getAppLog().alertAndLogException(e);
-				}
-			}
- 		}
-
-	}
-
-	private I_AmTermComponent termComponent;
-
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (termComponent != null
+                    && I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+                try {
+                    I_GetConceptData igcd = (I_GetConceptData) termComponent;
+                    if (igcd.isCanceled()) {
+                        setTermComponent(null);
+                    }
+                } catch (IOException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }
+        }
+    }
+    private I_AmTermComponent termComponent;
     private I_ConfigAceFrame config;
-    
     private boolean lineWrapEnabled = false;
     private int fixedWidth = 150;
 
     public boolean isLineWrapEnabled() {
-		return lineWrapEnabled;
-	}
+        return lineWrapEnabled;
+    }
 
-	public void setLineWrapEnabled(boolean lineWrapEnabled) {
-		this.lineWrapEnabled = lineWrapEnabled;
-	}
+    public void setLineWrapEnabled(boolean lineWrapEnabled) {
+        this.lineWrapEnabled = lineWrapEnabled;
+    }
 
-	private class TermLabelDragSourceListener implements DragSourceListener {
+    private class TermLabelDragSourceListener implements DragSourceListener {
 
+        @Override
         public void dragDropEnd(DragSourceDropEvent dsde) {
             // TODO Auto-generated method stub
         }
 
+        @Override
         public void dragEnter(DragSourceDragEvent dsde) {
             // TODO Auto-generated method stub
         }
 
+        @Override
         public void dragExit(DragSourceEvent dse) {
             // TODO Auto-generated method stub
         }
 
+        @Override
         public void dragOver(DragSourceDragEvent dsde) {
             // TODO Auto-generated method stub
         }
 
+        @Override
         public void dropActionChanged(DragSourceDragEvent dsde) {
             // TODO Auto-generated method stub
         }
@@ -140,6 +144,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
          */
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             setTermComponent(null);
         }
@@ -152,13 +157,13 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
          */
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringBuffer buff = new StringBuffer();
                 buff.append("<concept>\n");
                 if (getTermComponent() == null) {
-
                 } else {
                     I_TermFactory tf = Terms.get();
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
@@ -169,13 +174,13 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     buff.append("  </concept-ids>\n");
                     buff.append("  <descriptions>\n");
                     for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
-                        config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
+                            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
                         buff.append("    <description type='");
                         I_GetConceptData type = tf.getConcept(dt.getTypeNid());
 
                         I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
-                            config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                            config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
+                                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
                         buff.append(typeDesc.getText());
                         buff.append("'\n                 text='");
                         buff.append(dt.getText());
@@ -206,8 +211,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 throw new IOException(e);
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                    config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
+                    config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
             buff.append(idt.getDenotation().toString());
@@ -222,12 +227,12 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
          */
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 StringBuffer buff = new StringBuffer();
                 if (getTermComponent() == null) {
-
                 } else {
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("cid source\tcid\tdesc\n");
@@ -252,14 +257,49 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 throw new IOException(e);
             }
             I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                    config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
+                    config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("\t");
             buff.append(idt.getDenotation().toString());
             buff.append("\t");
             buff.append(text);
             buff.append("\n");
+        }
+    }
+
+    private class CopySctId extends AbstractAction {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                StringBuffer buff = new StringBuffer();
+                if (getTermComponent() == null) {
+                } else {
+                    I_GetConceptData concept = (I_GetConceptData) getTermComponent();
+                    for (I_IdVersion idv : concept.getIdentifier().getIdVersions()) {
+                        if (idv.getAuthorityNid()
+                                == ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid()) {
+                            writeIdentifiersToBuff(buff, idv);
+                        }
+                    }
+                }
+                StringSelection transferable = new StringSelection(buff.toString());
+
+                clipboard.setContents(transferable, TermComponentLabel.this);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+
+        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt) throws IOException {
+            buff.append(idt.getDenotation().toString());
         }
     }
 
@@ -272,27 +312,46 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             this.dsl = dsl;
         }
 
+        @Override
         public void dragGestureRecognized(DragGestureEvent dge) {
-        	if (termComponent == null) {
-        		return;
-        	}
+            if (termComponent == null) {
+                return;
+            }
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
             try {
-				dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
-				    (I_GetConceptData) termComponent), dsl);
-			} catch (InvalidDnDOperationException e) {
+                dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+                        (I_GetConceptData) termComponent), dsl);
+            } catch (InvalidDnDOperationException e) {
                 AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
                 AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [1]");
                 SunDragSourceContextPeer.setDragDropInProgress(false);
-			}
+            }
         }
     }
 
+    private class LabelHierarchyListener implements HierarchyListener {
+
+        @Override
+        public void hierarchyChanged(HierarchyEvent e) {
+            long flags = e.getChangeFlags();
+            boolean displayability = (flags & HierarchyEvent.DISPLAYABILITY_CHANGED) != 0;
+            boolean showing = (flags & HierarchyEvent.SHOWING_CHANGED) != 0;
+            if (displayability || showing) {
+                if (e.getChanged().isShowing()) {
+                    TermComponentLabel.this.config.addPropertyChangeListener("commit", commitListener);
+                } else {
+                    TermComponentLabel.this.config.removePropertyChangeListener("commit", commitListener);
+                }
+            }
+        }
+    }
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    CommitListener commitListener = new CommitListener();
 
     public TermComponentLabel() throws TerminologyException, IOException {
         this(Terms.get().getActiveAceFrameConfig());
@@ -300,28 +359,32 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     public TermComponentLabel(I_ConfigAceFrame config) {
         super("<html><font color=red>Empty");
+        this.setHorizontalAlignment(LEFT);
+        this.setVerticalAlignment(TOP);
         this.config = config;
         addFocusListener(this);
-        this.config.addPropertyChangeListener("commit", new CommitListener());
         setTransferHandler(Terms.get().makeTerminologyTransferHandler(this));
-        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
-            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
+        DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this,
+                DnDConstants.ACTION_COPY,
+                new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
         setFocusable(true);
         setEnabled(true);
         
-        
+        this.addHierarchyListener(new LabelHierarchyListener());
+
 
         this.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 requestFocusInWindow();
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 requestFocusInWindow();
             }
-
         });
 
         ActionMap map = this.getActionMap();
@@ -333,17 +396,18 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         map.put("deleteTask", new DeleteAction());
         map.put("Copy TDT", new CopyTDT());
         map.put("Copy XML", new CopyXML());
+        map.put("Copy SCT ID", new CopySctId());
         setBorder(noFocusBorder);
     }
-
     private static final Border hasFocusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
-
     private static final Border noFocusBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
 
+    @Override
     public void focusGained(FocusEvent e) {
         setBorder(hasFocusBorder);
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
         setBorder(noFocusBorder);
     }
@@ -353,42 +417,42 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
      * 
      * @see org.dwfa.ace.I_ContainTermComponent#getTermComponent()
      */
+    @Override
     public I_AmTermComponent getTermComponent() {
         return termComponent;
     }
-
     private boolean frozen = false;
-
-	private Dimension wrapSize = new Dimension(fixedWidth, 16);
+    private Dimension wrapSize = new Dimension(fixedWidth, 16);
 
     public int getFixedWidth() {
-		return fixedWidth;
-	}
+        return fixedWidth;
+    }
 
-	public void setFixedWidth(int fixedWidth) {
-		this.fixedWidth = fixedWidth;
-	}
+    public void setFixedWidth(int fixedWidth) {
+        this.fixedWidth = fixedWidth;
+    }
 
-	/*
+    /*
      * (non-Javadoc)
      * 
      * @see
      * org.dwfa.ace.I_ContainTermComponent#setTermComponent(org.dwfa.vodb.types
      * .I_AmTermComponent)
      */
+    @Override
     public void setTermComponent(I_AmTermComponent termComponent) {
         if (isFrozen()) {
             return;
         }
-        if (termComponent != null && 
-        		I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
+        if (termComponent != null
+                && I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
             try {
-				if (((I_GetConceptData) termComponent).isCanceled()) {
-					termComponent = null;
-				}
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
+                if (((I_GetConceptData) termComponent).isCanceled()) {
+                    termComponent = null;
+                }
+            } catch (IOException e) {
+                AceLog.getAppLog().alertAndLogException(e);
+            }
         }
         Object old = this.termComponent;
         this.termComponent = termComponent;
@@ -421,88 +485,109 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         }
     }
 
-	@Override
-	public void setText(String text) {
+    @Override
+    public void setText(String text) {
         setBorder(noFocusBorder);
-		if (lineWrapEnabled) {
-			if (!BasicHTML.isHTMLString(text)) {
-				text = "<html>" + text;
-			}
-	    	super.setText(text);
-	        View v = BasicHTML.createHTMLView(this, getText());
-	        v.setSize(fixedWidth, 0);
-	        float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
-	        if (prefYSpan > 16) {
-	        	wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
-	        	setSize(wrapSize);
-	        } else {
-	        	wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
-	        	setSize(wrapSize);
-	        }
-		} else {
-			super.setText(text);
-		}
-	}
+        if (lineWrapEnabled) {
+            if (!BasicHTML.isHTMLString(text)) {
+                text = "<html>" + text;
+            }
+            super.setText(text);
+            View v = BasicHTML.createHTMLView(this, getText());
+            v.setSize(fixedWidth, 0);
+            float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+            if (prefYSpan > 16) {
+                wrapSize = new Dimension(getWidth(), (int) (prefYSpan + 4));
+                setSize(wrapSize);
+            } else {
+                wrapSize = new Dimension(getWidth(), (int) prefYSpan);
+                setSize(wrapSize);
+            }
+        } else {
+            super.setText(text);
+        }
+    }
 
     @Override
-	public void setSize(Dimension d) {
-		if (lineWrapEnabled) {
-			super.setSize(wrapSize);
-		} else {
-			super.setSize(d);
-		}
-	}
+    public void setSize(Dimension d) {
+        if (lineWrapEnabled) {
+            if (d.height < wrapSize.height) {
+                d.height = wrapSize.height;
+            }
+            if (d.width < wrapSize.width) {
+                d.width = wrapSize.width;
+            }
+            super.setSize(d);
+        } else {
+            super.setSize(d);
+        }
+    }
 
-	@Override
-	public void setSize(int width, int height) {
-		if (lineWrapEnabled) {
-			super.setSize(wrapSize.width, wrapSize.height);
-		} else {
-			super.setSize(width, height);
-		}
-	}
+    @Override
+    public void setSize(int width, int height) {
+        if (lineWrapEnabled) {
+            if (height < wrapSize.height) {
+                height = wrapSize.height;
+            }
+            if (width < wrapSize.width) {
+                width = wrapSize.width;
+            }
+            super.setSize(width, height);
+        } else {
+            super.setSize(width, height);
+        }
+    }
 
-	
-	@Override
-	public void setBounds(int x, int y, int width, int height) {
-		if (lineWrapEnabled) {
-			super.setBounds(x, y, wrapSize.width, wrapSize.height);
-		} else {
-			super.setBounds(x, y, width, height);
-		}
-	}
+    @Override
+    public void setBounds(int x, int y, int width, int height) {
+        if (lineWrapEnabled) {
+            if (height < wrapSize.height) {
+                height = wrapSize.height;
+            }
+            if (width < wrapSize.width) {
+                width = wrapSize.width;
+            }
+            super.setBounds(x, y, width, height);
+        } else {
+            super.setBounds(x, y, width, height);
+        }
+    }
 
-	@Override
-	public void setBounds(Rectangle r) {
-		setBounds(r.x, r.y, r.width, r.height);
-	}
+    @Override
+    public void setBounds(Rectangle r) {
+        if (lineWrapEnabled) {
+            if (r.height < wrapSize.height) {
+                r.height = wrapSize.height;
+            }
+            if (r.width < wrapSize.width) {
+                r.width = wrapSize.width;
+            }
+            setBounds(r.x, r.y, r.width, r.height);
+        } else {
+            setBounds(r.x, r.y, r.width, r.height);
+        }
 
-	@Override
-	public Dimension getMaximumSize() {
-		if (lineWrapEnabled)
-			return wrapSize;
-		return super.getMaximumSize();
-	}
+    }
 
-	@Override
-	public Dimension getMinimumSize() {
-		if (lineWrapEnabled)
-			return wrapSize;
-		return super.getMinimumSize();
-	}
+    @Override
+    public Dimension getMaximumSize() {
+        return super.getMaximumSize();
+    }
 
-	@Override
-	public Dimension getPreferredSize() {
-		if (lineWrapEnabled)
-			return wrapSize;
-		return super.getPreferredSize();
-	}
+    @Override
+    public Dimension getMinimumSize() {
+        if (lineWrapEnabled) {
+            return wrapSize;
+        }
+        return super.getMinimumSize();
+    }
 
-	
-	
-	
+    @Override
+    public Dimension getPreferredSize() {
+        return super.getPreferredSize();
+    }
 
-	public void addTermChangeListener(PropertyChangeListener l) {
+    public void addTermChangeListener(PropertyChangeListener l) {
         addPropertyChangeListener("termComponent", l);
     }
 
@@ -510,6 +595,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         removePropertyChangeListener("termComponent", l);
     }
 
+    @Override
     public I_ConfigAceFrame getConfig() {
         throw new UnsupportedOperationException();
     }
@@ -528,6 +614,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         return dragImage;
     }
 
+    @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
         // Nothing to do...
     }
@@ -541,9 +628,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         getDropTarget().setActive(!frozen);
     }
 
-	@Override
-	public void unlink() {
-		// nothing to do...
-	}
-
+    @Override
+    public void unlink() {
+        // nothing to do...
+    }
 }

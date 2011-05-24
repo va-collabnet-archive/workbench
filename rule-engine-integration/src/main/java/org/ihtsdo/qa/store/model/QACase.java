@@ -1,5 +1,6 @@
 package org.ihtsdo.qa.store.model;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -12,13 +13,31 @@ public class QACase extends ViewPointSpecificObject {
 	private boolean isActive;
 	private UUID dispositionStatusUuid;
 	private UUID dispositionReasonUuid;
-	private Date dispositionStatusDate;
+	private Calendar dispositionStatusDate;
 	private String dispositionStatusEditor;
 	private String dispositionAnnotation;
 	private String detail;
 	private String assignedTo;
-	private Date effectiveTime;
-	private List<String> comments;
+	private String assignmentEditor;
+	private Calendar assignmentDate;
+	private Calendar effectiveTime;
+	private List<QaCaseComment> comments;
+
+	public String getAssignmentEditor() {
+		return assignmentEditor;
+	}
+
+	public void setAssignmentEditor(String assignmentEditor) {
+		this.assignmentEditor = assignmentEditor;
+	}
+
+	public Calendar getAssignmentDate() {
+		return assignmentDate;
+	}
+
+	public void setAssignmentDate(Calendar assignmentDate) {
+		this.assignmentDate = assignmentDate;
+	}
 
 	public QACase() {
 	}
@@ -71,11 +90,11 @@ public class QACase extends ViewPointSpecificObject {
 		this.dispositionReasonUuid = dispositionReasonUuid;
 	}
 
-	public Date getDispositionStatusDate() {
+	public Calendar getDispositionStatusDate() {
 		return dispositionStatusDate;
 	}
 
-	public void setDispositionStatusDate(Date dispositionStatusDate) {
+	public void setDispositionStatusDate(Calendar dispositionStatusDate) {
 		this.dispositionStatusDate = dispositionStatusDate;
 	}
 
@@ -111,19 +130,19 @@ public class QACase extends ViewPointSpecificObject {
 		this.assignedTo = assignedTo;
 	}
 
-	public Date getEffectiveTime() {
+	public Calendar getEffectiveTime() {
 		return effectiveTime;
 	}
 
-	public void setEffectiveTime(Date effectiveTime) {
+	public void setEffectiveTime(Calendar effectiveTime) {
 		this.effectiveTime = effectiveTime;
 	}
 
-	public List<String> getComments() {
+	public List<QaCaseComment> getComments() {
 		return comments;
 	}
 
-	public void setComments(List<String> comments) {
+	public void setComments(List<QaCaseComment> comments) {
 		this.comments = comments;
 	}
 

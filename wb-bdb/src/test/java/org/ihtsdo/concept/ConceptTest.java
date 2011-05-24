@@ -305,7 +305,7 @@ public class ConceptTest {
         img.setAdditionalIdComponents(null);
         img.setConceptUuid(new UUID(120, 130)); 
         img.setFormat("jpg");
-        img.setImage(new byte[] { 0, 2, 3, 4, 5, 6, 7, 8, 9 });
+        img.setDataBytes(new byte[] { 0, 2, 3, 4, 5, 6, 7, 8, 9 });
         img.setPathUuid(new UUID(450, 569));
         img.setPrimordialComponentUuid(new UUID(206, 305));
         img.setStatusUuid(new UUID(868, 977));
@@ -468,7 +468,7 @@ public class ConceptTest {
         img.setAdditionalIdComponents(null);
         img.setConceptUuid(new UUID(70, 70)); 
         img.setFormat("png");
-        img.setImage(new byte[] { 0, 2, 3, 4, 5, 6, 7, 8, 9 });
+        img.setDataBytes(new byte[] { 0, 2, 3, 4, 5, 6, 7, 8, 9 });
         img.setPathUuid(new UUID(71, 71));
         img.setPrimordialComponentUuid(new UUID(72, 72));
         img.setStatusUuid(new UUID(73, 73));
