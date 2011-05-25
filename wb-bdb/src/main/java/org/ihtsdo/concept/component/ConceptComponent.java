@@ -453,8 +453,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public boolean sapIsInRange(int min, int max) {
             if (index >= 0) {
-                return revisions.get(index).sapNid >= min
-                        && revisions.get(index).sapNid <= max;
+                CopyOnWriteArrayList<R> localRevisions = revisions;
+                if (localRevisions != null && index < localRevisions.size()) {
+                    return revisions.get(index).sapNid >= min
+                            && revisions.get(index).sapNid <= max;
+                }
+                return false;
             }
             return ConceptComponent.this.sapIsInRange(min, max);
         }
@@ -844,13 +848,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public CopyOnWriteArrayList<R> revisions;
     protected ArrayList<IdentifierVersion> additionalIdVersions;
     private ArrayList<IdVersion> idVersions;
-    public ConcurrentSkipListSet<RefsetMember<?,?>> annotations;
+    public ConcurrentSkipListSet<RefsetMember<?, ?>> annotations;
 
     @SuppressWarnings("rawtypes")
     @Override
     public boolean addAnnotation(RefexChronicleBI annotation) {
         if (annotations == null) {
-            annotations = new ConcurrentSkipListSet<RefsetMember<?,?>>(
+            annotations = new ConcurrentSkipListSet<RefsetMember<?, ?>>(
                     new Comparator<RefexChronicleBI>() {
 
                         @Override
@@ -860,7 +864,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     });
         }
         modified();
-        return annotations.add((RefsetMember<?,?>) annotation);
+        return annotations.add((RefsetMember<?, ?>) annotation);
     }
 
     @Override
@@ -1014,13 +1018,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return sapMap;
     }
-    
+
     public static boolean isCanceled(TupleInput input) {
         int nid = input.readInt();
         int primordialSapNid = input.readInt();
         return primordialSapNid == -1;
     }
-
 
     protected ConceptComponent(int enclosingConceptNid, TupleInput input) throws IOException {
         super();
@@ -1046,7 +1049,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         if (eComponent.getAnnotations() != null) {
-            this.annotations = new ConcurrentSkipListSet<RefsetMember<?,?>>();
+            this.annotations = new ConcurrentSkipListSet<RefsetMember<?, ?>>();
             for (TkRefsetAbstractMember<?> eAnnot : eComponent.getAnnotations()) {
                 RefsetMember<?, ?> annot = RefsetMemberFactory.create(
                         eAnnot, enclosingConceptNid);
@@ -1058,29 +1061,29 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public ConceptComponent() {
         Bdb.gVersion.incrementAndGet();
     }
-    
+
     public final boolean readyToWrite() {
         assert nid != Integer.MAX_VALUE : assertionString();
         assert nid != 0 : assertionString();
         assert readyToWriteComponent();
         if (revisions != null) {
-            for (R r: revisions) {
+            for (R r : revisions) {
                 assert r.readyToWrite();
             }
         }
         if (annotations != null) {
-            for (RefsetMember<?,?> m: annotations) {
+            for (RefsetMember<?, ?> m : annotations) {
                 assert m.readyToWrite();
             }
         }
         if (additionalIdVersions != null) {
-            for (IdentifierVersion idv: additionalIdVersions) {
+            for (IdentifierVersion idv : additionalIdVersions) {
                 assert idv.readyToWrite();
             }
         }
         return true;
     }
-    
+
     public abstract boolean readyToWriteComponent();
 
     public ConceptComponent<R, C> merge(C another) throws IOException {
@@ -2177,7 +2180,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return false;
     }
-    
+
     protected String assertionString() {
         try {
             return Ts.get().getConcept(enclosingConceptNid).toLongString();
