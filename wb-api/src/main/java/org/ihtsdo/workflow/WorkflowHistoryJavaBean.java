@@ -9,6 +9,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.hash.Hashcode;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
 
@@ -209,4 +210,23 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
         								  memberId, autoHashCode, overHashCode});
     }
 
+	@Override
+	public String getModelerForTitleBar() throws IOException{
+		try { 
+			return WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getModeler()));
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+	}
+
+	@Override
+	public String getStateForTitleBar() throws IOException{
+		try {
+			String term = WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getState()));
+			
+			return WorkflowHelper.shrinkTermForDisplay(term);
+		} catch (Exception e) {
+			throw new IOException(e);
+		}
+	}
 }

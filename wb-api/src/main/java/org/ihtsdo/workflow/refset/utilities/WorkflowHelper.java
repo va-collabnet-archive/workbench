@@ -1023,4 +1023,31 @@ public class WorkflowHelper {
 		}
 		return retSet;
 	}
+
+	public static String getPreferredTerm(I_GetConceptData con) throws IOException, TerminologyException {
+		for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+		    for (I_DescriptionTuple p: descv.getTuples()) {
+				if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
+					p.getLang().equalsIgnoreCase("en"))
+					return p.getText();
+		    }
+		}
+		
+		return "Unidentifiable";
+	}
+
+	public static String shrinkTermForDisplay(String term) {
+		StringBuffer retBuf = new StringBuffer();
+		
+		String words[] = term.split(" ");
+		for (int i = 0; i < words.length; i++) {
+			if (words[i].equalsIgnoreCase("workflow")) {
+				return retBuf.toString().trim();
+			} else {
+				retBuf.append(words[i] + " ");
+			}
+		}
+		
+		return "Unidentifiable";
+	}
 }

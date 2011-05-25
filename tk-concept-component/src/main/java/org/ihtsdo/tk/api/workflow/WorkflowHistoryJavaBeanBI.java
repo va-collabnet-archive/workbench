@@ -1,5 +1,6 @@
 package org.ihtsdo.tk.api.workflow;
 
+import java.io.IOException;
 import java.util.UUID;
 
 
@@ -29,6 +30,9 @@ public interface WorkflowHistoryJavaBeanBI {
 	public boolean getAutoApproved();
 	public boolean getOverridden();
 	public int getRxMemberId();
+	
+	public String getStateForTitleBar() throws IOException;
+	public String getModelerForTitleBar() throws IOException;
 	
 	public String toString();
 }

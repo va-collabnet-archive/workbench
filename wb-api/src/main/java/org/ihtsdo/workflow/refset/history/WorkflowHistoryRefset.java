@@ -143,16 +143,12 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 	}
 
 	private static String processMetaForDisplay(I_GetConceptData metaCon) throws IOException {
-		String[] metaStr = metaCon.getInitialText().split(" ");
-		StringBuffer strBuf = new StringBuffer();
-		
-		for (int i = 0; i < metaStr.length; i++) {
-			if (!metaStr[i].equalsIgnoreCase("Workflow"))
-				strBuf.append(metaStr[i]);
-			else
-				break;
+		try {
+			String term = WorkflowHelper.getPreferredTerm(metaCon);
+			
+			return WorkflowHelper.shrinkTermForDisplay(term);
+		} catch (Exception e) {
+			throw new IOException(e);
 		}
-
-		return strBuf.toString();
 	}
 }
