@@ -1,16 +1,17 @@
 package org.ihtsdo.mojo.econcept;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -114,7 +115,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     
     private final int numberOfColumns = timeStampPosition + 1;				// 10
 
-	private Scanner textScanner = null;
+	private BufferedReader inputFile = null;
 	private List<TkRefsetAbstractMember<?>> memberList = null;
 	private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -132,19 +133,22 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 		getLog().info("Exporting workflow history");
 
-        try
+    	int counter = 0;
+    	String currentRow = "";
+
+    	try
         {
-			// Initialize Loop
-        	//openAndInitializeReadOnlyWfHxDatabase();
-        	initializeExport();
-        	EConcept econcept = initializeEConcept();
+        	// Initialize Loop
+	    	initializeExport();
+	    	EConcept econcept = initializeEConcept(); 
 			
 			// Read Each Line of txt file
-        	int counter = 0;
-        	System.out.print("\n\n1-");
-			while (textScanner.hasNext())
+	    	System.out.print("\n\n1-");
+	    	
+	    	while ((currentRow = inputFile.readLine()) != null)
 			{
-				row = ((String)textScanner.nextLine()).split("\t");
+				row = currentRow.split("\t");
+
 				TkRefsetStrMember member = createTkMember(row);
 				
 				if (++counter % 100 == 0) {
@@ -156,19 +160,17 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 				}
 				memberList.add(member);
 				conceptCounter++;
-			}
+			} 
+				
 			System.out.print("\n\n");
-			
-			// Finalize
-			econcept.setRefsetMembers(memberList);
-			econcept.writeExternal(eConceptDOS);
-			eConceptDOS.close();
-	        //Terms.get().close();
 
+	        econcept.setRefsetMembers(memberList);
+	    	econcept.writeExternal(eConceptDOS);
+	    	eConceptDOS.close();
         } catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, row.toString() + " with error: " + e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Failure to import: " + currentRow + " at row# " + counter + "\nwith error: " + e.getMessage());
         }
-    }
+	}
 
 	private void initializeExport() throws IOException, TerminologyException
 	{
@@ -178,7 +180,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
         // Open Input File
         File txtFile = getInputTextFile();
-        textScanner = new Scanner(txtFile);
+        inputFile =  new BufferedReader(new FileReader(txtFile));    	
 	}
 
 	private void initializeOutputFile() throws FileNotFoundException {
@@ -194,7 +196,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 	private EConcept initializeEConcept() throws TerminologyException, IOException, ParseException
 	{
-		String[] row = ((String)textScanner.nextLine()).split("\t");
+		String[] row = ((String)inputFile.readLine()).split("\t");
 
 		//I_GetConceptData con = Terms.get().getConcept();
 		//EConcept eC = new EConcept(con);
