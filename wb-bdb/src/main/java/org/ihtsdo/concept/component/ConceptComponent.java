@@ -1910,6 +1910,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public void cancel() {
+        clearVersions();
         if (this.getTime() == Long.MAX_VALUE) {
             this.primordialSapNid = -1;
         }
@@ -1940,7 +1941,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     revisions.remove(r);
                 }
             }
-            clearVersions();
         }
 
         if (annotations != null) {
@@ -1964,7 +1964,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     annotations.remove((RefsetMember<?, ?>) r);
                 }
             }
-            clearVersions();
         }
     }
 
