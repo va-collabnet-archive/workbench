@@ -3,12 +3,18 @@ package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
 
@@ -106,5 +112,47 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		} catch (IndexOutOfBoundsException ioob) {
 			return false;
 		}
+	}
+	
+	public static String generateXmlForXslt(WorkflowHistoryJavaBean bean) {
+		StringBuffer retStr = new StringBuffer();
+		
+		try { 
+			retStr.append("<workflow>");
+			retStr.append("<id>");
+			retStr.append(bean.getWorkflowId().toString());
+			retStr.append("</id>");
+			retStr.append("<action>");
+			retStr.append(processMetaForDisplay(Terms.get().getConcept(bean.getAction())));
+			retStr.append("</action>");
+			retStr.append("<state>");
+			retStr.append(processMetaForDisplay(Terms.get().getConcept(bean.getState())));
+			retStr.append("</state>");
+			retStr.append("<modeler>");
+			retStr.append(Terms.get().getConcept(bean.getModeler()).getInitialText());
+			retStr.append("</modeler>");
+			retStr.append("<time>");
+			retStr.append(WorkflowHelper.format.format(new Date(bean.getWorkflowTime())));
+			retStr.append("</time>");
+			retStr.append("</workflow>");
+		} catch (Exception e) { 
+			AceLog.getAppLog().log(Level.WARNING, "Unable to get process row for Xslt for bean: " + bean.toString() + " with error: " + e.getMessage());
+		}
+		
+		return retStr.toString();
+	}
+
+	private static String processMetaForDisplay(I_GetConceptData metaCon) throws IOException {
+		String[] metaStr = metaCon.getInitialText().split(" ");
+		StringBuffer strBuf = new StringBuffer();
+		
+		for (int i = 0; i < metaStr.length; i++) {
+			if (!metaStr[i].equalsIgnoreCase("Workflow"))
+				strBuf.append(metaStr[i]);
+			else
+				break;
+		}
+
+		return strBuf.toString();
 	}
 }

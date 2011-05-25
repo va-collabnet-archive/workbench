@@ -1000,4 +1000,27 @@ public class WorkflowHelper {
 		
 		return semTag;
 	}
+
+	public static TreeSet<WorkflowHistoryJavaBean> getAllWorkflowHistory(I_GetConceptData concept) {
+		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
+		
+		try {
+			List<? extends I_ExtendByRef> members = 
+					Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), 
+																concept.getConceptNid());
+			
+			for (I_ExtendByRef row : members) {
+				int idx = row.getTuples().size() - 1;
+	
+				if (idx >= 0) {
+					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+						retSet.add(WorkflowHelper.createWfHxJavaBean(row));
+					}
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Cannot access Workflow History Refset members with error: " + e.getMessage());
+		}
+		return retSet;
+	}
 }

@@ -1,6 +1,5 @@
 package org.ihtsdo.workflow.refset.utilities;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -41,11 +40,14 @@ public class WfComparator
 		return new WfHxJavaBeanComparer();
 	}
 
-	public Comparator<I_GetConceptData> createWfHxConceptComparer() {
-		return new WfComparator.WfHxConceptComparer();
+	public Comparator<WorkflowHistoryJavaBean> createWfHxLatestFirstTimeComparer() {
+		return new WfHxLatestFirstTimeComparer();
 	}
 
-	
+	public Comparator<WorkflowHistoryJavaBean> createWfHxEarliestFirstTimeComparer() {
+		return new WfHxEarliestFirstTimeComparer();
+	}
+
 	
 	private class WorkflowFsnComparator implements Comparator<I_GetConceptData> { 
 		public int compare(I_GetConceptData a, I_GetConceptData b) {
@@ -65,43 +67,23 @@ public class WfComparator
 		}
 	}
 
-	private class WfHxConceptComparer implements Comparator<I_GetConceptData> {
+	private class WfHxEarliestFirstTimeComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
-		public int compare(I_GetConceptData o1, I_GetConceptData o2) {
-			try {
-				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
-			} catch (IOException e) {
-				AceLog.getAppLog().log(Level.WARNING, "Failure in Compare Routine", e);
-			}
-			return -1;
+		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
+			return o1.getWorkflowTime().compareTo(o2.getWorkflowTime());
 		}
 	}
 
-	public Comparator<WorkflowHistoryJavaBean> createWfHxFsnJavaBeanComparer() {
-		return new WfHxFsnJavaBeanComparer();
+	private class WfHxLatestFirstTimeComparer implements Comparator<WorkflowHistoryJavaBean> {
+		@Override
+		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
+			// Reverse List
+			return o2.getWorkflowTime().compareTo(o1.getWorkflowTime());
+		}
 	}
 
 	public  Comparator<I_GetConceptData> createPreferredTermComparer() {
 		return new PreferredTermComparator();
-	}
-
-	public Comparator<WorkflowHistoryJavaBean> createConceptWorkflowTimestampComparer() {
-		return new ConceptWorkflowTimestampComparer();
-	}
-
-	public Comparator<String> createComponentStringTimestampComparer() {
-		return new ComponentStringTimestampComparator();
-	}
-
-	public Comparator<WorkflowHistoryJavaBean> createTimestampComparer() {
-		return new TimestampComparer();
-	}
-
-	public class ComponentStringTimestampComparator implements Comparator<String> { 
-		public int compare(String a, String b) {
-			// Reverse List
-			return b.compareTo(a);
-		}
 	}
 
 	public class PreferredTermComparator implements Comparator<I_GetConceptData> { 
@@ -123,27 +105,6 @@ public class WfComparator
 		}
 	}
 	
-	public class ConceptWorkflowTimestampComparer implements Comparator<WorkflowHistoryJavaBean> {
-		@Override
-		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			if (o1.getConcept().compareTo(o2.getConcept()) != 0)
-				return o1.getConcept().compareTo(o2.getConcept());
-			else
-			{
-				if (o1.getWorkflowId().compareTo(o2.getWorkflowId()) != 0)
-					return (o1.getWorkflowId().compareTo(o2.getWorkflowId()));
-				else
-					return (o1.getWorkflowTime().compareTo(o2.getWorkflowTime()));
-			}
-		}
-	}
-
-	public class TimestampComparer implements Comparator<WorkflowHistoryJavaBean> {
-		@Override
-		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-			return (o2.getWorkflowTime().compareTo(o1.getWorkflowTime()));
-		}
-	}
 
 	private String getPreferredTerm(I_GetConceptData conceptData) throws Exception {
         descTypeList = Terms.get().newIntList();
