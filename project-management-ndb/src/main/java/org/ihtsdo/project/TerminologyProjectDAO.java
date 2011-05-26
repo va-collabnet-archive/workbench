@@ -2986,14 +2986,18 @@ public class TerminologyProjectDAO {
 
 	public static String getItemSubject(WorkListMember workListMember,
 			WorkList worklist, I_TerminologyProject project, PromotionRefset promotionRefset, Integer langRefset, int statusId, Long statusTime) {
-
 		String[] terms=getSourceTerms(workListMember.getId(), langRefset);
-		String subject=workListMember.getId()  + subjectSeparator + terms[0] +
-		subjectSeparator + worklist.getId() + subjectSeparator + worklist.getName() + 
-		subjectSeparator + project.getId() + subjectSeparator + terms[1] + 
-		subjectSeparator + promotionRefset.getRefsetId() + 
-		subjectSeparator + subjectSeparator + statusId +
-		subjectSeparator + statusTime;
+		String subject = "";
+		try{
+			subject = workListMember.getUids().iterator().next()  + subjectSeparator + terms[0] +
+			subjectSeparator + worklist.getUids().iterator().next() + subjectSeparator + worklist.getName() + 
+			subjectSeparator + project.getUids().iterator().next() + subjectSeparator + terms[1] + 
+			subjectSeparator + promotionRefset.getRefsetConcept().getUids().iterator().next() + 
+			subjectSeparator + subjectSeparator + Terms.get().nidToUuid(statusId) +
+			subjectSeparator + statusTime;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return subject;
 	}
