@@ -103,9 +103,9 @@
             <void method="setProperty"> 
              <string>font</string> 
              <object class="java.awt.Font"> 
-              <string>Verdana</string> 
+              <string>Lucida Grande</string> 
               <int>0</int> 
-              <int>14</int> 
+              <int>13</int> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -125,9 +125,9 @@
               <void method="setProperty"> 
                <string>font</string> 
                <object class="java.awt.Font"> 
-                <string>Verdana</string> 
+                <string>Lucida Grande</string> 
                 <int>0</int> 
-                <int>14</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -165,9 +165,9 @@
               <void method="setProperty"> 
                <string>font</string> 
                <object class="java.awt.Font"> 
-                <string>Verdana</string> 
+                <string>Lucida Grande</string> 
                 <int>0</int> 
-                <int>14</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -205,9 +205,9 @@
               <void method="setProperty"> 
                <string>font</string> 
                <object class="java.awt.Font"> 
-                <string>Verdana</string> 
+                <string>Lucida Grande</string> 
                 <int>0</int> 
-                <int>14</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -254,9 +254,9 @@
             <void method="setProperty"> 
              <string>font</string> 
              <object class="java.awt.Font"> 
-              <string>Verdana</string> 
+              <string>Lucida Grande</string> 
               <int>0</int> 
-              <int>14</int> 
+              <int>13</int> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -279,6 +279,14 @@
                 <int>85</int> 
                 <int>325</int> 
                 <boolean>false</boolean> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Lucida Grande</string> 
+                <int>0</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void property="name"> 
@@ -304,9 +312,9 @@
               <void method="setProperty"> 
                <string>font</string> 
                <object class="java.awt.Font"> 
-                <string>Verdana</string> 
+                <string>Lucida Grande</string> 
                 <int>0</int> 
-                <int>14</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void method="setProperty"> 
@@ -345,9 +353,9 @@
             <void method="setProperty"> 
              <string>font</string> 
              <object class="java.awt.Font"> 
-              <string>Verdana</string> 
+              <string>Lucida Grande</string> 
               <int>0</int> 
-              <int>14</int> 
+              <int>13</int> 
              </object> 
             </void> 
             <void method="setProperty"> 
@@ -374,6 +382,14 @@
                 <int>89</int> 
                 <int>4421</int> 
                 <boolean>false</boolean> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Lucida Grande</string> 
+                <int>0</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void property="name"> 
@@ -410,6 +426,14 @@
                 <int>71</int> 
                 <int>4421</int> 
                 <boolean>false</boolean> 
+               </object> 
+              </void> 
+              <void method="setProperty"> 
+               <string>font</string> 
+               <object class="java.awt.Font"> 
+                <string>Lucida Grande</string> 
+                <int>0</int> 
+                <int>13</int> 
                </object> 
               </void> 
               <void property="name"> 
@@ -1231,14 +1255,6 @@
                    <string>text</string> 
                    <string>Term:</string> 
                   </void> 
-                  <void method="setProperty"> 
-                   <string>font</string> 
-                   <object class="java.awt.Font"> 
-                    <string>Verdana</string> 
-                    <int>0</int> 
-                    <int>13</int> 
-                   </object> 
-                  </void> 
                   <void property="name"> 
                    <string>label2</string> 
                   </void> 
@@ -1308,14 +1324,6 @@
                   <void method="setProperty"> 
                    <string>text</string> 
                    <string>Term Type:</string> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>font</string> 
-                   <object class="java.awt.Font"> 
-                    <string>Verdana</string> 
-                    <int>0</int> 
-                    <int>13</int> 
-                   </object> 
                   </void> 
                   <void property="name"> 
                    <string>label1</string> 
@@ -1484,14 +1492,6 @@
                   <void method="setProperty"> 
                    <string>text</string> 
                    <string>Is case significant ?</string> 
-                  </void> 
-                  <void method="setProperty"> 
-                   <string>font</string> 
-                   <object class="java.awt.Font"> 
-                    <string>Verdana</string> 
-                    <int>0</int> 
-                    <int>13</int> 
-                   </object> 
                   </void> 
                   <void property="name"> 
                    <string>label3</string> 
