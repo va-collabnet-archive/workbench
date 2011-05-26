@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import javax.swing.JOptionPane;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
@@ -42,6 +44,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
@@ -87,11 +90,11 @@ public class RulesContextHelper {
 	//					kbCache.put(contextId, kbase);
 	//
 	//				} catch (FileNotFoundException e) {
-	//					e.printStackTrace();
+	//					AceLog.getAppLog().alertAndLogException(e);
 	//				} catch (IOException e) {
-	//					e.printStackTrace();
+	//					AceLog.getAppLog().alertAndLogException(e);
 	//				} catch (ClassNotFoundException e) {
-	//					e.printStackTrace();
+	//					AceLog.getAppLog().alertAndLogException(e);
 	//				}
 	//			}
 	//		}
@@ -127,11 +130,10 @@ public class RulesContextHelper {
 			} catch (StreamCorruptedException e0) {
 				serializedKbFile.delete();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (Exception e) {
+				serializedKbFile.delete();
+				//AceLog.getAppLog().alertAndLogException(e);
 			}
 			returnBase = kbase;
 		}
@@ -160,10 +162,11 @@ public class RulesContextHelper {
 					//out.writeObject( kbase.getKnowledgePackages() );
 					out.close();
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				} catch (IOException e) {
-					e.printStackTrace();
+					AceLog.getAppLog().alertAndLogException(e);
 				}
+				
 				kbCache.put(context.getConceptNid(), kbase);
 				Terms.get().setKnowledgeBaseCache(kbCache);
 				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
@@ -179,7 +182,7 @@ public class RulesContextHelper {
 			activity.complete();
 			activity.removeActivityFromViewer();
 		} catch (ComputationCanceled e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return returnBase;
 	}
@@ -246,11 +249,11 @@ public class RulesContextHelper {
 			return newConcept;
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return null;
@@ -265,9 +268,9 @@ public class RulesContextHelper {
 					config.getDestRelTypes(), config.getViewPositionSetReadOnly(), 
 					config.getPrecedence(), config.getConflictResolutionStrategy()));
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return contexts;
@@ -368,7 +371,7 @@ public class RulesContextHelper {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
@@ -402,9 +405,9 @@ public class RulesContextHelper {
 			}
 			return lastPart;
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -422,9 +425,9 @@ public class RulesContextHelper {
 			}
 			return role;
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return null;
 	}
@@ -461,9 +464,9 @@ public class RulesContextHelper {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
@@ -546,11 +549,11 @@ public class RulesContextHelper {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return returnData;
@@ -580,11 +583,11 @@ public class RulesContextHelper {
 			}
 
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 		return returnData;
@@ -647,11 +650,11 @@ public class RulesContextHelper {
 					promote(context);
 				}
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			} catch (Exception e) {
-				e.printStackTrace();
+				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 
@@ -687,11 +690,11 @@ public class RulesContextHelper {
 				}
 			}
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 	}
@@ -717,9 +720,9 @@ public class RulesContextHelper {
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return (activeStatuses.contains(statusId));
 	}
@@ -745,11 +748,11 @@ public class RulesContextHelper {
 
 			termFactory.commit();
 		} catch (IOException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
 
