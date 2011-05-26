@@ -59,6 +59,7 @@ public class RulesContextHelper {
 	I_ConfigAceFrame config;
 	HashMap<Integer, KnowledgeBase> kbCache;
 	long lastCacheUpdateTime = 0;
+	static boolean noRulesAlertShown = false;
 
 	public RulesContextHelper(I_ConfigAceFrame config) {
 		this.config = config;
@@ -156,6 +157,16 @@ public class RulesContextHelper {
 						kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
 					}
 				}
+				
+				if (kbase.getKnowledgePackages().size() == 0 && !noRulesAlertShown && 
+						RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids().containsAll(context.getUids())) {
+					noRulesAlertShown = true;
+					JOptionPane.showMessageDialog(null,
+						    "Rules base is empty, you might need to update from Guvnor.",
+						    "Rules base empty",
+						    JOptionPane.WARNING_MESSAGE);
+				}
+				
 				try {
 					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
 					out.writeObject( kbase );
