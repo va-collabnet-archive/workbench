@@ -62,6 +62,7 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
      * @see org.dwfa.ace.api.I_ManageContradiction#isInConflict(org.dwfa.ace.api.I_GetConceptData,
      *      boolean)
      */
+    @Override
     public boolean isInConflict(I_GetConceptData concept, boolean includeDependentEntities) throws IOException,
             TerminologyException {
 
@@ -104,6 +105,7 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return false;
     }
 
+    @Override
     public String toString() {
         return getDisplayName();
     }
@@ -112,9 +114,8 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return Terms.get().getActiveAceFrameConfig();
     }
 
+    @Override
     public boolean isInConflict(I_GetConceptData concept) throws IOException, TerminologyException {
-        I_ConfigAceFrame config = getConfig();
-
         if (isNull(concept, config)) {
             return false;
         }
@@ -124,10 +125,12 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return doesConflictExist(tuples);
     }
 
+    @Override
     public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute) throws TerminologyException, IOException {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isInConflict(I_Identify id) throws IOException {
         // TODO - must think of a better way to deal with IDs
         // the problem is that if the id parts are treated the same way as the
@@ -137,9 +140,8 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return false;
     }
 
+    @Override
     public boolean isInConflict(I_ImageVersioned image) throws IOException, TerminologyException {
-        I_ConfigAceFrame config = getConfig();
-
         if (isNull(image, config)) {
             return false;
         }
@@ -152,9 +154,8 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return doesConflictExist(matchingTuples);
     }
 
+    @Override
     public boolean isInConflict(I_RelVersioned relationship) throws IOException, TerminologyException {
-        I_ConfigAceFrame config = getConfig();
-
         if (isNull(relationship, config)) {
             return false;
         }
@@ -168,9 +169,8 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return doesConflictExist(matchingTuples);
     }
 
+    @Override
     public boolean isInConflict(I_DescriptionVersioned description) throws IOException, TerminologyException {
-        I_ConfigAceFrame config = getConfig();
-
         if (isNull(description, config)) {
             return false;
         }
@@ -184,9 +184,8 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         return doesConflictExist(matchingTuples);
     }
 
+    @Override
     public boolean isInConflict(I_ExtendByRef extension) throws TerminologyException, IOException {
-        I_ConfigAceFrame config = getConfig();
-
         if (isNull(extension, config)) {
             return false;
         }

@@ -40,7 +40,7 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
                 returnValues.add(v);
             }
         }
-        if (returnValues.size() == 0) {
+        if (returnValues.isEmpty()) {
             returnValues.addAll(parts);
         }
         return returnValues;
@@ -55,7 +55,7 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
         if (config.getEditingPathSetReadOnly().getPathNidSet().contains(part2.getPathNid())) {
             returnValues.add(part2);
         }
-        if (returnValues.size() == 0) {
+        if (returnValues.isEmpty()) {
             returnValues.add(part1);
             returnValues.add(part2);
         }
@@ -70,7 +70,7 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
                 returnValues.add(v);
             }
         }
-        if (returnValues.size() == 0) {
+        if (returnValues.isEmpty()) {
             returnValues.addAll(versions);
         }
         return returnValues;
@@ -84,10 +84,9 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
                 returnValues.add(v);
             }
         }
-        if (returnValues.size() == 0) {
+        if (returnValues.isEmpty()) {
             returnValues.addAll(tuples);
         }
         return returnValues;
     }
-
 }
