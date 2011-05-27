@@ -48,8 +48,15 @@ public class ChangeRolesToStatusBeanInfo extends SimpleBeanInfo {
             activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
             activeConceptPropName.setShortDescription("Name of the property containing the concept to change the status of. ");
+            
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                    getBeanDescriptor().getBeanClass());
+                uuidListListPropName.setBound(true);
+                uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+                uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
+                uuidListListPropName.setShortDescription("Uuid list.");
 
-            PropertyDescriptor rv[] = {newStatus, activeConceptPropName };
+            PropertyDescriptor rv[] = {newStatus, activeConceptPropName, uuidListListPropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
