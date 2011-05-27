@@ -15,7 +15,7 @@ public class RelationshipAttributeComparer extends AttributeComparer {
 
     public RelationshipAttributeComparer() {
         super();
-        componentType = ComponentType.RELATIONSHIP;
+        componentType = ComponentType.SRC_RELATIONSHIP;
     }
 
     public void setRelationshipType(ComponentType rel) {
