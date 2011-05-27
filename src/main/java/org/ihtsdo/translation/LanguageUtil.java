@@ -1137,7 +1137,7 @@ public class LanguageUtil {
 					String targetFSNText = "";
 					if (sourceFSN.getText().lastIndexOf("(") > 0 && sourceFSN.getText().lastIndexOf(")") > sourceFSN.getText().lastIndexOf("(")) {
 						String sourceSemtag = sourceFSN.getText().substring(sourceFSN.getText().lastIndexOf("(") + 1, sourceFSN.getText().lastIndexOf(")"));
-						String targetSemtag = getTargetEquivalentSemTag(sourceSemtag, sourceLangRefset.getLangCode(config), targetLangRefset.getLangCode(config));
+						String targetSemtag = getTargetEquivalentSemTag(sourceSemtag, sourceLangRefset.getLangCode(config), ArchitectonicAuxiliary.LANG_CODE.valueOf(targetLangRefset.getLangCode(config)).getFormatedLanguageCode());
 
 						targetFSNText = targetPreferred.getText().trim() + " (" + targetSemtag + ")";
 
