@@ -10,6 +10,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
@@ -86,6 +87,8 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
         			AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into editor category refset"));
     			}
             }
+
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
         } catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, line);
 		}

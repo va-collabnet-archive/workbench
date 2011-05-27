@@ -60,6 +60,7 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
         try {
             writer = new StateTransitionRefsetWriter();
             processStateTransitions(filePath);
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize state transition refset with error: " + e.getMessage());
 		}
