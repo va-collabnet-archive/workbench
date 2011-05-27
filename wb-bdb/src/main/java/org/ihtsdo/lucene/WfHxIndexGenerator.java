@@ -1,4 +1,4 @@
- package org.ihtsdo.lucene;
+package org.ihtsdo.lucene;
  
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,13 +36,14 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	private int memberCounter = 0;
 	private int refsetId = 0;
     private int feedbackInterval = 100;
-	private static File isFromInputFile;
-    private static Set<WorkflowHistoryJavaBean> wfHxJavaBeansToWrite = Collections.synchronizedSet(new HashSet<WorkflowHistoryJavaBean>());
-    private static Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap = Collections.synchronizedMap(new HashMap<UUID, WorkflowLuceneSearchResult>());
+	private static File inputFile = null;
+    private static Set<WorkflowHistoryJavaBean> wfHxJavaBeansToWrite  = new HashSet<WorkflowHistoryJavaBean>();
+    private static Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap = new HashMap<UUID, WorkflowLuceneSearchResult>();
     private static SortedSet<String> semanticTags = null;
     
 	public WfHxIndexGenerator(IndexWriter writer) throws IOException, ParseException {
 		super(writer);
+		WorkflowLuceneSearchResult vals = null;
 	
 		try {
         	initializeSemTags();
@@ -52,17 +52,14 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	    	int searcherId = searcher.getRefsetId();
 			this.refsetId = searcherId;
 	    	
-	        Set<? extends I_ExtendByRef> members = Collections.synchronizedSet(new HashSet<I_ExtendByRef>(Terms.get().getRefsetExtensionMembers(searcherId)));
-			
-			System.out.println("About to process: " + members.size() + " values");
 			lastBeanInWfMap.clear();
 
-			if (isFromInputFile != null) {
+			if (inputFile != null) {
 				String currentWfId = new String();
 				String line = null;
 				String[] curLastRow = null;
 				
-	        	BufferedReader reader = new BufferedReader(new FileReader(isFromInputFile));    	
+	        	BufferedReader reader = new BufferedReader(new FileReader(inputFile));    	
 
 	        	while ((line = reader.readLine()) != null)
 	        	{
@@ -75,7 +72,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					
 					if (curLastRow != null) {
 						if (!currentWfId.equals(wfId)) {
-							WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(curLastRow);
+							vals = new WorkflowLuceneSearchResult(curLastRow);
 							lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
 
 							curLastRow = row;
@@ -99,12 +96,15 @@ public class WfHxIndexGenerator extends IndexGenerator {
 				}
 			} else {
 				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+		        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(searcherId);
+				System.out.println("About to process: " + members.size() + " values");
+				
 				for (I_ExtendByRef row : members) {
 			    	UUID wfId = UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
 			    	
 			    	if (!lastBeanInWfMap.containsKey(wfId)) {
 			    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), wfId);
-			    		WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(latestBean);
+			    		vals = new WorkflowLuceneSearchResult(latestBean);
 			    		
 			    		lastBeanInWfMap.put(wfId, vals);
 			    	}
@@ -112,7 +112,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			}
 			
 		} catch (TerminologyException e) {
-		    AceLog.getAppLog().info("Lucene Creation Issues: " + e.getMessage());
+		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues on bean: " + vals.toString() + " with error: " + e.getMessage());
 		}
 	}
 
@@ -173,13 +173,14 @@ public class WfHxIndexGenerator extends IndexGenerator {
     	throws IOException 
     {
 		Document doc = new Document();
-
+		WorkflowHistoryJavaBean bean = null;
 		try {
-			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-			
-			doc = createDoc(bean, lastBeanInWfMap.get(bean.getWorkflowId()));
+			bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
+			WorkflowLuceneSearchResult vals = lastBeanInWfMap.get(bean.getWorkflowId());
+			doc = createDoc(bean, vals);
 		} catch (Exception e) {
-		    AceLog.getAppLog().info("Lucene Creation Issues: " + e.getMessage());
+		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues on bean: " + bean.toString() + " with error: " + e.getMessage());
+		    e.printStackTrace();
 		}
 
 		return doc;
@@ -235,7 +236,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
     }
 
 	public static void setSourceInputFile(File wfHxInputFile) {
-		isFromInputFile = wfHxInputFile;
+		inputFile = wfHxInputFile;
 	}
 	
 	public WorkflowLuceneSearchResult createLastWfIdLucVals(WorkflowHistoryJavaBean bean) {
