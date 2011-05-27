@@ -607,7 +607,7 @@
           </void> 
           <void method="setProperty"> 
            <string>resizeWeight</string> 
-           <double>1.0</double> 
+           <double>0.5</double> 
           </void> 
           <void method="setProperty"> 
            <string>oneTouchExpandable</string> 

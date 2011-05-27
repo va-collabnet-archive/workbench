@@ -1751,7 +1751,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			{
 				splitPane2.setToolTipText("Drag to resize");
 				splitPane2.setBackground(new Color(238, 238, 238));
-				splitPane2.setResizeWeight(1.0);
+				splitPane2.setResizeWeight(0.5);
 				splitPane2.setOneTouchExpandable(true);
 
 				//======== splitPane4 ========
