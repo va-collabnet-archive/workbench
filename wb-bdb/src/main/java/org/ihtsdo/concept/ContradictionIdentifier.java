@@ -182,8 +182,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             comparer = new DescriptionAttributeComparer();
         } else {
             comparer = new RelationshipAttributeComparer();
-            	((RelationshipAttributeComparer)comparer).setRelationshipType(ComponentType.SRC_RELATIONSHIP);
-                componentTuples = concept.getSourceRels();
+        	((RelationshipAttributeComparer)comparer).setRelationshipType(ComponentType.SRC_RELATIONSHIP);
+            componentTuples = concept.getSourceRels();
         }
 
         // Detect for contradictions per componentId in Collection
@@ -850,11 +850,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	                }
 	            }
 
-    	    	// If going to put into map, ensure that version doesn't represent a commit wf action
-				if (putIntoMap && member.getRefsetId() == workflowRefsetNid.get() && identifyIsCommitWfRefsetAction(part)) {
-					putIntoMap = false;
-				}
-				
     			if (putIntoMap) {
     				// Overwrite current latest version
     				latestDeveloperVersionMap.put(pathNidObj, part);
@@ -905,23 +900,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
         return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
-
-	private boolean identifyIsCommitWfRefsetAction(ComponentVersionBI latestVersion) 
-	{
-		try {
-			// Know wfHxRefset at this point, so action is safe
-			WorkflowHistoryJavaBean wfRefsetJavaBean = createWfHxJavaBean((StrMember.Version)latestVersion);
-		
-			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(Terms.get().getConcept(wfRefsetJavaBean.getAction()), 
-																				  ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
-	
-			return (relList != null && relList.size() > 0); 
-		} catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Version");
-		}
-		
-		return false;
-	}
 
 	private PositionBI determineLeastCommonAncestor(Set<HashSet<PositionBI>> originsByVersion)
 	{
