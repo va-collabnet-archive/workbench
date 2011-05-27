@@ -16,13 +16,14 @@
  */
 package org.ihtsdo.ace.task;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -89,16 +90,19 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
              EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
              File f= new File("workflow/userPermissionRefset.txt");
 
-             Scanner scanner = new Scanner(f);
+         	 BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
 
           	 WorkflowHelper.updateModelers();
              modelers = WorkflowHelper.getModelers();
 
-             while (scanner.hasNextLine())
-             {
-             	line = scanner.nextLine();
 
-             	String[] columns = line.split(",");
+         	while ((line = inputFile.readLine()) != null)
+             {
+         		if (line.trim().length() == 0) {
+         			continue;
+         		}
+
+         		String[] columns = line.split(",");
              	//Get rid of "User permission"
              	columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
              	//remove ")"

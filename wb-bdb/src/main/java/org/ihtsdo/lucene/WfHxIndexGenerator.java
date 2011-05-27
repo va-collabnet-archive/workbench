@@ -1,6 +1,8 @@
-package org.ihtsdo.lucene;
+ package org.ihtsdo.lucene;
  
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
@@ -8,7 +10,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -55,13 +56,21 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			
 			System.out.println("About to process: " + members.size() + " values");
 			lastBeanInWfMap.clear();
+
 			if (isFromInputFile != null) {
 				String currentWfId = new String();
+				String line = null;
 				String[] curLastRow = null;
-				Scanner inputFile = new Scanner(isFromInputFile);
 				
-				while (inputFile.hasNext()) {
-					String[] row = ((String)inputFile.nextLine()).split("\t");
+	        	BufferedReader reader = new BufferedReader(new FileReader(isFromInputFile));    	
+
+	        	while ((line = reader.readLine()) != null)
+	        	{
+	        		if (line.trim().length() == 0) {
+	        			continue;
+	        		}
+	        		
+					String[] row = line.split("\t");
 					String wfId = row[WorkflowHelper.workflowIdPosition];
 					
 					if (curLastRow != null) {

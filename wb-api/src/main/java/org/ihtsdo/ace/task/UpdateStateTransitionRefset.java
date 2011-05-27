@@ -16,12 +16,13 @@
  */
 package org.ihtsdo.ace.task;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.Scanner;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -101,15 +102,20 @@ public class UpdateStateTransitionRefset extends AbstractTask {
     }
 
     private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException {
-        Scanner scanner = new Scanner(f);
+    	BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
+
         StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
         writer.setWorkflowType(useType);
-
-        while (scanner.hasNextLine())
+        String line = null;
+        
+    	while ((line = inputFile.readLine()) != null)
         {
-        	String line = scanner.nextLine();
+    		if (line.trim().length() == 0) {
+    			continue;
+    		}
 
         	String[] columns = line.split(",");
+
         	//Get rid of "User permission"
         	columns[0] = (String) columns[0].subSequence("Workflow state transition (".length(), columns[0].length());
         	//remove ")"
