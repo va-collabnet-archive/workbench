@@ -45,6 +45,7 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
@@ -245,6 +246,14 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         access();
         return BdbTermFactory.createMember(memberUuid, referencedComponentNid, type, Concept.get(refsetId),
             getConfig(), propMap);
+    }
+
+    @Override
+    public <T extends I_ExtendByRefPart> I_ExtendByRef makeWfMetadataMemberAndSetup(int refsetId, int referencedComponentNid, 
+    		REFSET_TYPES type, RefsetPropertyMap propMap, UUID memberUuid) throws IOException {
+        access();
+        return BdbTermFactory.createMember(memberUuid, referencedComponentNid, type, 
+        								   Concept.get(refsetId), getConfig(), propMap);
     }
 
     @Override
@@ -611,5 +620,4 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
         }
         return childNids;
     }
-
 }

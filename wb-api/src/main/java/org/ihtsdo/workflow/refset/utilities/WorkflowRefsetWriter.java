@@ -8,27 +8,26 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 
-
-
 /* 
-* @author Jesse Efron
-* 
-*/
+ * @author Jesse Efron
+ * 
+ */
 public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 	protected WorkflowRefset refset = null;
 
 	public abstract String fieldsToRefsetString() throws IOException;
 	
-	protected WorkflowRefsetWriter(boolean setupDatabaseObjects) throws TerminologyException, IOException {
+	protected WorkflowRefsetWriter(boolean setupDatabaseObjects)
+			throws TerminologyException, IOException {
  		super();
+ 	
  		if (setupDatabaseObjects) {
-			helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());		
+			helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());
 		}
 	}
 
@@ -37,53 +36,46 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 	}
 
 	public boolean addMember() {
-		boolean retVal = false;
+		boolean retVal = true;
 		
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 			
-			if (fields.valuesExist())
-			{
+			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				I_ExtendByRef ref = helper.getOrCreateRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
-				Terms.get().addUncommitted(ref);
-				retVal = true;
-			} else
-				return false;
+
+				helper.makeWfMetadataMemberAndSetup(refsetId, fields.getReferencedComponent().getConceptNid(),
+													REFSET_TYPES.STR, propMap, UUID.randomUUID());
+			} 
 		} catch (Exception io) {
         	AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with error: " + io.getMessage());
+        	retVal = false;
 		}
 
 		fields.cleanValues();
 		return retVal;
 	}
 
-	//public boolean retireMember(int refsetId, int memberId)  {
 	public boolean retireMember()  {
-		
+		boolean retVal = false;
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 
-			if (fields.valuesExist())
-			{
+			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				I_ExtendByRef ref = helper.getRefsetExtension(refsetId, fields.getReferencedComponent().getConceptNid(), propMap);
-				helper.retireRefsetStrExtension(refsetId, fields.getReferencedComponent().getConceptNid(), propMap);
-				Terms.get().addUncommitted(ref);
-				return true;
+				retVal = helper.retireRefsetStrExtension(refsetId, 
+														 fields.getReferencedComponent().getConceptNid(), 
+														 propMap);
 			}
 		} catch (Exception io) {
-        	AceLog.getAppLog().log(Level.WARNING, "Failed to retire member with error: " + io.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Failed to retire member with error: " + io.getMessage());
 		}
 		
 		fields.cleanValues();
-			return false;
-		}
+		return retVal;
+	}
 	
-	
-
-	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException
-	{
+	public Collection<UUID> getRefsetUids() throws TerminologyException, IOException {
 		return refset.getRefsetConcept().getUids();
 	}
 
