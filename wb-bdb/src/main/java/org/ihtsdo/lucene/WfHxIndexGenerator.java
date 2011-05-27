@@ -175,7 +175,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		Document doc = new Document();
 
 		try {
-			WorkflowHistoryJavaBean bean = WorkflowHelper.createWfHxJavaBean(row);
+			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
 			
 			doc = createDoc(bean, lastBeanInWfMap.get(bean.getWorkflowId()));
 		} catch (Exception e) {

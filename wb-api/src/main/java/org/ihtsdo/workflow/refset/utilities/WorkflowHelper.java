@@ -838,7 +838,7 @@ public class WorkflowHelper {
 		return endWorkflowActionUid;
     }
 
-	public static WorkflowHistoryJavaBean createWfHxJavaBean(I_ExtendByRef ref) {
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRef ref) {
 		WorkflowHistoryJavaBean bean = null;
 		
 		try {
@@ -916,7 +916,7 @@ public class WorkflowHelper {
 			if (idx >= 0) {
 				if (row.getTuples().get(idx).getStatusNid() == currentNid) {
 					if (!ignoredWorkflows.contains(refset.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
-						WorkflowHistoryJavaBean bean = WorkflowHelper.createWfHxJavaBean(row);
+						WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 						
 						if (latestTimestamp == 0 || latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId())) {
 							returnSet.clear();
@@ -947,7 +947,7 @@ public class WorkflowHelper {
 			if (idx >= 0) {
 				if (row.getTuples().get(idx).getStatusNid() == currentNid) {
 					if (workflowId.equals(UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
-						returnSet.add(WorkflowHelper.createWfHxJavaBean(row));
+						returnSet.add(populateWorkflowHistoryJavaBean(row));
 					}
 				}
 			}
@@ -964,7 +964,7 @@ public class WorkflowHelper {
 		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(refset.getRefsetId(), Terms.get().uuidToNative(uuid))) 
 		{
-			WorkflowHistoryJavaBean bean = WorkflowHelper.createWfHxJavaBean(row);
+			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
 			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
 		}
@@ -1014,7 +1014,7 @@ public class WorkflowHelper {
 	
 				if (idx >= 0) {
 					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
-						retSet.add(WorkflowHelper.createWfHxJavaBean(row));
+						retSet.add(populateWorkflowHistoryJavaBean(row));
 					}
 				}
 			}

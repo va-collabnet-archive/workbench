@@ -57,7 +57,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
 					if (row.getTuples().get(idx).getStatusNid() == currentStatusNid) {
-						WorkflowHistoryJavaBean currentBean = WorkflowHelper.createWfHxJavaBean(row);
+						WorkflowHistoryJavaBean currentBean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
 						
 						if (currentBean.getWorkflowId().equals(workflowId) &&
 							currentTime < currentBean.getWorkflowTime()) {
@@ -84,7 +84,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		for (I_ExtendByRef row : Terms.get().getRefsetExtensionMembers(refset.getRefsetId())) 
 		{
-			WorkflowHistoryJavaBean bean = WorkflowHelper.createWfHxJavaBean(row);
+			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
 			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
 			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
 		}
