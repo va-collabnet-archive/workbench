@@ -1005,6 +1005,12 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         // Identify leastCommonAncestor of View Position from Origins of view position 
         Set<HashSet<PositionBI>> groupedOriginsOfOrigins = new HashSet<HashSet<PositionBI>>();
 
+        // While single origin, go up before finding common origin.  Because the 
+        // recursive instances of a single origin directly over the view position is a false-positive.
+		while (viewPos.getPath().getOrigins().size() == 1) {
+			viewPos = viewPos.getPath().getOrigins().iterator().next();
+		}
+		
 		// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
 		for (PositionBI origin : viewPos.getPath().getOrigins()) {
 			if (!origin.equals(viewPos)) {
