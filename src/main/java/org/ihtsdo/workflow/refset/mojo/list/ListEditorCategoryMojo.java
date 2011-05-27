@@ -95,7 +95,7 @@ public class ListEditorCategoryMojo extends AbstractMojo {
     private void printRefsetMembers(HashSet<String> members) {
     	Iterator itr = members.iterator();
     	while (itr.hasNext()) {
-    		//System.out.println("Next: " + ((String)itr.next()));
+    		System.out.println("Next: " + ((String)itr.next()));
     	}
     }
 
