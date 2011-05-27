@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefsetWriter;
 
@@ -69,6 +70,8 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
                 	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into semantic area hierarchy refset"));
     			}
             }
+
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage());
 		}
