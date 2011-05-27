@@ -737,8 +737,8 @@ public class ConceptVersion implements ConceptVersionBI {
     }
 
     @Override
-    public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
-        concept.commit(changeSetPolicy, changeSetWriterThreading);
+    public boolean commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+        return concept.commit(changeSetPolicy, changeSetWriterThreading);
     }
 
     public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading) throws IOException {

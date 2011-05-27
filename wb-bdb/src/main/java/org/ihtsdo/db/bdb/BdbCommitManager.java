@@ -429,27 +429,24 @@ public class BdbCommitManager {
         return null;
     }
 
-    public static void commit(Concept c, ChangeSetPolicy changeSetPolicy,
+    public static boolean commit(Concept c, ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
         if (uncommittedCNids.cardinality() == 1
                 && uncommittedCNidsNoChecks.cardinality() == 1
                 && uncommittedCNids.isMember(c.getNid())
                 && uncommittedCNidsNoChecks.isMember(c.getNid())) {
-            commit(changeSetPolicy, changeSetWriterThreading);
-            return;
+            
+            return commit(changeSetPolicy, changeSetWriterThreading);
 
         } else if (uncommittedCNids.cardinality() == 1
                 && uncommittedCNidsNoChecks.cardinality() == 0
                 && uncommittedCNids.isMember(c.getNid())) {
-            commit(changeSetPolicy, changeSetWriterThreading);
-            return;
+            return commit(changeSetPolicy, changeSetWriterThreading);
 
         } else if (uncommittedCNids.cardinality() == 0
                 && uncommittedCNidsNoChecks.cardinality() == 1
                 && uncommittedCNidsNoChecks.isMember(c.getNid())) {
-            commit(changeSetPolicy, changeSetWriterThreading);
-            return;
-
+            return commit(changeSetPolicy, changeSetWriterThreading);
         }
 
         Svn.rwl.acquireUninterruptibly();
@@ -579,12 +576,15 @@ public class BdbCommitManager {
             Svn.rwl.release();
         }
         fireCommit();
+        if (performCommit) {
+            return true;
+        }
+        return false;
     }
     private static boolean performCommit = false;
 
-    public static void commit(ChangeSetPolicy changeSetPolicy,
+    public static boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) {
-        lastCommit = Bdb.gVersion.incrementAndGet();
         Svn.rwl.acquireUninterruptibly();
         boolean passedRelease = false;
         try {
@@ -661,6 +661,7 @@ public class BdbCommitManager {
                         }
 
                         if (performCommit) {
+                            lastCommit = Bdb.gVersion.incrementAndGet();
                             KindOfComputer.reset();
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                             while (uncommittedCNidItr.next()) {
@@ -729,7 +730,7 @@ public class BdbCommitManager {
             }
             if (performCommit) {
                 Bdb.sync();
-            }
+            } 
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InterruptedException e1) {
@@ -746,6 +747,10 @@ public class BdbCommitManager {
             }
         }
         fireCommit();
+        if (performCommit) {
+            return true;
+        }
+        return false;
     }
 
     public static void commit() {

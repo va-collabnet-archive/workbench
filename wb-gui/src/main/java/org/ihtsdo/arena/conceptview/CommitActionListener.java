@@ -16,10 +16,11 @@ public class CommitActionListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            settings.getConcept().commit(
+            if (settings.getConcept().commit(
                     settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                    settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
-            settings.getView().getCvRenderer().updateCancelAndCommit();
+                    settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert())) {
+                settings.getView().getCvRenderer().updateCancelAndCommit();
+            }
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }

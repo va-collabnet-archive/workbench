@@ -326,6 +326,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return;
             }
+            cView.getCvRenderer().updateCancelAndCommit();
             Map<SpecBI, Integer> templates = get();
             cView.removeAll();
             cView.setLayout(new GridBagLayout());

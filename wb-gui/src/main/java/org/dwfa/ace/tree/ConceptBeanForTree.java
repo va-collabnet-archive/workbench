@@ -89,8 +89,8 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       bean.cancel();
    }
 
-   public void commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
-      bean.commit(changeSetPolicy, changeSetWriterThreading);
+   public boolean commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+      return bean.commit(changeSetPolicy, changeSetWriterThreading);
    }
 
    public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {

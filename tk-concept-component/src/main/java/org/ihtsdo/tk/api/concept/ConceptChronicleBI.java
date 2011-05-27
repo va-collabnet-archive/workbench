@@ -42,7 +42,7 @@ public interface ConceptChronicleBI extends
     Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
             throws IOException;
 
-    void commit(ChangeSetGenerationPolicy changeSetPolicy,
+    boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException;
 
     void cancel() throws IOException;

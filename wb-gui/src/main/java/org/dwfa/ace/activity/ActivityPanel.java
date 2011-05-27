@@ -516,8 +516,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         ActivityPanelImpl aPanel = (ActivityPanelImpl) event.getComponent();
         panels.remove(aPanel);
         aPanel.removeAncestorListener(this);
-        aPanel.progressBar.setIndeterminate(false);
-        aPanel.progressBar.setEnabled(false);
+        JProgressBar progressBar = aPanel.progressBar;
+        if (progressBar != null) {
+            progressBar.setIndeterminate(false);
+            progressBar.setEnabled(false);
+        }
         aPanel.removeAll();
         aPanel.setVisible(false);
     }

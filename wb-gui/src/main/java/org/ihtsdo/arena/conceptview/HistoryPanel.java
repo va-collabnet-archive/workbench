@@ -812,6 +812,5 @@ public class HistoryPanel {
                     new UpdateHistoryBorder(historyLabel, versionHistoryLabel));
         }
         hxWidth = locX;
-        System.out.println("hxWidth = " + locX);
     }
 }

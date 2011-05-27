@@ -165,8 +165,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                     stuckCount++;
                     if (logger.isLoggable(Level.INFO)) {
                         logger.log(Level.INFO,
-                                "ChildrenUpdator stuck at: {0} ({1})",
-                                new Object[]{lastCheck, stuckCount});
+                                "ChildrenUpdator stuck at: {0} ({1}): {2}",
+                                new Object[]{lastCheck, stuckCount, node});
                     }
                     if (stuckCount > allowableSticks) {
                         if (logger.isLoggable(Level.INFO)) {
@@ -175,7 +175,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                         }
                         lowerProgressMessage =
                                 "stopped because ChildrenUpdator stuck at: "
-                                + lastCheck + " (" + stuckCount + ") ";
+                                + lastCheck + " (" + stuckCount + "): " + node;
                         stop();
                     }
                 } else {

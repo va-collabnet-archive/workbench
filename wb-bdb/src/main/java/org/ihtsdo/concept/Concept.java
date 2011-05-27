@@ -423,10 +423,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     + " $$$$$$$$$$$$$$");
         }
     }
-    
+
     public boolean readyToWrite() {
         assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
-        assert data.readyToWrite(): toLongString();
+        assert data.readyToWrite() : toLongString();
         return true;
     }
 
@@ -1501,7 +1501,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public ConcurrentSkipListSet<RefsetMember<?, ?>> getRefsetMembers()
             throws IOException {
-        return data.getRefsetMembers(); 
+        return data.getRefsetMembers();
     }
 
     @Override
@@ -1873,15 +1873,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void commit(ChangeSetPolicy changeSetPolicy,
+    public boolean commit(ChangeSetPolicy changeSetPolicy,
             ChangeSetWriterThreading changeSetWriterThreading) throws IOException {
-        BdbCommitManager.commit(this, changeSetPolicy, changeSetWriterThreading);
+        return BdbCommitManager.commit(this, changeSetPolicy, changeSetWriterThreading);
     }
 
     @Override
-    public void commit(ChangeSetGenerationPolicy changeSetPolicy,
+    public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
-        BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
+        return BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
                 ChangeSetWriterThreading.get(changeSetWriterThreading));
     }
 
@@ -1897,12 +1897,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             canceled = true;
         }
         try {
-			KindOfComputer.updateIsaCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate(), this.getNid());
-		} catch (TerminologyException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+            KindOfComputer.updateIsaCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate(), this.getNid());
+        } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
         BdbCommitManager.fireCancel();
     }
 
