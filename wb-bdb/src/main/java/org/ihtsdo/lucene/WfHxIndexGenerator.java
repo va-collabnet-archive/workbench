@@ -94,7 +94,10 @@ public class WfHxIndexGenerator extends IndexGenerator {
 						currentWfId = wfId;
 					}
 				}
-			} else {
+
+	            vals = new WorkflowLuceneSearchResult(curLastRow);
+	            lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
+	        } else {
 				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(searcherId);
 				System.out.println("About to process: " + members.size() + " values");
