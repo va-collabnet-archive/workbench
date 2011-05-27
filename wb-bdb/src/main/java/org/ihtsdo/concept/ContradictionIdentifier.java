@@ -122,7 +122,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		ContradictionResult result = ContradictionResult.NONE;
     	
 		for (ComponentType type : ComponentType.values()) {
-			if (type != ComponentType.RELATIONSHIP && type != ComponentType.REFSET) 
+			if (type != ComponentType.REFSET) 
 			{
 	        	// Cycle through 4 component types
 	            if (type == ComponentType.ATTRIBUTE) {
@@ -182,14 +182,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             comparer = new DescriptionAttributeComparer();
         } else {
             comparer = new RelationshipAttributeComparer();
-
-            if (type == ComponentType.SRC_RELATIONSHIP) {
             	((RelationshipAttributeComparer)comparer).setRelationshipType(ComponentType.SRC_RELATIONSHIP);
                 componentTuples = concept.getSourceRels();
-            } else if (type == ComponentType.DEST_RELATIONSHIP) {
-            	((RelationshipAttributeComparer)comparer).setRelationshipType(ComponentType.DEST_RELATIONSHIP);
-                componentTuples = concept.getDestRels();
-            }
         }
 
         // Detect for contradictions per componentId in Collection
@@ -644,7 +638,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					}
 				}
 			} 
-			else if (compType == ComponentType.SRC_RELATIONSHIP || compType == ComponentType.DEST_RELATIONSHIP)
+			else if (compType == ComponentType.SRC_RELATIONSHIP)
 			{
 				// Assume Source Rel first.  If returns null, 
 				Relationship rel = concept.getRelationship(componentNid);
@@ -697,7 +691,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				Description desc = concept.getDescription(componentNid);
 				currentVersion = identifyDescriptionViewCoord(desc, viewCoord, adjudicatorVersionPosition);
 			} 
-			else if (compType == ComponentType.SRC_RELATIONSHIP || compType == ComponentType.DEST_RELATIONSHIP)
+			else if (compType == ComponentType.SRC_RELATIONSHIP)
 			{
 				// Assume Source Rel first.  If returns null, 
 				Collection<org.ihtsdo.concept.component.relationship.Relationship.Version> currentRelationshipVersions = null;

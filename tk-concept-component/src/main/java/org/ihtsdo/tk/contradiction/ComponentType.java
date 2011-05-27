@@ -21,5 +21,5 @@ package org.ihtsdo.tk.contradiction;
  * @author kec
  */
 public enum ComponentType {
-    ATTRIBUTE, DESCRIPTION, RELATIONSHIP, SRC_RELATIONSHIP, DEST_RELATIONSHIP, REFSET;
+    ATTRIBUTE, DESCRIPTION, SRC_RELATIONSHIP, REFSET;
 }
