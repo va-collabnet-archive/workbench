@@ -326,13 +326,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return;
             }
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                   cView.getCvRenderer().updateWizardPanel();
-                }
-            });
             cView.getCvRenderer().updateCancelAndCommit();
             Map<SpecBI, Integer> templates = get();
             cView.removeAll();

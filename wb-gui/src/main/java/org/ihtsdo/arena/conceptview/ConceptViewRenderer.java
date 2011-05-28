@@ -699,10 +699,19 @@ public class ConceptViewRenderer extends JLayeredPane {
     }
 
     private class HostListener implements PropertyChangeListener {
-
+        int lastNid = Integer.MAX_VALUE;
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            updateLabel();
+            if (evt.getNewValue() == null) {
+                updateLabel();
+            } else {
+                I_GetConceptData concept = (I_GetConceptData) evt.getNewValue();
+                if (concept.getNid() != lastNid) {
+                    lastNid = concept.getNid();
+                    updateLabel();
+                }
+            }
+          
             updateCancelAndCommit();
         }
     }
