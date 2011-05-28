@@ -2,7 +2,6 @@ package org.ihtsdo.arena;
 
 import java.awt.HeadlessException;
 import java.util.EventObject;
-import java.util.Hashtable;
 
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
@@ -13,6 +12,7 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.view.mxGraph;
 import com.mxgraph.view.mxStylesheet;
+import java.util.HashMap;
 
 public class ArenaFrame extends JFrame {
 
@@ -27,11 +27,13 @@ public class ArenaFrame extends JFrame {
         super("The Arena");
         mxGraph graph = new mxGraph() {
             // Overrides method to disallow edge label editing
+            @Override
             public boolean isCellEditable(Object cell) {
                 return !getModel().isEdge(cell);
             }
 
             // Overrides method to provide a cell label in the display
+            @Override
             public String convertValueToString(Object cell) {
                 if (cell instanceof mxCell) {
                     Object value = ((mxCell) cell).getValue();
@@ -44,6 +46,7 @@ public class ArenaFrame extends JFrame {
             }
 
             // Overrides method to store a cell label in the model
+            @Override
             public void cellLabelChanged(Object cell, Object newValue, boolean autoSize) {
                 super.cellLabelChanged(cell, newValue, autoSize);
             }
@@ -53,27 +56,27 @@ public class ArenaFrame extends JFrame {
         
 
         mxStylesheet stylesheet = graph.getStylesheet();
-        Hashtable<String, Object> style = new Hashtable<String, Object>();
+        HashMap<String, Object> style = new HashMap<String, Object>();
         style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_SWIMLANE);
         style.put(mxConstants.STYLE_OPACITY, 50);
         style.put(mxConstants.STYLE_FONTCOLOR, "#774400");
         stylesheet.putCellStyle("SWIMLANE", style);
         
-        style = new Hashtable<String, Object>();
+        style = new HashMap<String, Object>();
         style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
         style.put(mxConstants.STYLE_ROUNDED, true);
         style.put(mxConstants.STYLE_OPACITY, 75);
         style.put(mxConstants.STYLE_FONTCOLOR, "#774400");
         stylesheet.putCellStyle("ROLE", style);
         
-        style = new Hashtable<String, Object>();
+        style = new HashMap<String, Object>();
         style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_RECTANGLE);
         style.put(mxConstants.STYLE_ROUNDED, true);
         style.put(mxConstants.STYLE_OPACITY, 75);
         style.put(mxConstants.STYLE_FONTCOLOR, "#774400");
         stylesheet.putCellStyle("RESTRICTION", style);
         
-        style = new Hashtable<String, Object>();
+        style = new HashMap<String, Object>();
         style.put(mxConstants.STYLE_SHAPE, mxConstants.SHAPE_SWIMLANE);
         style.put(mxConstants.STYLE_OPACITY, 75);
         style.put(mxConstants.STYLE_FONTCOLOR, "#774400");
@@ -133,6 +136,7 @@ public class ArenaFrame extends JFrame {
              */
             private static final long serialVersionUID = 6824440535661529806L;
 
+            @Override
             public String getEditingValue(Object cell, EventObject trigger) {
                 return super.getEditingValue(cell, trigger);
             };

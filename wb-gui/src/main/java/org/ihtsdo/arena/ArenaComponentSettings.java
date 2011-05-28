@@ -232,7 +232,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 
     @Override
     public String toString() {
-        return getTitle();
+        return ".";
     }
 
     public abstract List<AbstractButton> getSpecializedButtons();
