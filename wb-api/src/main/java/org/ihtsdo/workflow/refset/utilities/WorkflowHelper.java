@@ -203,7 +203,7 @@ public class WorkflowHelper {
 		try {
 	    	modelers = new HashMap<String, I_GetConceptData>();
 	
-			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
 			Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
 			editors.remove(parentEditorConcept);
 	
