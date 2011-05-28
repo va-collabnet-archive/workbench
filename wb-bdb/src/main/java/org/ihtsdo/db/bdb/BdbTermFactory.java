@@ -1413,13 +1413,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return null;
     }
     
+    @Override
     public UUID nidToUuid(int nid) throws IOException {
         Concept c = Bdb.getConceptForComponent(nid);
         if (c == null) {
             return Bdb.getUuidsToNidMap().getUuidsForNid(nid).get(0);
         }
         ComponentChroncileBI<?> component = c.getComponent(nid);
-        assert component != null : "No component in concept for nid: " + nid + "\n\n\n" + c.toLongString();
+        if (component == null) {
+            return null;
+        }
         return component.getPrimUuid();
     }
     

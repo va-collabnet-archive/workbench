@@ -2,6 +2,7 @@ package org.ihtsdo.cs.econcept;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -20,6 +21,7 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -106,29 +108,40 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
     private List<TkRefsetAbstractMember<?>> processRefsetMembers(Concept c, AtomicBoolean changed) throws IOException {
         List<TkRefsetAbstractMember<?>> eRefsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(c.getRefsetMembers().size());
+        Collection<RefsetMember<?, ?>> membersToRemove = new ArrayList<RefsetMember<?, ?>>();
         for (RefsetMember<?, ?> member : c.getRefsetMembers()) {
             TkRefsetAbstractMember<?> eMember = null;
-            for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
-                    if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
-                        changed.set(true);
-                        try {
-                            if (eMember == null) {
-                                eMember = v.getERefsetMember();
-                                if (eMember != null) {
-                                    eRefsetMembers.add(eMember);
-                                    setupFirstVersion(eMember, v);
+            Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
+            if (concept != null && !concept.isCanceled()) {
+                for (RefsetMember<?, ?>.Version v : member.getTuples()) {
+                    if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                        if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
+                            changed.set(true);
+                            try {
+                                if (eMember == null) {
+                                    eMember = v.getERefsetMember();
+                                    if (eMember != null) {
+                                        eRefsetMembers.add(eMember);
+                                        setupFirstVersion(eMember, v);
+                                    }
+                                } else {
+                                    TkRevision eRevision = v.getERefsetRevision();
+                                    setupRevision(eMember, v, eRevision);
                                 }
-                            } else {
-                                TkRevision eRevision = v.getERefsetRevision();
-                                setupRevision(eMember, v, eRevision);
+                            } catch (TerminologyException e) {
+                                throw new IOException(e);
                             }
-                        } catch (TerminologyException e) {
-                            throw new IOException(e);
                         }
                     }
                 }
+            } else {
+                member.primordialSapNid = -1;
+                membersToRemove.add(member);
             }
+
+        }
+        if (!membersToRemove.isEmpty()) {
+            BdbCommitManager.writeImmediate(c);
         }
         return eRefsetMembers;
     }
