@@ -74,7 +74,7 @@ public class DiffPathPanel extends JPanel {
         if (SnoQuery.getIsaAdded() != null && SnoQuery.getIsaAdded().size() > 0) {
 
             table = updateTable(SnoQuery.getIsaAdded());
-            table.setDragEnabled(true);
+            table.setDragEnabled(false);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -101,7 +101,7 @@ public class DiffPathPanel extends JPanel {
         this.add(new JLabel("Dropped ISAs:"), c);
         if (SnoQuery.getIsaDropped() != null && SnoQuery.getIsaDropped().size() > 0) {
             table = updateTable(SnoQuery.getIsaDropped());
-            table.setDragEnabled(true);
+            table.setDragEnabled(false);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -127,7 +127,7 @@ public class DiffPathPanel extends JPanel {
         this.add(new JLabel("Added Roles:"), c);
         if (SnoQuery.getRoleAdded() != null && SnoQuery.getRoleAdded().size() > 0) {
             table = updateTable(SnoQuery.getRoleAdded());
-            table.setDragEnabled(true);
+            table.setDragEnabled(false);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -157,7 +157,7 @@ public class DiffPathPanel extends JPanel {
             c.weightx = 0.5;
             c.weighty = 0.5;
             table = updateTable(SnoQuery.getRoleDropped());
-            table.setDragEnabled(true);
+            table.setDragEnabled(false);
             table.setTransferHandler(new TerminologyTransferHandler(table));
             table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

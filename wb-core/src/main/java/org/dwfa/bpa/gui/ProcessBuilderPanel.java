@@ -809,7 +809,7 @@ public class ProcessBuilderPanel extends JPanel implements ActionListener, Prope
             PropertyTableModel ptm = new PropertyTableModel(processPanel.getProcess());
             propertiesPane = new JTable(ptm);
             propertiesPane.setCellSelectionEnabled(true);
-            propertiesPane.setDragEnabled(true);
+            propertiesPane.setDragEnabled(false);
             PropertySelectionListener psl = new PropertySelectionListener(propDocSplit, ptm);
             propertiesPane.getSelectionModel().addListSelectionListener(psl);
             TableColumn column = null;

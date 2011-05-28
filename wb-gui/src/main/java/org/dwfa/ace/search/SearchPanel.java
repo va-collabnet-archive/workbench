@@ -515,7 +515,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         gbc.weightx = 1;
         gbc.gridx++;
         this.searchPhraseField = new JTextField(200);
-        this.searchPhraseField.setDragEnabled(true);
+        this.searchPhraseField.setDragEnabled(false);
         this.searchPhraseField.setMinimumSize(new Dimension(400, 20));
         this.searchPhraseField.setText("search");
         add(searchPhraseField, gbc);
@@ -647,7 +647,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
         SortClickListener.setupSorter(descTable);
-        descTable.setDragEnabled(true);
+        descTable.setDragEnabled(false);
         descTable.setTransferHandler(new TerminologyTransferHandler(this));
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(config, true);
         descTable.setDefaultRenderer(Number.class, renderer);

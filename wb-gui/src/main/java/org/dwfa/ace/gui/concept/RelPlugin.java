@@ -195,7 +195,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
     }
 
     protected void setupEditors(I_HostConceptPlugins host) throws TerminologyException, IOException {
-        relTable.setDragEnabled(true);
+        relTable.setDragEnabled(false);
         relTable.setTransferHandler(new TerminologyTransferHandler(relTable));
         relTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         relTable.getColumn(REL_FIELD.REL_TYPE).setCellEditor(new RelTableModel.RelTypeFieldEditor(host.getConfig()));

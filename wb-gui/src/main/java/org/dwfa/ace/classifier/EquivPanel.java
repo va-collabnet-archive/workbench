@@ -101,7 +101,7 @@ public class EquivPanel extends JPanel {
         EquivTableRenderer renderer = new EquivTableRenderer(config);
         table.setDefaultRenderer(Object.class, renderer);
         table.setDefaultRenderer(String.class, renderer);
-        table.setDragEnabled(true);
+        table.setDragEnabled(false);
         table.setTransferHandler(new TerminologyTransferHandler(table));
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 

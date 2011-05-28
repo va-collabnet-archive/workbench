@@ -357,6 +357,7 @@ public class CollapsePanel extends JPanel {
         extrasButton.setOpaque(false);
         extrasButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
         extrasButton.setSelected(areExtrasShown());
+        extrasButton.setBackground(Color.LIGHT_GRAY);
         setExtrasIcon();
         updateExtras();
         return extrasButton;

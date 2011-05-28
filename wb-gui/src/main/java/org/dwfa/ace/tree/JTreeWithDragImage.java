@@ -122,19 +122,23 @@ public class JTreeWithDragImage extends JTree {
             int selRow = getRowForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
             TreePath path = getPathForLocation(dge.getDragOrigin().x, dge.getDragOrigin().y);
             if (selRow != -1) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                 try {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     I_GetConceptData obj = (I_GetConceptData) node.getUserObject();
                     Image dragImage = getDragImage(obj);
                     Point imageOffset = new Point(-10, -(dragImage.getHeight(JTreeWithDragImage.this) + 1));
-                    dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(obj), dsl);
-                } catch (InvalidDnDOperationException e) {
-                    AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
-                    AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [4]");
-                    SunDragSourceContextPeer.setDragDropInProgress(false);
-                } catch (Exception ex) {
+                    try {
+                        dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(obj), dsl);
+                    } catch (InvalidDnDOperationException e) {
+                        //AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
+                        AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [4.]");
+                        SunDragSourceContextPeer.setDragDropInProgress(false);
+                    } catch (Exception ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                } catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
-                }
+                } 
             }
         }
 
@@ -174,18 +178,18 @@ public class JTreeWithDragImage extends JTree {
         public void propertyChange(PropertyChangeEvent evt) {
             if (lastPropagationId == evt.getPropagationId()) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().info("rf pc suppressed: " + 
-                            evt.getPropertyName() + " " +
-                            evt.getPropagationId());
+                    AceLog.getAppLog().info("rf pc suppressed: "
+                            + evt.getPropertyName() + " "
+                            + evt.getPropagationId());
                 }
                 return;
             }
             if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                 AceLog.getAppLog().info(
-                        "rf pc: " + evt.getPropertyName() + " " +
-                        evt.getPropagationId() + " (" + lastPropagationId
-                        + ") Thread: " + Thread.currentThread().getName() + 
-                        " tree hash: " + JTreeWithDragImage.this.hashCode());
+                        "rf pc: " + evt.getPropertyName() + " "
+                        + evt.getPropagationId() + " (" + lastPropagationId
+                        + ") Thread: " + Thread.currentThread().getName()
+                        + " tree hash: " + JTreeWithDragImage.this.hashCode());
             }
             lastPropagationId = evt.getPropagationId();
 

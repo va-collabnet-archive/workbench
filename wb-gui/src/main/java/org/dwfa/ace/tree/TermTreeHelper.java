@@ -111,7 +111,7 @@ public class TermTreeHelper implements PropertyChangeListener {
         tree.setLargeModel(true);
         // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         tree.setTransferHandler(new TerminologyTransferHandler(tree));
-        tree.setDragEnabled(true);
+        //tree.setDragEnabled(true);
         ToolTipManager.sharedInstance().registerComponent(tree);
         renderer = new TermTreeCellRenderer(aceFrameConfig, this);
         tree.setCellRenderer(renderer);

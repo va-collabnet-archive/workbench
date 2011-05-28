@@ -98,6 +98,16 @@ public class WorkbenchRunner {
     public WorkbenchRunner(String[] args, LifeCycle lc) {
         try {
             AceProtocols.setupExtraProtocols();
+            UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
+            String lookAndFeelStr = UIManager.getSystemLookAndFeelClassName();
+            System.out.println("Default LAF: " + lookAndFeelStr);
+            for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+                if (lookAndFeel.getClassName().contains("WindowsClassic")) {
+                    lookAndFeelStr = lookAndFeel.getClassName();
+                    System.out.println("Changing LAF to: " + lookAndFeelStr);
+                }
+            }
+            UIManager.setLookAndFeel(lookAndFeelStr);
             DragMonitor.setup();
 
             /*
@@ -282,7 +292,6 @@ public class WorkbenchRunner {
                 }
             });
 
-            setupLookAndFeel();
             setupSwingExpansionTimerLogging();
 
             if (System.getProperty("newprofile") != null) {
@@ -731,19 +740,6 @@ public class WorkbenchRunner {
         }
         prompter.setUsername(username);
         prompter.setPassword(password);
-    }
-
-    private void setupLookAndFeel() throws ConfigurationException,
-            ClassNotFoundException, InstantiationException,
-            IllegalAccessException, UnsupportedLookAndFeelException {
-        if (jiniConfig != null) {
-            String lookAndFeelClassName = (String) jiniConfig.getEntry(this.getClass().getName(), "lookAndFeelClassName",
-                    String.class, UIManager.getSystemLookAndFeelClassName());
-
-            UIManager.setLookAndFeel(lookAndFeelClassName);
-        } else {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }
     }
 
     private void setupSwingExpansionTimerLogging()

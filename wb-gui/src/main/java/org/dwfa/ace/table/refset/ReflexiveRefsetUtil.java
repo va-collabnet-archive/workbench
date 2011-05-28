@@ -110,7 +110,7 @@ public class ReflexiveRefsetUtil {
             column.setMinWidth(columnDesc.getMin());
         }
 
-        extTable.setDragEnabled(true);
+        extTable.setDragEnabled(false);
         extTable.setTransferHandler(new TerminologyTransferHandler(extTable));
         extTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         relPanel.putClientProperty("extTable", extTable);

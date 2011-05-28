@@ -118,7 +118,7 @@ public class QACasesBrowser extends JPanel {
 
 		caseTable.setModel(tableModel);
 		caseTable.setTransferHandler(th);
-		caseTable.setDragEnabled(true);
+		caseTable.setDragEnabled(false);
 
 		TableColumn conceptUuidCol = caseTable.getColumnModel().getColumn(
 				tableModel.CONCEPT_UUID);

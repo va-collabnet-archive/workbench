@@ -260,7 +260,7 @@ public class LanguageRefsetDisplayPlugin extends AbstractPlugin implements Table
         c.gridx++;
         languageRefsetTable = new JTableWithDragImage(descTableModel);
         languageRefsetTable.getSelectionModel().addListSelectionListener(this);
-        languageRefsetTable.setDragEnabled(true);
+        languageRefsetTable.setDragEnabled(false);
         languageRefsetTable.setTransferHandler(new TerminologyTransferHandler(languageRefsetTable));
 
         if (ACE.editMode) {

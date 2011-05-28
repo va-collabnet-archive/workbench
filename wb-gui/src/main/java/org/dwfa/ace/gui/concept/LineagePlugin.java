@@ -186,7 +186,7 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         lineageTree.setLargeModel(true);
         lineageTree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         lineageTree.setTransferHandler(new TerminologyTransferHandler(lineageTree));
-        lineageTree.setDragEnabled(true);
+        lineageTree.setDragEnabled(false);
         lineageRenderer = new LineageTreeCellRenderer(host.getConfig());
         lineageTree.setCellRenderer(lineageRenderer);
         lineageTree.setRootVisible(false);

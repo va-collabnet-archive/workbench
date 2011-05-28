@@ -571,7 +571,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         wfHistoryTable = new JTableWithDragImage(model);
         wfHistoryTable.setAutoCreateColumnsFromModel(true);
         SortClickListener.setupSorter(wfHistoryTable);
-        wfHistoryTable.setDragEnabled(true);
+        wfHistoryTable.setDragEnabled(false);
         wfHistoryTable.setTransferHandler(new TerminologyTransferHandler(this));
         WorkflowHistoryTableRenderer renderer = new WorkflowHistoryTableRenderer(config, true);
         wfHistoryTable.setDefaultRenderer(Number.class, renderer);

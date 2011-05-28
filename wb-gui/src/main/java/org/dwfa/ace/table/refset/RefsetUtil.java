@@ -140,7 +140,7 @@ public class RefsetUtil {
             column.setMinWidth(columnDesc.getMin());
         }
 
-        extTable.setDragEnabled(true);
+        extTable.setDragEnabled(false);
         extTable.setTransferHandler(new TerminologyTransferHandler(extTable));
         extTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         if (ACE.editMode) {
