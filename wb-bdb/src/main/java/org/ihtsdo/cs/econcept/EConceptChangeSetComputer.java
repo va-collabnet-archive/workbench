@@ -115,8 +115,10 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                         try {
                             if (eMember == null) {
                                 eMember = v.getERefsetMember();
-                                eRefsetMembers.add(eMember);
-                                setupFirstVersion(eMember, v);
+                                if (eMember != null) {
+                                    eRefsetMembers.add(eMember);
+                                    setupFirstVersion(eMember, v);
+                                }
                             } else {
                                 TkRevision eRevision = v.getERefsetRevision();
                                 setupRevision(eMember, v, eRevision);
@@ -166,9 +168,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         for (Relationship r : c.getSourceRels()) {
             TkRelationship ecr = null;
             for (Relationship.Version v : r.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && 
-                        v.getTime() != Long.MIN_VALUE && 
-                        v.getAuthorNid() != classifier) {
+                if (v.sapIsInRange(minSapNid, maxSapNid)
+                        && v.getTime() != Long.MIN_VALUE
+                        && v.getAuthorNid() != classifier) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         try {
                             changed.set(true);
