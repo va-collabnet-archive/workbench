@@ -202,6 +202,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             RefsetMember rm = (RefsetMember) rc;
             rm.primordialSapNid = -1;
             BdbCommitManager.writeImmediate(refsetCon);
+            BdbCommitManager.addUncommittedNoChecks(refsetCon);
         }
     }
 
