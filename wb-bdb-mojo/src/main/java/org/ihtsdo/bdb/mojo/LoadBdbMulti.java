@@ -107,6 +107,12 @@ public class LoadBdbMulti extends AbstractMojo {
      */
     private File berkeleyDir;
     /**
+     * Generated resources directory.
+     * 
+     * @parameter expression="${project.build.directory}/workflow"
+     */
+    private File wfLuceneDir;
+    /**
      * 
      * @parameter default-value=true
      */
@@ -144,6 +150,11 @@ public class LoadBdbMulti extends AbstractMojo {
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
 //            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
 //                    berkeleyDir);
+            
+            if (inputWfHxFilePath != null) {
+            	Bdb.allowWfLuceneSetup(true);
+            }
+            
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
                getLog().info("initialPaths: " + Arrays.asList(initialPaths));
@@ -471,11 +482,11 @@ public class LoadBdbMulti extends AbstractMojo {
     }
 
     public void createLuceneIndices() throws Exception {
-        LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
+        LuceneManager.setLuceneRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
         LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
 
         if (inputWfHxFilePath != null) {
-        	LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
         	WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
         	LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
         }

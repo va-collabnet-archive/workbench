@@ -41,7 +41,7 @@ public class VodbMutableToReadOnly extends AbstractMojo {
     void executeMojo(File berkeleyDir) throws MojoExecutionException {
         try {
         	LuceneManager.init(LuceneSearchType.DESCRIPTION);
-            LuceneManager.setDbRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
+            LuceneManager.setLuceneRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
             File dirToMove = new File(berkeleyDir, "mutable");
             dirToMove.renameTo(new File(berkeleyDir, "read-only"));

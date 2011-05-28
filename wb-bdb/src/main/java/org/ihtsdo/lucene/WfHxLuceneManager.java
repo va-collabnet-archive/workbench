@@ -12,14 +12,15 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
 
 public class WfHxLuceneManager extends LuceneManager {
 
 
-    protected static File wfHxLuceneDirFile = new File("target/berkeley-db/workflow/lucene");
-    protected static String wfHxDirectorySuffix = "workflow/lucene";
+    static final String wfLuceneFileSuffix = "lucene";
+	protected static File wfHxLuceneDirFile = new File("target/workflow/lucene");
 	private static boolean recalculateMatchLimit = true;
 	private static int matchLimit = 0;
 	private static UUID workflowIdToUpdate = null;
@@ -31,7 +32,7 @@ public class WfHxLuceneManager extends LuceneManager {
 			throw new CorruptIndexException("Should have workflowIdToUpdate set, but is null");
 		}
 		if (wfHxWriter == null) {
-		    wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir);
+		    wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
 		    wfHxWriter.setUseCompoundFile(true);
 		    wfHxWriter.setMergeFactor(15);
 		    wfHxWriter.setMaxMergeDocs(Integer.MAX_VALUE);

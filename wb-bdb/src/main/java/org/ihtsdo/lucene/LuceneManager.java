@@ -23,11 +23,9 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 
 public abstract class LuceneManager {
 
@@ -48,8 +46,6 @@ public abstract class LuceneManager {
     public static Directory descLuceneMutableDir;
     public static Directory descLuceneReadOnlyDir;
 
-    private static LuceneSearchType currentType = null;
-
     private static ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
 
     public static void close(LuceneSearchType type) {
@@ -65,8 +61,6 @@ public abstract class LuceneManager {
     	}
 
         // Only do if not first time called
-    	if (currentType != null)
-    	{
         if (searcher != null) {
             try {
                 searcher.close();
@@ -84,48 +78,53 @@ public abstract class LuceneManager {
                 AceLog.getAppLog().alertAndLogException(e);
             }
         }
-    }
+        
+		if (type == LuceneSearchType.DESCRIPTION) {
+			descWriter = writer;
+			descSearcher = searcher;
+		} else {
+			wfHxWriter = writer;
+			wfHxSearcher = searcher;
+    	}
     }
 
     public static void init(LuceneSearchType type) throws IOException {
-		currentType = type;
-
     	// Only do if not first time
     	if (type == LuceneSearchType.DESCRIPTION) {
 	    	if (descLuceneReadOnlyDir == null) {
-	    		descLuceneReadOnlyDir = initDirectory(DescriptionLuceneManager.descLuceneReadOnlyDirFile, false);
+	    		descLuceneReadOnlyDir = initDirectory(DescriptionLuceneManager.descLuceneReadOnlyDirFile, false, LuceneSearchType.DESCRIPTION);
         	}
 	
 	    	if (descLuceneMutableDir == null) {
-    	    	descLuceneMutableDir = initDirectory(DescriptionLuceneManager.descLuceneMutableDirFile, true);
+    	    	descLuceneMutableDir = initDirectory(DescriptionLuceneManager.descLuceneMutableDirFile, true, LuceneSearchType.DESCRIPTION);
 	    	}
     	} else {
 	    	if (wfHxLuceneDir == null) {
-	    		wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true);
+	    		wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
 	    	}
     	}
     }
 
-    private static Directory initDirectory(File luceneDirFile, boolean mutable)
+    private static Directory initDirectory(File luceneDirFile, boolean mutable, LuceneSearchType type)
             throws IOException, CorruptIndexException,
             LockObtainFailedException {
         Directory luceneDir = null;
         if (luceneDirFile.exists()) {
             luceneDir = new SimpleFSDirectory(luceneDirFile);
             if (mutable) {
-                setupWriter(luceneDirFile, luceneDir);
+                setupWriter(luceneDirFile, luceneDir, type);
             }
         } else {
             luceneDirFile.mkdirs();
             luceneDir = new SimpleFSDirectory(luceneDirFile);
             if (mutable) {
-                setupWriter(luceneDirFile, luceneDir);
+                setupWriter(luceneDirFile, luceneDir, type);
             }
         }
         return luceneDir;
     }
 
-    protected static Directory setupWriter(File luceneDirFile, Directory luceneDir)
+    protected static Directory setupWriter(File luceneDirFile, Directory luceneDir, LuceneSearchType type)
             throws IOException, CorruptIndexException,
             LockObtainFailedException {
         if (luceneDir == null) {
@@ -142,7 +141,7 @@ public abstract class LuceneManager {
                     MaxFieldLength.UNLIMITED);
         }
 
-        if (currentType == LuceneSearchType.DESCRIPTION) {
+        if (type == LuceneSearchType.DESCRIPTION) {
         	descWriter = writer;
         } else {
         	wfHxWriter = writer;
@@ -192,13 +191,13 @@ public abstract class LuceneManager {
         } else {
         		searcherCopy = wfHxSearcher;
         		searcher = wfHxSearcher;
-    }
+        }
 
             if (searcherCopy == null) {
             	if (type == LuceneSearchType.DESCRIPTION) {
             		IndexSearcher readOnlySearcher = new IndexSearcher(descLuceneReadOnlyDir, true);
             		IndexSearcher mutableSearcher = new IndexSearcher(descLuceneMutableDir, true);
-                searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
+            		searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
                     descSearcher = searcherCopy;
                 } else {
             		IndexSearcher allHxSearcher = new IndexSearcher(wfHxLuceneDir, true);
@@ -282,10 +281,10 @@ public abstract class LuceneManager {
         if (writer == null) {
         	if (type == LuceneSearchType.DESCRIPTION) {
         		DescriptionLuceneManager.descLuceneMutableDirFile.mkdirs();
-        		descLuceneMutableDir = setupWriter(DescriptionLuceneManager.descLuceneMutableDirFile, descLuceneMutableDir);
+        		descLuceneMutableDir = setupWriter(DescriptionLuceneManager.descLuceneMutableDirFile, descLuceneMutableDir, type);
         	} else {
         		WfHxLuceneManager.wfHxLuceneDirFile.mkdirs();
-        		wfHxLuceneDir = setupWriter(WfHxLuceneManager.wfHxLuceneDirFile, wfHxLuceneDir);
+        		wfHxLuceneDir = setupWriter(WfHxLuceneManager.wfHxLuceneDirFile, wfHxLuceneDir, type);
         	}
         }
 
@@ -302,7 +301,7 @@ public abstract class LuceneManager {
         	wfIndexer = new WfHxIndexGenerator(writer);
             AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
         	wfIndexer.initializeWfHxLucene();
-    }
+        }
 
 
         AceLog.getAppLog().info("\nOptimizing index start time: " + timer.getElapsedTime());
@@ -315,7 +314,7 @@ public abstract class LuceneManager {
 	}
 	
 
-	public static void setDbRootDir(File root, LuceneSearchType type) {
+	public static void setLuceneRootDir(File root, LuceneSearchType type) {
 		ParallelMultiSearcher searcher;
 		IndexWriter writer;
 		
@@ -325,10 +324,10 @@ public abstract class LuceneManager {
 			searcher = descSearcher;
 			writer = descWriter;
 		} else {
-			WfHxLuceneManager.wfHxLuceneDirFile = new File(root, WfHxLuceneManager.wfHxDirectorySuffix);
+			WfHxLuceneManager.wfHxLuceneDirFile = new File(root, WfHxLuceneManager.wfLuceneFileSuffix);
 			searcher = wfHxSearcher;
 			writer = wfHxWriter;
-    }
+		}
 
         if (writer != null) {
             try {

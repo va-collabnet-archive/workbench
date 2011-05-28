@@ -83,6 +83,7 @@ public class Bdb {
     private static BdbPathManager pathManager;
     private static boolean closed = true;
     private static BdbMemoryMonitor memoryMonitor = new BdbMemoryMonitor();
+	private static boolean allowWfLucene = false;
 
     public static boolean removeMemoryMonitorListener(LowMemoryListener listener) {
         return memoryMonitor.removeListener(listener);
@@ -111,6 +112,10 @@ public class Bdb {
 
     public static void setup(String dbRoot) {
         setup(dbRoot, null);
+    }
+
+    public static void allowWfLuceneSetup(boolean allowVal) {
+    	allowWfLucene = allowVal;
     }
 
     public static void setCacheSize(String cacheSize) {
@@ -243,8 +248,12 @@ public class Bdb {
             }
             File bdbDirectory = new File(dbRoot);
             bdbDirectory.mkdirs();
-            LuceneManager.setDbRootDir(bdbDirectory, LuceneSearchType.DESCRIPTION);
-            LuceneManager.setDbRootDir(bdbDirectory, LuceneSearchType.WORKFLOW_HISTORY);
+            LuceneManager.setLuceneRootDir(bdbDirectory, LuceneSearchType.DESCRIPTION);
+
+            if (allowWfLucene) {
+            	File wfLuceneDirectory = new File("database" + File.separator + "target" + File.separator + "workflow");
+            	LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneSearchType.WORKFLOW_HISTORY);
+            }
             
             inform(activity, "Setting up database environment...");
             mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
@@ -553,7 +562,12 @@ public class Bdb {
                 BdbCommitManager.shutdown();
                 activity.setProgressInfoLower("8/11: Starting LuceneManager close.");
                 LuceneManager.close(LuceneSearchType.DESCRIPTION);
-                LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
+                
+                if (allowWfLucene) {
+                	LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
+                	Bdb.allowWfLuceneSetup(false);
+                }
+                
                 NidDataFromBdb.close();
                 activity.setProgressInfoLower("9/11: Starting mutable.bdbEnv.sync().");
                 mutable.bdbEnv.sync();

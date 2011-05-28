@@ -1690,9 +1690,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         
         try {
             if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
-                wfHxUpdater.setProgressInfo("Making lucene index -- this may take a while...");
-                WfHxIndexGenerator.setSourceInputFile(null);
-                LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+            	// If first time through, Lucene Dir must be set.  If still empty, then make index.
+            	File wfLuceneDirectory = new File("workflow");
+            	LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneSearchType.WORKFLOW_HISTORY);
+            
+            	if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
+	                wfHxUpdater.setProgressInfo("Making lucene index -- this may take a while...");
+	                WfHxIndexGenerator.setSourceInputFile(null);
+	                LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+	            }
             }
             
             wfHxUpdater.setIndeterminate(true);

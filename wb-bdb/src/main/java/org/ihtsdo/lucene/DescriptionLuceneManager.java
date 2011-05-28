@@ -20,7 +20,7 @@ public class DescriptionLuceneManager extends LuceneManager {
 
     protected static void writeToLuceneNoLock(Collection<Description> descriptions) throws CorruptIndexException, IOException {
 		if (descWriter == null) {
-		    descLuceneMutableDir = setupWriter(descLuceneMutableDirFile, descLuceneMutableDir);
+		    descLuceneMutableDir = setupWriter(descLuceneMutableDirFile, descLuceneMutableDir, LuceneSearchType.DESCRIPTION);
 		    descWriter.setUseCompoundFile(true);
 		    descWriter.setMergeFactor(15);
 		    descWriter.setMaxMergeDocs(Integer.MAX_VALUE);
