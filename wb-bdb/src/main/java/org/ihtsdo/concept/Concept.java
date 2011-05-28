@@ -60,6 +60,7 @@ import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
+import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -1892,6 +1893,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public void cancel() throws IOException {
         data.cancel();
+        
         if (BdbCommitManager.forget(getConceptAttributes())) {
             Bdb.getConceptDb().forget(this);
             canceled = true;

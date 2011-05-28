@@ -773,6 +773,12 @@ public class ConceptViewRenderer extends JLayeredPane {
         workflowToggleButton.setVisible(false);
         GuiUtil.tickle(ConceptViewRenderer.this);
     }
+    
+    public void updateWizardPanel() {
+        if (workflowToggleButton.isSelected()) {
+            showWizardPanel();
+        }
+    }
 
     private void setDividerLocation() {
         int dividerLocation = workflowPanel.getHeight() / 2;

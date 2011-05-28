@@ -182,27 +182,38 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     private void cancel(
-            Collection<? extends ConceptComponent<?, ?>> componentList) {
+            Collection<? extends ConceptComponent<?, ?>> componentList) throws IOException {
         ArrayList<ConceptComponent<?, ?>> toRemove =
                 new ArrayList<ConceptComponent<?, ?>>();
         if (componentList != null) {
             for (ConceptComponent<?, ?> cc : componentList) {
                 if (cancel(cc)) {
                     toRemove.add(cc);
+                    removeRefsetReferences(cc);
                 }
             }
             componentList.removeAll(toRemove);
         }
     }
 
+    private void removeRefsetReferences(ConceptComponent<?, ?> cc) throws IOException {
+        for (RefexChronicleBI<?> rc: cc.getRefsetMembers()) {
+            Concept refsetCon = Concept.get(rc.getCollectionNid());
+            RefsetMember rm = (RefsetMember) rc;
+            rm.primordialSapNid = -1;
+            BdbCommitManager.writeImmediate(refsetCon);
+        }
+    }
+
     private boolean cancel(
-            ConceptComponent<?, ?> cc) {
+            ConceptComponent<?, ?> cc) throws IOException {
         if (cc == null) {
             return true;
         }
         // component
         if (cc.getTime() == Long.MAX_VALUE) {
             cc.cancel();
+            removeRefsetReferences(cc);
             return true;
         }
         cc.cancel();
