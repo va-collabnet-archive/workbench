@@ -89,7 +89,7 @@ public class WfComparator
 	public class PreferredTermComparator implements Comparator<I_GetConceptData> { 
 		public int compare(I_GetConceptData a, I_GetConceptData b) {
 			try {
-				return getPreferredTerm(a).compareTo(getPreferredTerm(b));
+				return WorkflowHelper.getPreferredTerm(a).compareTo(WorkflowHelper.getPreferredTerm(b));
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTermComparator", e);
 			}
@@ -103,31 +103,5 @@ public class WfComparator
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
 			return (o1.getFSN().compareTo(o2.getFSN()));
 		}
-	}
-	
-
-	private String getPreferredTerm(I_GetConceptData conceptData) throws Exception {
-        descTypeList = Terms.get().newIntList();
-        descTypeList.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
-
-        statusSet = Terms.get().newIntSet();
-        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-        statusSet.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-        statusSet.add(ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.localize().getNid());
-        statusSet.add(ArchitectonicAuxiliary.Concept.READY_TO_PROMOTE.localize().getNid());
-        statusSet.add(ArchitectonicAuxiliary.Concept.PROMOTED.localize().getNid());
-
-        viewPos = Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly();
-
-        I_DescriptionTuple descTuple =
-            conceptData.getDescTuple(descTypeList, null, statusSet, viewPos,
-                LANGUAGE_SORT_PREF.TYPE_B4_LANG, null, null);
-    
-	    if (descTuple == null) {
-	        UUID conceptUuid = conceptData.getUids().iterator().next();
-	        throw new TerminologyException("Unable to obtain preferred term for concept " + conceptUuid.toString());
-	    }
-	
-	    return descTuple.getText();
 	}
 }
