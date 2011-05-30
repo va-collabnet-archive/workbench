@@ -1011,36 +1011,31 @@ public class InboxPanel extends JPanel {
 					statusId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_ID.ordinal()]);
 					statusTime = Long.parseLong(parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_TIME.ordinal()]);
 
-					Integer projectId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.PROJECT_ID.ordinal()]);
-					// String projectName =
-					// parsedSubj[TerminologyProjectDAO.subjectIndexes.PROJECT_NAME.ordinal()];
-					// Integer worklistId =
-					// Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_ID.ordinal()]);
-					Integer worklistmemberId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_ID.ordinal()]);
-					// String
-					// worklistmemberName=parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_NAME.ordinal()];
-					// String
-					// worklistName=parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_NAME.ordinal()];
-					Integer promoRefsetId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()]);
-					// String
-					// tags=parsedSubj[TerminologyProjectDAO.subjectIndexes.TAGS_ARRAY.ordinal()].trim();
-					// }
-					// process = this.queue.read(qEntry.getEntryID(), null);
-					//
-					// WorkListMember
-					// member=(WorkListMember)process.readAttachement(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey());
-					// if (member!=null){
+					String projectIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROJECT_ID.ordinal()];
+					Integer projectId = null;
+					try {
+						projectId = Terms.get().uuidToNative(UUID.fromString(projectIdStr));
+					} catch (IllegalArgumentException e) {
+						projectId = Integer.valueOf(projectIdStr);
+					}
+
+					String worklistMemberIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_ID.ordinal()];
+					Integer worklistmemberId = null;
+					try {
+						worklistmemberId = Terms.get().uuidToNative(UUID.fromString(worklistMemberIdStr));
+					} catch (IllegalArgumentException e) {
+						worklistmemberId = Integer.valueOf(worklistMemberIdStr);
+					}
+
+					String promoRefsetgIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()];
+					Integer promoRefsetId = null;
+					try {
+						promoRefsetId = Terms.get().uuidToNative(UUID.fromString(promoRefsetgIdStr));
+					} catch (IllegalArgumentException e) {
+						promoRefsetId = Integer.valueOf(promoRefsetgIdStr);
+					}
+
 					countAssignmentsInt++;
-					// I_TerminologyProject
-					// project=getProjectForMember(member,config);
-					// if (project!=null){
-					// if (!countAssignments.keySet().contains(project.getId()))
-					// {
-					// countAssignments.put(project.getId(), 1);
-					// } else {
-					// countAssignments.put(project.getId(),
-					// countAssignments.get(project.getId()) + 1);
-					// }
 					oFolder = new HashSet<String>();
 					oFolder.add(IconUtilities.OUTBOX_NODE);
 					addEntryToFolders(oFolder, qEntry.getEntryID());
