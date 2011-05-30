@@ -69,6 +69,7 @@ class Sct1_ConRecord implements Comparable<Object>, Serializable {
     }
 
     // method required for object to be sortable (comparable) in arrays
+    @Override
     public int compareTo(Object obj) {
         Sct1_ConRecord tmp = (Sct1_ConRecord) obj;
         int thisMore = 1;
@@ -101,6 +102,7 @@ class Sct1_ConRecord implements Comparable<Object>, Serializable {
     }
 
     // Create string to show some input fields for exception reporting
+    @Override
     public String toString() {
         UUID uuid = new UUID(conUuidMsb, conUuidLsb); // :yyy:
         return uuid + TAB_CHARACTER + status + TAB_CHARACTER + isprimitive;

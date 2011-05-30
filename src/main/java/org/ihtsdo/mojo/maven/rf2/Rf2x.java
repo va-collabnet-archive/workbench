@@ -25,7 +25,7 @@ import org.dwfa.util.id.Type3UuidFactory;
 public class Rf2x {
 
     static String convertEffectiveTimeToDate(String date) {
-        return date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 9)
+        return date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8)
                 + " 00:00:00";
     }
 

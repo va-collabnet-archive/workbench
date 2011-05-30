@@ -142,7 +142,7 @@ public class Rf2File implements Comparable<Object> {
 
         File f1 = new File(new File(wDir, subDir), rootDir);
         ArrayList<File> fv = new ArrayList<File>();
-        listFilesRecursive(fv, f1, "sct1_" + prefix, postfix);
+        listFilesRecursive(fv, f1, prefix, postfix);
 
         File[] files = new File[0];
         files = fv.toArray(files);

@@ -98,9 +98,9 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
             if (success) {
                 getLog().info("::: Output Directory: " + outDir);
             }
-            BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "ids.txt"), "UTF-8"));
-            getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
+            // BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+            //        outDir + "ids.txt"), "UTF-8"));
+            // getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
 
             // LANGUAGE REFSET FILES "der2_cRefset_Language"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -111,14 +111,14 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
                 Rf2_LrfRecord[] members = Rf2_LrfRecord.parseLangRefSet(rf2File);
                 for (Rf2_LrfRecord m : members) {
                     m.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, m.idL, m.effDateStr, m.pathStr);
+                    // writeSctSnomedLongId(bwIds, m.id, m.effDateStr, m.pathStr);
                 }
             }
             bw.flush();
             bw.close();
 
-            bwIds.flush();
-            bwIds.close();
+            // bwIds.flush();
+            // bwIds.close();
 
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
