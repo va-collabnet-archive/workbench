@@ -1008,9 +1008,15 @@ public class InboxPanel extends JPanel {
 
 					String worklistmemberPref = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_SOURCE_PREF.ordinal()];
 					String worklistmemberName = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_SOURCE_NAME.ordinal()];
-					statusId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_ID.ordinal()]);
 					statusTime = Long.parseLong(parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_TIME.ordinal()]);
 
+					String statusIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_ID.ordinal()];
+					try {
+						statusId = Terms.get().uuidToNative(UUID.fromString(statusIdStr));
+					} catch (IllegalArgumentException e) {
+						statusId = Integer.valueOf(statusIdStr);
+					}
+					
 					String projectIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROJECT_ID.ordinal()];
 					Integer projectId = null;
 					try {
@@ -1967,11 +1973,27 @@ public class InboxPanel extends JPanel {
 
 			if (parsedSubj.length == TerminologyProjectDAO.subjectIndexes.values().length) {
 
-				Integer worklistId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_ID.ordinal()]);
-				Integer worklistmemberId = Integer.parseInt(parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_ID.ordinal()]);
+				String worklistIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_ID.ordinal()];
 
-				// WorkListMember member= (WorkListMember)
-				// process.readAttachement(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey());
+				Integer worklistId = null;
+				try {
+					worklistId = Terms.get().uuidToNative(UUID.fromString(worklistIdStr));
+				} catch (IllegalArgumentException e) {
+					worklistId = Integer.valueOf(worklistIdStr);
+				} catch (TerminologyException e) {
+					e.printStackTrace();
+				}
+
+				String worklistMemberIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_ID.ordinal()];
+				Integer worklistmemberId = null;
+				try {
+					worklistmemberId = Terms.get().uuidToNative(UUID.fromString(worklistMemberIdStr));
+				} catch (IllegalArgumentException e) {
+					worklistmemberId = Integer.valueOf(worklistMemberIdStr);
+				} catch (TerminologyException e) {
+					e.printStackTrace();
+				}
+
 				try {
 
 					I_GetConceptData memberCpt = Terms.get().getConcept(worklistmemberId);
@@ -1990,8 +2012,6 @@ public class InboxPanel extends JPanel {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						// process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(),
-						// member);
 					}
 					Integer tid = (Integer) process.getProperty(ProcessAttachmentKeys.LAST_USER_TASKID.getAttachmentKey());
 					process.setCurrentTaskId(tid);
