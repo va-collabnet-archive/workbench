@@ -113,7 +113,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             throws IOException, InvalidCAB {
         RefsetMember<?, ?> refex = getRefex(blueprint);
         if (refex != null) {
-            if (refex.getSapNid() == -1 || refex.getTime() != -1) {
+            if (refex.getSapNid() == -1) {
                 return reCreateRefex(refex, blueprint);
             } else {
                 boolean current = false;
