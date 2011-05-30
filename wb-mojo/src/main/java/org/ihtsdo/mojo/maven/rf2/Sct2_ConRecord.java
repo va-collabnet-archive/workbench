@@ -15,6 +15,7 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
+import com.sleepycat.je.utilint.LongMaxStat;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -39,6 +40,8 @@ class Sct2_ConRecord implements Serializable {
     boolean isPrimitiveB; // ISPRIMITIVE
 
     public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim) {
+        if (conIdL == Long.MAX_VALUE)
+            System.out.println(":!!!:DEBUG Long.MAX_VALUE");
         this.conSnoIdL = conIdL;
         this.effDateStr = dateStr;
         this.isActive = active;
@@ -54,8 +57,8 @@ class Sct2_ConRecord implements Serializable {
 
             // DATA COLUMNS
             int ID = 0;// id
-            int EFFECTIVE_TIME = 2; // effectiveTime
-            int ACTIVE = 1; // active
+            int EFFECTIVE_TIME = 1; // effectiveTime
+            int ACTIVE = 2; // active
             int MODULE_ID = 3; // moduleId
             int DEFINITION_STATUS_ID = 4; // definitionStatusId
 

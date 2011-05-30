@@ -120,8 +120,8 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
 
             // DESCRIPTION FILES "sct2_Description"
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "description_rf2.txt"), "UTF-8"));
-            getLog().info("::: DESCRIPTIONS FILE: " + outDir + "description_rf2.txt");
+                    outDir + "descriptions_rf2.txt"), "UTF-8"));
+            getLog().info("::: DESCRIPTIONS FILE: " + outDir + "descriptions_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
@@ -159,7 +159,7 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
 
             bwIds.flush();
             bwIds.close();
-            
+
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -176,22 +176,17 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
 
     private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
             throws IOException, TerminologyException {
-        // Primary UUID
+        // PRIMARY_UUID = 0;
         writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
-
-        // Source System UUID
+        // SOURCE_SYSTEM_UUID = 1;
         writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
-
-        // Source Id
+        // ID_FROM_SOURCE_SYSTEM = 2;
         writer.append(Long.toString(sctId) + TAB_CHARACTER);
-
-        // Status UUID
+        // STATUS_UUID = 3;
         writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
-
-        // Effective Date   yyyy-MM-dd HH:mm:ss
-        writer.append(Rf2x.convertEffectiveTimeToDate(date) + TAB_CHARACTER);
-
-        // Path UUID
+        // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
+        writer.append(date + TAB_CHARACTER);
+        // PATH_UUID = 5;
         writer.append(path + LINE_TERMINATOR);
     }
 }

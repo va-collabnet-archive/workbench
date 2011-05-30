@@ -117,7 +117,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
     }
     
     public Sct1_RelRecord(UUID uuidRelId, int status, UUID uuidC1, int roleTypeIdx, UUID uuidC2,
-            int characteristic, int refinability, int group, long revTime, int pathIdx) {
+            int characteristic, int refinability, int group, long revTime, int pathIdx, int userIdx) {
         
         this.relSnoId = Long.MAX_VALUE; // SNOMED RELATIONSHIPID, if applicable
         this.relUuidMsb = uuidRelId.getMostSignificantBits();
@@ -139,7 +139,7 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
         this.exceptionFlag = false; // to handle Concept ID change exception
         this.pathIdx = pathIdx;
         this.revTime = revTime;
-        this.userIdx = 0; // ARF Input Format does not have a field for user id.
+        this.userIdx = userIdx; // ARF user id.
     }
 
     // method required for object to be sortable (comparable) in arrays

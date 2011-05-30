@@ -20,7 +20,6 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 
 public class Rf2_LrfRecord {
@@ -28,7 +27,7 @@ public class Rf2_LrfRecord {
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
     // RECORD FIELDS
-    final long idL;
+    final String id;
     final String effDateStr;
     final boolean isActive;
     final String pathStr;
@@ -36,9 +35,9 @@ public class Rf2_LrfRecord {
     final long referencedComponentIdL;
     final long acceptibilityIdL;
 
-    public Rf2_LrfRecord(long idL, String dateStr, boolean active, String path,
+    public Rf2_LrfRecord(String id, String dateStr, boolean active, String path,
             long refsetIdL, long referencedComponentIdL, long acceptibilityIdL) {
-        this.idL = idL;
+        this.id = id;
         this.effDateStr = dateStr;
         this.isActive = active;
 
@@ -56,8 +55,8 @@ public class Rf2_LrfRecord {
 
         // DATA COLUMNS
         int ID = 0;// id
-        int EFFECTIVE_TIME = 2; // effectiveTime
-        int ACTIVE = 1; // active
+        int EFFECTIVE_TIME = 1; // effectiveTime
+        int ACTIVE = 2; // active
         int MODULE_ID = 3; // moduleId
         int REFSET_ID = 4; // refSetId
         int REFERENCED_COMPONENT_ID = 5; // referencedComponentId
@@ -71,7 +70,7 @@ public class Rf2_LrfRecord {
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
-            a[idx] = new Rf2_LrfRecord(Long.parseLong(line[ID]),
+            a[idx] = new Rf2_LrfRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertIdToUuidStr(line[MODULE_ID]),
@@ -90,7 +89,7 @@ public class Rf2_LrfRecord {
         writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
         // Member UUID
-        writer.append(Rf2x.convertIdToUuidStr(idL) + TAB_CHARACTER);
+        writer.append(id + TAB_CHARACTER);
 
         // Status UUID
         writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);

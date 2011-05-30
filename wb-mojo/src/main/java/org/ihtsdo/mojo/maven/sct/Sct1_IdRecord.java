@@ -20,42 +20,39 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     long primaryUuidMsb; // CONCEPTID/PRIMARYID
     long primaryUuidLsb; // CONCEPTID/PRIMARYID
-    
     // SOURCE UUID
     // ArchitectonicAuxiliary.Concept.ICD_9.getUids().get(0)
     int srcSystemIdx;
-    
     // SOURCE ID -- DENOTATION
     String denotation;
     long denotationLong;
-    
     // STATUS UUID
     // ArchitectonicAuxiliary.Concept.CURRENT.getUids().get(0)
     int status;
-    
     // EFFECTIVE DATE
     long revTime;
-   
     // PATH
     int pathIdx;
-    
     // USER
-    int userIdx;    
+    int userIdx;
 
-    // :NYI:HACK:
-    // UUID allocation called only from ARF input
-    // so far, only String identifiers are supported for ARF ids.
+    // Each non-String must be conditionally added.
     public Sct1_IdRecord(UUID uuidPrimaryId, int sourceSystemIdx, String idFromSourceSystem,
             int status, long revDateTime, int pathIdx, int userIdx) {
         this.primaryUuidMsb = uuidPrimaryId.getMostSignificantBits(); // CONCEPTID/PRIMARYID
         this.primaryUuidLsb = uuidPrimaryId.getLeastSignificantBits(); // CONCEPTID/PRIMARYID
         this.srcSystemIdx = sourceSystemIdx;
-        this.denotation = idFromSourceSystem;
-        this.denotationLong = Long.MAX_VALUE;
+        if (sourceSystemIdx == 0) { // SNOMED Long is index "0"
+            this.denotation = null;
+            this.denotationLong = Long.parseLong(idFromSourceSystem);
+        } else {
+            this.denotation = idFromSourceSystem;
+            this.denotationLong = Long.MAX_VALUE;
+        }
         this.status = status;
         this.revTime = revDateTime;
         this.pathIdx = pathIdx;
@@ -113,6 +110,5 @@ public class Sct1_IdRecord implements Comparable<Sct1_IdRecord>, Serializable {
                 }
             }
         }
-    }    
-    
+    }
 }

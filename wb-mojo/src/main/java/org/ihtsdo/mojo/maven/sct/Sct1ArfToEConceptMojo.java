@@ -578,13 +578,24 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private String[] zRelCharStrArray;
 
     private int lookupRelCharTypeIdx(String uuid) {
+        int max = zRelCharArray.length;
         int idx = 0;
-        while (idx < 6) {
+        while (idx < max) {
             if (uuid.equalsIgnoreCase(zRelCharStrArray[idx])) {
-                break;
+                return idx;
             }
             idx++;
         }
+
+        // GROW ARRAYS
+        max = max + 1;
+        UUID[] tmpUuidArray = Arrays.copyOf(zRelCharArray, max);
+        tmpUuidArray[idx] = UUID.fromString(uuid);
+        zRelCharArray = tmpUuidArray;
+
+        String[] tmpStrArray = Arrays.copyOf(zRelCharStrArray, max);
+        tmpStrArray[idx] = uuid;
+        zRelCharStrArray = tmpStrArray;
         return idx;
     }
     // RELATIONSHIP REFINIBILITY LOOKUP
@@ -592,13 +603,24 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private String[] zRelRefStrArray;
 
     private int lookupRelRefTypeIdx(String uuid) {
+        int max = zRelRefArray.length;
         int idx = 0;
-        while (idx < 3) {
+        while (idx < max) {
             if (uuid.equalsIgnoreCase(zRelRefStrArray[idx])) {
-                break;
+                return idx;
             }
             idx++;
         }
+        // GROW ARRAYS
+        max = max + 1;
+        UUID[] tmpUuidArray = Arrays.copyOf(zRelRefArray, max);
+        tmpUuidArray[idx] = UUID.fromString(uuid);
+        zRelRefArray = tmpUuidArray;
+
+        String[] tmpStrArray = Arrays.copyOf(zRelRefStrArray, max);
+        tmpStrArray[idx] = uuid;
+        zRelRefStrArray = tmpStrArray;
+
         return idx;
     }
 
@@ -1029,7 +1051,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
             // STEP #4. Add IDs to components.
-            executeMojoStep4();
+            executeMojoStep4_MatchIds();
             System.gc();
 
             // STEP #5. Add IDs to components.
@@ -1224,7 +1246,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
-            // Status UUID
+            // Concept UUID
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // Status
             int conceptStatus = lookupZStatusUuidIdx(line[CONCEPT_STATUS]);
@@ -1356,6 +1378,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int GROUP = 7;
         int EFFECTIVE_DATE = 8; // yyyy-MM-dd HH:mm:ss
         int PATH_UUID = 9;
+        int AUTHOR_UUID = 10;
 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
@@ -1380,9 +1403,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 9;
             int pathIdx = lookupZPathIdx(line[PATH_UUID]);
+            // USER_UUID
+            int userIdx = USER_DEFAULT_IDX;
+            if (line[PATH_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
+                userIdx = USER_SNOROCKET_IDX;
+            }
 
             Sct1_RelRecord tmpRelRec = new Sct1_RelRecord(uuidRelId, status, uuidC1, roleTypeIdx,
-                    uuidC2, characteristic, refinability, group, revTime, pathIdx);
+                    uuidC2, characteristic, refinability, group, revTime, pathIdx, userIdx);
 
             oos.writeUnshared(tmpRelRec);
         }
@@ -1764,7 +1792,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
     }
 
-    private void executeMojoStep4() throws MojoFailureException {
+    private void executeMojoStep4_MatchIds() throws MojoFailureException {
         getLog().info("*** Sct1ArfToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
         long start = System.currentTimeMillis();
         int nWrite = 0; // counter for memory optimization for object files writing
@@ -1837,10 +1865,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
                 if (match == 0) {
                     // MATCH
-                    if (tmpCon.addedIds == null) {
-                        tmpCon.addedIds = new ArrayList<Sct1_IdRecord>();
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpCon.conSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpCon.addedIds == null) {
+                            tmpCon.addedIds = new ArrayList<Sct1_IdRecord>();
+                        }
+                        tmpCon.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpCon.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) {
                     // Ids are ahead of the concepts.
@@ -1911,10 +1943,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 Sct1_DesRecord tmpDes = aDes.get(theDesIdx);
                 int match = checkIdDesMatched(aId.get(theIdIdx), tmpDes);
                 if (match == 0) { // MATCH
-                    if (tmpDes.addedIds == null) {
-                        tmpDes.addedIds = new ArrayList<Sct1_IdRecord>();
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpDes.desSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpDes.addedIds == null) {
+                            tmpDes.addedIds = new ArrayList<Sct1_IdRecord>();
+                        }
+                        tmpDes.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpDes.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) { // Ids are ahead of the descriptions.
                     oos.writeUnshared(tmpDes); // Save this description.
@@ -1982,10 +2018,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 int match = checkIdRelMatched(aId.get(theIdIdx), tmpRel);
 
                 if (match == 0) { // MATCH
-                    if (tmpRel.addedIds == null) {
-                        tmpRel.addedIds = new ArrayList<Sct1_IdRecord>(1);
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpRel.relSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpRel.addedIds == null) {
+                            tmpRel.addedIds = new ArrayList<Sct1_IdRecord>(1);
+                        }
+                        tmpRel.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpRel.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) { // Ids are ahead of the relationships.
                     oos.writeUnshared(tmpRel); // Save this relationship.
@@ -3036,7 +3076,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             if (theCon.compareTo(theDes) != IS_EQUAL || theCon.compareTo(theRel) != IS_EQUAL /*|| theCon != theRelDest*/) {
                 getLog().info("CONFIRM: ROOT CONCEPT ");
                 UUID uuid = new UUID(conList.get(0).conUuidMsb, conList.get(0).conUuidLsb);
-                getLog().info(" -is- concept SNOMED id =" + uuid.toString());
+                getLog().info(" -is- concept SNOMED UUID =" + uuid.toString());
+                getLog().info(" -is- concept SNOMED id =" + conList.get(0).conSnoId);
                 getLog().info(" -is- concept counter #" + countCon);
                 getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
                 getLog().info(

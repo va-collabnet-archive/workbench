@@ -40,7 +40,7 @@ class Sct2_RelRecord implements Serializable {
     long c2SnoId; // CONCEPTID2
     int group; // RELATIONSHIPGROUP
     long characteristicL; // CHARACTERISTICTYPE
-    long refinability; // REFINABILITY
+    long refinabilityL; // REFINABILITY
     boolean isInferred;
 
     public Sct2_RelRecord(long relID, String dateStr, boolean active, String path,
@@ -60,7 +60,7 @@ class Sct2_RelRecord implements Serializable {
         this.group = grp; // RELATIONSHIPGROUP
 
         this.characteristicL = characterType; // CHARACTERISTICTYPE
-        this.refinability = refinibility; // REFINABILITY
+        this.refinabilityL = refinibility; // REFINABILITY
 
         this.isInferred = inferredB;
     }
@@ -84,10 +84,14 @@ class Sct2_RelRecord implements Serializable {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
 
-        // Header row
-        br.readLine();
+        // Refinibility UUID
+        // notRefinable	RF2==900000000000007000, RF1="0"
+        // optional     RF2==900000000000216007, RF1="1"
+        // mandatory    RF2==900000000000218008, RF1="2"
+        long refinibilityId = Long.parseLong("900000000000216007");
 
         int idx = 0;
+        br.readLine(); // Header row
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
@@ -100,8 +104,9 @@ class Sct2_RelRecord implements Serializable {
                     Long.parseLong(line[DESTINATION_ID]),
                     Integer.parseInt(line[RELATIONSHIP_GROUP]),
                     Long.parseLong(line[CHARACTERISTIC_TYPE]),
-                    0,
+                    refinibilityId,
                     inferredB);
+            idx++;
         }
 
         return a;
@@ -130,17 +135,17 @@ class Sct2_RelRecord implements Serializable {
         // Destination Concept UUID
         writer.append(Rf2x.convertIdToUuidStr(c2SnoId) + TAB_CHARACTER);
 
-        // Relationship Group
-        writer.append(group + TAB_CHARACTER);
-
         // Characteristic Type UUID
         writer.append(Rf2x.convertIdToUuidStr(characteristicL) + TAB_CHARACTER);
 
         // Refinibility UUID
         // notRefinable	RF2==900000000000007000, RF1="0"
-        // optional     RF2==900000000000216007, RF1="1"
+        // optional     RF2==900000000000216007, RF1="1" <--
         // mandatory    RF2==900000000000218008, RF1="2"
-        writer.append("900000000000216007" + TAB_CHARACTER);
+        writer.append(Rf2x.convertIdToUuidStr(refinabilityL) + TAB_CHARACTER);
+
+        // Relationship Group
+        writer.append(group + TAB_CHARACTER);
 
         // Effective Date
         writer.append(effDateStr + TAB_CHARACTER);
