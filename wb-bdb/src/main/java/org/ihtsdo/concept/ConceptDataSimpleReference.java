@@ -46,7 +46,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
-    private Boolean annotationStyleRefset = false;
+    private Boolean annotationStyleRefset;
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
     private AtomicReference<AddDescriptionSet> descriptions = new AtomicReference<AddDescriptionSet>();
@@ -67,7 +67,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     @Override
     public boolean readyToWrite() {
-        assert annotationStyleRefset != null;
         if (attributes.get() != null) {
             attributes.get().readyToWriteComponent();
         }
