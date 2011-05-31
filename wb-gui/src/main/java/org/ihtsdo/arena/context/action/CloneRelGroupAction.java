@@ -19,6 +19,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
@@ -50,11 +51,10 @@ public class CloneRelGroupAction extends AbstractAction {
 				int sourceGroup = relGroup.getRelGroup();
 				
 				//get group numbers in target concept
-				ConceptChronicleBI target = (ConceptChronicleBI) targetComponent; 
-				Collection targetGroups = target.getRelGroups(config.getViewCoordinate());
+				ConceptChronicleBI target = (ConceptChronicleBI) targetComponent;  
+				Collection<? extends RelGroupVersionBI> targetGroups = target.getRelGroups(config.getViewCoordinate());
 				int max = 0;
-				for (Object groupObject : targetGroups) {
-					RelGroupVersionBI rg = (RelGroupVersionBI) groupObject;
+				for (RelGroupVersionBI rg : targetGroups) {
 					int group = rg.getRelGroup();
 					if (group > max){
 						 max = group;

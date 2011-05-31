@@ -67,7 +67,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
@@ -190,7 +190,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getPrimUuid();
 	}
 
-	public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc)
+	public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
 			throws IOException, ContraditionException {
 		return bean.getRelGroups(vc);
 	}

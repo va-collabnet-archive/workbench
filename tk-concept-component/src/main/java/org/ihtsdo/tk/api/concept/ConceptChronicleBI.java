@@ -14,7 +14,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 public interface ConceptChronicleBI extends
@@ -30,7 +30,7 @@ public interface ConceptChronicleBI extends
 
     Collection<? extends MediaChronicleBI> getMedia() throws IOException;
 
-    Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException;
+    Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException;
 
     boolean isAnnotationStyleRefex() throws IOException;
 

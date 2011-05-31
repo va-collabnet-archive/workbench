@@ -57,10 +57,10 @@ import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.concept.component.relationship.group.RelGroupChronicle;
+import org.ihtsdo.concept.component.relationship.group.RelGroupVersion;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
-import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -95,6 +95,7 @@ import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.dto.concept.TkConcept;
@@ -801,7 +802,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return null;
     }
 
-    private void getRelGroups(ViewCoordinate vc, ArrayList<RelGroupChronicleBI> results) throws IOException {
+    private void getRelGroups(ViewCoordinate vc, ArrayList<RelGroupVersionBI> results) throws IOException {
         Map<Integer, HashSet<RelationshipChronicleBI>> groupMap =
                 new HashMap<Integer, HashSet<RelationshipChronicleBI>>();
         ViewCoordinate tempVc = new ViewCoordinate(vc);
@@ -821,7 +822,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
 
         for (Entry<Integer, HashSet<RelationshipChronicleBI>> groupEntry : groupMap.entrySet()) {
-            results.add(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()));
+            results.add(new RelGroupVersion(new RelGroupChronicle(this, groupEntry.getKey(), groupEntry.getValue()), vc));
         }
     }
 
@@ -1741,9 +1742,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc)
+    public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
             throws IOException {
-        ArrayList<RelGroupChronicleBI> results = new ArrayList<RelGroupChronicleBI>();
+        ArrayList<RelGroupVersionBI> results = new ArrayList<RelGroupVersionBI>();
 
         if (vc.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
             ViewCoordinate tempVc = new ViewCoordinate(vc);

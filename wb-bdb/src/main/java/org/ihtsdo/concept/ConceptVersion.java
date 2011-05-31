@@ -59,7 +59,7 @@ public class ConceptVersion implements ConceptVersionBI {
     private Concept concept;
 
     @Override
-    public Collection<? extends RelGroupChronicleBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException {
+    public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException {
         return concept.getRelGroups(vc);
     }
     private ViewCoordinate vc;
