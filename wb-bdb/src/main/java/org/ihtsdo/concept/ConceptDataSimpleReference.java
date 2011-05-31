@@ -196,7 +196,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     private void removeRefsetReferences(ConceptComponent<?, ?> cc) throws IOException {
-        for (RefexChronicleBI<?> rc: cc.getRefsetMembers()) {
+        for (RefexChronicleBI<?> rc : cc.getRefsetMembers()) {
             Concept refsetCon = Concept.get(rc.getCollectionNid());
             RefsetMember rm = (RefsetMember) rc;
             rm.primordialSapNid = -1;
@@ -284,12 +284,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 if (hasUncommittedVersion(cc)) {
                     return true;
                 }
-                if (hasUncommittedId(cc)) {
-                    return true;
-                }
-                if (hasUncommittedAnnotation(cc)) {
-                    return true;
-                }
             }
         }
         return false;
@@ -328,6 +322,12 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         return true;
                     }
                 }
+            }
+            if (hasUncommittedId(cc)) {
+                return true;
+            }
+            if (hasUncommittedAnnotation(cc)) {
+                return true;
             }
         }
         return false;
