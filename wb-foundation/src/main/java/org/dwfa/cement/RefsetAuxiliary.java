@@ -544,6 +544,8 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         EN_NZ_TEXT_VARIANTS(new String[]{"New Zealand English text variants", "en-NZ text variants"},
         new I_ConceptualizeUniversally[]{EN_TEXT_WITH_DIALECT_VARIANTS}),
         SYNONYMY(new String[]{"Degree of Synonymy Refset", "Degree of Synonymy Refset"},
+        new I_ConceptualizeUniversally[]{REFSET_IDENTITY}),
+        CASE_SENSITIVE_WORDS(new String[]{"Case Sensitive Words Refset", "Case Sensitive Words Refset"},
         new I_ConceptualizeUniversally[]{REFSET_IDENTITY}),;
         private ArrayList<UUID> conceptUids = new ArrayList<UUID>();
         private Boolean primitive = true;
