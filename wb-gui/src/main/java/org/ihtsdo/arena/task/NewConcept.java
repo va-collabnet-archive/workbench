@@ -42,6 +42,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -64,11 +65,13 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**
@@ -131,6 +134,9 @@ public class NewConcept extends PreviousNextOrCancel {
     private TerminologyConstructorBI tc;
     private ConceptChronicleBI newConcept;
     private String lang;
+    
+    private ConceptChronicleBI gbRefexConcept;
+    private ConceptChronicleBI usRefexConcept;
 
     /*
      * -----------------------
@@ -210,6 +216,8 @@ public class NewConcept extends PreviousNextOrCancel {
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
                 createBlueprintConcept();
+                usRefexConcept = Refsets.EN_US_LANG.getLenient();
+                gbRefexConcept = Refsets.EN_GB_LANG.getLenient();
                 if (addUsDescFsn) {
                 	createBlueprintUsFsnDesc();
                 	createBlueprintUsFsnRefex(descSpecUsFsn.getComponentNid());
@@ -732,13 +740,11 @@ public class NewConcept extends PreviousNextOrCancel {
 
             //create concept blue print
             conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
-            newConcept = tc.construct(conceptSpec);
+            newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(e);
         } catch (InvalidCAB e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(e);
         }
     }
     
@@ -753,29 +759,28 @@ public class NewConcept extends PreviousNextOrCancel {
 
             tc.construct(descSpecGbFsn);
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintGbFsnRefex(int componentNid){
     	try {
-            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+            UUID gbUuid = Refsets.EN_GB_LANG.getLenient().getPrimUuid();
             refexSpecGbFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             tc.construct(refexSpecGbFsn);
+            if(!gbRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(gbRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
@@ -790,17 +795,15 @@ public class NewConcept extends PreviousNextOrCancel {
 
             tc.construct(descSpecGbPref);
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintGbPrefRefex(int componentNid){
         try {
-            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+        	UUID gbUuid = Refsets.EN_GB_LANG.getLenient().getPrimUuid();
             refexSpecGbPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
@@ -808,18 +811,19 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecGbPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecGbPref);
+            if(!gbRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(gbRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintGbAcctRefex(int componentNid){
         try {
-            UUID gbUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+        	UUID gbUuid = Refsets.EN_GB_LANG.getLenient().getPrimUuid();
             refexSpecGbAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
@@ -827,12 +831,13 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecGbAcct);
+            if(!gbRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(gbRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
@@ -847,17 +852,15 @@ public class NewConcept extends PreviousNextOrCancel {
 
             tc.construct(descSpecUsFsn);
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintUsFsnRefex(int componentNid){
     	try {
-            UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+            UUID usUuid = Refsets.EN_US_LANG.getLenient().getPrimUuid();
             refexSpecUsFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
@@ -866,12 +869,13 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsFsn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsFsn);
+            if(!usRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(usRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
@@ -886,17 +890,15 @@ public class NewConcept extends PreviousNextOrCancel {
 
             tc.construct(descSpecUsPref);
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintUsPrefRefex(int componentNid){
         try {
-           UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+        	UUID usUuid = Refsets.EN_US_LANG.getLenient().getPrimUuid();
             refexSpecUsPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
@@ -905,18 +907,19 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsPref.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsPref);
+            if(!usRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(usRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
     private void createBlueprintUsAcctRefex(int componentNid){
         try {
-           UUID usUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
+        	UUID usUuid = Refsets.EN_US_LANG.getLenient().getPrimUuid();
             refexSpecUsAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     componentNid,
@@ -925,12 +928,13 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             
             tc.construct(refexSpecUsAcct);
+            if(!usRefexConcept.isAnnotationStyleRefex()){
+            	Ts.get().addUncommitted(usRefexConcept);
+            }
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+        	AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 
