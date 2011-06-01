@@ -844,12 +844,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
 
         // SHOW input directories from POM file
-        for (int i = 0; i < sct1Dirs.length; i++) {
-            sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
-                    File.separatorChar));
-            getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
-            if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
-                sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
+        if (sct1Dirs != null) {
+            for (int i = 0; i < sct1Dirs.length; i++) {
+                sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
+                        File.separatorChar));
+                getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
+                if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
+                    sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
+                }
             }
         }
 
@@ -897,30 +899,31 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         if (dateStopObj != null) {
             getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
         }
-
-        for (int i = 0; i < sctDirs.length; i++) {
-            getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
-            getLog().info(
-                    ":::     UUID Core:     " + sctDirs[i].getWbPathUuidCore() + " : "
-                    + sctDirs[i].getWbPathUuidCoreFromName());
-            getLog().info(
-                    ":::     UUID Stated:   " + sctDirs[i].getWbPathUuidStated() + " : "
-                    + sctDirs[i].getWbPathUuidStatedFromName());
-            getLog().info(
-                    ":::     UUID Inferred: " + sctDirs[i].getWbPathUuidInferred() + " : "
-                    + sctDirs[i].getWbPathUuidInferredFromName());
-            getLog().info(
-                    ":::     Keep Qualifier Rels from _inferred_ file:  "
-                    + sctDirs[i].getKeepQualifierFromInferred());
-            getLog().info(
-                    ":::     Keep Historical Rels from _inferred_ file: "
-                    + sctDirs[i].getKeepHistoricalFromInferred());
-            getLog().info(
-                    ":::     Keep Additional Rels from _inferred_ file: "
-                    + sctDirs[i].getKeepAdditionalFromInferred());
-            getLog().info(
-                    ":::     Map SCT REL IDs from inferred to stated: "
-                    + sctDirs[i].doMapSctIdInferredToStated());
+        if (sctDirs != null) {
+            for (int i = 0; i < sctDirs.length; i++) {
+                getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
+                getLog().info(
+                        ":::     UUID Core:     " + sctDirs[i].getWbPathUuidCore() + " : "
+                        + sctDirs[i].getWbPathUuidCoreFromName());
+                getLog().info(
+                        ":::     UUID Stated:   " + sctDirs[i].getWbPathUuidStated() + " : "
+                        + sctDirs[i].getWbPathUuidStatedFromName());
+                getLog().info(
+                        ":::     UUID Inferred: " + sctDirs[i].getWbPathUuidInferred() + " : "
+                        + sctDirs[i].getWbPathUuidInferredFromName());
+                getLog().info(
+                        ":::     Keep Qualifier Rels from _inferred_ file:  "
+                        + sctDirs[i].getKeepQualifierFromInferred());
+                getLog().info(
+                        ":::     Keep Historical Rels from _inferred_ file: "
+                        + sctDirs[i].getKeepHistoricalFromInferred());
+                getLog().info(
+                        ":::     Keep Additional Rels from _inferred_ file: "
+                        + sctDirs[i].getKeepAdditionalFromInferred());
+                getLog().info(
+                        ":::     Map SCT REL IDs from inferred to stated: "
+                        + sctDirs[i].doMapSctIdInferredToStated());
+            }
         }
         for (int i = 0; i < arfDirs.length; i++) {
             getLog().info("::: ARF Input Directory (" + i + ") = " + arfDirs[i]);
@@ -1026,9 +1029,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // STEP #1. Convert to versioned binary objects file.  
             // Also computes algorithmic relationship uuid.
-            executeMojoStep1(tDir, tSubDir, sctDirs, ctv3idTF, snomedrtTF, oosCon, oosDes, oosRel,
-                    oosIds);
-            System.gc();
+            if (sctDirs != null) {
+                executeMojoStep1(tDir, tSubDir, sctDirs, ctv3idTF, snomedrtTF, oosCon, oosDes, oosRel,
+                        oosIds);
+                System.gc();
+            }
 
             // STEP #2. Convert arf files to versioned binary objects file.
             // Uses existing relationship uuid
