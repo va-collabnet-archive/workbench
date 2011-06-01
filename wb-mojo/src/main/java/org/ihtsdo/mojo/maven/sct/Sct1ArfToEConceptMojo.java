@@ -272,7 +272,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * mutually exclusive to others directories in the array.
      * 
      * @parameter 
-     * @required
      */
     private Sct1Dir[] sct1Dirs;
     /**
