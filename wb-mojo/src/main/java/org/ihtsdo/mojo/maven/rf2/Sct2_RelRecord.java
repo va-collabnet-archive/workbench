@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 class Sct2_RelRecord implements Serializable {
@@ -138,8 +139,9 @@ class Sct2_RelRecord implements Serializable {
         // Characteristic Type UUID
         if (characteristicL >= 0) {
             writer.append(Rf2x.convertIdToUuidStr(characteristicL) + TAB_CHARACTER);
-        } else { // -1 == historical relationship
-            writer.append("1d054ca3-2b32-3004-b7af-2701276059d5" + TAB_CHARACTER);
+        } else { // -1 becomes  ==> (2) historical relationship
+            writer.append(ArchitectonicAuxiliary.getSnomedCharacteristicType(2).getPrimoridalUid().toString()
+                    + TAB_CHARACTER);
         }
 
         // Refinibility UUID
