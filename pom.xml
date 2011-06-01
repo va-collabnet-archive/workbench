@@ -231,6 +231,7 @@
       <module>rule-engine-integration</module>
       <module>tk-spelling-variants</module>
       <module>tk-junit-ext</module>
+      <module>tk-case-sensitive-words</module>
  <!--     <module>bdb-properties</module> -->
    </modules>
 </project>
