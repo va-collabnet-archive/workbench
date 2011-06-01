@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -386,8 +388,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static int uuidSourceSnomedIdx;
     private static UUID uuidSourceCtv3;
     private static UUID uuidSourceSnomedRt;
-    private SimpleDateFormat arfSimpleDateFormat;
+    private SimpleDateFormat arfSimpleDateFormatDash;
     private SimpleDateFormat arfSimpleDateFormatDot;
+    private SimpleDateFormat arfSimpleDateFormat;
 
     private class ARFFile {
 
@@ -978,8 +981,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // Setup target (build) directory
         getLog().info("    Target Build Directory: " + tDir);
 
-        arfSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        arfSimpleDateFormatDash = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         arfSimpleDateFormatDot = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        arfSimpleDateFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
         ObjectOutputStream oosCon = null;
         ObjectOutputStream oosDes = null;
@@ -1217,9 +1221,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             getLog().info(e1);
         } catch (IOException e) {
             getLog().info(e);
-        } catch (ParseException e) {
-            getLog().info("FAILED: ParseException");
-            getLog().info(e);
         }
 
         getLog().info(
@@ -1229,7 +1230,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfConFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfConFile(f.file, oos);
@@ -1237,7 +1238,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1275,7 +1276,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfDesFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfDesFile(f.file, oos);
@@ -1283,7 +1284,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1360,7 +1361,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRelFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRelFile(f.file, oos);
@@ -1368,7 +1369,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1423,7 +1424,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfIdsFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfIdsFile(f.file, oos);
@@ -1431,7 +1432,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1468,7 +1469,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsBoolFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsBoolFile(f.file, oos);
@@ -1476,8 +1477,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1531,7 +1531,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsConFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsConFile(f.file, oos);
@@ -1539,8 +1539,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1587,7 +1586,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsIntFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsIntFile(f.file, oos);
@@ -1595,8 +1594,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1643,7 +1641,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsStrFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsStrFile(f.file, oos);
@@ -1651,8 +1649,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -5669,11 +5666,18 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     }
 
-    private long convertDateStrToTime(String date) throws ParseException {
-        if (date.contains(".")) {
-            return (arfSimpleDateFormatDot.parse(date)).getTime();
-        } else {
-            return arfSimpleDateFormat.parse(date).getTime();
+    private long convertDateStrToTime(String date) throws MojoFailureException {
+        try {
+            if (date.contains(".")) {
+                return (arfSimpleDateFormatDot.parse(date)).getTime();
+            } else if (date.contains("-")) {
+                return arfSimpleDateFormatDash.parse(date).getTime();
+            } else {
+                return arfSimpleDateFormat.parse(date).getTime();
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("CAN NOT PARSE DATE: " + date, ex);
         }
     }
 
