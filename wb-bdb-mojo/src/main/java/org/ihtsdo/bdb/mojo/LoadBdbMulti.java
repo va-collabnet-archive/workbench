@@ -467,6 +467,8 @@ public class LoadBdbMulti extends AbstractMojo {
                         parts = line.split(" ");
                         String word = parts[wordIndex];
                         String caseType = parts[caseIndex];
+                        
+                        getLog().info("added to Refex Coll: " + word + " " + caseType);
 
                         RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
                                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
