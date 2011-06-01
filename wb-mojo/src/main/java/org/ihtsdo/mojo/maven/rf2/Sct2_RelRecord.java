@@ -136,7 +136,11 @@ class Sct2_RelRecord implements Serializable {
         writer.append(Rf2x.convertIdToUuidStr(c2SnoId) + TAB_CHARACTER);
 
         // Characteristic Type UUID
-        writer.append(Rf2x.convertIdToUuidStr(characteristicL) + TAB_CHARACTER);
+        if (characteristicL >= 0) {
+            writer.append(Rf2x.convertIdToUuidStr(characteristicL) + TAB_CHARACTER);
+        } else {
+            writer.append("1d054ca3-2b32-3004-b7af-2701276059d5" + TAB_CHARACTER);
+        }
 
         // Refinibility UUID
         // notRefinable	RF2==900000000000007000, RF1="0"
