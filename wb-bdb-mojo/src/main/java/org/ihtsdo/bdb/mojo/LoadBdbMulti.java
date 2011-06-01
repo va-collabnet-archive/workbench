@@ -150,18 +150,18 @@ public class LoadBdbMulti extends AbstractMojo {
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
 //            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
 //                    berkeleyDir);
-            
+
             if (inputWfHxFilePath != null) {
-            	Bdb.allowWfLuceneSetup(true);
+                Bdb.allowWfLuceneSetup(true);
             }
-            
+
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
-               getLog().info("initialPaths: " + Arrays.asList(initialPaths));
+                getLog().info("initialPaths: " + Arrays.asList(initialPaths));
             } else {
-               getLog().warn("initialPaths: are NULL");
+                getLog().warn("initialPaths: are NULL");
             }
- 
+
             for (String fname : conceptsFileNames) {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
@@ -241,8 +241,8 @@ public class LoadBdbMulti extends AbstractMojo {
                             Ts.get().getConcept(spec.getOriginConcept().getUuids());
                     validateSpec(origin, spec.getOriginConcept());
 
-                    getLog().info("Adding path: " + spec.getPathConcept().getDescription() +
-                            " with origin: " + spec.getOriginConcept().getDescription());
+                    getLog().info("Adding path: " + spec.getPathConcept().getDescription()
+                            + " with origin: " + spec.getOriginConcept().getDescription());
 
                     RefexCAB newPathSpec =
                             new RefexCAB(TK_REFSET_TYPE.CID,
@@ -267,8 +267,8 @@ public class LoadBdbMulti extends AbstractMojo {
 
                     RefsetMemberFactory.createNoTx(newPathSpec, ec, startTime);
                     RefsetMemberFactory.createNoTx(newOriginSpec, ec, startTime);
-                    getLog().info("Added path: " + spec.getPathConcept().getDescription() +
-                            " with origin: " + spec.getOriginConcept().getDescription());
+                    getLog().info("Added path: " + spec.getPathConcept().getDescription()
+                            + " with origin: " + spec.getOriginConcept().getDescription());
 
 
 
@@ -292,6 +292,8 @@ public class LoadBdbMulti extends AbstractMojo {
 
             getLog().info("Loading spelling variants.");
             loadVariants();
+            getLog().info("Loading case sensitive words.");
+            loadCaseSensitiveWords();
             getLog().info("Starting db sync.");
             Bdb.sync();
             getLog().info("Finished db sync, starting generate lucene index.");
@@ -423,8 +425,69 @@ public class LoadBdbMulti extends AbstractMojo {
                 BdbCommitManager.addUncommitted(dialectVariantsRefexColl);
             }
         } else {
-           getLog().warn("No dialect files found in " + 
-                   new File(generatedResources, "spelling-variants").getAbsolutePath());
+            getLog().warn("No dialect files found in "
+                    + new File(generatedResources, "spelling-variants").getAbsolutePath());
+        }
+    }
+
+    public void loadCaseSensitiveWords() throws Exception {
+        List<File> caseFiles = FileIO.recursiveGetFiles(
+                new File(generatedResources, "case-sensitive"),
+                "cs_words", ".txt", false);
+        if (caseFiles != null && caseFiles.size() > 0) {
+            I_ConfigAceFrame config = DefaultConfig.newProfile();
+
+            int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
+            int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
+            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
+
+            for (File cf : caseFiles) {
+                getLog().info("processing dialectFile: " + cf.getName());
+                InputStreamReader isr =
+                        new InputStreamReader(new FileInputStream(cf),
+                        "UTF-8");
+                Concept caseSensitiveRefexColl = null;
+                if (cf.getName().toLowerCase().contains("cs_words.txt")) {
+                    caseSensitiveRefexColl = Bdb.getConcept(
+                            Bdb.uuidsToNid(RefsetAuxiliary.Concept.CASE_SENSITIVE_WORDS.getUids()));
+                }
+                if (caseSensitiveRefexColl == null) {
+                    break;
+                }
+                BufferedReader br = new BufferedReader(isr);
+                try {
+                    String line = br.readLine();
+                    String[] parts = line.split(" ");
+                    int wordIndex = 0;
+                    int caseIndex = 1;
+
+                    line = br.readLine();
+                    while (line != null && line.length() > 3) {
+                        parts = line.split(" ");
+                        String word = parts[wordIndex];
+                        String caseType = parts[caseIndex];
+
+                        RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+                                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
+                        wordRefexSpec.with(RefexProperty.STRING1, word);
+                        wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                        wordRefexSpec.setMemberContentUuid();
+
+                        RefexChronicleBI<?> wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
+
+                        line = br.readLine();
+                    }
+                } catch (EOFException ex) {
+                    // nothing to do...
+                } finally {
+                    br.close();
+                }
+                BdbCommitManager.addUncommitted(caseSensitiveRefexColl);
+            }
+        } else {
+            getLog().warn("No dialect files found in "
+                    + new File(generatedResources, "spelling-variants").getAbsolutePath());
         }
     }
 
@@ -486,9 +549,9 @@ public class LoadBdbMulti extends AbstractMojo {
         LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
 
         if (inputWfHxFilePath != null) {
-        	LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-        	WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
-        	LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+            LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
+            WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
+            LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
         }
     }
 }
