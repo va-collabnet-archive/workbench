@@ -461,24 +461,36 @@ public class LoadBdbMulti extends AbstractMojo {
                     String[] parts = line.split(" ");
                     int wordIndex = 0;
                     int caseIndex = 1;
+                    int lineCount = 0;
+                    RefexChronicleBI<?> wordRefex = null;
 
                     line = br.readLine();
-                    while (line != null && line.length() > 3) {
+                    while (line != null && line.length() > 1) {
                         parts = line.split(" ");
                         String word = parts[wordIndex];
                         String caseType = parts[caseIndex];
                         
-                        getLog().info("added to Refex Coll: " + word + " " + caseType);
 
-                        RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
-                                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
-                        wordRefexSpec.with(RefexProperty.STRING1, word);
-                        wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
-                        wordRefexSpec.setMemberContentUuid();
+                        if (lineCount == 0) {
+                            RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+                                    caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
+                            wordRefexSpec.with(RefexProperty.STRING1, word);
+                            wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                            wordRefexSpec.setMemberContentUuid();
 
-                        RefexChronicleBI<?> wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
+                            wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
+                        } else {
+                            RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
+                                    wordRefex.getNid(), caseSensitiveRefexColl.getNid());
+                            wordRefexSpec.with(RefexProperty.STRING1, word);
+                            wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                            wordRefexSpec.setMemberContentUuid();
 
+                            amender.constructIfNotCurrent(wordRefexSpec);
+                        }
+                        
                         line = br.readLine();
+                        lineCount++;
                     }
                 } catch (EOFException ex) {
                     // nothing to do...
