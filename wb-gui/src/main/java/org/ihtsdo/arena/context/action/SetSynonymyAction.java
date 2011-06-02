@@ -55,103 +55,102 @@ public class SetSynonymyAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-    	I_ConfigAceFrame config;
-		try {
-			I_AmPart componentVersion;
-			config = Terms.get().getActiveAceFrameConfig();
-			TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
-	                config.getViewCoordinate());
-			ViewCoordinate vc = config.getViewCoordinate();
-			UUID degreeOfSynonymy = UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847");
-			
-			if(currentSynonymy){
-				Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-				int synonymyCollectionNid = Ts.get().getNidForUuids(Refsets.DEGREE_OF_SYNONYMY.getLenient().getPrimUuid());
-				int synonymyTypeNid;
-				
-				if(synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)){
-					synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid());
-				}else if(synonymy.equals(SynonymyType.NON_SYNONYMOUS)){
-					synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid());
-				}else {
-					synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid());
-				}
-				
-				if (refexes != null) {
-	                for (RefexChronicleBI refex : refexes) {
-	                	if (refex.getCollectionNid() == synonymyCollectionNid) {
-	                		//make analog
-	                		componentVersion = (I_AmPart) refex;
-	                		AnalogBI analog = null;
-	                		for (PathBI ep : config.getEditingPathSet()) {
-	                            analog = componentVersion.makeAnalog(
-	                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-	                                    config.getDbConfig().getUserConcept().getNid(),
-	                                    ep.getConceptNid(),
-	                                    Long.MAX_VALUE);
-	                            
-		                		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-		                		//test member type
-		                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
-		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
-		                			
-		                			rca.setCnid1(synonymyTypeNid);
+        I_ConfigAceFrame config;
+        try {
+            I_AmPart componentVersion;
+            config = Terms.get().getActiveAceFrameConfig();
+            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                    config.getViewCoordinate());
+            ViewCoordinate vc = config.getViewCoordinate();
+            UUID degreeOfSynonymy = Refsets.DEGREE_OF_SYNONYMY.getLenient().getPrimUuid();
 
-		                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-		                            Terms.get().addUncommitted(concept);
-		                		}else{
-				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-				                }
-			                }
-	                	}
-	                }
-	            }
-			}else {
-				if(synonymy.equals(SynonymyType.SYNONYM)){
-					RefexCAB syn = new RefexCAB(
-										TK_REFSET_TYPE.CID,
-										desc.getNid(),
-										Ts.get().getNidForUuids(degreeOfSynonymy));
-					syn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid()));
-					RefexChronicleBI<?> newRefex = tc.construct(syn);
-	   	           	I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
-	   	           	Ts.get().addUncommitted(refex);
-				}else if(synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)){
-					RefexCAB nearSyn = new RefexCAB(
-							TK_REFSET_TYPE.CID,
-							desc.getNid(),
-							Ts.get().getNidForUuids(degreeOfSynonymy));
-					nearSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid()));
-					RefexChronicleBI<?> newRefex = tc.construct(nearSyn);
-	   	           	I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
-	   	           	Ts.get().addUncommitted(refex);
-				}else if(synonymy.equals(SynonymyType.NON_SYNONYMOUS)){
-					RefexCAB notSyn = new RefexCAB(
-							TK_REFSET_TYPE.CID,
-							desc.getNid(),
-							Ts.get().getNidForUuids(degreeOfSynonymy));
-					notSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid()));
-					RefexChronicleBI<?> newRefex = tc.construct(notSyn);
-	   	           	I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
-	   	           	Ts.get().addUncommitted(refex);
-				}
-				else{
-					throw new UnsupportedOperationException("Synonymy not supported");
-				}
-			}
-			
-			
-		} catch (TerminologyException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (IOException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (PropertyVetoException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (InvalidCAB ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-    	
-       
+            if (currentSynonymy) {
+                Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+                int synonymyCollectionNid = Ts.get().getNidForUuids(Refsets.DEGREE_OF_SYNONYMY.getLenient().getPrimUuid());
+                int synonymyTypeNid;
+
+                if (synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)) {
+                    synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid());
+                } else if (synonymy.equals(SynonymyType.NON_SYNONYMOUS)) {
+                    synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid());
+                } else {
+                    synonymyTypeNid = Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid());
+                }
+
+                if (refexes != null) {
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.getCollectionNid() == synonymyCollectionNid) {
+                            //make analog
+                            componentVersion = (I_AmPart) refex;
+                            AnalogBI analog = null;
+                            for (PathBI ep : config.getEditingPathSet()) {
+                                analog = componentVersion.makeAnalog(
+                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                        config.getDbConfig().getUserConcept().getNid(),
+                                        ep.getConceptNid(),
+                                        Long.MAX_VALUE);
+
+                                RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
+                                //test member type
+                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
+                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+
+                                    rca.setCnid1(synonymyTypeNid);
+
+                                    I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
+                                    Terms.get().addUncommitted(concept);
+                                } else {
+                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (synonymy.equals(SynonymyType.SYNONYM)) {
+                    RefexCAB syn = new RefexCAB(
+                            TK_REFSET_TYPE.CID,
+                            desc.getNid(),
+                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                    syn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid()));
+                    RefexChronicleBI<?> newRefex = tc.construct(syn);
+                    I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
+                    Ts.get().addUncommitted(refex);
+                } else if (synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)) {
+                    RefexCAB nearSyn = new RefexCAB(
+                            TK_REFSET_TYPE.CID,
+                            desc.getNid(),
+                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                    nearSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid()));
+                    RefexChronicleBI<?> newRefex = tc.construct(nearSyn);
+                    I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
+                    Ts.get().addUncommitted(refex);
+                } else if (synonymy.equals(SynonymyType.NON_SYNONYMOUS)) {
+                    RefexCAB notSyn = new RefexCAB(
+                            TK_REFSET_TYPE.CID,
+                            desc.getNid(),
+                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                    notSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid()));
+                    RefexChronicleBI<?> newRefex = tc.construct(notSyn);
+                    I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
+                    Ts.get().addUncommitted(refex);
+                } else {
+                    throw new UnsupportedOperationException("Synonymy not supported");
+                }
+            }
+
+
+        } catch (TerminologyException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (InvalidCAB ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
+
     }
 }
