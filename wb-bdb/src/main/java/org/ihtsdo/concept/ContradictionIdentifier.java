@@ -108,7 +108,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         } else if (isDuplicateNew) {
             return ContradictionResult.DUPLICATE_NEW;
         } else if (isSingleEdit) {
-        	returnVersionCollection.add(singleVersion);
+			if (isReturnVersionsUseCase.get()) {
+				returnVersionCollection.add(singleVersion);
+			}
             return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
 			return ContradictionResult.NONE;
