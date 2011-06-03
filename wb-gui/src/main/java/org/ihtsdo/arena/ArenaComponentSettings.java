@@ -76,7 +76,6 @@ public abstract class ArenaComponentSettings implements Serializable,
     protected JLabel resizeLabel;
     protected mxGraphComponent graphContainer;
     protected JComponent preferences;
-    protected JComponent wfHistory;
     protected JComponent renderer;
     private DefaultMutableTreeNode prefRoot;
 
@@ -166,9 +165,6 @@ public abstract class ArenaComponentSettings implements Serializable,
         if (preferences != null) {
             setPrefLocation();
         }
-        if (wfHistory != null) {
-        	setWfHxLocation();
-        }
     }
 
     @Override
@@ -241,7 +237,6 @@ public abstract class ArenaComponentSettings implements Serializable,
         List<AbstractButton> buttons = getSpecializedButtons();
         buttons.add(getButtonPreferencesButton());
         buttons.add(getCollapseExpandButton());
-        buttons.add(getWfHxDetailButton());
         return buttons;
     }
 
@@ -254,14 +249,6 @@ public abstract class ArenaComponentSettings implements Serializable,
         }
         return preferences;
     }
-
-    protected void createNewWfPanel() {
-        wfHistory = new ArenaWfHxPanel(this);
-        wfHistory.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
-        wfHistory.setOpaque(true);
-        wfHistory.setBounds(0, 0, 450, 20);
-//            wfHistory.setMaximumSize(new Dimension(450, 10));
-     }
 
     protected AbstractButton getButtonPreferencesButton() {
         AbstractButton button = new JToggleButton(new AbstractAction("", new ImageIcon(
@@ -343,20 +330,6 @@ public abstract class ArenaComponentSettings implements Serializable,
         layers.add(getPreferences(), JLayeredPane.PALETTE_LAYER);
     }
 
-    private void setWfHxLocation() {
-        JLayeredPane layers = renderer.getRootPane().getLayeredPane(); 
-        Point loc = SwingUtilities.convertPoint(renderer, new Point(0, 0), layers);
-        if (layers.getWidth() > loc.x + renderer.getWidth() + wfHistory.getWidth()) {
-            loc.x = loc.x + renderer.getWidth();
-            wfHistory.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
-        } else {
-            loc.x = loc.x - wfHistory.getWidth();
-            wfHistory.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
-        }
-        wfHistory.setBounds(loc.x, loc.y, wfHistory.getWidth(), renderer.getHeight());
-        layers.add(wfHistory, JLayeredPane.PALETTE_LAYER);
-    }
-
     private JButton getCollapseExpandButton() {
         JButton button = new JButton(new AbstractAction("", new ImageIcon(
                 ConceptViewRenderer.class.getResource(IMAGE_PATH + "minimize.gif"))) {
@@ -389,61 +362,7 @@ public abstract class ArenaComponentSettings implements Serializable,
         return button;
     }
 
-    private JButton getWfHxDetailButton() {
-        JButton button = new JButton(new AbstractAction("",  new ImageIcon(ACE.class.getResource("/16x16/plain/media_step_forward.png"))) {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 1L;
-            boolean showWfHxDetails = false;
-
-
-            public void actionPerformed(ActionEvent e) {
-                showWfHxDetails = !showWfHxDetails;
-                JLayeredPane layers = renderer.getRootPane().getLayeredPane();
-
-                if (showWfHxDetails) {
-                	if (wfHistory == null) {
-                		createNewWfPanel();
-                	}
-                	
-                	if (((ArenaWfHxPanel)wfHistory).isNewHtmlCodeRequired(getConcept())) {
-                		getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, ((ArenaWfHxPanel)wfHistory).getConceptChangeListener());
-                		createNewWfPanel();
-                	}
-                	((ArenaWfHxPanel)wfHistory).setCurrentlyDisplayed(true);
-                	wfHistory.setVisible(true);
-                	setWfHxLocation();
-                } else { 
-                	wfHistory.setVisible(false);
-                	wfHistory.invalidate();
-                    layers.remove(wfHistory);
-                	((ArenaWfHxPanel)wfHistory).setCurrentlyDisplayed(false);
-                }
-            }
-        });
-        button.setPreferredSize(new Dimension(21, 16));
-        button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        button.setToolTipText("Show concept's entire workflow history");
-        button.setOpaque(false);
-        button.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
-        return button;
-    }
-
-    protected void regenerateWfPanel(I_GetConceptData con) {
-    	if (((ArenaWfHxPanel)wfHistory).isNewHtmlCodeRequired(getConcept())) {
-        	JLayeredPane layers = renderer.getRootPane().getLayeredPane();
-            layers.remove(wfHistory);
-
-            getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, ((ArenaWfHxPanel)wfHistory).getConceptChangeListener());
-    		
-            createNewWfPanel();
-    	}
-
-    	setWfHxLocation();
-    }
-
-	public float getFontSize() {
+    public float getFontSize() {
         return fontSize;
     }
 
