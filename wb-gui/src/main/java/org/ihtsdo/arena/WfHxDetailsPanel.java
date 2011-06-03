@@ -1,8 +1,7 @@
 package org.ihtsdo.arena;
 
+import java.awt.Color;
 import java.awt.GridLayout;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.StringBufferInputStream;
 import java.io.StringReader;
@@ -21,9 +20,9 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerFactory;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
+import org.dwfa.ace.table.AceTableRenderer;
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -31,27 +30,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class ArenaWfHxPanel extends JPanel {
+public class WfHxDetailsPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-
-	public class ArenaWfHxConceptChangeListener implements PropertyChangeListener {
-
-        @Override
-        public void propertyChange(PropertyChangeEvent pce) {
-            if (currentlyDisplayed) {
-	        	Object termComponent = pce.getNewValue();
-	            
-	            if (termComponent != null && 
-	            	I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-	                I_GetConceptData con = (I_GetConceptData) termComponent;
 	
-	                settings.regenerateWfPanel(con);
-	            }
-            }
-        }
-    }
-
 	private class Workflow {
 		private String id;
 		private String action;
@@ -152,21 +134,20 @@ public class ArenaWfHxPanel extends JPanel {
 	private List<Workflow> allWorkflows;
 
 	private String currentHtml;  
-	private boolean currentlyDisplayed = true;
+
+	//	private boolean currentlyDisplayed = true;
 	private long currentLatestTimestamp = Long.MIN_VALUE;
 	private I_GetConceptData currentConcept = null;
-	private ArenaWfHxConceptChangeListener currentListener = null;
 	
-	private ArenaComponentSettings settings;
+	private ConceptViewSettings settings;
 
-	public ArenaWfHxPanel(ArenaComponentSettings settings) {
+	public WfHxDetailsPanel(ConceptViewSettings settings) {
 		super(new GridLayout(1,1));
-		currentListener = new ArenaWfHxConceptChangeListener();
 
 		this.settings = settings;
-		this.settings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
 
         htmlPane.setContentType("text/html");
+        htmlPane.setEditable(false);
     	currentHtml = generateWfHxAsHtml(settings.getConcept());
     	currentConcept = settings.getConcept();
 		WorkflowHistoryJavaBean latestBean = null;
@@ -190,23 +171,31 @@ public class ArenaWfHxPanel extends JPanel {
 		boolean generateNewHtml = false;
 		
 		if (arenaConcept != null) {
-			if (currentConcept == null || !arenaConcept.getPrimUuid().equals(currentConcept.getPrimUuid())) {
-				generateNewHtml = true;
-				currentConcept = arenaConcept;
-			}  
-
-			try {
-				WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(arenaConcept);
-				
-				if (latestBean != null) {
-					if (latestBean.getWorkflowTime() > currentLatestTimestamp) {
-						generateNewHtml = true;
-					}
+			if (arenaConcept.getPrimUuid() != null) {
+				// Proper Concept
+				if (currentConcept == null || !arenaConcept.getPrimUuid().equals(currentConcept.getPrimUuid())) {
+					generateNewHtml = true;
+					currentConcept = arenaConcept;
+				}  
 	
-					currentLatestTimestamp = latestBean.getWorkflowTime();
+				try {
+					WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(arenaConcept);
+					
+					if (latestBean != null) {
+						if (latestBean.getWorkflowTime() > currentLatestTimestamp) {
+							generateNewHtml = true;
+						}
+		
+						currentLatestTimestamp = latestBean.getWorkflowTime();
+					}
+				} catch (Exception e) {
+					AceLog.getAppLog().log(Level.WARNING, "Failure to identify latest WfHx for concept: " + arenaConcept);
 				}
-			} catch (Exception e) {
-				AceLog.getAppLog().log(Level.WARNING, "Failure to identify latest WfHx for concept: " + arenaConcept);
+			} else {
+				// Concept is not correct state (missing a PrimUid).
+				// Therefore, generate new (blank) wfHx details, but do not 
+				// assign the currentConcept nor currentLatestTimestamp.
+				generateNewHtml = true;
 			}
 		}
 		
@@ -258,67 +247,94 @@ public class ArenaWfHxPanel extends JPanel {
 		}
 	}
 	private String transformerWithoutXslt(String inputXml) {
+		Color headerColor = Color.LIGHT_GRAY;
 		StringBuffer retStr = new StringBuffer();
 		
 		// Setup XML
 		retStr.append("\n<html><body>");
-
+		
 		// Setup Table
 		retStr.append("<TABLE border=\"1\" cellpadding=\"3\" cellspacing=\"0\"> 	<tbody>");
-		retStr.append("<tr bgcolor=\"green\">	<th>Action</th>		<th>State</th> 	<th>Modeler</th>      <th>Timestamp</th>    </tr>");
+//        buff.append(getFont().getSize());
+//        buff.append("pt ");
+//        buff.append(getFont().getFamily());
+		retStr.append("<tr bgcolor=\"" + colorToHtml(headerColor) + "\">	<th>Action</th>		<th>State</th> 	<th>Modeler</th>      <th>Timestamp</th>    </tr>");
 		
-		parseDocument(inputXml);
-		Iterator itr = allWorkflows.iterator();
-		String currentUid = UUID.randomUUID().toString();
-		
-		String currentColor = "red";
-		while(itr.hasNext()) {
-			Workflow currentWf = (Workflow)itr.next();
+		if (inputXml.length() > 0) {
+			parseDocument(inputXml);
+			Iterator<Workflow> itr = allWorkflows.iterator();
+			String currentUid = UUID.randomUUID().toString();
+			Color currentColor =  Color.WHITE;
 			
-			if (!currentUid.equalsIgnoreCase(currentWf.getId())) {
-				currentUid = currentWf.getId();
-				if (currentColor.equalsIgnoreCase("red")) {
-					currentColor = "yellow";
-				} else {
-					currentColor = "red";
-				}
-			} 
-			
-			retStr.append("<tr bgcolor=\"" + currentColor + "\">");
-			retStr.append("<td>" + currentWf.getAction() + "</td>");
-			retStr.append("<td>" + currentWf.getState() + "</td>");
-			retStr.append("<td>" + currentWf.getModeler() + "</td>");
-			retStr.append("<td>" + currentWf.getTime() + "</td>");
-			retStr.append("</tr>");
+			while(itr.hasNext()) {
+				Workflow currentWf = (Workflow)itr.next();
+				
+				if (!currentUid.equalsIgnoreCase(currentWf.getId())) {
+					currentUid = currentWf.getId();
+					if (currentColor.equals( AceTableRenderer.LEMON_CHIFFON)) {
+						currentColor = Color.WHITE;
+					} else {
+						currentColor = AceTableRenderer.LEMON_CHIFFON;
+					}
+				} 
+				
+				retStr.append("<tr bgcolor=\"" + colorToHtml(currentColor) + "\">");
+				
+				retStr.append(processColumn(currentWf.getAction()));
+				retStr.append(processColumn(currentWf.getState()));
+				retStr.append(processColumn(currentWf.getModeler()));
+				retStr.append(processColumn(currentWf.getTime()));
+
+				retStr.append("</tr>");
+			}
 		}
 		
+		retStr.append("\n</tbody></TABLE>");
 		retStr.append("\n</body></html>");
 		return retStr.toString();
+	}
+
+	private Object processColumn(String str) {
+		return "<td>" + 
+		   	"<font face='Dialog' size='3'>" + 
+			   str +
+			   "</font></td>";
+	}
+
+	private String colorToHtml(Color c) {
+        String r = (c.getRed() < 16) ? "0" + Integer.toHexString(c.getRed()) : Integer.toHexString(c.getRed());
+        String g = (c.getGreen() < 16) ? "0" + Integer.toHexString(c.getGreen()) : Integer.toHexString(c.getGreen());
+        String b = (c.getBlue() < 16) ? "0" + Integer.toHexString(c.getBlue()) : Integer.toHexString(c.getBlue());
+        return "#" + r + g + b;
 	}
 
 	private String generateXsltXml(TreeSet<WorkflowHistoryJavaBean> allRows) {
 		StringBuffer retStr = new StringBuffer();
 		
-		retStr.append("\n<workflows>");
+		if (allRows.size() > 0) {
+			retStr.append("\n<workflows>");
+		}
 		
 		for (WorkflowHistoryJavaBean bean : allRows) {
 			retStr.append("\n\t\t" + WorkflowHistoryRefset.generateXmlForXslt(bean));
 		}
-		retStr.append("\n</workflows>");
+
+		if (allRows.size() > 0) {
+			retStr.append("\n</workflows>");
+		}
 
 		return retStr.toString();
 	}
 
-	public  boolean isCurrentlyDisplayed() {
-		return currentlyDisplayed;
-	}
+//	public  boolean isCurrentlyDisplayed() {
+//		return currentlyDisplayed;
+//	}
+//
+//	public  void setCurrentlyDisplayed(boolean newDisplaySetting) {
+//		currentlyDisplayed = newDisplaySetting;
+//	}
 
-	public  void setCurrentlyDisplayed(boolean newDisplaySetting) {
-		currentlyDisplayed = newDisplaySetting;
+	public String getCurrentHtml() {
+		return currentHtml;
 	}
-
-	public PropertyChangeListener getConceptChangeListener() {
-		return currentListener;
-	}
-
 }

@@ -413,4 +413,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     public void setLinkedTab(Integer linkedTab) {
         this.linkedTab = linkedTab;
     }
+
+	public void regenerateWfPanel(I_GetConceptData con) {
+		
+	}
 }

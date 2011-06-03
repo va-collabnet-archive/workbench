@@ -97,7 +97,8 @@ public class ConceptViewRenderer extends JLayeredPane {
     final String WORKFLOW_ACTION_SUFFIX = " workflow action";
     private final JButton cancelButton;
     private final JButton commitButton;
-
+    private WfHxDetailsPanelHandler wfHxDetails;
+    
     private class RendererComponentAdaptor extends ComponentAdapter implements AncestorListener {
 
         @Override
@@ -196,6 +197,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     private JScrollPane wizardScrollPane;
     private JScrollPane conceptScrollPane;
     private JToggleButton workflowToggleButton;
+    private JToggleButton wfHxDetailsToggleButton;
     private JToggleButton oopsButton;
     private final static String advanceWorkflowActionPath = "migration-wf";
     private final String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
@@ -585,6 +587,36 @@ public class ConceptViewRenderer extends JLayeredPane {
         footerPanel.add(workflowToggleButton, gbc);
 
 
+        
+        
+        
+        
+        gbc.gridx++;
+        wfHxDetails = new WfHxDetailsPanelHandler(this, settings);
+        wfHxDetailsToggleButton = new JToggleButton(
+                new ImageIcon(ACE.class.getResource("/16x16/plain/workflow_history.png")));
+        wfHxDetailsToggleButton.setToolTipText("show workflow history details for this concept...");
+        wfHxDetailsToggleButton.setSelected(false);
+//        wfHxDetailsToggleButton.setSelected(false);
+        wfHxDetailsToggleButton.setVisible(true);
+
+        wfHxDetailsToggleButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JToggleButton button = (JToggleButton) e.getSource();
+                if (button.isSelected()) {
+                	wfHxDetails.showWfHxDetailsPanel(settings.getConcept());
+                } else {
+                	wfHxDetails.hideWfHxDetailsPanel();
+                }
+            }
+        });
+
+        wfHxDetailsToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+        footerPanel.add(wfHxDetailsToggleButton, gbc);
+
+        
         gbc.gridx++;
 
         gbc.weightx = 1;
@@ -763,7 +795,6 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptViewPanel.setVisible(true);
         workflowToggleButton.setSelected(false);
         workflowToggleButton.setVisible(true);
-
         if (this.getIndexOf(conceptViewPanel) < 0) {
             add(conceptViewPanel, BorderLayout.CENTER);
         }
@@ -780,6 +811,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         remove(workflowScrollPane);
         add(wizardScrollPane, BorderLayout.CENTER);
         workflowToggleButton.setVisible(false);
+        wfHxDetailsToggleButton.setVisible(false);
         GuiUtil.tickle(ConceptViewRenderer.this);
     }
     

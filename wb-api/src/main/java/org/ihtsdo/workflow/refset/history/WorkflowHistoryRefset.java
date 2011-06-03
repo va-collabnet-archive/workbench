@@ -23,7 +23,10 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 * 
 */
 public class WorkflowHistoryRefset extends WorkflowRefset  {
+	private static final String chiefTermSearchTerm = "Chief Terminologist";
+	public static final String chiefTermReplaceTerm = "C. T.";
 	
+
 	public WorkflowHistoryRefset() throws IOException, TerminologyException {
 		super (RefsetAuxiliary.Concept.WORKFLOW_HISTORY, true);
 	}
@@ -146,7 +149,23 @@ public class WorkflowHistoryRefset extends WorkflowRefset  {
 		try {
 			String term = WorkflowHelper.getPreferredTerm(metaCon);
 			
-			return WorkflowHelper.shrinkTermForDisplay(term);
+			if (term.contains(" Workflow ")) {
+				term = WorkflowHelper.shrinkTermForDisplay(term);
+			}
+
+			if (term.contains(chiefTermSearchTerm)) {
+				StringBuffer retBuf = new StringBuffer();
+				
+				int searchTermBeginIdx = term.indexOf(chiefTermSearchTerm); 
+				int searchTermEndIdx = term.indexOf(chiefTermSearchTerm) + chiefTermSearchTerm.length(); 
+				
+				retBuf.append(term.substring(0, searchTermBeginIdx)); 
+				retBuf.append(chiefTermReplaceTerm); 
+				retBuf.append(term.substring(searchTermEndIdx));
+				
+				term = retBuf.toString();
+			}
+			return term;
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
