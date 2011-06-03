@@ -19,37 +19,57 @@ package org.ihtsdo.tk.contradiction;
 
 import org.ihtsdo.tk.hash.Hashcode;
 
-public class PositionForSet {
+public class PositionForSet implements Comparable<PositionForSet> {
+    long time;
+    int pathNid;
 
-        long time;
-        int pathNid;
-
-        public PositionForSet(long time, int pathNid) {
-            super();
-            this.time = time;
-            this.pathNid = pathNid;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (PositionForSet.class.isAssignableFrom(obj.getClass())) {
-                PositionForSet another = (PositionForSet) obj;
-                return another.time == time && another.pathNid == pathNid;
-            }
-
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Hashcode.compute(new int[] { (int) time + pathNid } );
-        }
-
-        public long getTime() {
-            return time;
-        }
-
-        public int getPathNid() {
-            return pathNid;
-        }
+    public PositionForSet(long time, int pathNid) {
+        super();
+        this.time = time;
+        this.pathNid = pathNid;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (PositionForSet.class.isAssignableFrom(obj.getClass())) {
+            PositionForSet another = (PositionForSet) obj;
+            return another.time == time && another.pathNid == pathNid;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Hashcode.compute(new int[] { (int) time + pathNid } );
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public int getPathNid() {
+        return pathNid;
+    }
+
+	@Override
+	public int compareTo(PositionForSet o) {
+		if (this.time == o.time && this.pathNid == o.pathNid) {
+			return 0;
+		} else if (this.time == o.time) {
+			// If time same, use path Id
+			if (this.pathNid < o.pathNid) {
+				return -1;
+			} else { 
+				return 1;
+			}
+		} else {
+			// If pathNid is same or different, use the time comparison for the method's result
+			if (this.time < o.time) {
+				return -1;
+			} else { 
+				return 1;
+			}
+		} 
+	}
+}
