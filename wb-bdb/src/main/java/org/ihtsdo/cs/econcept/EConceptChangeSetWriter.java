@@ -16,14 +16,14 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
-    protected static boolean writeDebugFiles = System.getProperty("DEBUG_CS", "false").toLowerCase().startsWith("t");
+    protected static boolean writeDebugFiles = true;
     /**
      * 
      */
@@ -40,6 +40,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     private ChangeSetGenerationPolicy policy;
     private Semaphore writePermit = new Semaphore(1);
     private boolean timeStampEnabled = true;
+    private static boolean validateAfterWrite = true;
 
     public boolean isTimeStampEnabled() {
         return timeStampEnabled;
@@ -123,6 +124,23 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                         AceLog.getAppLog().warning("tempFile.renameTo failed. Attempting FileIO.copyFile...");
                         FileIO.copyFile(tempFile.getCanonicalPath(), changeSetFile.getCanonicalPath());
                     }
+                    if (validateAfterWrite) {
+                        try {
+                            EConceptChangeSetReader reader = new EConceptChangeSetReader();
+                            reader.setChangeSetFile(changeSetFile);
+                            reader.setNoCommit(true);
+                            reader.read();
+                            // if no exception is thrown...
+                            if (writeDebugFiles) {
+                                cswcFile.delete();
+                                csweFile.delete();
+                            }
+                        } catch (IOException ex) {
+                            AceLog.getAppLog().alertAndLogException(new Exception("Change set write did not validate " + changeSetFile, ex));
+                        } catch (ClassNotFoundException ex) {
+                            AceLog.getAppLog().alertAndLogException(new Exception("Change set write did not validate" + changeSetFile, ex));
+                        }
+                    }
                     tempFile = new File(canonicalFileString);
                 }
                 tempFile.delete();
@@ -130,7 +148,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             if (changeSetFile.length() == 0) {
                 changeSetFile.delete();
             } else {
-                AceLog.getAppLog().info("Finished import of: " + changeSetFile.getName()
+                AceLog.getAppLog().info("Finished export of: " + changeSetFile.getName()
                         + " size: " + changeSetFile.length());
                 Terms.get().setProperty(changeSetFile.getName(),
                         Long.toString(changeSetFile.length()));
@@ -196,7 +214,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             }
             if (cswcOut != null) {
                 cswcOut.append("\n*******************************\n");
-                cswcOut.append(TimeUtil.formatDateForFile(time));
+                cswcOut.append(TimeHelper.formatDateForFile(time));
                 cswcOut.append(" sapNids for commit: ");
                 cswcOut.append(commitSapNids.toString());
                 cswcOut.append("\n*******************************\n");
@@ -204,7 +222,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             }
             if (csweOut != null) {
                 csweOut.append("\n*******************************\n");
-                csweOut.append(TimeUtil.formatDateForFile(time));
+                csweOut.append(TimeHelper.formatDateForFile(time));
                 csweOut.append(" sapNids for commit: ");
                 csweOut.append(commitSapNids.toString());
                 csweOut.append("\n*******************************\n");

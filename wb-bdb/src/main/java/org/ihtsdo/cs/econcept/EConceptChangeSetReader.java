@@ -29,9 +29,9 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.time.TimeUtil;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.helper.time.TimeHelper;
 
 public class EConceptChangeSetReader implements I_ReadChangeSet {
 
@@ -61,6 +61,15 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     private Long nextCommit;
     private String nextCommitStr;
+    private boolean noCommit = false;
+
+    public boolean isNoCommit() {
+        return noCommit;
+    }
+
+    public void setNoCommit(boolean noCommit) {
+        this.noCommit = noCommit;
+    }
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
 
@@ -75,7 +84,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
             try {
                 nextCommit = dataStream.readLong();
                 assert nextCommit != Long.MAX_VALUE;
-                nextCommitStr = TimeUtil.getFileDateFormat().format(new Date(nextCommit));
+                nextCommitStr = TimeHelper.getFileDateFormat().format(new Date(nextCommit));
             } catch (EOFException e) {
                 AceLog.getAppLog().info("No next commit time for file: " + changeSetFile);
                 nextCommit = Long.MAX_VALUE;
@@ -91,14 +100,14 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             AceLog.getEditLog().info(
                 "Reading from log " + changeSetFile.getName() + " until " +
-                TimeUtil.getFileDateFormat().format(new Date(endTime)));
+                TimeHelper.getFileDateFormat().format(new Date(endTime)));
         }
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 EConcept eConcept = new EConcept(dataStream);
                 if (csreOut != null) {
                     csreOut.append("\n*******************************\n");
-                    csreOut.append(TimeUtil.formatDateForFile(nextCommitTime()));
+                    csreOut.append(TimeHelper.formatDateForFile(nextCommitTime()));
                     csreOut.append("\n*******************************\n");
                     csreOut.append(eConcept.toString());
                 }
@@ -120,7 +129,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                         if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                             AceLog.getEditLog().fine("Read eConcept... " + eConcept);
                         }
-                        ACE.addImported(commitEConcept(eConcept, nextCommit, values));
+                        if (!noCommit) {
+                            ACE.addImported(commitEConcept(eConcept, nextCommit, values));
+                        }
                 } else {
                     unvalidated++;
                 }
@@ -177,11 +188,14 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     private Concept commitEConcept(EConcept eConcept, long time, Set<TimePathId> values) throws IOException,
             ClassNotFoundException {
+        if (noCommit) {
+            return null;
+        }
         try {
             assert time != Long.MAX_VALUE;
             if (EConceptChangeSetWriter.writeDebugFiles) {
                 csrcOut.append("\n*******************************\n");
-                csrcOut.append(TimeUtil.formatDateForFile(time));
+                csrcOut.append(TimeHelper.formatDateForFile(time));
                 csrcOut.append("\n********** before ***********\n");
 
                 Concept before = Concept.get(Bdb.uuidToNid(eConcept.getPrimordialUuid()));

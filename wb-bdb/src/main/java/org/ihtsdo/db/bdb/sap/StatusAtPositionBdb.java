@@ -39,13 +39,12 @@ import com.sleepycat.je.OperationStatus;
  *
  */
 public class StatusAtPositionBdb extends ComponentBdb {
-    
+
     private static int initialPosition;
 
     public static int getInitialPosition() {
         return initialPosition;
     }
-
     private static PositionArrays readOnlyArray;
     private static PositionArrays mutableArray;
     private static PositionArrayBinder positionArrayBinder = new PositionArrayBinder();
@@ -188,12 +187,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
             sapToIntMap = new SapToIntHashMap(sequence.get());
             for (int i = 0; i < readOnlySize; i++) {
                 if (readOnlyArray.commitTimes[i] != 0) {
-                sapToIntMap.put(
-                        readOnlyArray.statusNids[i], 
-                        readOnlyArray.authorNids[i], 
-                        readOnlyArray.pathNids[i], 
-                        readOnlyArray.commitTimes[i],
-                        i);
+                    sapToIntMap.put(
+                            readOnlyArray.statusNids[i],
+                            readOnlyArray.authorNids[i],
+                            readOnlyArray.pathNids[i],
+                            readOnlyArray.commitTimes[i],
+                            i);
                 }
             }
             closeReadOnly();
@@ -213,11 +212,13 @@ public class StatusAtPositionBdb extends ComponentBdb {
                         + mutableIndex + " pathNids.length: "
                         + mutableArray.pathNids.length;
 
-                sapToIntMap.put(
-                        mutableArray.statusNids[i],
-                        mutableArray.authorNids[i],
-                        mutableArray.pathNids[i],
-                        mutableArray.commitTimes[i], mutableIndex);
+                if (mutableArray.commitTimes[i] != 0) {
+                    sapToIntMap.put(
+                            mutableArray.statusNids[i],
+                            mutableArray.authorNids[i],
+                            mutableArray.pathNids[i],
+                            mutableArray.commitTimes[i], mutableIndex);
+                }
             }
             if (size == 0) {
                 initialPosition = 1;
