@@ -216,7 +216,9 @@ public class NidCNidMapBdb extends ComponentBdb {
         ensureCapacity(nid);
         assert nidCNidMaps.get()[mapIndex][indexInMap] == Integer.MAX_VALUE
                 || nidCNidMaps.get()[mapIndex][indexInMap] == cNid : "processing cNid: " + cNid
+                + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid)
                 + " nid: " + nid + " found existing cNid: " + nidCNidMaps.get()[mapIndex][indexInMap]
+                + " " + Bdb.getUuidsToNidMap().getUuidsForNid(nidCNidMaps.get()[mapIndex][indexInMap])
                 + "\n    " + cNid + " maps to: " + getCNid(cNid)
                 + "\n    " + nidCNidMaps.get()[mapIndex][indexInMap]
                 + " maps to: " + getCNid(nidCNidMaps.get()[mapIndex][indexInMap]);

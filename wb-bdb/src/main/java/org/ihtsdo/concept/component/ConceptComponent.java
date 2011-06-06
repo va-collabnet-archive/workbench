@@ -1029,7 +1029,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         super();
         this.enclosingConceptNid = enclosingConceptNid;
         readComponentFromBdb(input);
-        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        int cNid = Bdb.getNidCNidMap().getCNid(nid);
+        if (cNid != this.enclosingConceptNid) {
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            AceLog.getAppLog().warning("Datafix warning. cNid " + 
+                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
+                    "\nincorrect for: " + this.nid + " " + 
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
+                    "\nshould have been: " + this.enclosingConceptNid +
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
+                    "\nprocessing: " + this.toString());
+        }
+        
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
     }

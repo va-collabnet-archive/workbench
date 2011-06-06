@@ -71,6 +71,7 @@ import org.ihtsdo.db.util.ReferenceType;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidListBI;
@@ -1489,7 +1490,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 return d;
             }
         }
-        throw new IOException("No description: " + nid + " found in\n" + toLongString());
+        throw new IOException("No description: " + nid + " " + Ts.get().getUuidsForNid(nid) + " found in\n" + toLongString());
     }
 
     public void modified() {
