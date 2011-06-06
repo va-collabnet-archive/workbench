@@ -544,7 +544,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE, null, options, options[1]);
 					bPendTerm = false;
-					if (n == 0) {
+					if (n == 1) {
 						if (Terms.get().getUncommitted().size() > 0) {
 							try {
 								Terms.get().cancel();
@@ -555,7 +555,8 @@ public class TranslationConceptEditor6 extends JPanel {
 						}
 						descriptionInEditor = null;
 						targetTextField.setText("");
-						return true;
+						alreadyVerified = false;
+						return false;
 					} else if (!bPendTerm) {
 						if (saveDescActionPerformed()) {
 
