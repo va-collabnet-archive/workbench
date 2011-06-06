@@ -523,9 +523,9 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
         case 7: // REFERS TO
         	uuid = Type5UuidFactory.get("900000000000531004" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String REFERS_REFERENCES_REFSET_ID = "900000000000531004";
             break;
-        /*default:
+        default:
             uuid = Type5UuidFactory.get(Rf1Dir.HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1
-                   + htr.componentSid + htr.referenceType + htr.referencedSid);*/
+                   + htr.componentSid + htr.referenceType + htr.referencedSid);
         }
         
         sb.append(uuid.toString() + TAB_CHARACTER);
