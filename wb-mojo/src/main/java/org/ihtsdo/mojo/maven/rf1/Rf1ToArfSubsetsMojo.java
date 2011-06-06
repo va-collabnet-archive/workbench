@@ -390,14 +390,17 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
       
         
         /*To create consistent algorithm to generated uuid in workbench*/
-        UUID uuid;
+        UUID uuid = null;
+        getLog().info("==debug====" + sid.getRefsetFsName());
         
         if(sid.getRefsetFsName().equals("VMP subset")){
-        	uuid = Type5UuidFactory.get("447566000" + m.memberId); //public final static String VMP_REFSET_ID = "447566000";
+            getLog().info("==VMP Refset====" + sid.getRefsetFsName());
+        	uuid = Type5UuidFactory.get("447566000" + Long.toString(m.memberId)); //public final static String VMP_REFSET_ID = "447566000";
         }else if(sid.getRefsetFsName().equals("VTM subset")){
-        	uuid = Type5UuidFactory.get("447565001" + m.memberId); //public final static String VTM_REFSET_ID = "447565001";
+        	getLog().info("==VTM Refset====" + sid.getRefsetFsName());
+        	uuid = Type5UuidFactory.get("447565001" + Long.toString(m.memberId)); //public final static String VTM_REFSET_ID = "447565001";
         }else if(sid.getRefsetFsName().equals("Non-human Subset")){
-        	uuid = Type5UuidFactory.get("447564002" + m.memberId); //public final static String NON_HUMAN_REFSET_ID = "447564002";
+        	uuid = Type5UuidFactory.get("447564002" + Long.toString(m.memberId)); //public final static String NON_HUMAN_REFSET_ID = "447564002";
         }else if(sid.getRefsetFsName().equals("GB English Dialect Subset")){
 	    	uuid = Type5UuidFactory.get("900000000000508004" + m.memberId); //public final static String GB_LANG_REFSET_ID = "900000000000508004";
 	    }else if(sid.getRefsetFsName().equals("US English Dialect Subset")){
@@ -408,10 +411,10 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         	uuid = Type5UuidFactory.get("US Specific Proprietary Drug Concepts Subset" + m.memberId); 
         }else if(sid.getRefsetFsName().equals("Spanish Language Edition")){
         	uuid = Type5UuidFactory.get("Spanish Language Edition" + m.memberId); 
-        }else{
+        }/*else{
         	uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1
                     + sid.getSubsetSctIdOriginal() + m.memberId);
-        }
+        }*/
         
         
         sb.append(uuid.toString() + TAB_CHARACTER);
