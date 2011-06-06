@@ -267,7 +267,7 @@ public interface I_TermFactory {
      */
     List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings();
 
-    public void commit() throws Exception;
+    public boolean commit() throws Exception;
 
     public void commit(ChangeSetPolicy changeSetPolicy, ChangeSetWriterThreading changeSetWriterThreading)
             throws Exception;

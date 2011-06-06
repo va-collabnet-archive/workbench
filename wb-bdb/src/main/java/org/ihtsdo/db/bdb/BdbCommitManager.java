@@ -753,8 +753,8 @@ public class BdbCommitManager {
         return false;
     }
 
-    public static void commit() {
-        commit(ChangeSetPolicy.MUTABLE_ONLY,
+    public static boolean commit() {
+        return commit(ChangeSetPolicy.MUTABLE_ONLY,
                 ChangeSetWriterThreading.SINGLE_THREAD);
     }
 

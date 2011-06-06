@@ -255,8 +255,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
     
     @Override
-    public void commit() throws Exception {
-        BdbCommitManager.commit();
+    public boolean commit() throws Exception {
+        return BdbCommitManager.commit();
     }
     
     @Override
