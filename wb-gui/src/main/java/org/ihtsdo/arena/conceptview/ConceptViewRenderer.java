@@ -593,11 +593,8 @@ public class ConceptViewRenderer extends JLayeredPane {
         
         gbc.gridx++;
         wfHxDetails = new WfHxDetailsPanelHandler(this, settings);
-     //   wfHxDetailsToggleButton = new JToggleButton(
-     //          new ImageIcon(ACE.class.getResource("/16x16/plain/workflow_history.png")));
-	 //TODO: GET Jesse to check in icon...
-			    wfHxDetailsToggleButton = new JToggleButton(
-               new ImageIcon(ACE.class.getResource("/16x16/plain/unknown.png")));
+        wfHxDetailsToggleButton = new JToggleButton(
+              new ImageIcon(ACE.class.getResource("/16x16/plain/workflow_history.png")));
         wfHxDetailsToggleButton.setToolTipText("show workflow history details for this concept...");
         wfHxDetailsToggleButton.setSelected(false);
 //        wfHxDetailsToggleButton.setSelected(false);
