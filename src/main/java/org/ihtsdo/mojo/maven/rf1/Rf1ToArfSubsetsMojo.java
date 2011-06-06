@@ -391,7 +391,6 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         
         /*To create consistent algorithm to generated uuid in workbench*/
         UUID uuid = null;
-        getLog().info("==debug====" + sid.getRefsetFsName());
         
         if(sid.getRefsetFsName().equals("VMP subset")){
             getLog().info("==VMP Refset====" + sid.getRefsetFsName());
@@ -411,10 +410,14 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         	uuid = Type5UuidFactory.get("US Specific Proprietary Drug Concepts Subset" + m.memberId); 
         }else if(sid.getRefsetFsName().equals("Spanish Language Edition")){
         	uuid = Type5UuidFactory.get("Spanish Language Edition" + m.memberId); 
-        }/*else{
+        }else if(sid.getRefsetFsName().equals("Spanish Language Edition")){
+        	uuid = Type5UuidFactory.get("Spanish Language Edition" + m.memberId); 
+        }else if(sid.getRefsetFsName().equals("GB English Dialect Exceptions Subset")){
+        	uuid = Type5UuidFactory.get("GB English Dialect Exceptions Subset" + m.memberId); 
+        }else{
         	uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1
                     + sid.getSubsetSctIdOriginal() + m.memberId);
-        }*/
+        }
         
         
         sb.append(uuid.toString() + TAB_CHARACTER);

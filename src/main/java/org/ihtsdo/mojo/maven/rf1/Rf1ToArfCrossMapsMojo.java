@@ -707,17 +707,13 @@ public class Rf1ToArfCrossMapsMojo extends AbstractMojo implements Serializable 
        
         /*To create consistent algorithm to generated uuid in workbench*/
         UUID uuid = null;
-        getLog().info("==debug====" + refsetFsName);
-       
         if(refsetFsName.equals("ICD-O-3 CrossMap")){
         	getLog().info("==Refset Name====" + refsetFsName);
         	uuid = Type5UuidFactory.get("446608001" + Long.toString(r.sctId) +  r.targetCode); //public final static String ICDO_REFSET_ID = "446608001";
-        }
-        
-        /*else{
+        }else{
         	uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1 + refsetFsName
                 + sctUuid + ":" + r.targetCode);
-        }*/
+        }
         
         bw.write(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
