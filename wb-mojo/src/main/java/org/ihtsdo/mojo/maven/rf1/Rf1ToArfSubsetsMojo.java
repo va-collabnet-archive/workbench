@@ -384,9 +384,36 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 
         // REFSET_UUID
         sb.append(sid.getSubsetRefsetUuidStr() + TAB_CHARACTER);
+        
+        
         // MEMBER_UUID ... of refset member
-        UUID uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1
-                + sid.getSubsetSctIdOriginal() + m.memberId);
+      
+        
+        /*To create consistent algorithm to generated uuid in workbench*/
+        UUID uuid;
+        
+        if(sid.getRefsetFsName().equals("VMP subset")){
+        	uuid = Type5UuidFactory.get("447566000" + m.memberId); //public final static String VMP_REFSET_ID = "447566000";
+        }else if(sid.getRefsetFsName().equals("VTM subset")){
+        	uuid = Type5UuidFactory.get("447565001" + m.memberId); //public final static String VTM_REFSET_ID = "447565001";
+        }else if(sid.getRefsetFsName().equals("Non-human Subset")){
+        	uuid = Type5UuidFactory.get("447564002" + m.memberId); //public final static String NON_HUMAN_REFSET_ID = "447564002";
+        }else if(sid.getRefsetFsName().equals("GB English Dialect Subset")){
+	    	uuid = Type5UuidFactory.get("900000000000508004" + m.memberId); //public final static String GB_LANG_REFSET_ID = "900000000000508004";
+	    }else if(sid.getRefsetFsName().equals("US English Dialect Subset")){
+	    	uuid = Type5UuidFactory.get("900000000000509007" + m.memberId); //public final static String US_LANG_REFSET_ID = "900000000000509007";
+	    }else if(sid.getRefsetFsName().equals("US Specific Proprietary Drug Descriptions Subset")){
+        	uuid = Type5UuidFactory.get("US Specific Proprietary Drug Descriptions Subset" + m.memberId); 
+        }else if(sid.getRefsetFsName().equals("US Specific Proprietary Drug Concepts Subset")){
+        	uuid = Type5UuidFactory.get("US Specific Proprietary Drug Concepts Subset" + m.memberId); 
+        }else if(sid.getRefsetFsName().equals("Spanish Language Edition")){
+        	uuid = Type5UuidFactory.get("Spanish Language Edition" + m.memberId); 
+        }else{
+        	uuid = Type5UuidFactory.get(Rf1Dir.SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1
+                    + sid.getSubsetSctIdOriginal() + m.memberId);
+        }
+        
+        
         sb.append(uuid.toString() + TAB_CHARACTER);
         // STATUS_UUID
         if (m.getStatus() == 0)
