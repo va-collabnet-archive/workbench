@@ -229,7 +229,7 @@
 					<staticText>
 						<reportElement style="Column header" x="290" y="0" width="73" height="20"/>
 						<textElement/>
-						<text><![CDATA[Percentage]]></text>
+						<text><![CDATA[Persentage]]></text>
 					</staticText>
 				</frame>
 			</band>
