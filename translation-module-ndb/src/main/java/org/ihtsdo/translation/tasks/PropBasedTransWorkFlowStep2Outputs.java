@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
@@ -56,6 +57,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -200,6 +202,12 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
+		if (Terms.get().getUncommitted().size() > 0) {
+			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
+					"There are uncommitted changes - please cancel or commit before continuing.", 
+					"", JOptionPane.ERROR_MESSAGE);
+			return Condition.STOP;
+		}
 		try {
 
 			Thread t = new Thread(new Runnable() {
