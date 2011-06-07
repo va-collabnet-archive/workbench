@@ -21,10 +21,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Arrays;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-class Sct2_RelRecord implements Serializable {
+class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final String LINE_TERMINATOR = "\r\n";
@@ -35,6 +36,7 @@ class Sct2_RelRecord implements Serializable {
     long relSnoId; // SNOMED RELATIONSHIPID, if applicable
     String effDateStr;
     boolean isActive; // status is computed for relationships
+    long statusConceptL; // extended from AttributeValue file
     String pathStr;
     long c1SnoId; // CONCEPTID1
     long roleTypeSnoId; // RELATIONSHIPTYPE .. SNOMED ID
@@ -47,7 +49,8 @@ class Sct2_RelRecord implements Serializable {
     public Sct2_RelRecord(long relID, String dateStr, boolean active, String path,
             long cOneID, long roleTypeSnoId, long cTwoID, int grp,
             long characterType, long refinibility,
-            boolean inferredB) {
+            boolean inferredB,
+            long statusConceptL) {
 
         this.relSnoId = relID; // RELATIONSHIPID
 
@@ -64,6 +67,27 @@ class Sct2_RelRecord implements Serializable {
         this.refinabilityL = refinibility; // REFINABILITY
 
         this.isInferred = inferredB;
+
+        this.statusConceptL = statusConceptL;
+    }
+
+    static void attachStatus(Sct2_RelRecord[] a, Rf2_RefsetCRecord[] b) {
+        int idxA = 0;
+        int idxB = 0;
+        Arrays.sort(a);
+        Arrays.sort(b);
+
+        while (idxA < a.length && idxB < b.length) {
+            if (a[idxA].relSnoId == b[idxB].referencedComponentIdL) {
+                a[idxA].relSnoId = b[idxB].valueIdL;
+                idxA++;
+                idxB++;
+            } else if (a[idxA].relSnoId < b[idxB].referencedComponentIdL) {
+                idxA++;
+            } else {
+                idxB++;
+            }
+        }
     }
 
     public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB) throws IOException {
@@ -106,7 +130,8 @@ class Sct2_RelRecord implements Serializable {
                     Integer.parseInt(line[RELATIONSHIP_GROUP]),
                     Long.parseLong(line[CHARACTERISTIC_TYPE]),
                     refinibilityId,
-                    inferredB);
+                    inferredB,
+                    Long.MAX_VALUE);
             idx++;
         }
 
@@ -125,7 +150,11 @@ class Sct2_RelRecord implements Serializable {
         writer.append(Rf2x.convertIdToUuidStr(relSnoId) + TAB_CHARACTER);
 
         // Status UUID
-        writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        if (statusConceptL < Long.MAX_VALUE) {
+            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+        } else {
+            writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        }
 
         // Source Concept UUID
         writer.append(Rf2x.convertIdToUuidStr(c1SnoId) + TAB_CHARACTER);
@@ -166,5 +195,15 @@ class Sct2_RelRecord implements Serializable {
             writer.append(uuidUserStr + LINE_TERMINATOR);
         }
 
+    }
+
+    @Override
+    public int compareTo(Sct2_RelRecord t) {
+        if (this.relSnoId < t.relSnoId) {
+            return -1; // instance less than received
+        } else if (this.relSnoId > t.relSnoId) {
+            return 1; // instance greater than received
+        }
+        return 0; // instance == received
     }
 }
