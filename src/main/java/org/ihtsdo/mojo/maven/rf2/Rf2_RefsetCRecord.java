@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import org.dwfa.tapi.TerminologyException;
 
-public class Rf2_LrfRecord {
+public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
@@ -33,10 +33,10 @@ public class Rf2_LrfRecord {
     final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
-    final long acceptibilityIdL;
+    final long valueIdL; // For Language refset valueIdL is acceptibilityId
 
-    public Rf2_LrfRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, long acceptibilityIdL) {
+    public Rf2_RefsetCRecord(String id, String dateStr, boolean active, String path,
+            long refsetIdL, long referencedComponentIdL, long valueIdL) {
         this.id = id;
         this.effDateStr = dateStr;
         this.isActive = active;
@@ -45,13 +45,13 @@ public class Rf2_LrfRecord {
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
-        this.acceptibilityIdL = acceptibilityIdL;
+        this.valueIdL = valueIdL;
     }
 
-    static Rf2_LrfRecord[] parseLangRefSet(Rf2File f) throws IOException {
+    static Rf2_RefsetCRecord[] parseLangRefSet(Rf2File f) throws IOException {
 
         int count = Rf2File.countFileLines(f);
-        Rf2_LrfRecord[] a = new Rf2_LrfRecord[count];
+        Rf2_RefsetCRecord[] a = new Rf2_RefsetCRecord[count];
 
         // DATA COLUMNS
         int ID = 0;// id
@@ -60,7 +60,7 @@ public class Rf2_LrfRecord {
         int MODULE_ID = 3; // moduleId
         int REFSET_ID = 4; // refSetId
         int REFERENCED_COMPONENT_ID = 5; // referencedComponentId
-        int ACCEPTIBILITY_ID = 6; // acceptabilityId
+        int VALUE_ID = 6; // For Language refset VALUE_ID is ACCEPTIBILITY_ID
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
@@ -70,13 +70,13 @@ public class Rf2_LrfRecord {
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
-            a[idx] = new Rf2_LrfRecord(line[ID],
+            a[idx] = new Rf2_RefsetCRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[REFSET_ID]),
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-                    Long.parseLong(line[ACCEPTIBILITY_ID]));
+                    Long.parseLong(line[VALUE_ID]));
             idx++;
         }
 
@@ -104,6 +104,16 @@ public class Rf2_LrfRecord {
         writer.append(pathStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(Rf2x.convertIdToUuidStr(acceptibilityIdL) + LINE_TERMINATOR);
+        writer.append(Rf2x.convertIdToUuidStr(valueIdL) + LINE_TERMINATOR);
+    }
+
+    @Override
+    public int compareTo(Rf2_RefsetCRecord t) {
+        if (this.referencedComponentIdL < t.referencedComponentIdL) {
+            return -1; // instance less than received
+        } else if (this.referencedComponentIdL > t.referencedComponentIdL) {
+            return 1; // instance greater than received
+        }
+        return 0; // instance == received
     }
 }

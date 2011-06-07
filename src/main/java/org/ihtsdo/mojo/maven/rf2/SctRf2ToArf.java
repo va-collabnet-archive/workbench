@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +66,11 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
      */
     private String inputDir;
     /**
+     * @parameter
+     * @required
+     */
+    private String statusDir;
+    /**
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      *
@@ -77,6 +83,7 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
+        List<Rf2File> filesInStatus;
         getLog().info("::: BEGIN SctRf2ToArf");
 
         // SHOW DIRECTORIES
@@ -102,6 +109,9 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
                     outDir + "ids.txt"), "UTF-8"));
             getLog().info("::: IDS OUTPUT: " + outDir + "ids.txt");
 
+            // :NYI: extended status implementation does not multiple version years
+            filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
+            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseLangRefSet(filesInStatus.get(0)); // hardcoded
 
             // CONCEPT FILES: parse, write
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -110,6 +120,7 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
+                Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
                     c.writeArf(bw);
                     writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
@@ -125,6 +136,7 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
+                Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
                     d.writeArf(bw);
                     writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
@@ -140,6 +152,7 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Relationship", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
+                Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
                     writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);

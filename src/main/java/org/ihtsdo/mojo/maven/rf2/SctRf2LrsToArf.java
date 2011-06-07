@@ -108,8 +108,8 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
             getLog().info("::: LANGUAGE REFSET FILE: " + outDir + "concept_language_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Language", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_LrfRecord[] members = Rf2_LrfRecord.parseLangRefSet(rf2File);
-                for (Rf2_LrfRecord m : members) {
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseLangRefSet(rf2File);
+                for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                     // writeSctSnomedLongId(bwIds, m.id, m.effDateStr, m.pathStr);
                 }

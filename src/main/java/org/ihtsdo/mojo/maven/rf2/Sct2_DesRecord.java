@@ -21,11 +21,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
 
-class Sct2_DesRecord implements Serializable {
+class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final String LINE_TERMINATOR = "\r\n";
@@ -34,6 +35,7 @@ class Sct2_DesRecord implements Serializable {
     String desUuidStr; // id
     String effDateStr; // effectiveTime
     boolean isActive; // STATUS
+    long statusConceptL; // extended from AttributeValue file
     String pathStr;
     String conUuidStr; // CONCEPTID
     String termText; // TERM
@@ -43,7 +45,8 @@ class Sct2_DesRecord implements Serializable {
 
     public Sct2_DesRecord(long dId, String dateStr, boolean activeB, String path,
             String conUuidStr, String termStr,
-            boolean capitalization, String desTypeStr, String langCodeStr) {
+            boolean capitalization, String desTypeStr, String langCodeStr,
+            long statusConceptL) {
         desSnoIdL = dId;
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
         this.desUuidStr = tmpUUID.toString();
@@ -58,6 +61,27 @@ class Sct2_DesRecord implements Serializable {
         this.languageCodeStr = langCodeStr; // LANGUAGECODE
 
         this.pathStr = path;
+
+        this.statusConceptL = statusConceptL;
+    }
+
+    static void attachStatus(Sct2_DesRecord[] a, Rf2_RefsetCRecord[] b) {
+        int idxA = 0;
+        int idxB = 0;
+        Arrays.sort(a);
+        Arrays.sort(b);
+
+        while (idxA < a.length && idxB < b.length) {
+            if (a[idxA].desSnoIdL == b[idxB].referencedComponentIdL) {
+                a[idxA].desSnoIdL = b[idxB].valueIdL;
+                idxA++;
+                idxB++;
+            } else if (a[idxA].desSnoIdL < b[idxB].referencedComponentIdL) {
+                idxA++;
+            } else {
+                idxB++;
+            }
+        }
     }
 
     public static Sct2_DesRecord[] parseDescriptions(Rf2File f) throws IOException {
@@ -91,7 +115,8 @@ class Sct2_DesRecord implements Serializable {
                     line[TERM],
                     Rf2x.convertCaseSignificanceIdToCapStatus(line[CASE_SIGNIFICANCE_ID]),
                     Rf2x.convertIdToUuidStr(line[TYPE_ID]),
-                    line[LANGUAGE_CODE]);
+                    line[LANGUAGE_CODE],
+                    Long.MAX_VALUE);
             idx++;
         }
 
@@ -119,7 +144,11 @@ class Sct2_DesRecord implements Serializable {
         writer.append(desUuidStr + TAB_CHARACTER);
 
         // Status UUID
-        writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        if (statusConceptL < Long.MAX_VALUE) {
+            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+        } else {
+            writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        }
 
         // Concept UUID
         writer.append(conUuidStr + TAB_CHARACTER);
@@ -145,5 +174,15 @@ class Sct2_DesRecord implements Serializable {
 
         // Path UUID
         writer.append(pathStr + LINE_TERMINATOR);
+    }
+
+    @Override
+    public int compareTo(Sct2_DesRecord t) {
+        if (this.desSnoIdL < t.desSnoIdL) {
+            return -1; // instance less than received
+        } else if (this.desSnoIdL > t.desSnoIdL) {
+            return 1; // instance greater than received
+        }
+        return 0; // instance == received
     }
 }

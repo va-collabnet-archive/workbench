@@ -22,12 +22,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.tapi.TerminologyException;
 
-class Sct2_ConRecord implements Serializable {
+class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final String LINE_TERMINATOR = "\r\n";
@@ -36,18 +37,41 @@ class Sct2_ConRecord implements Serializable {
     long conSnoIdL; //  id
     String effDateStr; // effectiveTime
     boolean isActive; // CONCEPTSTATUS
+    long statusConceptL; // extended from AttributeValue file
     String pathStr; // Module ID
     boolean isPrimitiveB; // ISPRIMITIVE
 
-    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim) {
-        if (conIdL == Long.MAX_VALUE)
+    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim, long statusConceptL) {
+        if (conIdL == Long.MAX_VALUE) {
             System.out.println(":!!!:DEBUG Long.MAX_VALUE");
+        }
         this.conSnoIdL = conIdL;
         this.effDateStr = dateStr;
         this.isActive = active;
 
         this.pathStr = path;
         this.isPrimitiveB = isPrim;
+
+        this.statusConceptL = statusConceptL;
+    }
+
+    static void attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b) {
+        int idxA = 0;
+        int idxB = 0;
+        Arrays.sort(a);
+        Arrays.sort(b);
+
+        while (idxA < a.length && idxB < b.length) {
+            if (a[idxA].conSnoIdL == b[idxB].referencedComponentIdL) {
+                a[idxA].conSnoIdL = b[idxB].valueIdL;
+                idxA++;
+                idxB++;
+            } else if (a[idxA].conSnoIdL < b[idxB].referencedComponentIdL) {
+                idxA++;
+            } else {
+                idxB++;
+            }
+        }
     }
 
     static Sct2_ConRecord[] parseConcepts(Rf2File f) throws MojoFailureException {
@@ -74,7 +98,8 @@ class Sct2_ConRecord implements Serializable {
                         Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                         Rf2x.convertStringToBoolean(line[ACTIVE]),
                         Rf2x.convertIdToUuidStr(line[MODULE_ID]),
-                        Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]));
+                        Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]),
+                        Long.MAX_VALUE);
                 idx++;
             }
 
@@ -96,7 +121,11 @@ class Sct2_ConRecord implements Serializable {
         writer.append(Rf2x.convertIdToUuidStr(conSnoIdL) + TAB_CHARACTER);
 
         // Status UUID
-        writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        if (statusConceptL < Long.MAX_VALUE) {
+            writer.append(Rf2x.convertIdToUuidStr(statusConceptL) + TAB_CHARACTER);
+        } else {
+            writer.append(Rf2x.convertActiveToStatusUuid(isActive) + TAB_CHARACTER);
+        }
 
         // Primitive string 0 (false == defined) or 1 (true == primitive)
         if (isPrimitiveB) {
@@ -110,5 +139,15 @@ class Sct2_ConRecord implements Serializable {
 
         // Path UUID
         writer.append(pathStr + LINE_TERMINATOR);
+    }
+
+    @Override
+    public int compareTo(Sct2_ConRecord t) {
+        if (this.conSnoIdL < t.conSnoIdL) {
+            return -1; // instance less than received
+        } else if (this.conSnoIdL > t.conSnoIdL) {
+            return 1; // instance greater than received
+        }
+        return 0; // instance == received
     }
 }
