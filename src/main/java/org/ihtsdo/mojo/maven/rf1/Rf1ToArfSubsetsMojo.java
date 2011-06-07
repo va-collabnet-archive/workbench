@@ -393,10 +393,10 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
         UUID uuid = null;
         
         if(sid.getRefsetFsName().equals("VMP subset")){
-            getLog().info("==VMP Refset====" + sid.getRefsetFsName());
+            //getLog().info("==VMP Refset====" + sid.getRefsetFsName());
         	uuid = Type5UuidFactory.get("447566000" + Long.toString(m.memberId)); //public final static String VMP_REFSET_ID = "447566000";
         }else if(sid.getRefsetFsName().equals("VTM subset")){
-        	getLog().info("==VTM Refset====" + sid.getRefsetFsName());
+        	//getLog().info("==VTM Refset====" + sid.getRefsetFsName());
         	uuid = Type5UuidFactory.get("447565001" + Long.toString(m.memberId)); //public final static String VTM_REFSET_ID = "447565001";
         }else if(sid.getRefsetFsName().equals("Non-human Subset")){
         	uuid = Type5UuidFactory.get("447564002" + Long.toString(m.memberId)); //public final static String NON_HUMAN_REFSET_ID = "447564002";
