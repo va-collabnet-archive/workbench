@@ -1472,13 +1472,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             if (additionalIdVersions != null) {
                 count = count + additionalIdVersions.size();
             }
-            idVersions = new ArrayList<IdVersion>(count);
-            idVersions.add(new IdVersion());
+            ArrayList<IdVersion> idvl = new ArrayList<IdVersion>(count);
+            idvl.add(new IdVersion());
             if (additionalIdVersions != null) {
                 for (int i = 0; i < additionalIdVersions.size(); i++) {
-                    idVersions.add(new IdVersion(i));
+                    idvl.add(new IdVersion(i));
                 }
             }
+            idVersions = idvl;
         }
         return Collections.unmodifiableList(idVersions);
     }
