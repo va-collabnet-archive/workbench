@@ -16,6 +16,8 @@
 package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -24,9 +26,15 @@ import org.dwfa.util.id.Type3UuidFactory;
 
 public class Rf2x {
 
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
     static String convertEffectiveTimeToDate(String date) {
         return date.substring(0, 4) + "-" + date.substring(4, 6) + "-" + date.substring(6, 8)
                 + " 00:00:00";
+    }
+
+    static long convertDateToTime(String date) throws ParseException {
+        return formatter.parse(date).getTime();
     }
 
     static boolean convertStringToBoolean(String s) {
