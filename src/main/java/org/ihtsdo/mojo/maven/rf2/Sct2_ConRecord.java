@@ -71,7 +71,9 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
                 if (a[idxA].timeL < timeRangeInL) {
                     idxA++;
                 } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
-                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    if (b[idxB].isActive) {
+                        a[idxA].statusConceptL = b[idxB].valueIdL;
+                    }
                     idxA++;
                     idxB++;
                 } else {

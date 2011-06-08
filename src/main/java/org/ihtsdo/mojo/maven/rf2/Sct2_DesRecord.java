@@ -53,7 +53,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
         this.desUuidStr = tmpUUID.toString();
         this.effDateStr = dateStr;
-        this.timeL =  Rf2x.convertDateToTime(dateStr);
+        this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = activeB;
 
         this.conUuidStr = conUuidStr; // CONCEPTID
@@ -85,7 +85,9 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
                 if (a[idxA].timeL < timeRangeInL) {
                     idxA++;
                 } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
-                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    if (b[idxB].isActive) {
+                        a[idxA].statusConceptL = b[idxB].valueIdL;
+                    }
                     idxA++;
                     idxB++;
                 } else {
