@@ -42,6 +42,7 @@ import org.ihtsdo.arena.context.action.MakePreferredAction;
 import org.ihtsdo.arena.context.action.GroupRelsAction;
 import org.ihtsdo.arena.context.action.SetSynonymyAction;
 import org.ihtsdo.arena.context.action.SetDefinedAction;
+import org.ihtsdo.arena.context.action.SetICSignificantAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -766,4 +767,20 @@ rule "rule 55" #change from defined to primitive
       )
 	then
 		actions.add(new SetDefinedAction("make defined", $dropTarget));
+end
+
+rule "rule 56" #set case sensitivity 
+	when
+		$dropTarget: DescFact(context == Context.DROP_TARGET, this.desc.isInitialCaseSignificant == false)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetICSignificantAction("make case sensitive", $dropTarget));
+end
+
+rule "rule 57" #change to non-case-sensitive
+	when
+		$dropTarget: DescFact(context == Context.DROP_TARGET, this.desc.isInitialCaseSignificant == true)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget));
 end
