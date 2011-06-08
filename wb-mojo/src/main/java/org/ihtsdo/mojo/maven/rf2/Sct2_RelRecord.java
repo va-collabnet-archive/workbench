@@ -57,7 +57,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.relSnoId = relID; // RELATIONSHIPID
 
         this.effDateStr = dateStr;
-        this.timeL =  Rf2x.convertDateToTime(dateStr);
+        this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
         this.pathStr = path;
 
@@ -91,7 +91,9 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
                 if (a[idxA].timeL < timeRangeInL) {
                     idxA++;
                 } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
-                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    if (b[idxB].isActive) {
+                        a[idxA].statusConceptL = b[idxB].valueIdL;
+                    }
                     idxA++;
                     idxB++;
                 } else {
