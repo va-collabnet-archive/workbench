@@ -23,6 +23,8 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
@@ -704,7 +706,7 @@ public class WorkflowHelper {
 	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid)
 	{
 		I_GetConceptData initialState = null;
-		//boolean existsInDb = isConceptInWorkflowRefset(concept);
+		boolean existsInDb = isConceptInDatabase(concept);
 		
 		try {
 			WorkflowHistoryJavaBean bean = getLatestWfHxJavaBeanForConcept(concept);
@@ -718,7 +720,9 @@ public class WorkflowHelper {
 		
 		    		for (I_RelVersioned rel : relList)
 		    		{
-		    			if (rel != null && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))
+		    			if ((rel != null) &&
+							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
+							 (!existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
 		    			{
 							initialState = state;
 		    			}
@@ -1050,4 +1054,24 @@ public class WorkflowHelper {
 		
 		return "Unidentifiable";
 	}
-}
+
+	private boolean isConceptInDatabase(I_GetConceptData concept) {
+		boolean hasBeenReleased = false;
+
+		try {
+			int snomedId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
+
+			I_Identify idVersioned = Terms.get().getId(concept.getConceptNid());
+	        for (I_IdPart idPart : idVersioned.getMutableIdParts()) {
+	            if (idPart.getAuthorityNid() == snomedId)
+	            	hasBeenReleased = true;
+	        }
+
+			if (!hasBeenReleased && (getLatestWfHxForConcept(concept) == null))
+				return false;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+    	return true;
+    }}
