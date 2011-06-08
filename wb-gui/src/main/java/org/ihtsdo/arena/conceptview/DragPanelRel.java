@@ -26,7 +26,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
-public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionBI> {
+public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionBI> {
 
     /**
      * 
@@ -53,10 +53,10 @@ public class DragPanelRel extends ComponentVersionDragPanel<RelationshipVersionB
     }
 
     @Override
-    public Collection<ComponentVersionDragPanel<RelationshipVersionBI>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<RelationshipVersionBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<ComponentVersionDragPanel<RelationshipVersionBI>> panelList =
-                new ArrayList<ComponentVersionDragPanel<RelationshipVersionBI>>();
+        Collection<DragPanelComponentVersion<RelationshipVersionBI>> panelList =
+                new ArrayList<DragPanelComponentVersion<RelationshipVersionBI>>();
         Collection<RelationshipVersionBI> versions = thingToDrag.getChronicle().getVersions();
         for (RelationshipVersionBI dav : versions) {
             if (inferred) {

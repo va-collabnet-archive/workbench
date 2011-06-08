@@ -5,7 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.util.EnumSet;
 
 import javax.swing.TransferHandler;
-import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
+import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
 
 import org.ihtsdo.tk.spec.RelSpec;
 

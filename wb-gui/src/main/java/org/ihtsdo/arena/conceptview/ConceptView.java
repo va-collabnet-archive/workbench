@@ -337,7 +337,7 @@ public class ConceptView extends JPanel {
         return cvLayout.getRowToPathCheckMap();
     }
 
-    public Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> getPositionPanelMap() {
+    public Map<PositionBI, Collection<DragPanelComponentVersion<?>>> getPositionPanelMap() {
         return cvLayout.getPositionPanelMap();
     }
 

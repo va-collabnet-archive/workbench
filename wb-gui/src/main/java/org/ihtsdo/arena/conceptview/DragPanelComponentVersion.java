@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,7 +32,7 @@ import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
-public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
+public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
         extends DragPanel<T> implements I_ToggleSubPanels {
 
     /**
@@ -40,7 +42,6 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
     private static ImageIcon dynamicPopupImage = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/dynamic_popup.png"));
     private static ImageIcon ghostIcon = new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/ghost.png"));
     private static int MIN_HEIGHT = 22;
-
 
     public static ImageIcon getGhostIcon() {
         return ghostIcon;
@@ -70,9 +71,9 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
             public void actionPerformed(ActionEvent e) {
                 collapsed = !collapsed;
                 if (collapsed) {
-                    hideSubPanels(ComponentVersionDragPanel.this.parentCollapsePanel.getSubpanelsToShow());
+                    hideSubPanels(DragPanelComponentVersion.this.parentCollapsePanel.getSubpanelsToShow());
                 } else {
-                    showSubPanels(ComponentVersionDragPanel.this.parentCollapsePanel.getSubpanelsToShow());
+                    showSubPanels(DragPanelComponentVersion.this.parentCollapsePanel.getSubpanelsToShow());
                 }
                 ((JButton) e.getSource()).setIcon(new ImageIcon(
                         CollapsePanel.class.getResource(ArenaComponentSettings.IMAGE_PATH
@@ -127,8 +128,6 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                 d.height = Math.max(MIN_HEIGHT, d.height);
                 super.setMinimumSize(d);
             }
-            
-            
         };
     }
 
@@ -224,14 +223,14 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         return parentCollapsePanel;
     }
 
-    public ComponentVersionDragPanel(ConceptViewLayout viewLayout,
+    public DragPanelComponentVersion(ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, T component) {
         super(viewLayout, component);
         this.parentCollapsePanel = parentCollapsePanel;
         setupCollapseExpandButton();
     }
 
-    public ComponentVersionDragPanel(LayoutManager layout,
+    public DragPanelComponentVersion(LayoutManager layout,
             ConceptViewLayout viewLayout,
             CollapsePanel parentCollapsePanel, T component) {
         super(layout, viewLayout, component);
@@ -398,7 +397,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         }
     }
 
-    public abstract Collection<ComponentVersionDragPanel<T>> getOtherVersionPanels()
+    public abstract Collection<DragPanelComponentVersion<T>> getOtherVersionPanels()
             throws IOException, TerminologyException;
 
     public void addHistoryPanels(GridBagConstraints gbc) throws IOException, TerminologyException {
@@ -410,7 +409,7 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
 
         boolean first = true;
         int top = 1;
-        for (ComponentVersionDragPanel<T> ovp : getOtherVersionPanels()) {
+        for (DragPanelComponentVersion<T> ovp : getOtherVersionPanels()) {
 
             if (first) {
                 first = false;
@@ -437,16 +436,16 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
         Collection<? extends RefexVersionBI<?>> refexes =
                 getThingToDrag().getCurrentRefexes(
                 getSettings().getConfig().getViewCoordinate());
+
+        Set<Integer> refexIds = new HashSet<Integer>();
+        Set<Integer> refexIdsWithDups = new HashSet<Integer>();
+
         for (RefexVersionBI<?> rx : refexes) {
-            DragPanelExtension dpe =
-                    new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
-            getSettings().getView().getSeperatorComponents().add(dpe);
-            dpe.setBorder(BorderFactory.createEtchedBorder());
-            dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
-                    && parentCollapsePanel.areExtrasShown());
-            add(dpe, gbc);
-            refexSubPanels.add(dpe);
-            gbc.gridy++;
+            if (refexIds.contains(rx.getCollectionNid())) {
+                refexIdsWithDups.add(rx.getCollectionNid());
+            } else {
+                refexIds.add(rx.getCollectionNid());
+            }
         }
 
         Collection<? extends RefexVersionBI<?>> tempRefexList =
@@ -454,16 +453,40 @@ public abstract class ComponentVersionDragPanel<T extends ComponentVersionBI>
                 getInactiveRefexes(getSettings().getConfig().getViewCoordinate());
 
         for (RefexVersionBI<?> rx : tempRefexList) {
-            DragPanelExtension dpe =
-                    new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
-            getSettings().getView().getSeperatorComponents().add(dpe);
-            dpe.setInactiveBackground();
-            dpe.setBorder(BorderFactory.createEtchedBorder());
-            dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
-                    && parentCollapsePanel.areExtrasShown());
-            add(dpe, gbc);
-            historicalRefexSubPanels.add(dpe);
-            gbc.gridy++;
+            if (refexIds.contains(rx.getCollectionNid())) {
+                refexIdsWithDups.add(rx.getCollectionNid());
+            } else {
+                refexIds.add(rx.getCollectionNid());
+            }
+        }
+
+        for (RefexVersionBI<?> rx : refexes) {
+            if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
+                DragPanelExtension dpe =
+                        new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
+                getSettings().getView().getSeperatorComponents().add(dpe);
+                dpe.setBorder(BorderFactory.createEtchedBorder());
+                dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
+                        && parentCollapsePanel.areExtrasShown());
+                add(dpe, gbc);
+                refexSubPanels.add(dpe);
+                gbc.gridy++;
+            }
+        }
+
+        for (RefexVersionBI<?> rx : tempRefexList) {
+            if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
+                DragPanelExtension dpe =
+                        new DragPanelExtension(viewLayout, getParentCollapsePanel(), rx);
+                getSettings().getView().getSeperatorComponents().add(dpe);
+                dpe.setInactiveBackground();
+                dpe.setBorder(BorderFactory.createEtchedBorder());
+                dpe.setVisible(parentCollapsePanel.isShown(SubPanelTypes.REFEX)
+                        && parentCollapsePanel.areExtrasShown());
+                add(dpe, gbc);
+                historicalRefexSubPanels.add(dpe);
+                gbc.gridy++;
+            }
         }
 
     }

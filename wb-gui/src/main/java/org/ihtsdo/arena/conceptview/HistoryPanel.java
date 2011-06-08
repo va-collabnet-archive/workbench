@@ -180,7 +180,7 @@ public class HistoryPanel {
     Map<JCheckBox, JLabel> positionHeaderCheckLabelMap = new HashMap<JCheckBox, JLabel>();
     Map<JCheckBox, JLabel> positionVersionPanelCheckLabelMap = new HashMap<JCheckBox, JLabel>();
     int hxWidth = 0;
-    private final Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap;
+    private final Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap;
     private final Map<Integer, ButtonGroup> nidGroupMap = new HashMap<Integer, ButtonGroup>();
     private final Map<Integer, ButtonGroup> inferredNidGroupMap = new HashMap<Integer, ButtonGroup>();
     private final Map<NidSapNid, JRadioButton> nidSapNidButtonMap = new HashMap<NidSapNid, JRadioButton>();
@@ -416,9 +416,9 @@ public class HistoryPanel {
         }
     }
 
-    private void setupVersionPanel(Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap) throws IOException {
-        for (Collection<ComponentVersionDragPanel<?>> panelSet : positionPanelMap.values()) {
-            for (ComponentVersionDragPanel<?> dragPanel : panelSet) {
+    private void setupVersionPanel(Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap) throws IOException {
+        for (Collection<DragPanelComponentVersion<?>> panelSet : positionPanelMap.values()) {
+            for (DragPanelComponentVersion<?> dragPanel : panelSet) {
                 processPanel(dragPanel);
             }
         }
@@ -446,11 +446,11 @@ public class HistoryPanel {
         return group;
     }
 
-    private void processPanel(ComponentVersionDragPanel<?> dragPanel) throws IOException {
+    private void processPanel(DragPanelComponentVersion<?> dragPanel) throws IOException {
         ComponentVersionBI version = dragPanel.getComponentVersion();
-        List<ComponentVersionDragPanel<?>> versionPanels =
+        List<DragPanelComponentVersion<?>> versionPanels =
                 getVersionPanels(dragPanel);
-        List<ComponentVersionDragPanel<?>> refexPanels =
+        List<DragPanelComponentVersion<?>> refexPanels =
                 getRefexPanels(dragPanel);
         if (versionPanels.isEmpty()) {
             processAllPositions(version, dragPanel);
@@ -462,17 +462,17 @@ public class HistoryPanel {
             ButtonGroup group = getButtonGroup(version.getNid(), inferred);
             processPosition(group,
                     version, version, dragPanel);
-            for (ComponentVersionDragPanel panel : versionPanels) {
+            for (DragPanelComponentVersion panel : versionPanels) {
                 processPosition(group,
                         version, panel.getComponentVersion(), panel);
             }
         }
-        for (ComponentVersionDragPanel refexPanel : refexPanels) {
+        for (DragPanelComponentVersion refexPanel : refexPanels) {
             processPanel(refexPanel);
         }
     }
 
-    private void processAllPositions(ComponentVersionBI version, ComponentVersionDragPanel<?> dragPanel) throws IOException {
+    private void processAllPositions(ComponentVersionBI version, DragPanelComponentVersion<?> dragPanel) throws IOException {
         if (version instanceof RelationshipVersionBI) {
             RelationshipVersionBI rv = (RelationshipVersionBI) version;
             Collection<RelationshipVersionBI> positionVersions = rv.getChronicle().getVersions();
@@ -493,7 +493,7 @@ public class HistoryPanel {
 
     private void processPosition(ButtonGroup group,
             ComponentVersionBI viewVersion, ComponentVersionBI positionVersion,
-            ComponentVersionDragPanel<?> dragPanel) {
+            DragPanelComponentVersion<?> dragPanel) {
         try {
             boolean add = false;
             PositionBI p = positionVersion.getPosition();
@@ -597,14 +597,14 @@ public class HistoryPanel {
         }
     }
 
-    private List<ComponentVersionDragPanel<?>> getVersionPanels(
-            ComponentVersionDragPanel<?> dragPanel) throws IOException {
-        List<ComponentVersionDragPanel<?>> versionPanels =
-                new ArrayList<ComponentVersionDragPanel<?>>();
+    private List<DragPanelComponentVersion<?>> getVersionPanels(
+            DragPanelComponentVersion<?> dragPanel) throws IOException {
+        List<DragPanelComponentVersion<?>> versionPanels =
+                new ArrayList<DragPanelComponentVersion<?>>();
         for (Component comp : dragPanel.getComponents()) {
-            if (comp instanceof ComponentVersionDragPanel) {
-                ComponentVersionDragPanel cvdp =
-                        (ComponentVersionDragPanel) comp;
+            if (comp instanceof DragPanelComponentVersion) {
+                DragPanelComponentVersion cvdp =
+                        (DragPanelComponentVersion) comp;
                 if (cvdp.isVisible()) {
                     if (cvdp.getComponentVersion().getChronicle().equals(
                             dragPanel.getComponentVersion().getChronicle())) {
@@ -616,14 +616,14 @@ public class HistoryPanel {
         return versionPanels;
     }
 
-    private List<ComponentVersionDragPanel<?>> getRefexPanels(
-            ComponentVersionDragPanel<?> dragPanel) {
-        List<ComponentVersionDragPanel<?>> versionPanels =
-                new ArrayList<ComponentVersionDragPanel<?>>();
+    private List<DragPanelComponentVersion<?>> getRefexPanels(
+            DragPanelComponentVersion<?> dragPanel) {
+        List<DragPanelComponentVersion<?>> versionPanels =
+                new ArrayList<DragPanelComponentVersion<?>>();
         for (Component comp : dragPanel.getComponents()) {
-            if (comp.isVisible() && comp instanceof ComponentVersionDragPanel) {
-                ComponentVersionDragPanel cvdp =
-                        (ComponentVersionDragPanel) comp;
+            if (comp.isVisible() && comp instanceof DragPanelComponentVersion) {
+                DragPanelComponentVersion cvdp =
+                        (DragPanelComponentVersion) comp;
                 if (!cvdp.getComponentVersion().getChronicle().equals(
                         dragPanel.getComponentVersion().getChronicle())) {
                     versionPanels.add(cvdp);

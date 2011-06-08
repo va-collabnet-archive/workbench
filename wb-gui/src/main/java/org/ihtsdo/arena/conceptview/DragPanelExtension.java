@@ -29,7 +29,7 @@ import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
 public class DragPanelExtension
-        extends ComponentVersionDragPanel<RefexVersionBI<?>> {
+        extends DragPanelComponentVersion<RefexVersionBI<?>> {
 
     /**
      * 
@@ -52,10 +52,10 @@ public class DragPanelExtension
     }
 
     @Override
-    public Collection<ComponentVersionDragPanel<RefexVersionBI<?>>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<RefexVersionBI<?>>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<ComponentVersionDragPanel<RefexVersionBI<?>>> panelList =
-                new ArrayList<ComponentVersionDragPanel<RefexVersionBI<?>>>();
+        Collection<DragPanelComponentVersion<RefexVersionBI<?>>> panelList =
+                new ArrayList<DragPanelComponentVersion<RefexVersionBI<?>>>();
         Collection<RefexVersionBI<?>> versions = thingToDrag.getChronicle().getVersions();
         for (RefexVersionBI<?> dav : versions) {
             if (!thingToDrag.equals(dav)) {

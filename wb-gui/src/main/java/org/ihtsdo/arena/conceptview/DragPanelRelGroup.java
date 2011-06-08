@@ -11,7 +11,7 @@ import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
-public class DragPanelRelGroup extends ComponentVersionDragPanel<RelGroupVersionBI> {
+public class DragPanelRelGroup extends DragPanelComponentVersion<RelGroupVersionBI> {
 
     /**
      * 
@@ -29,10 +29,10 @@ public class DragPanelRelGroup extends ComponentVersionDragPanel<RelGroupVersion
     }
 
     @Override
-    public Collection<ComponentVersionDragPanel<RelGroupVersionBI>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<RelGroupVersionBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<ComponentVersionDragPanel<RelGroupVersionBI>> panelList =
-                new ArrayList<ComponentVersionDragPanel<RelGroupVersionBI>>();
+        Collection<DragPanelComponentVersion<RelGroupVersionBI>> panelList =
+                new ArrayList<DragPanelComponentVersion<RelGroupVersionBI>>();
         return panelList;
     }
 

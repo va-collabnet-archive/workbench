@@ -37,7 +37,7 @@ import javax.swing.JPopupMenu;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.arena.ArenaComponentSettings;
-import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
+import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
 import org.ihtsdo.arena.conceptview.ConceptView.PanelSection;
 import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
 import org.ihtsdo.tk.Ts;
@@ -133,7 +133,7 @@ public class CollapsePanel extends JPanel {
     /**
      * @return the subpanelsToShow
      */
-    public EnumSet<ComponentVersionDragPanel.SubPanelTypes> getSubpanelsToShow() {
+    public EnumSet<DragPanelComponentVersion.SubPanelTypes> getSubpanelsToShow() {
         return prefs.getSubpanelsToShow();
     }
     Set<PanelSection> noMenuSections =
@@ -439,7 +439,7 @@ public class CollapsePanel extends JPanel {
     }
 
     private void updateShowSubpanelSet(boolean show,
-            ComponentVersionDragPanel.SubPanelTypes subpanel) {
+            DragPanelComponentVersion.SubPanelTypes subpanel) {
         if (show) {
             getSubpanelsToShow().add(subpanel);
         } else {

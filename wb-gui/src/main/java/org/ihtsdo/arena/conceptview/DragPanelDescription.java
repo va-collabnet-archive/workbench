@@ -25,7 +25,7 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
-public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionAnalogBI> {
+public class DragPanelDescription extends DragPanelComponentVersion<DescriptionAnalogBI> {
 
     /**
      * 
@@ -188,10 +188,10 @@ public class DragPanelDescription extends ComponentVersionDragPanel<DescriptionA
     }
 
     @Override
-    public Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> getOtherVersionPanels()
+    public Collection<DragPanelComponentVersion<DescriptionAnalogBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {
-        Collection<ComponentVersionDragPanel<DescriptionAnalogBI>> panelList =
-                new ArrayList<ComponentVersionDragPanel<DescriptionAnalogBI>>();
+        Collection<DragPanelComponentVersion<DescriptionAnalogBI>> panelList =
+                new ArrayList<DragPanelComponentVersion<DescriptionAnalogBI>>();
         Collection<DescriptionAnalogBI> versions = thingToDrag.getChronicle().getVersions();
         for (DescriptionAnalogBI dav : versions) {
             if (!thingToDrag.equals(dav)) {

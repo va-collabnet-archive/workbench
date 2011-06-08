@@ -114,10 +114,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private I_ConfigAceFrame config;
     private PanelsChangedActionListener pcal;
     // 
-    private Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> positionPanelMap =
-            new ConcurrentHashMap<PositionBI, Collection<ComponentVersionDragPanel<?>>>();
+    private Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap =
+            new ConcurrentHashMap<PositionBI, Collection<DragPanelComponentVersion<?>>>();
 
-    public Map<PositionBI, Collection<ComponentVersionDragPanel<?>>> getPositionPanelMap() {
+    public Map<PositionBI, Collection<DragPanelComponentVersion<?>>> getPositionPanelMap() {
         return positionPanelMap;
     }
     private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
@@ -386,26 +386,29 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
 
                     if (memberRefsets != null) {
-                        for (RefexVersionBI<?> extn : memberRefsets) {
-                            if (stop) {
-                                return;
-                            }
-                            int refsetNid = extn.getCollectionNid();
-                            List<? extends I_ExtendByRefPart> currentRefsets =
-                                    tf.getRefsetHelper(config).
-                                    getAllCurrentRefsetExtensions(refsetNid, layoutConcept.getConceptNid());
-                            for (I_ExtendByRefPart cr : currentRefsets) {
-                                DragPanelExtension ce =
-                                        new DragPanelExtension(this, cpe, extn);
-                                seperatorComponents.add(ce);
-                                cpe.addToggleComponent(ce);
-                                cView.add(ce, gbc);
-                                cpe.getRefexPanels().add(ce);
-                                gbc.gridy++;
-                                cpe.setAlertCount(cpe.alertCount += ce.getAlertSubpanelCount());
-                                cpe.setRefexCount(cpe.refexCount += ce.getRefexSubpanelCount());
-                                cpe.setHistoryCount(cpe.historyCount += ce.getHistorySubpanelCount());
-                                cpe.setTemplateCount(cpe.templateCount += ce.getTemplateSubpanelCount());
+                        boolean displayRefsetMembersInArena = false;
+                        if (displayRefsetMembersInArena) {
+                            for (RefexVersionBI<?> extn : memberRefsets) {
+                                if (stop) {
+                                    return;
+                                }
+                                int refsetNid = extn.getCollectionNid();
+                                List<? extends I_ExtendByRefPart> currentRefsets =
+                                        tf.getRefsetHelper(config).
+                                        getAllCurrentRefsetExtensions(refsetNid, layoutConcept.getConceptNid());
+                                for (I_ExtendByRefPart cr : currentRefsets) {
+                                    DragPanelExtension ce =
+                                            new DragPanelExtension(this, cpe, extn);
+                                    seperatorComponents.add(ce);
+                                    cpe.addToggleComponent(ce);
+                                    cView.add(ce, gbc);
+                                    cpe.getRefexPanels().add(ce);
+                                    gbc.gridy++;
+                                    cpe.setAlertCount(cpe.alertCount += ce.getAlertSubpanelCount());
+                                    cpe.setRefexCount(cpe.refexCount += ce.getRefexSubpanelCount());
+                                    cpe.setHistoryCount(cpe.historyCount += ce.getHistorySubpanelCount());
+                                    cpe.setTemplateCount(cpe.templateCount += ce.getTemplateSubpanelCount());
+                                }
                             }
                         }
                     }
@@ -431,7 +434,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
                     }
 
-                    boolean descHistoryIsShown = cpd.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+                    boolean descHistoryIsShown = cpd.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
                     for (DragPanelDescription dc : inactiveDescriptionPanels) {
                         if (stop) {
                             return;
@@ -460,7 +463,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     if (settings.showStated()) {
                         cpr.setHistoryCount(cpr.historyCount + inactiveStatedRels.size());
                     }
-                    boolean relHistoryIsShown = cpr.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+                    boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
                     cpr.setTemplateCount(0);
                     boolean cprAdded = false;
                     if (settings.showStated()) {
@@ -938,7 +941,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             cprg.setHistoryCount(cprg.historyCount += dpr.getHistorySubpanelCount());
             cprg.setTemplateCount(cprg.templateCount += dpr.getTemplateSubpanelCount());
         }
-        boolean relHistoryIsShown = cpr.isShown(ComponentVersionDragPanel.SubPanelTypes.HISTORY);
+        boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
         for (RelationshipVersionBI rv : group.getAllRels()) {
             if (!activeRelIds.contains(rv.getNid())) {
                 DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
@@ -1125,19 +1128,19 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return relPanel;
     }
 
-    private void addToPositionPanelMap(ComponentVersionDragPanel<?> panel) throws IOException {
+    private void addToPositionPanelMap(DragPanelComponentVersion<?> panel) throws IOException {
         ComponentVersionBI componentVersion = panel.getComponentVersion();
         if (componentVersion == null) {
             return;
         }
         PositionBI position = componentVersion.getPosition();
-        Collection<ComponentVersionDragPanel<?>> panels =
+        Collection<DragPanelComponentVersion<?>> panels =
                 positionPanelMap.get(position);
         if (panels == null) {
-            panels = new ConcurrentSkipListSet<ComponentVersionDragPanel<?>>(new Comparator<ComponentVersionDragPanel<?>>() {
+            panels = new ConcurrentSkipListSet<DragPanelComponentVersion<?>>(new Comparator<DragPanelComponentVersion<?>>() {
 
                 @Override
-                public int compare(ComponentVersionDragPanel<?> o1, ComponentVersionDragPanel<?> o2) {
+                public int compare(DragPanelComponentVersion<?> o1, DragPanelComponentVersion<?> o2) {
                     return o1.getId() - o2.getId();
                 }
             });

@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.EnumSet;
-import org.ihtsdo.arena.conceptview.ComponentVersionDragPanel.SubPanelTypes;
+import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
 
 /**
  *
@@ -23,8 +23,8 @@ public class CollapsePanelPrefs implements Serializable {
    private static final long serialVersionUID = 1L;
    private static final int dataVersion = 1;
    private boolean extrasShown = false;
-   private EnumSet<ComponentVersionDragPanel.SubPanelTypes> subpanelsToShow =
-           EnumSet.noneOf(ComponentVersionDragPanel.SubPanelTypes.class);
+   private EnumSet<DragPanelComponentVersion.SubPanelTypes> subpanelsToShow =
+           EnumSet.noneOf(DragPanelComponentVersion.SubPanelTypes.class);
    private boolean collapsed = false;
 
    public CollapsePanelPrefs(CollapsePanelPrefs other) {
