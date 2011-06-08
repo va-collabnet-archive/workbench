@@ -15,13 +15,13 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
-import com.sleepycat.je.utilint.LongMaxStat;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,17 +36,16 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
     // RECORD FIELDS
     long conSnoIdL; //  id
     String effDateStr; // effectiveTime
+    long timeL;
     boolean isActive; // CONCEPTSTATUS
     long statusConceptL; // extended from AttributeValue file
     String pathStr; // Module ID
     boolean isPrimitiveB; // ISPRIMITIVE
 
-    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim, long statusConceptL) {
-        if (conIdL == Long.MAX_VALUE) {
-            System.out.println(":!!!:DEBUG Long.MAX_VALUE");
-        }
+    public Sct2_ConRecord(long conIdL, String dateStr, boolean active, String path, boolean isPrim, long statusConceptL) throws ParseException {
         this.conSnoIdL = conIdL;
         this.effDateStr = dateStr;
+        this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
         this.pathStr = path;
@@ -63,9 +62,22 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
         while (idxA < a.length && idxB < b.length) {
             if (a[idxA].conSnoIdL == b[idxB].referencedComponentIdL) {
-                a[idxA].conSnoIdL = b[idxB].valueIdL;
-                idxA++;
-                idxB++;
+                long timeRangeInL = b[idxB].timeL;
+                long timeRangeOutL = Long.MAX_VALUE;
+                if (idxB + 1 < b.length && a[idxA].conSnoIdL == b[idxB + 1].referencedComponentIdL) {
+                    timeRangeOutL = b[idxB + 1].timeL;
+                }
+
+                if (a[idxA].timeL < timeRangeInL) {
+                    idxA++;
+                } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    idxA++;
+                    idxB++;
+                } else {
+                    idxB++;
+                }
+
             } else if (a[idxA].conSnoIdL < b[idxB].referencedComponentIdL) {
                 idxA++;
             } else {
@@ -104,6 +116,9 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             }
 
             return a;
+        } catch (ParseException ex) {
+            Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("error parsing rf2 concepts", ex);
         } catch (IOException ex) {
             Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("error parsing rf2 concepts", ex);
@@ -147,6 +162,12 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             return -1; // instance less than received
         } else if (this.conSnoIdL > t.conSnoIdL) {
             return 1; // instance greater than received
+        } else {
+            if (this.timeL < t.timeL) {
+                return -1; // instance less than received
+            } else if (this.timeL > t.timeL) {
+                return 1; // instance greater than received
+            }
         }
         return 0; // instance == received
     }

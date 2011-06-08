@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Arrays;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -35,6 +36,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
     // RELATIONSHIP FIELDS
     long relSnoId; // SNOMED RELATIONSHIPID, if applicable
     String effDateStr;
+    long timeL;
     boolean isActive; // status is computed for relationships
     long statusConceptL; // extended from AttributeValue file
     String pathStr;
@@ -50,11 +52,12 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             long cOneID, long roleTypeSnoId, long cTwoID, int grp,
             long characterType, long refinibility,
             boolean inferredB,
-            long statusConceptL) {
+            long statusConceptL) throws ParseException {
 
         this.relSnoId = relID; // RELATIONSHIPID
 
         this.effDateStr = dateStr;
+        this.timeL =  Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
         this.pathStr = path;
 
@@ -79,9 +82,22 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
 
         while (idxA < a.length && idxB < b.length) {
             if (a[idxA].relSnoId == b[idxB].referencedComponentIdL) {
-                a[idxA].relSnoId = b[idxB].valueIdL;
-                idxA++;
-                idxB++;
+                long timeRangeInL = b[idxB].timeL;
+                long timeRangeOutL = Long.MAX_VALUE;
+                if (idxB + 1 < b.length && a[idxA].relSnoId == b[idxB + 1].referencedComponentIdL) {
+                    timeRangeOutL = b[idxB + 1].timeL;
+                }
+
+                if (a[idxA].timeL < timeRangeInL) {
+                    idxA++;
+                } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    idxA++;
+                    idxB++;
+                } else {
+                    idxB++;
+                }
+
             } else if (a[idxA].relSnoId < b[idxB].referencedComponentIdL) {
                 idxA++;
             } else {
@@ -90,7 +106,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         }
     }
 
-    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB) throws IOException {
+    public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB) throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Sct2_RelRecord[] a = new Sct2_RelRecord[count];
@@ -203,6 +219,12 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             return -1; // instance less than received
         } else if (this.relSnoId > t.relSnoId) {
             return 1; // instance greater than received
+        } else {
+            if (this.timeL < t.timeL) {
+                return -1; // instance less than received
+            } else if (this.timeL > t.timeL) {
+                return 1; // instance greater than received
+            }
         }
         return 0; // instance == received
     }

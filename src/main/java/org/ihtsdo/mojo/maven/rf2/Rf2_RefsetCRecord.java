@@ -20,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import org.dwfa.tapi.TerminologyException;
 
 public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
@@ -29,6 +30,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
     // RECORD FIELDS
     final String id;
     final String effDateStr;
+    final long timeL;
     final boolean isActive;
     final String pathStr;
     final long refsetIdL;
@@ -36,9 +38,10 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
     final long valueIdL; // For Language refset valueIdL is acceptibilityId
 
     public Rf2_RefsetCRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, long valueIdL) {
+            long refsetIdL, long referencedComponentIdL, long valueIdL) throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
+        this.timeL =  Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
         this.pathStr = path;
@@ -48,7 +51,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
     }
 
-    static Rf2_RefsetCRecord[] parseLangRefSet(Rf2File f) throws IOException {
+    static Rf2_RefsetCRecord[] parseLangRefSet(Rf2File f) throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Rf2_RefsetCRecord[] a = new Rf2_RefsetCRecord[count];

@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
@@ -34,6 +35,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     long desSnoIdL; // DESCRIPTIONID
     String desUuidStr; // id
     String effDateStr; // effectiveTime
+    long timeL;
     boolean isActive; // STATUS
     long statusConceptL; // extended from AttributeValue file
     String pathStr;
@@ -46,11 +48,12 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     public Sct2_DesRecord(long dId, String dateStr, boolean activeB, String path,
             String conUuidStr, String termStr,
             boolean capitalization, String desTypeStr, String langCodeStr,
-            long statusConceptL) {
+            long statusConceptL) throws ParseException {
         desSnoIdL = dId;
         UUID tmpUUID = Type3UuidFactory.fromSNOMED(desSnoIdL);
         this.desUuidStr = tmpUUID.toString();
         this.effDateStr = dateStr;
+        this.timeL =  Rf2x.convertDateToTime(dateStr);
         this.isActive = activeB;
 
         this.conUuidStr = conUuidStr; // CONCEPTID
@@ -73,9 +76,22 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
 
         while (idxA < a.length && idxB < b.length) {
             if (a[idxA].desSnoIdL == b[idxB].referencedComponentIdL) {
-                a[idxA].desSnoIdL = b[idxB].valueIdL;
-                idxA++;
-                idxB++;
+                long timeRangeInL = b[idxB].timeL;
+                long timeRangeOutL = Long.MAX_VALUE;
+                if (idxB + 1 < b.length && a[idxA].desSnoIdL == b[idxB + 1].referencedComponentIdL) {
+                    timeRangeOutL = b[idxB + 1].timeL;
+                }
+
+                if (a[idxA].timeL < timeRangeInL) {
+                    idxA++;
+                } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    a[idxA].statusConceptL = b[idxB].valueIdL;
+                    idxA++;
+                    idxB++;
+                } else {
+                    idxB++;
+                }
+
             } else if (a[idxA].desSnoIdL < b[idxB].referencedComponentIdL) {
                 idxA++;
             } else {
@@ -84,7 +100,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         }
     }
 
-    public static Sct2_DesRecord[] parseDescriptions(Rf2File f) throws IOException {
+    public static Sct2_DesRecord[] parseDescriptions(Rf2File f) throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Sct2_DesRecord[] a = new Sct2_DesRecord[count];
@@ -182,6 +198,12 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
             return -1; // instance less than received
         } else if (this.desSnoIdL > t.desSnoIdL) {
             return 1; // instance greater than received
+        } else {
+            if (this.timeL < t.timeL) {
+                return -1; // instance less than received
+            } else if (this.timeL > t.timeL) {
+                return 1; // instance greater than received
+            }
         }
         return 0; // instance == received
     }
