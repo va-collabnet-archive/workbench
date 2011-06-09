@@ -32,13 +32,14 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * @author Marc E. Campbell
  *
- * @goal sct-rf2-lrs-to-arf
+ * @author marc
+ *
+ * @goal sct-rf2-crossmap-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
+public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -66,19 +67,16 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
     private String inputDir;
     /**
      * Directory used to output the eConcept format files
-     * Default value "/classes" set programmatically due to file separator
      *
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
-    String uuidSourceSnomedLongStr;
-    String uuidPathStr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        BufferedWriter bwIds = null;
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN SctRf2LrsToArf");
-
+        getLog().info("::: BEGIN SctRf2CrossMapToArfMojo");
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
         getLog().info("    POM Target Directory: " + targetDirectory.getAbsolutePath());
@@ -87,8 +85,10 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
 
         try {
             // SETUP CONSTANTS
-            uuidSourceSnomedLongStr =
-                    ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString();
+            Rf2_CrossmapRecord.uuidSourceSnomedRtStr =
+                    ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getPrimoridalUid().toString();
+            Rf2_CrossmapRecord.uuidSourceCtv3Str =
+                    ArchitectonicAuxiliary.Concept.CTV3_ID.getPrimoridalUid().toString();
 
             // FILE & DIRECTORY SETUP
             // Create multiple directories
@@ -98,57 +98,48 @@ public class SctRf2LrsToArf extends AbstractMojo implements Serializable {
             if (success) {
                 getLog().info("::: Output Directory: " + outDir);
             }
-            // BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-            //        outDir + "ids.txt"), "UTF-8"));
-            // getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
+            bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    outDir + "ids.txt"), "UTF-8"));
+            getLog().info("::: IDS OUTPUT: " + outDir + "ids_crossmap.txt");
 
             // LANGUAGE REFSET FILES "der2_cRefset_Language"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_language_rf2.refset"), "UTF-8"));
-            getLog().info("::: LANGUAGE REFSET FILE: " + outDir + "concept_language_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Language", ".txt");
+            getLog().info("::: CROSSMAP REFSET FILE: " + outDir + "string_simplemap_rf2.refset");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "SimpleMap", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseLangRefSet(rf2File);
-                for (Rf2_RefsetCRecord m : members) {
-                    m.writeArf(bw);
-                    // writeSctSnomedLongId(bwIds, m.id, m.effDateStr, m.pathStr);
+                Rf2_CrossmapRecord[] members = Rf2_CrossmapRecord.parseCrossmapFile(rf2File);
+                for (Rf2_CrossmapRecord m : members) {
+                    // 446608001 ICD-O
+                    // 900000000000498005 SNOMED RT
+                    // 900000000000497000 CTV3
+                    if (m.refsetIdL == 900000000000498005L) {
+                        m.writeArfId(bwIds);
+                    } else if (m.refsetIdL == 900000000000497000L) {
+                        m.writeArfId(bwIds);
+                    } else if (m.refsetIdL == 446608001L) {
+                        m.writeArfRefset(bw);
+                    } else {
+                        throw new UnsupportedOperationException();
+                    }
                 }
             }
+
             bw.flush();
             bw.close();
-
-            // bwIds.flush();
-            // bwIds.close();
-
+            
+            bwIds.flush();
+            bwIds.close();
         } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF file error", ex);
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo Terminology error", ex);
         } catch (ParseException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF file name parse error", ex);
+            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo parse error", ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo file error", ex);
         }
-    }
-
-    private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
-            throws IOException, TerminologyException {
-        // Primary UUID
-        writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
-
-        // Source System UUID
-        writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
-
-        // Source Id
-        writer.append(Long.toString(sctId) + TAB_CHARACTER);
-
-        // Status UUID
-        writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
-
-        // Effective Date   yyyy-MM-dd HH:mm:ss
-        writer.append(Rf2x.convertEffectiveTimeToDate(date) + TAB_CHARACTER);
-
-        // Path UUID
-        writer.append(path + LINE_TERMINATOR);
+        getLog().info("::: END SctRf2CrossMapToArfMojo");
     }
 }

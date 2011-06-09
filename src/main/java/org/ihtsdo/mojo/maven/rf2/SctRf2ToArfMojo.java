@@ -39,7 +39,7 @@ import org.dwfa.tapi.TerminologyException;
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2ToArf extends AbstractMojo implements Serializable {
+public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -174,15 +174,15 @@ public class SctRf2ToArf extends AbstractMojo implements Serializable {
             bwIds.close();
 
         } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file error", ex);
         } catch (MojoFailureException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw ex;
         } catch (ParseException ex) {
-            Logger.getLogger(SctRf2ToArf.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file name parse error", ex);
         }
     }
