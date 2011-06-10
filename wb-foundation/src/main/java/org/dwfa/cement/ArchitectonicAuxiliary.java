@@ -234,6 +234,8 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                                                         new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
                        ALL_CHARACTERS_CASE_SENSITIVE(new String[] {"all characters case sensitive (language concept)","unchangable"}, null,
                                                         new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
+                       MAYBE_CASE_SENSITIVE(new String[] {"maybe case sensitive (language concept)","maybe ics"}, null,
+                                                        new I_ConceptualizeUniversally[] { CASE_SENSITIVITY }) ,
                LANGUAGE_SPECIFICATION(new String[] {"language specification (language concept)","language"}, null,
                        new I_ConceptualizeUniversally[] { LANGUAGE_CONCEPT }) ,
                        LIT(new String[] {"Language-independent token (language concept)","Language-independent token"}, null,
