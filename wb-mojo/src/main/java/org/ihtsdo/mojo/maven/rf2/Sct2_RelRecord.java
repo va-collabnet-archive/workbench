@@ -59,7 +59,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
-        this.pathStr = path;
+        /* this.pathStr = path; */
+        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
 
         this.c1SnoId = cOneID; // CONCEPTID1
         this.roleTypeSnoId = roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID)
