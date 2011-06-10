@@ -63,6 +63,7 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.CaseSensitive;
 import org.ihtsdo.tk.spec.PathSpec;
 
 /**
@@ -461,36 +462,30 @@ public class LoadBdbMulti extends AbstractMojo {
                     String[] parts = line.split(" ");
                     int wordIndex = 0;
                     int caseIndex = 1;
-                    int lineCount = 0;
                     RefexChronicleBI<?> wordRefex = null;
 
                     line = br.readLine();
                     while (line != null && line.length() > 1) {
                         parts = line.split(" ");
                         String word = parts[wordIndex];
-                        String caseType = parts[caseIndex];
-                        
-
-                        if (lineCount == 0) {
-                            RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
-                                    caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
-                            wordRefexSpec.with(RefexProperty.STRING1, word);
-                            wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
-                            wordRefexSpec.setMemberContentUuid();
-
-                            wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
+                        int caseType = Integer.parseInt(parts[caseIndex]);
+                        int icsTypeNid;
+                        if (caseType == 1) {
+                            icsTypeNid =  CaseSensitive.IC_SIGNIFICANT.getLenient().getNid();
                         } else {
-                            RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
-                                    wordRefex.getNid(), caseSensitiveRefexColl.getNid());
-                            wordRefexSpec.with(RefexProperty.STRING1, word);
-                            wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
-                            wordRefexSpec.setMemberContentUuid();
-
-                            amender.constructIfNotCurrent(wordRefexSpec);
+                            icsTypeNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
                         }
-                        
+
+                        RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.CID_STR,
+                                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
+                        wordRefexSpec.with(RefexProperty.STRING1, word);
+                        wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
+                        wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                        wordRefexSpec.setMemberContentUuid();
+
+                        wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
+
                         line = br.readLine();
-                        lineCount++;
                     }
                 } catch (EOFException ex) {
                     // nothing to do...
