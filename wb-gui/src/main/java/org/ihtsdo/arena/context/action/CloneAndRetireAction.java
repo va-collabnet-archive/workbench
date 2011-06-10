@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import javax.swing.AbstractAction;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
@@ -47,9 +49,10 @@ public class CloneAndRetireAction extends AbstractAction {
             }
             if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
                 DescriptionVersionBI desc = (DescriptionVersionBI) component;
-                Terms.get().newDescription(UUID.randomUUID(), concept,
+                I_DescriptionVersioned newDesc = Terms.get().newDescription(UUID.randomUUID(), concept,
                         desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
                         config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
+                newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
             }
             if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
@@ -90,6 +93,8 @@ public class CloneAndRetireAction extends AbstractAction {
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (PropertyVetoException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 
