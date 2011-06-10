@@ -3,18 +3,19 @@ package org.ihtsdo.arena.context.action;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.swing.AbstractAction;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
@@ -35,9 +36,7 @@ public class SetICSignificantAction extends AbstractAction {
         try {
             config = Terms.get().getActiveAceFrameConfig();
             //get concept
-            I_GetConceptData descConcept = Terms.get().getConceptForNid(desc.getNid());
-            //get descriptions for concept
-            Collection<? extends I_DescriptionVersioned> descriptions = descConcept.getDescriptions();
+            ConceptVersionBI descConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
             //get inital word of selected description
             String descText = desc.getText();
             String initialWord = null;
@@ -47,7 +46,7 @@ public class SetICSignificantAction extends AbstractAction {
                 initialWord = descText;
             }
             //compare to initial word of returned descriptions
-            for (I_DescriptionVersioned descVersion : descriptions) {
+            for (DescriptionVersionBI descVersion : descConcept.getDescsActive()) {
                 String otherText = descVersion.getText();
                 //if same word then add to description list
                 String otherInitialWord = null;
@@ -56,12 +55,12 @@ public class SetICSignificantAction extends AbstractAction {
                 } else {
                     otherInitialWord = otherText;
                 }
-                if (initialWord.equals(otherInitialWord)
-                        && descVersion.getStatusNid() == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
+                if (initialWord.equals(otherInitialWord)) {
                     DescriptionAnalogBI analog = null;
                     if (desc.isInitialCaseSignificant()) {
                         if (descVersion.isUncommitted()) {
-                            descVersion.setInitialCaseSignificant(false);
+                            DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
+                            da.setInitialCaseSignificant(false);
                             I_GetConceptData concept = Terms.get().getConceptForNid(descVersion.getNid());
                             Terms.get().addUncommitted(concept);
                         } else {
@@ -78,7 +77,8 @@ public class SetICSignificantAction extends AbstractAction {
                         }
                     } else {
                         if (descVersion.isUncommitted()) {
-                            descVersion.setInitialCaseSignificant(true);
+                            DescriptionAnalogBI da = (DescriptionAnalogBI) descVersion;
+                            da.setInitialCaseSignificant(true);
                             I_GetConceptData concept = Terms.get().getConceptForNid(descVersion.getNid());
                             Terms.get().addUncommitted(concept);
                         } else {
@@ -101,6 +101,8 @@ public class SetICSignificantAction extends AbstractAction {
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch(ContraditionException ex){
             AceLog.getAppLog().alertAndLogException(ex);
         }
 
