@@ -9,6 +9,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,9 +23,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.example.binding.CaseSensitive;
 
 public class DragPanelDescription extends DragPanelComponentVersion<DescriptionAnalogBI> {
 
@@ -163,14 +167,26 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         JLabel langLabel = getJLabel(lang);
         add(langLabel, gbc);
         gbc.gridx++;
+        //check for case sensitivity
         String caseStr = "ci";
-        if (getDesc().isInitialCaseSignificant()) {
+        String descText = getDesc().getText();
+        String initialWord = null;
+        if (descText.indexOf(" ") != -1) {
+            initialWord = descText.substring(0, descText.indexOf(" "));
+        } else {
+            initialWord = descText;
+        }
+
+        if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid())
+                && getDesc().isInitialCaseSignificant() == false && getDesc().isUncommitted()) {
+            caseStr = "<html><font color = 'red'>Cs";
+        } else if (getDesc().isInitialCaseSignificant()) {
             caseStr = "Cs";
         }
         JLabel caseLabel = getJLabel(caseStr);
         add(caseLabel, gbc);
-        
-        
+
+
         gbc.gridx++;
 
         add(getComponentActionMenuButton(), gbc);
