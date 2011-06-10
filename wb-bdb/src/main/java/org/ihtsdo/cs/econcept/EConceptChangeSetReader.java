@@ -176,7 +176,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         }
         AceLog.getAppLog().info(
             "Change set " + changeSetFile.getName() + " contains " + count + " change objects. "
-                + "\n unvalidated objects: " + unvalidated + "\n imported Concepts: " + conceptCount);
+                + "\n unvalidated objects: " + unvalidated + "\n imported concepts: " + conceptCount);
 
     }
 
@@ -247,9 +247,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 dataStream = new DataInputStream(bis);
 
                 if (EConceptChangeSetWriter.writeDebugFiles) {
-                    csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");;
+                    csreFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csre");
                     csreOut = new FileWriter(csreFile, true);
-                    csrcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csrc");;
+                    csrcFile = new File(changeSetFile.getParentFile(), changeSetFile.getName() + ".csrc");
                     csrcOut = new FileWriter(csrcFile, true);
                 }
             } else {

@@ -23,7 +23,9 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
-    protected static boolean writeDebugFiles = true;
+    public static boolean writeDebugFiles = false;
+    public   static boolean validateAfterWrite = false;
+    
     /**
      * 
      */
@@ -40,7 +42,6 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     private ChangeSetGenerationPolicy policy;
     private Semaphore writePermit = new Semaphore(1);
     private boolean timeStampEnabled = true;
-    private static boolean validateAfterWrite = true;
 
     public boolean isTimeStampEnabled() {
         return timeStampEnabled;
@@ -126,6 +127,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                     }
                     if (validateAfterWrite) {
                         try {
+                            AceLog.getAppLog().info("validating " + changeSetFile + " after write.");
                             EConceptChangeSetReader reader = new EConceptChangeSetReader();
                             reader.setChangeSetFile(changeSetFile);
                             reader.setNoCommit(true);
@@ -148,7 +150,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
             if (changeSetFile.length() == 0) {
                 changeSetFile.delete();
             } else {
-                AceLog.getAppLog().info("Finished export of: " + changeSetFile.getName()
+                AceLog.getAppLog().info("Finished writing: " + changeSetFile.getName()
                         + " size: " + changeSetFile.length());
                 Terms.get().setProperty(changeSetFile.getName(),
                         Long.toString(changeSetFile.length()));

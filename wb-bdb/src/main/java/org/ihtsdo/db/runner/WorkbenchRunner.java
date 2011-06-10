@@ -28,7 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
@@ -98,6 +97,41 @@ public class WorkbenchRunner {
     public WorkbenchRunner(String[] args, LifeCycle lc) {
         try {
             AceProtocols.setupExtraProtocols();
+
+            WorkbenchRunner.args = args;
+            WorkbenchRunner.lc = lc;
+
+            AceLog.getAppLog().info(
+                    "\n*******************\n" + "\n Starting "
+                    + this.getClass().getSimpleName()
+                    + "\n with config file: " + getArgString(args)
+                    + "\n\n******************\n");
+            if (new File(args[0]).exists()) {
+                jiniConfig = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
+            }
+            
+            if (jiniConfig != null) {
+                wbConfigFile = (File) jiniConfig.getEntry(this.getClass().getName(), "wbConfigFile", File.class, new File(
+                        "config/wb.config"));
+                initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "initFromSubversion",
+                        Boolean.class, Boolean.FALSE);
+                svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
+                        String[].class, null);
+                ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "refsetOnly",
+                        Boolean.class, Boolean.FALSE);
+                ACE.editMode = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "allowEdit",
+                        Boolean.class, Boolean.TRUE);
+                
+                EConceptChangeSetWriter.writeDebugFiles = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "writeDebugFiles",
+                        Boolean.class, Boolean.FALSE);
+                EConceptChangeSetWriter.validateAfterWrite = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "validateAfterWrite",
+                        Boolean.class, Boolean.FALSE);
+
+            } else {
+                wbConfigFile = new File("config/wb.config");
+            }
+ 
+
             UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
             String lookAndFeelStr = UIManager.getSystemLookAndFeelClassName();
             System.out.println("Default LAF: " + lookAndFeelStr);
@@ -143,18 +177,6 @@ public class WorkbenchRunner {
                 javax.swing.UIManager.put("ProgressBar.border", BorderFactory.createRaisedBevelBorder());
                 javax.swing.UIManager.put("javax.swing.plaf.basic.BasicProgressBarUI", Class.forName("javax.swing.plaf.basic.BasicProgressBarUI"));
 
-            }
-
-            WorkbenchRunner.args = args;
-            WorkbenchRunner.lc = lc;
-
-            AceLog.getAppLog().info(
-                    "\n*******************\n" + "\n Starting "
-                    + this.getClass().getSimpleName()
-                    + "\n with config file: " + getArgString(args)
-                    + "\n\n******************\n");
-            if (new File(args[0]).exists()) {
-                jiniConfig = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
             }
 
             OpenFrames.addNewWindowMenuItemGenerator(new ContradictionEditorGenerator());
@@ -204,20 +226,6 @@ public class WorkbenchRunner {
             //Check to see if there is a custom Properties file
             checkCustom();
 
-            if (jiniConfig != null) {
-                wbConfigFile = (File) jiniConfig.getEntry(this.getClass().getName(), "wbConfigFile", File.class, new File(
-                        "config/wb.config"));
-                initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "initFromSubversion",
-                        Boolean.class, Boolean.FALSE);
-                svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
-                        String[].class, null);
-                ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "refsetOnly",
-                        Boolean.class, Boolean.FALSE);
-                ACE.editMode = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "allowEdit",
-                        Boolean.class, Boolean.TRUE);
-            } else {
-                wbConfigFile = new File("config/wb.config");
-            }
 
             File profileDir = new File("profiles");
             if ((profileDir.exists() == false && initializeFromSubversion)
