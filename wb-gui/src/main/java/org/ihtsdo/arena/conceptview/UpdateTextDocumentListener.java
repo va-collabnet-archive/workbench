@@ -35,6 +35,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.ihtsdo.helper.cswords.CsWordsHelper;
+import org.ihtsdo.tk.example.binding.CaseSensitive;
 
 /**
  *
@@ -116,7 +118,27 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 int type = desc.getTypeNid();
                 int pref = WbDescType.PREFERRED.getLenient().getNid();
                 int fsn = WbDescType.FULLY_SPECIFIED.getLenient().getNid();
-
+                
+                //set initial word case sensitivity
+                String descText = editorPane.extractText();
+                String initialWord = null;
+                if (descText.indexOf(" ") != -1) {
+                    initialWord = descText.substring(0, descText.indexOf(" "));
+                } else {
+                    initialWord = descText;
+                }
+                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true 
+                        && desc.isInitialCaseSignificant() == false) {
+                    desc.setInitialCaseSignificant(true);
+                }else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false 
+                        && desc.isInitialCaseSignificant() == true) {
+                    desc.setInitialCaseSignificant(false);
+                }else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true 
+                        && desc.isInitialCaseSignificant() == false) {
+                    desc.setInitialCaseSignificant(false);
+                }
+                
+                /*
                 // do syn Update
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
@@ -139,7 +161,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     } else {
                         doSynUpdate();
                     }
-                }
+                }*/
+
+                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                Terms.get().addUncommitted(concept); 
+
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -147,9 +173,9 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        }/* catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        }
+        }*/
     }
 
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB {
