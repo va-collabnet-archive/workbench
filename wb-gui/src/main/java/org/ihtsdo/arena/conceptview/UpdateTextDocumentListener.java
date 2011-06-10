@@ -138,7 +138,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.setInitialCaseSignificant(false);
                 }
                 
-                /*
+                
                 // do syn Update
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
@@ -161,7 +161,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     } else {
                         doSynUpdate();
                     }
-                }*/
+                }
 
                 I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
                 Terms.get().addUncommitted(concept); 
@@ -173,9 +173,9 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        }/* catch (InvalidCAB ex) {
+        } catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        }*/
+        }
     }
 
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB {
