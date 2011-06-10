@@ -48,7 +48,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        this.pathStr = path;
+        /* this.pathStr = path; */
+        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
         this.isPrimitiveB = isPrim;
 
         this.statusConceptL = statusConceptL;

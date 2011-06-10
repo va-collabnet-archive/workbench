@@ -63,7 +63,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         this.descriptionTypeStr = desTypeStr; // DESCRIPTIONTYPE
         this.languageCodeStr = langCodeStr; // LANGUAGECODE
 
-        this.pathStr = path;
+        /* this.pathStr = path; */
+        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2";
 
         this.statusConceptL = statusConceptL;
     }

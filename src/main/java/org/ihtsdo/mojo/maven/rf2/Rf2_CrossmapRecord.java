@@ -54,7 +54,8 @@ public class Rf2_CrossmapRecord {
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        this.pathStr = path;
+        /* this.pathStr = path; */
+        this.pathStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,7 +77,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      */
     private String outputDir;
     String uuidSourceSnomedLongStr;
-    String uuidPathStr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
