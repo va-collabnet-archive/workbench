@@ -772,16 +772,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             buf.append(primordialSapNid);
         }
         if (primordialSapNid >= 0) {
-            buf.append(" status:");
-            ConceptComponent.addNidToBuffer(buf, getStatusNid());
-            buf.append(" author:");
-            ConceptComponent.addNidToBuffer(buf, getAuthorNid());
-            buf.append(" path:");
-            ConceptComponent.addNidToBuffer(buf, getPathNid());
-            buf.append(" tm: ");
-            buf.append(TimeUtil.formatDate(getTime()));
-            buf.append(" ");
-            buf.append(getTime());
+            try {
+                buf.append(" status:");
+                ConceptComponent.addNidToBuffer(buf, getStatusNid());
+                buf.append(" author:");
+                ConceptComponent.addNidToBuffer(buf, getAuthorNid());
+                buf.append(" path:");
+                ConceptComponent.addNidToBuffer(buf, getPathNid());
+                buf.append(" tm: ");
+                buf.append(TimeUtil.formatDate(getTime()));
+                buf.append(" ");
+                buf.append(getTime());
+            } catch (Throwable e) {
+                buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+                buf.append(e.getLocalizedMessage());
+            }
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
