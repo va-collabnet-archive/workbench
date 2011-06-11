@@ -843,7 +843,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert enclosingConcept != null;
         this.enclosingConceptNid = enclosingConcept.getNid();
         readComponentFromBdb(input);
-        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        int cNid = Bdb.getNidCNidMap().getCNid(nid);
+        if (cNid != this.enclosingConceptNid) {
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            AceLog.getAppLog().warning("Datafix warning. cNid " + 
+                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
+                    "\nincorrect for: " + this.nid + " " + 
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
+                    "\nshould have been: " + this.enclosingConceptNid +
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
+                    "\nprocessing: " + this.toString());
+        }
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
         assert nid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
@@ -858,7 +869,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.nid = Bdb.uuidToNid(eComponent.primordialUuid);
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
         this.enclosingConceptNid = enclosingConcept.getNid();
-        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        int cNid = Bdb.getNidCNidMap().getCNid(nid);
+        if (cNid != this.enclosingConceptNid) {
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            AceLog.getAppLog().warning("Datafix warning. cNid " + 
+                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
+                    "\nincorrect for: " + this.nid + " " + 
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
+                    "\nshould have been: " + this.enclosingConceptNid +
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
+                    "\nprocessing: " + this.toString());
+        }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
