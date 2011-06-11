@@ -246,6 +246,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     private static Concept populateFromEConcept(EConcept eConcept, Concept c) throws IOException {
         if (eConcept.getConceptAttributes() != null) {
             setAttributesFromEConcept(c, eConcept.getConceptAttributes());
+            Bdb.getNidCNidMap().setCNidForNid(c.nid, c.nid);
         }
 
         if (eConcept.getDescriptions() != null) {

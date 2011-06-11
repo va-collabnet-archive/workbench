@@ -870,7 +870,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
         this.enclosingConceptNid = enclosingConcept.getNid();
         int cNid = Bdb.getNidCNidMap().getCNid(nid);
-        if (cNid != this.enclosingConceptNid) {
+        if (cNid == Integer.MAX_VALUE) {
+            Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        } else if (cNid != this.enclosingConceptNid) {
             Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
             AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
             AceLog.getAppLog().warning("Datafix warning. cNid " + 
