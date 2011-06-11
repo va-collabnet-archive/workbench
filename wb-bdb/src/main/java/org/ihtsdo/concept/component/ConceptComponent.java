@@ -888,7 +888,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
                     "\nshould have been: " + this.enclosingConceptNid +
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
-                    "\nprocessing: " + this.toString());
+                    "\nprocessing: " + this.toString() + 
+                    "\nfrom eConcomponent" + eComponent.toString());
         }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
