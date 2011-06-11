@@ -91,17 +91,15 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         super();
     }
 
-        
     public final boolean readyToWrite() {
-        assert primordialComponent != null: assertionString();
-        assert sapNid != Integer.MAX_VALUE: assertionString();
-        assert sapNid > 0 || sapNid  == -1;
+        assert primordialComponent != null : assertionString();
+        assert sapNid != Integer.MAX_VALUE : assertionString();
+        assert sapNid > 0 || sapNid == -1;
         return true;
     }
-    
+
     public abstract boolean readyToWriteRevision();
 
-    
     protected void modified() {
         if (primordialComponent != null) {
             primordialComponent.modified();
@@ -260,16 +258,21 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         StringBuffer buf = new StringBuffer();
         buf.append(" sap:");
         buf.append(sapNid);
-        buf.append(" status:");
-        ConceptComponent.addNidToBuffer(buf, getStatusNid());
-        buf.append(" author:");
-        ConceptComponent.addNidToBuffer(buf, getAuthorNid());
-        buf.append(" path:");
-        ConceptComponent.addNidToBuffer(buf, getPathNid());
-        buf.append(" tm: ");
-        buf.append(TimeUtil.formatDate(getTime()));
-        buf.append(" ");
-        buf.append(getTime());
+        try {
+            buf.append(" status:");
+            ConceptComponent.addNidToBuffer(buf, getStatusNid());
+            buf.append(" author:");
+            ConceptComponent.addNidToBuffer(buf, getAuthorNid());
+            buf.append(" path:");
+            ConceptComponent.addNidToBuffer(buf, getPathNid());
+            buf.append(" tm: ");
+            buf.append(TimeUtil.formatDate(getTime()));
+            buf.append(" ");
+            buf.append(getTime());
+        } catch (Throwable e) {
+            buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+            buf.append(e.getLocalizedMessage());
+        }
         buf.append(" };");
         return buf.toString();
     }
@@ -439,8 +442,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
                 && sapNid <= max;
 
     }
-    
-        
+
     protected String assertionString() {
         try {
             return Ts.get().getConcept(primordialComponent.enclosingConceptNid).toLongString();
@@ -449,5 +451,4 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         }
         return toString();
     }
-
 }

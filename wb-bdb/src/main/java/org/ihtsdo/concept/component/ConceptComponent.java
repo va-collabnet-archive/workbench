@@ -949,16 +949,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             buf.append(primordialSapNid);
         }
         if (primordialSapNid >= 0) {
-            buf.append(" status:");
-            ConceptComponent.addNidToBuffer(buf, getStatusNid());
-            buf.append(" author:");
-            ConceptComponent.addNidToBuffer(buf, getAuthorNid());
-            buf.append(" path:");
-            ConceptComponent.addNidToBuffer(buf, getPathNid());
-            buf.append(" tm: ");
-            buf.append(TimeUtil.formatDate(getTime()));
-            buf.append(" ");
-            buf.append(getTime());
+            try {
+                buf.append(" status:");
+                ConceptComponent.addNidToBuffer(buf, getStatusNid());
+                buf.append(" author:");
+                ConceptComponent.addNidToBuffer(buf, getAuthorNid());
+                buf.append(" path:");
+                ConceptComponent.addNidToBuffer(buf, getPathNid());
+                buf.append(" tm: ");
+                buf.append(TimeUtil.formatDate(getTime()));
+                buf.append(" ");
+                buf.append(getTime());
+            } catch (Throwable e) {
+                buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+                buf.append(e.getLocalizedMessage());
+            }
         } else {
             buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
         }
@@ -1030,7 +1035,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.enclosingConceptNid = enclosingConceptNid;
         readComponentFromBdb(input);
         int cNid = Bdb.getNidCNidMap().getCNid(nid);
-        if (cNid != this.enclosingConceptNid) {
+        if (cNid == Integer.MAX_VALUE) {
+            Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        } else if (cNid != this.enclosingConceptNid) {
             Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
             AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
             AceLog.getAppLog().warning("Datafix warning. cNid " + 
@@ -1054,7 +1061,20 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.nid = Bdb.uuidToNid(eComponent.primordialUuid);
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         this.enclosingConceptNid = enclosingConceptNid;
-        Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        int cNid = Bdb.getNidCNidMap().getCNid(nid);
+         if (cNid == Integer.MAX_VALUE) {
+            Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
+        } else if (cNid != this.enclosingConceptNid) {
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            AceLog.getAppLog().warning("Datafix warning. cNid " + 
+                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
+                    "\nincorrect for: " + this.nid + " " + 
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
+                    "\nshould have been: " + this.enclosingConceptNid +
+                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
+                    "\nprocessing: " + this.toString());
+        }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
