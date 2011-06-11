@@ -17,7 +17,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
@@ -1146,6 +1145,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
             referencedComponent.addAnnotation(member);
             member.enclosingConceptNid = Bdb.getConceptNid(referencedComponentNid);
+            Bdb.getNidCNidMap().resetCidForNid(member.enclosingConceptNid, member.nid);
         } else {
             refsetConcept.getExtensions().add(member);
         }
