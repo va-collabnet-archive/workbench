@@ -50,6 +50,7 @@ import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.tk.api.ComponentBI;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
         I_AmTermComponent, I_AmPart, I_AmTuple, I_Identify, I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
@@ -852,15 +853,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (cNid == Integer.MAX_VALUE) {
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
-            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
-            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            ComponentBI component = Bdb.getComponent(cNid);
             AceLog.getAppLog().warning("Datafix warning. cNid " + 
                     cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
-                    "\nincorrect for: " + this.nid + " " + 
+                    "\nassociated with: " + component + 
+                    "\nis incorrect for: " + this.nid + " " + 
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
                     "\nshould have been: " + this.enclosingConceptNid +
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
-                    "\nprocessing: " + this.toString());
+                     "\nassociated with: " + Bdb.getComponent(enclosingConceptNid) +
+                   "\nprocessing: " + this.toString());
+
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
         }
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConcept.getNid();
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConcept.getNid();
@@ -880,16 +885,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (cNid == Integer.MAX_VALUE) {
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
-            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
-            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            ComponentBI component = Bdb.getComponent(cNid);
             AceLog.getAppLog().warning("Datafix warning. cNid " + 
                     cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
+                   "\nassociated with: " + component + 
                     "\nincorrect for: " + this.nid + " " + 
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
                     "\nshould have been: " + this.enclosingConceptNid +
                     Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
+                    "\nassociated with: " + Bdb.getComponent(enclosingConceptNid) +
                     "\nprocessing: " + this.toString() + 
                     "\nfrom eConcomponent" + eComponent.toString());
+            Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
+            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
         }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
