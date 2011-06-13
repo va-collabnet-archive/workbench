@@ -404,6 +404,8 @@ public class Rf1ToArfLanguageGbUsMojo extends AbstractMojo implements Serializab
         mojo.setRf2Mapping(rf2Mapping);
         mojo.setUuidAcceptable(uuidAcceptable);
         mojo.setUuidPrefAccept(uuidPrefAccept);
+        mojo.setSubsetIds(subsetIds);
+     
 
         // KEEP LOGIC
         if (keepUS) {
