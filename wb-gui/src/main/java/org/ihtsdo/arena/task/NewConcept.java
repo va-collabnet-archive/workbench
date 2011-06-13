@@ -72,6 +72,7 @@ import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
+import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**
@@ -725,12 +726,12 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintConcept() {
-        UUID isa = UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"); //this is for "Is a"
         tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         try {
             //get parents
+            UUID isa = Snomed.IS_A.getLenient().getPrimUuid();
             UUID[] uuidArray = new UUID[nidList.size()];
 
             for (int index = 0; index < nidList.size(); index++) {
