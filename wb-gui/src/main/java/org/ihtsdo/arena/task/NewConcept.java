@@ -954,7 +954,7 @@ public class NewConcept extends PreviousNextOrCancel {
             }else if((fsn.extractText().length() != 0) && (fsn.extractText().indexOf("(") == -1 || fsn.extractText().indexOf(")") == -1)){
             	//test for semantic tag
             	JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "please enter the semtaic tag", "",
+                        "please enter the semantic tag", "",
                         JOptionPane.ERROR_MESSAGE);
             }else if(nidList.isEmpty()){
             	//please list parents for the new concept
