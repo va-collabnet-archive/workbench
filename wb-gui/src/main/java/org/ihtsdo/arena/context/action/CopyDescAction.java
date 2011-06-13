@@ -3,6 +3,7 @@ package org.ihtsdo.arena.context.action;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -15,14 +16,24 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class CopyDescAction extends AbstractAction {
 
@@ -50,10 +61,28 @@ public class CopyDescAction extends AbstractAction {
             }
             if (DescriptionVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 DescriptionVersionBI desc = (DescriptionVersionBI) sourceComponent;
-                I_DescriptionVersioned newDesc= Terms.get().newDescription(UUID.randomUUID(), concept,
+                Collection<? extends RefexVersionBI<?>> oldRefexes = desc.getCurrentRefexes(config.getViewCoordinate());
+                I_DescriptionVersioned newDesc = Terms.get().newDescription(UUID.randomUUID(), concept,
                         desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
                         config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
                 newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
+                TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                        config.getViewCoordinate());
+                for (RefexVersionBI refex : oldRefexes) {
+                    RefexCAB newSpec = new RefexCAB(
+                            TK_REFSET_TYPE.CID,
+                            newDesc.getNid(),
+                            refex.getCollectionNid());
+                    RefexCnidVersionBI cv =
+                            (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
+                    int typeNid = cv.getCnid1();
+                    newSpec.put(RefexProperty.CNID1, typeNid);
+                    tc.construct(newSpec);
+                    ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
+                    if (!refexConcept.isAnnotationStyleRefex()) {
+                        Ts.get().addUncommitted(refexConcept);
+                    }
+                }
             }
             if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
@@ -81,6 +110,10 @@ public class CopyDescAction extends AbstractAction {
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (PropertyVetoException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (InvalidCAB e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (ContraditionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 
