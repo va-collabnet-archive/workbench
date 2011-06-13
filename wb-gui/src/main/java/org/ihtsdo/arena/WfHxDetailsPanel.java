@@ -182,7 +182,8 @@ public class WfHxDetailsPanel extends JPanel {
 					WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(arenaConcept);
 					
 					if (latestBean != null) {
-						if (latestBean.getWorkflowTime() > currentLatestTimestamp) {
+						// Greater means new, lesser means undo performed
+						if (latestBean.getWorkflowTime() != currentLatestTimestamp) {
 							generateNewHtml = true;
 						}
 		

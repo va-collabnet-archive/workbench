@@ -773,15 +773,14 @@ public class ConceptViewRenderer extends JLayeredPane {
                 UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
                 boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
 
-                if (latestWfHxJavaBean == null
-                        || autoApproved
-                        || !currentModelerUUID.equals(latestModelerUUID)
-                        || WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
-                    oopsButton.setEnabled(false);
-                } else {
-                    oopsButton.setEnabled(true);
+                if (autoApproved || 
+                    !currentModelerUUID.equals(latestModelerUUID) || 
+                    WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
+                    enableOopsButton = false;
                 }
             }
+            
+            oopsButton.setEnabled(enableOopsButton);
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Error in finding Undo-Button's State with error: " + e.getMessage());
         }
