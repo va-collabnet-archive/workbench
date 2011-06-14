@@ -205,25 +205,10 @@ public class WfHxDetailsPanel extends JPanel {
 
 	private String generateWfHxAsHtml(I_GetConceptData arenaConcept) {
         TransformerFactory tFactory = TransformerFactory.newInstance();
-//		try {
-	        TreeSet<WorkflowHistoryJavaBean> allRows = WorkflowHelper.getAllWorkflowHistory(arenaConcept);
-	        String inputXml = generateXsltXml(allRows);
+        TreeSet<WorkflowHistoryJavaBean> allRows = WorkflowHelper.getAllWorkflowHistory(arenaConcept);
+        String inputXml = generateXsltXml(allRows);
 
-	        return transformerWithoutXslt(inputXml);
-	        
-	        
-// 	        TODO: Use Xslt later
-//			Transformer transformer = tFactory.newTransformer(new StreamSource("stocks.xsl"));
-//        	Result res = new StreamResult(new ByteArrayOutputStream());
-//        	transformer.transform(new StreamSource(inputXml), res);
-//
-//        	return res.toString();
-//		} catch (TransformerConfigurationException e) {
-//			AceLog.getAppLog().log(Level.WARNING, "Unable to configure transformation with XSLT on concept: " + arenaConcept + " with error: " + e.getMessage());
-//		} catch (TransformerException e) {
-//			AceLog.getAppLog().log(Level.WARNING, "Unable to perform transformation with XSLT on concept: " + arenaConcept + " with error: " + e.getMessage());
-//		}
-//		return "";
+        return transformerWithoutXslt(inputXml);
 	}
 
 	private void parseDocument(String inputXml) {
@@ -256,9 +241,6 @@ public class WfHxDetailsPanel extends JPanel {
 		
 		// Setup Table
 		retStr.append("<TABLE border=\"1\" cellpadding=\"3\" cellspacing=\"0\"> 	<tbody>");
-//        buff.append(getFont().getSize());
-//        buff.append("pt ");
-//        buff.append(getFont().getFamily());
 		retStr.append("<tr bgcolor=\"" + colorToHtml(headerColor) + "\">	<th>Action</th>		<th>State</th> 	<th>Modeler</th>      <th>Timestamp</th>    </tr>");
 		
 		if (inputXml.length() > 0) {
@@ -326,14 +308,6 @@ public class WfHxDetailsPanel extends JPanel {
 
 		return retStr.toString();
 	}
-
-//	public  boolean isCurrentlyDisplayed() {
-//		return currentlyDisplayed;
-//	}
-//
-//	public  void setCurrentlyDisplayed(boolean newDisplaySetting) {
-//		currentlyDisplayed = newDisplaySetting;
-//	}
 
 	public String getCurrentHtml() {
 		return currentHtml;
