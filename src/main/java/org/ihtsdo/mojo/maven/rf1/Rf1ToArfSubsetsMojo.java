@@ -406,6 +406,12 @@ public class Rf1ToArfSubsetsMojo extends AbstractMojo implements Serializable {
 	    }else if(sid.getRefsetFsName().equals("US English Dialect Subset")){
 	    	getLog().info("==US Lang Refset====" + sid.getRefsetFsName());
 	    	uuid = Type5UuidFactory.get("900000000000509007" + Long.toString(m.memberId)); //public final static String US_LANG_REFSET_ID = "900000000000509007";
+	    }else if(Long.toString(sid.getSubsetSctIdOriginal()).equals("100033")){
+	    	getLog().info("==US Lang Original ID ====" + sid.getSubsetSctIdOriginal());
+	    	uuid = Type5UuidFactory.get("900000000000509007" + Long.toString(m.memberId)); //public final static String US_LANG_REFSET_ID = "900000000000509007";
+	    }else if(Long.toString(sid.getSubsetSctIdOriginal()).equals("101032")){
+	    	getLog().info("==GB Lang Original ID ====" + sid.getSubsetSctIdOriginal());
+	    	uuid = Type5UuidFactory.get("900000000000508004" + Long.toString(m.memberId)); //public final static String US_LANG_REFSET_ID = "900000000000509007";
 	    }else if(sid.getRefsetFsName().equals("US Specific Proprietary Drug Descriptions Subset")){
         	uuid = Type5UuidFactory.get("US Specific Proprietary Drug Descriptions Subset" + m.memberId); 
         }else if(sid.getRefsetFsName().equals("US Specific Proprietary Drug Concepts Subset")){
