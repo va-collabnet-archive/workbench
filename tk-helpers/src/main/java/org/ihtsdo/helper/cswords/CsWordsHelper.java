@@ -60,15 +60,15 @@ public class CsWordsHelper {
                     Set<String> csWordSet = new HashSet<String>();
                     Set<String> maybeCsWordSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : csWords) {
-                        
+
                         RefexStrVersionBI sv =
                                 (RefexStrVersionBI) refex.getVersion(vc);
-                        RefexCnidVersionBI cv = 
+                        RefexCnidVersionBI cv =
                                 (RefexCnidVersionBI) refex.getVersion(vc);
                         int typeNid = cv.getCnid1();
-                        if(typeNid == CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()){
+                        if (typeNid == CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) {
                             csWordSet.add(sv.getStr1());
-                        }else{
+                        } else {
                             maybeCsWordSet.add(sv.getStr1());
                         }
                     }
@@ -82,78 +82,19 @@ public class CsWordsHelper {
             }
         }
     }
-    
+
     public static boolean isIcTypeSignificant(String text, int icsTypeNid)
             throws IOException {
         lazyInit();
         String[] tokens = text.split(" ");
         Set<String> csWords = csWordSetMap.get(icsTypeNid);
-        for (String token : tokens) {
-            if (csWords.contains(text)) {
-                return true;
+        if (csWords != null) {
+            for (String token : tokens) {
+                if (csWords.contains(text)) {
+                    return true;
+                }
             }
         }
         return false;
     }
-
-    /*public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
-    int dialectNid, ViewCoordinate vc) throws IOException,
-    ContraditionException, UnsupportedDialectOrLanguage {
-    lazyInit();
-    if (isTextForDialect(desc.getText(), dialectNid)) {
-    return false;
-    }
-    String dialectText = makeTextForDialect(desc.getText(), dialectNid);
-    ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
-    desc.getConceptNid());
-    for (DescriptionVersionBI d : concept.getDescsActive()) {
-    if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
-    return false;
-    }
-    }
-    return true;
-    }*/ 
-    
-
-    /*public static boolean isTextForDialect(String text, int dialectNid)
-    throws UnsupportedDialectOrLanguage, IOException {
-    lazyInit(dialectNid);
-    String[] tokens = text.split("\\s+");
-    Map<String, String> dialectVariants = variantMap.get(dialectNid);
-    for (String token : tokens) {
-    if (dialectVariants.containsKey(token.toLowerCase())) {
-    return false;
-    }
-    }
-    return true;
-    }
-    
-    public static String makeTextForDialect(String text, int dialectNid)
-    throws UnsupportedDialectOrLanguage, IOException {
-    lazyInit(dialectNid);
-    String[] tokens = text.split("\\s+");
-    Map<String, String> dialectVariants = variantMap.get(dialectNid);
-    for (int i = 0; i < tokens.length; i++) {
-    if (dialectVariants.containsKey(tokens[i].toLowerCase())) {
-    boolean upperCase = Character.isUpperCase(tokens[i].charAt(0));
-    tokens[i] = dialectVariants.get(tokens[i].toLowerCase());
-    if (upperCase) {
-    if (Character.isLowerCase(tokens[i].charAt(0))) {
-    tokens[i] = Character.toUpperCase(tokens[i].charAt(0)) +
-    tokens[i].substring(1);
-    }
-    }
-    }
-    }
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < tokens.length; i++) {
-    sb.append(tokens[i]);
-    if (i < tokens.length - 1) {
-    sb.append(' ');
-    }
-    }
-    return sb.toString();
-    }*/
 }
-
-
