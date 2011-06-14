@@ -16,13 +16,14 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
 
 
 public class WfHxDetailsPanelHandler {
-	public boolean currentlyDisplayed  = false;
+	private boolean currentlyDisplayed  = false;
 	private ConceptViewRenderer conceptPanelRenderer;
 	private ConceptViewSettings conceptSettings;
     private WfHxDetailsPanel detailsPanel;
 	private WfHxDetailsConceptChangeListener currentListener;
 	private final int rowHeightInPixels = 30;
     
+	private int idealHeight;
 	public class WfHxDetailsConceptChangeListener implements PropertyChangeListener {
 
         @Override
@@ -93,19 +94,21 @@ public class WfHxDetailsPanelHandler {
 			width = 250;
 		}
 		
+		idealHeight = height;
 		detailsPanel.setBounds(0, 0, width, height);
 	}
 	
 	public void hideWfHxDetailsPanel() {
-        JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
-
-        detailsPanel.setVisible(false);
-    	detailsPanel.invalidate();
-        layers.remove(detailsPanel);
-    	currentlyDisplayed = false;
+		if (detailsPanel != null) {
+			JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
+	
+	        detailsPanel.setVisible(false);
+	    	detailsPanel.invalidate();
+	        layers.remove(detailsPanel);
+	    	currentlyDisplayed = false;
+			idealHeight = 0;
+		}
 	}
-
-
 
     private void createNewWfPanel() {
         detailsPanel = new WfHxDetailsPanel(conceptSettings);
@@ -114,10 +117,14 @@ public class WfHxDetailsPanelHandler {
     }
 
 
-    private void setWfHxLocation() {
+    public void setWfHxLocation() {
     	try {
 	        JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane(); 
 
+	        if (idealHeight > detailsPanel.getHeight()) {
+	    		detailsPanel.setBounds(0, 0, detailsPanel.getWidth(), idealHeight);
+	        }
+	        
     		Point loc = SwingUtilities.convertPoint(conceptPanelRenderer, new Point(0, 0), layers);
 	        if (layers.getWidth() > loc.x + conceptPanelRenderer.getWidth() + detailsPanel.getWidth()) {
 	            loc.x = loc.x + conceptPanelRenderer.getWidth();
@@ -150,4 +157,7 @@ public class WfHxDetailsPanelHandler {
     	setWfHxPanelProperties();
     }
 
+    public boolean isWfHxDetailsCurrenltyDisplayed() {
+    	return currentlyDisplayed;
+    }
 }

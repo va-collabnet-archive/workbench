@@ -112,6 +112,16 @@ public class ConceptViewRenderer extends JLayeredPane {
                     }
                 });
             }
+            
+            if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                    	wfHxDetails.setWfHxLocation();
+                    }
+                });          
+            }
         }
 
         @Override
@@ -124,6 +134,15 @@ public class ConceptViewRenderer extends JLayeredPane {
                         settings.showNavigator();
                     }
                 });
+            }
+            if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                    	wfHxDetails.setWfHxLocation();
+                    }
+                });          
             }
             setDividerLocation();
         }
@@ -140,18 +159,29 @@ public class ConceptViewRenderer extends JLayeredPane {
                         }
                     });
                 }
-            }
+                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                        	wfHxDetails.setWfHxLocation();
+                        }
+                    });          
+                }
+           }
             setDividerLocation();
         }
 
         @Override
         public void ancestorRemoved(AncestorEvent event) {
             settings.hideNavigator();
+            wfHxDetails.hideWfHxDetailsPanel();
         }
 
         @Override
         public void ancestorAdded(AncestorEvent event) {
             settings.hideNavigator();
+            wfHxDetails.hideWfHxDetailsPanel();
         }
     }
     /**
