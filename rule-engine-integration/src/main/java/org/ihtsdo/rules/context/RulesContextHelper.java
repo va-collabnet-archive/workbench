@@ -523,6 +523,9 @@ public class RulesContextHelper {
 
 	public void clearCache() {
 		File dir = new File("rules");
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
 		for (File loopFile : dir.listFiles()) {
 			if (loopFile.getName().endsWith(".bkb") || loopFile.getName().endsWith(".pkg")) {
 				loopFile.delete();
