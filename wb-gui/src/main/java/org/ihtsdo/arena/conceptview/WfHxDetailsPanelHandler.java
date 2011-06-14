@@ -55,7 +55,6 @@ public class WfHxDetailsPanelHandler {
         }
         
     	if (detailsPanel.isNewHtmlCodeRequired(concept)) {
-//    		conceptSettings.getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
     		createNewWfPanel();
     	}
     	
@@ -155,6 +154,7 @@ public class WfHxDetailsPanelHandler {
     	}
 
     	setWfHxPanelProperties();
+        conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
     }
 
     public boolean isWfHxDetailsCurrenltyDisplayed() {
