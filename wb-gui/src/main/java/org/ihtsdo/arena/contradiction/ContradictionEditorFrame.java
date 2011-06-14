@@ -90,8 +90,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
         this.addWindowListener(new OpenFramesWindowListener(this, this.cfb));
         this.setBounds(getDefaultFrameSize());
 
-        TerminologyListModel batchListModel =
-                new TerminologyListModel(newFrameConfig.getTabHistoryMap().get("batchList"));
+        TerminologyListModel batchListModel = new TerminologyListModel();
         batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
         topSplit.setLeftComponent(new JScrollPane(batchConceptList));
         batchConceptList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
