@@ -65,12 +65,17 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
         int currentCount = count.incrementAndGet();
-//        if (currentCount%12500 == 0) 
-//        	System.out.println("HERE with " + currentCount);
-//        if (activityMonitor != null && activityMonitor.isCanceled()) {
-//            return;
-//        }
-//        
+        
+        if (currentCount == 1) {
+        	AceLog.getAppLog().log(Level.INFO, "Number of concepts being processed " + cNids.cardinality());
+        } else if (currentCount%50000 == 0) { 
+        	AceLog.getAppLog().log(Level.INFO, "Have processed " + currentCount + " concepts");
+        }
+        
+        if (activityMonitor != null && activityMonitor.isCanceled()) {
+            return;
+        }
+        
         if (cNids.isMember(cNid)) { 
             ConceptChronicleBI c = fcfc.fetch();
             ContradictionResult position = (detector.isConceptInConflict(c));
@@ -94,6 +99,10 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
             }
         }
         
+        if (currentCount == cNids.cardinality()) {
+        	AceLog.getAppLog().log(Level.INFO, "Have completed Contradiction Identification Successfully");
+        }
+
 //        if (activityMonitor != null && currentCount % 5 == 0) {
 //            activityMonitor.setValue(count.get());
 //            activityMonitor.setProgressInfoLower("Contradictions: " + found.get());
