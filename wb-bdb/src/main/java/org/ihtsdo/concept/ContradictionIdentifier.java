@@ -13,18 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
-import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
@@ -40,8 +36,6 @@ import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.PositionForSet;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
@@ -50,7 +44,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	private AtomicInteger viewPathNid = null;
 	private AtomicInteger commonOriginPathNid;
-	private AtomicInteger workflowRefsetNid;
 	private AtomicBoolean isReturnVersionsUseCase;
 	private ViewCoordinate viewCoord;
 	private Set<ComponentVersionBI> returnVersionCollection;
@@ -934,21 +927,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	}
 
 
-	private WorkflowHistoryJavaBean createWfHxJavaBean(I_ExtendByRefVersion refsetVersion) {
-		try {
-			StrMember.Version stringVersion = (StrMember.Version)refsetVersion;
-			return WorkflowHelper.populateWorkflowHistoryJavaBean(refsetVersion.getMemberId(),
-					   											  Terms.get().nidToUuid(refsetVersion.getReferencedComponentNid()), 
-															      stringVersion.getStringValue(), 
-															      refsetVersion.getTime());
-		} catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Version");
-		}
-		
-		return null;
-	}
-
-
 	// Initialize the PositionMapper used for identifying contradictions
 	private void initializeViewPos(PositionBI pos) {
 		try 
@@ -965,8 +943,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             PathBI commonOriginPath = identifyCommonOriginPosition(pos).getPath();
 			commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
 
-			workflowRefsetNid = new AtomicInteger(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid()));
-			
 			if (isReturnVersionsUseCase.get()) {
 				returnVersionCollection = new HashSet<ComponentVersionBI>();
 			}
