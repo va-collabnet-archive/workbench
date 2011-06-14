@@ -6,11 +6,11 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -50,7 +50,7 @@ public class RefsetAttributeComparer extends AttributeComparer {
 		}
 
 		if (refsetId == wfHxRefsetId) {
-			WorkflowHistoryJavaBean bean =  WorkflowHelper.populateWorkflowHistoryJavaBean((I_ExtendByRef) refsetVersion);
+			WorkflowHistoryJavaBean bean =  WorkflowHelper.populateWorkflowHistoryJavaBean(refsetVersion);
 
 			if ((bean.getState() != workflowState) || 
 				(bean.getWorkflowId() != workflowId)) {
@@ -75,7 +75,7 @@ public class RefsetAttributeComparer extends AttributeComparer {
 		
 		if (refsetId == wfHxRefsetId) {
 			try {
-				WorkflowHistoryJavaBean bean =  WorkflowHelper.populateWorkflowHistoryJavaBean((I_ExtendByRef) refsetVersion);
+				WorkflowHistoryJavaBean bean =  WorkflowHelper.populateWorkflowHistoryJavaBean(refsetVersion);
 
 				workflowState = bean.getState();
 				workflowId = bean.getWorkflowId();

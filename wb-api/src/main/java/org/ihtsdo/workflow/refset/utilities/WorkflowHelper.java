@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -1074,4 +1075,23 @@ public class WorkflowHelper {
 		}
 
     	return true;
-    }}
+    }
+
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRefVersion refsetVersion) {
+			WorkflowHistoryJavaBean bean = null;
+
+			try {
+				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr)refsetVersion.getMutablePart(); 
+
+				bean = populateWorkflowHistoryJavaBean(refsetVersion.getMemberId(), 
+													   Terms.get().nidToUuid(refsetVersion.getComponentId()), 
+													   strPart.getStringValue(), 
+													   new Long(refsetVersion.getTime()));
+			} catch (Exception e) {
+	            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member");
+			}
+			
+			return bean;
+		}
+
+	}
