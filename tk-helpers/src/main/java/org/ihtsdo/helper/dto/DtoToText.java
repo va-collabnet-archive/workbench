@@ -32,39 +32,41 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
  */
 public class DtoToText {
 
-   public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
-      convert(changeSetFile, true);
-   }
+    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
+        convert(changeSetFile, true);
+    }
 
-   public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
-      convert(changeSetFile, false);
-   }
+    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
+        convert(changeSetFile, false);
+    }
 
-   private static void convert(File changeSetFile, boolean changeSet) throws IOException, FileNotFoundException, ClassNotFoundException {
-      FileInputStream fis = new FileInputStream(changeSetFile);
-      BufferedInputStream bis = new BufferedInputStream(fis);
-      DataInputStream dataStream = new DataInputStream(bis);
-      File textFile = new File(changeSetFile.getParentFile(),
-              changeSetFile.getName() + ".txt");
-      FileWriter textOut = new FileWriter(textFile, true);
-      try {
-         int count = 0;
-         if (changeSet) {
-            long nextCommit = dataStream.readLong();
-            textOut.append("\n*******************************\n");
-            textOut.append(Integer.toString(count));
-            textOut.append(": ");
-            textOut.append(TimeHelper.formatDateForFile(nextCommit));
-         }
-         TkConcept eConcept = new TkConcept(dataStream);
-         textOut.append("\n*******************************\n");
-         textOut.append(eConcept.toString());
-         count++;
-      } catch (EOFException ex) {
-         // Nothing to do...
-      } finally {
-         dataStream.close();
-         textOut.close();
-      }
-   }
+    private static void convert(File changeSetFile, boolean changeSet) throws IOException, FileNotFoundException, ClassNotFoundException {
+        FileInputStream fis = new FileInputStream(changeSetFile);
+        BufferedInputStream bis = new BufferedInputStream(fis);
+        DataInputStream dataStream = new DataInputStream(bis);
+        File textFile = new File(changeSetFile.getParentFile(),
+                changeSetFile.getName() + ".txt");
+        FileWriter textOut = new FileWriter(textFile, true);
+        try {
+            int count = 0;
+            while (dataStream.available() > 0) {
+                if (changeSet) {
+                    long nextCommit = dataStream.readLong();
+                    textOut.append("\n*******************************\n");
+                    textOut.append(Integer.toString(count));
+                    textOut.append(": ");
+                    textOut.append(TimeHelper.formatDateForFile(nextCommit));
+                }
+                TkConcept eConcept = new TkConcept(dataStream);
+                textOut.append("\n*******************************\n");
+                textOut.append(eConcept.toString());
+                count++;
+            }
+        } catch (EOFException ex) {
+            // Nothing to do...
+        } finally {
+            dataStream.close();
+            textOut.close();
+        }
+    }
 }
