@@ -136,4 +136,6 @@ public interface I_ManageConceptData {
 
     public boolean readyToWrite();
 
+    public boolean isAnnotationStyleSet();
+
 }

@@ -133,6 +133,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    private boolean isAnnotationStyleSet() {
+        return data.isAnnotationStyleSet();
+    }
+
     public static class ConceptLowMemoryListener implements LowMemoryListener {
 
         @Override
@@ -214,7 +218,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
             throws IOException {
-        c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
+        if (c.isAnnotationStyleSet() == false) {
+            c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
+        }
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
         if (eAttr != null) {
             if (c.getConceptAttributes() == null) {

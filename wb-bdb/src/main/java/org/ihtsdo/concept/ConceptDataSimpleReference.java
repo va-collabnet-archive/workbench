@@ -876,6 +876,11 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
+    public boolean isAnnotationStyleSet() {
+        return annotationStyleRefset != null;
+    }
+
+    @Override
     public boolean isAnnotationStyleRefset() throws IOException {
         if (annotationStyleRefset == null) {
             annotationStyleRefset = getIsAnnotationStyleRefset();
