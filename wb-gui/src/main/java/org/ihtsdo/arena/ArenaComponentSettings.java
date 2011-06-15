@@ -161,7 +161,15 @@ public abstract class ArenaComponentSettings implements Serializable,
     }
 
     private void handleMoved() {
-        bounds = new mxRectangle(renderer.getBounds());
+        Rectangle r = renderer.getBounds();
+        r = new Rectangle(Math.max(r.x, 0), Math.max(r.y, 0), r.width, r.height);
+        if (r.equals(renderer.getBounds()) == false) {
+            renderer.setBounds(r);
+            cell.getGeometry().setX(r.x);
+            cell.getGeometry().setY(r.y);
+            graphContainer.setLocation(r.x, r.y);
+        }
+        bounds = new mxRectangle(r);
         if (preferences != null) {
             setPrefLocation();
         }
