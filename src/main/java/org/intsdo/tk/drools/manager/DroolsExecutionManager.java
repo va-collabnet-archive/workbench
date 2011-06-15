@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
@@ -36,14 +37,17 @@ import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.EvaluatorOption;
+import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.conf.ConsequenceExceptionHandlerOption;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.rule.builder.dialect.java.JavaDialectConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.ConsequenceExceptionHandler;
+import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMissingDescForDialectEvaluatorDefinition;
@@ -51,7 +55,6 @@ import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsSynonymMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsUsMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
-import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 
 /**
  *
@@ -132,6 +135,8 @@ public class DroolsExecutionManager {
                 ConsequenceExceptionHandlerOption.get(exHandlerClass);
 
         kBaseConfig.setOption(cehOption);
+        kBaseConfig.setProperty("drools.dialect.java.compiler", "JANINO");
+        
         kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
         if (kpkgs != null) {
             kbase.addKnowledgePackages(kpkgs);
@@ -162,6 +167,8 @@ public class DroolsExecutionManager {
         }
         KnowledgeBuilderConfiguration builderConfig =
                 KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
+        
+        builderConfig.setProperty("drools.dialect.java.compiler", "JANINO");
 
         if (extraEvaluators.contains(ExtraEvaluators.IS_KIND_OF)) {
             builderConfig.setOption(EvaluatorOption.get(
@@ -208,6 +215,7 @@ public class DroolsExecutionManager {
         }
 
 
+        kBaseConfig.setProperty("drools.dialect.java.compiler", "JANINO");
         kbase = KnowledgeBaseFactory.newKnowledgeBase(kBaseConfig);
         KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase, builderConfig);
         for (Resource resource : resources.keySet()) {
