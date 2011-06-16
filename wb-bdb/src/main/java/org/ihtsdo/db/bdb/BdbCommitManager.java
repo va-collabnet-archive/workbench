@@ -453,8 +453,8 @@ public class BdbCommitManager {
         try {
             int errorCount = 0;
             int warningCount = 0;
-            List<AlertToDataConstraintFailure> warningsAndErrors =
-                    new ArrayList<AlertToDataConstraintFailure>();
+            Set<AlertToDataConstraintFailure> warningsAndErrors =
+                    new HashSet<AlertToDataConstraintFailure>();
             dataCheckMap.put(c, warningsAndErrors);
 
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
@@ -600,7 +600,7 @@ public class BdbCommitManager {
                             DataCheckRunner.cancelAll();
                             dataCheckMap.clear();
                             while (uncommittedCNidItr.next()) {
-                                List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+                            	Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
                                 dataCheckMap.put(concept, warningsAndErrors);
 
@@ -1127,7 +1127,7 @@ public class BdbCommitManager {
     }
 
     public static List<AlertToDataConstraintFailure> getCommitErrorsAndWarnings() {
-        List<AlertToDataConstraintFailure> warningsAndErrors = new ArrayList<AlertToDataConstraintFailure>();
+        Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
         try {
             NidBitSetItrBI cNidItr = uncommittedCNids.iterator();
             while (cNidItr.next()) {
@@ -1145,7 +1145,9 @@ public class BdbCommitManager {
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
-        return warningsAndErrors;
+        List<AlertToDataConstraintFailure> warningsAndErrorsList = new ArrayList<AlertToDataConstraintFailure>();
+        warningsAndErrorsList.addAll(warningsAndErrors);
+        return warningsAndErrorsList;
     }
 
     public static void addUncommittedDescNid(int dNid) {
