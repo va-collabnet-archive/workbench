@@ -21,7 +21,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,8 +102,18 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
                 getLog().info("::: Output Directory: " + outDir);
             }
             bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "ids.txt"), "UTF-8"));
+                    outDir + "ids_CrossMap.txt"), "UTF-8"));
             getLog().info("::: IDS OUTPUT: " + outDir + "ids_crossmap.txt");
+
+            // WRITE REFSET CONCEPTS
+            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+            refsetIdList.add(new Rf2_RefsetId(446608001L, /* refsetSctIdOriginal */
+                    "2002.01.31", /* refsetDate */
+                    "8c230474-9f11-30ce-9cad-185a96fd03a2", /* refsetPathUuidStr */
+                    "ICD-O", /* refsetPrefTerm */
+                    "ICD-O", /* refsetFsName */
+                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
+            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
 
             // LANGUAGE REFSET FILES "der2_cRefset_Language"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -127,12 +140,20 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
 
             bw.flush();
             bw.close();
-            
+
             bwIds.flush();
             bwIds.close();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException(
+                    "RF2/ARF SctRf2CrossMapToArfMojo NoSuchAlgorithmException error", ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException(
+                    "RF2/ARF SctRf2CrossMapToArfMojo UnsupportedEncodingException error", ex);
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo Terminology error", ex);
+            throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo Terminology error", ex);
         } catch (ParseException ex) {
             Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo parse error", ex);

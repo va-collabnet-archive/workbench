@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,38 +56,78 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         this.statusConceptL = statusConceptL;
     }
 
-    static void attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b) {
+    public Sct2_ConRecord(Sct2_ConRecord in, long time, long status) throws ParseException {
+        this.conSnoIdL = in.conSnoIdL;
+        this.effDateStr = in.effDateStr;
+        this.timeL = time;
+        this.isActive = in.isActive;
+
+        this.pathStr = in.pathStr;
+        this.isPrimitiveB = in.isPrimitiveB;
+
+        this.statusConceptL = status;
+    }
+
+    static Sct2_ConRecord[] attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b) throws ParseException {
         int idxA = 0;
         int idxB = 0;
         Arrays.sort(a);
         Arrays.sort(b);
 
+        ArrayList<Sct2_ConRecord> addedRecords = new ArrayList<Sct2_ConRecord>();
+
         while (idxA < a.length && idxB < b.length) {
+            // MATCHED IDS
             if (a[idxA].conSnoIdL == b[idxB].referencedComponentIdL) {
+                // determine time range
                 long timeRangeInL = b[idxB].timeL;
                 long timeRangeOutL = Long.MAX_VALUE;
                 if (idxB + 1 < b.length && a[idxA].conSnoIdL == b[idxB + 1].referencedComponentIdL) {
                     timeRangeOutL = b[idxB + 1].timeL;
                 }
 
+                // EXPAND STATUS
                 if (a[idxA].timeL < timeRangeInL) {
-                    idxA++;
-                } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    idxA++; // before range, leave status unchanged
+                } else if (a[idxA].timeL == timeRangeInL) {
                     if (b[idxB].isActive) {
                         a[idxA].statusConceptL = b[idxB].valueIdL;
                     }
                     idxA++;
                     idxB++;
-                } else {
+                } else if (a[idxA].timeL > timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    if (b[idxB].isActive) {
+                        a[idxA].statusConceptL = b[idxB].valueIdL;
+                    }
+                    idxA++;
+                    idxB++;
+                } else if (a[idxA].timeL >= timeRangeOutL) {
+                    // ADD STATUS CHANGE EVENT
+                    if (b[idxB + 1].isActive) {
+                        addedRecords.add(new Sct2_ConRecord(a[idxA], b[idxB + 1].timeL, b[idxB + 1].valueIdL));
+                    } else {
+                        addedRecords.add(new Sct2_ConRecord(a[idxA], b[idxB + 1].timeL, Long.MAX_VALUE));
+                    }
                     idxB++;
                 }
 
+                // GET NEXT IDS
             } else if (a[idxA].conSnoIdL < b[idxB].referencedComponentIdL) {
                 idxA++;
             } else {
                 idxB++;
             }
         }
+
+        if (addedRecords.size() > 0) {
+            int offsetI = a.length;
+            a = Arrays.copyOf(a, a.length + addedRecords.size());
+            for (int i = 0; i < addedRecords.size(); i++) {
+                a[offsetI + i] = addedRecords.get(i);
+            }
+        }
+
+        return a;
     }
 
     static Sct2_ConRecord[] parseConcepts(Rf2File f) throws MojoFailureException {

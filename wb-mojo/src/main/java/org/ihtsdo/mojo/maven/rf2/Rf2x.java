@@ -18,11 +18,9 @@ package org.ihtsdo.mojo.maven.rf2;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.UUID;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
-
 
 public class Rf2x {
 

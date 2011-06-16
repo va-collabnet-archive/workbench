@@ -37,6 +37,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.mojo.maven.rf1.Rf1Dir;
 
@@ -61,7 +62,7 @@ public class Sct1DescToRefsetMojo extends AbstractMojo implements Serializable {
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
 
-    private static final String UUID_NORMAL_MEMBER = "cc624429-b17d-4ac5-a69e-0b32448aaf3c";
+    private static String uuidNormalMember = null;
 
     private static String uuidCurrentStr = null;
     private static String uuidRetiredStr = null;
@@ -174,6 +175,8 @@ public class Sct1DescToRefsetMojo extends AbstractMojo implements Serializable {
     public void executeMojo(File tDir, String tSubDir, String inDir, String outDir)
             throws Exception {
         
+        uuidNormalMember = RefsetAuxiliary.Concept.NORMAL_MEMBER.getPrimoridalUid().toString();
+
         // SETUP DESCRIPTION TYPES
         for (int i = 0; i < 5; i++)
             decriptionTypeUuidStrArray[i] = ArchitectonicAuxiliary.getSnomedDescriptionType(i).getUids()
