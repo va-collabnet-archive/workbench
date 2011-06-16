@@ -722,7 +722,9 @@ public class Bdb {
     public static Concept getConcept(int cNid) throws IOException {
         assert cNid == Bdb.getConceptNid(cNid) :
                 " Not a concept nid: " + cNid
-                + " Bdb cNid:" + Bdb.getConceptNid(cNid);
+                + " Bdb cNid:" + Bdb.getConceptNid(cNid) + " max nid: " + 
+                Bdb.getUuidsToNidMap().getCurrentMaxNid() + 
+                " (" + (Bdb.getUuidsToNidMap().getCurrentMaxNid() - cNid) + ")";
         return conceptDb.getConcept(cNid);
     }
 
