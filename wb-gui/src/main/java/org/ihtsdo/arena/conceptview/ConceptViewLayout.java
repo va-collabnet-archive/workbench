@@ -165,10 +165,16 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     public ConceptViewLayout(ConceptView conceptView,
-            I_GetConceptData layoutConcept) {
+            I_GetConceptData layoutConcept) throws IOException {
         super();
+        if (layoutConcept != null && 
+                layoutConcept.getNid() != 0 &&
+                Ts.get().getConceptNidForNid(layoutConcept.getNid()) == layoutConcept.getNid()) {
+            this.layoutConcept = layoutConcept;
+        } else {
+            this.layoutConcept = null;
+        }
         this.cView = conceptView;
-        this.layoutConcept = layoutConcept;
         this.settings = conceptView.getSettings();
         this.pcal = new PanelsChangedActionListener(settings);
         this.config = conceptView.getConfig();

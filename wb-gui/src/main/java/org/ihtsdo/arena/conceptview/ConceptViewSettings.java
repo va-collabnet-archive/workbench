@@ -12,6 +12,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -91,7 +93,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (view != null) {
-                view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
+                try {
+                    view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
+                } catch (IOException iOException) {
+                    AceLog.getAppLog().alertAndLogException(iOException);
+                }
             }
 
         }
@@ -107,7 +113,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             this.conceptChangedListener = new ConceptChangedListener();
             view = new ConceptView(config, this, (ConceptViewRenderer) this.renderer);
             addHostListener(conceptChangedListener);
-            view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
+            try {
+                view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
+            } catch (IOException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            }
         }
         return view;
     }
