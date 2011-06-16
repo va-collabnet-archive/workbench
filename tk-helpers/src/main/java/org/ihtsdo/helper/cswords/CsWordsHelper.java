@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
@@ -90,11 +89,68 @@ public class CsWordsHelper {
         Set<String> csWords = csWordSetMap.get(icsTypeNid);
         if (csWords != null) {
             for (String token : tokens) {
-                if (csWords.contains(text)) {
+                if (csWords.contains(token)) {
                     return true;
                 }
             }
         }
         return false;
     }
+
+    /*public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
+    int dialectNid, ViewCoordinate vc) throws IOException,
+    ContraditionException, UnsupportedDialectOrLanguage {
+    lazyInit();
+    if (isTextForDialect(desc.getText(), dialectNid)) {
+    return false;
+    }
+    String dialectText = makeTextForDialect(desc.getText(), dialectNid);
+    ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
+    desc.getConceptNid());
+    for (DescriptionVersionBI d : concept.getDescsActive()) {
+    if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
+    return false;
+    }
+    }
+    return true;
+    }*/
+    /*public static boolean isTextForDialect(String text, int dialectNid)
+    throws UnsupportedDialectOrLanguage, IOException {
+    lazyInit(dialectNid);
+    String[] tokens = text.split("\\s+");
+    Map<String, String> dialectVariants = variantMap.get(dialectNid);
+    for (String token : tokens) {
+    if (dialectVariants.containsKey(token.toLowerCase())) {
+    return false;
+    }
+    }
+    return true;
+    }
+    
+    public static String makeTextForDialect(String text, int dialectNid)
+    throws UnsupportedDialectOrLanguage, IOException {
+    lazyInit(dialectNid);
+    String[] tokens = text.split("\\s+");
+    Map<String, String> dialectVariants = variantMap.get(dialectNid);
+    for (int i = 0; i < tokens.length; i++) {
+    if (dialectVariants.containsKey(tokens[i].toLowerCase())) {
+    boolean upperCase = Character.isUpperCase(tokens[i].charAt(0));
+    tokens[i] = dialectVariants.get(tokens[i].toLowerCase());
+    if (upperCase) {
+    if (Character.isLowerCase(tokens[i].charAt(0))) {
+    tokens[i] = Character.toUpperCase(tokens[i].charAt(0)) +
+    tokens[i].substring(1);
+    }
+    }
+    }
+    }
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < tokens.length; i++) {
+    sb.append(tokens[i]);
+    if (i < tokens.length - 1) {
+    sb.append(' ');
+    }
+    }
+    return sb.toString();
+    }*/
 }
