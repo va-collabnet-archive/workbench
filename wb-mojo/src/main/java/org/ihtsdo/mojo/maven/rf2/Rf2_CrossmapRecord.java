@@ -135,8 +135,8 @@ public class Rf2_CrossmapRecord {
     }
 
     public void writeArfId(BufferedWriter writer) throws IOException, TerminologyException {
-        // PRIMARY_UUID = 0;
-        writer.append(id + TAB_CHARACTER);
+        // REFERENCED_COMPONENT_ID = 5;
+        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
         // SOURCE_SYSTEM_UUID = 1;
         // 446608001 ICD-O
         // 900000000000498005 SNOMED RT
