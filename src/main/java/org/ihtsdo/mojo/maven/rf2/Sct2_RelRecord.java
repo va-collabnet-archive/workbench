@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -75,38 +76,90 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.statusConceptL = statusConceptL;
     }
 
-    static void attachStatus(Sct2_RelRecord[] a, Rf2_RefsetCRecord[] b) {
+    public Sct2_RelRecord(Sct2_RelRecord in, long time, long status) throws ParseException {
+
+        this.relSnoId = in.relSnoId; // RELATIONSHIPID
+
+        this.effDateStr = in.effDateStr;
+        this.timeL = time;
+        this.isActive = in.isActive;
+        this.pathStr = in.pathStr;
+
+        this.c1SnoId = in.c1SnoId; // CONCEPTID1
+        this.roleTypeSnoId = in.roleTypeSnoId; // RELATIONSHIPTYPE (SNOMED ID)
+        this.c2SnoId = in.c2SnoId; // CONCEPTID2
+        this.group = in.group; // RELATIONSHIPGROUP
+
+        this.characteristicL = in.characteristicL; // CHARACTERISTICTYPE
+        this.refinabilityL = in.refinabilityL; // REFINABILITY
+
+        this.isInferred = in.isInferred;
+
+        this.statusConceptL = status;
+    }
+
+    static Sct2_RelRecord[] attachStatus(Sct2_RelRecord[] a, Rf2_RefsetCRecord[] b) throws ParseException {
         int idxA = 0;
         int idxB = 0;
         Arrays.sort(a);
         Arrays.sort(b);
 
+        ArrayList<Sct2_RelRecord> addedRecords = new ArrayList<Sct2_RelRecord>();
+
         while (idxA < a.length && idxB < b.length) {
+            // MATCHED IDS
             if (a[idxA].relSnoId == b[idxB].referencedComponentIdL) {
+                // determine time range
                 long timeRangeInL = b[idxB].timeL;
                 long timeRangeOutL = Long.MAX_VALUE;
                 if (idxB + 1 < b.length && a[idxA].relSnoId == b[idxB + 1].referencedComponentIdL) {
                     timeRangeOutL = b[idxB + 1].timeL;
                 }
 
+                // EXPAND STATUS
                 if (a[idxA].timeL < timeRangeInL) {
-                    idxA++;
-                } else if (a[idxA].timeL >= timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    idxA++; // before range, leave status unchanged
+                } else if (a[idxA].timeL == timeRangeInL) {
                     if (b[idxB].isActive) {
                         a[idxA].statusConceptL = b[idxB].valueIdL;
                     }
                     idxA++;
                     idxB++;
-                } else {
+                } else if (a[idxA].timeL > timeRangeInL && a[idxA].timeL < timeRangeOutL) {
+                    if (b[idxB].isActive) {
+                        a[idxA].statusConceptL = b[idxB].valueIdL;
+                    }
+                    idxA++;
+                    idxB++;
+                } else if (a[idxA].timeL == timeRangeOutL) {
+                    idxB++;
+                } else if (a[idxA].timeL > timeRangeOutL) {
+                    // ADD STATUS CHANGE EVENT
+                    if (b[idxB + 1].isActive) {
+                        addedRecords.add(new Sct2_RelRecord(a[idxA], b[idxB + 1].timeL, b[idxB + 1].valueIdL));
+                    } else {
+                        addedRecords.add(new Sct2_RelRecord(a[idxA], b[idxB + 1].timeL, Long.MAX_VALUE));
+                    }
                     idxB++;
                 }
 
+                // GET NEXT IDS
             } else if (a[idxA].relSnoId < b[idxB].referencedComponentIdL) {
                 idxA++;
             } else {
                 idxB++;
             }
         }
+
+        if (addedRecords.size() > 0) {
+            int offsetI = a.length;
+            a = Arrays.copyOf(a, a.length + addedRecords.size());
+            for (int i = 0; i < addedRecords.size(); i++) {
+                a[offsetI + i] = addedRecords.get(i);
+            }
+        }
+
+        return a;
     }
 
     public static Sct2_RelRecord[] parseRelationships(Rf2File f, boolean inferredB) throws IOException, ParseException {

@@ -21,6 +21,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Logger;
 import org.dwfa.tapi.TerminologyException;
 
 public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
@@ -41,7 +44,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             long refsetIdL, long referencedComponentIdL, long valueIdL) throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
-        this.timeL =  Rf2x.convertDateToTime(dateStr);
+        this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
         /* this.pathStr = path; */
@@ -52,7 +55,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
     }
 
-    static Rf2_RefsetCRecord[] parseLangRefSet(Rf2File f) throws IOException, ParseException {
+    static Rf2_RefsetCRecord[] parseRefset(Rf2File f) throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Rf2_RefsetCRecord[] a = new Rf2_RefsetCRecord[count];
@@ -68,11 +71,15 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
+        Set m = new HashSet<Long>();
 
         int idx = 0;
         br.readLine(); // Header row
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
+
+            Long refsetIdL = Long.parseLong(line[REFSET_ID]);
+            m.add(refsetIdL);
 
             a[idx] = new Rf2_RefsetCRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
@@ -83,6 +90,15 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
                     Long.parseLong(line[VALUE_ID]));
             idx++;
         }
+
+        Long[] aLongs = (Long[]) m.toArray(new Long[0]);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Concept Refset SCT IDs:\r\n");
+        for (Long l : aLongs) {
+            sb.append(l.toString());
+            sb.append("\r\n");
+        }
+        Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
 
         return a;
     }

@@ -114,13 +114,14 @@ public class Rf1SubsetId {
         this.refsetPrefTerm = term;
     }
 
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
-        sb.append(subsetSctIdOriginal + " (SCTID), ");
-        sb.append(subsetPathUuidFromName + " (NAME), ");
-        sb.append(subsetPathUuid + " (PATH), ");
-        sb.append(subsetRefsetUuid + " (REFSET)");
+        sb.append(subsetSctIdOriginal).append(" (SCTID), ");
+        sb.append(subsetPathUuidFromName).append(" (NAME), ");
+        sb.append(subsetPathUuid).append(" (PATH), ");
+        sb.append(subsetRefsetUuid).append(" (REFSET)");
 
         return sb.toString();
     }

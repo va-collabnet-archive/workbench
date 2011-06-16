@@ -101,8 +101,10 @@ public class Rf2_CrossmapRecord {
 
         Long[] aLongs = (Long[]) m.toArray(new Long[0]);
         StringBuilder sb = new StringBuilder();
+        sb.append("Crossmap Refset SCT IDs:\r\n");
         for (Long l : aLongs) {
             sb.append(l.toString());
+            sb.append("\r\n");
         }
         Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
 
