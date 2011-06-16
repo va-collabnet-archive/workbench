@@ -271,7 +271,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public String toUserString(TerminologySnapshotDI snapshot)
                 throws IOException, ContraditionException {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index).toUserString(snapshot);
             }
             return ConceptComponent.this.toUserString(snapshot);
@@ -279,7 +279,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public boolean isActive(NidSetBI allowedStatusNids) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index).isActive(allowedStatusNids);
             }
             return ConceptComponent.this.isActive(allowedStatusNids);
@@ -433,7 +433,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         public R getRevision() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index);
             }
             return makeAnalog(getStatusNid(),
@@ -444,7 +444,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public I_AmPart getMutablePart() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index);
             }
             return this;
@@ -452,7 +452,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public boolean sapIsInRange(int min, int max) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 CopyOnWriteArrayList<R> localRevisions = revisions;
                 if (localRevisions != null && index < localRevisions.size()) {
                     return revisions.get(index).sapNid >= min
@@ -465,7 +465,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getSapNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index).sapNid;
             }
             return primordialSapNid;
@@ -473,7 +473,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public String toString() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return "Version: " + revisions.get(index).toString();
             }
             return "Version: " + ConceptComponent.this.toString();
@@ -481,7 +481,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public String toUserString() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index).toUserString();
             }
             return ConceptComponent.this.toUserString();
@@ -497,7 +497,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getPathId() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getPathNid();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -505,7 +505,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getPathNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getPathNid();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -514,7 +514,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getStatusId() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getStatusNid();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -522,7 +522,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getStatusNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getStatusNid();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -530,7 +530,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getAuthorNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getAuthorNid();
             }
             return Bdb.getSapDb().getAuthorNid(primordialSapNid);
@@ -538,7 +538,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public long getTime() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getTime();
             }
             return Bdb.getSapDb().getTime(primordialSapNid);
@@ -546,7 +546,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setTime(long time) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 getMutablePart().setTime(time);
             }
             ConceptComponent.this.setTime(time);
@@ -555,7 +555,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getVersion() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutablePart().getVersion();
             }
             return Bdb.getSapDb().getVersion(primordialSapNid);
@@ -584,7 +584,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public void setPathId(int pathId) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 revisions.get(index).setPathNid(pathId);
             } else {
                 ConceptComponent.this.setPathNid(pathId);
@@ -593,7 +593,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setPathNid(int pathId) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 revisions.get(index).setPathNid(pathId);
             } else {
                 ConceptComponent.this.setPathNid(pathId);
@@ -608,7 +608,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setStatusNid(int statusNid) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 revisions.get(index).setStatusNid(statusNid);
             } else {
                 ConceptComponent.this.setStatusNid(statusNid);
@@ -617,7 +617,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public PositionBI getPosition() throws IOException {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return revisions.get(index).getPosition();
             } else {
                 return ConceptComponent.this.getPosition();
@@ -630,7 +630,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setAuthorNid(int authorNid) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 revisions.get(index).setAuthorNid(authorNid);
             } else {
                 ConceptComponent.this.setAuthorNid(authorNid);
@@ -661,7 +661,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         public int getSapNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return additionalIdVersions.get(index).getSapNid();
             }
             return primordialSapNid;
@@ -670,7 +670,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getPathId() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getPathId();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -678,7 +678,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getPathNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getPathNid();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -686,7 +686,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getAuthorNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getAuthorNid();
             }
             return Bdb.getSapDb().getAuthorNid(primordialSapNid);
@@ -695,7 +695,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getStatusId() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getStatusId();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -703,7 +703,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getStatusNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getStatusNid();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -711,7 +711,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public long getTime() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getTime();
             }
             return Bdb.getSapDb().getTime(primordialSapNid);
@@ -719,7 +719,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getVersion() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getVersion();
             }
             return Bdb.getSapDb().getVersion(primordialSapNid);
@@ -732,7 +732,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getAuthorityNid() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getAuthorityNid();
             }
             return ConceptComponent.this.getAuthorityNid();
@@ -740,7 +740,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public Object getDenotation() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return getMutableIdPart().getDenotation();
             }
             return ConceptComponent.this.getDenotation();
@@ -748,7 +748,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public I_IdPart getMutableIdPart() {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 return additionalIdVersions.get(index);
             }
             return this;
@@ -790,7 +790,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setAuthorityNid(int sourceNid) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 getMutableIdPart().setAuthorityNid(sourceNid);
             }
             // ConceptComponent.this.setAuthorityNid(sourceNid);
@@ -798,7 +798,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setDenotation(Object sourceId) {
-            if (index >= 0) {
+            if (index >= 0 && index < revisions.size()) {
                 getMutableIdPart().setDenotation(sourceId);
             }
             // ConceptComponent.this.setDenotation(sourceId);

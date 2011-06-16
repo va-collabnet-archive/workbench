@@ -132,22 +132,13 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             File userDir = new File(userDirStr);
             File userQueueRoot = new File("queues", newConfig.getUsername());
             userQueueRoot.mkdirs();
-            EditOnPromotePath promotePathProfile = new EditOnPromotePath(creatorConfig);
-            if (promotePathProfile.getEditingPathSet().size() != 1) {
-                throw new TaskFailedException("creatorConfig does not have a promotion path selected... "
-                    + promotePathProfile.getEditingPathSet());
-            }
-            if (promotePathProfile.getViewPositionSet().size() != 1) {
-                throw new TaskFailedException("creatorConfig does not have a single view path selected..."
-                    + promotePathProfile.getViewPositionSet());
-            }
+            EditOnRootPath rootPathProfile = new EditOnRootPath(creatorConfig);
 
             // Create new concept for user...
-            createUser(newConfig, promotePathProfile);
+            createUser(newConfig, rootPathProfile);
 
             // Create new paths for user...
-            createDevPath(newConfig, promotePathProfile);
-            createClassifierPath(newConfig, promotePathProfile);
+            createDevPath(newConfig, rootPathProfile);
             if (creatorConfig.getPromotionPathSet().size() > 1) {
                 throw new TaskFailedException("This task only supports a single promotion path...\nFound: "
                     + creatorConfig.getPromotionPathSet().size());
@@ -430,12 +421,6 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         newConfig.getDbConfig().setUserPath(userPathConcept);
     }
 
-    private void createClassifierPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Collection<? extends PositionBI> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
-        PathBI classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
-        newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
-    }
-
     private Set<PositionBI> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
             IOException, TaskFailedException {
     	PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
@@ -445,16 +430,6 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         }
         Set<PositionBI> inputSet = new HashSet<PositionBI>(developerViewPosition.getPath().getOrigins());
         return inputSet;
-    }
-
-    private PathBI createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
-        for (PathBI promotionPath : commitConfig.getPromotionPathSet()) {
-        	PathBI newConfigPromotionPath = createNewPath(newConfig, commitConfig, new HashSet<PositionBI>(
-                promotionPath.getOrigins()), " promotion path");
-            newConfig.addPromotionPath(newConfigPromotionPath);
-            return newConfigPromotionPath;
-        }
-        return null;
     }
 
     private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 

@@ -75,13 +75,13 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
 public class EditOnPromotePath implements I_ConfigAceFrame {
+
     I_ConfigAceFrame config;
 
-   public EditCoordinate getEditCoordinate() {
-      return config.getEditCoordinate();
-   }
+    public EditCoordinate getEditCoordinate() {
+        return config.getEditCoordinate();
+    }
 
-  
     @Override
     public void setRelAssertionType(RelAssertionType relAssertionType) {
         config.setRelAssertionType(relAssertionType);
@@ -102,32 +102,31 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         return config.getClassifierConcept();
     }
 
+    public void quit() {
+        config.quit();
+    }
 
-	public void quit() {
-		config.quit();
-	}
+    public ViewCoordinate getViewCoordinate() {
+        return config.getViewCoordinate();
+    }
 
-	public ViewCoordinate getViewCoordinate() {
-		return config.getViewCoordinate();
-	}
+    public Set<PathBI> getPromotionPathSet() {
+        return config.getPromotionPathSet();
+    }
 
-	public Set<PathBI> getPromotionPathSet() {
-		return config.getPromotionPathSet();
-	}
+    public void addViewPosition(PositionBI p) {
+        config.addViewPosition(p);
+    }
 
-	public void addViewPosition(PositionBI p) {
-		config.addViewPosition(p);
-	}
-
-	public void removeViewPosition(PositionBI p) {
-		config.removeViewPosition(p);
-	}
+    public void removeViewPosition(PositionBI p) {
+        config.removeViewPosition(p);
+    }
 
     public void replaceViewPosition(PositionBI oldPosition, PositionBI newPosition) {
-		config.replaceViewPosition(oldPosition, newPosition);
-	}
+        config.replaceViewPosition(oldPosition, newPosition);
+    }
 
-	public I_ShowActivity getTopActivity() {
+    public I_ShowActivity getTopActivity() {
         return config.getTopActivity();
     }
 
@@ -734,7 +733,7 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
 
     public void setClassifierInputMode(CLASSIFIER_INPUT_MODE_PREF classifierInputMode) {
         config.setClassifierInputMode(classifierInputMode);
-     }
+    }
 
     public void setClassifierInputPath(I_GetConceptData inputPath) {
         config.setClassifierInputPath(inputPath);
@@ -965,9 +964,9 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     }
 
     public void setShowWorkflowSignpostPanel(boolean show) {
-    	config.setShowWorkflowSignpostPanel(show);
+        config.setShowWorkflowSignpostPanel(show);
     }
-    
+
     public void setShowViewerImagesInTaxonomy(Boolean showViewerImagesInTaxonomy) {
         config.setShowViewerImagesInTaxonomy(showViewerImagesInTaxonomy);
     }
@@ -1192,15 +1191,17 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
     public void setShowPromotionTab(Boolean show) {
         config.setShowPromotionTab(show);
     }
+
     @Override
     public void setEnabledAllQueuesButton(boolean enable) {
         config.setEnabledAllQueuesButton(enable);
     }
 
-	@Override
-	public boolean isAutoApproveOn() {
-		return config.isAutoApproveOn();
-	}
+    @Override
+    public boolean isAutoApproveOn() {
+        return config.isAutoApproveOn();
+    }
+
     @Override
     public void setEnabledExistingInboxButton(boolean enable) {
         config.setEnabledExistingInboxButton(enable);
@@ -1216,58 +1217,58 @@ public class EditOnPromotePath implements I_ConfigAceFrame {
         config.setEnabledNewInboxButton(enable);
     }
 
-	@Override
-	public boolean isOverrideOn() {
-		return config.isOverrideOn();
-	}
+    @Override
+    public boolean isOverrideOn() {
+        return config.isOverrideOn();
+    }
 
-	@Override
-	public void setAutoApprove(boolean b) {
-		config.setAutoApprove(b);
-	}
+    @Override
+    public void setAutoApprove(boolean b) {
+        config.setAutoApprove(b);
+    }
 
-	@Override
-	public void setOverride(boolean b) {
-		config.setOverride(b);
-	}
+    @Override
+    public void setOverride(boolean b) {
+        config.setOverride(b);
+    }
 
-	@Override
-	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
-		return config.getAllAvailableWorkflowActionUids();
-	}
+    @Override
+    public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+        return config.getAllAvailableWorkflowActionUids();
+    }
 
-	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
-		return config.getWorkflowActions();
-	}
+    @Override
+    public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+        return config.getWorkflowActions();
+    }
 
-	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
-		return config.getWorkflowRoles();
-	}
+    @Override
+    public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+        return config.getWorkflowRoles();
+    }
 
-	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
-		return config.getWorkflowStates();
-	}
+    @Override
+    public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+        return config.getWorkflowStates();
+    }
 
-	@Override
-	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
-		config.setAllAvailableWorkflowActionUids(actions);
-	}
+    @Override
+    public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+        config.setAllAvailableWorkflowActionUids(actions);
+    }
 
-	@Override
-	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
-		config.setWorkflowActions(actions);
-	}
+    @Override
+    public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+        config.setWorkflowActions(actions);
+    }
 
-	@Override
-	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
-		config.setWorkflowRoles(roles);
-	}
+    @Override
+    public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+        config.setWorkflowRoles(roles);
+    }
 
-	@Override
-	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
-		config.setWorkflowStates(states);
-	}
+    @Override
+    public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+        config.setWorkflowStates(states);
+    }
 }
