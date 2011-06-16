@@ -841,6 +841,12 @@ public class BdbCommitManager {
             Concept c = Concept.get(idItr.nid());
             if (c.isCanceled()) {
                 Terms.get().forget(c);
+                try {
+					KindOfComputer.updateIsaCaches((Concept) c);
+				} catch (Exception e) {
+					 AceLog.getAppLog().alertAndLog(Level.SEVERE,
+	                            "Canceling cache for: " + c.toString(), e);
+				}
             }
         }
     }
@@ -867,6 +873,12 @@ public class BdbCommitManager {
                     }
                 }
             }
+            try {
+				KindOfComputer.updateIsaCaches((Concept) c);
+			} catch (Exception e) {
+				 AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                            "Canceling cache for: " + c.toString(), e);
+			}
             Terms.get().addUncommittedNoChecks(c);
         } else {
             a.primordialSapNid = -1;
@@ -905,6 +917,12 @@ public class BdbCommitManager {
             r.primordialSapNid = -1;
         }
         c.modified();
+        try {
+			KindOfComputer.updateIsaCaches((Concept) c);
+		} catch (Exception e) {
+			 AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                        "Canceling cache for: " + c.toString(), e);
+		}
         Terms.get().addUncommittedNoChecks(c);
     }
 
