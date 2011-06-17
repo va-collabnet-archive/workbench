@@ -261,6 +261,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         writer.append(pathStr + TAB_CHARACTER);
 
         // Author UUID
+        // SCT ID Is-a == 116680003L
         if (isInferred) {
             writer.append(uuidUserSnorocketStr + LINE_TERMINATOR);
         } else {
