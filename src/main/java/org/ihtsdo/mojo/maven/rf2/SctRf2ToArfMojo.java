@@ -149,7 +149,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             getLog().info("::: RELATIONSHIPS FILE: " + outDir + "relationships_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Relationship", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
+                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
                 rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
