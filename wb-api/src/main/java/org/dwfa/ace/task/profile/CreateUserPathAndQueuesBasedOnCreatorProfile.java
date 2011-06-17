@@ -41,7 +41,6 @@ import net.jini.core.entry.Entry;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -66,12 +65,12 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN)})
 public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
+
     private static final long serialVersionUID = 1;
-
     private static final int dataVersion = 1;
-
     private String creatorProfilePropName = ProcessAttachmentKeys.COMMIT_PROFILE.getAttachmentKey();
     private String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String errorsAndWarningsPropName = ProcessAttachmentKeys.ERRORS_AND_WARNINGS.getAttachmentKey();
@@ -107,7 +106,8 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
      *      org.dwfa.bpa.process.I_Work)
      */
     @SuppressWarnings("unchecked")
-	public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+    @Override
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         I_ConfigAceFrame newConfig;
         try {
             newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
@@ -125,7 +125,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.setClassifierInputPath(creatorConfig.getClassifierInputPath());
             newConfig.setClassifierIsaType(creatorConfig.getClassifierIsaType());
             newConfig.setClassifierOutputPath(creatorConfig.getClassifierOutputPath());
-            
+
             I_TermFactory tf = Terms.get();
 
             String userDirStr = "profiles" + File.separator + newConfig.getUsername();
@@ -141,51 +141,59 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             createDevPath(newConfig, rootPathProfile);
             if (creatorConfig.getPromotionPathSet().size() > 1) {
                 throw new TaskFailedException("This task only supports a single promotion path...\nFound: "
-                    + creatorConfig.getPromotionPathSet().size());
-            	
+                        + creatorConfig.getPromotionPathSet().size());
+
             }
             if (creatorConfig.getEditingPathSet().size() > 1) {
                 throw new TaskFailedException("This task only supports a single editing path...\nFound: "
-                    + creatorConfig.getPromotionPathSet().size());
+                        + creatorConfig.getPromotionPathSet().size());
             }
 
+            if (creatorConfig.getViewPositionSet().size() == 1) {
+                PositionBI viewPosition = (PositionBI) creatorConfig.getViewPositionSet().toArray()[0];
+                PathBI editPath = (PathBI) creatorConfig.getEditingPathSet().toArray()[0];
+                if (viewPosition.getPath().getConceptNid() == editPath.getConceptNid()) {
+                    newConfig.getViewPositionSet().clear();
+                    newConfig.getViewPositionSet().addAll(creatorConfig.getViewPositionSet());
+                }
+            }
             newConfig.getPromotionPathSet().addAll(creatorConfig.getPromotionPathSet());
- 
+
             List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
             process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
             if (errorsAndWarnings.size() > 0) {
                 AceLog.getAppLog().warning(errorsAndWarnings.toString());
-            	Terms.get().cancel();
+                Terms.get().cancel();
                 return Condition.FALSE;
             }
-            
+
             File changeSetRoot = new File(userDir, "changesets");
             changeSetRoot.mkdirs();
             I_ConfigAceDb newDbProfile = newConfig.getDbConfig();
             newDbProfile.setChangeSetRoot(changeSetRoot);
-            newDbProfile.setChangeSetWriterFileName(newConfig.getUsername() + "#1#" + 
-            		UUID.randomUUID().toString() + ".eccs");
+            newDbProfile.setChangeSetWriterFileName(newConfig.getUsername() + "#1#"
+                    + UUID.randomUUID().toString() + ".eccs");
             newDbProfile.setUsername(newConfig.getUsername());
 
-            
+
             String tempKey = UUID.randomUUID().toString();
-            
+
             ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
-					new File(newConfig.getDbConfig().getChangeSetRoot(),
-							newConfig.getDbConfig().getChangeSetWriterFileName()), 
-							new File(newConfig.getDbConfig().getChangeSetRoot(), "#0#"
-									+ newConfig.getDbConfig().getChangeSetWriterFileName()),
-									ChangeSetGenerationPolicy.MUTABLE_ONLY);
+                    new File(newConfig.getDbConfig().getChangeSetRoot(),
+                    newConfig.getDbConfig().getChangeSetWriterFileName()),
+                    new File(newConfig.getDbConfig().getChangeSetRoot(), "#0#"
+                    + newConfig.getDbConfig().getChangeSetWriterFileName()),
+                    ChangeSetGenerationPolicy.MUTABLE_ONLY);
             List<ChangeSetGeneratorBI> extraGeneratorList = (List<ChangeSetGeneratorBI>) process.readAttachement(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey());
             if (extraGeneratorList == null) {
-            	extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
+                extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
             }
             extraGeneratorList.add(generator);
             process.writeAttachment(ProcessAttachmentKeys.EXTRA_CHANGE_SET_GENERATOR_LIST.getAttachmentKey(), extraGeneratorList);
 
             Ts.get().addChangeSetGenerator(tempKey, generator);
-           try {
-            	Terms.get().commit();
+            try {
+                Terms.get().commit();
             } catch (Exception e) {
                 throw new TaskFailedException();
             } finally {
@@ -210,19 +218,19 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             for (Integer pathNid : creatorConfig.getPathColorMap().keySet()) {
                 newConfig.setColorForPath(pathNid, creatorConfig.getColorForPath(pathNid));
             }
-            
+
             // Set desc types
             for (Integer descTypeNid : creatorConfig.getDescTypes().getSetValues()) {
                 newConfig.getDescTypes().add(descTypeNid);
             }
-            
+
             newConfig.getShortLabelDescPreferenceList().clear();
             newConfig.getShortLabelDescPreferenceList().addAll(
-                creatorConfig.getShortLabelDescPreferenceList().getListValues());
+                    creatorConfig.getShortLabelDescPreferenceList().getListValues());
 
             newConfig.getLongLabelDescPreferenceList().clear();
             newConfig.getLongLabelDescPreferenceList().addAll(
-                creatorConfig.getLongLabelDescPreferenceList().getListValues());
+                    creatorConfig.getLongLabelDescPreferenceList().getListValues());
 
             newConfig.getTreeDescPreferenceList().clear();
             newConfig.getTreeDescPreferenceList().addAll(creatorConfig.getTreeDescPreferenceList().getListValues());
@@ -232,12 +240,12 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
             newConfig.getLanguagePreferenceList().clear();
             newConfig.getLanguagePreferenceList().addAll(creatorConfig.getLanguagePreferenceList().getListValues());
-            
+
             newConfig.setShowViewerImagesInTaxonomy(creatorConfig.getShowViewerImagesInTaxonomy());
 
             newConfig.getRefsetsToShowInTaxonomy().clear();
             newConfig.getRefsetsToShowInTaxonomy().addAll(creatorConfig.getRefsetsToShowInTaxonomy().getListValues());
-            
+
             newConfig.setShowPathInfoInTaxonomy(creatorConfig.getShowPathInfoInTaxonomy());
             newConfig.setShowRefsetInfoInTaxonomy(creatorConfig.getShowRefsetInfoInTaxonomy());
             newConfig.getDescTypes().addAll(creatorConfig.getDescTypes().getSetValues());
@@ -245,32 +253,32 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.setHighlightConflictsInComponentPanel(creatorConfig.getHighlightConflictsInComponentPanel());
             newConfig.setHighlightConflictsInTaxonomyView(creatorConfig.getHighlightConflictsInTaxonomyView());
             newConfig.setConflictResolutionStrategy(creatorConfig.getConflictResolutionStrategy());
-            
+
             newConfig.getDbConfig().setClassifierChangesChangeSetPolicy(
-                creatorConfig.getDbConfig().getClassifierChangesChangeSetPolicy());
+                    creatorConfig.getDbConfig().getClassifierChangesChangeSetPolicy());
             newConfig.getDbConfig().setRefsetChangesChangeSetPolicy(
-                creatorConfig.getDbConfig().getRefsetChangesChangeSetPolicy());
+                    creatorConfig.getDbConfig().getRefsetChangesChangeSetPolicy());
             newConfig.getDbConfig().setUserChangesChangeSetPolicy(
-                creatorConfig.getDbConfig().getUserChangesChangeSetPolicy());
+                    creatorConfig.getDbConfig().getUserChangesChangeSetPolicy());
             newConfig.getDbConfig().setChangeSetWriterThreading(
-                creatorConfig.getDbConfig().getChangeSetWriterThreading());
+                    creatorConfig.getDbConfig().getChangeSetWriterThreading());
             newConfig.setPrecedence(creatorConfig.getPrecedence());
 
             // clear the user's path color
             if (creatorConfig.getDbConfig().getUserPath() != null) {
                 Color userColor = newConfig.getPathColorMap().remove(
-                    creatorConfig.getDbConfig().getUserPath().getConceptNid());
+                        creatorConfig.getDbConfig().getUserPath().getConceptNid());
                 newConfig.setColorForPath(newConfig.getDbConfig().getUserPath().getConceptNid(), userColor);
             }
 
             // Create inbox
             createInbox(newConfig, newConfig.getUsername() + ".inbox", userQueueRoot, newConfig.getUsername()
-                + ".inbox");
+                    + ".inbox");
             // Create todo box
             createInbox(newConfig, newConfig.getUsername() + ".todo", userQueueRoot, newConfig.getUsername() + ".inbox");
             // Create outbox box
             createOutbox(newConfig, newConfig.getUsername() + ".outbox", userQueueRoot, newConfig.getUsername()
-                + ".inbox");
+                    + ".inbox");
 
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
@@ -278,8 +286,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
 
             errorsAndWarnings.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR,
-                "<html>Error while creating user path and queues: <br>" + e.getMessage(), newConfig.getDbConfig()
-                    .getUserConcept()));
+                    "<html>Error while creating user path and queues: <br>" + e.getMessage(), newConfig.getDbConfig().getUserConcept()));
 
             try {
                 process.setProperty(errorsAndWarningsPropName, errorsAndWarnings);
@@ -287,13 +294,12 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             } catch (Exception inner) {
                 inner.printStackTrace();
                 throw new TaskFailedException(inner);
-        }
+            }
             return Condition.FALSE;
         }
         return Condition.TRUE;
     }
-
-    String[] QueueTypes = new String[] { "aging", "archival", "compute", "inbox", "launcher", "outbox" };
+    String[] QueueTypes = new String[]{"aging", "archival", "compute", "inbox", "launcher", "outbox"};
 
     private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot, String nodeInboxAddress) {
         config.getQueueAddressesToShow().add(inboxName);
@@ -358,10 +364,10 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
             config.getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
             Configuration queueConfig =
-                    ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
+                    ConfigurationProvider.getInstance(new String[]{newQueueConfig.getAbsolutePath()});
             Entry[] entries =
                     (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries", Entry[].class,
-                new Entry[] {});
+                    new Entry[]{});
             for (Entry entry : entries) {
                 if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
                     ElectronicAddress ea = (ElectronicAddress) entry;
@@ -372,7 +378,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             if (QueueServer.started(newQueueConfig)) {
                 AceLog.getAppLog().info("Queue already started: " + newQueueConfig.toURI().toURL().toExternalForm());
             } else {
-                new QueueServer(new String[] { newQueueConfig.getCanonicalPath() }, null);
+                new QueueServer(new String[]{newQueueConfig.getCanonicalPath()}, null);
             }
 
         } catch (Exception e) {
@@ -385,7 +391,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         AceLog.getAppLog().info("Create new path for user: " + newConfig.getDbConfig().getFullName());
         if (newConfig.getDbConfig().getFullName() == null || newConfig.getDbConfig().getFullName().length() == 0) {
             JOptionPane.showMessageDialog(newConfig.getWorkflowPanel().getTopLevelAncestor(),
-                "Full name cannot be empty.");
+                    "Full name cannot be empty.");
             throw new TaskFailedException();
         }
         I_TermFactory tf = Terms.get();
@@ -393,19 +399,13 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         I_GetConceptData userConcept = tf.newConcept(UUID.randomUUID(), false, creatorConfig);
 
         // Needs a description record...
-        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getDbConfig().getFullName(), Terms.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), creatorConfig);
+        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getDbConfig().getFullName(), Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), creatorConfig);
         tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername(), Terms.get().getConcept(
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), creatorConfig);
-        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername() + ".inbox", Terms.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()), creatorConfig);
+                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), creatorConfig);
+        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername() + ".inbox", Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()), creatorConfig);
 
         // Needs a relationship record...
-        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
-            .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()), tf
-            .getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), tf
-            .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
-            .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
+        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
         newConfig.getDbConfig().setUserConcept(userConcept);
         tf.addUncommitted(userConcept);
 
@@ -423,22 +423,21 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
     private Set<PositionBI> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
             IOException, TaskFailedException {
-    	PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
+        PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
         if (developerViewPosition == null) {
             throw new TaskFailedException("developerViewPosition input path is null..."
-                + "You must set the view position prior to running the new user process...");
+                    + "You must set the view position prior to running the new user process...");
         }
         Set<PositionBI> inputSet = new HashSet<PositionBI>(developerViewPosition.getPath().getOrigins());
         return inputSet;
     }
 
-    private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 
-    		Collection<? extends PositionBI> positionSet,
+    private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig,
+            Collection<? extends PositionBI> positionSet,
             String suffix) throws TaskFailedException, TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + config.getDbConfig().getFullName());
         if (config.getDbConfig().getFullName() == null || config.getDbConfig().getFullName().length() == 0) {
-            JOptionPane
-                .showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Full name cannot be empty.");
+            JOptionPane.showMessageDialog(config.getWorkflowPanel().getTopLevelAncestor(), "Full name cannot be empty.");
             throw new TaskFailedException();
         }
         AceLog.getAppLog().info(positionSet.toString());
@@ -452,21 +451,21 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
 
         // Needs a description record...
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", config.getDbConfig().getFullName() + suffix,
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), 
-        		commitConfig);
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()),
+                commitConfig);
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", config.getUsername() + suffix,
-            Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), commitConfig);
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), commitConfig);
 
         // Needs a relationship record...
         Terms.get().newRelationship(UUID.randomUUID(), pathConcept,
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, commitConfig);
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()),
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids()),
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
+                Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, commitConfig);
 
         Terms.get().addUncommitted(pathConcept);
-        
+
         return Terms.get().newPath(positionSet, pathConcept, commitConfig);
     }
 
@@ -474,14 +473,15 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
      *      org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
-
     }
 
     /**
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONDITIONAL_TEST_CONDITIONS;
     }
@@ -509,5 +509,4 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     public void setNewProfilePropName(String newProfilePropName) {
         this.newProfilePropName = newProfilePropName;
     }
-
 }
