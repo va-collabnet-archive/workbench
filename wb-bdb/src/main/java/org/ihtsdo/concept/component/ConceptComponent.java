@@ -661,7 +661,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         public int getSapNid() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return additionalIdVersions.get(index).getSapNid();
             }
             return primordialSapNid;
@@ -670,7 +670,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getPathId() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getPathId();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -678,7 +678,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getPathNid() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getPathNid();
             }
             return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -686,7 +686,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getAuthorNid() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getAuthorNid();
             }
             return Bdb.getSapDb().getAuthorNid(primordialSapNid);
@@ -695,7 +695,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         @Deprecated
         public int getStatusId() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getStatusId();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -703,7 +703,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getStatusNid() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getStatusNid();
             }
             return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -711,7 +711,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public long getTime() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getTime();
             }
             return Bdb.getSapDb().getTime(primordialSapNid);
@@ -719,7 +719,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getVersion() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getVersion();
             }
             return Bdb.getSapDb().getVersion(primordialSapNid);
@@ -732,7 +732,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public int getAuthorityNid() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getAuthorityNid();
             }
             return ConceptComponent.this.getAuthorityNid();
@@ -740,7 +740,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public Object getDenotation() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return getMutableIdPart().getDenotation();
             }
             return ConceptComponent.this.getDenotation();
@@ -748,7 +748,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public I_IdPart getMutableIdPart() {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 return additionalIdVersions.get(index);
             }
             return this;
@@ -790,7 +790,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setAuthorityNid(int sourceNid) {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 getMutableIdPart().setAuthorityNid(sourceNid);
             }
             // ConceptComponent.this.setAuthorityNid(sourceNid);
@@ -798,7 +798,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public void setDenotation(Object sourceId) {
-            if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && additionalIdVersions != null && index < additionalIdVersions.size()) {
                 getMutableIdPart().setDenotation(sourceId);
             }
             // ConceptComponent.this.setDenotation(sourceId);
