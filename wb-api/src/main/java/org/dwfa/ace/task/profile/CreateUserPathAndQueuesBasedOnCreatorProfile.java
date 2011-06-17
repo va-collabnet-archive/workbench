@@ -41,6 +41,7 @@ import net.jini.core.entry.Entry;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -74,6 +75,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     private String creatorProfilePropName = ProcessAttachmentKeys.COMMIT_PROFILE.getAttachmentKey();
     private String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
     private String errorsAndWarningsPropName = ProcessAttachmentKeys.ERRORS_AND_WARNINGS.getAttachmentKey();
+    private PathBI templateEditPath;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -120,6 +122,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             newConfig.getViewPositionSet().clear();
             newConfig.getEditingPathSet().clear();
             I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+            templateEditPath = creatorConfig.getEditingPathSet().iterator().next();
             newConfig.setClassificationRoleRoot(creatorConfig.getClassificationRoleRoot());
             newConfig.setClassificationRoot(creatorConfig.getClassificationRoot());
             newConfig.setClassifierInputPath(creatorConfig.getClassifierInputPath());
@@ -152,7 +155,7 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
             if (creatorConfig.getViewPositionSet().size() == 1) {
                 PositionBI viewPosition = (PositionBI) creatorConfig.getViewPositionSet().toArray()[0];
                 PathBI editPath = (PathBI) creatorConfig.getEditingPathSet().toArray()[0];
-                if (viewPosition.getPath().getConceptNid() == editPath.getConceptNid()) {
+                if (viewPosition.getPath().getConceptNid() != editPath.getConceptNid()) {
                     newConfig.getViewPositionSet().clear();
                     newConfig.getViewPositionSet().addAll(creatorConfig.getViewPositionSet());
                 }
@@ -412,8 +415,15 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
     }
 
     private void createDevPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Set<PositionBI> inputSet = getDeveloperOrigins(creatorConfig);
+        Set<PositionBI> inputSet = getDeveloperOrigins();
         PathBI userPath = createNewPath(newConfig, creatorConfig, inputSet, " dev path");
+        
+        
+        for (PathBI child: Terms.get().getPathChildren(templateEditPath.getConceptNid())) {
+            ((I_Path)child).addOrigin(Terms.get().newPosition(userPath, Long.MAX_VALUE),
+            		creatorConfig);
+        }
+        
         newConfig.addEditingPath(userPath);
         I_GetConceptData userPathConcept = Terms.get().getConcept(userPath.getConceptNid());
         newConfig.setClassifierInputPath(userPathConcept);
@@ -421,14 +431,13 @@ public class CreateUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
         newConfig.getDbConfig().setUserPath(userPathConcept);
     }
 
-    private Set<PositionBI> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
+    private Set<PositionBI> getDeveloperOrigins() throws TerminologyException,
             IOException, TaskFailedException {
-        PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
-        if (developerViewPosition == null) {
-            throw new TaskFailedException("developerViewPosition input path is null..."
-                    + "You must set the view position prior to running the new user process...");
+        if (templateEditPath == null) {
+            throw new TaskFailedException("developerEditPath input path is null..."
+                    + "You must set the edit path prior to running the new user process...");
         }
-        Set<PositionBI> inputSet = new HashSet<PositionBI>(developerViewPosition.getPath().getOrigins());
+        Set<PositionBI> inputSet = new HashSet<PositionBI>(templateEditPath.getOrigins());
         return inputSet;
     }
 
