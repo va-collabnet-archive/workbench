@@ -637,6 +637,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     
     @Override
     public Collection<UUID> getUids(int nid) throws TerminologyException, IOException {
+        if (getId(nid) == null) {
+            return null;
+        }
         return getId(nid).getUUIDs();
     }
     
