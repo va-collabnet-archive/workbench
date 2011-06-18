@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -37,14 +38,12 @@ import org.drools.builder.KnowledgeBuilderConfiguration;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.builder.conf.EvaluatorOption;
-import org.drools.compiler.PackageBuilderConfiguration;
 import org.drools.conf.ConsequenceExceptionHandlerOption;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
-import org.drools.rule.builder.dialect.java.JavaDialectConfiguration;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.ConsequenceExceptionHandler;
 import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
@@ -165,10 +164,10 @@ public class DroolsExecutionManager {
 		for (File f : kbFiles) {
 			resources.put(ResourceFactory.newFileResource(f), ResourceType.DRL);
 		}
+		Properties props = new Properties();
+	    props.setProperty("drools.dialect.java.compiler", "JANINO");
 		KnowledgeBuilderConfiguration builderConfig =
-			KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration();
-
-		builderConfig.setProperty("drools.dialect.java.compiler", "JANINO");
+			KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration(props, null);
 
 		if (extraEvaluators.contains(ExtraEvaluators.IS_KIND_OF)) {
 			builderConfig.setOption(EvaluatorOption.get(
