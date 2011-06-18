@@ -61,6 +61,7 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.arena.contradiction.ContradictionEditorGenerator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.custom.statics.CustomStatics;
@@ -70,9 +71,9 @@ import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
-import org.ihtsdo.arena.contradiction.ContradictionEditorGenerator;
 
 public class WorkbenchRunner {
 
@@ -118,6 +119,8 @@ public class WorkbenchRunner {
                         Boolean.class, Boolean.FALSE);
                 svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
                         String[].class, null);
+                DroolsExecutionManager.drools_dialect_java_compiler = (String) jiniConfig.getEntry(this.getClass().getName(), "drools_dialect_java_compiler",
+                		String.class, null);
                 ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "refsetOnly",
                         Boolean.class, Boolean.FALSE);
                 ACE.editMode = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "allowEdit",
