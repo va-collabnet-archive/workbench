@@ -169,7 +169,9 @@ public class DroolsExecutionManager {
 			resources.put(ResourceFactory.newFileResource(f), ResourceType.DRL);
 		}
 		Properties props = new Properties();
-		//props.setProperty("drools.dialect.java.compiler", "JANINO");
+		if (drools_dialect_java_compiler != null) {
+			props.setProperty("drools.dialect.java.compiler", drools_dialect_java_compiler);
+		}
 		KnowledgeBuilderConfiguration builderConfig =
 			KnowledgeBuilderFactory.newKnowledgeBuilderConfiguration(props, null);
 
