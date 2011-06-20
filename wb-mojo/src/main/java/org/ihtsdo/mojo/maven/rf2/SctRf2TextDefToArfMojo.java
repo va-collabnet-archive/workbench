@@ -34,11 +34,11 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-to-arf
+ * @goal sct-rf2-text-definition-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -104,65 +104,24 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                 getLog().info("::: Output Directory: " + outDir);
             }
             BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "ids.txt"), "UTF-8"));
-            getLog().info("::: IDS OUTPUT: " + outDir + "ids_sct.txt");
+                    outDir + "ids_textdefinitions.txt"), "UTF-8"));
+            getLog().info("::: IDS OUTPUT: " + outDir + "ids.txt");
 
             // :NYI: extended status implementation does not multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
             Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0)); // hardcoded
 
-            // CONCEPT FILES: parse, write
+            // TEXTDEFINITION FILES "sct2_TextDefinition"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "concepts_rf2.txt"), "UTF-8"));
-            getLog().info("::: CONCEPTS FILE: " + outDir + "concepts_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
+                    outDir + "descriptions_textdefinitions_rf2.txt"), "UTF-8"));
+            getLog().info("::: TEXTDEFINITIONS FILE: " + outDir + "textdefinitions_rf2.txt");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_TextDefinition", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
-                concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
-                for (Sct2_ConRecord c : concepts) {
-                    c.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
-                }
-            }
-            bw.flush();
-            bw.close();
-
-            // DESCRIPTION FILES "sct2_Description"
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "descriptions_rf2.txt"), "UTF-8"));
-            getLog().info("::: DESCRIPTIONS FILE: " + outDir + "descriptions_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
-                descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
-                for (Sct2_DesRecord d : descriptions) {
+                Sct2_DesRecord[] textdefinitions = Sct2_DesRecord.parseDescriptions(rf2File);
+                textdefinitions = Sct2_DesRecord.attachStatus(textdefinitions, statusRecords);
+                for (Sct2_DesRecord d : textdefinitions) {
                     d.writeArf(bw);
                     writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
-                }
-            }
-            bw.flush();
-            bw.close();
-
-            // RELATIONSHIP FILES "sct2_StatedRelationship" "sct2_Relationship"
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "relationships_rf2.txt"), "UTF-8"));
-            getLog().info("::: RELATIONSHIPS FILE: " + outDir + "relationships_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Relationship", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
-                rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
-                for (Sct2_RelRecord r : rels) {
-                    r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
-                }
-            }
-
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_StatedRelationship", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
-                for (Sct2_RelRecord r : rels) {
-                    r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
                 }
             }
             bw.flush();
@@ -172,15 +131,12 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             bwIds.close();
 
         } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2TextDefToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2TextDefToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file error", ex);
-        } catch (MojoFailureException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
         } catch (ParseException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2TextDefToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF file name parse error", ex);
         }
     }

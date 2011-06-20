@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,11 +35,11 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-to-arf
+ * @goal sct-rf2-simple-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -65,11 +66,6 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      */
     private String inputDir;
     /**
-     * @parameter
-     * @required
-     */
-    private String statusDir;
-    /**
      * Directory used to output the eConcept format files
      * Default value "/classes" set programmatically due to file separator
      *
@@ -77,12 +73,12 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      */
     private String outputDir;
     String uuidSourceSnomedLongStr;
+    String uuidPathStr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
-        List<Rf2File> filesInStatus;
-        getLog().info("::: BEGIN SctRf2ToArf");
+        getLog().info("::: BEGIN SctRf2RefsetSimpleToArfMojo");
 
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
@@ -103,101 +99,62 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             if (success) {
                 getLog().info("::: Output Directory: " + outDir);
             }
-            BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "ids.txt"), "UTF-8"));
-            getLog().info("::: IDS OUTPUT: " + outDir + "ids_sct.txt");
+            // BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+            //        outDir + "ids.txt"), "UTF-8"));
+            // getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
 
-            // :NYI: extended status implementation does not multiple version years
-            filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
-            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0)); // hardcoded
 
-            // CONCEPT FILES: parse, write
+            // SIMPLE REFSET FILES "der2_cRefset_Simple"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "concepts_rf2.txt"), "UTF-8"));
-            getLog().info("::: CONCEPTS FILE: " + outDir + "concepts_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
+                    outDir + "concept_simple_rf2.refset"), "UTF-8"));
+            getLog().info("::: SIMPLE REFSET FILE: " + outDir + "concept_simple_rf2.refset");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_Refset_Simple", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
-                concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
-                for (Sct2_ConRecord c : concepts) {
-                    c.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathStr);
+                Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File);
+                for (Rf2_RefsetSimpleRecord m : members) {
+                    m.writeArf(bw);
+                    // writeSctSnomedLongId(bwIds, m.id, m.effDateStr, m.pathStr);
                 }
             }
             bw.flush();
             bw.close();
 
-            // DESCRIPTION FILES "sct2_Description"
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "descriptions_rf2.txt"), "UTF-8"));
-            getLog().info("::: DESCRIPTIONS FILE: " + outDir + "descriptions_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
-                descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
-                for (Sct2_DesRecord d : descriptions) {
-                    d.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathStr);
-                }
-            }
-            bw.flush();
-            bw.close();
-
-            // RELATIONSHIP FILES "sct2_StatedRelationship" "sct2_Relationship"
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "relationships_rf2.txt"), "UTF-8"));
-            getLog().info("::: RELATIONSHIPS FILE: " + outDir + "relationships_rf2.txt");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Relationship", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
-                rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
-                for (Sct2_RelRecord r : rels) {
-                    r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
-                }
-            }
-
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_StatedRelationship", ".txt");
-            for (Rf2File rf2File : filesIn) {
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
-                for (Sct2_RelRecord r : rels) {
-                    r.writeArf(bw);
-                    writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathStr);
-                }
-            }
-            bw.flush();
-            bw.close();
-
-            bwIds.flush();
-            bwIds.close();
-
+            // bwIds.flush();
+            // bwIds.close();
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(SctRf2RefsetSimpleToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetSimpleToArfMojo UnsupportedEncodingException", ex);
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetSimpleToArfMojo Terminology error", ex);
         } catch (IOException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF file error", ex);
-        } catch (MojoFailureException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetSimpleToArfMojo file error", ex);
         } catch (ParseException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF file name parse error", ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetSimpleToArfMojo file name parse error", ex);
         }
+        getLog().info("::: END SctRf2RefsetSimpleToArfMojo");
     }
 
     private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
             throws IOException, TerminologyException {
-        // PRIMARY_UUID = 0;
+        // Primary UUID
         writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
-        // SOURCE_SYSTEM_UUID = 1;
+
+        // Source System UUID
         writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
-        // ID_FROM_SOURCE_SYSTEM = 2;
+
+        // Source Id
         writer.append(Long.toString(sctId) + TAB_CHARACTER);
-        // STATUS_UUID = 3;
+
+        // Status UUID
         writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
-        // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-        writer.append(date + TAB_CHARACTER);
-        // PATH_UUID = 5;
+
+        // Effective Date   yyyy-MM-dd HH:mm:ss
+        writer.append(Rf2x.convertEffectiveTimeToDate(date) + TAB_CHARACTER);
+
+        // Path UUID
         writer.append(path + LINE_TERMINATOR);
     }
 }

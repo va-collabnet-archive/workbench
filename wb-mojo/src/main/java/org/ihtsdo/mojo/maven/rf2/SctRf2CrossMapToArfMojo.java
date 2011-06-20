@@ -106,18 +106,18 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
             getLog().info("::: IDS OUTPUT: " + outDir + "ids_crossmap.txt");
 
             // WRITE REFSET CONCEPTS
-            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
-            refsetIdList.add(new Rf2_RefsetId(446608001L, /* refsetSctIdOriginal */
-                    "2002.01.31", /* refsetDate */
-                    "8c230474-9f11-30ce-9cad-185a96fd03a2", /* refsetPathUuidStr */
-                    "ICD-O", /* refsetPrefTerm */
-                    "ICD-O", /* refsetFsName */
-                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
-            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
+//            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+//            refsetIdList.add(new Rf2_RefsetId(446608001L, /* refsetSctIdOriginal */
+//                    "2002.01.31", /* refsetDate */
+//                    "8c230474-9f11-30ce-9cad-185a96fd03a2", /* refsetPathUuidStr */
+//                    "ICD-O", /* refsetPrefTerm */
+//                    "ICD-O", /* refsetFsName */
+//                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
+//            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
 
             // LANGUAGE REFSET FILES "der2_cRefset_Language"
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "concept_language_rf2.refset"), "UTF-8"));
+            BufferedWriter bwRefsetBufferedWriter = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(outDir + "string_simplemap_rf2.refset"), "UTF-8"));
             getLog().info("::: CROSSMAP REFSET FILE: " + outDir + "string_simplemap_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "SimpleMap", ".txt");
             for (Rf2File rf2File : filesIn) {
@@ -131,22 +131,22 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
                     } else if (m.refsetIdL == 900000000000497000L) {
                         m.writeArfId(bwIds);
                     } else if (m.refsetIdL == 446608001L) {
-                        m.writeArfRefset(bw);
+                        m.writeArfRefset(bwRefsetBufferedWriter);
                     } else {
                         throw new UnsupportedOperationException();
                     }
                 }
             }
 
-            bw.flush();
-            bw.close();
+            bwRefsetBufferedWriter.flush();
+            bwRefsetBufferedWriter.close();
 
             bwIds.flush();
             bwIds.close();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException(
-                    "RF2/ARF SctRf2CrossMapToArfMojo NoSuchAlgorithmException error", ex);
+//        } catch (NoSuchAlgorithmException ex) {
+//            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+//            throw new MojoFailureException(
+//                    "RF2/ARF SctRf2CrossMapToArfMojo NoSuchAlgorithmException error", ex);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException(
