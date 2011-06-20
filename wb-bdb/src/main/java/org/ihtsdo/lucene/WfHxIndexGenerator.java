@@ -100,11 +100,21 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	        } else {
 				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(searcherId);
-				System.out.println("About to process: " + members.size() + " values");
+		        
+		        AceLog.getAppLog().log(Level.INFO, "WfHx Lucene capability must first be built.");
+				AceLog.getAppLog().log(Level.INFO, "About to process: " + members.size() + " values");
+				int progressMilestone = members.size() / 10;
 				
+				int rowsProcessed = 0;
+				int tenthsProcessed = 0;
 				for (I_ExtendByRef row : members) {
 			    	UUID wfId = UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
+					
 			    	
+			    	if (rowsProcessed++ % progressMilestone == 0) {
+			    		AceLog.getAppLog().log(Level.INFO, "Have completed " + tenthsProcessed++ + "0% of the values");
+			    	}
+
 			    	if (!lastBeanInWfMap.containsKey(wfId)) {
 			    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), wfId);
 			    		vals = new WorkflowLuceneSearchResult(latestBean);
@@ -112,6 +122,8 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			    		lastBeanInWfMap.put(wfId, vals);
 			    	}
 		        }
+
+				AceLog.getAppLog().log(Level.INFO, "WfHx Initialization completed.");
 			}
 			
 		} catch (TerminologyException e) {
