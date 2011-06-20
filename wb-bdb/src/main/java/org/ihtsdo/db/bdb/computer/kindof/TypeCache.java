@@ -2,7 +2,6 @@ package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -134,7 +133,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 			String stackItem = childNid + "-" + parentNid;
 			if (callsStack.contains(stackItem)) {
 				cancelled = true;
-				System.out.println("Cycle detected!! [TypeCache]");
+				System.out.println("Cycle detected!! [TypeCache] childNid==" + childNid + " parentNid==" + parentNid);
 				return false;
 			}
 			callsStack.add(stackItem);
