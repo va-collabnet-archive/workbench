@@ -37,4 +37,8 @@ public class Refsets {
     public static ConceptSpec DEGREE_OF_SYNONYMY =
             new ConceptSpec("Degree of Synonymy Refset",
             UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847"));
+    
+    public static ConceptSpec REFERS_TO =
+            new ConceptSpec("Refers To Refset",
+            UUID.fromString("1b122b8f-172f-53d5-a2e2-eb1161737c2a"));
 }
