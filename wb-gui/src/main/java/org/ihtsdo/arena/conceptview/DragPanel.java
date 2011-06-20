@@ -104,6 +104,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                     Map<String, Object> globals = new HashMap<String, Object>();
                     globals.put("vc", coordinate);
                     globals.put("actions", list);
+                    globals.put("cvSettings", getSettings());
                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                         AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
                         AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
