@@ -54,8 +54,8 @@ public class Rf2_CrossmapRecord {
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active;
 
-        /* this.pathStr = path; */
-        this.pathStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
+        /* this.pathStr = path; // This would be the ModuleID. */
+        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2"; // SNOMED Core for now.
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
