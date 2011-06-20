@@ -858,4 +858,8 @@ public class ConceptViewRenderer extends JLayeredPane {
     public JScrollPane getConceptScrollPane() {
         return conceptScrollPane;
     }
+    
+    public WizardPanel getWizardPanel() {
+        return wizardPanel;
+    }
 }
