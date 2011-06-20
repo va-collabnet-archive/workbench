@@ -24,31 +24,25 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
-/**
- *
- * @author marc
- */
-public class Rf2_CrossmapRecord {
+public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord> {
 
     private static final String LINE_TERMINATOR = "\r\n";
     private static final String TAB_CHARACTER = "\t";
     // RECORD FIELDS
-    final String id; // UUID
+    final String id;
     final String effDateStr;
     final long timeL;
     final boolean isActive;
     final String pathStr;
     final long refsetIdL;
     final long referencedComponentIdL;
-    final String mapValueStr;
+    final String uuidNormalMember; // For Language refset uuidNormalMember is acceptibilityId
 
-    static String uuidSourceSnomedRtStr = null;
-    static String uuidSourceCtv3Str = null;
-
-    public Rf2_CrossmapRecord(String id, String dateStr, boolean active, String path,
-            long refsetIdL, long referencedComponentIdL, String valueIdL) throws ParseException {
+    public Rf2_RefsetSimpleRecord(String id, String dateStr, boolean active, String path,
+            long refsetIdL, long referencedComponentIdL, String uuid) throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
         this.timeL = Rf2x.convertDateToTime(dateStr);
@@ -59,14 +53,15 @@ public class Rf2_CrossmapRecord {
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
-        this.mapValueStr = valueIdL;
+        this.uuidNormalMember = uuid;
     }
 
-    static Rf2_CrossmapRecord[] parseCrossmapFile(Rf2File f)
-            throws IOException, ParseException {
+    static Rf2_RefsetSimpleRecord[] parseRefset(Rf2File f)
+            throws IOException, ParseException, IOException, TerminologyException {
+        String uuidNormalMember = RefsetAuxiliary.Concept.NORMAL_MEMBER.getPrimoridalUid().toString();
 
         int count = Rf2File.countFileLines(f);
-        Rf2_CrossmapRecord[] a = new Rf2_CrossmapRecord[count];
+        Rf2_RefsetSimpleRecord[] a = new Rf2_RefsetSimpleRecord[count];
 
         // DATA COLUMNS
         int ID = 0;// id
@@ -75,7 +70,6 @@ public class Rf2_CrossmapRecord {
         int MODULE_ID = 3; // moduleId
         int REFSET_ID = 4; // refSetId
         int REFERENCED_COMPONENT_ID = 5; // referencedComponentId
-        int MAP_TARGET_ID = 6; // For Language refset VALUE_ID is ACCEPTIBILITY_ID
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
@@ -89,19 +83,19 @@ public class Rf2_CrossmapRecord {
             Long refsetIdL = Long.parseLong(line[REFSET_ID]);
             idSet.add(refsetIdL);
 
-            a[idx] = new Rf2_CrossmapRecord(line[ID],
+            a[idx] = new Rf2_RefsetSimpleRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertIdToUuidStr(line[MODULE_ID]),
-                    refsetIdL,
+                    Long.parseLong(line[REFSET_ID]),
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-                    line[MAP_TARGET_ID]);
+                    uuidNormalMember);
             idx++;
         }
 
         Long[] aLongs = (Long[]) idSet.toArray(new Long[0]);
         StringBuilder sb = new StringBuilder();
-        sb.append("Crossmap Refset SCT IDs:\r\n");
+        sb.append("Simple Refset SCT IDs:\r\n");
         sb.append(f.file.getName());
         sb.append("\r\n");
         for (Long l : aLongs) {
@@ -115,7 +109,8 @@ public class Rf2_CrossmapRecord {
         return a;
     }
 
-    public void writeArfRefset(BufferedWriter writer) throws IOException, TerminologyException {
+    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException {
+
         // Refset UUID
         writer.append(Rf2x.convertIdToUuidStr(refsetIdL) + TAB_CHARACTER);
 
@@ -135,30 +130,16 @@ public class Rf2_CrossmapRecord {
         writer.append(pathStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
-        writer.append(mapValueStr + LINE_TERMINATOR);
+        writer.append(uuidNormalMember + LINE_TERMINATOR);
     }
 
-    public void writeArfId(BufferedWriter writer) throws IOException, TerminologyException {
-        // REFERENCED_COMPONENT_ID = 5;
-        writer.append(Rf2x.convertIdToUuidStr(referencedComponentIdL) + TAB_CHARACTER);
-        // SOURCE_SYSTEM_UUID = 1;
-        // 446608001 ICD-O
-        // 900000000000498005 SNOMED RT
-        // 900000000000497000 CTV3
-        if (refsetIdL == 900000000000498005L) {
-            writer.append(uuidSourceSnomedRtStr + TAB_CHARACTER);
-        } else if (refsetIdL == 900000000000497000L) {
-            writer.append(uuidSourceCtv3Str + TAB_CHARACTER);
-        } else {
-            throw new UnsupportedOperationException();
+    @Override
+    public int compareTo(Rf2_RefsetSimpleRecord t) {
+        if (this.referencedComponentIdL < t.referencedComponentIdL) {
+            return -1; // instance less than received
+        } else if (this.referencedComponentIdL > t.referencedComponentIdL) {
+            return 1; // instance greater than received
         }
-        // ID_FROM_SOURCE_SYSTEM = 2;
-        writer.append(mapValueStr + TAB_CHARACTER);
-        // STATUS_UUID = 3;
-        writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
-        // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
-        writer.append(effDateStr + TAB_CHARACTER);
-        // PATH_UUID = 5;
-        writer.append(pathStr + LINE_TERMINATOR);
+        return 0; // instance == received
     }
 }

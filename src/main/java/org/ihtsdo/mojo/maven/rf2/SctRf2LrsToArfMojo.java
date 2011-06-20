@@ -108,20 +108,20 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
             // getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
 
             // WRITE REFSET CONCEPTS
-            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
-            refsetIdList.add(new Rf2_RefsetId(900000000000509007L, /* refsetSctIdOriginal */
-                    "2002.01.31",  /* refsetDate */
-                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
-                    "US Language Refset", /* refsetPrefTerm */
-                    "US Language Refset", /* refsetFsName */
-                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
-            refsetIdList.add(new Rf2_RefsetId(900000000000508004L, /* refsetSctIdOriginal */
-                    "2002.01.31",  /* refsetDate */
-                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
-                    "GB Language Refset", /* refsetPrefTerm */
-                    "GB Language Refset", /* refsetFsName */
-                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
-            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
+//            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+//            refsetIdList.add(new Rf2_RefsetId(900000000000509007L, /* refsetSctIdOriginal */
+//                    "2002.01.31",  /* refsetDate */
+//                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
+//                    "US Language Refset", /* refsetPrefTerm */
+//                    "US Language Refset", /* refsetFsName */
+//                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
+//            refsetIdList.add(new Rf2_RefsetId(900000000000508004L, /* refsetSctIdOriginal */
+//                    "2002.01.31",  /* refsetDate */
+//                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
+//                    "GB Language Refset", /* refsetPrefTerm */
+//                    "GB Language Refset", /* refsetFsName */
+//                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
+//            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
 
             // LANGUAGE REFSET FILES "der2_cRefset_Language"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -140,9 +140,9 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
 
             // bwIds.flush();
             // bwIds.close();
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(SctRf2LrsToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo NoSuchAlgorithmException", ex);
+//        } catch (NoSuchAlgorithmException ex) {
+//            Logger.getLogger(SctRf2LrsToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+//            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo NoSuchAlgorithmException", ex);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(SctRf2LrsToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo UnsupportedEncodingException", ex);

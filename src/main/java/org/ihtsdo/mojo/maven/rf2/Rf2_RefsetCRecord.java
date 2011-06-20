@@ -71,7 +71,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f.file),
                 "UTF-8"));
-        Set m = new HashSet<Long>();
+        Set idSet = new HashSet<Long>();
 
         int idx = 0;
         br.readLine(); // Header row
@@ -79,7 +79,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
             Long refsetIdL = Long.parseLong(line[REFSET_ID]);
-            m.add(refsetIdL);
+            idSet.add(refsetIdL);
 
             a[idx] = new Rf2_RefsetCRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
@@ -91,11 +91,15 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             idx++;
         }
 
-        Long[] aLongs = (Long[]) m.toArray(new Long[0]);
+        Long[] aLongs = (Long[]) idSet.toArray(new Long[0]);
         StringBuilder sb = new StringBuilder();
         sb.append("Concept Refset SCT IDs:\r\n");
+        sb.append(f.file.getName());
+        sb.append("\r\n");
         for (Long l : aLongs) {
             sb.append(l.toString());
+            sb.append("\t");
+            sb.append(Rf2x.convertIdToUuidStr(l));
             sb.append("\r\n");
         }
         Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
