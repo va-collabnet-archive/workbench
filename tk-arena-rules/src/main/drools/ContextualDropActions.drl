@@ -12,6 +12,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.context.action.AddFromSpecAction;
 import org.ihtsdo.arena.context.action.AddFromDialectSpecAction;
 import org.ihtsdo.arena.context.action.AddToRelGroupAction;
@@ -43,6 +44,7 @@ import org.ihtsdo.arena.context.action.GroupRelsAction;
 import org.ihtsdo.arena.context.action.SetSynonymyAction;
 import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
+import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -78,6 +80,7 @@ import org.ihtsdo.arena.spec.SynonymyType;
 
 global Collection actions;
 global ViewCoordinate vc;
+global ConceptViewSettings cvSettings;
 
 rule "rule 1" #concept onto different SNOMED concept
 
@@ -783,4 +786,13 @@ rule "rule 57" #change to non-case-sensitive
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget));
+end
+
+rule "rule 58" #retire inappropriate synonym
+	when
+		$dropTarget: DescFact(this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+                                        context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings));
 end
