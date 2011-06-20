@@ -122,7 +122,6 @@ public class SearchWfHxWorker extends SwingWorker<I_UpdateProgress> implements I
     {
         luceneMatches = Collections.synchronizedCollection(new TreeSet<LuceneMatch>());
         matchedWorkflowCount = Integer.MAX_VALUE;
-        AceLog.getAppLog().info("WfCount: " + matchedWorkflowCount);
         I_UpdateProgress updater = new LuceneWfHxProgressUpdator();
         completeLatch = new CountDownLatch(1);
         new MatchUpdator();
