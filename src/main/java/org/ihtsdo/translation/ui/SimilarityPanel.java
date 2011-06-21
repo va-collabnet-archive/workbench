@@ -480,7 +480,8 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		int selectedRow = similarityTable.getSelectedRow();
 		if (selectedRow >= 0) {
 			String target = similarityTable.getValueAt(selectedRow, 0).toString();
-			StringSelection strSel = new StringSelection(target);
+			String noHTMLString = target.replaceAll("\\<.*?>","");
+			StringSelection strSel = new StringSelection(noHTMLString);
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(strSel, strSel);
 		}
