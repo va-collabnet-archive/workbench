@@ -1390,11 +1390,12 @@ public class TranslationConceptEditor6 extends JPanel {
 		mAddPref = new JMenuItem();
 		mAddDesc = new JMenuItem();
 		menu3 = new JMenu();
-		menuItem1 = new JMenuItem();
 		mSpellChk = new JMenuItem();
 		menu2 = new JMenu();
 		mHist = new JMenuItem();
 		mLog = new JMenuItem();
+		menu4 = new JMenu();
+		menuItem1 = new JMenuItem();
 		label14 = new JLabel();
 		label15 = new JLabel();
 		label16 = new JLabel();
@@ -1460,36 +1461,36 @@ public class TranslationConceptEditor6 extends JPanel {
 		menuItem2 = new JMenuItem();
 		menuItem3 = new JMenuItem();
 
-		// ======== this ========
+		//======== this ========
 		setBackground(new Color(238, 238, 238));
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 35, 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {35, 0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 30, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {30, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-			// ======== menuBar1 ========
+			//======== menuBar1 ========
 			{
 
-				// ======== menu1 ========
+				//======== menu1 ========
 				{
 					menu1.setText("E[d]it");
 					menu1.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu1.setMnemonic('D');
 
-					// ---- bAddFSN ----
+					//---- bAddFSN ----
 					bAddFSN.setText("Add Concept FSN");
 					bAddFSN.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					bAddFSN.setMnemonic('F');
-					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					bAddFSN.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					bAddFSN.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1498,11 +1499,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu1.add(bAddFSN);
 
-					// ---- mAddPref ----
+					//---- mAddPref ----
 					mAddPref.setText("Add Concept Preferred");
 					mAddPref.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mAddPref.setMnemonic('P');
-					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					mAddPref.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					mAddPref.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1511,11 +1512,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu1.add(mAddPref);
 
-					// ---- mAddDesc ----
+					//---- mAddDesc ----
 					mAddDesc.setText("Add Concept Description");
 					mAddDesc.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mAddDesc.setMnemonic('D');
-					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					mAddDesc.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					mAddDesc.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1526,29 +1527,17 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				menuBar1.add(menu1);
 
-				// ======== menu3 ========
+				//======== menu3 ========
 				{
 					menu3.setText("[T]ools");
 					menu3.setSelectedIcon(null);
 					menu3.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu3.setMnemonic('T');
 
-					// ---- menuItem1 ----
-					menuItem1.setText("Search Documents");
-					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.META_MASK | KeyEvent.SHIFT_MASK));
-					menuItem1.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
-					menuItem1.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							searchDocumentsActionPerformed(e);
-						}
-					});
-					menu3.add(menuItem1);
-
-					// ---- mSpellChk ----
+					//---- mSpellChk ----
 					mSpellChk.setText("Spellcheck");
 					mSpellChk.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
-					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					mSpellChk.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					mSpellChk.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -1559,16 +1548,16 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				menuBar1.add(menu3);
 
-				// ======== menu2 ========
+				//======== menu2 ========
 				{
 					menu2.setText("[V]iew");
 					menu2.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					menu2.setMnemonic('V');
 
-					// ---- mHist ----
+					//---- mHist ----
 					mHist.setText("History");
 					mHist.setMnemonic('Y');
-					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					mHist.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					mHist.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mHist.addActionListener(new ActionListener() {
 						@Override
@@ -1578,11 +1567,11 @@ public class TranslationConceptEditor6 extends JPanel {
 					});
 					menu2.add(mHist);
 
-					// ---- mLog ----
+					//---- mLog ----
 					mLog.setText("Log");
 					mLog.setMnemonic('G');
 					mLog.setIcon(null);
-					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | KeyEvent.SHIFT_MASK));
+					mLog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
 					mLog.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
 					mLog.addActionListener(new ActionListener() {
 						@Override
@@ -1593,25 +1582,53 @@ public class TranslationConceptEditor6 extends JPanel {
 					menu2.add(mLog);
 				}
 				menuBar1.add(menu2);
-			}
-			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			// ---- label14 ----
+				//======== menu4 ========
+				{
+					menu4.setText("[S]earch");
+					menu4.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
+					menu4.setMnemonic('S');
+
+					//---- menuItem1 ----
+					menuItem1.setText("Search Documents");
+					menuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()|KeyEvent.SHIFT_MASK));
+					menuItem1.setFont(new Font("Lucida Grande", Font.PLAIN, 13));
+					menuItem1.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							searchDocumentsActionPerformed(e);
+						}
+					});
+					menu4.add(menuItem1);
+				}
+				menuBar1.add(menu4);
+			}
+			panel1.add(menuBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- label14 ----
 			label14.setText("S:-");
 			label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label14, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
-			// ---- label15 ----
+			//---- label15 ----
 			label15.setText("TM:-");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label15, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
-			// ---- label16 ----
+			//---- label16 ----
 			label16.setText("LG:-");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label16, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
 
-			// ---- label10 ----
+			//---- label10 ----
 			label10.setText("text");
 			label10.addMouseListener(new MouseAdapter() {
 				@Override
@@ -1619,76 +1636,84 @@ public class TranslationConceptEditor6 extends JPanel {
 					label10MouseClicked(e);
 				}
 			});
-			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(label10, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel10 ========
+		//======== panel10 ========
 		{
 			panel10.setLayout(new GridBagLayout());
-			((GridBagLayout) panel10.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel10.getLayout()).rowHeights = new int[] { 0, 0 };
-			((GridBagLayout) panel10.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel10.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout)panel10.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel10.getLayout()).rowHeights = new int[] {0, 0};
+			((GridBagLayout)panel10.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel10.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-			// ======== splitPane2 ========
+			//======== splitPane2 ========
 			{
 				splitPane2.setToolTipText("Drag to resize");
 				splitPane2.setBackground(new Color(238, 238, 238));
 				splitPane2.setResizeWeight(0.5);
 				splitPane2.setOneTouchExpandable(true);
 
-				// ======== splitPane4 ========
+				//======== splitPane4 ========
 				{
 					splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
 					splitPane4.setOneTouchExpandable(true);
 
-					// ======== panel9 ========
+					//======== panel9 ========
 					{
 						panel9.setBackground(new Color(238, 238, 238));
 						panel9.setLayout(new GridBagLayout());
-						((GridBagLayout) panel9.getLayout()).columnWidths = new int[] { 0, 0 };
-						((GridBagLayout) panel9.getLayout()).rowHeights = new int[] { 20, 90, 0 };
-						((GridBagLayout) panel9.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-						((GridBagLayout) panel9.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+						((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {20, 90, 0};
+						((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-						// ---- label9 ----
+						//---- label9 ----
 						label9.setText("Source Language");
-						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ======== scrollPane1 ========
+						//======== scrollPane1 ========
 						{
 
-							// ---- tabSou ----
+							//---- tabSou ----
 							tabSou.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 							tabSou.setBorder(LineBorder.createBlackLineBorder());
 							tabSou.setAutoCreateRowSorter(true);
 							scrollPane1.setViewportView(tabSou);
 						}
-						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane4.setTopComponent(panel9);
 
-					// ======== tabbedPane2 ========
+					//======== tabbedPane2 ========
 					{
 
-						// ======== panel16 ========
+						//======== panel16 ========
 						{
 							panel16.setLayout(new GridBagLayout());
-							((GridBagLayout) panel16.getLayout()).columnWidths = new int[] { 0, 0 };
-							((GridBagLayout) panel16.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-							((GridBagLayout) panel16.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-							((GridBagLayout) panel16.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+							((GridBagLayout)panel16.getLayout()).columnWidths = new int[] {0, 0};
+							((GridBagLayout)panel16.getLayout()).rowHeights = new int[] {0, 0, 0};
+							((GridBagLayout)panel16.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+							((GridBagLayout)panel16.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-							// ======== panel17 ========
+							//======== panel17 ========
 							{
 								panel17.setLayout(new GridBagLayout());
-								((GridBagLayout) panel17.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-								((GridBagLayout) panel17.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) panel17.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0E-4 };
-								((GridBagLayout) panel17.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+								((GridBagLayout)panel17.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+								((GridBagLayout)panel17.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)panel17.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
+								((GridBagLayout)panel17.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-								// ---- bAddComent ----
+								//---- bAddComent ----
 								bAddComent.setText("[A]dd Comment");
 								bAddComent.setMnemonic('A');
 								bAddComent.addActionListener(new ActionListener() {
@@ -1697,10 +1722,14 @@ public class TranslationConceptEditor6 extends JPanel {
 										bAddComentActionPerformed();
 									}
 								});
-								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
+								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- label17 ----
+								//---- label17 ----
 								label17.setText("text");
 								label17.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1708,17 +1737,21 @@ public class TranslationConceptEditor6 extends JPanel {
 										label17MouseClicked(e);
 									}
 								});
-								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
-							// ======== tabbedPane1 ========
+							//======== tabbedPane1 ========
 							{
 
-								// ======== scrollPane9 ========
+								//======== scrollPane9 ========
 								{
 
-									// ---- tblComm ----
+									//---- tblComm ----
 									tblComm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 									tblComm.addMouseListener(new MouseAdapter() {
 										@Override
@@ -1730,10 +1763,11 @@ public class TranslationConceptEditor6 extends JPanel {
 								}
 								tabbedPane1.addTab("Comments", scrollPane9);
 
-								// ======== scrollPane8 ========
+
+								//======== scrollPane8 ========
 								{
 
-									// ---- refTable ----
+									//---- refTable ----
 									refTable.setEditable(false);
 									refTable.addHyperlinkListener(new HyperlinkListener() {
 										@Override
@@ -1746,18 +1780,21 @@ public class TranslationConceptEditor6 extends JPanel {
 								tabbedPane1.addTab("Web references", scrollPane8);
 
 							}
-							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 						}
 						tabbedPane2.addTab("Comments", panel16);
 
-						// ======== panel11 ========
+
+						//======== panel11 ========
 						{
 							panel11.setBackground(Color.white);
 							panel11.setLayout(new GridBagLayout());
-							((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
-							((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
-							((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-							((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+							((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
+							((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+							((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 						}
 						tabbedPane2.addTab("Issues", panel11);
 						tabbedPane2.setMnemonicAt(1, 'U');
@@ -1766,155 +1803,191 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				splitPane2.setLeftComponent(splitPane4);
 
-				// ======== splitPane1 ========
+				//======== splitPane1 ========
 				{
 					splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
 					splitPane1.setOneTouchExpandable(true);
 
-					// ======== panel8 ========
+					//======== panel8 ========
 					{
 						panel8.setBackground(new Color(238, 238, 238));
 						panel8.setLayout(new GridBagLayout());
-						((GridBagLayout) panel8.getLayout()).columnWidths = new int[] { 0, 0 };
-						((GridBagLayout) panel8.getLayout()).rowHeights = new int[] { 0, 105, 0, 34, 0 };
-						((GridBagLayout) panel8.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-						((GridBagLayout) panel8.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
+						((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 105, 0, 34, 0};
+						((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
 
-						// ---- label11 ----
+						//---- label11 ----
 						label11.setText("Target Language");
 						label11.setBackground(new Color(238, 238, 238));
-						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ======== scrollPane6 ========
+						//======== scrollPane6 ========
 						{
 
-							// ---- tabTar ----
+							//---- tabTar ----
 							tabTar.setAutoCreateRowSorter(true);
 							tabTar.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 							tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 							tabTar.setBorder(LineBorder.createBlackLineBorder());
 							scrollPane6.setViewportView(tabTar);
 						}
-						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ======== panel2 ========
+						//======== panel2 ========
 						{
 							panel2.setBorder(LineBorder.createBlackLineBorder());
 							panel2.setBackground(new Color(238, 238, 238));
 							panel2.setLayout(new GridBagLayout());
-							((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 5, 0 };
-							((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 13, 26, 23, 23, 33, 0, 0, 0 };
-							((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4 };
-							((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+							((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 5, 0};
+							((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {13, 26, 23, 23, 33, 0, 0, 0};
+							((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4};
+							((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-							// ---- label2 ----
+							//---- label2 ----
 							label2.setText("Term:");
-							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 10, 5, 5), 0, 0));
 
-							// ======== scrollPane5 ========
+							//======== scrollPane5 ========
 							{
 
-								// ---- targetTextField ----
+								//---- targetTextField ----
 								targetTextField.setRows(2);
 								scrollPane5.setViewportView(targetTextField);
 							}
-							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ---- label1 ----
+							//---- label1 ----
 							label1.setText("Term Type:");
-							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 10, 5, 5), 0, 0));
 
-							// ======== panel7 ========
+							//======== panel7 ========
 							{
 								panel7.setBackground(new Color(238, 238, 238));
 								panel7.setLayout(new FlowLayout(FlowLayout.LEFT));
 								panel7.add(label4);
 								panel7.add(comboBox1);
 							}
-							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ======== panel5 ========
+							//======== panel5 ========
 							{
 								panel5.setBackground(new Color(238, 238, 238));
 								panel5.setLayout(new GridBagLayout());
-								((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 15, 0, 0, 0 };
-								((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
-								((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+								((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {15, 0, 0, 0};
+								((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+								((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-								// ---- label5 ----
+								//---- label5 ----
 								label5.setText("Acceptability:");
-								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
+								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ---- label3 ----
+							//---- label3 ----
 							label3.setText("Is case significant ?");
-							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 10, 5, 5), 0, 0));
+							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 10, 5, 5), 0, 0));
 
-							// ======== panel4 ========
+							//======== panel4 ========
 							{
 								panel4.setBackground(new Color(238, 238, 238));
 								panel4.setLayout(new GridBagLayout());
-								((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-								((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-								((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+								((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+								((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+								((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-								// ---- rbYes ----
+								//---- rbYes ----
 								rbYes.setText("Yes");
 								rbYes.setBackground(new Color(238, 238, 238));
-								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
+								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- label6 ----
+								//---- label6 ----
 								label6.setText("    ");
-								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
+								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- rbNo ----
+								//---- rbNo ----
 								rbNo.setSelected(true);
 								rbNo.setText("No");
 								rbNo.setBackground(new Color(238, 238, 238));
-								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ======== panel14 ========
+							//======== panel14 ========
 							{
 								panel14.setBackground(new Color(238, 238, 238));
 								panel14.setLayout(new GridBagLayout());
-								((GridBagLayout) panel14.getLayout()).columnWidths = new int[] { 15, 0, 0, 0, 0, 0, 0 };
-								((GridBagLayout) panel14.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) panel14.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-								((GridBagLayout) panel14.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+								((GridBagLayout)panel14.getLayout()).columnWidths = new int[] {15, 0, 0, 0, 0, 0, 0};
+								((GridBagLayout)panel14.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)panel14.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+								((GridBagLayout)panel14.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-								// ---- label7 ----
+								//---- label7 ----
 								label7.setText("Status:");
-								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
+								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- rbAct ----
+								//---- rbAct ----
 								rbAct.setText("Active");
 								rbAct.setSelected(true);
 								rbAct.setBackground(new Color(238, 238, 238));
-								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 5), 0, 0));
+								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- rbInact ----
+								//---- rbInact ----
 								rbInact.setText("Inactive");
 								rbInact.setBackground(new Color(238, 238, 238));
-								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
+							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 5, 5), 0, 0));
 
-							// ======== panel3 ========
+							//======== panel3 ========
 							{
 								panel3.setBackground(new Color(238, 238, 238));
 								panel3.setLayout(new GridBagLayout());
-								((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-								((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
-								((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+								((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+								((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+								((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-								// ---- label13 ----
+								//---- label13 ----
 								label13.setText("text");
 								label13.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1922,27 +1995,33 @@ public class TranslationConceptEditor6 extends JPanel {
 										label13MouseClicked(e);
 									}
 								});
-								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 0), 0, 0));
 							}
-							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
+							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
+								GridBagConstraints.EAST, GridBagConstraints.NONE,
+								new Insets(0, 0, 0, 5), 0, 0));
 						}
-						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ======== panel6 ========
+						//======== panel6 ========
 						{
 							panel6.setBorder(LineBorder.createBlackLineBorder());
 							panel6.setLayout(new BoxLayout(panel6, BoxLayout.Y_AXIS));
 
-							// ======== buttonPanel ========
+							//======== buttonPanel ========
 							{
 								buttonPanel.setBackground(new Color(238, 238, 238));
 								buttonPanel.setLayout(new GridBagLayout());
-								((GridBagLayout) buttonPanel.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-								((GridBagLayout) buttonPanel.getLayout()).rowHeights = new int[] { 0, 0 };
-								((GridBagLayout) buttonPanel.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
-								((GridBagLayout) buttonPanel.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
+								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
+								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-								// ---- label12 ----
+								//---- label12 ----
 								label12.setText("text");
 								label12.addMouseListener(new MouseAdapter() {
 									@Override
@@ -1950,13 +2029,17 @@ public class TranslationConceptEditor6 extends JPanel {
 										label12MouseClicked(e);
 									}
 								});
-								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- label8 ----
+								//---- label8 ----
 								label8.setText("Workflow actions:      ");
-								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- bKeep ----
+								//---- bKeep ----
 								bKeep.setText("Keep in inbox");
 								bKeep.setIcon(new ImageIcon("icons/cabinet.gif"));
 								bKeep.addActionListener(new ActionListener() {
@@ -1965,9 +2048,11 @@ public class TranslationConceptEditor6 extends JPanel {
 										bKeepActionPerformed();
 									}
 								});
-								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- bReview ----
+								//---- bReview ----
 								bReview.setText("Send to reviewer");
 								bReview.setIcon(new ImageIcon("icons/reviewer.gif"));
 								bReview.addActionListener(new ActionListener() {
@@ -1976,9 +2061,11 @@ public class TranslationConceptEditor6 extends JPanel {
 										bReviewActionPerformed();
 									}
 								});
-								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 
-								// ---- bEscalate ----
+								//---- bEscalate ----
 								bEscalate.setText("Escalate");
 								bEscalate.setIcon(new ImageIcon("icons/editor.gif"));
 								bEscalate.addActionListener(new ActionListener() {
@@ -1987,21 +2074,25 @@ public class TranslationConceptEditor6 extends JPanel {
 										bEscalateActionPerformed();
 									}
 								});
-								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
+								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
 							}
 							panel6.add(buttonPanel);
 						}
-						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
 					splitPane1.setTopComponent(panel8);
 
-					// ======== tabbedPane3 ========
+					//======== tabbedPane3 ========
 					{
 
-						// ======== scrollPane7 ========
+						//======== scrollPane7 ========
 						{
 
-							// ---- tree3 ----
+							//---- tree3 ----
 							tree3.setVisibleRowCount(4);
 							scrollPane7.setViewportView(tree3);
 						}
@@ -2014,14 +2105,18 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 				splitPane2.setRightComponent(splitPane1);
 			}
-			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 
-		// ======== popupMenu1 ========
+		//======== popupMenu1 ========
 		{
 
-			// ---- menuItem2 ----
+			//---- menuItem2 ----
 			menuItem2.setText("Delete");
 			menuItem2.addActionListener(new ActionListener() {
 				@Override
@@ -2031,7 +2126,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			});
 			popupMenu1.add(menuItem2);
 
-			// ---- menuItem3 ----
+			//---- menuItem3 ----
 			menuItem3.setText("View Comment");
 			menuItem3.addActionListener(new ActionListener() {
 				@Override
@@ -2042,12 +2137,12 @@ public class TranslationConceptEditor6 extends JPanel {
 			popupMenu1.add(menuItem3);
 		}
 
-		// ---- buttonGroup1 ----
+		//---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rbYes);
 		buttonGroup1.add(rbNo);
 
-		// ---- buttonGroup3 ----
+		//---- buttonGroup3 ----
 		ButtonGroup buttonGroup3 = new ButtonGroup();
 		buttonGroup3.add(rbAct);
 		buttonGroup3.add(rbInact);
@@ -2063,11 +2158,12 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JMenuItem mAddPref;
 	private JMenuItem mAddDesc;
 	private JMenu menu3;
-	private JMenuItem menuItem1;
 	private JMenuItem mSpellChk;
 	private JMenu menu2;
 	private JMenuItem mHist;
 	private JMenuItem mLog;
+	private JMenu menu4;
+	private JMenuItem menuItem1;
 	private JLabel label14;
 	private JLabel label15;
 	private JLabel label16;
