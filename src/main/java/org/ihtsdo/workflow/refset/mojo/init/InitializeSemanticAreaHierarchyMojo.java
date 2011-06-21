@@ -1,7 +1,7 @@
 package org.ihtsdo.workflow.refset.mojo.init;
 
-import java.io.File;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -49,13 +49,16 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
         try {
 
             SemanticAreaHierarchyRefsetWriter writer = new SemanticAreaHierarchyRefsetWriter();
+            String line = null;
+        	BufferedReader inputFile = new BufferedReader(new FileReader(filePath));    	
 
-            Scanner scanner = new Scanner(new File(filePath));
-
-            while (scanner.hasNextLine())
+        	while ((line = inputFile.readLine()) != null)
             {
-            	String line = scanner.nextLine();
-            	String[] columns = line.split("\t");
+        		if (line.trim().length() == 0) {
+        			continue;
+        		}
+
+        		String[] columns = line.split("\t");
             
         		if (columns.length == numberOfColumns)
         		{
@@ -68,9 +71,7 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
     			}
             }
 
-            // Single RefCompId, so commit at end
-
-            Terms.get().addUncommitted(writer.getRefsetConcept());
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Exception: " + e.getMessage());
 		}

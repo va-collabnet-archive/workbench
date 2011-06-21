@@ -1,8 +1,9 @@
 package org.ihtsdo.workflow.refset.mojo.init;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -65,12 +66,15 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
         try {
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
-            Scanner scanner = new Scanner(new File(filePath));
+        	BufferedReader inputFile = new BufferedReader(new FileReader(filePath));    	
 
-            while (scanner.hasNextLine())
+        	while ((line = inputFile.readLine()) != null)
             {
-            	line = scanner.nextLine();
-            	String[] columns = line.split("\t");
+        		if (line.trim().length() == 0) {
+        			continue;
+        		}
+
+        		String[] columns = line.split("\t");
 
         		if (columns.length == numberOfColumns)
         		{
@@ -84,7 +88,7 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
     			}
             }
 
-            Terms.get().addUncommitted(writer.getRefsetConcept());
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
         } catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, line);
 		}

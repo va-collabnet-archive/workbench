@@ -50,8 +50,8 @@ public class SimpleUniversalAcePosition {
     }
 
     public long getTime() throws ParseException {
-        if (timeStr == null) {
-            return Integer.MAX_VALUE;
+        if (timeStr == null || timeStr.equalsIgnoreCase("latest")) {
+            return Long.MAX_VALUE;
         }
         Date date = dateParser.parse(timeStr);
         return date.getTime();

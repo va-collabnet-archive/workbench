@@ -46,6 +46,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -272,7 +274,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * mutually exclusive to others directories in the array.
      * 
      * @parameter 
-     * @required
      */
     private Sct1Dir[] sct1Dirs;
     /**
@@ -387,8 +388,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private static int uuidSourceSnomedIdx;
     private static UUID uuidSourceCtv3;
     private static UUID uuidSourceSnomedRt;
-    private SimpleDateFormat arfSimpleDateFormat;
+    private SimpleDateFormat arfSimpleDateFormatDash;
     private SimpleDateFormat arfSimpleDateFormatDot;
+    private SimpleDateFormat arfSimpleDateFormat;
 
     private class ARFFile {
 
@@ -578,13 +580,24 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private String[] zRelCharStrArray;
 
     private int lookupRelCharTypeIdx(String uuid) {
+        int max = zRelCharArray.length;
         int idx = 0;
-        while (idx < 6) {
+        while (idx < max) {
             if (uuid.equalsIgnoreCase(zRelCharStrArray[idx])) {
-                break;
+                return idx;
             }
             idx++;
         }
+
+        // GROW ARRAYS
+        max = max + 1;
+        UUID[] tmpUuidArray = Arrays.copyOf(zRelCharArray, max);
+        tmpUuidArray[idx] = UUID.fromString(uuid);
+        zRelCharArray = tmpUuidArray;
+
+        String[] tmpStrArray = Arrays.copyOf(zRelCharStrArray, max);
+        tmpStrArray[idx] = uuid;
+        zRelCharStrArray = tmpStrArray;
         return idx;
     }
     // RELATIONSHIP REFINIBILITY LOOKUP
@@ -592,13 +605,24 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private String[] zRelRefStrArray;
 
     private int lookupRelRefTypeIdx(String uuid) {
+        int max = zRelRefArray.length;
         int idx = 0;
-        while (idx < 3) {
+        while (idx < max) {
             if (uuid.equalsIgnoreCase(zRelRefStrArray[idx])) {
-                break;
+                return idx;
             }
             idx++;
         }
+        // GROW ARRAYS
+        max = max + 1;
+        UUID[] tmpUuidArray = Arrays.copyOf(zRelRefArray, max);
+        tmpUuidArray[idx] = UUID.fromString(uuid);
+        zRelRefArray = tmpUuidArray;
+
+        String[] tmpStrArray = Arrays.copyOf(zRelRefStrArray, max);
+        tmpStrArray[idx] = uuid;
+        zRelRefStrArray = tmpStrArray;
+
         return idx;
     }
 
@@ -823,12 +847,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
 
         // SHOW input directories from POM file
-        for (int i = 0; i < sct1Dirs.length; i++) {
-            sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
-                    File.separatorChar));
-            getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
-            if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
-                sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
+        if (sct1Dirs != null) {
+            for (int i = 0; i < sct1Dirs.length; i++) {
+                sct1Dirs[i].setDirectoryName(sct1Dirs[i].getDirectoryName().replace('/',
+                        File.separatorChar));
+                getLog().info("POM SCT Input Directory (" + i + ") = " + sct1Dirs[i]);
+                if (!sct1Dirs[i].getDirectoryName().startsWith(FILE_SEPARATOR)) {
+                    sct1Dirs[i].setDirectoryName(FILE_SEPARATOR + sct1Dirs[i].getDirectoryName());
+                }
             }
         }
 
@@ -876,30 +902,31 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         if (dateStopObj != null) {
             getLog().info(":::  Stop date (inclusive) = " + sdf.format(dateStopObj));
         }
-
-        for (int i = 0; i < sctDirs.length; i++) {
-            getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
-            getLog().info(
-                    ":::     UUID Core:     " + sctDirs[i].getWbPathUuidCore() + " : "
-                    + sctDirs[i].getWbPathUuidCoreFromName());
-            getLog().info(
-                    ":::     UUID Stated:   " + sctDirs[i].getWbPathUuidStated() + " : "
-                    + sctDirs[i].getWbPathUuidStatedFromName());
-            getLog().info(
-                    ":::     UUID Inferred: " + sctDirs[i].getWbPathUuidInferred() + " : "
-                    + sctDirs[i].getWbPathUuidInferredFromName());
-            getLog().info(
-                    ":::     Keep Qualifier Rels from _inferred_ file:  "
-                    + sctDirs[i].getKeepQualifierFromInferred());
-            getLog().info(
-                    ":::     Keep Historical Rels from _inferred_ file: "
-                    + sctDirs[i].getKeepHistoricalFromInferred());
-            getLog().info(
-                    ":::     Keep Additional Rels from _inferred_ file: "
-                    + sctDirs[i].getKeepAdditionalFromInferred());
-            getLog().info(
-                    ":::     Map SCT REL IDs from inferred to stated: "
-                    + sctDirs[i].doMapSctIdInferredToStated());
+        if (sctDirs != null) {
+            for (int i = 0; i < sctDirs.length; i++) {
+                getLog().info("::: SCT Input Directory (" + i + ") = " + sctDirs[i].getDirectoryName());
+                getLog().info(
+                        ":::     UUID Core:     " + sctDirs[i].getWbPathUuidCore() + " : "
+                        + sctDirs[i].getWbPathUuidCoreFromName());
+                getLog().info(
+                        ":::     UUID Stated:   " + sctDirs[i].getWbPathUuidStated() + " : "
+                        + sctDirs[i].getWbPathUuidStatedFromName());
+                getLog().info(
+                        ":::     UUID Inferred: " + sctDirs[i].getWbPathUuidInferred() + " : "
+                        + sctDirs[i].getWbPathUuidInferredFromName());
+                getLog().info(
+                        ":::     Keep Qualifier Rels from _inferred_ file:  "
+                        + sctDirs[i].getKeepQualifierFromInferred());
+                getLog().info(
+                        ":::     Keep Historical Rels from _inferred_ file: "
+                        + sctDirs[i].getKeepHistoricalFromInferred());
+                getLog().info(
+                        ":::     Keep Additional Rels from _inferred_ file: "
+                        + sctDirs[i].getKeepAdditionalFromInferred());
+                getLog().info(
+                        ":::     Map SCT REL IDs from inferred to stated: "
+                        + sctDirs[i].doMapSctIdInferredToStated());
+            }
         }
         for (int i = 0; i < arfDirs.length; i++) {
             getLog().info("::: ARF Input Directory (" + i + ") = " + arfDirs[i]);
@@ -954,8 +981,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         // Setup target (build) directory
         getLog().info("    Target Build Directory: " + tDir);
 
-        arfSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        arfSimpleDateFormatDash = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         arfSimpleDateFormatDot = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        arfSimpleDateFormat = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
         ObjectOutputStream oosCon = null;
         ObjectOutputStream oosDes = null;
@@ -1005,9 +1033,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             // STEP #1. Convert to versioned binary objects file.  
             // Also computes algorithmic relationship uuid.
-            executeMojoStep1(tDir, tSubDir, sctDirs, ctv3idTF, snomedrtTF, oosCon, oosDes, oosRel,
-                    oosIds);
-            System.gc();
+            if (sctDirs != null) {
+                executeMojoStep1(tDir, tSubDir, sctDirs, ctv3idTF, snomedrtTF, oosCon, oosDes, oosRel,
+                        oosIds);
+                System.gc();
+            }
 
             // STEP #2. Convert arf files to versioned binary objects file.
             // Uses existing relationship uuid
@@ -1029,7 +1059,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
             // STEP #4. Add IDs to components.
-            executeMojoStep4();
+            executeMojoStep4_MatchIds();
             System.gc();
 
             // STEP #5. Add IDs to components.
@@ -1191,9 +1221,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             getLog().info(e1);
         } catch (IOException e) {
             getLog().info(e);
-        } catch (ParseException e) {
-            getLog().info("FAILED: ParseException");
-            getLog().info(e);
         }
 
         getLog().info(
@@ -1203,7 +1230,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfConFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfConFile(f.file, oos);
@@ -1211,7 +1238,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfConFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1224,7 +1251,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
-            // Status UUID
+            // Concept UUID
             UUID uuidCon = UUID.fromString(line[CONCEPT_UUID]);
             // Status
             int conceptStatus = lookupZStatusUuidIdx(line[CONCEPT_STATUS]);
@@ -1249,7 +1276,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfDesFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfDesFile(f.file, oos);
@@ -1257,7 +1284,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfDesFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1334,7 +1361,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRelFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRelFile(f.file, oos);
@@ -1342,7 +1369,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfRelFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1356,6 +1383,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         int GROUP = 7;
         int EFFECTIVE_DATE = 8; // yyyy-MM-dd HH:mm:ss
         int PATH_UUID = 9;
+        int AUTHOR_UUID = 10;
 
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
@@ -1380,9 +1408,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
             // PATH_UUID = 9;
             int pathIdx = lookupZPathIdx(line[PATH_UUID]);
+            // USER_UUID
+            int userIdx = USER_DEFAULT_IDX;
+            if (line[PATH_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
+                userIdx = USER_SNOROCKET_IDX;
+            }
 
             Sct1_RelRecord tmpRelRec = new Sct1_RelRecord(uuidRelId, status, uuidC1, roleTypeIdx,
-                    uuidC2, characteristic, refinability, group, revTime, pathIdx);
+                    uuidC2, characteristic, refinability, group, revTime, pathIdx, userIdx);
 
             oos.writeUnshared(tmpRelRec);
         }
@@ -1391,7 +1424,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfIdsFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfIdsFile(f.file, oos);
@@ -1399,7 +1432,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException, ParseException {
+    private void parseArfIdsFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1436,7 +1469,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsBoolFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsBoolFile(f.file, oos);
@@ -1444,8 +1477,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsBoolFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1499,7 +1531,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsConFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsConFile(f.file, oos);
@@ -1507,8 +1539,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsConFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1555,7 +1586,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsIntFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsIntFile(f.file, oos);
@@ -1563,8 +1594,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsIntFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1611,7 +1641,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
 
     private void processArfRsStrFiles(String wDir, List<List<ARFFile>> listOfDirs,
-            ObjectOutputStream oos) throws IOException, ParseException {
+            ObjectOutputStream oos) throws IOException, MojoFailureException {
         for (List<ARFFile> laf : listOfDirs) {
             for (ARFFile f : laf) {
                 parseArfRsStrFile(f.file, oos);
@@ -1619,8 +1649,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
     }
 
-    private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException,
-            ParseException {
+    private void parseArfRsStrFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
                 "UTF-8"));
 
@@ -1764,7 +1793,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
     }
 
-    private void executeMojoStep4() throws MojoFailureException {
+    private void executeMojoStep4_MatchIds() throws MojoFailureException {
         getLog().info("*** Sct1ArfToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
         long start = System.currentTimeMillis();
         int nWrite = 0; // counter for memory optimization for object files writing
@@ -1837,10 +1866,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
                 if (match == 0) {
                     // MATCH
-                    if (tmpCon.addedIds == null) {
-                        tmpCon.addedIds = new ArrayList<Sct1_IdRecord>();
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpCon.conSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpCon.addedIds == null) {
+                            tmpCon.addedIds = new ArrayList<Sct1_IdRecord>();
+                        }
+                        tmpCon.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpCon.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) {
                     // Ids are ahead of the concepts.
@@ -1911,10 +1944,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 Sct1_DesRecord tmpDes = aDes.get(theDesIdx);
                 int match = checkIdDesMatched(aId.get(theIdIdx), tmpDes);
                 if (match == 0) { // MATCH
-                    if (tmpDes.addedIds == null) {
-                        tmpDes.addedIds = new ArrayList<Sct1_IdRecord>();
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpDes.desSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpDes.addedIds == null) {
+                            tmpDes.addedIds = new ArrayList<Sct1_IdRecord>();
+                        }
+                        tmpDes.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpDes.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) { // Ids are ahead of the descriptions.
                     oos.writeUnshared(tmpDes); // Save this description.
@@ -1982,10 +2019,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 int match = checkIdRelMatched(aId.get(theIdIdx), tmpRel);
 
                 if (match == 0) { // MATCH
-                    if (tmpRel.addedIds == null) {
-                        tmpRel.addedIds = new ArrayList<Sct1_IdRecord>(1);
+                    if (aId.get(theIdIdx).srcSystemIdx == 0) {
+                        tmpRel.relSnoId = aId.get(theIdIdx).denotationLong;
+                    } else {
+                        if (tmpRel.addedIds == null) {
+                            tmpRel.addedIds = new ArrayList<Sct1_IdRecord>(1);
+                        }
+                        tmpRel.addedIds.add(aId.get(theIdIdx));
                     }
-                    tmpRel.addedIds.add(aId.get(theIdIdx));
                     theIdIdx++; // Get next id.
                 } else if (match == 1) { // Ids are ahead of the relationships.
                     oos.writeUnshared(tmpRel); // Save this relationship.
@@ -3036,7 +3077,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             if (theCon.compareTo(theDes) != IS_EQUAL || theCon.compareTo(theRel) != IS_EQUAL /*|| theCon != theRelDest*/) {
                 getLog().info("CONFIRM: ROOT CONCEPT ");
                 UUID uuid = new UUID(conList.get(0).conUuidMsb, conList.get(0).conUuidLsb);
-                getLog().info(" -is- concept SNOMED id =" + uuid.toString());
+                getLog().info(" -is- concept SNOMED UUID =" + uuid.toString());
+                getLog().info(" -is- concept SNOMED id =" + conList.get(0).conSnoId);
                 getLog().info(" -is- concept counter #" + countCon);
                 getLog().info(" -is- description \"" + desList.get(0).termText + "\"\r\n");
                 getLog().info(
@@ -5624,11 +5666,18 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     }
 
-    private long convertDateStrToTime(String date) throws ParseException {
-        if (date.contains(".")) {
-            return (arfSimpleDateFormatDot.parse(date)).getTime();
-        } else {
-            return arfSimpleDateFormat.parse(date).getTime();
+    private long convertDateStrToTime(String date) throws MojoFailureException {
+        try {
+            if (date.contains(".")) {
+                return (arfSimpleDateFormatDot.parse(date)).getTime();
+            } else if (date.contains("-")) {
+                return arfSimpleDateFormatDash.parse(date).getTime();
+            } else {
+                return arfSimpleDateFormat.parse(date).getTime();
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("CAN NOT PARSE DATE: " + date, ex);
         }
     }
 

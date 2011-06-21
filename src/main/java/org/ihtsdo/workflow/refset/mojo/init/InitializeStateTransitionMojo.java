@@ -1,8 +1,9 @@
 package org.ihtsdo.workflow.refset.mojo.init;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -59,10 +60,9 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
         try {
             writer = new StateTransitionRefsetWriter();
             processStateTransitions(filePath);
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize state transition refset with error: " + e.getMessage());
 		}
 	}
 
@@ -71,16 +71,15 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
     }
 
     private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException {
-        Scanner scanner = new Scanner(f);
+    	BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
     	writer.setWorkflowType(useType);
+    	String line = null;
 
-        while (scanner.hasNextLine())
+    	while ((line = inputFile.readLine()) != null)
         {
-        	String line = scanner.nextLine();
-        	
-        	if (line.trim().length() == 0)
+        	if (line.trim().length() == 0) {
         		continue;
-        	
+        	}
         	
         	String[] columns = line.split("\t");
 
@@ -99,7 +98,5 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
             	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
         	}
         }
-        
-        Terms.get().addUncommitted(writer.getRefsetConcept());
     }
 }

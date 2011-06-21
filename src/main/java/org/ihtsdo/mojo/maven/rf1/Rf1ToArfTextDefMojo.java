@@ -188,7 +188,7 @@ public class Rf1ToArfTextDefMojo extends AbstractMojo implements Serializable {
             getLog().info("OUTPUT DIRECTORY: " + tDir + outDir);
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.ss HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
         if (dateStartObj != null)
             getLog().info("::: Start date (inclusive) = " + sdf.format(dateStartObj));
         if (dateStopObj != null)

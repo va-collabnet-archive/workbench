@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-14-SNAPSHOT</version>
+		<version>2.6.0-trek-15-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
@@ -39,11 +39,6 @@
 			<artifactId>easymockclassextension</artifactId>
 			<version>2.4</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ihtsdo</groupId>
-			<artifactId>wb-wf</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.doxia</groupId>
@@ -184,7 +179,19 @@
 		</plugins>
 	</reporting>
 	<profiles>
-	<profile>
+		<profile>
+			<id>add-tools</id> <!-- should work on windows and linux systems -->
+			<dependencies>
+				<dependency>
+					<groupId>sun.jdk</groupId>
+					<artifactId>tools</artifactId>
+					<version>any</version>
+					<scope>system</scope>
+					<systemPath>${java.home}/../lib/tools.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+		<!-- <profile>
 		<id>add-tools-on-windows</id>
 			<activation>
 				<os>
@@ -197,7 +204,7 @@
 					<artifactId>tools</artifactId>
 					<version>any</version>
 					<scope>system</scope>
-					<systemPath>${java.home}\..\lib\tools.jar</systemPath>
+					<systemPath>C:\SoftwareApps\Java\jdk1.6.0_20\lib\tools.jar</systemPath>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -217,7 +224,7 @@
 					<systemPath>${java.home}/../lib/tools.jar</systemPath>
 				</dependency>
 			</dependencies>
-		</profile>
+		</profile> -->
 		<profile>
 			<id>genweb</id>
 			<activation>

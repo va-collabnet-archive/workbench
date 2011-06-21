@@ -495,11 +495,41 @@ public class Rf1ToArfHistoryTableReferenceMojo extends AbstractMojo implements S
             sb.append(uuidRefersToRefset + TAB_CHARACTER);
             break;
         }
-
+        
+        
+        /*To create consistent algorithm to generated uuid in workbench*/
+        UUID uuid = null;
+        
         // MEMBER_UUID ... of refset member
-        UUID uuid = Type5UuidFactory.get(Rf1Dir.HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1
-                + htr.componentSid + htr.referenceType + htr.referencedSid);
+        switch (htr.referenceType) {
+        case 1: // REPLACED BY
+        	uuid = Type5UuidFactory.get("900000000000526001" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String REPLACED_REFERENCES_REFSET_ID = "900000000000526001";
+            break;
+        case 2: // DUPLICATED BY
+        	uuid = Type5UuidFactory.get("900000000000523009" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String DUPLICATE_REFERENCES_REFSET_ID = "900000000000523009";
+            break;
+        case 3: // SIMILAR TO
+        	uuid = Type5UuidFactory.get("900000000000529008" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String SIMILAR_REFERENCES_REFSET_ID = "900000000000529008";
+            break;
+        case 4: // ALTERNATIVE
+        	uuid = Type5UuidFactory.get("900000000000530003" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String ALTERNATIVE_REFERENCES_REFSET_ID = "900000000000530003";
+            break;
+        case 5: // MOVED TO
+        	uuid = Type5UuidFactory.get("900000000000524003" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid));//public final static String MOVED_TO_REFERENCES_REFSET_ID = "900000000000524003";
+            break;
+        case 6: // MOVED FROM
+        	uuid = Type5UuidFactory.get("900000000000525002" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String MOVED_FROM_REFERENCES_REFSET_ID = "900000000000525002";
+            break;
+        case 7: // REFERS TO
+        	uuid = Type5UuidFactory.get("900000000000531004" +Long.toString(htr.componentSid) + Long.toString(htr.referencedSid)); //public final static String REFERS_REFERENCES_REFSET_ID = "900000000000531004";
+            break;
+        default:
+            uuid = Type5UuidFactory.get(Rf1Dir.HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1
+                   + htr.componentSid + htr.referenceType + htr.referencedSid);
+        }
+        
         sb.append(uuid.toString() + TAB_CHARACTER);
+        
 
         // STATUS_UUID
         if (htr.status == 0)

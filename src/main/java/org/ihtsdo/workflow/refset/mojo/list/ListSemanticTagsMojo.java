@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,17 +18,18 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semArea.SemanticAreaSearchRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
 
 /**
  * @author Jesse Efron
  * 
- * @goal list-semantic-area-search-refset
+ * @goal list-semantic-tags-refset
  * @requiresDependencyResolution compile
  */
 
-public class ListSemanticAreaSearchMojo extends AbstractMojo {
+public class ListSemanticTagsMojo extends AbstractMojo {
 
     /**
      * Location of the build directory.
@@ -44,13 +46,11 @@ public class ListSemanticAreaSearchMojo extends AbstractMojo {
     {
         System.setProperty("java.awt.headless", "true");
         try {
-            SemanticAreaSearchRefset refset = new SemanticAreaSearchRefset();
+            SemanticTagsRefset refset = new SemanticTagsRefset();
             HashSet<String> members = getRefsetMembers(refset.getRefsetId());            
             printRefsetMembers(members);
 		} catch (Exception e) {
-			e.printStackTrace();
-			e.getMessage();
-			throw new MojoExecutionException(e.getMessage());
+			AceLog.getAppLog().log(Level.WARNING, "Unable to read semantic tags refset with error: " + e.getMessage());
 		}
 	}
     public File getTargetDirectory() {
@@ -94,7 +94,7 @@ public class ListSemanticAreaSearchMojo extends AbstractMojo {
     private void printRefsetMembers(HashSet<String> members) {
     	Iterator itr = members.iterator();
     	while (itr.hasNext()) {
-    		//System.out.println("Next: " + ((String)itr.next()));
+    		System.out.println("Next: " + ((String)itr.next()));
     	}
     }
 
