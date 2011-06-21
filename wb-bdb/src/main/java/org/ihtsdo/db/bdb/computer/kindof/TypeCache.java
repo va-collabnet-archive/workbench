@@ -34,6 +34,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	private boolean ready = false;
 	private boolean cancelled = false;
 	private CountDownLatch latch = new CountDownLatch(1);
+	protected int maxSubtypeIterations = 500;
 	protected NidSetBI types;
 
 	@Override
@@ -95,9 +96,8 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	 */
 	@Override
 	public boolean isKindOf(int childNid, int parentNid) throws Exception {
-		Set<String> callsStack = new HashSet<String>();
-		boolean result = isKindOfNoLatch(childNid, parentNid, callsStack);
-		callsStack = new HashSet<String>();
+		int subtypeIterations = 0;
+		boolean result = isKindOfNoLatch(childNid, parentNid, subtypeIterations);
 		cancelled = false;
 		return result;
 	}
@@ -128,22 +128,21 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		}
 	}
 
-	protected boolean isKindOfNoLatch(int childNid, int parentNid, Set<String> callsStack) {
+	protected boolean isKindOfNoLatch(int childNid, int parentNid, int subtypeIterations) {
 		if (!cancelled) {
-			String stackItem = childNid + "-" + parentNid;
-			if (callsStack.contains(stackItem)) {
+			if (childNid == parentNid) {
+				return true;
+			}
+			subtypeIterations++;
+			if (subtypeIterations >= maxSubtypeIterations) {
 				cancelled = true;
 				System.out.println("Infinite loop prevented. [TypeCache] Cause: Existing cycle between childNid==" + childNid + " parentNid==" + parentNid);
 				return false;
 			}
-			callsStack.add(stackItem);
-			if (childNid == parentNid) {
-				return true;
-			}
 			int[] parents = (int[]) typeMap.get(childNid);
 			if (parents != null) {
 				for (int pNid : parents) {
-					if (isKindOfNoLatch(pNid, parentNid, callsStack)) {
+					if (isKindOfNoLatch(pNid, parentNid, subtypeIterations)) {
 						return true;
 					}
 				}
