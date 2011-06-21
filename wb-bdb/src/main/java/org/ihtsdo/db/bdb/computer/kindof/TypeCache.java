@@ -133,7 +133,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 			String stackItem = childNid + "-" + parentNid;
 			if (callsStack.contains(stackItem)) {
 				cancelled = true;
-				System.out.println("Cycle detected!! [TypeCache] childNid==" + childNid + " parentNid==" + parentNid);
+				System.out.println("Cycle prevented. [TypeCache] childNid==" + childNid + " parentNid==" + parentNid);
 				return false;
 			}
 			callsStack.add(stackItem);
