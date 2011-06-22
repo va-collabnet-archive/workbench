@@ -1708,7 +1708,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
             
             wfHxUpdater.setIndeterminate(true);
-            wfHxUpdater.setProgressInfo("Starting StandardAnalyzer lucene query...");
             long startTime = System.currentTimeMillis();
             SearchResult result = WfHxLuceneManager.searchAllWorkflowCriterion(checkList, wfInProgress, completedWF);
             

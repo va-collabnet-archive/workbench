@@ -190,7 +190,13 @@ public class SearchWfHxWorker extends SwingWorker<I_UpdateProgress> implements I
                 } else {
                     AceLog.getAppLog().info("completeLatch is null");
                 }
-                wfSearchPanel.setProgressInfo(" " + luceneMatches.size() + " matches. ");
+                
+                if (luceneMatches.size() == 0) {
+                	wfSearchPanel.setProgressInfo("Starting search.");
+                } else {
+                	wfSearchPanel.setProgressInfo(" " + luceneMatches.size() + " matches. ");
+                }
+
                 if (hits != null && completeLatch.getCount() == 0) {
                     normalCompletion();
                 }
@@ -211,7 +217,12 @@ public class SearchWfHxWorker extends SwingWorker<I_UpdateProgress> implements I
                 firstUpdate = false;
             }
             wfSearchPanel.setProgressValue(0);
-            wfSearchPanel.setProgressInfo(" " + luceneMatches.size() + " matches. Search complete. ");
+            
+            if (luceneMatches.size() == 0) {
+            	wfSearchPanel.setProgressInfo("The search did not find any matches.  Try different criterion");
+            } else {
+            	wfSearchPanel.setProgressInfo("Search completed having found " + luceneMatches.size() + " matches.  Processing results for display.");
+            }
         }
 
         public void setProgressInfo(String info) {
