@@ -68,54 +68,97 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         this.statusConceptL = status;
     }
 
-    static Sct2_ConRecord[] attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b) throws ParseException {
-        int idxA = 0;
-        int idxB = 0;
+    static Sct2_ConRecord[] attachStatus(Sct2_ConRecord[] a, Rf2_RefsetCRecord[] b)
+            throws ParseException, MojoFailureException {
+        ArrayList<Sct2_ConRecord> addedRecords = new ArrayList<Sct2_ConRecord>();
+        Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
+                null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
+
         Arrays.sort(a);
         Arrays.sort(b);
 
-        ArrayList<Sct2_ConRecord> addedRecords = new ArrayList<Sct2_ConRecord>();
+        int idxA = 0;
+        int idxB = 0;
+        long currentId = a[0].conSnoIdL;
+        while (idxA < a.length) {
+            if (currentId == 198885008) {
+                System.out.println(":!!!:DEBUG");
+            }
+            if (currentId == 207462000) {
+                System.out.println(":!!!:DEBUG");
+            }
 
-        while (idxA < a.length && idxB < b.length) {
-            // MATCHED IDS
-            if (a[idxA].conSnoIdL == b[idxB].referencedComponentIdL) {
-                // determine time range
-                long timeRangeInL = b[idxB].timeL;
-                long timeRangeOutL = Long.MAX_VALUE;
-                if (idxB + 1 < b.length && a[idxA].conSnoIdL == b[idxB + 1].referencedComponentIdL) {
-                    timeRangeOutL = b[idxB + 1].timeL;
-                }
-
-                // EXPAND STATUS
-                if (a[idxA].timeL < timeRangeInL) {
-                    idxA++; // before range, leave status unchanged
-                } else if (a[idxA].timeL == timeRangeInL) {
-                    if (b[idxB].isActive) {
-                        a[idxA].statusConceptL = b[idxB].valueIdL;
-                    }
-                    idxA++;
-                    idxB++;
-                } else if (a[idxA].timeL > timeRangeInL && a[idxA].timeL < timeRangeOutL) {
-                    if (b[idxB].isActive) {
-                        a[idxA].statusConceptL = b[idxB].valueIdL;
-                    }
-                    idxA++;
-                    idxB++;
-                } else if (a[idxA].timeL >= timeRangeOutL) {
-                    // ADD STATUS CHANGE EVENT
-                    if (b[idxB + 1].isActive) {
-                        addedRecords.add(new Sct2_ConRecord(a[idxA], b[idxB + 1].timeL, b[idxB + 1].valueIdL));
-                    } else {
-                        addedRecords.add(new Sct2_ConRecord(a[idxA], b[idxB + 1].timeL, Long.MAX_VALUE));
-                    }
-                    idxB++;
-                }
-
-                // GET NEXT IDS
-            } else if (a[idxA].conSnoIdL < b[idxB].referencedComponentIdL) {
+            ArrayList<Sct2_ConRecord> listA = new ArrayList<Sct2_ConRecord>();
+            ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<Rf2_RefsetCRecord>();
+            while (idxA < a.length && a[idxA].conSnoIdL == currentId) {
+                listA.add(a[idxA]);
                 idxA++;
-            } else {
+            }
+            while (idxB < b.length && b[idxB].referencedComponentIdL == currentId) {
+                listB.add(b[idxB]);
                 idxB++;
+            }
+
+            // PROCESS ID
+            if (listB.size() > 0) {
+                if (listA.get(0).timeL < listB.get(0).timeL) {
+                    listB.add(0, zeroB);
+                }
+                int idxAA = 0;
+                int idxBB = 0;
+                boolean moreToDo = true;
+                while (moreToDo) {
+                    // determine time range
+                    long timeInAA = listA.get(idxAA).timeL;
+                    long timeOutAA = Long.MAX_VALUE;
+                    if (idxAA + 1 < listA.size()) {
+                        timeOutAA = listA.get(idxAA + 1).timeL;
+                    }
+                    long timeInBB = listB.get(idxBB).timeL;
+                    long timeOutBB = Long.MAX_VALUE;
+                    if (idxBB + 1 < listB.size()) {
+                        timeOutBB = listB.get(idxBB + 1).timeL;
+                    }
+
+                    // UPDATE VALUES
+                    if (timeInAA >= timeInBB) {
+                        if (listB.get(idxBB).isActive) {
+                            listA.get(idxAA).statusConceptL = listB.get(idxBB).valueIdL;
+                        } else {
+                            // no change
+                        }
+                    } else {
+                        if (listB.get(idxBB).isActive) {
+                            addedRecords.add(new Sct2_ConRecord(listA.get(idxAA),
+                                    listB.get(idxBB).timeL, listB.get(idxBB).valueIdL));
+                        } else {
+                            addedRecords.add(new Sct2_ConRecord(listA.get(idxAA),
+                                    listB.get(idxBB).timeL, Long.MAX_VALUE));
+                        }
+                    }
+
+                    // DETERMINE NEXT TO PROCESS
+                    if (timeOutAA == Long.MAX_VALUE && timeOutBB == Long.MAX_VALUE) {
+                        moreToDo = false;
+                    } else if (timeOutAA < timeOutBB) {
+                        idxAA++;
+                    } else if (timeOutAA == timeOutBB) {
+                        idxAA++;
+                        idxBB++;
+                    } else if (timeOutAA > timeOutBB) {
+                        idxBB++;
+                    }
+                }
+            }
+
+            // NEXT ID
+            if (idxA < a.length) {
+                currentId = a[idxA].conSnoIdL;
+            }
+            if (idxB < b.length) {
+                while (idxB < b.length && b[idxB].referencedComponentIdL < currentId) {
+                    idxB++;
+                }
             }
         }
 
@@ -127,7 +170,52 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             }
         }
 
+        // REMOVE DUPLICATES
+        a = removeDuplicates(a);
+
         return a;
+    }
+
+    static private Sct2_ConRecord[] removeDuplicates(Sct2_ConRecord[] a) throws MojoFailureException {
+        Arrays.sort(a);
+
+        // REMOVE DUPLICATES
+        int lenA = a.length;
+        ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
+        for (int idx = 0; idx < lenA - 2; idx++) {
+            if (a[idx].conSnoIdL == 198885008) {
+                System.out.println(":!!!:DEBUG removeDuplicates");
+            }
+            if ((a[idx].conSnoIdL == a[idx + 1].conSnoIdL)
+                    && (a[idx].isPrimitiveB == a[idx + 1].isPrimitiveB)
+                    && (a[idx].statusConceptL == a[idx + 1].statusConceptL)) {
+                if ((a[idx].statusConceptL == Long.MAX_VALUE)
+                        && (a[idx].isActive == a[idx + 1].isActive)) {
+                    duplIdxList.add(Integer.valueOf(idx + 1));
+                } else {
+                    duplIdxList.add(Integer.valueOf(idx + 1));
+                }
+            }
+        }
+
+        if (duplIdxList.size()
+                > 0) {
+            Sct2_ConRecord[] b = new Sct2_ConRecord[lenA - duplIdxList.size()];
+            int aPos = 0;
+            int bPos = 0;
+            int len;
+            for (int dropIdx : duplIdxList) {
+                len = dropIdx - aPos;
+                System.arraycopy(a, aPos, b, bPos, len);
+                bPos = bPos + len;
+                aPos = aPos + len + 1;
+            }
+            len = lenA - aPos;
+            System.arraycopy(a, aPos, b, bPos, len);
+            return b;
+        } else {
+            return a;
+        }
     }
 
     static Sct2_ConRecord[] parseConcepts(Rf2File f) throws MojoFailureException {
@@ -160,12 +248,26 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             }
 
             return a;
+
+
+
+
         } catch (ParseException ex) {
             Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("error parsing rf2 concepts", ex);
+
+
+
+
+            throw new MojoFailureException(
+                    "error parsing rf2 concepts", ex);
         } catch (IOException ex) {
             Logger.getLogger(Sct2_ConRecord.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("error parsing rf2 concepts", ex);
+
+
+
+
+            throw new MojoFailureException(
+                    "error parsing rf2 concepts", ex);
         }
     }
 
@@ -175,7 +277,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         return conSnoIdL + TAB_CHARACTER + isActive + TAB_CHARACTER + isPrimitiveB;
     }
 
-    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException {
+    public void writeArf(BufferedWriter writer) throws IOException, TerminologyException, ParseException {
         // Concept UUID
         writer.append(Rf2x.convertIdToUuidStr(conSnoIdL) + TAB_CHARACTER);
 
@@ -194,7 +296,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         }
 
         // Effective Date yyyy-MM-dd HH:mm:ss
-        writer.append(effDateStr + TAB_CHARACTER);
+        writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
         // Path UUID
         writer.append(pathStr + LINE_TERMINATOR);
