@@ -1036,42 +1036,46 @@ public class BdbCommitManager {
         }
     }
 
+    private static long lastDoUpdate = Long.MIN_VALUE;
     private static void doUpdate() {
-        try {
-            for (Frame f : OpenFrames.getFrames()) {
-                if (AceFrame.class.isAssignableFrom(f.getClass())) {
-                    AceFrame af = (AceFrame) f;
-                    ACE aceInstance = af.getCdePanel();
-                    aceInstance.getDataCheckListScroller();
-                    aceInstance.getUncommittedListModel().clear();
+        if (lastDoUpdate < Bdb.gVersion.get()) {
+            lastDoUpdate = Bdb.gVersion.get();
+            try {
+                for (Frame f : OpenFrames.getFrames()) {
+                    if (AceFrame.class.isAssignableFrom(f.getClass())) {
+                        AceFrame af = (AceFrame) f;
+                        ACE aceInstance = af.getCdePanel();
+                        aceInstance.getDataCheckListScroller();
+                        aceInstance.getUncommittedListModel().clear();
 
-                    for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-                        aceInstance.getUncommittedListModel().addAll(alerts);
-                    }
-                    if (aceInstance.getUncommittedListModel().size() > 0) {
-                        for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
-                            if (aceInstance.getLeftTabs().getTitleAt(i).equals(ACE.DATA_CHECK_TAB_LABEL)) {
-                                aceInstance.getLeftTabs().setSelectedIndex(i);
-                                break;
+                        for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
+                            aceInstance.getUncommittedListModel().addAll(alerts);
+                        }
+                        if (aceInstance.getUncommittedListModel().size() > 0) {
+                            for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
+                                if (aceInstance.getLeftTabs().getTitleAt(i).equals(ACE.DATA_CHECK_TAB_LABEL)) {
+                                    aceInstance.getLeftTabs().setSelectedIndex(i);
+                                    break;
+                                }
                             }
+                            // show data checks tab...
+                        } else {
+                            for (TermComponentDataCheckSelectionListener l : aceInstance.getDataCheckListeners()) {
+                                l.setSelection(null);
+                            }
+                            // hide data checks tab...
                         }
-                        // show data checks tab...
-                    } else {
-                        for (TermComponentDataCheckSelectionListener l : aceInstance.getDataCheckListeners()) {
-                            l.setSelection(null);
+                        if (uncommittedCNids.cardinality() == 0) {
+                            aceInstance.aceFrameConfig.setCommitEnabled(false);
+                            aceInstance.aceFrameConfig.fireCommit();
+                        } else {
+                            aceInstance.aceFrameConfig.setCommitEnabled(true);
                         }
-                        // hide data checks tab...
-                    }
-                    if (uncommittedCNids.cardinality() == 0) {
-                        aceInstance.aceFrameConfig.setCommitEnabled(false);
-                        aceInstance.aceFrameConfig.fireCommit();
-                    } else {
-                        aceInstance.aceFrameConfig.setCommitEnabled(true);
                     }
                 }
+            } catch (Exception e) {
+                AceLog.getAppLog().warning(e.toString());
             }
-        } catch (Exception e) {
-            AceLog.getAppLog().warning(e.toString());
         }
     }
 
@@ -1096,23 +1100,25 @@ public class BdbCommitManager {
     }
 
     public static void removeUncommitted(final Concept concept) {
-        uncommittedCNids.setNotMember(concept.getNid());
-        if (uncommittedCNids.cardinality() == 0) {
-            dataCheckMap.clear();
-        } else {
-            dataCheckMap.remove(concept);
-        }
-        if (getActiveFrame() != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    removeUncommittedUpdateFrame(concept);
-                }
-            });
+        if (uncommittedCNids.isMember(concept.getNid())) {
+            uncommittedCNids.setNotMember(concept.getNid());
+            if (uncommittedCNids.cardinality() == 0) {
+                dataCheckMap.clear();
+            } else {
+                dataCheckMap.remove(concept);
+            }
+            if (getActiveFrame() != null) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        removeUncommittedUpdateFrame(concept);
+                    }
+                });
+            }
         }
     }
-
+    
     private static void removeUncommittedUpdateFrame(Concept concept) {
         for (I_ConfigAceFrame frameConfig : getActiveFrame().getDbConfig().getAceFrames()) {
             try {
