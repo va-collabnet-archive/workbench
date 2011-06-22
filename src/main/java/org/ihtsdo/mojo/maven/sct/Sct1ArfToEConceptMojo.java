@@ -1410,7 +1410,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int pathIdx = lookupZPathIdx(line[PATH_UUID]);
             // USER_UUID
             int userIdx = USER_DEFAULT_IDX;
-            if (line[PATH_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
+            if (line[AUTHOR_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
                 userIdx = USER_SNOROCKET_IDX;
             }
 
@@ -3416,6 +3416,14 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         for (Sct1_IdRecord eId : rRec.addedIds) {
                             tmpRelAdditionalIds.add(createEIdentifier(eId));
                         }
+                    } else if (rRec.relSnoId < Long.MAX_VALUE) {
+                        EIdentifierLong rid = new EIdentifierLong();
+                        rid.setAuthorityUuid(uuidSourceSnomedLong);
+                        rid.setDenotation(rRec.relSnoId);
+                        rid.setPathUuid(zPathArray[rRec.pathIdx]);
+                        rid.setStatusUuid(uuidCurrent);
+                        rid.setTime(rRec.revTime);
+                        tmpRelAdditionalIds.add(rid);
                     }
                     if (tmpRelAdditionalIds.size() > 0) {
                         rel.additionalIds = tmpRelAdditionalIds;
