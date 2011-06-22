@@ -107,6 +107,7 @@ public class SearchWfHxWorker extends SwingWorker<I_UpdateProgress> implements I
         this.wfSearchPanel = wfSearchPanel;
         this.wfInProgress= wfIP;
         this.completedWF = wfCompleted;
+        wfSearchPanel.addStopActionListener(stopListener);
     }
 
   
