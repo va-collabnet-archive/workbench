@@ -202,9 +202,9 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
                     && (a[idx].statusConceptL == a[idx + 1].statusConceptL)
                     && (a[idx].capStatus == a[idx + 1].capStatus)
                     && (a[idx].conUuidStr.compareToIgnoreCase(a[idx + 1].conUuidStr) == 0)
-                    && (a[idx].termText.compareToIgnoreCase(a[idx + 1].termText) == 0)
+                    && (a[idx].termText.compareTo(a[idx + 1].termText) == 0)
                     && (a[idx].descriptionTypeStr.compareToIgnoreCase(a[idx + 1].descriptionTypeStr) == 0)
-                    && (a[idx].languageCodeStr.compareToIgnoreCase(a[idx + 1].languageCodeStr) == 0)) {
+                    && (a[idx].languageCodeStr.compareTo(a[idx + 1].languageCodeStr) == 0)) {
                 if (a[idx].statusConceptL == Long.MAX_VALUE) {
                     if (a[idx].isActive == a[idx + 1].isActive) {
                         duplIdxList.add(Integer.valueOf(idx + 1));
