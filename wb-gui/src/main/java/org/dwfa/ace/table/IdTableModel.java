@@ -58,14 +58,15 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.tk.api.PathBI;
 
 public class IdTableModel extends AbstractTableModel implements PropertyChangeListener {
+
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
-    public static class StringWithIdTuple extends StringWithTuple<StringWithIdTuple>  {
-        String cellText;
+    public static class StringWithIdTuple extends StringWithTuple<StringWithIdTuple> {
 
+        String cellText;
         I_IdVersion tuple;
 
         public StringWithIdTuple(String cellText, I_IdVersion tuple, boolean isInConflict) {
@@ -77,18 +78,14 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             return tuple;
         }
     }
-
     private List<? extends I_IdVersion> allTuples;
-
     private TableChangedSwingWorker tableChangeWorker;
-
     private Set<Integer> conceptsToFetch = new HashSet<Integer>();
-
     private Map<Integer, I_GetConceptData> referencedConcepts = new HashMap<Integer, I_GetConceptData>();
 
     public class ReferencedConceptsSwingWorker extends SwingWorker<Boolean> {
-        private boolean stopWork = false;
 
+        private boolean stopWork = false;
         Map<Integer, I_GetConceptData> concepts;
 
         @Override
@@ -152,10 +149,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     public class TableChangedSwingWorker extends SwingWorker<Boolean> {
+
         I_AmTermComponent tc;
-
         private boolean workStopped = false;
-
         ReferencedConceptsSwingWorker refConWorker;
 
         public TableChangedSwingWorker(I_AmTermComponent tc) {
@@ -171,14 +167,17 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             int nid = getNidFromTermComponent(tc);
 
             I_Identify id = Terms.get().getId(nid);
-            for (I_IdPart part : id.getMutableIdParts()) {
-                if (workStopped) {
-                    return false;
+            if (id.getMutableIdParts() != null
+                    && id.getMutableIdParts().size() > 0) {
+                for (I_IdPart part : id.getMutableIdParts()) {
+                    if (workStopped) {
+                        return false;
+                    }
+                    conceptsToFetch.add(part.getStatusNid());
+                    conceptsToFetch.add(part.getPathNid());
+                    conceptsToFetch.add(part.getAuthorityNid());
+                    conceptsToFetch.add(part.getAuthorNid());
                 }
-                conceptsToFetch.add(part.getStatusNid());
-                conceptsToFetch.add(part.getPathNid());
-                conceptsToFetch.add(part.getAuthorityNid());
-                conceptsToFetch.add(part.getAuthorNid());
             }
 
             if (workStopped) {
@@ -229,6 +228,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     public enum ID_FIELD {
+
         LOCAL_ID("local id", 5, 100, 100),
         STATUS("status", 5, 50, 250),
         EXT_ID("id", 5, 85, 1550),
@@ -236,13 +236,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         AUTHOR("author", 5, 90, 150),
         PATH("path", 5, 90, 150),
         SOURCE("id source", 5, 50, 250);
-
         private String columnName;
-
         private int min;
-
         private int pref;
-
         private int max;
 
         private ID_FIELD(String columnName, int min, int pref, int max) {
@@ -267,13 +263,9 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
         public int getPref() {
             return pref;
         }
-
     }
-
     private ID_FIELD[] columns;
-
     private SmallProgressPanel progress = new SmallProgressPanel();
-
     private I_HostConceptPlugins host;
 
     public IdTableModel(ID_FIELD[] columns, I_HostConceptPlugins host) {
@@ -353,7 +345,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     private String getPrefText(int id) throws IOException {
-    	I_GetConceptData cb = referencedConcepts.get(id);
+        I_GetConceptData cb = referencedConcepts.get(id);
         I_DescriptionTuple desc = cb.getDescTuple(host.getConfig().getTableDescPreferenceList(), host.getConfig());
         if (desc != null) {
             String text = desc.getText();
@@ -374,38 +366,38 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             I_ConfigAceFrame config = host.getConfig();
             boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedIdPart());
+                    && config.getConflictResolutionStrategy().isInConflict((I_Identify) idTuple.getFixedIdPart());
 
             switch (columns[columnIndex]) {
-            case LOCAL_ID:
-                return new StringWithIdTuple(Integer.toString(idTuple.getNid()), idTuple, inConflict);
-            case STATUS:
-                if (referencedConcepts.containsKey(idTuple.getStatusId())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getStatusId()), idTuple, inConflict);
-                }
-                return new StringWithIdTuple(Integer.toString(idTuple.getStatusId()), idTuple, inConflict);
-            case EXT_ID:
-                return new StringWithIdTuple(idTuple.getDenotation().toString(), idTuple, inConflict);
-            case VERSION:
-                if (idTuple.getVersion() == Integer.MAX_VALUE) {
-                    return new StringWithIdTuple(ThinVersionHelper.uncommittedHtml(), idTuple, inConflict);
-                }
-                return new StringWithIdTuple(ThinVersionHelper.format(idTuple.getVersion()), idTuple, inConflict);
-            case PATH:
-                if (referencedConcepts.containsKey(idTuple.getPathId())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple, inConflict);
-                }
-                return new StringWithIdTuple(Integer.toString(idTuple.getPathId()), idTuple, inConflict);
-            case SOURCE:
-                if (referencedConcepts.containsKey(idTuple.getAuthorityNid())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getAuthorityNid()), idTuple, inConflict);
-                }
-                return new StringWithIdTuple(Integer.toString(idTuple.getAuthorityNid()), idTuple, inConflict);
-            case AUTHOR:
-                if (referencedConcepts.containsKey(idTuple.getAuthorNid())) {
-                    return new StringWithIdTuple(getPrefText(idTuple.getAuthorNid()), idTuple, inConflict);
-                }
-                return new StringWithIdTuple(Integer.toString(idTuple.getAuthorNid()), idTuple, inConflict);
+                case LOCAL_ID:
+                    return new StringWithIdTuple(Integer.toString(idTuple.getNid()), idTuple, inConflict);
+                case STATUS:
+                    if (referencedConcepts.containsKey(idTuple.getStatusId())) {
+                        return new StringWithIdTuple(getPrefText(idTuple.getStatusId()), idTuple, inConflict);
+                    }
+                    return new StringWithIdTuple(Integer.toString(idTuple.getStatusId()), idTuple, inConflict);
+                case EXT_ID:
+                    return new StringWithIdTuple(idTuple.getDenotation().toString(), idTuple, inConflict);
+                case VERSION:
+                    if (idTuple.getVersion() == Integer.MAX_VALUE) {
+                        return new StringWithIdTuple(ThinVersionHelper.uncommittedHtml(), idTuple, inConflict);
+                    }
+                    return new StringWithIdTuple(ThinVersionHelper.format(idTuple.getVersion()), idTuple, inConflict);
+                case PATH:
+                    if (referencedConcepts.containsKey(idTuple.getPathId())) {
+                        return new StringWithIdTuple(getPrefText(idTuple.getPathId()), idTuple, inConflict);
+                    }
+                    return new StringWithIdTuple(Integer.toString(idTuple.getPathId()), idTuple, inConflict);
+                case SOURCE:
+                    if (referencedConcepts.containsKey(idTuple.getAuthorityNid())) {
+                        return new StringWithIdTuple(getPrefText(idTuple.getAuthorityNid()), idTuple, inConflict);
+                    }
+                    return new StringWithIdTuple(Integer.toString(idTuple.getAuthorityNid()), idTuple, inConflict);
+                case AUTHOR:
+                    if (referencedConcepts.containsKey(idTuple.getAuthorNid())) {
+                        return new StringWithIdTuple(getPrefText(idTuple.getAuthorNid()), idTuple, inConflict);
+                    }
+                    return new StringWithIdTuple(Integer.toString(idTuple.getAuthorNid()), idTuple, inConflict);
 
             }
         } catch (Exception e) {
@@ -416,16 +408,16 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
     public Class<?> getColumnClass(int c) {
         switch (columns[c]) {
-        case LOCAL_ID:
-            return Number.class;
-        case EXT_ID:
-            return StringWithIdTuple.class;
-        case STATUS:
-            return StringWithIdTuple.class;
-        case VERSION:
-            return Number.class;
-        case PATH:
-            return StringWithIdTuple.class;
+            case LOCAL_ID:
+                return Number.class;
+            case EXT_ID:
+                return StringWithIdTuple.class;
+            case STATUS:
+                return StringWithIdTuple.class;
+            case VERSION:
+                return Number.class;
+            case PATH:
+                return StringWithIdTuple.class;
         }
         return String.class;
     }
@@ -454,6 +446,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
     }
 
     public class PopupListener extends MouseAdapter {
+
         private class ChangeActionListener implements ActionListener {
 
             public ChangeActionListener() {
@@ -462,20 +455,20 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
 
             public void actionPerformed(ActionEvent e) {
                 try {
-					for (PathBI p : config.getEditingPathSet()) {
-					    I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
-					    newPart.setPathId(p.getConceptNid());
-					    newPart.setVersion(Integer.MAX_VALUE);
-					    selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
-					}
-					Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
-					allTuples = null;
-					IdTableModel.this.fireTableDataChanged();
-				} catch (TerminologyException e1) {
-					throw new RuntimeException(e1);
-				} catch (IOException e1) {
-					throw new RuntimeException(e1);
-				}
+                    for (PathBI p : config.getEditingPathSet()) {
+                        I_IdPart newPart = selectedObject.getTuple().duplicateIdPart();
+                        newPart.setPathId(p.getConceptNid());
+                        newPart.setVersion(Integer.MAX_VALUE);
+                        selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
+                    }
+                    Terms.get().addUncommitted(Terms.get().getConcept(selectedObject.getTuple().getNid()));
+                    allTuples = null;
+                    IdTableModel.this.fireTableDataChanged();
+                } catch (TerminologyException e1) {
+                    throw new RuntimeException(e1);
+                } catch (IOException e1) {
+                    throw new RuntimeException(e1);
+                }
             }
         }
 
@@ -492,7 +485,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                         newPart.setPathId(p.getConceptNid());
                         newPart.setVersion(Integer.MAX_VALUE);
                         newPart.setStatusId(Terms.get().uuidToNative(
-                            ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
+                                ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
                         referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
                         selectedObject.getTuple().getIdentifier().addMutableIdPart(newPart);
                     }
@@ -504,17 +497,11 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                 }
             }
         }
-
         JPopupMenu popup;
-
         JTable table;
-
         ActionListener retire;
-
         ActionListener change;
-
         StringWithIdTuple selectedObject;
-
         I_ConfigAceFrame config;
 
         public PopupListener(JTable table, I_ConfigAceFrame config) {
@@ -555,7 +542,7 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 } else {
                     JOptionPane.showMessageDialog(table.getTopLevelAncestor(),
-                        "You must select at least one path to edit on...");
+                            "You must select at least one path to edit on...");
                 }
             }
             e.consume();
@@ -585,5 +572,4 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
             return Terms.get().getConcept(swdt.getTuple().getStatusId());
         }
     }
-
 }
