@@ -166,6 +166,7 @@ public class DocumentManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		output = output + "<br><br>Done!<br>";
 		output = output + "</font></body></html>";
 		return output;
 	}
