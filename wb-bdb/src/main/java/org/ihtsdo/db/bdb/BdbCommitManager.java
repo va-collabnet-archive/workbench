@@ -264,13 +264,6 @@ public class BdbCommitManager {
                         + concept.getNid() + " --- ");
             }
             removeUncommitted(c);
-            try {
-                dbWriterPermit.acquire();
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-            dbWriterService.execute(new SetNidsForCid(c));
-            dbWriterService.execute(new ConceptWriter(c));
         }
         try {
             writeUncommitted(c);
