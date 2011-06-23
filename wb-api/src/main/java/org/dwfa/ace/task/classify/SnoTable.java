@@ -200,8 +200,13 @@ public class SnoTable {
         } else if (config.getEditingPathSet().size() != 1) {
             String errStr = "(SnoTable error) Profile must have exactly one edit path. Found: "
                     + config.getEditingPathSet();
-            AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
+            if (showDialogs) {
+                AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                     new TaskFailedException(errStr));
+            } else {
+                AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
+            }
+            
             return errStr;
         }
         PathBI cEditPathBI = config.getEditingPathSet().iterator().next();

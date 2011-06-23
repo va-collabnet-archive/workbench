@@ -25,6 +25,7 @@ import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.bpa.process.TaskFailedException;
@@ -61,6 +62,9 @@ public class TestForIsaCycle extends AbstractConceptTest {
             ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 
             Collection<? extends I_RelVersioned> usrl = (Collection<? extends I_RelVersioned>) concept.getSourceRels();
+            if (Terms.get().getActiveAceFrameConfig() == null || Terms.get().getActiveAceFrameConfig().getEditingPathSet().isEmpty()) {
+                return alertList;
+            }
 
             boolean foundCycle = false;
             String error = SnoTable.updatePrefs(false);
