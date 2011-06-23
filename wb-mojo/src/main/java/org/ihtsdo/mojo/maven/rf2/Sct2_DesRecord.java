@@ -90,7 +90,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         this.statusConceptL = status;
     }
 
-    static Sct2_DesRecord[] attachStatus(Sct2_DesRecord[] a, Rf2_RefsetCRecord[] b) throws ParseException, MojoFailureException {
+    static Sct2_DesRecord[] attachStatus(Sct2_DesRecord[] a, Rf2_RefsetCRecord[] b)
+            throws ParseException, MojoFailureException {
         ArrayList<Sct2_DesRecord> addedRecords = new ArrayList<Sct2_DesRecord>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
                 null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
@@ -204,9 +205,10 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
                     && (a[idx].termText.compareToIgnoreCase(a[idx + 1].termText) == 0)
                     && (a[idx].descriptionTypeStr.compareToIgnoreCase(a[idx + 1].descriptionTypeStr) == 0)
                     && (a[idx].languageCodeStr.compareToIgnoreCase(a[idx + 1].languageCodeStr) == 0)) {
-                if ((a[idx].statusConceptL == Long.MAX_VALUE)
-                        && (a[idx].isActive == a[idx + 1].isActive)) {
-                    duplIdxList.add(Integer.valueOf(idx + 1));
+                if (a[idx].statusConceptL == Long.MAX_VALUE) {
+                    if (a[idx].isActive == a[idx + 1].isActive) {
+                        duplIdxList.add(Integer.valueOf(idx + 1));
+                    }
                 } else {
                     duplIdxList.add(Integer.valueOf(idx + 1));
                 }

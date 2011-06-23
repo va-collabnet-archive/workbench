@@ -81,13 +81,6 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         int idxB = 0;
         long currentId = a[0].conSnoIdL;
         while (idxA < a.length) {
-            if (currentId == 198885008) {
-                System.out.println(":!!!:DEBUG");
-            }
-            if (currentId == 207462000) {
-                System.out.println(":!!!:DEBUG");
-            }
-
             ArrayList<Sct2_ConRecord> listA = new ArrayList<Sct2_ConRecord>();
             ArrayList<Rf2_RefsetCRecord> listB = new ArrayList<Rf2_RefsetCRecord>();
             while (idxA < a.length && a[idxA].conSnoIdL == currentId) {
@@ -183,15 +176,13 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         int lenA = a.length;
         ArrayList<Integer> duplIdxList = new ArrayList<Integer>();
         for (int idx = 0; idx < lenA - 2; idx++) {
-            if (a[idx].conSnoIdL == 198885008) {
-                System.out.println(":!!!:DEBUG removeDuplicates");
-            }
             if ((a[idx].conSnoIdL == a[idx + 1].conSnoIdL)
                     && (a[idx].isPrimitiveB == a[idx + 1].isPrimitiveB)
                     && (a[idx].statusConceptL == a[idx + 1].statusConceptL)) {
-                if ((a[idx].statusConceptL == Long.MAX_VALUE)
-                        && (a[idx].isActive == a[idx + 1].isActive)) {
-                    duplIdxList.add(Integer.valueOf(idx + 1));
+                if (a[idx].statusConceptL == Long.MAX_VALUE) {
+                    if (a[idx].isActive == a[idx + 1].isActive) {
+                        duplIdxList.add(Integer.valueOf(idx + 1));
+                    }
                 } else {
                     duplIdxList.add(Integer.valueOf(idx + 1));
                 }

@@ -215,9 +215,10 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
                     && (a[idx].isInferred == a[idx + 1].isInferred)
                     && (a[idx].characteristicL == a[idx + 1].characteristicL)
                     && (a[idx].refinabilityL == a[idx + 1].refinabilityL)) {
-                if ((a[idx].statusConceptL == Long.MAX_VALUE)
-                        && (a[idx].isActive == a[idx + 1].isActive)) {
-                    duplIdxList.add(Integer.valueOf(idx + 1));
+                if (a[idx].statusConceptL == Long.MAX_VALUE) {
+                    if (a[idx].isActive == a[idx + 1].isActive) {
+                        duplIdxList.add(Integer.valueOf(idx + 1));
+                    }
                 } else {
                     duplIdxList.add(Integer.valueOf(idx + 1));
                 }
