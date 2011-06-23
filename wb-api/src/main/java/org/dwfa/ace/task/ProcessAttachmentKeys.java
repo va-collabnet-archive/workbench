@@ -151,6 +151,12 @@ public enum ProcessAttachmentKeys {
     DESCRIPTION,
     SEND_TO_USER,
     SEND_COMMENT,
+    PARENT_CONCEPT_FOR_USER,
+    PARENT_CONCEPT_FOR_PATH, 
+    PATHS_FOR_ORIGIN, 
+    PATHS_FOR_VIEW, 
+    ADD_TO_PATH_ORIGIN,
+    RELEASE_DATE,
     COLLABNET_ARTIFACT_SUBMITTER;
 
     public String getAttachmentKey() {

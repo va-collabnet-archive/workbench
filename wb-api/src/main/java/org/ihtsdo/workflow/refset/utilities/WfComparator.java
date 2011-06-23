@@ -104,4 +104,31 @@ public class WfComparator
 			return (o1.getFSN().compareTo(o2.getFSN()));
 		}
 	}
+
+	public Comparator<? super I_GetConceptData> createPreferredTermComparerNoCase() {
+		return new PreferredTermComparatorNoCase();
+	}
+
+	// If no Pref Term found, use 
+	public class PreferredTermComparatorNoCase implements Comparator<I_GetConceptData> { 
+		public int compare(I_GetConceptData a, I_GetConceptData b) {
+			try {
+				String aStr = WorkflowHelper.getPreferredTerm(a).toLowerCase();
+				if (aStr == null || aStr.length() == 0) {
+					aStr = WorkflowHelper.getFsnTerm(a).toLowerCase();
+				}
+				
+				String bStr = WorkflowHelper.getPreferredTerm(b).toLowerCase();
+				if (bStr == null || aStr.length() == 0) {
+					bStr = WorkflowHelper.getFsnTerm(b).toLowerCase();
+				}
+
+				return aStr.compareTo(bStr);
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTermComparator", e);
+			}
+			
+			return 0;
+		}
+	}
 }

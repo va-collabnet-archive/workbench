@@ -1038,7 +1038,19 @@ public class WorkflowHelper {
 		    }
 		}
 		
-		return "Unidentifiable";
+		return "";
+	}
+
+	public static String getFsnTerm(I_GetConceptData con) throws IOException, TerminologyException {
+		for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+		    for (I_DescriptionTuple p: descv.getTuples()) {
+				if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
+					p.getLang().equalsIgnoreCase("en"))
+					return p.getText();
+		    }
+		}
+
+		return "";
 	}
 
 	public static String shrinkTermForDisplay(String term) {
@@ -1053,7 +1065,7 @@ public class WorkflowHelper {
 			}
 		}
 		
-		return "Unidentifiable";
+		return "";
 	}
 
 	private boolean isConceptInDatabase(I_GetConceptData concept) {
