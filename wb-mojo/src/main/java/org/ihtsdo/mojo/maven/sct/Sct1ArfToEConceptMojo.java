@@ -1410,8 +1410,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             int pathIdx = lookupZPathIdx(line[PATH_UUID]);
             // USER_UUID
             int userIdx = USER_DEFAULT_IDX;
-            if (line[AUTHOR_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
-                userIdx = USER_SNOROCKET_IDX;
+            if (line.length >= 11) {
+                if (line[AUTHOR_UUID].equalsIgnoreCase(uuidUserSnorocket.toString())) {
+                    userIdx = USER_SNOROCKET_IDX;
+                }
             }
 
             Sct1_RelRecord tmpRelRec = new Sct1_RelRecord(uuidRelId, status, uuidC1, roleTypeIdx,
