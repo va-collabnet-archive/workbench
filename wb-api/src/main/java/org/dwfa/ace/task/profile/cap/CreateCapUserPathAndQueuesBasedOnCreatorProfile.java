@@ -65,6 +65,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
 public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTask {
@@ -83,6 +84,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     private String releaseDatePropName = ProcessAttachmentKeys.RELEASE_DATE.getAttachmentKey();
 	private I_GetConceptData parentConceptForPath;
 
+	private Set<String> existingUserStrings;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -170,12 +172,16 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             File userQueueRoot = new File("queues", newConfig.getUsername());
             userQueueRoot.mkdirs();
 
-            // Create new concept for user...
-            createUser(newConfig, creatorConfig, parentConceptForUser);
+            // Create new concept for user if not already in existence...
+            if (userNonExistent(newConfig.getDbConfig().getFullName(), newConfig.getUsername())) {
+            	createUser(newConfig, creatorConfig, parentConceptForUser);
+            }
             
             // Create new paths for user...
             createDevPath(newConfig, creatorConfig, releaseDate, pathsForView, pathsForOrigin, addToPathOrigin);
-/*            createClassifierPath(newConfig, promotePathProfile);
+
+/*            
+			createClassifierPath(newConfig, promotePathProfile);
             if (creatorConfig.getPromotionPathSet().size() > 1) {
                 throw new TaskFailedException("This task only supports a single promotion path...\nFound: "
                     + creatorConfig.getPromotionPathSet().size());
@@ -331,6 +337,38 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         return Condition.TRUE;
     }
 
+    private boolean userNonExistent(String fsn, String preferred) {
+    	if (existingUserStrings == null) {
+    		try {
+	    		existingUserStrings = new HashSet<String>();
+	    		
+	    		I_GetConceptData userCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+	    		
+	    		for (I_GetConceptData user : WorkflowHelper.getChildren(userCon)) {
+	    			String s = WorkflowHelper.getFsnTerm(user);
+	    			if (s.length() > 0) {
+	    				existingUserStrings.add(s);
+	
+		    			s = WorkflowHelper.getPreferredTerm(user);
+		    			if (s.length() > 0) {
+		    				existingUserStrings.add(s);
+		    			}
+	    			}
+	    		}
+    		} catch (Exception e) {
+    			AceLog.getAppLog().log(Level.WARNING, "Cannot access user concepts to add their fsn/pref terms to a storage collection");
+    		}
+    	}
+    	
+    	if (existingUserStrings.contains(fsn) || existingUserStrings.contains(preferred)) {
+    		return false;
+    	} else {
+    		existingUserStrings.add(fsn);
+    		existingUserStrings.add(preferred);
+    		return true;
+    	}
+	}
+
     String[] QueueTypes = new String[] { "aging", "archival", "compute", "inbox", "launcher", "outbox" };
 
     private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot, String nodeInboxAddress) {
@@ -463,7 +501,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     	Set<PositionBI> inputSet = new HashSet<PositionBI>();
     	inputSet.add(Terms.get().newPosition(pathsForOrigin, Long.MAX_VALUE));
     	
-    	String suffix = " dev path";
+    	String suffix = " author path";
         String prefName = releaseDate + " " + newConfig.getUsername() + suffix;
         String fsnName = newConfig.getDbConfig().getFullName() + suffix;
         PathBI devPath = createNewPath(newConfig, creatorConfig, inputSet, fsnName, prefName);
