@@ -289,6 +289,8 @@ public class DocumentManager {
 			writer.close();
 
 			output = output + "<br><br>Done!<br>";
+		} else {
+			output = output + "<br><br>No file to process..<br>";
 		}
 		output = output + "</font></body></html>";
 		return output;
