@@ -42,6 +42,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -103,11 +104,14 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.InstructAndWait;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.document.DocumentManager;
 import org.ihtsdo.document.DocumentsSearchPanel;
 import org.ihtsdo.issue.IssueRepoRegistration;
@@ -496,12 +500,6 @@ public class TranslationConceptEditor6 extends JPanel {
 	 * @return
 	 */
 	synchronized public boolean verifySavePending(String message, boolean doVerify) {
-		if (Terms.get().getUncommitted().size() > 0) {
-			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-					"There are uncommitted changes - please cancel or commit before continuing.", 
-					"", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
 		boolean bPendTerm = true;
 		if (saveDesc) {
 			if (doVerify) {
@@ -588,6 +586,15 @@ public class TranslationConceptEditor6 extends JPanel {
 						return false;
 					}
 
+				}
+			}
+			Collection<Collection<AlertToDataConstraintFailure>> values = BdbCommitManager.getDatacheckMap().values();
+			for (Collection<AlertToDataConstraintFailure> collection : values) {
+				if(!collection.isEmpty()){
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
+							"There are uncommitted changes - please cancel or commit before continuing.", 
+							"", JOptionPane.ERROR_MESSAGE);
+					return false;
 				}
 			}
 		}
