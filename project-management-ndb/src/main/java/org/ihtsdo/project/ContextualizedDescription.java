@@ -133,7 +133,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		//			return persistChangesNoChecks();
 		//		}
 		// end of deviation, code below is not executed
-		boolean success = false;
+		boolean success = true;
 		I_TermFactory tf = Terms.get();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -189,14 +189,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 			}
 		}
 		if (descriptionPartChanged || extensionPartChanged) {
-			//Thread.currentThread().sleep(5000);//sleep for 1000 milliseconds
-			tf.commit();
-			if (tf.getUncommitted().size() > 0) {
-				success = false;
-			} else {
-				success = true;
-			}
-
+			success = tf.commit();
 		}
 		return success;
 	}
@@ -204,7 +197,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 	 * @see org.ihtsdo.project.refset.I_ContextualizeDescription#persistChanges()
 	 */
 	public boolean persistChangesNoChecks() throws Exception {
-		boolean success = false;
+		boolean success = true;
 		I_TermFactory tf = Terms.get();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
@@ -260,13 +253,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 			}
 		}
 		if (descriptionPartChanged || extensionPartChanged) {
-			tf.commit();
-			if (tf.getUncommitted().size() > 0) {
-				success = false;
-			} else {
-				success = true;
-			}
-
+			success = tf.commit();
 		}
 		return success;
 	}
