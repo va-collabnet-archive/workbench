@@ -107,7 +107,7 @@ public class CommentPanel extends JPanel {
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- label2 ----
-		label2.setText("From");
+		label2.setText("From:");
 		add(label2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
@@ -116,7 +116,7 @@ public class CommentPanel extends JPanel {
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- label4 ----
-		label4.setText("Role");
+		label4.setText("Role:");
 		add(label4, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
@@ -125,7 +125,7 @@ public class CommentPanel extends JPanel {
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- label3 ----
-		label3.setText("Date");
+		label3.setText("Date:");
 		add(label3, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
@@ -172,25 +172,25 @@ public class CommentPanel extends JPanel {
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 
 	public void setFrom(String from) {
-		lFrom.setText(from);
+		lFrom.setText("<html><body>" + from);
 		
 	}
 
 
 	public void setRole(String role) {
-		lRole.setText(role);
+		lRole.setText("<html><body>" + role);
 		
 	}
 
 
 	public void setDate(String date) {
-		lDate.setText(date);
+		lDate.setText("<html><body>" + date);
 		
 	}
 
 
 	public void setSource(String source) {
-		lSource.setText(source);
+		lSource.setText("<html><body>" + source);
 		
 	}
 }
