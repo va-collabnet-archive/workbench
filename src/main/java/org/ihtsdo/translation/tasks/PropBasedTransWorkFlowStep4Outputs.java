@@ -232,12 +232,12 @@ public class PropBasedTransWorkFlowStep4Outputs extends AbstractTask {
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
-		if (Terms.get().getUncommitted().size() > 0) {
-			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-					"There are uncommitted changes - please cancel or commit before continuing.", 
-					"", JOptionPane.ERROR_MESSAGE);
-			return Condition.STOP;
-		}
+//		if (Terms.get().getUncommitted().size() > 0) {
+//			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
+//					"There are uncommitted changes - please cancel or commit before continuing.", 
+//					"", JOptionPane.ERROR_MESSAGE);
+//			return Condition.STOP;
+//		}
 		try {
 			Thread t = new Thread(new Runnable() {
 				@Override
