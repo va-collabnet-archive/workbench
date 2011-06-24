@@ -151,6 +151,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
     }
 
     public PathBI get(int nid) throws IOException, TerminologyException {
+    	//AceLog.getAppLog().info("BdbPathManager get(int nid) nid = "+nid);
         if (exists(nid)) {
         	//AceLog.getAppLog().info("BdbPathManager exists get nid = "+nid);
             return pathMap.get(nid);
@@ -160,10 +161,14 @@ public class BdbPathManager implements I_Manage<PathBI> {
             if (p != null) {
                 return p;
             }
+            else{
+            	AceLog.getAppLog().severe("path doesn't exists already nor can it be found from the disk");
+            	
+            }
         }
-        AceLog.getAppLog().alertAndLogException(
+        /*AceLog.getAppLog().alertAndLogException(
             new PathNotExistsException("Path not found: " + TerminologyHelper.conceptToString(nid) + " uuid: "
-                + Bdb.getUuidsToNidMap().getUuidsForNid(nid)));
+                + Bdb.getUuidsToNidMap().getUuidsForNid(nid)));*/
 
         pathMap.put(nid, pathMap.get(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid()));
         return pathMap.get(nid);
