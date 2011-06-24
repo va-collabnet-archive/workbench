@@ -382,11 +382,11 @@ public class TranslationConceptEditor6 extends JPanel {
 						try {
 							if (accEvent.getActionCommand().equals("Send as preferred")) {
 								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), preferred.getConceptNid());
-								Terms.get().commit();
+								//Terms.get().commit();
 							}
 							if (accEvent.getActionCommand().equals("Send as acceptable")) {
 								contDescription.contextualizeThisDescription(targetLangRefset.getRefsetId(), acceptable.getConceptNid());
-								Terms.get().commit();
+								//Terms.get().commit();
 							}
 
 							try {
