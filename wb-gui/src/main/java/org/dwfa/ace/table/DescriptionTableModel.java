@@ -22,6 +22,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.EventObject;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -46,15 +47,24 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.Refsets;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.example.binding.WbDescType;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 public abstract class DescriptionTableModel extends AbstractTableModel {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
 
     public enum DESC_FIELD {
+
         SCORE("score", 5, 75, 75),
         DESC_ID("did", 5, 100, 100),
         CON_ID("cid", 5, 100, 100),
@@ -66,13 +76,9 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         TYPE("type", 5, 85, 450),
         VERSION("time", 5, 140, 140),
         PATH("path", 5, 90, 150);
-
         private String columnName;
-
         private int min;
-
         private int pref;
-
         private int max;
 
         private DESC_FIELD(String columnName, int min, int pref, int max) {
@@ -98,11 +104,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             return pref;
         }
     }
-
     private DESC_FIELD[] columns;
-
     private SmallProgressPanel progress = new SmallProgressPanel();
-
     private I_ConfigAceFrame config;
 
     public DescriptionTableModel(DESC_FIELD[] columns, I_ConfigAceFrame config) {
@@ -147,48 +150,59 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             I_DescriptionTuple desc = getDescription(rowIndex);
 
             boolean inConflict = config.getHighlightConflictsInComponentPanel()
-                && config.getConflictResolutionStrategy().isInConflict((I_DescriptionVersioned) desc.getFixedPart());
+                    && config.getConflictResolutionStrategy().isInConflict((I_DescriptionVersioned) desc.getFixedPart());
 
             if (desc == null) {
                 return null;
             }
 
             switch (columns[columnIndex]) {
-            case SCORE:
-                return new StringWithDescTuple(getScore(rowIndex), desc, false, inConflict);
-            case DESC_ID:
-                return new StringWithDescTuple(Integer.toString(desc.getDescId()), desc, false, inConflict);
-            case CON_ID:
-                return new StringWithDescTuple(Integer.toString(desc.getConceptNid()), desc, false, inConflict);
-            case TEXT:
-                if (BasicHTML.isHTMLString(desc.getText())) {
-                    return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
-                } else {
-                    return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
-                }
-            case LANG:
-                return new StringWithDescTuple(desc.getLang(), desc, false, inConflict);
-            case CASE_FIXED:
-                return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
-                    inConflict);
-            case STATUS:
-                     return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
-            case AUTHOR:
-                     return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
-             case TYPE:
-                   return new StringWithDescTuple(getPrefText(desc.getTypeNid()), desc, false, inConflict);
-            case VERSION:
-                if (desc.getTime() == Long.MAX_VALUE) {
-                    return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false, inConflict);
-                }
-                return new StringWithDescTuple(ThinVersionHelper.format(desc.getVersion()), desc, false, inConflict);
-            case PATH:
-                try {
-                    return new StringWithDescTuple(getPrefText(desc.getPathNid()), desc, false, inConflict);
-                } catch (Exception e) {
-                    return new StringWithDescTuple(Integer.toString(desc.getPathNid()) + " no pref desc...", desc,
-                        false, inConflict);
-                }
+                case SCORE:
+                    return new StringWithDescTuple(getScore(rowIndex), desc, false, inConflict);
+                case DESC_ID:
+                    return new StringWithDescTuple(Integer.toString(desc.getDescId()), desc, false, inConflict);
+                case CON_ID:
+                    return new StringWithDescTuple(Integer.toString(desc.getConceptNid()), desc, false, inConflict);
+                case TEXT:
+                    if (BasicHTML.isHTMLString(desc.getText())) {
+                        return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
+                    } else {
+                        return new StringWithDescTuple(desc.getText(), desc, true, inConflict);
+                    }
+                case LANG:
+                    return new StringWithDescTuple(desc.getLang(), desc, false, inConflict);
+                case CASE_FIXED:
+                    return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
+                            inConflict);
+                case STATUS:
+                    return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
+                case AUTHOR:
+                    return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
+                case TYPE:
+                    if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
+                            && isPreferredTerm(desc, Refsets.EN_US_LANG) && isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:EN", desc, false, inConflict);
+                    }else if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
+                            && isPreferredTerm(desc, Refsets.EN_US_LANG) && !isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:US", desc, false, inConflict);
+                    }else if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
+                            && !isPreferredTerm(desc, Refsets.EN_US_LANG) && isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:GB", desc, false, inConflict);
+                    } else {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()), desc, false, inConflict);
+                    }
+                case VERSION:
+                    if (desc.getTime() == Long.MAX_VALUE) {
+                        return new StringWithDescTuple(ThinVersionHelper.uncommittedHtml(), desc, false, inConflict);
+                    }
+                    return new StringWithDescTuple(ThinVersionHelper.format(desc.getVersion()), desc, false, inConflict);
+                case PATH:
+                    try {
+                        return new StringWithDescTuple(getPrefText(desc.getPathNid()), desc, false, inConflict);
+                    } catch (Exception e) {
+                        return new StringWithDescTuple(Integer.toString(desc.getPathNid()) + " no pref desc...", desc,
+                                false, inConflict);
+                    }
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -196,7 +210,40 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         return null;
     }
 
-    protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOException;
+    private boolean isPreferredTerm(I_DescriptionTuple desc, ConceptSpec evalRefset) {
+        boolean isPreferredTerm = false;
+        try {
+            Collection<? extends RefexChronicleBI> refexes =
+                    desc.getCurrentRefexes(config.getViewCoordinate());
+            int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
+
+            if (refexes != null) {
+                for (RefexChronicleBI refex : refexes) {
+                    if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
+                                RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+
+                                if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                    int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                    if (cnid == AcceptabilityType.PREF.getLenient().getNid()) {
+                                        isPreferredTerm = true;
+                                    }
+                                } else {
+                                    System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);
+                                }
+                            } else {
+                                System.out.println("Can't convert: RefexVersionBI:  " + refex);
+                            }
+                    }
+                }
+            }
+            return isPreferredTerm;
+        }catch (IOException e) {
+            return isPreferredTerm;
+    }
+}
+protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOException;
+
     protected abstract int getDescriptionCount() throws IOException;
 
     public String getColumnName(int col) {
@@ -229,89 +276,93 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
             boolean changed = false;
             if (desc.getTime() == Long.MAX_VALUE) {
                 switch (columns[col]) {
-                case DESC_ID:
-                    break;
-                case CON_ID:
-                    break;
-                case TEXT:
-                    desc.setText(value.toString());
-                    changed = true;
-                    break;
-                case LANG:
-                    desc.setLang(value.toString());
-                    changed = true;
-                    break;
-                case CASE_FIXED:
-                    desc.setInitialCaseSignificant((Boolean) value);
-                    changed = true;
-                    break;
-                case STATUS:
-                    Integer statusId = (Integer) value;
-                    desc.setStatusNid(statusId);
-                    changed = true;
-                    break;
-                case TYPE:
-                    Integer typeId = (Integer) value;
-                    desc.setTypeNid(typeId);
-                    changed = true;
-                    break;
-                case VERSION:
-                    break;
-                case PATH:
-                    break;
+                    case DESC_ID:
+                        break;
+                    case CON_ID:
+                        break;
+                    case TEXT:
+                        desc.setText(value.toString());
+                        changed = true;
+                        break;
+                    case LANG:
+                        desc.setLang(value.toString());
+                        changed = true;
+                        break;
+                    case CASE_FIXED:
+                        desc.setInitialCaseSignificant((Boolean) value);
+                        changed = true;
+                        break;
+                    case STATUS:
+                        Integer statusId = (Integer) value;
+                        desc.setStatusNid(statusId);
+                        changed = true;
+                        break;
+                    case TYPE:
+                        Integer typeId = (Integer) value;
+                        desc.setTypeNid(typeId);
+                        changed = true;
+                        break;
+                    case VERSION:
+                        break;
+                    case PATH:
+                        break;
                 }
                 fireTableDataChanged();
                 if (changed) {
                     AceLog.getAppLog().info("Description table changed");
                     updateDataAlerts(row);
                     Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
-               }
+                }
             }
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
-        }
+        
+
+
+
+}
     }
 
     private class UpdateDataAlertsTimerTask extends TimerTask {
-        boolean active = true;
-        final int row;
 
-        public UpdateDataAlertsTimerTask(int row) {
-            super();
-            this.row = row;
-        }
+    boolean active = true;
+    final int row;
 
-        @Override
-        public void run() {
-            if (active) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if (active) {
-                            try {
-                                I_DescriptionTuple desc = getDescription(row);
-                                if (desc != null) {
-                                    Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
-                                }
-                            } catch (IOException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            } catch (TerminologyException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-							}
-                        }
-                    }
-                });
-            }
-        }
-
-        public void setActive(boolean active) {
-            this.active = active;
-        }
-
+    public UpdateDataAlertsTimerTask(int row) {
+        super();
+        this.row = row;
     }
 
-    UpdateDataAlertsTimerTask alertUpdater;
+    @Override
+    public void run() {
+        if (active) {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    if (active) {
+                        try {
+                            I_DescriptionTuple desc = getDescription(row);
+                            if (desc != null) {
+                                Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
+                            }
+                        } catch (IOException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (TerminologyException e) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+}
+UpdateDataAlertsTimerTask alertUpdater;
 
     private void updateDataAlerts(int row) {
         if (alertUpdater != null) {
@@ -322,195 +373,295 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
     }
 
-    public Class<?> getColumnClass(int c) {
-        switch (columns[c]) {
-        case DESC_ID:
-            return Number.class;
-        case CON_ID:
-            return Number.class;
-        case TEXT:
-            return StringWithDescTuple.class;
-        case LANG:
-            return String.class;
-        case CASE_FIXED:
-            return Boolean.class;
-        case STATUS:
-            return Number.class;
-        case TYPE:
-            return Number.class;
-        case VERSION:
-            return Number.class;
-        case PATH:
-            return Number.class;
-        case SCORE:
-            return Number.class;
+    public Class
 
-        }
-        return String.class;
-    }
+
+
+<?> getColumnClass(int c) {
+        switch (columns[c]) {
+            case DESC_ID:
+                return Number.class  
+
+    ;
+            
+    
+    case CON_ID
+    
+    :
+                return Number.
+
+    
+
+    class  
+
+        ;
+            
+        
+        case TEXT
+        
+        :
+                return StringWithDescTuple.
+
+        
+
+        class  
+
+            ;
+            
+            
+            case LANG
+            
+            :
+                return String.
+
+            
+
+            class  
+
+                ;
+            
+                
+                case CASE_FIXED
+                
+                :
+                return Boolean.
+
+                
+
+                class  
+
+                    ;
+            
+                    
+                    case STATUS
+                    
+                    :
+                return Number.
+
+                    
+
+                    class  
+
+                        ;
+            
+                        
+                        case TYPE
+                        
+                        :
+                return Number.
+
+                        
+
+                        class  
+
+                            ;
+            
+                            
+                            case VERSION
+                            
+                            :
+                return Number.
+
+                            
+
+                            class  
+
+                                ;
+            
+                                
+                                case PATH
+                                
+                                :
+                return Number.
+
+                                
+
+                                class  
+
+                                    ;
+            
+                                    
+                                    case SCORE
+                                    
+                                    :
+                return Number.
+
+                                    
+
+                                    class  
+                                    ;
+                                    }
+        
+                                    
+                                    return String.
+
+                                    
+
+                                    class  
+                                    ;
+
+                                    }
 
     public SmallProgressPanel getProgress() {
-        return progress;
-    }
+                                        return progress;
+                                    }
 
-    public void setProgress(SmallProgressPanel progress) {
-        this.progress = progress;
-    }
+                                    public void setProgress(SmallProgressPanel progress) {
+                                        this.progress = progress;
+                                    }
 
-    public static class StringWithDescTuple extends StringWithTuple<StringWithDescTuple>  {
-        I_DescriptionTuple tuple;
+                                    public static class StringWithDescTuple extends StringWithTuple<StringWithDescTuple> {
 
-        boolean wrapLines;
+                                        I_DescriptionTuple tuple;
+                                        boolean wrapLines;
 
-        public StringWithDescTuple(String cellText, I_DescriptionTuple tuple, boolean wrapLines, boolean inConflict) {
-            super(cellText, inConflict);
-            this.tuple = tuple;
-            this.wrapLines = wrapLines;
-        }
+                                        public StringWithDescTuple(String cellText, I_DescriptionTuple tuple, boolean wrapLines, boolean inConflict) {
+                                            super(cellText, inConflict);
+                                            this.tuple = tuple;
+                                            this.wrapLines = wrapLines;
+                                        }
 
-        public I_DescriptionTuple getTuple() {
-            return tuple;
-        }
+                                        public I_DescriptionTuple getTuple() {
+                                            return tuple;
+                                        }
 
-        public boolean getWrapLines() {
-            return wrapLines;
-        }
+                                        public boolean getWrapLines() {
+                                            return wrapLines;
+                                        }
 
-        public void setWrapLines(boolean wrapLines) {
-            this.wrapLines = wrapLines;
-        }
-    }
+                                        public void setWrapLines(boolean wrapLines) {
+                                            this.wrapLines = wrapLines;
+                                        }
+                                    }
 
-    public static class DescTextFieldEditor extends DefaultCellEditor {
+                                    public static class DescTextFieldEditor extends DefaultCellEditor {
 
-        private static final long serialVersionUID = 1L;
+                                        private static final long serialVersionUID = 1L;
 
-        private class TextFieldFocusListener implements FocusListener {
+                                        private class TextFieldFocusListener implements FocusListener {
 
-            public void focusGained(FocusEvent e) {
-                // nothing to do
-            }
+                                            public void focusGained(FocusEvent e) {
+                                                // nothing to do
+                                            }
 
-            public void focusLost(FocusEvent e) {
-                delegate.stopCellEditing();
-            }
+                                            public void focusLost(FocusEvent e) {
+                                                delegate.stopCellEditing();
+                                            }
+                                        }
+                                        JTextField textField;
+                                        int row;
+                                        int column;
 
-        }
+                                        public DescTextFieldEditor() {
+                                            super(new JTextField());
+                                            textField = new JTextField();
+                                            textField.addFocusListener(new TextFieldFocusListener());
+                                            editorComponent = textField;
 
-        JTextField textField;
-        int row;
-        int column;
+                                            delegate = new EditorDelegate() {
 
-        public DescTextFieldEditor() {
-            super(new JTextField());
-            textField = new JTextField();
-            textField.addFocusListener(new TextFieldFocusListener());
-            editorComponent = textField;
+                                                private static final long serialVersionUID = 1L;
 
-            delegate = new EditorDelegate() {
-                private static final long serialVersionUID = 1L;
+                                                public void setValue(Object value) {
+                                                    if (StringWithDescTuple.class.isAssignableFrom(value.getClass())) {
+                                                        StringWithDescTuple swdt = (StringWithDescTuple) value;
+                                                        textField.setText((value != null) ? swdt.tuple.getText() : "");
+                                                    } else {
+                                                        textField.setText((value != null) ? value.toString() : "");
+                                                    }
+                                                }
 
-                public void setValue(Object value) {
-                    if (StringWithDescTuple.class.isAssignableFrom(value.getClass())) {
-                        StringWithDescTuple swdt = (StringWithDescTuple) value;
-                        textField.setText((value != null) ? swdt.tuple.getText() : "");
-                    } else {
-                        textField.setText((value != null) ? value.toString() : "");
-                    }
-                }
+                                                public Object getCellEditorValue() {
+                                                    return textField.getText();
+                                                }
+                                            };
+                                            textField.addActionListener(delegate);
+                                        }
 
-                public Object getCellEditorValue() {
-                    return textField.getText();
-                }
-            };
-            textField.addActionListener(delegate);
-        }
+                                        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                                            this.row = row;
+                                            this.column = column;
+                                            ((JComponent) getComponent()).setBorder(new LineBorder(Color.black));
+                                            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+                                        }
 
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.row = row;
-            this.column = column;
-            ((JComponent) getComponent()).setBorder(new LineBorder(Color.black));
-            return super.getTableCellEditorComponent(table, value, isSelected, row, column);
-        }
+                                        @Override
+                                        public boolean isCellEditable(EventObject evt) {
+                                            if (evt instanceof MouseEvent) {
+                                                int clickCount;
+                                                // For double-click activation
+                                                clickCount = 2;
+                                                return ((MouseEvent) evt).getClickCount() >= clickCount;
+                                            }
+                                            return true;
+                                        }
+                                    }
 
-        @Override
-        public boolean isCellEditable(EventObject evt) {
-            if (evt instanceof MouseEvent) {
-                int clickCount;
-                // For double-click activation
-                clickCount = 2;
-                return ((MouseEvent) evt).getClickCount() >= clickCount;
-            }
-            return true;
-        }
-    }
+                                    public static class DescTypeFieldEditor extends AbstractPopupFieldEditor {
 
-    public static class DescTypeFieldEditor extends AbstractPopupFieldEditor {
+                                        private static final long serialVersionUID = 1L;
 
-        private static final long serialVersionUID = 1L;
+                                        public DescTypeFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
+                                            super(config);
+                                        }
 
-        public DescTypeFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
-            super(config);
-        }
+                                        @Override
+                                        public int[] getPopupValues() {
+                                            return config.getEditDescTypePopup().getListArray();
+                                        }
 
-        @Override
-        public int[] getPopupValues() {
-            return config.getEditDescTypePopup().getListArray();
-        }
+                                        @Override
+                                        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
+                                            StringWithDescTuple swdt = (StringWithDescTuple) value;
+                                            return Terms.get().getConcept(swdt.getTuple().getTypeId());
+                                        }
 
-        @Override
-        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
-            StringWithDescTuple swdt = (StringWithDescTuple) value;
-            return Terms.get().getConcept(swdt.getTuple().getTypeId());
-        }
+                                        @Override
+                                        public boolean isCellEditable(EventObject evt) {
+                                            if (evt instanceof MouseEvent) {
+                                                int clickCount;
+                                                // For double-click activation
+                                                clickCount = 2;
+                                                return ((MouseEvent) evt).getClickCount() >= clickCount;
+                                            }
+                                            return true;
+                                        }
+                                    }
 
-        @Override
-        public boolean isCellEditable(EventObject evt) {
-            if (evt instanceof MouseEvent) {
-                int clickCount;
-                // For double-click activation
-                clickCount = 2;
-                return ((MouseEvent) evt).getClickCount() >= clickCount;
-            }
-            return true;
-        }
-    }
+                                    public static class DescStatusFieldEditor extends AbstractPopupFieldEditor {
 
-    public static class DescStatusFieldEditor extends AbstractPopupFieldEditor {
+                                        private static final long serialVersionUID = 1L;
 
-        private static final long serialVersionUID = 1L;
+                                        public DescStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
+                                            super(config);
+                                        }
 
-        public DescStatusFieldEditor(I_ConfigAceFrame config) throws TerminologyException, IOException {
-            super(config);
-        }
+                                        @Override
+                                        public int[] getPopupValues() {
+                                            return config.getEditStatusTypePopup().getListArray();
+                                        }
 
-        @Override
-        public int[] getPopupValues() {
-            return config.getEditStatusTypePopup().getListArray();
-        }
+                                        @Override
+                                        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
+                                            StringWithDescTuple swdt = (StringWithDescTuple) value;
+                                            return Terms.get().getConcept(swdt.getTuple().getStatusId());
+                                        }
 
-        @Override
-        public I_GetConceptData getSelectedItem(Object value) throws TerminologyException, IOException {
-            StringWithDescTuple swdt = (StringWithDescTuple) value;
-            return Terms.get().getConcept(swdt.getTuple().getStatusId());
-        }
+                                        @Override
+                                        public boolean isCellEditable(EventObject evt) {
+                                            if (evt instanceof MouseEvent) {
+                                                int clickCount;
+                                                // For double-click activation
+                                                clickCount = 2;
+                                                return ((MouseEvent) evt).getClickCount() >= clickCount;
+                                            }
+                                            return true;
+                                        }
+                                    }
 
-        @Override
-        public boolean isCellEditable(EventObject evt) {
-            if (evt instanceof MouseEvent) {
-                int clickCount;
-                // For double-click activation
-                clickCount = 2;
-                return ((MouseEvent) evt).getClickCount() >= clickCount;
-            }
-            return true;
-        }
-    }
+                                    public DESC_FIELD[] getColumnEnums() {
+                                        return columns;
+                                    }
 
-    public DESC_FIELD[] getColumnEnums() {
-        return columns;
-    }
-
-    public abstract String getScore(int rowIndex);
-
-}
+                                    public abstract String getScore(int rowIndex);
+                                }
