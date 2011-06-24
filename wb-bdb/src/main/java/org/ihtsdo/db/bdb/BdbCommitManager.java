@@ -1340,4 +1340,8 @@ public class BdbCommitManager {
             doUpdate();
         }
     }
+    
+    public static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> getDatacheckMap() {
+    	return dataCheckMap;
+    }
 }
