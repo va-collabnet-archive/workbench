@@ -13,8 +13,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.time.TimeUtil;
-
+import org.ihtsdo.helper.time.TimeHelper;
 
 /**
  * Goal which generates an incremental e-concept file, in a change set 
@@ -119,8 +118,8 @@ public class GenerateIECFile extends AbstractMojo  {
                 new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), timeStampEnabled);
             String key = UUID.randomUUID().toString();
             ChangeSetWriterHandler.addWriter(key, writer);
-            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeUtil.getFileDateFormat().parse(startDate).getTime(), 
-                TimeUtil.getFileDateFormat().parse(endDate).getTime());
+            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeHelper.getFileDateFormat().parse(startDate).getTime(), 
+                TimeHelper.getFileDateFormat().parse(endDate).getTime());
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
             if (sapsToWrite.size() > 0) {
                 ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
