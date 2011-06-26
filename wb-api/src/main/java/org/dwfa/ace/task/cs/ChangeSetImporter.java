@@ -43,6 +43,7 @@ public abstract class ChangeSetImporter implements ActionListener {
 
     private boolean continueImport = true;
 
+    @Override
     public void actionPerformed(ActionEvent arg0) {
         continueImport = false;
     }
@@ -64,7 +65,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             activity.addRefreshActionListener(this);
             String[] validatorArray = new String[] {};
 
-            if (validators != null && validators != "") {
+            if (validators != null && !"".equals(validators)) {
                 validatorArray = validators.split("'");
             }
 
@@ -81,8 +82,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
-                logger.info("Adding reader: " + csf.getAbsolutePath() + "\nThis has nextCommitTime() of : "
-                    + csr.nextCommitTime() + " (" + new Date(csr.nextCommitTime()) + ")");
+                logger.log(Level.INFO, "Adding reader: {0}\nThis has nextCommitTime() of : {1} ({2})", new Object[]{csf.getAbsolutePath(), csr.nextCommitTime(), new Date(csr.nextCommitTime())});
             }
 
             int max = avaibleBytes(readerSet);
@@ -141,7 +141,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
-        if (readerSet.size() == 0) {
+        if (readerSet.isEmpty()) {
             return;
         }
         I_TermFactory tf = Terms.get();
@@ -196,6 +196,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             final String prefix) {
         File[] children = rootFile.listFiles(new FileFilter() {
 
+            @Override
             public boolean accept(File child) {
                 if (child.isHidden() || child.getName().startsWith(".")) {
                     return false;
