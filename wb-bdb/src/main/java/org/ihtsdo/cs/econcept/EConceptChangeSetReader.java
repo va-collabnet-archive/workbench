@@ -167,6 +167,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 throw new IOException(e);
             }
         }
+        Concept.resolveUnresolvedAnnotations();
         try {
             if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                 AceLog.getEditLog().fine("Committing time branches: " + values);

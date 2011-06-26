@@ -47,6 +47,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
@@ -286,22 +287,72 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         if (eConcept.getRefsetMembers() != null
                 && !eConcept.getRefsetMembers().isEmpty()) {
-            if (c.getRefsetMembers() == null || c.getRefsetMembers().isEmpty()) {
-                setRefsetMembersFromEConcept(eConcept, c);
-            } else {
-                Set<Integer> currentMemberNids = c.data.getMemberNids();
+            if (c.isAnnotationStyleRefex()) {
                 for (TkRefsetAbstractMember<?> er : eConcept.getRefsetMembers()) {
-                    int rNid = Bdb.uuidToNid(er.primordialUuid);
-                    RefsetMember<?, ?> r = c.getRefsetMember(rNid);
-                    if (currentMemberNids.contains(rNid) && r != null) {
-                        r.merge((RefsetMember) RefsetMemberFactory.create(er, c.getNid()));
+                    ConceptComponent cc;
+                    Object referencedComponent = Ts.get().getComponent(er.getComponentUuid());
+                    if (referencedComponent != null) {
+                        if (referencedComponent instanceof Concept) {
+                            cc = ((Concept) referencedComponent).getConceptAttributes();
+                        } else {
+                            cc = (ConceptComponent) referencedComponent;
+                        }
+                        RefsetMember r = (RefsetMember) Ts.get().getComponent(er.getPrimordialComponentUuid());
+                        if (r == null) {
+                            cc.addAnnotation(RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                        } else {
+                            r.merge((RefsetMember) RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                        }
                     } else {
-                        c.getRefsetMembers().add(RefsetMemberFactory.create(er, c.getNid()));
+                        unresolvedAnnotations.add(er);
+                    }
+                }
+            } else {
+                if (c.getRefsetMembers() == null || c.getRefsetMembers().isEmpty()) {
+                    setRefsetMembersFromEConcept(eConcept, c);
+                } else {
+                    Set<Integer> currentMemberNids = c.data.getMemberNids();
+                    for (TkRefsetAbstractMember<?> er : eConcept.getRefsetMembers()) {
+                        int rNid = Bdb.uuidToNid(er.primordialUuid);
+                        RefsetMember<?, ?> r = c.getRefsetMember(rNid);
+                        if (currentMemberNids.contains(rNid) && r != null) {
+                            r.merge((RefsetMember) RefsetMemberFactory.create(er, c.getNid()));
+                        } else {
+                            c.getRefsetMembers().add(RefsetMemberFactory.create(er, c.getNid()));
+                        }
                     }
                 }
             }
         }
         return c;
+    }
+    private static List<TkRefsetAbstractMember<?>> unresolvedAnnotations = new ArrayList<TkRefsetAbstractMember<?>>();
+
+    public static void resolveUnresolvedAnnotations() throws IOException {
+        List<TkRefsetAbstractMember<?>> cantResolve = new ArrayList<TkRefsetAbstractMember<?>>();
+        for (TkRefsetAbstractMember<?> er : unresolvedAnnotations) {
+            ConceptComponent cc;
+            Object referencedComponent = Ts.get().getComponent(er.getComponentUuid());
+            if (referencedComponent != null) {
+                if (referencedComponent instanceof Concept) {
+                    cc = ((Concept) referencedComponent).getConceptAttributes();
+                } else {
+                    cc = (ConceptComponent) referencedComponent;
+                }
+                RefsetMember r = (RefsetMember) Ts.get().getComponent(er.getPrimordialComponentUuid());
+                if (r == null) {
+                    cc.addAnnotation(RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                } else {
+                    r.merge((RefsetMember) RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                }
+            } else {
+                cantResolve.add(er);
+            }
+        }
+        
+        if (!cantResolve.isEmpty()) {
+            AceLog.getAppLog().alertAndLogException(new Exception("Can't resolve some annotations on import: " + cantResolve));
+        }
     }
 
     private static void setRefsetMembersFromEConcept(EConcept eConcept,
@@ -1901,7 +1952,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public void cancel() throws IOException {
         data.cancel();
-        
+
         if (BdbCommitManager.forget(getConceptAttributes())) {
             Bdb.getConceptDb().forget(this);
             canceled = true;
