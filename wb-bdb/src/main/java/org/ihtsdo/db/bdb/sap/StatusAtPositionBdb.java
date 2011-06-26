@@ -22,6 +22,7 @@ import org.dwfa.vodb.types.Position;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 
@@ -61,6 +62,31 @@ public class StatusAtPositionBdb extends ComponentBdb {
      */
     private SapToIntHashMap sapToIntMap;
     private boolean changedSinceSync = false;
+
+    public void cancelAfterCommit(NidSetBI commitSapNids) throws IOException {
+        synchronized (uncomittedStatusPathEntries) {
+            int min = Integer.MAX_VALUE;
+            expandPermit.acquireUninterruptibly();
+            for (int sapNid : commitSapNids.getSetValues()) {
+                min = Math.min(min, sapNid);
+            }
+            
+            for (int sapNid : uncomittedStatusPathEntries.values()) {
+                min = Math.min(min, sapNid);
+            }
+            
+            for (int i = min; i < sequence.get(); i++) {
+                changedSinceSync = true;
+                mutableArray.commitTimes[getReadWriteIndex(i)] = Long.MIN_VALUE;
+                sapToIntMap.put(getStatusNid(i), getAuthorNid(i), getPathNid(i), Long.MIN_VALUE, i);
+            }
+
+            uncomittedStatusPathEntries.clear();
+            mapperCache.clear();
+            expandPermit.release();
+        }
+        sync();
+    }
 
     private static class PositionArrayBinder extends TupleBinding<PositionArrays> {
 

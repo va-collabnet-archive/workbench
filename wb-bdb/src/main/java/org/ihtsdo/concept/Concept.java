@@ -1878,7 +1878,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
             ViewCoordinate xyz) throws IOException {
-        return getConceptAttributes().getCurrentRefexes(xyz);
+        if (getConceptAttributes() != null) {
+            return getConceptAttributes().getCurrentRefexes(xyz);
+        }
+        return new ArrayList<RefexVersionBI<?>>(0);
     }
 
     @Override

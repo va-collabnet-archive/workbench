@@ -14,6 +14,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
+import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
@@ -212,6 +213,7 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                         + "\n##################################################################\n");
                 AceLog.getAppLog().alertAndLogException(new Exception("Exception writing change set for: " + c
                         + "\n See log for details", e));
+                Bdb.getSapDb().cancelAfterCommit(commitSapNids);
 
             }
             if (cswcOut != null) {
