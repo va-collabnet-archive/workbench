@@ -53,7 +53,6 @@ import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.util.swing.GuiUtil;
 
@@ -110,46 +109,47 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         try {
             for (int i = 0; i < termList.getSize(); i++) {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
-
-                // EXISTING PARENTS
-                for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                    for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
-                        if (rvbi.isStated() ) {
-                            setParents.add(rvbi.getDestinationNid());
+                if (!cb.isCanceled()) {
+                    // EXISTING PARENTS
+                    for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                            if (rvbi.isStated()) {
+                                setParents.add(rvbi.getDestinationNid());
+                            }
                         }
                     }
-                }
 
-                // EXISTING ROLES
-                for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
-                    for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
-                        if (rvbi.isStated()) {
-                            setRoles.add(rvbi.getNid());
+                    // EXISTING ROLES
+                    for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
+                        for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
+                            if (rvbi.isStated()) {
+                                setRoles.add(rvbi.getNid());
+                            }
                         }
                     }
-                }
-                
-                //
-                Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
-                for (RefexVersionBI<?> rvbi : cr) {
-                    int refexNid = rvbi.getCollectionNid();
-                    existingRefsetTypes.put(refexNid, RefexStrVersionBI.class);
-                    if (RefexStrVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                        RefexStrVersionBI r = (RefexStrVersionBI) rvbi;
-                    } else if (RefexBooleanVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                        RefexBooleanVersionBI r = (RefexBooleanVersionBI) rvbi;
 
-                        // rvbi.getRefexEditSpec() throws exception on internal index = -1
-                        // RefexBooleanAnalogBI ra = (RefexBooleanAnalogBI) r.makeAnalog(r.getStatusNid(), r.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
-                        // ra.setBoolean1(true);
-                    } else if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                        RefexCnidVersionBI r = (RefexCnidVersionBI) rvbi;
-                    } else if (RefexIntVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                        RefexIntVersionBI r = (RefexIntVersionBI) rvbi;
-                    } else if (RefexLongVersionBI.class.isAssignableFrom(rvbi.getClass())) {
-                        RefexLongVersionBI r = (RefexLongVersionBI) rvbi;
+                    //
+                    Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
+                    for (RefexVersionBI<?> rvbi : cr) {
+                        int refexNid = rvbi.getCollectionNid();
+                        existingRefsetTypes.put(refexNid, RefexStrVersionBI.class);
+                        if (RefexStrVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexStrVersionBI r = (RefexStrVersionBI) rvbi;
+                        } else if (RefexBooleanVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexBooleanVersionBI r = (RefexBooleanVersionBI) rvbi;
+
+                            // rvbi.getRefexEditSpec() throws exception on internal index = -1
+                            // RefexBooleanAnalogBI ra = (RefexBooleanAnalogBI) r.makeAnalog(r.getStatusNid(), r.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
+                            // ra.setBoolean1(true);
+                        } else if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexCnidVersionBI r = (RefexCnidVersionBI) rvbi;
+                        } else if (RefexIntVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexIntVersionBI r = (RefexIntVersionBI) rvbi;
+                        } else if (RefexLongVersionBI.class.isAssignableFrom(rvbi.getClass())) {
+                            RefexLongVersionBI r = (RefexLongVersionBI) rvbi;
+                        }
+                        setRefsets.add(refexNid);
                     }
-                    setRefsets.add(refexNid);
                 }
             }
             // CONVERT SET TO LIST

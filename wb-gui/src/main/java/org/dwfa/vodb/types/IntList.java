@@ -40,10 +40,11 @@ import org.dwfa.ace.list.TerminologyIntListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
 
 public class IntList implements ListDataListener, I_IntList {
-    private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 
+    private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
     private List<Integer> listValues = new ArrayList<Integer>(2);
 
     public IntList(int[] values) {
@@ -96,22 +97,26 @@ public class IntList implements ListDataListener, I_IntList {
         for (int i = 0; i < size; i++) {
             try {
                 if (ignoreMappingErrors) {
-                    try {
-                        Object uuidObj = in.readObject();
-                        if (uuidObj != null) {
-                            if (List.class.isAssignableFrom(uuidObj.getClass())) {
-                                list[i] = Terms.get().uuidToNative((List<UUID>) uuidObj);
-                            } else {
-                                AceLog.getAppLog().alertAndLogException(
-                                    new Exception("<html>Expecting List<UUID>. Found:<br>" + uuidObj));
+                    Object uuidObj = in.readObject();
+                    if (uuidObj != null) {
+                        if (List.class.isAssignableFrom(uuidObj.getClass())) {
+                            boolean found = false;
+                            for (UUID uuid : (List<UUID>) uuidObj) {
+                                if (Ts.get().hasUuid(uuid)) {
+                                    list[i] = Ts.get().getNidForUuids(uuid);
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found) {
+                                unmappedIds++;
+                                list[i] = Integer.MAX_VALUE;
+                            }
+                        } else {
+                            AceLog.getAppLog().alertAndLogException(
+                                    new Exception("<html>Expecting List<UUID>. Found:<br>" + uuidObj));
                         }
-                    } catch (NoMappingException e) {
-                        AceLog.getAppLog().log(Level.FINE, e.getLocalizedMessage(), e);
-                        unmappedIds++;
-                        list[i] = Integer.MAX_VALUE;
                     }
-
                 } else {
                     list[i] = Terms.get().uuidToNative((List<UUID>) in.readObject());
                 }
@@ -148,7 +153,7 @@ public class IntList implements ListDataListener, I_IntList {
      * org.dwfa.vodb.types.I_IntList#contentsChanged(javax.swing.event.ListDataEvent
      * )
      */
-   @Override
+    @Override
     public void contentsChanged(ListDataEvent e) {
         handleChange(e);
         for (ListDataListener l : listeners) {
@@ -186,7 +191,7 @@ public class IntList implements ListDataListener, I_IntList {
      * org.dwfa.vodb.types.I_IntList#intervalAdded(javax.swing.event.ListDataEvent
      * )
      */
-   @Override
+    @Override
     public void intervalAdded(ListDataEvent e) {
         handleChange(e);
         for (ListDataListener l : listeners) {
@@ -206,7 +211,7 @@ public class IntList implements ListDataListener, I_IntList {
      * org.dwfa.vodb.types.I_IntList#intervalRemoved(javax.swing.event.ListDataEvent
      * )
      */
-   @Override
+    @Override
     public void intervalRemoved(ListDataEvent e) {
         handleChange(e);
         for (ListDataListener l : listeners) {
@@ -220,7 +225,7 @@ public class IntList implements ListDataListener, I_IntList {
      * @seeorg.dwfa.vodb.types.I_IntList#addListDataListener(javax.swing.event.
      * ListDataListener)
      */
-   @Override
+    @Override
     public boolean addListDataListener(ListDataListener o) {
         return listeners.add(o);
     }
@@ -232,7 +237,7 @@ public class IntList implements ListDataListener, I_IntList {
      * org.dwfa.vodb.types.I_IntList#removeListDataListener(javax.swing.event
      * .ListDataListener)
      */
-   @Override
+    @Override
     public boolean removeListDataListener(ListDataListener o) {
         return listeners.remove(o);
     }
@@ -242,7 +247,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#add(int, java.lang.Integer)
      */
-   @Override
+    @Override
     public void add(int index, Integer element) {
         listValues.add(index, element);
         handleChange(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index - 1, listValues.size()));
@@ -253,7 +258,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#add(java.lang.Integer)
      */
-   @Override
+    @Override
     public boolean add(Integer o) {
         boolean returnValue = listValues.add(o);
         intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, listValues.size() - 1, listValues.size()));
@@ -265,7 +270,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#addAll(java.util.Collection)
      */
-   @Override
+    @Override
     public boolean addAll(Collection<? extends Integer> c) {
         boolean returnValue = listValues.addAll(c);
         intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, listValues.size()));
@@ -277,7 +282,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#addAll(int, java.util.Collection)
      */
-   @Override
+    @Override
     public boolean addAll(int index, Collection<? extends Integer> c) {
         boolean returnValue = listValues.addAll(index, c);
         intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, 0, listValues.size()));
@@ -289,7 +294,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#clear()
      */
-   @Override
+    @Override
     public void clear() {
         int oldSize = listValues.size();
         listValues.clear();
@@ -301,7 +306,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#contains(java.lang.Object)
      */
-   @Override
+    @Override
     public boolean contains(Object o) {
         return listValues.contains(o);
     }
@@ -311,7 +316,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#containsAll(java.util.Collection)
      */
-   @Override
+    @Override
     public boolean containsAll(Collection<?> c) {
         return listValues.containsAll(c);
     }
@@ -321,7 +326,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#get(int)
      */
-   @Override
+    @Override
     public Integer get(int index) {
         return listValues.get(index);
     }
@@ -331,7 +336,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#indexOf(java.lang.Object)
      */
-   @Override
+    @Override
     public int indexOf(Object o) {
         return listValues.indexOf(o);
     }
@@ -341,7 +346,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#isEmpty()
      */
-   @Override
+    @Override
     public boolean isEmpty() {
         return listValues.isEmpty();
     }
@@ -351,7 +356,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#iterator()
      */
-   @Override
+    @Override
     public Iterator<Integer> iterator() {
         return listValues.iterator();
     }
@@ -361,7 +366,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#lastIndexOf(java.lang.Object)
      */
-   @Override
+    @Override
     public int lastIndexOf(Object o) {
         return listValues.lastIndexOf(o);
     }
@@ -371,7 +376,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#listIterator()
      */
-   @Override
+    @Override
     public ListIterator<Integer> listIterator() {
         return listValues.listIterator();
     }
@@ -381,7 +386,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#listIterator(int)
      */
-   @Override
+    @Override
     public ListIterator<Integer> listIterator(int index) {
         return listValues.listIterator(index);
     }
@@ -391,7 +396,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#remove(int)
      */
-   @Override
+    @Override
     public Integer remove(int index) {
         int oldSize = listValues.size();
         Integer returnValue = listValues.remove(index);
@@ -404,7 +409,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#remove(java.lang.Object)
      */
-   @Override
+    @Override
     public boolean remove(Object o) {
         int oldSize = listValues.size();
         boolean returnValue = listValues.remove(o);
@@ -417,7 +422,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#removeAll(java.util.Collection)
      */
-   @Override
+    @Override
     public boolean removeAll(Collection<?> c) {
         int oldSize = listValues.size();
         boolean returnValue = listValues.removeAll(c);
@@ -430,7 +435,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#retainAll(java.util.Collection)
      */
-   @Override
+    @Override
     public boolean retainAll(Collection<?> c) {
         int oldSize = listValues.size();
         boolean returnValue = listValues.retainAll(c);
@@ -443,7 +448,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#set(int, java.lang.Integer)
      */
-   @Override
+    @Override
     public Integer set(int index, Integer element) {
         Integer old = listValues.set(index, element);
         contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index));
@@ -455,7 +460,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#size()
      */
-   @Override
+    @Override
     public int size() {
         return listValues.size();
     }
@@ -465,7 +470,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#subList(int, int)
      */
-   @Override
+    @Override
     public List<Integer> subList(int fromIndex, int toIndex) {
         return listValues.subList(fromIndex, toIndex);
     }
@@ -475,7 +480,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#toArray()
      */
-   @Override
+    @Override
     public Object[] toArray() {
         return listValues.toArray();
     }
@@ -485,7 +490,7 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#toArray(T[])
      */
-   @Override
+    @Override
     public <T> T[] toArray(T[] a) {
         return listValues.toArray(a);
     }
@@ -495,12 +500,12 @@ public class IntList implements ListDataListener, I_IntList {
      *
      * @see org.dwfa.vodb.types.I_IntList#getListValues()
      */
-   @Override
+    @Override
     public List<Integer> getListValues() {
         return listValues;
     }
 
-   @Override
+    @Override
     public int[] getListArray() {
         int[] listArray = new int[listValues.size()];
         for (int i = 0; i < listArray.length; i++) {
@@ -509,23 +514,23 @@ public class IntList implements ListDataListener, I_IntList {
         return listArray;
     }
 
-   @Override
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[");
         int count = 0;
         for (int i : listValues) {
             try {
-            	if (Terms.get().hasConcept(i)) {
+                if (Terms.get().hasConcept(i)) {
                     buf.append(Terms.get().getConcept(i).getInitialText());
-            	} else {
+                } else {
                     buf.append(i);
-            	}
+                }
             } catch (IOException e) {
                 buf.append(i);
             } catch (TerminologyException e) {
                 buf.append(i);
-			}
+            }
             if (count++ < listValues.size() - 1) {
                 buf.append(", ");
             }
@@ -533,5 +538,4 @@ public class IntList implements ListDataListener, I_IntList {
         buf.append("]");
         return buf.toString();
     }
-
 }
