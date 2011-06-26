@@ -152,16 +152,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 if (csreOut != null) {
                     csreOut.flush();
                     csreOut.close();
-                    if (csreFile.length() == 0) {
-                        csreFile.delete();
-                    }
+                    csreFile.delete();
                 }
                 if (csrcOut != null) {
                     csrcOut.flush();
                     csrcOut.close();
-                    if (csrcFile.length() == 0) {
-                        csrcFile.delete();
-                    }
+                    csrcFile.delete();
                 }
             } catch (Exception e) {
                 throw new IOException(e);
