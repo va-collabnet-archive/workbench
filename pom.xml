@@ -71,7 +71,7 @@
             <version>${juint.version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+    </dependencies> 
     <dependencyManagement>
         <dependencies>
             <dependency>

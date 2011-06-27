@@ -61,8 +61,9 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(" refsetUuid:");
         buff.append(this.refsetUuid);
         buff.append(" componentUuid:");
@@ -77,6 +78,7 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
      * 
      * @return a hash code value for this <tt>ERefset</tt>.
      */
+    @Override
     public int hashCode() {
         return this.primordialUuid.hashCode();
     }
@@ -91,6 +93,7 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;

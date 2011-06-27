@@ -3,7 +3,9 @@ package org.ihtsdo.cs.econcept;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.dwfa.ace.log.AceLog;
@@ -309,5 +311,42 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                 }
             }
         }
-    }
+        if (v.getAnnotations() != null) {
+            HashMap<UUID, TkRefsetAbstractMember<?>> annotationMap = new HashMap<UUID, TkRefsetAbstractMember<?>>();
+            if (ec.getAnnotations() != null) {
+                for (TkRefsetAbstractMember<?> member : (Collection<TkRefsetAbstractMember<?>>) ec.getAnnotations()) {
+                    annotationMap.put(member.getPrimordialComponentUuid(), member);
+                }
+            }
+            for (RefsetMember<?, ?> member : (Collection<RefsetMember<?, ?>>) v.getAnnotations()) {
+                TkRefsetAbstractMember<?> eMember = null;
+                Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
+                if (concept != null && !concept.isCanceled()) {
+                    for (RefsetMember<?, ?>.Version mv : member.getTuples()) {
+                        if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                            if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
+                                try {
+                                    if (eMember == null) {
+                                        eMember = mv.getERefsetMember();
+                                        if (eMember != null) {
+                                            if (ec.getAnnotations() == null) {
+                                                ec.setAnnotations(new ArrayList());
+                                            }
+                                            ec.getAnnotations().add(eMember);
+                                            setupFirstVersion(eMember, mv);
+                                        }
+                                    } else {
+                                        TkRevision eRevision = mv.getERefsetRevision();
+                                        setupRevision(eMember, mv, eRevision);
+                                    }
+                                } catch (TerminologyException e) {
+                                    throw new IOException(e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } 
 }
