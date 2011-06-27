@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ProjectMembersStatusTotals" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="400"/>
+	<property name="ireport.y" value="2926"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#FFFFFF" fontName="Arial" fontSize="12" isBold="true"/>
@@ -29,6 +29,9 @@
 	</variable>
 	<variable name="status_COUNT" class="java.lang.Integer" resetType="Group" resetGroup="WorkList" calculation="Count">
 		<variableExpression><![CDATA[$F{Status}]]></variableExpression>
+	</variable>
+	<variable name="PC" class="java.lang.Integer" incrementType="Report" calculation="Highest">
+		<variableExpression><![CDATA[$V{PAGE_NUMBER}+1]]></variableExpression>
 	</variable>
 	<group name="Project">
 		<groupExpression><![CDATA[$F{Project}]]></groupExpression>
@@ -310,67 +313,74 @@
 	<background>
 		<band height="822" splitType="Stretch">
 			<rectangle>
-				<reportElement positionType="Float" x="-21" y="374" width="105" height="348" backcolor="#79A0DA"/>
+				<reportElement x="7" y="655" width="13" height="13" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="-9" y="791" width="51" height="30"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_COUNT}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="-15" y="577" width="10" height="10" forecolor="#101B8A" backcolor="#101B8A"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-8" y="453" width="15" height="15" forecolor="#0178C7" backcolor="#0178C7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-20" y="722" width="72" height="100" forecolor="#C5C5D9" backcolor="#C5C5D9"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-5" y="513" width="13" height="13" forecolor="#6161F6" backcolor="#6161F6"/>
+			</rectangle>
+			<rectangle>
+				<reportElement positionType="Float" x="-20" y="374" width="73" height="348" backcolor="#79A0DA"/>
 				<graphicElement>
 					<pen lineWidth="0.0"/>
 				</graphicElement>
 			</rectangle>
-			<line>
-				<reportElement x="-20" y="643" width="104" height="1" forecolor="#006699"/>
-			</line>
 			<rectangle>
-				<reportElement x="6" y="655" width="13" height="13" forecolor="#B0023F" backcolor="#B0023F"/>
+				<reportElement x="-6" y="526" width="7" height="7" forecolor="#CCCCFF" backcolor="#CCCCFF"/>
 			</rectangle>
+			<rectangle>
+				<reportElement x="43" y="533" width="6" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
+			<line>
+				<reportElement x="-9" y="791" width="51" height="1"/>
+			</line>
+			<textField evaluationTime="Page">
+				<reportElement x="-9" y="745" width="51" height="46"/>
+				<textElement textAlignment="Center">
+					<font size="32"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement x="0" y="551" width="25" height="82" forecolor="#FFFFFF"/>
+				<reportElement x="1" y="551" width="25" height="82" forecolor="#FFFFFF"/>
 				<textElement rotation="Left">
 					<font size="20" isBold="true"/>
 				</textElement>
 				<text><![CDATA[IHTSDO]]></text>
 			</staticText>
+			<line>
+				<reportElement x="-19" y="643" width="68" height="1" forecolor="#006699"/>
+			</line>
+			<rectangle>
+				<reportElement x="8" y="484" width="12" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
+			</rectangle>
 			<staticText>
-				<reportElement x="23" y="388" width="33" height="245" forecolor="#FFFFFF"/>
+				<reportElement x="24" y="388" width="25" height="245" forecolor="#FFFFFF"/>
 				<textElement rotation="Left"/>
 				<text><![CDATA[- global efforts for a common health terminology]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="42" y="465" width="15" height="15" forecolor="#0178C7" backcolor="#0178C7"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="47" y="561" width="10" height="10" forecolor="#101B8A" backcolor="#101B8A"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="40" y="544" width="7" height="7" forecolor="#CCCCFF" backcolor="#CCCCFF"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="67" y="441" width="12" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="52" y="496" width="13" height="13" forecolor="#6161F6" backcolor="#6161F6"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="77" y="585" width="6" height="12" forecolor="#B0023F" backcolor="#B0023F"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="-21" y="722" width="104" height="100" forecolor="#C5C5D9" backcolor="#C5C5D9"/>
-			</rectangle>
-			<textField isBlankWhenNull="true">
-				<reportElement x="25" y="759" width="59" height="63"/>
+			<textField evaluationTime="Report">
+				<reportElement x="-9" y="791" width="51" height="30"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="22"/>
+					<font size="20"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_COUNT}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PC}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="-24" y="722" width="64" height="60"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<line direction="BottomUp">
-				<reportElement x="-20" y="722" width="103" height="100"/>
-			</line>
 		</band>
 	</background>
 	<title>
