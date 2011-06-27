@@ -432,20 +432,20 @@
     <wsdl:part name="parameters" element="tns:AllRulesResponse">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="getQACasesReportLinesByPageRequest">
-    <wsdl:part name="parameters" element="tns:QACasesReportLinesByPageRequest">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getAllPathsResponse">
     <wsdl:part name="parameters" element="tns:AllPathsResponse">
     </wsdl:part>
   </wsdl:message>
-  <wsdl:message name="getCaseResponse">
-    <wsdl:part name="parameters" element="tns:getCaseResponse">
+  <wsdl:message name="getQACasesReportLinesByPageRequest">
+    <wsdl:part name="parameters" element="tns:QACasesReportLinesByPageRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="getAllComponentsResponse">
     <wsdl:part name="parameters" element="tns:AllComponentsResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCaseResponse">
+    <wsdl:part name="parameters" element="tns:getCaseResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="persistQACaseResponse">
@@ -522,12 +522,12 @@
   </wsdl:message>
   <wsdl:message name="getAllPathsRequest">
   </wsdl:message>
-  <wsdl:message name="getAllSeveritiesResponse">
-    <wsdl:part name="parameters" element="tns:AllSeveritiesResponse">
-    </wsdl:part>
-  </wsdl:message>
   <wsdl:message name="getRulesReportLinesByPageResponse">
     <wsdl:part name="parameters" element="tns:RulesReportLinesByPageResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllSeveritiesResponse">
+    <wsdl:part name="parameters" element="tns:AllSeveritiesResponse">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="qadb-data">
