@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -131,6 +132,7 @@ public class NewDefaultProfile extends NewProfile {
         addIfNotNull(statusPopupTypes, Concept.INAPPROPRIATE, tf);
         addIfNotNull(statusPopupTypes, Concept.MOVED_ELSEWHERE, tf);
         addIfNotNull(statusPopupTypes, Concept.PENDING_MOVE, tf);
+        
         activeConfig.setEditStatusTypePopup(statusPopupTypes);
 
         I_IntList descPopupTypes = tf.newIntList();
@@ -186,6 +188,10 @@ public class NewDefaultProfile extends NewProfile {
         addIfNotNull(allowedStatus, Concept.ADJUDICATED_AND_PROCESSED, tf);
         addIfNotNull(allowedStatus, Concept.CONCEPT_RETIRED, tf);
         allowedStatus.add(tf.uuidToNative(Concept.CURRENT.getUids()));
+        
+        // TODO: Adding status = "Active value" in snomed metadata - TEMP fix
+        allowedStatus.add(tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f")));
+        
         addIfNotNull(allowedStatus, Concept.DO_NOT_EDIT_INTERNAL_USE, tf);
         addIfNotNull(allowedStatus, Concept.DO_NOT_EDIT_FOR_RELEASE, tf);
         addIfNotNull(allowedStatus, Concept.DUAL_REVIEWED, tf);
