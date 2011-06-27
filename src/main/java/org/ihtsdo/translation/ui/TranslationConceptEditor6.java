@@ -822,13 +822,14 @@ public class TranslationConceptEditor6 extends JPanel {
 			config = Terms.get().getActiveAceFrameConfig();
 			String targetComm = (String) cmbTarComm.getSelectedItem();
 			if (targetComm.equals(WORKLIST_COMMENT_NAME)) {
+				String fullName = config.getDbConfig().getFullName();
 				WorkList workList = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistMember.getWorkListUUID()), config);
 
 				CommentsRefset commentsRefset = workList.getCommentsRefset(config);
 				if (commentSubType != null) {
-					commentsRefset.addComment(worklistMember.getId(), commentType.getConceptNid(), commentSubType.getConceptNid(), comment);
+					commentsRefset.addComment(worklistMember.getId(), commentType.getConceptNid(), commentSubType.getConceptNid(),  role.toString() + HEADER_SEPARATOR + "<b>" + fullName + "</b>" + COMMENT_HEADER_SEP + comment);
 				} else {
-					commentsRefset.addComment(worklistMember.getId(), commentType.getConceptNid(), comment);
+					commentsRefset.addComment(worklistMember.getId(), commentType.getConceptNid(),  role.toString() + HEADER_SEPARATOR + "<b>" + fullName + "</b>" + COMMENT_HEADER_SEP + comment);
 				}
 
 			} else {
@@ -3541,12 +3542,12 @@ public class TranslationConceptEditor6 extends JPanel {
 				commentsList = targetLangRefset.getCommentsRefset(config).getFullComments(concept.getConceptNid());
 				for (int i = commentsList.size() - 1; i > -1; i--) {
 					if (commentsList.get(i).getTypeCid() == commentsList.get(i).getSubTypeCid()) {
-						tableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", commentsList.get(i) });
+						tableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 					} else {
 						tableModel
 								.addRow(new Object[] {
 										"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-										commentsList.get(i) });
+										formatComment(commentsList.get(i).getComment()) });
 					}
 				}
 			}
@@ -3558,7 +3559,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 				} else {
 					tableModel.addRow(new Object[] { "Worklist: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-							commentsList.get(i) });
+							formatComment(commentsList.get(i).getComment()) });
 				}
 			}
 
