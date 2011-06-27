@@ -70,6 +70,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -2035,9 +2036,9 @@ public class TranslationConceptEditorRO extends JPanel {
 			
 			refTable.setText(sb.toString());
 			if (urlCount>0){
-				tabbedPane1.setTitleAt(1, "<html>Web references <b><font color='red'>(" + urlCount + ")</font></b></html>");
+				tabbedPane2.setTitleAt(1, "<html>Web references <b><font color='red'>(" + urlCount + ")</font></b></html>");
 			}else {
-				tabbedPane1.setTitleAt(1, "<html>Web references (0)</font></b></html>");
+				tabbedPane2.setTitleAt(1, "<html>Web references (0)</font></b></html>");
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2197,9 +2198,9 @@ public class TranslationConceptEditorRO extends JPanel {
 			tblComm.setRowHeight(65);
 			tblComm.revalidate();
 			if (tblComm.getRowCount() > 0) {
-				tabbedPane1.setTitleAt(0, "<html>Comments <b><font color='red'>(" + tblComm.getRowCount() + ")</font></b></html>");
+				tabbedPane2.setTitleAt(0, "<html>Comments <b><font color='red'>(" + tblComm.getRowCount() + ")</font></b></html>");
 			} else {
-				tabbedPane1.setTitleAt(0, "<html>Comments (0)</font></b></html>");
+				tabbedPane2.setTitleAt(0, "<html>Comments (0)</font></b></html>");
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
