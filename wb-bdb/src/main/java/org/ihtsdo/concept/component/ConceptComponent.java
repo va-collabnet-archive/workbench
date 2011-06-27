@@ -73,6 +73,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
@@ -1163,7 +1164,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                                 anotherAnnotation.getVersions()) {
                             if (!currentSapNids.contains(
                                     annotationVersion.getSapNid())) {
-                                anotherAnnotation.addVersion(annotationVersion);
+                                anotherAnnotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
                             }
                         }
                     }
