@@ -20,12 +20,17 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.testmodel.DrDefiningRolesSet;
 import org.ihtsdo.testmodel.DrDescription;
+import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.testmodel.DrRelationship;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class DrComponentHelper {
@@ -38,6 +43,7 @@ public class DrComponentHelper {
 	public static DrConcept getDrConcept(ConceptVersionBI conceptBi, String factContextName, 
 			INFERRED_VIEW_ORIGIN inferredOrigin) {
 		I_TermFactory tf = Terms.get();
+		TerminologyStoreDI ts = Ts.get();
 		DrConcept concept = new DrConcept();
 
 		try {
@@ -76,6 +82,28 @@ public class DrComponentHelper {
 				loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
 				loopDescription.setFactContextName(factContextName);
 				concept.getDescriptions().add(loopDescription);
+				
+				for (RefexVersionBI<?> annotation : descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate())) {
+					try {
+						RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
+						boolean newLangDesSet = true;
+						DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
+						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+						for (DrLanguageDesignationSet loopLangDefSet : concept.getLanguageDesignationSets()) {
+							if (tf.nidToUuid(annotationCnid.getCollectionNid()).toString().equals(loopLangDefSet.getLanguageRefsetUuid())) {
+								newLangDesSet = false;
+								langDefSet = loopLangDefSet;
+							}
+						}
+						loopDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getCnid1()).toString());
+						loopDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+						langDefSet.getDescriptions().add(loopDescription);
+						if (newLangDesSet) concept.getLanguageDesignationSets().add(langDefSet);
+					} catch (Exception e) {
+						// not cnid annotation, ignore
+					}
+				}
+				
 			}
 
 			if (allRels == null) {
