@@ -39,6 +39,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -277,6 +278,8 @@ public class PartitionDetailsPanel extends JPanel {
 								}
 								if (altWorker == null) {
 									altWorker = worker.getTransactionIndependentClone();
+									altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+									
 									cloneList.add(altWorker);
 								}
 								altWorker.execute(processToExecute);

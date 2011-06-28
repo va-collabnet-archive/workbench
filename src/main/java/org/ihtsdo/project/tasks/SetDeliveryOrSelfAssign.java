@@ -17,18 +17,13 @@
 package org.ihtsdo.project.tasks;
 
 import java.awt.GridLayout;
-import java.beans.IntrospectionException;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JPanel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -36,12 +31,9 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.model.I_TerminologyProject;
 
 /**
  * The Class
@@ -95,11 +87,7 @@ public class SetDeliveryOrSelfAssign extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		I_ConfigAceFrame config;
 		try {
-
-//			System.out.println("Process: " + (process == null));
-//			System.out.println(profilePropName);
-
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			config = (I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			workflowDetailsSheet.setLayout(new GridLayout(1, 1));
@@ -112,12 +100,6 @@ public class SetDeliveryOrSelfAssign extends AbstractTask {
 			
 			
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IntrospectionException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
