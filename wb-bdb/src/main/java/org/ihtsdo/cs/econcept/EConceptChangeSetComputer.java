@@ -101,7 +101,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         ec.setDescriptions(processDescriptions(c, changed));
         ec.setRelationships(processRelationships(c, changed));
         ec.setImages(processMedia(c, changed));
-        ec.setRefsetMembers(processRefsetMembers(c, changed));
+        if (!c.isAnnotationStyleRefex()) {
+            ec.setRefsetMembers(processRefsetMembers(c, changed));
+        }
         if (changed.get()) {
             return ec;
         }
