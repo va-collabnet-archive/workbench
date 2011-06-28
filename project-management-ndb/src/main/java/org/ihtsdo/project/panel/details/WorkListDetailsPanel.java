@@ -46,6 +46,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -414,6 +415,8 @@ public class WorkListDetailsPanel extends JPanel {
 				repaint();
 				revalidate();
 				final I_Work transactionIndependentClone = worker.getTransactionIndependentClone();
+				transactionIndependentClone.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+				
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						try {

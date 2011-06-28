@@ -177,19 +177,13 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
-			final I_Work tworker;
-			if (config.getWorker().isExecuting()) {
-				tworker = config.getWorker().getTransactionIndependentClone();
-			} else {
-				tworker = config.getWorker();
-			}
-
-			Runnable r=new Runnable(){
-				public void run(){
-
-					I_ConfigAceFrame config;
+			
+//			Runnable r=new Runnable(){
+//				public void run(){
+//
+//					I_ConfigAceFrame config;
 					try {
-						config = termFactory.getActiveAceFrameConfig();
+//						config = termFactory.getActiveAceFrameConfig();
 
 						Boolean selfAssign=(Boolean)process.readAttachement(SELF_ASSIGN_KEY);
 
@@ -263,7 +257,15 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 
 							//				tworker.setProcessStack(nStack);
 							//				wfProcess.execute(tworker);
-							tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+							final I_Work tworker;
+							if (config.getWorker().isExecuting()) {
+								tworker = config.getWorker().getTransactionIndependentClone();
+								tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+							} else {
+								tworker = config.getWorker();
+								
+							}
+
 							tworker.execute(wfProcess);
 							//				tworker.setProcessStack(stack);
 						}else{
@@ -327,11 +329,11 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
-			};
-
-			new Thread(r).start();
-
+//				}
+//			};
+//
+//			new Thread(r).start();
+//
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TaskFailedException(e.getMessage());

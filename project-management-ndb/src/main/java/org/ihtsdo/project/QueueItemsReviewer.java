@@ -27,6 +27,7 @@ import net.jini.lookup.entry.Name;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
 import org.dwfa.bpa.process.I_DescribeQueueEntry;
@@ -210,9 +211,11 @@ public class QueueItemsReviewer {
 			Entry[] attrSetTemplates = new Entry[] { new Name(outboxQueueName) };
 			ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
 			ServiceItemFilter filter = null;
-			if (outboxWorker==null)
+			if (outboxWorker==null){
 				outboxWorker=worker.getTransactionIndependentClone();
 
+				outboxWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+			}
 			ServiceItem service = outboxWorker.lookup(template, filter);
 			if (service == null) {
 				throw new TaskFailedException("No queue with the specified name could be found: "
