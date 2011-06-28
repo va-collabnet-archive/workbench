@@ -35,8 +35,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -70,6 +72,8 @@ public class ProcessPopupUtil {
                     ois.close();
                     if (worker.isExecuting()) {
                         worker = worker.getTransactionIndependentClone();
+                        worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+						
                     }
                     process.execute(worker);
                     worker.commitTransactionIfActive();
