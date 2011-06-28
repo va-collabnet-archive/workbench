@@ -171,6 +171,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 								if (originalSemTag.equals(potentialMatchSemtag)) {
 									result = true;
+									System.out.println("Hierarchy match found: " + originalFsn + " & " + potentialMatchFsn.getText());
 									break;
 								}
 							}
