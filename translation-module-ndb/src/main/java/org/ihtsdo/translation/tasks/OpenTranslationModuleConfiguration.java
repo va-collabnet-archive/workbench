@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -100,14 +99,8 @@ public class OpenTranslationModuleConfiguration extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-			if (config == null) {
-				config = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			}
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
-			if (config==null)
-				config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			ConfigTranslationModule confTrans = LanguageUtil.getTranslationConfig(config);
 			
 			

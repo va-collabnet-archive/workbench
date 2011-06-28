@@ -138,25 +138,6 @@ public class RoleBasedWFDestinationSelector extends AbstractTask {
     		process.setProperty(exit1PropName, destinationQueueName);
     		process.setDestination(destinationQueueName);
 			process.validateDestination();
-    		
-//    		ServiceID serviceID = null;
-//    		System.out.println(
-//    				"Moving process " + process.getProcessID() + " to queue: " + destinationQueueName);
-//    		Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-//    		Entry[] attrSetTemplates = new Entry[] { new Name(destinationQueueName) };
-//    		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-//    		ServiceItemFilter filter = null;
-//
-//    		ServiceItem service = worker.lookup(template, filter);
-//    		if (service == null) {
-//    			throw new TaskFailedException("No queue with the specified address could be found: "
-//    					+ destinationQueueName);
-//    		}
-//    		I_QueueProcesses q = (I_QueueProcesses) service.service;
-//    		q.write(process, worker.getActiveTransaction());
-//			worker.commitTransactionIfActive();
-//    		System.out.println("Moved process " + process.getProcessID() + " to queue: " + destinationQueueName);
-
 
         } catch (Exception e) {
         	throw new TaskFailedException(e);

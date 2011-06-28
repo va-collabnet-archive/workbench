@@ -62,6 +62,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
 import org.dwfa.bpa.process.I_DescribeObject;
@@ -425,9 +426,10 @@ public class SpecialInboxPanel extends JPanel {
 		Entry[] attrSetTemplates = new Entry[] { new Name(outboxQueueName) };
 		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
 		ServiceItemFilter filter = null;
-		if (outboxReadWorker == null)
+		if (outboxReadWorker == null){
 			outboxReadWorker = worker.getTransactionIndependentClone();
-
+			outboxReadWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+		}
 		ServiceItem service = outboxReadWorker.lookup(template, filter);
 		if (service == null) {
 			throw new TaskFailedException("No queue with the specified name could be found: " + outboxQueueName);
@@ -732,6 +734,8 @@ public class SpecialInboxPanel extends JPanel {
 						}
 						if (altWorker == null) {
 							altWorker = worker.getTransactionIndependentClone();
+							altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+							
 							cloneList.add(altWorker);
 						}
 						setViewItemAndRemove(entId);

@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -35,7 +33,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ContextualizedDescription;
-import org.ihtsdo.project.I_ContextualizeDescription;
 
 /**
  * The Class CreateNewContextualizedDescription.
@@ -94,16 +91,13 @@ public class CreateNewContextualizedDescription extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
-		I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-		.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 		I_TermFactory tf = Terms.get();
 
 		try{
 			I_GetConceptData conceptConcept = tf.getConcept(concept.ids);
 			I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefset.ids);
 			
-			I_ContextualizeDescription conextualizedDescription = 
-					ContextualizedDescription.createNewContextualizedDescription(conceptConcept.getConceptNid(), 
+			ContextualizedDescription.createNewContextualizedDescription(conceptConcept.getConceptNid(), 
 							languageRefsetConcept.getConceptNid(), "es");
 			
 

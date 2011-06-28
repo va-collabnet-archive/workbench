@@ -28,7 +28,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -105,7 +104,7 @@ public class AddAttachedRepoConceptToConfigAsSourceDefect extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData repoConcept = AceTaskUtil.getConceptFromProperty(process, getRepositoryConceptPropName());
 			
 			if (repoConcept == null) {
@@ -115,14 +114,6 @@ public class AddAttachedRepoConceptToConfigAsSourceDefect extends AbstractTask {
 						JOptionPane.ERROR_MESSAGE);
 				throw new TaskFailedException("Problem getting the Issue Repository Concept.");
 			}
-			
-			if (config == null) {
-				config = (I_ConfigAceFrame) worker
-				.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			}
-
-			if (config==null)
-				config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			
 			ConfigTranslationModule translationConfig = LanguageUtil.getTranslationConfig(config);
 			

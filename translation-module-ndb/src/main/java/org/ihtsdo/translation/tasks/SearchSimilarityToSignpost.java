@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -115,8 +115,7 @@ public class SearchSimilarityToSignpost extends AbstractTask {
 	throws TaskFailedException {
 		try {
 			String message = "<html><body>Similarity results:<br>";
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			
 			if (query == null) {
 				query = config.getHierarchySelection().toString();

@@ -95,6 +95,8 @@ public class ListComponentViewerPanel extends JPanel {
 				final I_Work tworker;
 				if (config.getWorker().isExecuting()) {
 						tworker = config.getWorker().getTransactionIndependentClone();
+						tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+							
 				} else {
 
 					tworker = config.getWorker();						
@@ -112,8 +114,6 @@ public class ListComponentViewerPanel extends JPanel {
 								process=TerminologyProjectDAO.getBusinessProcess(new File("sampleProcesses/SendToTranslFromAS.bp"));
 								process.writeAttachment("HASHED_CONCEPTS", nodes);
 								
-
-				                tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
 								tworker.execute(process);		
 								return;
 							}

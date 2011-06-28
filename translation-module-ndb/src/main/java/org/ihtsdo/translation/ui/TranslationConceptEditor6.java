@@ -1098,6 +1098,10 @@ public class TranslationConceptEditor6 extends JPanel {
 		if (row > -1) {
 			CommentPanel cp = new CommentPanel();
 			String comm = (String) tblComm.getValueAt(row, 0) + "  -  " + tblComm.getValueAt(row, 1);
+			String tmpDate=(String)tblComm.getValueAt(row, 1);
+			String[] arrTmpDate=tmpDate.split(HEADER_SEPARATOR);
+			String date = "";
+			date=arrTmpDate[0];
 			comm = comm.replace(htmlHeader, "");
 			comm = comm.replace(htmlFooter, "");
 			comm = comm.replace(endP, "");
@@ -1106,19 +1110,13 @@ public class TranslationConceptEditor6 extends JPanel {
 			String[] headerComp = header.split(HEADER_SEPARATOR);
 			String from = "";
 			String role = "";
-			String date = "";
 			String source = "";
 			if (headerComp.length > 0) {
 				source = headerComp[0];
 				if (headerComp.length > 1) {
-					date = headerComp[1];
+					role = headerComp[1];
 					if (headerComp.length > 2) {
-						role = headerComp[2];
-						if (headerComp.length > 3) {
-							from = headerComp[3];
-						} else {
-							from = headerComp[2];
-						}
+						from = headerComp[2];
 					} else {
 						from = headerComp[0];
 					}

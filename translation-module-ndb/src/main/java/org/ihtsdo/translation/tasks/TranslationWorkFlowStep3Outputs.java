@@ -187,10 +187,12 @@ public class TranslationWorkFlowStep3Outputs extends AbstractTask {
 			
 			//TODO: Implement role verification with profile and throw taskfailed exeption if fails
 			
-			config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (config==null)
-				config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
+//			config = (I_ConfigAceFrame) worker
+//			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+//			Replaced previous line with next line to force active config use
+			config=Terms.get().getActiveAceFrameConfig();
+//			if (config==null)
+//				config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			
 			WorkListMember workListMember = (WorkListMember) process.readAttachement("A:WORKLIST_MEMBER");
 			if (workListMember == null) {
@@ -211,10 +213,7 @@ public class TranslationWorkFlowStep3Outputs extends AbstractTask {
 			config.setHierarchySelectionAndExpand(workListMember.getConcept());
 //			config.selectConceptViewer(1);
 
-			AceFrameConfig aceConfig = (AceFrameConfig) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (aceConfig==null)
-				aceConfig=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+			AceFrameConfig aceConfig =(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 			
 			AceFrame ace=aceConfig.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getConceptTabs();

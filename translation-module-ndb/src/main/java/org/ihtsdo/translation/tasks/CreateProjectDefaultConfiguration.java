@@ -25,7 +25,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -93,11 +92,7 @@ public class CreateProjectDefaultConfiguration extends AbstractTask {
 	throws TaskFailedException {
 		try {
 			
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
-			if (config==null){
-				config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
-			}
+			I_ConfigAceFrame config =(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 			
 			ConfigTranslationModule confTrans;
 			

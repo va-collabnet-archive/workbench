@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JPanel;
 
@@ -39,9 +38,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
 
 /**
  * The Class
@@ -104,9 +101,7 @@ public class SetWFDtoWFUserSelectionExecAS extends AbstractTask {
 		try {
 			I_TermFactory tf = Terms.get();
 
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-			if (config==null)
-				config=tf.getActiveAceFrameConfig();
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
 			WorkList worklist  = (WorkList) process.getProperty(memberPropName);
 			

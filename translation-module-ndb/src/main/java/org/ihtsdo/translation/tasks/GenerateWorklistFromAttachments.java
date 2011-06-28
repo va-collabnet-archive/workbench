@@ -21,6 +21,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
@@ -101,7 +102,7 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		I_ConfigAceFrame config;
 		try {
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
 			BusinessProcess selectedWorkFlow = (BusinessProcess) process.getProperty(getProcessPropName());
 

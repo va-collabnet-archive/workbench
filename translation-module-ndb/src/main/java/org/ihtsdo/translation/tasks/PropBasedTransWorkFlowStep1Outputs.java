@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
@@ -47,7 +46,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
@@ -57,7 +55,6 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -184,12 +181,6 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
-//		if (Terms.get().getUncommitted().size() > 0) {
-//			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), 
-//					"There are uncommitted changes - please cancel or commit before continuing.", 
-//					"", JOptionPane.ERROR_MESSAGE);
-//			return Condition.STOP;
-//		}
 		try {
 			Thread t = new Thread(new Runnable() {
 				@Override
@@ -240,10 +231,10 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 
 			WorkList workList=TerminologyProjectDAO.getWorkList(Terms.get().getConcept(workListMember.getWorkListUUID()), config);
 			TranslationProject translationProject =(TranslationProject)TerminologyProjectDAO.getProjectForWorklist(workList, config);
-			config2 = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (config2==null)
-				config2=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
+//			config2 = (I_ConfigAceFrame) worker
+//			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+//			Replaced previous line with next line to force active config use
+			config2=Terms.get().getActiveAceFrameConfig();
 			config2.setShowQueueViewer(false);
 			config2.setShowProcessBuilder(false);
 			config2.setShowSearch(false);
@@ -254,11 +245,8 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 			// set member on standard workbench editor components
 
 			config2.setHierarchySelectionAndExpand(workListMember.getConcept());
-			// config.selectConceptViewer(1);
 
 			AceFrameConfig aceConfig = (AceFrameConfig) config2;
-			if (aceConfig==null)
-				aceConfig=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 
 			AceFrame ace=aceConfig.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
@@ -281,20 +269,26 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 						}
 						uiPanel.setAutoKeepFunction(new ThisAutoKeep());
 						uiPanel.updateUI(translationProject, workListMember, role);
+						break;
+					}
+				}
+				bPanelExists=false;
+				tabCount=tp.getTabCount();
+				for (int i=0;i<tabCount;i++){
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						tp.setSelectedIndex(i);
 						bPanelExists=true;
 						break;
 					}
 				}
 				if (!bPanelExists){
-					//if (uiPanelName.trim().equals("standardTranslationPanel")) {
 					uiPanel = new TranslationConceptEditor6();
+					
 					tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
 					tp.setSelectedIndex(tabCount);
 					uiPanel.setAutoKeepFunction(new ThisAutoKeep());
 					uiPanel.setUnloaded(false);
 					uiPanel.updateUI(translationProject, workListMember, role);
-					//}
 				}
 				tp.revalidate();
 				tp.repaint();
@@ -344,11 +338,6 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 
 					uiPanel.setWorkflowButtons(buttons);
 
-					//					Container cont = workflowPanel;
-					//					while (cont != null) {
-					//						cont.validate();
-					//						cont = cont.getParent();
-					//					}
 				}
 			});
 			synchronized (this) {
@@ -379,7 +368,6 @@ public class PropBasedTransWorkFlowStep1Outputs extends AbstractTask {
 				Terms.get().commit();
 				parsedSubj[TerminologyProjectDAO.subjectIndexes.TAGS_ARRAY.ordinal()]="";
 
-				//				process.writeAttachment(CUSTOM_NODE_KEY, null);
 				process.setDestination(selectedDestination);
 				process.validateDestination();
 			}

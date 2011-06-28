@@ -23,7 +23,7 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -92,8 +92,7 @@ public class LangViewersToCptPanel extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			
 			FirstLangViewerPlugin translationTermsPlugin = new FirstLangViewerPlugin(true,93,I_HostConceptPlugins.TOGGLES.FIRSTLANGVIEWER_PANEL);
 //			//TODO: fix reference to concept panel plugin
@@ -105,8 +104,6 @@ public class LangViewersToCptPanel extends AbstractTask {
 //			//TODO: fix reference to concept panel plugin
 			config.addConceptPanelPlugins(I_HostConceptPlugins.HOST_ENUM.CONCEPT_PANEL_R1, 
 					I_HostConceptPlugins.TOGGLES.SECONDLANGVIEWER_PANEL.getPluginId(), secTranslationTermsPlugin);
-
-//				panel.add(new SimilarityResultsPanel(query, sourceLangCode, targetLangCode, matches, config), BorderLayout.CENTER);
 
 			return Condition.CONTINUE;
 		} catch (Exception e) {

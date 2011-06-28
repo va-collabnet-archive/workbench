@@ -107,7 +107,7 @@ public class AskForCommentInput extends AbstractTask {
 		WorkListMember workListMember;
 		I_TermFactory tf = Terms.get();
 		try {
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			System.out.println("Config null?" + (config==null));
 			workListMember = (WorkListMember) process.readAttachement(getWorklistMemberPropName());
 			

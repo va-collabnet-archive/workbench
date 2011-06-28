@@ -106,12 +106,9 @@ public class OpenSpecialInboxToLT extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			AceFrameConfig config = (AceFrameConfig) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (config==null){
-				config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+			AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 
-				worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
-			}
+			worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
 
 			ProjectPermissionsAPI permissionApi = new ProjectPermissionsAPI(
 					config);

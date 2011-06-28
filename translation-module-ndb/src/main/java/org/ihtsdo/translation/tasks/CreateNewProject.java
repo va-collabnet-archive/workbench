@@ -163,8 +163,7 @@ public class CreateNewProject extends AbstractTask {
 			
 			String seq=sequence;
 			String name = projectName;
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			List<UUID> nullUid = null;
 			TranslationProject tempProjectForMetadata = new TranslationProject(name, 0, nullUid);
 			TranslationProject project = TerminologyProjectDAO.createNewTranslationProject(tempProjectForMetadata, config);
@@ -173,7 +172,6 @@ public class CreateNewProject extends AbstractTask {
 
 
 			I_GetConceptData rootConcept = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
-			I_GetConceptData procedure = tf.getConcept(UUID.fromString("bfbced4b-ad7d-30aa-ae5c-f848ccebd45b"));
 			I_GetConceptData colonoscopicPolypectomy = tf.getConcept(UUID.fromString("bd2ce7f7-20a5-3ce4-b044-141284395579"));
 			I_GetConceptData pneumonitis = tf.getConcept(UUID.fromString("975420b8-e706-3744-a9f6-54180b5a5469"));
 
@@ -234,13 +232,6 @@ public class CreateNewProject extends AbstractTask {
 					"partition Scheme " + seq, 
 					workSet1.getUids().iterator().next(), config);
 			sleep(1);
-
-//			IsDescendantOfPartitioner isDescendantOfPartitioner = new IsDescendantOfPartitioner(procedure);
-//			List<I_GetConceptData> previewPartitionMembers = 
-//				isDescendantOfPartitioner.getMembersToInclude(partitionScheme1, "partition 0", config);
-//
-//
-//			Partition partition0 = isDescendantOfPartitioner.createPartition(partitionScheme1, "partition 0", config);
 
 			RefsetSplitter refsetSplitter = new RefsetSplitter();
 

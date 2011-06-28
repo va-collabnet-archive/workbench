@@ -25,7 +25,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -133,19 +132,12 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		I_ConfigAceFrame config;
 		try {
-			Date timeStamp = new Date();
 			I_TermFactory tf = Terms.get();
 
-//			System.out.println("Process: " + (process == null));
-//			System.out.println(profilePropName);
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-
-			//System.out.println("Profile: " + (config == null));
 			I_TerminologyProject project = (I_TerminologyProject) process.getProperty(getProjectPropName());
 
-			// Begin testing fixture
-			//TranslationProject project = TerminologyProjectDAO.createNewTranslationProject("Test Project " + timeStamp, config);
 			FileLinkAPI flApi = new FileLinkAPI(config);
 			FileLink link1 = new FileLink(new File("sampleProcesses/TranslationWorkflow.bp"), 
 					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
@@ -165,7 +157,6 @@ public class SetWFDtoWFUserSelection extends AbstractTask {
 			FileLink link6 = new FileLink(new File("sampleProcesses/TranslationWorkflowDk.bp"), 
 					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));
 			flApi.putLinkInConfig(link6);
-			//			// end testing fixture
 
 
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();

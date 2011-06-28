@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import javax.swing.JTabbedPane;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
@@ -106,8 +107,7 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			AceFrameConfig config = (AceFrameConfig) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			AceFrameConfig config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 
 			if (sourceLangCode == null) {
 				sourceLangCode = "en";
