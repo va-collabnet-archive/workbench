@@ -1080,7 +1080,7 @@ public class WorkflowHelper {
 	            	hasBeenReleased = true;
 	        }
 
-			if (!hasBeenReleased && (getLatestWfHxForConcept(concept) == null))
+			if (!hasBeenReleased && (getLatestWfHxForConcept(concept).size() == 0))
 				return false;
 		} catch (Exception e) {
 			e.printStackTrace();
