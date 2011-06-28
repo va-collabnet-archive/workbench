@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="0">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="140"/>
+	<property name="ireport.y" value="1531"/>
 	<style name="Title" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
 	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#FFFFFF" fontName="Arial" fontSize="12" isBold="true"/>
@@ -85,7 +85,7 @@
 					<staticText>
 						<reportElement style="Column header" x="5" y="0" width="176" height="20"/>
 						<textElement/>
-						<text><![CDATA[Term]]></text>
+						<text><![CDATA[Source FSN]]></text>
 					</staticText>
 					<staticText>
 						<reportElement style="Column header" x="382" y="0" width="110" height="20"/>
@@ -192,18 +192,18 @@
 				<reportElement x="-9" y="791" width="51" height="1"/>
 			</line>
 			<textField>
-				<reportElement x="-9" y="745" width="51" height="46"/>
-				<textElement textAlignment="Center">
-					<font size="32"/>
+				<reportElement x="-9" y="756" width="51" height="35"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="22"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="-9" y="791" width="51" height="30"/>
-				<textElement textAlignment="Center">
+			<textField evaluationTime="Report">
+				<reportElement x="-6" y="792" width="48" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="18"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_COUNT}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</background>
