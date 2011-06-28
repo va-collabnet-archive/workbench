@@ -134,7 +134,7 @@ public class AceSvn {
             || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
             if (connectToSubversion == false) {
                 connectToSubversion = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                    LogWithAlerts.getActiveFrame(null), "AceSvn Would you like to connect over the network to Subversion?",
+                    LogWithAlerts.getActiveFrame(null), "Would you like to connect over the network to Subversion?",
                     "Confirm network operation", JOptionPane.YES_NO_OPTION));
             }
             if (connectToSubversion) {
