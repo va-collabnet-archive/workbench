@@ -123,7 +123,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     // transient
     private transient File profileFile;
     
-    // Max CS FIle Size 
+    // Max CS File Size 
     private int maxCSFileSize = 512000;
 
     public AceConfig() throws TerminologyException, IOException {

@@ -73,7 +73,7 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         loginButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("User Login");
+        setTitle("AceLoginDialog User Login");
         setResizable(false);
         setModal(true);
 
