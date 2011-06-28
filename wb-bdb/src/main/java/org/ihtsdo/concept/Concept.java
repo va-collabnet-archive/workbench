@@ -134,8 +134,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private boolean isAnnotationStyleSet() {
-        return data.isAnnotationStyleSet();
+
+    public boolean addMemberNid(int nid) throws IOException {
+        Set<Integer> memberNids = data.getMemberNids();
+        if (!memberNids.contains(nid)) {
+            memberNids.add(nid);
+            modified();
+            return true;
+        }
+        return false;
     }
 
     public static class ConceptLowMemoryListener implements LowMemoryListener {
@@ -219,7 +226,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static Concept mergeWithEConcept(EConcept eConcept, Concept c, boolean updateLucene)
             throws IOException {
-        if (c.isAnnotationStyleSet() == false) {
+        if (c.isAnnotationStyleRefex() == false) {
             c.setAnnotationStyleRefex(eConcept.isAnnotationStyleRefex());
         }
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
@@ -1432,6 +1439,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             buff.append(nid);
             buff.append(" annotationRefset: ");
             buff.append(isAnnotationStyleRefex());
+            buff.append(" annotationIndex: ");
+            buff.append(isAnnotationIndex());
             buff.append("\n  data version: ");
             buff.append(getDataVersion());
             buff.append("\n write version: ");
@@ -1448,8 +1457,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             formatCollection(buff, getSourceRels());
             buff.append("\n images: ");
             formatCollection(buff, getImages());
-            buff.append("\n refset members: ");
-            formatCollection(buff, getExtensions());
+            if (!isAnnotationStyleRefex()) {
+                buff.append("\n refset members: ");
+                formatCollection(buff, getExtensions());
+            }
             buff.append("\n desc nids: ");
             buff.append(data.getDescNids());
             buff.append("\n src rel nids: ");
@@ -1604,7 +1615,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             if (r.revisions != null) {
                 for (RelationshipRevision p : r.revisions) {
                     if (p.getTypeNid() != r.getTypeNid()) {
-                        npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), nid);
+                        npr = NidPair.getTypeNidRelNidPair(p.getTypeNid(), r.getNid());
                         Bdb.addXrefPair(r.getC2Id(), npr);
                     }
                 }
@@ -1858,10 +1869,19 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return results;
     }
+    
+    
+     public boolean isAnnotationIndex() throws IOException {
+       return data.isAnnotationIndex();
+     }
+
+     public void setAnnotationIndex(boolean annotationIndex) throws IOException {
+        data.setAnnotationIndex(annotationIndex);
+     }
 
     @Override
     public boolean isAnnotationStyleRefex() throws IOException {
-        return data.isAnnotationStyleRefset();
+        return data.isAnnotationStyleRefex();
     }
 
     @Override

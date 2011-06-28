@@ -25,6 +25,7 @@ import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRel;
 
 import com.sleepycat.bind.tuple.TupleInput;
+import org.ihtsdo.concept.component.AnnotationIndexBinder;
 import org.ihtsdo.concept.component.AnnotationStyleBinder;
 import org.ihtsdo.tk.api.NidSetBI;
 
@@ -42,7 +43,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddDescriptionSet(Collection<? extends Description> c) {
             super(new ComponentComparator());
-            for (Description d: c) {
+            for (Description d : c) {
                 addDirect(d);
             }
         }
@@ -69,7 +70,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddSrcRelSet(Collection<? extends Relationship> c) {
             super(new ComponentComparator());
-            for (Relationship r: c) {
+            for (Relationship r : c) {
                 addDirect(r);
             }
         }
@@ -100,7 +101,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddImageSet(Collection<? extends Image> c) {
             super(new ComponentComparator());
-            for (Image i: c) {
+            for (Image i : c) {
                 addDirect(i);
             }
         }
@@ -127,7 +128,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
 
         public AddMemberSet(Collection<? extends RefsetMember<?, ?>> c) {
             super(new ComponentComparator());
-             for (RefsetMember m: c) {
+            for (RefsetMember m : c) {
                 addDirect(m);
             }
         }
@@ -288,6 +289,20 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         return isAnnotationStyle;
     }
 
+        public boolean getIsAnnotationStyleIndex() throws IOException {
+        AnnotationIndexBinder binder = AnnotationIndexBinder.getBinder();
+        TupleInput readOnlyInput = nidData.getReadOnlyTupleInput();
+        boolean isIndex = false;
+        if (readOnlyInput.available() > 0) {
+            isIndex = binder.entryToObject(readOnlyInput);
+        }
+        TupleInput readWriteInput = nidData.getMutableTupleInput();
+        if (readWriteInput.available() > 0) {
+            isIndex = binder.entryToObject(readWriteInput);
+        }
+        return isIndex;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -411,13 +426,15 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
                 + this;
         assert refsetMember.enclosingConceptNid != 0 : "refsetNid is 0: "
                 + this;
-        getMemberNids().add(refsetMember.nid);
-        addToMemberMap(refsetMember);
-        modified();
-        Bdb.addXrefPair(refsetMember.getReferencedComponentNid(),
-                NidPair.getRefsetNidMemberNidPair(
-                refsetMember.getRefsetId(),
-                refsetMember.getNid()));
+        if (!isAnnotationStyleRefex()) {
+            getMemberNids().add(refsetMember.nid);
+            addToMemberMap(refsetMember);
+            modified();
+            Bdb.addXrefPair(refsetMember.getReferencedComponentNid(),
+                    NidPair.getRefsetNidMemberNidPair(
+                    refsetMember.getRefsetId(),
+                    refsetMember.getNid()));
+        }
     }
 
     protected abstract void addToMemberMap(RefsetMember<?, ?> refsetMember);
@@ -432,7 +449,10 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         Collection<Integer> descNids = getDescNids();
         Collection<Integer> srcRelNids = getSrcRelNids();
         Collection<Integer> imgNids = getImageNids();
-        Collection<Integer> memberNids = getMemberNids();
+        Collection<Integer> memberNids = new ArrayList<Integer>(0);
+        if (!isAnnotationStyleSet()) {
+            memberNids = getMemberNids();
+        }
 
         int size = 1 + descNids.size() + srcRelNids.size() + imgNids.size()
                 + memberNids.size();

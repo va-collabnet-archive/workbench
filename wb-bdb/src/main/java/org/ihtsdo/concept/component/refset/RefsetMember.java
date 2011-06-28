@@ -173,10 +173,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             return RefsetMember.this.getTypeNid();
         }
 
+        @Override
         public List<? extends I_ExtendByRefPart<R>> getVersions() {
             return RefsetMember.this.getVersions();
         }
 
+        @Override
         public void setCollectionNid(int collectionNid) throws PropertyVetoException {
             RefsetMember.this.setCollectionNid(collectionNid);
         }
@@ -334,12 +336,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
      */
     public String validate(RefsetMember<?, ?> another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         if (this.referencedComponentNid != another.referencedComponentNid) {
-            buf.append("\tRefsetMember.referencedComponentNid not equal: \n"
-                    + "\t\tthis.referencedComponentNid = " + this.referencedComponentNid + "\n"
-                    + "\t\tanother.referencedComponentNid = " + another.referencedComponentNid + "\n");
+            buf.append("\tRefsetMember.referencedComponentNid not equal: \n" + "\t\tthis.referencedComponentNid = ").append(this.referencedComponentNid).append("\n" + "\t\tanother.referencedComponentNid = ").append(another.referencedComponentNid).append("\n");
         }
         // Compare the parents
         buf.append(super.validate(another));
@@ -491,11 +491,13 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
     protected List<? extends Version> versions;
 
+    @Override
     public List<Version> getTuples() {
         return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<? extends Version> getVersions() {
         if (versions == null) {
             int count = 1;
@@ -531,10 +533,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         return HashFunction.hashCode(new int[]{referencedComponentNid});
     }
 
+    @Override
     public int getReferencedComponentNid() {
         return referencedComponentNid;
     }
 
+    @Override
     public void setReferencedComponentNid(int referencedComponentNid) {
         this.referencedComponentNid = referencedComponentNid;
         modified();

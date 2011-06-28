@@ -117,7 +117,6 @@ public interface I_ManageConceptData {
 
     boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
 
-    boolean isAnnotationStyleRefset() throws IOException;
 
     void setAnnotationStyleRefset(boolean annotationStyleRefset);
 
@@ -134,8 +133,21 @@ public interface I_ManageConceptData {
 
     void diet();
 
-    public boolean readyToWrite();
+    boolean readyToWrite();
 
-    public boolean isAnnotationStyleSet();
+    boolean isAnnotationStyleRefex() throws IOException;
+    
+    /**
+     * 
+     * @return
+     * @deprecated use isAnnotationStyleRefex
+     */
+
+    @Deprecated
+    boolean isAnnotationStyleSet() throws IOException;
+
+    public boolean isAnnotationIndex() throws IOException;
+
+    public void setAnnotationIndex(boolean annotationIndex) throws IOException;;
 
 }

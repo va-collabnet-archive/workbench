@@ -48,6 +48,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -60,6 +61,7 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.dwfa.util.io.FileIO;
 
 public class Bdb {
@@ -151,6 +153,15 @@ public class Bdb {
     public static int getCachePercent() {
         return Bdb.mutable.bdbEnv.getMutableConfig().getCachePercent();
     }
+    
+    static ConcurrentSkipListSet<Concept> annotationConcepts = new ConcurrentSkipListSet<Concept>();
+
+    public static void xrefAnnotation(RefexChronicleBI annotation) throws IOException {
+        Concept annotationConcept = Concept.get(annotation.getCollectionNid());
+        if (annotationConcept.addMemberNid(annotation.getNid())) {
+            annotationConcepts.add(annotationConcept);
+        }
+     }
 
     private enum HeapSize {
 

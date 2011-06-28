@@ -506,6 +506,12 @@ public class BdbCommitManager {
             }
 
             if (performCommit) {
+                
+                for (Concept annotationConcept: Bdb.annotationConcepts) {
+                    dbWriterService.execute(new ConceptWriter(annotationConcept));
+                }
+                Bdb.annotationConcepts.clear();
+ 
                 KindOfComputer.reset();
                 KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
                 long commitTime = System.currentTimeMillis();
@@ -655,6 +661,10 @@ public class BdbCommitManager {
 
                         if (performCommit) {
                             lastCommit = Bdb.gVersion.incrementAndGet();
+                            for (Concept annotationConcept: Bdb.annotationConcepts) {
+                                dbWriterService.execute(new ConceptWriter(annotationConcept));
+                            }
+                            Bdb.annotationConcepts.clear();
                             KindOfComputer.reset();
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                             while (uncommittedCNidItr.next()) {

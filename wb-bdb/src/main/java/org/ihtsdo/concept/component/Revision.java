@@ -380,7 +380,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     }
 
     @Override
-    public boolean addAnnotation(@SuppressWarnings("rawtypes") RefexChronicleBI annotation) {
+    public boolean addAnnotation(@SuppressWarnings("rawtypes") RefexChronicleBI annotation) throws IOException {
         return primordialComponent.addAnnotation(annotation);
     }
 

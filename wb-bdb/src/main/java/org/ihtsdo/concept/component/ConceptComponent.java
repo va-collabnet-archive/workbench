@@ -144,7 +144,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     throw new RuntimeException(
                             "Use makeAnalog to generate revisions. They will be automatically added.");
                 }
-                if (revisions.contains(e)) {
+                if (revisions.contains(e.getRevision())) {
                     return false;
                 }
                 throw new RuntimeException("Use makeAnalog to generate revisions. They will be automatically added.");
@@ -317,7 +317,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @SuppressWarnings("rawtypes")
         @Override
-        public boolean addAnnotation(RefexChronicleBI annotation) {
+        public boolean addAnnotation(RefexChronicleBI annotation) throws IOException {
             return ConceptComponent.this.addAnnotation(annotation);
         }
 
@@ -853,7 +853,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @SuppressWarnings("rawtypes")
     @Override
-    public boolean addAnnotation(RefexChronicleBI annotation) {
+    public boolean addAnnotation(RefexChronicleBI annotation) throws IOException {
         if (annotations == null) {
             annotations = new ConcurrentSkipListSet<RefsetMember<?, ?>>(
                     new Comparator<RefexChronicleBI>() {
@@ -865,6 +865,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     });
         }
         modified();
+        Bdb.xrefAnnotation(annotation);
         return annotations.add((RefsetMember<?, ?>) annotation);
     }
 

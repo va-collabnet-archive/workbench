@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -124,6 +125,12 @@ public class LoadBdbMulti extends AbstractMojo {
      * @parameter
      */
     private PathSpec[] initialPaths;
+    /**
+     * Annotation index concepts
+     * 
+     * @parameter
+     */
+    private List<ConceptDescriptor> annotationIndexes;
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
@@ -206,6 +213,15 @@ public class LoadBdbMulti extends AbstractMojo {
                 Thread.sleep(1000);
             }
 
+            if (annotationIndexes != null) {
+                for (ConceptDescriptor cd : annotationIndexes) {
+                    Concept c = (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
+                    c.setAnnotationIndex(true);
+                    Ts.get().addUncommitted(c);
+                    Ts.get().commit();
+                    getLog().info("Setting concept to annotation index: "
+                                    + cd.getDescription());                  }
+            }
             if (rstaFileNames != null) {
                 for (String rstaName : rstaFileNames) {
                     getLog().info("Processing: " + rstaName);
@@ -471,7 +487,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         int caseType = Integer.parseInt(parts[caseIndex]);
                         int icsTypeNid;
                         if (caseType == 1) {
-                            icsTypeNid =  CaseSensitive.IC_SIGNIFICANT.getLenient().getNid();
+                            icsTypeNid = CaseSensitive.IC_SIGNIFICANT.getLenient().getNid();
                         } else {
                             icsTypeNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
                         }

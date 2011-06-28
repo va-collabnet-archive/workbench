@@ -47,6 +47,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 public class ConceptDataSimpleReference extends ConceptDataManager {
 
     private Boolean annotationStyleRefset;
+    private Boolean annotationIndex;
     private AtomicReference<ConceptAttributes> attributes = new AtomicReference<ConceptAttributes>();
     private AtomicReference<AddSrcRelSet> srcRels = new AtomicReference<AddSrcRelSet>();
     private AtomicReference<AddDescriptionSet> descriptions = new AtomicReference<AddDescriptionSet>();
@@ -418,6 +419,18 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     @Override
     public AddMemberSet getRefsetMembers() throws IOException {
+         if (isAnnotationStyleRefex()) {
+             ArrayList<RefsetMember<?, ?>> members = 
+                     new ArrayList<RefsetMember<?, ?>>(getMemberNids().size());
+             for (int memberNid: getMemberNids()) {
+                 RefsetMember<?, ?> member = (RefsetMember<?, ?>) Bdb.getComponent(memberNid);
+                 if (member != null) {
+                     members.add(member);
+                 }
+             }
+             return new AddMemberSet(members);
+        }
+
         if (refsetMembers.get() == null) {
             refsetMembers.compareAndSet(null, new AddMemberSet(getList(new RefsetMemberBinder(enclosingConcept),
                     OFFSETS.REFSET_MEMBERS, enclosingConcept)));
@@ -629,6 +642,12 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     @Override
     public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
+        if (isAnnotationStyleRefex()) {
+            if (getMemberNids().contains(memberNid)) {
+                return (RefsetMember<?, ?>) Bdb.getComponent(memberNid);
+            }
+            return null;
+        }
         Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
         if (refsetMemberList.size() < useMemberMapThreshold) {
             for (RefsetMember<?, ?> member : refsetMemberList) {
@@ -876,12 +895,26 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     }
 
     @Override
-    public boolean isAnnotationStyleSet() {
-        return annotationStyleRefset != null;
+    public boolean isAnnotationStyleSet() throws IOException {
+        return isAnnotationStyleRefex();
     }
 
     @Override
-    public boolean isAnnotationStyleRefset() throws IOException {
+     public void setAnnotationIndex(boolean annotationIndex) throws IOException {
+         modified();
+        this.annotationIndex = annotationIndex;
+     }
+
+    @Override
+    public boolean isAnnotationIndex() throws IOException {
+         if (annotationIndex == null) {
+            annotationIndex = getIsAnnotationStyleIndex();
+        }
+        return annotationIndex;
+   }
+
+    @Override
+    public boolean isAnnotationStyleRefex() throws IOException {
         if (annotationStyleRefset == null) {
             annotationStyleRefset = getIsAnnotationStyleRefset();
         }

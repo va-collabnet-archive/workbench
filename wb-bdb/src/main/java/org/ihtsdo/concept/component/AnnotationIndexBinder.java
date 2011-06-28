@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 International Health Terminology Standards Development Organisation.
+ * Copyright 2011 International Health Terminology Standards Development Organisation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,20 +22,20 @@ import org.ihtsdo.concept.OFFSETS;
 
 /**
  *
- * @author maestro
+ * @author kec
  */
-public class AnnotationStyleBinder extends TupleBinding<Boolean> {
+public class AnnotationIndexBinder extends TupleBinding<Boolean> {
 
-    private static AnnotationStyleBinder binder = new AnnotationStyleBinder();
+    private static AnnotationIndexBinder binder = new AnnotationIndexBinder();
 
-    public static AnnotationStyleBinder getBinder() {
+    public static AnnotationIndexBinder getBinder() {
         return binder;
     }
 
     @Override
     public Boolean entryToObject(TupleInput ti) {
         ti.skipFast(OFFSETS.ANNOTATION_STYLE_REFSET.getOffset());
-        return ti.readByte() >= 1;
+        return ti.readByte() == 2;
     }
 
     @Override
