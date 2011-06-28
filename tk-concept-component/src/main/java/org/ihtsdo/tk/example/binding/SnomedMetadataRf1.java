@@ -27,7 +27,7 @@ public class SnomedMetadataRf1 {
     /*** DEFINITIONS ***/
     // SCT ID: none.
     // SCT Enum: DescriptionType 3
-    public static ConceptSpec FULLY_SPECIFIED_NAME_DESCRIPTION_TYPE_RF1 =
+    public static ConceptSpec FULLY_SPECIFIED_DESCRIPTION_TYPE =
             new ConceptSpec("fully specified name (description type)",
             UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66"));
     // SCT ID: none.
@@ -177,7 +177,7 @@ public class SnomedMetadataRf1 {
 
     /**** Associations ***/
     // Part_Of (Refset) 123005000
-    public static ConceptSpec PART_OF_ATTRIBUTE_RF1 =
+    public static ConceptSpec PART_OF_ATTRIBUTE_REFSET =
             new ConceptSpec("Part of (attribute)",
             UUID.fromString("b4c3f6f9-6937-30fd-8412-d0c77f8a7f73"));
     // May_Be (Refset) 149016008
