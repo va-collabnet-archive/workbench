@@ -112,44 +112,46 @@ public class DocumentManager {
 			for (File f : files) {
 				counter++;
 				try {
-					ContentHandler textHandler = new BodyContentHandler();
-					String pdfText = null; 
-					if (f.getName().endsWith(".pdf")) {
-						FileInputStream fi = new FileInputStream(f);
-						Metadata metadata = new Metadata();
-						//ParseContext context = new ParseContext();
-						Tika tika = new Tika();
-						tika.setMaxStringLength(3*1024*1024);
-						pdfText = tika.parseToString(fi,metadata);
-						//org.apache.tika.parser.pdf.PDFParser parser = new org.apache.tika.parser.pdf.PDFParser();
-						//parser.parse(fi, textHandler, metadata, context);
-						fi.close();
-					} else if (f.getName().endsWith(".doc") || f.getName().endsWith(".xls")) {
-						FileInputStream fi = new FileInputStream(f);
-						Metadata metadata = new Metadata();
-						ParseContext context = new ParseContext();
-						org.apache.tika.parser.microsoft.OfficeParser parser = new org.apache.tika.parser.microsoft.OfficeParser();
-						parser.parse(fi, textHandler, metadata, context);
-						fi.close();
-					} else if (f.getName().endsWith(".docx") || f.getName().endsWith(".xlsx")) {
-						FileInputStream fi = new FileInputStream(f);
-						Metadata metadata = new Metadata();
-						ParseContext context = new ParseContext();
-						org.apache.tika.parser.microsoft.ooxml.OOXMLParser parser = new org.apache.tika.parser.microsoft.ooxml.OOXMLParser();
-						parser.parse(fi, textHandler, metadata, context);
-						fi.close();
-					} else {
-						throw new IOException();
+					ContentHandler textHandler = new BodyContentHandler(-1);
+					if (!f.isHidden()) {String pdfText = null;
+						if (f.getName().endsWith(".pdf")) {
+							FileInputStream fi = new FileInputStream(f);
+							Metadata metadata = new Metadata();
+							// ParseContext context = new ParseContext();
+							Tika tika = new Tika();
+							tika.setMaxStringLength(3 * 1024 * 1024);
+							pdfText = tika.parseToString(fi, metadata);
+							// org.apache.tika.parser.pdf.PDFParser parser = new
+							// org.apache.tika.parser.pdf.PDFParser();
+							// parser.parse(fi, textHandler, metadata, context);
+							fi.close();
+						} else if (f.getName().endsWith(".doc") || f.getName().endsWith(".xls")) {
+							FileInputStream fi = new FileInputStream(f);
+							Metadata metadata = new Metadata();
+							ParseContext context = new ParseContext();
+							org.apache.tika.parser.microsoft.OfficeParser parser = new org.apache.tika.parser.microsoft.OfficeParser();
+							parser.parse(fi, textHandler, metadata, context);
+							fi.close();
+						} else if (f.getName().endsWith(".docx") || f.getName().endsWith(".xlsx")) {
+							FileInputStream fi = new FileInputStream(f);
+							Metadata metadata = new Metadata();
+							ParseContext context = new ParseContext();
+							org.apache.tika.parser.microsoft.ooxml.OOXMLParser parser = new org.apache.tika.parser.microsoft.ooxml.OOXMLParser();
+							parser.parse(fi, textHandler, metadata, context);
+							fi.close();
+						} else {
+							throw new IOException();
+						}
+						Document doc = new Document();
+						doc.add(new Field("path", f.getPath(), Field.Store.YES, Field.Index.ANALYZED));
+						if (f.getName().endsWith(".pdf")) {
+							doc.add(new Field("text", pdfText, Field.Store.YES, Field.Index.ANALYZED));
+						} else {
+							doc.add(new Field("text", textHandler.toString(), Field.Store.YES, Field.Index.ANALYZED));
+						}
+						writer.addDocument(doc);
+						output = output + counter + ") Indexing:" + doc.get("path") + " Size:" + doc.get("text").length() + "<br>";
 					}
-					Document doc = new Document();
-					doc.add(new Field("path", f.getPath(), Field.Store.YES, Field.Index.ANALYZED));
-					if (f.getName().endsWith(".pdf")) {
-						doc.add(new Field("text", pdfText, Field.Store.YES, Field.Index.ANALYZED));
-					}else{
-						doc.add(new Field("text", textHandler.toString(), Field.Store.YES, Field.Index.ANALYZED));
-					}
-					writer.addDocument(doc);
-					output = output + counter + ") Indexing:" + doc.get("path") + " Size:" + doc.get("text").length() + "<br>";
 				} catch (IOException e) {
 					e.printStackTrace();
 					output = output + counter + ") Skipping " + f.getName() + "<br>";
@@ -384,7 +386,6 @@ public class DocumentManager {
 		return output;
 	}
 
-
 	/**
 	 * 
 	 * 
@@ -393,14 +394,15 @@ public class DocumentManager {
 	 * @param dictionaryTextFile
 	 * 
 	 * @return the string
-	 */	
+	 */
 	/**
 	 * Index dictionary from text file.
+	 * 
 	 * @param overwrite
 	 * @param indexDir
-	 * 				Index dictionary folder.
+	 *            Index dictionary folder.
 	 * @param dictionaryTextFile
-	 * 				If null, indexes all dictionary files of shared folder
+	 *            If null, indexes all dictionary files of shared folder
 	 * @return
 	 */
 	public static String indexDictionaryFromTextFile(boolean overwrite, File dictionaryTextFile) {
@@ -408,8 +410,7 @@ public class DocumentManager {
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
-			I_ShowActivity activity =
-				Terms.get().newActivityPanel(true, config, "Dictionaries Build", false);
+			I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "Dictionaries Build", false);
 			activities.add(activity);
 			activity.setValue(0);
 			activity.setIndeterminate(true);
@@ -420,15 +421,15 @@ public class DocumentManager {
 			if (!sharedDictionaryDir.exists()) {
 				sharedDictionaryDir.mkdirs();
 			}
-			
+
 			File[] sharedFiles = sharedDictionaryDir.listFiles();
 			for (File loopFile : sharedFiles) {
 				if (!loopFile.getName().startsWith("userDic-")) {
 					loopFile.delete();
 				}
 			}
-			
-			if(dictionaryTextFile != null){
+
+			if (dictionaryTextFile != null) {
 				File destFile = new File(sharedDictionaryDir, "main-dictionary-" + UUID.randomUUID().toString() + ".txt");
 				copyfile(dictionaryTextFile, destFile);
 			}
@@ -533,19 +534,19 @@ public class DocumentManager {
 				dir.mkdirs();
 			}
 			String userPrefix = "userDic-" + config.getUsername();
-			
+
 			File file = null;
-			
+
 			for (File loopFile : dir.listFiles()) {
 				if (loopFile.getName().startsWith(userPrefix)) {
 					file = loopFile;
 				}
 			}
-			
+
 			if (file == null) {
 				file = new File(dir, userPrefix + UUID.randomUUID().toString() + ".txt");
 			}
-			
+
 			FileOutputStream fos = new FileOutputStream(file, true);
 			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
 			bw = new BufferedWriter(osw);
@@ -723,8 +724,7 @@ public class DocumentManager {
 		return descendants;
 	}
 
-	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException,
-	IOException {
+	public static void addNewLinguisticGuideline(String name, String pattern, String recommendation, I_GetConceptData infoRoot, I_ConfigAceFrame config) throws TerminologyException, IOException {
 		I_TermFactory termFactory = Terms.get();
 		termFactory.setActiveAceFrameConfig(config);
 
@@ -766,8 +766,8 @@ public class DocumentManager {
 				for (I_GetConceptData infoConcept : descendants) {
 					String key = "";
 					String info = "";
-					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-							config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getConflictResolutionStrategy())) {
 						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
@@ -808,8 +808,8 @@ public class DocumentManager {
 				for (I_GetConceptData infoConcept : descendants) {
 					String key = "";
 					String info = "";
-					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-							config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getConflictResolutionStrategy())) {
 						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
@@ -847,7 +847,7 @@ public class DocumentManager {
 			case '?':
 				s.append(".");
 				break;
-				// escape special regexp-characters
+			// escape special regexp-characters
 			case '(':
 			case ')':
 			case '[':
