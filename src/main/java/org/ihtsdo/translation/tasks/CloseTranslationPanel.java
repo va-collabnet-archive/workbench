@@ -16,32 +16,26 @@
  */
 package org.ihtsdo.translation.tasks;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.Collection;
 
 import javax.swing.JTabbedPane;
-import javax.swing.Timer;
-import javax.swing.plaf.basic.BasicTabbedPaneUI.MouseHandler;
 
-import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.queue.SelectAll;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.translation.ui.InboxPanel;
 import org.ihtsdo.translation.ui.TranslationConceptEditor6;
@@ -59,6 +53,9 @@ public class CloseTranslationPanel extends AbstractTask {
 
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
+	
+
+	private String memberPropName ;
 	
 	/**
 	 * Write object.
@@ -104,10 +101,8 @@ public class CloseTranslationPanel extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			AceFrameConfig config = (AceFrameConfig) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (config==null){
-				config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
-			}
+			memberPropName= ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
+			AceFrameConfig config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 			AceFrame ace=config.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getLeftTabs();
 			boolean openInbox=false;
@@ -152,31 +147,25 @@ public class CloseTranslationPanel extends AbstractTask {
 					for (int i=0;i<tabCount;i++){
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 							if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6){
+								WorkListMember workListMember = (WorkListMember) process.getProperty(memberPropName);
+								
 								TranslationConceptEditor6 uiPanel=(TranslationConceptEditor6)tpc.getComponentAt(i);
-								uiPanel.AutokeepInInbox();
-								//
-								//							synchronized (this) {
-								//								while (!uiPanel.getUnloaded()){
-								//									try {
-								//										wait();
-								//									} catch (InterruptedException e1) {
-								//										e1.printStackTrace();
-								//										break;
-								//									}
-								//								}
-								//							}
+								if ((workListMember==null) || (workListMember!=null && uiPanel.getConcept().getNid()==workListMember.getConcept().getNid())){
+									uiPanel.AutokeepInInbox();
+									tpc.remove(i);
+									tpc.repaint();
+									tpc.revalidate();
+									break;
+								}
 							}
-							tpc.remove(i);
-							tpc.repaint();
-							tpc.revalidate();
-							break;
 						}
 
 					}
 				}
 			}
 		} catch (Exception e) {
-			throw new TaskFailedException(e);
+			//do nothing
+//			throw new TaskFailedException(e);
 		}
 		return Condition.CONTINUE;
 	}

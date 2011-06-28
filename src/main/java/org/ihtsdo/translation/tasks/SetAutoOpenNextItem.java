@@ -26,7 +26,6 @@ import javax.swing.JTabbedPane;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -99,10 +98,8 @@ public class SetAutoOpenNextItem extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			AceFrameConfig config = (AceFrameConfig) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			if (config==null){
-				config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
-			}
+			AceFrameConfig config =(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
+		
 			AceFrame ace=config.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getLeftTabs();
 			if (tp!=null){

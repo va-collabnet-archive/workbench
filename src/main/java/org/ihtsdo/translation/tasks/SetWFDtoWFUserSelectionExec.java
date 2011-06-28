@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JPanel;
 
@@ -104,9 +103,7 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 		try {
 			I_TermFactory tf = Terms.get();
 
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-			if (config==null)
-				config=tf.getActiveAceFrameConfig();
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
 			WorkListMember workListMember = (WorkListMember) process.getProperty(memberPropName);
 			

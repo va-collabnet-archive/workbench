@@ -111,12 +111,14 @@ public class TranslationWorkflowInit extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+//			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
+//			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-			I_GetConceptData concept = config.getHierarchySelection();
-
+//			Replaced previous line with next line to force active config use
+			
 			I_TermFactory termFactory = Terms.get();
+			I_ConfigAceFrame config =termFactory.getActiveAceFrameConfig();
+			I_GetConceptData concept = config.getHierarchySelection();
 
 			I_GetConceptData refsetsParent = termFactory
 			.getConcept(new UUID[] {UUID.fromString("3e0cd740-2cc6-3d68-ace7-bad2eb2621da")});

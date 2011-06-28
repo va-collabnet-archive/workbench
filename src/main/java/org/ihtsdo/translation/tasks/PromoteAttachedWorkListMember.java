@@ -21,9 +21,6 @@ import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.Collection;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -33,7 +30,6 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkListMember;
 /**
  * The Class TranslationWorkFlowStep3Outputs.
@@ -47,9 +43,6 @@ public class PromoteAttachedWorkListMember extends AbstractTask {
 
 	/** The worklist item. */
 	private String workListItemPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
-
-	/** The config. */
-	private I_ConfigAceFrame config;
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
@@ -105,20 +98,12 @@ public class PromoteAttachedWorkListMember extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-			if (config==null)
-				config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
-
-			I_TermFactory tf = Terms.get();
 
 			WorkListMember workListMember = (WorkListMember) process.readAttachement(getWorkListItemPropName());
 			if (workListMember == null) {
 				throw new TaskFailedException("Missing workist member attachment");
 			}
-			
-//			TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
-//			tf.commit();
-
+		
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			e.printStackTrace();

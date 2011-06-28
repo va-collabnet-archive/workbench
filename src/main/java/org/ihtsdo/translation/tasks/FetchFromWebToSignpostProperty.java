@@ -24,9 +24,8 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -104,29 +103,14 @@ public class FetchFromWebToSignpostProperty extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			/*InputStream inStream = (InputStream) webURL.getContent();
-             BufferedReader in   = 
-                 new BufferedReader (new InputStreamReader (inStream));
-               String line;
-               StringBuffer msgBuff = new StringBuffer();
-               while ((line = in.readLine()) != null) {
-            	   msgBuff.append(line);
-            	   msgBuff.append("\n");
-               }*/
-			//System.out.println("htmlprop" + htmlPropName);
-			//I_GetConceptData selectedConcept = (I_GetConceptData) process.readAttachement("A: I_GET_CONCEPT_DATA");
-			//I_GetConceptData selectedConcept = (I_GetConceptData) process.readAttachement(selectionPropName);
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData selectedConcept = config.getHierarchySelection();
 			process.setProperty("A: SIGNPOST_HTML", "<html><body>Probando2!! <B>bold</B> <i>Concept: + "
 					+ selectedConcept.getUids().iterator().next().toString()
 					+"</i>"
-					+ "<br><a href='http://www.google.com/search?rls=en-us&q=" + TermmedUtils.getFSN(selectedConcept,LocalVersionedTerminology.get()) 
+					+ "<br><a href='http://www.google.com/search?rls=en-us&q=" + TermmedUtils.getFSN(selectedConcept,Terms.get()) 
 					+ "'>Buscar en google</a>"  
 					+ "</body></html>" );
-			//process.setProperty("A: SIGNPOST_HTML", msgBuff.toString() );
-			//JOptionPane.showMessageDialog(new JFrame(), msgBuff.toString());
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);

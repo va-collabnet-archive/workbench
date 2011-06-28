@@ -28,6 +28,7 @@ import javax.swing.JTabbedPane;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -108,8 +109,7 @@ public class OpenSimpleTranslationForSelectedConcept extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			
 			if (sourceLangCode == null) {
 				sourceLangCode = "en";
@@ -119,7 +119,7 @@ public class OpenSimpleTranslationForSelectedConcept extends AbstractTask {
 				targetLangCode = "es";
 			}
 			
-	        I_GetConceptData concept = LocalVersionedTerminology.get().getConcept(config.getHierarchySelection().getUids());
+	        I_GetConceptData concept = Terms.get().getConcept(config.getHierarchySelection().getUids());
 	        SimpleTranslationConceptEditor uiPanel = new SimpleTranslationConceptEditor(concept, config, sourceLangCode, targetLangCode);
 	        
 	        TranslationHelperPanel thp=PanelHelperFactory.getTranslationHelperPanel();

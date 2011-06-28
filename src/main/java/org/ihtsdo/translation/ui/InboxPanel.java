@@ -98,6 +98,7 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.EntryID;
 import org.dwfa.bpa.process.I_DescribeBusinessProcess;
 import org.dwfa.bpa.process.I_DescribeObject;
@@ -196,6 +197,8 @@ public class InboxPanel extends JPanel {
 		this.worker = (Worker) worker;
 		try {
 			this.cloneWorker = (Worker) worker.getTransactionIndependentClone();
+			this.cloneWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+				
 		} catch (LoginException e) {
 			e.printStackTrace();
 		}
@@ -975,8 +978,10 @@ public class InboxPanel extends JPanel {
 		Entry[] attrSetTemplates = new Entry[] { new Name(outboxQueueName) };
 		ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
 		ServiceItemFilter filter = null;
-		if (outboxReadWorker == null)
+		if (outboxReadWorker == null){
 			outboxReadWorker = worker.getTransactionIndependentClone();
+			outboxReadWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+		}
 
 		ServiceItem service = outboxReadWorker.lookup(template, filter);
 		if (service == null) {
@@ -1150,6 +1155,8 @@ public class InboxPanel extends JPanel {
 					}
 					if (altWorker == null) {
 						altWorker = worker.getTransactionIndependentClone();
+						altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+						
 						cloneList.add(altWorker);
 					}
 
@@ -2566,6 +2573,8 @@ public class InboxPanel extends JPanel {
 						}
 						if (altWorker == null) {
 							altWorker = worker.getTransactionIndependentClone();
+							altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+							
 							cloneList.add(altWorker);
 						}
 						processToExecute = queue.take(entId, altWorker.getActiveTransaction());

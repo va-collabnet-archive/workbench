@@ -20,209 +20,219 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.tapi.TerminologyException;
 
 public abstract class Translation_InboxReviewEscalate extends AbstractTask {
 
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
-    private static final int dataVersion = 1;
+	private static final int dataVersion = 1;
 
-    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
-    protected transient Condition returnCondition;
+	protected transient Condition returnCondition;
 
-    protected transient boolean done;
+	protected transient boolean done;
 
-    protected transient I_ConfigAceFrame config;
-    protected transient boolean builderVisible;
-    protected transient boolean progressPanelVisible;
-    protected transient boolean subversionButtonVisible;
-    protected transient boolean inboxButtonVisible;
-    protected transient JPanel workflowPanel;
+	protected transient I_ConfigAceFrame config;
+	protected transient boolean builderVisible;
+	protected transient boolean progressPanelVisible;
+	protected transient boolean subversionButtonVisible;
+	protected transient boolean inboxButtonVisible;
+	protected transient JPanel workflowPanel;
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-        out.writeObject(profilePropName);
-    }
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(profilePropName);
+	}
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-            profilePropName = (String) in.readObject();
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
-    }
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == 1) {
+			profilePropName = (String) in.readObject();
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
-    private class PreviousActionListener implements ActionListener {
+	private class PreviousActionListener implements ActionListener {
 
-        /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.PREVIOUS;
-            done = true;
-            synchronized (Translation_InboxReviewEscalate.this) {
-                Translation_InboxReviewEscalate.this.notifyAll();
-            }
-        }
-    }
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			returnCondition = Condition.PREVIOUS;
+			done = true;
+			synchronized (Translation_InboxReviewEscalate.this) {
+				Translation_InboxReviewEscalate.this.notifyAll();
+			}
+		}
+	}
 
-    public class ContinueActionListener implements ActionListener {
+	public class ContinueActionListener implements ActionListener {
 
-        /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.CONTINUE;
-            done = true;
-            synchronized (Translation_InboxReviewEscalate.this) {
-                Translation_InboxReviewEscalate.this.notifyAll();
-            }
-        }
-    }
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			returnCondition = Condition.CONTINUE;
+			done = true;
+			synchronized (Translation_InboxReviewEscalate.this) {
+				Translation_InboxReviewEscalate.this.notifyAll();
+			}
+		}
+	}
 
-    public class StopActionListener implements ActionListener {
+	public class StopActionListener implements ActionListener {
 
-        /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        public void actionPerformed(ActionEvent e) {
-            returnCondition = Condition.ITEM_CANCELED;
-            done = true;
-            synchronized (Translation_InboxReviewEscalate.this) {
-                Translation_InboxReviewEscalate.this.notifyAll();
-            }
-        }
-    }
+		/**
+		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+		 */
+		public void actionPerformed(ActionEvent e) {
+			returnCondition = Condition.ITEM_CANCELED;
+			done = true;
+			synchronized (Translation_InboxReviewEscalate.this) {
+				Translation_InboxReviewEscalate.this.notifyAll();
+			}
+		}
+	}
 
-    protected void waitTillDone(Logger l) {
-        while (!this.isDone()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                l.log(Level.SEVERE, e.getMessage(), e);
-            }
-        }
-    }
+	protected void waitTillDone(Logger l) {
+		while (!this.isDone()) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				l.log(Level.SEVERE, e.getMessage(), e);
+			}
+		}
+	}
 
-    public boolean isDone() {
-        return this.done;
-    }
+	public boolean isDone() {
+		return this.done;
+	}
 
-    protected void setupPreviousNextOrCancelButtons(final JPanel workflowPanel, GridBagConstraints c) {
-        c.gridx++;
-        workflowPanel.add(new JLabel("  "), c);
-        c.gridx++;
-        c.anchor = GridBagConstraints.SOUTHWEST;
-        if (showPrevious()) {
-            JButton previousButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getPreviousImage())));
-            previousButton.setToolTipText("go back");
-            workflowPanel.add(previousButton, c);
-            previousButton.addActionListener(new PreviousActionListener());
-            c.gridx++;
-        }
-        JButton continueButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getContinueImage())));
-        continueButton.setToolTipText("continue");
-        workflowPanel.add(continueButton, c);
-        continueButton.addActionListener(new ContinueActionListener());
-        c.gridx++;
+	protected void setupPreviousNextOrCancelButtons(final JPanel workflowPanel, GridBagConstraints c) {
+		c.gridx++;
+		workflowPanel.add(new JLabel("  "), c);
+		c.gridx++;
+		c.anchor = GridBagConstraints.SOUTHWEST;
+		if (showPrevious()) {
+			JButton previousButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getPreviousImage())));
+			previousButton.setToolTipText("go back");
+			workflowPanel.add(previousButton, c);
+			previousButton.addActionListener(new PreviousActionListener());
+			c.gridx++;
+		}
+		JButton continueButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getContinueImage())));
+		continueButton.setToolTipText("continue");
+		workflowPanel.add(continueButton, c);
+		continueButton.addActionListener(new ContinueActionListener());
+		c.gridx++;
 
-        JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
-        cancelButton.setToolTipText("cancel");
-        workflowPanel.add(cancelButton, c);
-        cancelButton.addActionListener(new StopActionListener());
-        c.gridx++;
-        workflowPanel.add(new JLabel("     "), c);
-        workflowPanel.validate();
-        Container cont = workflowPanel;
-        while (cont != null) {
-            cont.validate();
-            cont = cont.getParent();
-        }
-        continueButton.requestFocusInWindow();
-        workflowPanel.repaint();
-    }
+		JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
+		cancelButton.setToolTipText("cancel");
+		workflowPanel.add(cancelButton, c);
+		cancelButton.addActionListener(new StopActionListener());
+		c.gridx++;
+		workflowPanel.add(new JLabel("     "), c);
+		workflowPanel.validate();
+		Container cont = workflowPanel;
+		while (cont != null) {
+			cont.validate();
+			cont = cont.getParent();
+		}
+		continueButton.requestFocusInWindow();
+		workflowPanel.repaint();
+	}
 
-    protected abstract boolean showPrevious();
+	protected abstract boolean showPrevious();
 
-    protected void restore() throws InterruptedException, InvocationTargetException {
-        if (SwingUtilities.isEventDispatchThread()) {
-            doRun();
-        } else {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    doRun();
-                }
-            });
-        }
-        config.setBuilderToggleVisible(builderVisible);
-        config.setSubversionToggleVisible(subversionButtonVisible);
-        config.setInboxToggleVisible(inboxButtonVisible);
-    }
+	protected void restore() throws InterruptedException, InvocationTargetException {
+		if (SwingUtilities.isEventDispatchThread()) {
+			doRun();
+		} else {
+			SwingUtilities.invokeAndWait(new Runnable() {
+				public void run() {
+					doRun();
+				}
+			});
+		}
+		config.setBuilderToggleVisible(builderVisible);
+		config.setSubversionToggleVisible(subversionButtonVisible);
+		config.setInboxToggleVisible(inboxButtonVisible);
+	}
 
-    protected void setup(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException,
-            InvocationTargetException {
-        this.done = false;
-        config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+	protected void setup(I_EncodeBusinessProcess process) throws IntrospectionException, IllegalAccessException,
+	InvocationTargetException {
+		this.done = false;
+		try {
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
-        builderVisible = config.isBuilderToggleVisible();
-        config.setBuilderToggleVisible(false);
-        subversionButtonVisible = config.isBuilderToggleVisible();
-        config.setSubversionToggleVisible(false);
-        inboxButtonVisible = config.isInboxToggleVisible();
-        config.setInboxToggleVisible(false);
-        workflowPanel = config.getWorkflowPanel();
-        workflowPanel.setVisible(true);
-    }
+			builderVisible = config.isBuilderToggleVisible();
+			config.setBuilderToggleVisible(false);
+			subversionButtonVisible = config.isBuilderToggleVisible();
+			config.setSubversionToggleVisible(false);
+			inboxButtonVisible = config.isInboxToggleVisible();
+			config.setInboxToggleVisible(false);
+			workflowPanel = config.getWorkflowPanel();
+			workflowPanel.setVisible(true);} catch (TerminologyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-    /**
-     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-     */
-    public Collection<Condition> getConditions() {
-        if (showPrevious()) {
-            return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
-        }
-        return AbstractTask.CONTINUE_CANCEL;
-    }
+	}
 
-    public String getProfilePropName() {
-        return profilePropName;
-    }
+	/**
+	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+	 */
+	public Collection<Condition> getConditions() {
+		if (showPrevious()) {
+			return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
+		}
+		return AbstractTask.CONTINUE_CANCEL;
+	}
 
-    public void setProfilePropName(String profilePropName) {
-        this.profilePropName = profilePropName;
-    }
+	public String getProfilePropName() {
+		return profilePropName;
+	}
 
-    private void doRun() {
-        Component[] components = workflowPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            workflowPanel.remove(components[i]);
-        }
-        workflowPanel.setVisible(false);
-        workflowPanel.repaint();
-        workflowPanel.validate();
-        Container cont = workflowPanel;
-        while (cont != null) {
-            cont.validate();
-            cont = cont.getParent();
-        }
-    }
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
+	}
 
-    protected static String getPreviousImage() {
-        return "/16x16/plain/navigate_left.png";
-    }
+	private void doRun() {
+		Component[] components = workflowPanel.getComponents();
+		for (int i = 0; i < components.length; i++) {
+			workflowPanel.remove(components[i]);
+		}
+		workflowPanel.setVisible(false);
+		workflowPanel.repaint();
+		workflowPanel.validate();
+		Container cont = workflowPanel;
+		while (cont != null) {
+			cont.validate();
+			cont = cont.getParent();
+		}
+	}
 
-    protected static String getContinueImage() {
-        return "/16x16/plain/navigate_right.png";
-    }
+	protected static String getPreviousImage() {
+		return "/16x16/plain/navigate_left.png";
+	}
 
-    protected static String getCancelImage() {
-        return "/16x16/plain/navigate_cross.png";
-    }
+	protected static String getContinueImage() {
+		return "/16x16/plain/navigate_right.png";
+	}
+
+	protected static String getCancelImage() {
+		return "/16x16/plain/navigate_cross.png";
+	}
 }

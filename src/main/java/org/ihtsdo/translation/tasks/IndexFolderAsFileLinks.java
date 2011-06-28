@@ -93,7 +93,7 @@ public class IndexFolderAsFileLinks extends AbstractTask {
 		I_ConfigAceFrame config;
 		try {
 			I_TermFactory tf = Terms.get();
-			config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			FileLinkAPI fileLinkApi = new FileLinkAPI(config);
 			fileLinkApi.addFolderAsFileLinksToConfig(new File(getFolderName()),
 					tf.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_BUSINESS_PROCESS_CATEGORY.getUids()));

@@ -22,12 +22,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -44,8 +42,6 @@ import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
-import org.ihtsdo.translation.LanguageUtil;
-import org.ihtsdo.translation.ui.ConfigTranslationModule;
 
 /**
  * The Class
@@ -107,35 +103,9 @@ public class CreateIssueForInternationalEdition extends AbstractTask {
 	public Condition evaluate(final I_EncodeBusinessProcess process,
 			I_Work worker) throws TaskFailedException {
 		I_ConfigAceFrame config;
-		I_TermFactory tf = Terms.get();
 		Date timeStamp = new Date();
 		try {
-			config = (I_ConfigAceFrame) process
-					.getProperty(getProfilePropName());
-			if (config == null) {
-				config = Terms.get().getActiveAceFrameConfig();
-			}
-
-//			ConfigTranslationModule translationConfig = LanguageUtil
-//					.getTranslationConfig(config);
-//
-//			if (translationConfig == null) {
-//				JOptionPane.showMessageDialog(null,
-//						"Problem getting translation configuration.", "Error",
-//						JOptionPane.ERROR_MESSAGE);
-//				throw new TaskFailedException(
-//						"Problem getting translation configuration.");
-//			}
-//
-//			if (translationConfig.getSourceIssuesRepositoryIds() == null) {
-//				JOptionPane
-//						.showMessageDialog(
-//								null,
-//								"Problem getting source language issue repository information from config.",
-//								"Error", JOptionPane.ERROR_MESSAGE);
-//				throw new TaskFailedException(
-//						"Problem getting source language issue repository information from config.");
-//			}
+			config = Terms.get().getActiveAceFrameConfig();
 
 			Object[] options = TerminologyProjectDAO.getAllProjects(config).toArray();
 			TranslationProject project = (TranslationProject)JOptionPane.showInputDialog(

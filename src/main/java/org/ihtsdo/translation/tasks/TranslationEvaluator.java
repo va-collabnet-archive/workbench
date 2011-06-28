@@ -28,7 +28,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -98,8 +97,7 @@ public class TranslationEvaluator extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+			I_ConfigAceFrame config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
 			I_GetConceptData concept = config.getHierarchySelection();
 
@@ -108,7 +106,12 @@ public class TranslationEvaluator extends AbstractTask {
 			I_GetConceptData refsetsParent = termFactory
 			.getConcept(new UUID[] {UUID.fromString("3e0cd740-2cc6-3d68-ace7-bad2eb2621da")});
 			
-			if (refsetsParent.isParentOf(concept)) {
+			if (refsetsParent.isParentOf(concept, 
+					config.getAllowedStatus(),
+					config.getDestRelTypes(), 
+					config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), 
+					config.getConflictResolutionStrategy()))  {
 				process.writeAttachment("DLG_MSG", "True");
 			} else {
 				process.writeAttachment("DLG_MSG", "False");

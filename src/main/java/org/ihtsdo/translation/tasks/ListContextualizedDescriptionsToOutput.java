@@ -21,11 +21,9 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.List;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -96,8 +94,6 @@ public class ListContextualizedDescriptionsToOutput extends AbstractTask {
 	 */
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
-		I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-		.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 		I_TermFactory tf = Terms.get();
 
 		try{
