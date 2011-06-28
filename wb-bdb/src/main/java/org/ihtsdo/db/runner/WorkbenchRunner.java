@@ -177,6 +177,9 @@ public class WorkbenchRunner {
 						.get("initialized"));
 			}
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
+			
+			AceLog.getAppLog().info("About to open the init svn dialog");
+			
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
 					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
@@ -210,7 +213,9 @@ public class WorkbenchRunner {
 				wbConfigFile = new File("config/wb.config");
 			}
 
+			
 			File profileDir = new File("profiles");
+			AceLog.getAppLog().info("About to initializeFromSubversion");
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
@@ -311,6 +316,7 @@ public class WorkbenchRunner {
 
 				// Put up a dialog to select the configuration file...
 				CountDownLatch latch = new CountDownLatch(1);
+				AceLog.getAppLog().info("About to open ProfileWorker");
 				GetProfileWorker profiler = new GetProfileWorker(latch);
 				profiler.start();
 				latch.await();
@@ -541,6 +547,7 @@ public class WorkbenchRunner {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
+			AceLog.getAppLog().info("About to open loginDialog");
 			loginDialog = new AceLoginDialog(parentFrame);
 			loginDialog.setConnectToSvn(initializeFromSubversion);
 			loginDialog.setLocation((d.width / 2)
