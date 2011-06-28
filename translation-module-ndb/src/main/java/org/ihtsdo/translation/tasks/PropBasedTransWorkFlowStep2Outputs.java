@@ -273,7 +273,6 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 			AceFrame ace=aceConfig.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
 			if (tp!=null){
-				boolean bPanelExists=false;
 				int tabCount=tp.getTabCount();
 				I_GetConceptData role=Terms.get().getConcept(stepRole.ids);
 				for (int i=0;i<tabCount;i++){
@@ -292,6 +291,13 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 						}
 						uiPanel.setAutoKeepFunction(new ThisAutoKeep());
 						uiPanel.updateUI(translationProject, workListMember, role);
+						break;
+					}
+				}
+				boolean bPanelExists=false;
+				tabCount=tp.getTabCount();
+				for (int i=0;i<tabCount;i++){
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
 						tp.setSelectedIndex(i);
 						bPanelExists=true;
 						break;
