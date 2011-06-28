@@ -1867,6 +1867,7 @@ public class TranslationConceptEditor6 extends JPanel {
 
 								//---- targetTextField ----
 								targetTextField.setRows(2);
+								targetTextField.setLineWrap(true);
 								scrollPane5.setViewportView(targetTextField);
 							}
 							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
