@@ -448,7 +448,7 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 			for (int i=comments.size()-1;i>-1;i--) {
 				thickVer =  Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") +1));
 				strDate = formatter.format(thickVer);
-				addStringTolist(strDate, "Workflow comment: " + comments.get(i).substring(0,comments.get(i).lastIndexOf(" - Time:") ));
+				addStringTolist(strDate, "Worklist comment: " + comments.get(i).substring(0,comments.get(i).lastIndexOf(" - Time:") ));
 
 			}
 		} catch (TerminologyException e) {
