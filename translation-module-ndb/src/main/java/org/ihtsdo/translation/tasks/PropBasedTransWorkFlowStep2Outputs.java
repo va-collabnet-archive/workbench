@@ -240,10 +240,10 @@ public class PropBasedTransWorkFlowStep2Outputs extends AbstractTask {
 
 			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 
-			if (config==null)
-				config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
-			else
-				process.setProperty(getProfilePropName(), config);
+//			if (config==null)
+//				config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+//			else
+//				process.setProperty(getProfilePropName(), config);
 
 			WorkListMember workListMember = (WorkListMember) process.readAttachement(getWorkListItemPropName());
 			if (workListMember == null) {
