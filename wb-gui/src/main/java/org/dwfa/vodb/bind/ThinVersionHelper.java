@@ -80,7 +80,7 @@ public class ThinVersionHelper {
 
     public static long convert(String dateStr) throws ParseException {
         if (dateStr.equalsIgnoreCase("latest")) {
-            return Integer.MAX_VALUE;
+            return Long.MAX_VALUE;
         }
         SimpleDateFormat formatter = dateFormatterTL.get();
         if (formatter == null) {

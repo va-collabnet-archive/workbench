@@ -660,7 +660,7 @@ public abstract class ChangeReportBase extends DiffBase {
     protected void processConcept(I_GetConceptData c, int i, long beg)
             throws Exception {
         changes = "";
-        changes_xml = "";
+        changes_xml     = "";
         if (debug_p) {
             System.out.println("Concept: " + c.getInitialText());
         }
