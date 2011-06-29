@@ -54,20 +54,6 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 			for (int i = 0; i < possibleActions.size();i++) {
 				retSet.add(possibleActions.get(i));
 			}
-			
-	        // Get config
-	        final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-	        
-	        // Get Worker
-	        final I_Work worker;
-	        if (config.getWorker().isExecuting()) {
-	            worker = config.getWorker().getTransactionIndependentClone();
-	        } else {
-	            worker = config.getWorker();
-	        }
-	        
-	        // Set bean
-	        worker.writeAttachment(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name(), possibleActions);
 		} catch (Exception e) {
 			throw new IOException("Unable to search for possible Actions", e);
 		}

@@ -49,8 +49,8 @@ public class AdvanceWorkflow extends AbstractTask {
     @SuppressWarnings("unchecked")
 	public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
     	try {
-            UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
-            List<WorkflowHistoryJavaBean> availableActions = (List<WorkflowHistoryJavaBean>) worker.readAttachement(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name());
+            UUID selectedActionUid = (UUID) process.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
+            List<WorkflowHistoryJavaBean> availableActions = (List<WorkflowHistoryJavaBean>) process.readAttachement(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name());
             
             
     		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
