@@ -47,10 +47,11 @@ public class RefsetMemberFactory {
     public static RefsetMember<?, ?> reCreate(RefexCAB res, RefsetMember<?, ?> member, EditCoordinate ec) throws IOException, InvalidCAB {
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
+        member.refsetNid  = refexNid;
         member.nid = refexNid;
         if (refexColCon.isAnnotationStyleRefex()) {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
-            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.enclosingConceptNid);
             Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
        } else {
             member.enclosingConceptNid = refexColCon.getNid();
