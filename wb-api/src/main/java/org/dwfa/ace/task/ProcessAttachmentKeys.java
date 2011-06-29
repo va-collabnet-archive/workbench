@@ -157,7 +157,9 @@ public enum ProcessAttachmentKeys {
     PATHS_FOR_VIEW, 
     ADD_TO_PATH_ORIGIN,
     RELEASE_DATE,
-    COLLABNET_ARTIFACT_SUBMITTER;
+    COLLABNET_ARTIFACT_SUBMITTER,
+    START_DATE,
+    END_DATE;
 
     public String getAttachmentKey() {
         return "A: " + this.name();
