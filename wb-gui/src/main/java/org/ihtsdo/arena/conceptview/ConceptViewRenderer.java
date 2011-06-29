@@ -79,6 +79,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.SwingUtilities;
+import org.ihtsdo.arena.context.action.BpAction;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 /**
@@ -522,7 +523,12 @@ public class ConceptViewRenderer extends JLayeredPane {
                                             && rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
                                         JButton actionButton = new JButton();
 
-                                        Action a = actionFactory.make(wfBpFile);
+                                        BpAction a = (BpAction) actionFactory.make(wfBpFile);
+                                        a.getExtraAttachments().put(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), 
+                                                WorkflowHelper.lookupAction(a.getValue(Action.NAME) + WORKFLOW_ACTION_SUFFIX).getPrimUuid());
+                                        a.getExtraAttachments().put(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name(), 
+                                                possibleActions);
+                                        
                                         actionButton.setAction(a);
 
                                         actionButton.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -537,16 +543,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                                 try {
                                                     final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-                                                    // Get Worker
-                                                    I_Work worker;
-                                                    if (config.getWorker().isExecuting()) {
-                                                        worker = config.getWorker().getTransactionIndependentClone();
-                                                    } else {
-                                                        worker = config.getWorker();
-                                                    }
-
                                                     // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN
-                                                    worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(e.getActionCommand() + WORKFLOW_ACTION_SUFFIX).getPrimUuid());
                                                     updateOopsButton(settings.getConcept());
                                                     workflowToggleButton.doClick();
                                                 } catch (Exception e1) {

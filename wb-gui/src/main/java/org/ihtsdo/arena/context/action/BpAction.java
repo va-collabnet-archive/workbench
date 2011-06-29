@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,8 +24,6 @@ import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.worker.MasterWorker;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.thread.NamedThreadFactory;
 
@@ -32,6 +32,8 @@ public class BpAction extends AbstractAction implements Runnable {
     private static final ThreadGroup bpActionThreadGroup = new ThreadGroup("BpAction threads");
     private static ExecutorService executorService = Executors.newCachedThreadPool(
             new NamedThreadFactory(bpActionThreadGroup, "BpAction executor service"));
+    
+    
     /**
      *
      */
@@ -40,6 +42,11 @@ public class BpAction extends AbstractAction implements Runnable {
     private I_ConfigAceFrame frameConfig;
     private I_HostConceptPlugins host;
     private ScrollablePanel wizardPanel;
+    private HashMap<String, Object> extraAttachments = new HashMap<String, Object>();
+
+    public HashMap<String, Object> getExtraAttachments() {
+        return extraAttachments;
+    }
 
     public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
             I_HostConceptPlugins host, ScrollablePanel wizardPanel)
@@ -171,6 +178,11 @@ public class BpAction extends AbstractAction implements Runnable {
                     host);
             process.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(),
                     frameConfig);
+            
+            for (Map.Entry<String, Object> es: extraAttachments.entrySet()) {
+                process.writeAttachment(es.getKey(), es.getValue());
+            }
+            
             worker.execute(process);
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
