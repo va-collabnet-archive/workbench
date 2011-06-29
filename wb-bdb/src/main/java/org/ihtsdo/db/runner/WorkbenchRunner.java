@@ -46,6 +46,7 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceLoginDialog;
 import org.dwfa.ace.config.AceProtocols;
+import org.dwfa.ace.config.UIAuthenticator;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
@@ -91,6 +92,23 @@ public class WorkbenchRunner {
 	public static Boolean initializeFromSubversion = false;
 	public static String[] svnUpdateOnStart = null;
 	public static File userProfile;
+	public static UIAuthenticator auth = new UIAuthenticator();
+	
+	
+	private String authenticate(){
+		String result = auth.authenticate();
+		
+		if(result != null && result.length() > 0){
+			AceLog.getAppLog().info("Authentic Called result = "+result);
+		}
+		
+		else{
+			AceLog.getAppLog().info("Authentic Called everything OK");
+		}
+		
+		return result;
+	}
+	
 
 	public WorkbenchRunner(String[] args, LifeCycle lc) {
 		try {
@@ -214,8 +232,17 @@ public class WorkbenchRunner {
 			}
 
 			
+			
+			
+			
 			File profileDir = new File("profiles");
 			AceLog.getAppLog().info("About to initializeFromSubversion");
+			
+			
+			authenticate();
+			
+			
+			
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
