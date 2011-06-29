@@ -77,8 +77,10 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
                     return new ERefsetStrMember(m);
                 case CID_INT:
                     return new ERefsetCidIntMember(m);
-                case LONG:
+                case CID_LONG:
                     return new ERefsetCidLongMember(m);
+                case LONG:
+                    return new ERefsetLongMember(m);
                 case BOOLEAN:
                     return new ERefsetBooleanMember(m);
                 case CID_STR:
