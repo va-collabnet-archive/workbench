@@ -369,6 +369,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                         possibleActions = wfHandler.getAvailableWorkflowActions(concept);
                     } catch (Exception e1) {
                         AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e1.getMessage());
+                        e1.printStackTrace();
                     }
 
                     capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
@@ -566,6 +567,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                         }
                     } catch (Exception e) {
                         AceLog.getAppLog().log(Level.WARNING, "Error in setting up Workflow with error: " + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
             }
