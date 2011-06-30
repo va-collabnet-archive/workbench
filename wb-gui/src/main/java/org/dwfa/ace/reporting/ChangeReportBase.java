@@ -50,12 +50,8 @@ public abstract class ChangeReportBase extends DiffBase {
      * @parameter expression="${project.build.directory}/generated-resources"
      */
     protected File report_dir;
-    /**
-     * Concept per page
-     * 
-     * @parameter default-value=100
-     */
-    protected int concepts_per_page;
+
+    protected int concepts_per_page = 100;
     protected int concepts_on_page = 0;
     protected int page_i = 0;
     protected PrintWriter out = null;
