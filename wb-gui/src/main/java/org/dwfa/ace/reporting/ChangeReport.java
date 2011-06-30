@@ -17,11 +17,13 @@
 package org.dwfa.ace.reporting;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
  * 
@@ -36,12 +38,17 @@ public class ChangeReport extends ChangeReportBase {
     public ChangeReport(String v1, String v2){
         super(v1, v2);
     }
+    
+    private static ConceptSpec BODY_STRUCTURE =
+            new ConceptSpec("Body structure (body structure)",
+            UUID.fromString("4be3f62e-28d5-3bb4-a424-9aa7856a1790"));
 
     @Override
     protected void processConcepts() throws Exception {
         I_TermFactory tf = Terms.get();
         AceLog.getAppLog().info("Getting concepts in DFS order.");
-        ArrayList<Integer> all_concepts = getAllConcepts();
+        //ArrayList<Integer> all_concepts = getAllConcepts();
+        ArrayList<Integer> all_concepts = getAllConceptsForParent(BODY_STRUCTURE);
         AceLog.getAppLog().info("Processing: " + all_concepts.size());
         long beg = System.currentTimeMillis();
         int i = 0;
