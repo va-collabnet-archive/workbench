@@ -165,6 +165,7 @@ public class PromptUserForDate extends AbstractTask {
                     for (int i = 0; i < components.length; i++) {
                         workflowPanel.remove(components[i]);
                     }
+                    workflowPanel.setVisible(true);
                     workflowPanel.setLayout(new GridBagLayout());
                     GridBagConstraints c = new GridBagConstraints();
                     c.fill = GridBagConstraints.BOTH;
@@ -230,6 +231,7 @@ public class PromptUserForDate extends AbstractTask {
              */
 
             process.setProperty(newDateProp, date);
+            workflowPanel.setVisible(false);
 
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
