@@ -83,7 +83,7 @@ rule "no FSN"
 		} 	
 end
 
-rule "missing Dialect description EN_UK"
+/*rule "missing Dialect description EN_UK"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
@@ -109,7 +109,7 @@ rule "missing Dialect description EN_US"
                Language.EN_US, $c.getViewCoordinate()), $c.getNid());
          }
 		} 	
-end
+end */
 
 rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 	
