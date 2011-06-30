@@ -37,6 +37,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.tapi.spec.ConceptSpec;
 
 /**
  * 
@@ -44,11 +45,6 @@ import org.dwfa.cement.SNOMED;
  */
 public abstract class ChangeReportBase extends DiffBase {
 
-    /**
-     * Report directory.
-     * 
-     * @parameter expression="${project.build.directory}/generated-resources"
-     */
     protected File report_dir;
 
     protected int concepts_per_page = 100;
@@ -62,7 +58,9 @@ public abstract class ChangeReportBase extends DiffBase {
     
     public ChangeReportBase(String v1, String v2){
         super(v1, v2);
-        report_dir = new File ("../reports");
+        String curDir = System.getProperty("user.dir");
+        report_dir = new File (curDir + "/reports");
+        
     }
 
     protected void getOut() throws Exception {
@@ -567,6 +565,26 @@ public abstract class ChangeReportBase extends DiffBase {
         if (!test_p) {
             all_concepts = getDescendants(
                     tf.getConcept(SNOMED.Concept.ROOT.getUids()).getNid(),
+                    this.allowed_position2);
+            AceLog.getAppLog().info("Retrieved hierarchical: " + all_concepts.size());
+            return all_concepts;
+        } else {
+            all_concepts = super.getAllConcepts();
+            // for (int id : test_concepts) {
+            // UUID uuid = Type3UuidFactory.fromSNOMED(id);
+            // I_GetConceptData c = tf.getConcept(uuid);
+            // all_concepts.add(0, c.getConceptNid());
+            // }
+        }
+        return all_concepts;
+    }
+    
+    protected ArrayList<Integer> getAllConceptsForParent(ConceptSpec parentConcept) throws Exception {
+        ArrayList<Integer> all_concepts;
+        I_TermFactory tf = Terms.get();
+        if (!test_p) {
+            all_concepts = getDescendants(
+                    tf.getConcept(parentConcept.getUuids()).getNid(),
                     this.allowed_position2);
             AceLog.getAppLog().info("Retrieved hierarchical: " + all_concepts.size());
             return all_concepts;
