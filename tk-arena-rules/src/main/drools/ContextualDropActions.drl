@@ -564,6 +564,7 @@ rule "rule 35" #clinical finding onto procedure
 		actions.add(new CreateRelAction("Associated With - after", $dropTarget, Snomed.ASSOCIATED_WITH_AFTER, $dropObject));
 		actions.add(new CreateRelAction("Associated With", $dropTarget, Snomed.ASSOCIATED_WITH, $dropObject));
 		actions.add(new CreateRelAction("Finding Method", $dropTarget, Snomed.FINDING_METHOD, $dropObject));
+                actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject));
 end
 
 rule "rule 36" #clinical finding onto clinical finding
@@ -575,6 +576,16 @@ rule "rule 36" #clinical finding onto clinical finding
 	then
 		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject));
 		actions.add(new CreateRelAction("Has Definitional Manifestation", $dropTarget, Snomed.HAS_DEFINITIONAL_MANIFESTATION, $dropObject));
+end
+
+rule "rule 36.1" #clinical finding onto event
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject));
 end
 
 rule "rule 37" #clinical finding onto qualifier value
@@ -625,6 +636,36 @@ rule "rule 41" #clinical finding onto organism
 	(and
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
          ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
+end
+
+rule "rule 41.1" #clinical finding onto physical object
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
+end
+
+rule "rule 41.2" #clinical finding onto physical force
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
+end
+
+rule "rule 41.3" #clinical finding onto product
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -740,6 +781,46 @@ rule "rule 52" #Situation with explicit context onto person
       )
 	then
 		actions.add(new CreateRelAction("Subject Relationship Context", $dropTarget, Snomed.SUBJECT_REL_CONTEXT, $dropObject));
+end
+
+rule "rule 52.1" #Situation with explicit context onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
+end
+
+rule "rule 52.2" #Situation with explicit context onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
+end
+
+rule "rule 52.3" #Situation with explicit context onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
+end
+
+rule "rule 52.4" #Situation with explicit context onto clinical finding
+	when
+	(and
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.LINK_ASSERTION, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
 end
 
 rule "rule 53" #Body structure onto qualifier value
