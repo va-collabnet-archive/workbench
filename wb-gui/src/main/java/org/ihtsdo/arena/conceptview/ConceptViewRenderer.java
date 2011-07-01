@@ -150,7 +150,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         @Override
         public void ancestorMoved(AncestorEvent event) {
-            if (event.getAncestor() != ConceptViewRenderer.this.getRootPane().getParent()) {
+            if (ConceptViewRenderer.this.getRootPane() != null
+                    && event.getAncestor() != ConceptViewRenderer.this.getRootPane().getParent()) {
                 if (settings.hideNavigator()) {
                     SwingUtilities.invokeLater(new Runnable() {
 

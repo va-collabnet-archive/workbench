@@ -419,7 +419,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     @Override
     public AddMemberSet getRefsetMembers() throws IOException {
-         if (isAnnotationStyleRefex()) {
+         if (isAnnotationStyleRefex() && isAnnotationIndex()) {
              ArrayList<RefsetMember<?, ?>> members = 
                      new ArrayList<RefsetMember<?, ?>>(getMemberNids().size());
              for (int memberNid: getMemberNids()) {

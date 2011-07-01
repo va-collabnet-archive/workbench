@@ -7,9 +7,8 @@ package org.ihtsdo.arena.contradiction;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.rmi.MarshalledObject;
-import java.util.Set;
-import javax.naming.ConfigurationException;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -36,7 +35,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.ihtsdo.arena.Arena;
-import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -82,7 +80,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
                 conceptTabs, 1, "plugins/contradiction");
         conceptTabs.add(c1Panel);
 
-        arena = new Arena(newFrameConfig);
+        arena = new Arena(newFrameConfig, new File("arena/default.mxe"));
         conceptTabs.addTab("arena",
                 new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         conceptTabs.setSelectedIndex(1);

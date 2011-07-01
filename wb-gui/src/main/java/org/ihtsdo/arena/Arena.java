@@ -1,6 +1,7 @@
 package org.ihtsdo.arena;
 
 import java.awt.BorderLayout;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JPanel;
@@ -15,10 +16,10 @@ public class Arena extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
-    public Arena(I_ConfigAceFrame config) throws IOException {
+    public Arena(I_ConfigAceFrame config, File defaultLayout) throws IOException {
         super(new BorderLayout());
         
-        ArenaEditor editor = new ArenaEditor(config);
+        ArenaEditor editor = new ArenaEditor(config, defaultLayout);
         add(editor, BorderLayout.CENTER);   
 
     }

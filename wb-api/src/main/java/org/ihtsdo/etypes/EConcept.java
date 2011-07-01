@@ -365,15 +365,17 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             }
             media.add(eImage);
         }
-        Collection<? extends I_ExtendByRef> members = getRefsetMembers(c.getNid());
-        if (members != null) {
-            refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(members.size());
-            for (I_ExtendByRef m : members) {
-                TkRefsetAbstractMember<?> member = convertRefsetMember(m);
-                if (member != null) {
-                    refsetMembers.add(member);
-                } else {
-                    AceLog.getAppLog().severe("Could not convert refset member: " + m + "\nfrom refset: " + c);
+        if (!c.isAnnotationStyleRefex()) {
+            Collection<? extends I_ExtendByRef> members = getRefsetMembers(c.getNid());
+            if (members != null) {
+                refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(members.size());
+                for (I_ExtendByRef m : members) {
+                    TkRefsetAbstractMember<?> member = convertRefsetMember(m);
+                    if (member != null) {
+                        refsetMembers.add(member);
+                    } else {
+                        AceLog.getAppLog().severe("Could not convert refset member: " + m + "\nfrom refset: " + c);
+                    }
                 }
             }
         }

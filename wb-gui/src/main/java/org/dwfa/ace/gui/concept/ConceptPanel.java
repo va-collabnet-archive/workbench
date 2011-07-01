@@ -83,7 +83,6 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -443,18 +442,18 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
         this.conceptTabs = conceptTabs;
         GridBagConstraints c = new GridBagConstraints();
 
-        List<ImageIcon> ImageIconList = new ArrayList<ImageIcon>();
-        ImageIconList.add(UNLINKED_ICON);
-        ImageIconList.add(SEARCH_LINK_ICON);
-        ImageIconList.add(TREE_LINK_ICON);
+        List<ImageIcon> imageIconList = new ArrayList<ImageIcon>();
+        imageIconList.add(UNLINKED_ICON);
+        imageIconList.add(SEARCH_LINK_ICON);
+        imageIconList.add(TREE_LINK_ICON);
         if (ACE.editMode) {
-            ImageIconList.add(DATA_CHECK_LINK_ICON);
+            imageIconList.add(DATA_CHECK_LINK_ICON);
         }
         if (enableListLink) {
-            ImageIconList.add(LIST_LINK_ICON);
+            imageIconList.add(LIST_LINK_ICON);
         }
 
-        linkSpinnerModel = new LinkListModel(ImageIconList.toArray(new ImageIcon[ImageIconList.size()]),
+        linkSpinnerModel = new LinkListModel(imageIconList.toArray(new ImageIcon[imageIconList.size()]),
                 link.ordinal());
 
         linkSpinner = new JSpinner(linkSpinnerModel);

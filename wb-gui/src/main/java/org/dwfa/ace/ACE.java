@@ -1218,7 +1218,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         this.aceFrameConfig.addPropertyChangeListener(this);
         try {
             masterProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
-            descListProcessBuilderPanel = new ProcessBuilderContainer(config, aceFrameConfig);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1497,7 +1496,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             conceptTabs.addTab("classifier", new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
                     snoRocketPanel);
 
-            arena = new Arena(this.aceFrameConfig);
+            arena = new Arena(this.aceFrameConfig, new File("arena/default.mxe"));
             conceptTabs.addTab("arena", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
         }
 
@@ -1571,14 +1570,13 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             TerminologyListModel batchListModel =
                     new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("batchList"));
             batchConceptList = new TerminologyList(batchListModel, true, true, aceFrameConfig);
-            conceptListEditor = new CollectionEditorContainer(batchConceptList, this, descListProcessBuilderPanel);
+            conceptListEditor = new CollectionEditorContainer(batchConceptList, this);
         }
         return conceptListEditor;
     }
     protected JMenuItem newProcessMI, readProcessMI, takeProcessNoTranMI, takeProcessTranMI, saveProcessMI,
             saveForLauncherQueueMI, saveAsXmlMI;
     private JPanel masterProcessBuilderPanel;
-    private JPanel descListProcessBuilderPanel;
     private JPanel workflowPanel;
     private JPanel workflowDetailsSheet;
     private JPanel signpostPanel = new JPanel();

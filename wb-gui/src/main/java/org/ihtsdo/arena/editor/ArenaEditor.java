@@ -45,7 +45,7 @@ public class ArenaEditor extends BasicGraphEditor {
      * @throws IOException 
      * 
      */
-    public ArenaEditor(I_ConfigAceFrame config) throws IOException {
+    public ArenaEditor(I_ConfigAceFrame config, File defaultArenaConfig) throws IOException {
         super("mxGraph for JFC/Swing", new ArenaGraphComponent(new mxGraph() {
 
             /**
@@ -79,7 +79,8 @@ public class ArenaEditor extends BasicGraphEditor {
             addPaletteTemplate(editorPalette, "tab 2", "view", 2);
             addPaletteTemplate(editorPalette, "tab 3", "view", 3);
             addPaletteTemplate(editorPalette, "tab 4", "view", 4);
-            addPaletteTemplate(editorPalette, "taxonomy", "text_tree", 1, new TaxonomyViewSettings());
+            addPaletteTemplate(editorPalette, "taxonomy", "text_tree", new TaxonomyViewSettings());
+            addPaletteTemplate(editorPalette, "list selection", "view", -2);
 
             getGraphComponent().getGraph().setCellsResizable(false);
             getGraphComponent().setConnectable(false);
@@ -100,7 +101,7 @@ public class ArenaEditor extends BasicGraphEditor {
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
         mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings()));
-        File defaultArenaConfig = new File("arena/default.mxe");
+        
         if (defaultArenaConfig.exists()) {
             Document document = mxUtils.parse(mxUtils.readFile(defaultArenaConfig.getAbsolutePath()));
             mxCodec codec = new mxCodec(document);
@@ -114,10 +115,10 @@ public class ArenaEditor extends BasicGraphEditor {
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, int link) {
-        addPaletteTemplate(palette, label, imageName, link, new ConceptViewSettings(link));
+        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(link));
     }
 
-    private void addPaletteTemplate(EditorPalette palette, String label, String imageName, int link, ArenaComponentSettings settings) {
+    private void addPaletteTemplate(EditorPalette palette, String label, String imageName, ArenaComponentSettings settings) {
 
         mxGeometry geometry = new mxGeometry(20, 20, 300, 200);
         geometry.setAlternateBounds(new mxRectangle(0, 0, 300, 20));

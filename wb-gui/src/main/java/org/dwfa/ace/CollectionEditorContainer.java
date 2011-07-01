@@ -46,7 +46,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
 import javax.swing.ListModel;
@@ -73,6 +72,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.gui.button.Button32x32;
 import org.dwfa.gui.toggle.Toggle32x32;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
 
 public class CollectionEditorContainer extends JPanel {
@@ -164,8 +164,9 @@ public class CollectionEditorContainer extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (showComponentView.isSelected()) {
-                showProcessBuilder.setSelected(false);
+                showCollectionArena.setSelected(false);
                 bottomTabs.setSelectedIndex(0);
+                listDetailSplit.setBottomComponent(conceptPanel);
                 if (lastDividerLocation > 0) {
                     listDetailSplit.setDividerLocation(lastDividerLocation);
                 } else {
@@ -179,13 +180,13 @@ public class CollectionEditorContainer extends JPanel {
 
     }
 
-    private class ShowProcessBuilderActionListener implements ActionListener {
+    private class ShowListArenaActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (showProcessBuilder.isSelected()) {
+            if (showCollectionArena.isSelected()) {
                 showComponentView.setSelected(false);
-                listDetailSplit.setBottomComponent(processBuilder);
+                listDetailSplit.setBottomComponent(listArena);
                 if (lastDividerLocation > 0) {
                     listDetailSplit.setDividerLocation(lastDividerLocation);
                 } else {
@@ -209,7 +210,7 @@ public class CollectionEditorContainer extends JPanel {
     }
 
     private boolean showOnlyList() {
-        return showComponentView.isSelected() == false && showProcessBuilder.isSelected() == false;
+        return showComponentView.isSelected() == false && showCollectionArena.isSelected() == false;
     }
 
     int lastDividerLocation = -1;
@@ -217,9 +218,9 @@ public class CollectionEditorContainer extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
-    private JComponent processBuilder;
+    private JComponent listArena;
     private JToggleButton showComponentView;
-    private JToggleButton showProcessBuilder;
+    private JToggleButton showCollectionArena;
     private JSplitPane listDetailSplit;
     private JSplitPane listActionSplit;
     private ACE ace;
@@ -236,12 +237,13 @@ public class CollectionEditorContainer extends JPanel {
         return ace.getAceFrameConfig();
     }
 
-    public CollectionEditorContainer(TerminologyList list, ACE ace, JPanel descListProcessBuilderPanel)
+    public CollectionEditorContainer(TerminologyList list, ACE ace)
             throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
         super(new GridBagLayout());
         this.ace = ace;
         this.list = list;
-        this.processBuilder = descListProcessBuilderPanel;
+        this.listArena = new Arena(ace.getAceFrameConfig(), new File("arena/listView.mxe"));
+
 
         // SET UP BATCH ACTION PANELS
         batchResults = new JTextPane();
@@ -306,11 +308,10 @@ public class CollectionEditorContainer extends JPanel {
         showComponentView.setToolTipText("Show component view associated with list view");
         listEditorTopPanel.add(showComponentView, c);
         c.gridx++;
-        showProcessBuilder = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
-        listEditorTopPanel.add(showProcessBuilder, c);
-        showProcessBuilder.setVisible(ACE.editMode);
-        showProcessBuilder.setToolTipText("Show process builder associated with list view");
-        showProcessBuilder.addActionListener(new ShowProcessBuilderActionListener());
+        showCollectionArena = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/eye.png")));
+        listEditorTopPanel.add(showCollectionArena, c);
+        showCollectionArena.setToolTipText("Show arena associated with list view");
+        showCollectionArena.addActionListener(new ShowListArenaActionListener());
         c.gridx++;
 
         JButton eraseListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_delete.png")));

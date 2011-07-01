@@ -35,9 +35,10 @@ public class TermComponentListSelectionListener implements ListSelectionListener
         this.linkedComponent = linkedComponent;
     }
 
+    @Override
     public void valueChanged(ListSelectionEvent e) {
         I_GetConceptData currentBean = (I_GetConceptData) linkedComponent.getTermComponent();
-		setLinkedComponent(e);
+	setLinkedComponent(e);
     }
 
     private void setLinkedComponent(ListSelectionEvent e) {

@@ -12,8 +12,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -41,8 +39,8 @@ import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
-    public static final int NAVIGATOR_WIDTH = 350;
 
+    public static final int NAVIGATOR_WIDTH = 350;
     /**
      *
      */
@@ -116,7 +114,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             try {
                 view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
             } catch (IOException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             }
         }
         return view;
@@ -150,6 +148,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     public I_HostConceptPlugins getHost() {
         if (linkedTab != null && linkedTab != -1) {
             if (getConfig() != null) {
+                if (linkedTab == -2) {
+                    return getConfig().getListConceptViewer();
+                }
                 return getConfig().getConceptViewer(linkedTab);
             }
         }
@@ -158,7 +159,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
     @Override
     public JComponent getLinkComponent() {
-        if (linkedTab != null) {
+        if (linkedTab != null && linkedTab >= 0) {
             JButton goToLinkButton = new JButton(new AbstractAction(" "
                     + linkedTab.toString() + " ") {
 
@@ -199,6 +200,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         }
         return false;
     }
+
     public boolean showNavigator() {
         if (!navButton.isSelected()) {
             navButton.doClick();
@@ -424,7 +426,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         this.linkedTab = linkedTab;
     }
 
-	public void regenerateWfPanel(I_GetConceptData con) {
-		
-	}
+    public void regenerateWfPanel(I_GetConceptData con) {
+    }
 }
