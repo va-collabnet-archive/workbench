@@ -60,11 +60,11 @@ public class UIAuthenticator {
 		
 	}
 
-	public String authenticate(){
+	//public String authenticate(SvnHelper svnH){
+		public String authenticate(){	
 		
 		
-		
-		initPrompter("bob");
+		initPrompter();
 		
 		String result = testCredentials();
 		
@@ -72,7 +72,7 @@ public class UIAuthenticator {
 		return result;
 	}
 	
-	private void initPrompter(String userName){
+	private void initPrompter(){
 		if(prompt.getUsername() == null || prompt.getUsername().length() == 0){
 			AceLog.getAppLog().info("No name found so prompting");
 			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame());

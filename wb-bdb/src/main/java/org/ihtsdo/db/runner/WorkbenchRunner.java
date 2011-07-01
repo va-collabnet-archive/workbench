@@ -95,7 +95,13 @@ public class WorkbenchRunner {
 	public static UIAuthenticator auth = new UIAuthenticator();
 	
 	
-	private String authenticate(){
+	private String authenticate(SvnHelper svnH){
+		
+		
+		
+		
+		
+		//String result = auth.authenticate(svnH);
 		String result = auth.authenticate();
 		
 		if(result != null && result.length() > 0){
@@ -239,7 +245,7 @@ public class WorkbenchRunner {
 			AceLog.getAppLog().info("About to initializeFromSubversion");
 			
 			
-			authenticate();
+			authenticate(svnHelper);
 			
 			
 			
