@@ -49,6 +49,9 @@ public class Snomed {
     public static ConceptSpec APPROACH =
 		new ConceptSpec("Procedural approach (qualifier value)",
 		UUID.fromString("2209583c-de0b-376d-9aa0-850c37240788"));
+    public static ConceptSpec ASSOCIATED_FINDING =
+		new ConceptSpec("Associated finding (attribute)",
+		UUID.fromString("b20b664d-2690-3092-a2ef-7f8013b2dad3"));
     public static ConceptSpec ASSOCIATED_MORPHOLOGY =
 		new ConceptSpec("Associated morphology (attribute)",
 		UUID.fromString("3161e31b-7d00-33d9-8cbd-9c33dc153aae"));
@@ -76,6 +79,9 @@ public class Snomed {
     public static ConceptSpec ENVIRONMENT =
 		new ConceptSpec("Environment (environment)",
 		UUID.fromString("da439d54-0823-3b47-abed-f9ba50791335"));
+    public static ConceptSpec EVENT =
+		new ConceptSpec("Event (event)",
+		UUID.fromString("c7243365-510d-3e5f-82b3-7286b27d7698"));
     public static ConceptSpec FINDING_CONTEXT =
 		new ConceptSpec("Finding context (attribute)",
 		UUID.fromString("2dbbf50e-9e14-382d-80be-ec7a020cb436"));
@@ -112,6 +118,9 @@ public class Snomed {
     public static ConceptSpec LATERALITY =
 		new ConceptSpec("Laterality (attribute)",
 		UUID.fromString("26ca4590-bbe5-327c-a40a-ba56dc86996b"));
+    public static ConceptSpec LINK_ASSERTION =
+		new ConceptSpec("Link assertion (link assertion)",
+		UUID.fromString("7f39edac-198d-366d-b8b9-4eab221ee144"));
     public static ConceptSpec MEASUREMENT_METHOD =
 		new ConceptSpec("Measurement method (attribute)",
 		UUID.fromString("a6e4f659-a4b4-33b7-a75d-4a810167b32a"));
