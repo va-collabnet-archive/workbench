@@ -96,7 +96,11 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<ConAtt
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         JLabel attrLabel = getJLabel(" ");
-        attrLabel.setBackground(Color.CYAN);
+        if (getParentCollapsePanel() == null || !getSettings().getView().getConfig().getAllowedStatus().contains(getAttr().getStatusNid())) {
+            attrLabel.setBackground(Color.CYAN.darker());
+        } else {
+            attrLabel.setBackground(Color.CYAN);
+        }
         attrLabel.setOpaque(true);
         setDropPopupInset(attrLabel.getPreferredSize().width);
 
