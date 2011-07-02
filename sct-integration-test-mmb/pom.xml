@@ -12,7 +12,7 @@
     <url>http://maven.apache.org</url>
     <properties>
         <branch>19v SCT-EN-ES-VTMVMP</branch>
-        <wb-toolkit.version>2.6.0-trek-14-SNAPSHOT</wb-toolkit.version>
+        <wb-toolkit.version>2.6.0-trek-15-SNAPSHOT</wb-toolkit.version>
         <berkeleydb.directory>${project.build.directory}/test-resources/berkeley-db</berkeleydb.directory>
         <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
         <org.ihtsdo.mrcm.specs.version>0.0.5-SNAPSHOT</org.ihtsdo.mrcm.specs.version>
