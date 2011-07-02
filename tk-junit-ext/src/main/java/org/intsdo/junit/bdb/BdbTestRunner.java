@@ -32,14 +32,16 @@ public class BdbTestRunner extends BlockJUnit4ClassRunner {
 
     private static boolean addHook = true;
     private static String bdbLocation = null;
-    private File buildDirFile;
+    private File buildDirFile = new File("target");
 
     public BdbTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
         String surefireClassPath = System.getProperty("surefire.test.class.path");
-        String[] surefireClassPathParts = surefireClassPath.split(":");
-        buildDirFile = new File(surefireClassPathParts[0].replaceAll("test-classes$", ""));
-        System.out.println(buildDirFile.getAbsolutePath());
+        if (surefireClassPath != null) {
+            String[] surefireClassPathParts = surefireClassPath.split(":");
+            buildDirFile = new File(surefireClassPathParts[0].replaceAll("test-classes$", ""));
+            System.out.println(buildDirFile.getAbsolutePath());
+        }
         BdbTestRunnerConfig annotation = klass.getAnnotation(BdbTestRunnerConfig.class);
         if (annotation == null) {
             throw new InitializationError(
