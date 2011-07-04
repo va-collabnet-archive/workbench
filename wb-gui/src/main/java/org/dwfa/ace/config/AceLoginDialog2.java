@@ -44,6 +44,9 @@ import org.dwfa.svn.Svn;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
@@ -79,6 +82,8 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     //private List<File> profiles = new ArrayList<File>();
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
+    
+    public String svnUrl;
 
     public AceLoginDialog2(JFrame topFrame) {
 
@@ -269,11 +274,11 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
     		AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
-    		String em = checkSVN("",un,pw);	
-    		
+    		String em = checkSVN(getSvnUrl(),un,pw);	
+    		AceLog.getAppLog().info("em = "+em);
     	}
     	
-    	    	
+    	AceLog.getAppLog().info("Check4Debug");    	
     	//if No profiles try to check out from SVN and then reload.
     	
     	
@@ -292,9 +297,15 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	
     	SVNRepository repo= null;
     	 try { 
+    		 AceLog.getAppLog().info("checkSVN url = "+url);  
+    		 DAVRepositoryFactory.setup();
+    	     SVNRepositoryFactoryImpl.setup();
+    	     FSRepositoryFactory.setup();
     	     repo = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(url));
+    	     AceLog.getAppLog().info("checkSVN OK1");
     	     ISVNAuthenticationManager authManager = 
     	                  SVNWCUtil.createDefaultAuthenticationManager(uname, pw);
+    	     AceLog.getAppLog().info("checkSVN OK2");
     	     repo.setAuthenticationManager(authManager);
     	     repo.testConnection();
     	 } catch (SVNException e){
@@ -459,4 +470,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	passwordLabel.setVisible(connectToSvn());
         Svn.setConnectedToSvn(connectToSvn());
     }
+
+	public String getSvnUrl() {
+		return svnUrl;
+	}
+
+	public void setSvnUrl(String svnUrl) {
+		this.svnUrl = svnUrl;
+	}
 }

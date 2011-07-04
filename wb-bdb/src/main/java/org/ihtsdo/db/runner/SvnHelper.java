@@ -393,4 +393,12 @@ public class SvnHelper {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 	}
+
+	public String getSvnCheckoutProfileOnStart() {
+		return svnCheckoutProfileOnStart;
+	}
+
+	public void setSvnCheckoutProfileOnStart(String svnCheckoutProfileOnStart) {
+		this.svnCheckoutProfileOnStart = svnCheckoutProfileOnStart;
+	}
 }

@@ -24,6 +24,8 @@ public class UIAuthenticator {
 	//Store UN etc in the SVN Prompter
 	public SvnPrompter prompt = new SvnPrompter();
 	
+	public String baseURL;
+	
 	private JFrame parentFrame = null;
 	
 	public void setParentFrame(JFrame parentFrame) {
@@ -61,9 +63,9 @@ public class UIAuthenticator {
 	}
 
 	//public String authenticate(SvnHelper svnH){
-		public String authenticate(){	
-		
-		
+		public String authenticate(SvnPrompter prompt, String testURL){	
+		baseURL = testURL;
+		this.prompt = prompt;
 		initPrompter();
 		
 		String result = testCredentials();
@@ -76,6 +78,7 @@ public class UIAuthenticator {
 		if(prompt.getUsername() == null || prompt.getUsername().length() == 0){
 			AceLog.getAppLog().info("No name found so prompting");
 			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame());
+			ald.setSvnUrl(baseURL);
 			ald.setVisible(true);
 			//prompt.setParentContainer(getParentFrame());	
 			//prompt.prompt("please set password", userName);

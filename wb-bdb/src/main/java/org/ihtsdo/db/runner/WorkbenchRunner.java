@@ -95,21 +95,22 @@ public class WorkbenchRunner {
 	public static UIAuthenticator auth = new UIAuthenticator();
 	
 	
-	private String authenticate(SvnHelper svnH){
+	private String authenticate(SvnPrompter prompt, String baseURL){
 		
 		
 		
 		
 		
 		//String result = auth.authenticate(svnH);
-		String result = auth.authenticate();
+		//SvnPrompter prompt = new SvnPrompter();
+		String result = auth.authenticate(prompt, baseURL);
 		
 		if(result != null && result.length() > 0){
-			AceLog.getAppLog().info("Authentic Called result = "+result);
+			AceLog.getAppLog().info("authenticate Called result = "+result);
 		}
 		
 		else{
-			AceLog.getAppLog().info("Authentic Called everything OK");
+			AceLog.getAppLog().info("authenticate Called everything OK");
 		}
 		
 		return result;
@@ -201,8 +202,14 @@ public class WorkbenchRunner {
 						.get("initialized"));
 			}
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
+			String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
+			AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
+			//TODO thorw some sort of error if url is empty or null
 			
-			AceLog.getAppLog().info("About to open the init svn dialog");
+			
+			
+			authenticate(prompter,testSVNURL);
+			
 			
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
@@ -245,7 +252,7 @@ public class WorkbenchRunner {
 			AceLog.getAppLog().info("About to initializeFromSubversion");
 			
 			
-			authenticate(svnHelper);
+			
 			
 			
 			
