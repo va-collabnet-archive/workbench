@@ -42,6 +42,7 @@ import org.ihtsdo.time.TimeUtil;
 public abstract class ChangeSetImporter implements ActionListener {
 
     private boolean continueImport = true;
+    private static boolean commitAfterImport = false;
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
@@ -94,7 +95,9 @@ public abstract class ChangeSetImporter implements ActionListener {
                 activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
                 readNext(readerSet);
             }
-            Terms.get().commit();
+            if (commitAfterImport) {
+                Terms.get().commit();
+            }
             activity.setIndeterminate(false);
             long elapsed = System.currentTimeMillis() - start;
             String elapsedString = TimeUtil.getElapsedTimeString(elapsed);
