@@ -77,7 +77,7 @@
         </dependency>
         <dependency>
             <groupId>jgraphx</groupId>
-            <artifactId>jgraphx-mmb</artifactId>
+            <artifactId>jgraphx</artifactId>
             <version>1.7.0.7</version>
             <type>jar</type>
             <optional>false</optional>
