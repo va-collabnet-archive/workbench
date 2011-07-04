@@ -1356,7 +1356,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         editMenu.add(menuItem);
 
 
-        
+
         menuBar.add(editMenu);
     }
 
@@ -1571,6 +1571,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     new TerminologyListModel(aceFrameConfig.getTabHistoryMap().get("batchList"));
             batchConceptList = new TerminologyList(batchListModel, true, true, aceFrameConfig);
             conceptListEditor = new CollectionEditorContainer(batchConceptList, this);
+            conceptListEditor.setupArena();
         }
         return conceptListEditor;
     }
@@ -3223,8 +3224,23 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 }
             }
 
-            JOptionPane.showMessageDialog(this,
-                    "<html>There are uncommitted changes.<p>Please commit or cancel before quitting.");
+            Object[] options = {"List Uncommitted",
+                "OK"};
+
+            int n = JOptionPane.showOptionDialog(frame,
+                    "Please commit or cancel before quitting.",
+                    "There are uncommitted changes",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, //do not use a custom Icon
+                    options, //the titles of buttons
+                    options[0]); //default button title
+
+
+            if (n == JOptionPane.YES_OPTION) {
+                conceptListEditor.addUncommittedToListButton.doClick();
+                showListView();
+            }
             return false;
         }
         return true;

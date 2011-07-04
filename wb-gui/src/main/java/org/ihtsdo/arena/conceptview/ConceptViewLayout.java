@@ -169,7 +169,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         super();
         if (layoutConcept != null && 
                 layoutConcept.getNid() != 0 &&
-                Ts.get().getConceptNidForNid(layoutConcept.getNid()) == layoutConcept.getNid()) {
+                Ts.get().getConceptNidForNid(layoutConcept.getNid()) == layoutConcept.getNid() &&
+                !layoutConcept.isCanceled()) {
             this.layoutConcept = layoutConcept;
         } else {
             this.layoutConcept = null;
@@ -628,6 +629,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 } catch (TerminologyException e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
+            } else {
+                cView.getCvRenderer().title.setTitleEmpty();
             }
             if (stop) {
                 return;

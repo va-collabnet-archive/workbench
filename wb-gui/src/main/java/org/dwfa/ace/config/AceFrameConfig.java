@@ -2026,6 +2026,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         if (index == 0) {
             return aceFrame.getCdePanel().getConceptPanels().get(index);
         }
+        if (index == -2) {
+            return aceFrame.getCdePanel().getListConceptViewer();
+        }
         return aceFrame.getCdePanel().getConceptPanels().get(index - 1);
     }
 

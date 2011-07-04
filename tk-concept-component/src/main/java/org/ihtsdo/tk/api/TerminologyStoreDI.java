@@ -78,4 +78,6 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoord, boolean useCase);
     
     boolean hasUncommittedChanges();
+
+    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
 }

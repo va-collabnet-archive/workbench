@@ -70,7 +70,7 @@ public abstract class ArenaComponentSettings implements Serializable,
     private mxRectangle alternateBounds = new mxRectangle();
     private float fontSize = 9;
     // transient
-    protected I_ConfigAceFrame config;
+    protected transient I_ConfigAceFrame config;
     protected mxCell cell;
     protected mxGraph graph;
     protected JLabel resizeLabel;

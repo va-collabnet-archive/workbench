@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -407,7 +406,16 @@ public class ConceptView extends JPanel {
                         if (evt.getPropagationId() == null
                                 || (Long) evt.getPropagationId() > lastPropId) {
                             try {
-                                layoutConcept(ConceptView.this.concept);
+                                if (ConceptView.this.concept == null) {
+                                    layoutConcept(ConceptView.this.concept);
+                                } else {
+                                    if (ConceptView.this.concept.isCanceled()) {
+                                        getSettings().getHost().setTermComponent(null);
+                                    } else {
+                                        layoutConcept(ConceptView.this.concept);
+                                    }
+                                }
+                                
                             } catch (IOException ex) {
                                 AceLog.getAppLog().alertAndLogException(ex);
                             }
@@ -438,7 +446,8 @@ public class ConceptView extends JPanel {
         removeAll();
         if (concept == null
                 || this.concept == null
-                || this.concept.equals(concept) == false) {
+                || this.concept.equals(concept) == false
+                || this.concept.isCanceled()) {
             changedVersionSelections.clear();
         }
         this.concept = concept;

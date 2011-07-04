@@ -56,6 +56,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -74,8 +75,11 @@ import org.dwfa.gui.toggle.Toggle32x32;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class CollectionEditorContainer extends JPanel {
+    public JButton addUncommittedToListButton;
 
     public class ImportListButtonListener implements ActionListener {
 
@@ -130,9 +134,10 @@ public class CollectionEditorContainer extends JPanel {
                     final JDialog alert = new JDialog();
                     JPanel panel = new JPanel(new GridLayout(2, 1));
                     panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to "
-                        + e.getLocalizedMessage()));
+                            + e.getLocalizedMessage()));
                     JButton button = new JButton("OK");
                     button.addActionListener(new ActionListener() {
+
                         @Override
                         public void actionPerformed(ActionEvent arg0) {
                             alert.dispose();
@@ -146,17 +151,39 @@ public class CollectionEditorContainer extends JPanel {
         }
     }
 
+    public class AddUncommittedToListButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (Ts.get().hasUncommittedChanges()) {
+                if (list.getModel().getSize() > 0) {
+                    int option = JOptionPane.showConfirmDialog(CollectionEditorContainer.this,
+                            "Do you want to erase existing components from the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        ((TerminologyListModel) list.getModel()).clear();
+                    }
+                }
+                I_ModelTerminologyList model = (I_ModelTerminologyList) list.getModel();
+
+                for (ConceptChronicleBI concept : Ts.get().getUncommittedConcepts()) {
+                    model.addElement((I_GetConceptData) concept);
+                }
+            } else {
+                JOptionPane.showMessageDialog(CollectionEditorContainer.this, "There are no uncommitted concepts");
+            }
+        }
+    }
+
     public class EraseListActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             int option = JOptionPane.showConfirmDialog(CollectionEditorContainer.this,
-                "Are you sure you want to erase the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
+                    "Are you sure you want to erase the list?", "Erase the list?", JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION) {
                 ((TerminologyListModel) list.getModel()).clear();
             }
         }
-
     }
 
     private class ShowComponentActionListener implements ActionListener {
@@ -177,7 +204,6 @@ public class CollectionEditorContainer extends JPanel {
                 showListOnly();
             }
         }
-
     }
 
     private class ShowListArenaActionListener implements ActionListener {
@@ -197,7 +223,6 @@ public class CollectionEditorContainer extends JPanel {
                 showListOnly();
             }
         }
-
     }
 
     private void showListOnly() {
@@ -212,7 +237,6 @@ public class CollectionEditorContainer extends JPanel {
     private boolean showOnlyList() {
         return showComponentView.isSelected() == false && showCollectionArena.isSelected() == false;
     }
-
     int lastDividerLocation = -1;
     /**
      * 
@@ -230,7 +254,6 @@ public class CollectionEditorContainer extends JPanel {
     private JTabbedPane bottomTabs = new JTabbedPane();
     private JScrollPane batchResultsScroller;
     private JTextPane batchResults;
-    
     private BatchActionEditorPanel batchActionPanelMain;
 
     public I_ConfigAceFrame getConfig() {
@@ -242,7 +265,6 @@ public class CollectionEditorContainer extends JPanel {
         super(new GridBagLayout());
         this.ace = ace;
         this.list = list;
-        this.listArena = new Arena(ace.getAceFrameConfig(), new File("arena/listView.mxe"));
 
 
         // SET UP BATCH ACTION PANELS
@@ -253,9 +275,9 @@ public class CollectionEditorContainer extends JPanel {
         batchActionPanelMain = new BatchActionEditorPanel(ace, list, batchResults);
 
         batchResultsScroller = new JScrollPane(batchResults);
-        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig, 
-        		LINK_TYPE.LIST_LINK, true,
-            Integer.MIN_VALUE, ace.getPluginRoot());
+        conceptPanel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_LIST_VIEW, ace.aceFrameConfig,
+                LINK_TYPE.LIST_LINK, true,
+                Integer.MIN_VALUE, ace.getPluginRoot());
         conceptPanel.setAce(ace, LINK_TYPE.LIST_LINK);
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
@@ -277,15 +299,19 @@ public class CollectionEditorContainer extends JPanel {
         showComponentActionListener.actionPerformed(new ActionEvent(showComponentView, 0, "show"));
     }
 
+    public void setupArena() throws IOException {
+        this.listArena = new Arena(ace.getAceFrameConfig(), new File("arena/listView.mxe"));
+    }
+
     private JSplitPane getListSplit(JList list, ACE ace) throws IOException, ClassNotFoundException {
         listDetailSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         listDetailSplit.setOneTouchExpandable(true);
-        
+
         listActionSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         listActionSplit.setLeftComponent(new JScrollPane(list));
         listActionSplit.setDividerLocation(400);
         listActionSplit.setRightComponent(batchActionPanelMain);
-                
+
         listDetailSplit.setTopComponent(listActionSplit);
         listDetailSplit.setBottomComponent(bottomTabs);
         listDetailSplit.setDividerLocation(3000);
@@ -338,6 +364,14 @@ public class CollectionEditorContainer extends JPanel {
 
         c.gridx++;
 
+        addUncommittedToListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/question_and_answer.png")));
+        addUncommittedToListButton.setVisible(ACE.editMode);
+        addUncommittedToListButton.addActionListener(new AddUncommittedToListButtonListener());
+        addUncommittedToListButton.setToolTipText("Add concepts with uncommitted components to the list view");
+        listEditorTopPanel.add(addUncommittedToListButton, c);
+
+        c.gridx++;
+
         c.weightx = 1.0;
         listEditorTopPanel.add(new JLabel(" "), c);
         c.gridx++;
@@ -345,11 +379,11 @@ public class CollectionEditorContainer extends JPanel {
 
         File componentPluginDir = new File(ace.getPluginRoot() + File.separator + "list");
         File[] plugins = componentPluginDir.listFiles(new FilenameFilter() {
+
             @Override
             public boolean accept(File arg0, String fileName) {
                 return fileName.toLowerCase().endsWith(".bp");
             }
-
         });
 
         if (plugins != null) {
@@ -371,7 +405,7 @@ public class CollectionEditorContainer extends JPanel {
                             pluginButton.addActionListener(new PluginListener(f));
                             c.gridx++;
                             listEditorTopPanel.add(pluginButton, c);
-                         } else {
+                        } else {
                             JButton pluginButton = new Button32x32(bp.getName());
                             pluginButton.setToolTipText(bp.getSubject());
                             pluginButton.addActionListener(new PluginListener(f));
@@ -394,6 +428,7 @@ public class CollectionEditorContainer extends JPanel {
     }
 
     private class PluginListener implements ActionListener {
+
         File pluginProcessFile;
         String exceptionMessage;
 
@@ -426,15 +461,16 @@ public class CollectionEditorContainer extends JPanel {
                 bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), concept);
                 worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), conceptPanel);
                 Runnable r = new Runnable() {
+
                     @Override
                     public void run() {
                         I_EncodeBusinessProcess process = bp;
                         try {
                             worker.getLogger().log(
-                                Level.INFO, "Worker: {0} ({1}) executing process: {2}", new Object[]{worker.getWorkerDesc(), worker.getId(), process.getName()});
+                                    Level.INFO, "Worker: {0} ({1}) executing process: {2}", new Object[]{worker.getWorkerDesc(), worker.getId(), process.getName()});
                             worker.execute(process);
                             SortedSet<ExecutionRecord> sortedRecords = new TreeSet<ExecutionRecord>(
-                                process.getExecutionRecords());
+                                    process.getExecutionRecords());
                             Iterator<ExecutionRecord> recordItr = sortedRecords.iterator();
                             StringBuilder buff = new StringBuilder();
                             while (recordItr.hasNext()) {
@@ -449,6 +485,7 @@ public class CollectionEditorContainer extends JPanel {
                             exceptionMessage = e1.toString();
                         }
                         SwingUtilities.invokeLater(new Runnable() {
+
                             @Override
                             public void run() {
                                 getConfig().setStatusMessage("<html><font color='#006400'>execute");
@@ -457,16 +494,15 @@ public class CollectionEditorContainer extends JPanel {
                                 conceptPanel.setTermComponent(conceptInPanel);
                                 if (exceptionMessage.equals("")) {
                                     getConfig().setStatusMessage(
-                                        "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
+                                            "<html>Execution of <font color='blue'>" + bp.getName() + "</font> complete.");
                                 } else {
                                     getConfig().setStatusMessage(
-                                        "<html><font color='blue'>Process complete: <font color='red'>"
+                                            "<html><font color='blue'>Process complete: <font color='red'>"
                                             + exceptionMessage);
                                 }
                             }
                         });
                     }
-
                 };
                 new Thread(r, "Collection editor container").start();
             } catch (Exception e1) {
@@ -479,5 +515,4 @@ public class CollectionEditorContainer extends JPanel {
     public ConceptPanel getConceptPanel() {
         return conceptPanel;
     }
-
 }

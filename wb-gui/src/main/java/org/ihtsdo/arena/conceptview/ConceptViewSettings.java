@@ -46,7 +46,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
      */
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
-    private ConceptChangedListener conceptChangedListener;
+        
+    
+    private transient ConceptChangedListener conceptChangedListener;
 
     public enum SIDE {
 
@@ -55,11 +57,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     // dataVersion = 1;
     private Integer linkedTab = null;
     // transient
-    private ConceptView view;
-    private ConceptNavigator navigator;
-    private JTreeWithDragImage navigatorTree;
-    private JToggleButton navButton;
-    private JButton statedInferredButton;
+    private transient ConceptView view;
+    private transient ConceptNavigator navigator;
+    private transient JTreeWithDragImage navigatorTree;
+    private transient JToggleButton navButton;
+    private transient JButton statedInferredButton;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);

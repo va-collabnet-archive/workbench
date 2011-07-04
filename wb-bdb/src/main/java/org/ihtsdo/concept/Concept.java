@@ -1577,6 +1577,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     @Override
     public boolean isCanceled() throws IOException {
+        if (!canceled) {
+            if (getConAttrs() != null && getConAttrs().getPrimordialVersion().getTime() == Long.MIN_VALUE) {
+                canceled = true;
+            }
+        }
         return canceled;
     }
 

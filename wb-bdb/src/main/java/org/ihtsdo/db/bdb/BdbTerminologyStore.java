@@ -510,4 +510,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     	}
     	return false;
     }
+
+    @Override
+    public Collection<? extends ConceptChronicleBI> getUncommittedConcepts() {
+        return BdbCommitManager.getUncommitted();
+    }
+    
+    
 }

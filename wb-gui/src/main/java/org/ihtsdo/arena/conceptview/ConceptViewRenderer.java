@@ -215,7 +215,7 @@ public class ConceptViewRenderer extends JLayeredPane {
      */
     public JComponent renderedComponent;
     private ConceptViewSettings settings;
-    private ConceptViewTitle title;
+    public ConceptViewTitle title;
     private JSplitPane workflowPanel =
             new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private JPanel applicationWorkflowPanel =

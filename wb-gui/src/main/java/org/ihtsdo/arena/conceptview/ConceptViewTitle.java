@@ -56,6 +56,10 @@ public class ConceptViewTitle extends JPanel implements I_AcceptConcept {
         label.setText(settings.getTitle());
     }
 
+    public void setTitleEmpty() {
+        label.setText("Empty");
+    }
+
     @Override
     public void sendConcept(I_GetConceptData c) {
         settings.getHost().setTermComponent(c);

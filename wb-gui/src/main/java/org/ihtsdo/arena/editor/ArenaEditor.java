@@ -100,7 +100,8 @@ public class ArenaEditor extends BasicGraphEditor {
             }
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
-        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings()));
+        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(), 
+                new String[] {"view", "navigator", "navigatorTree", "navButton", "statedInferredButton"}, null, null));
         
         if (defaultArenaConfig.exists()) {
             Document document = mxUtils.parse(mxUtils.readFile(defaultArenaConfig.getAbsolutePath()));
