@@ -61,7 +61,7 @@ import org.ihtsdo.util.swing.GuiUtil;
  */
 public class HistoryPanel {
 
-    private static final int HISTORY_LABEL_WIDTH = 11;
+    private static final int HISTORY_LABEL_WIDTH = 12;
     private final ConceptNavigator navigator;
 
     private JLabel setupLabel(String hxString, int locX) {
@@ -77,7 +77,7 @@ public class HistoryPanel {
                 new HistoryBorder(
                 BorderFactory.createEmptyBorder(),
                 hxString,
-                new Font("monospaced", Font.PLAIN, 12),
+                new Font("monospaced", Font.PLAIN, 10),
                 Color.BLACK)));
         return historyLabel;
     }
