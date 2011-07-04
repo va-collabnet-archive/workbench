@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -356,375 +355,315 @@ public class QACaseDetailsPanel extends JPanel {
 		button1 = new JButton();
 		saveButton = new JButton();
 
-		// ======== this ========
+		//======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 740, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 391, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0,
-				1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {740, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {391, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
 			panel1.setBorder(new EmptyBorder(5, 5, 5, 5));
 			panel1.setLayout(new BorderLayout());
 
-			// ======== tabbedPane1 ========
+			//======== tabbedPane1 ========
 			{
 
-				// ======== scrollPane2 ========
+				//======== scrollPane2 ========
 				{
 
-					// ======== panel3 ========
+					//======== panel3 ========
 					{
 						panel3.setBorder(new EmptyBorder(5, 5, 0, 0));
 						panel3.setLayout(new GridBagLayout());
-						((GridBagLayout) panel3.getLayout()).columnWidths = new int[] {
-								0, 127, 0, 0, 0, 114, 60, 0, 0 };
-						((GridBagLayout) panel3.getLayout()).rowHeights = new int[] {
-								25, 66, 12, 25, 30, 0, 28, 26, 0, 0, 0, 0 };
-						((GridBagLayout) panel3.getLayout()).columnWeights = new double[] {
-								0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
-						((GridBagLayout) panel3.getLayout()).rowWeights = new double[] {
-								0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-								0.0, 0.0, 1.0E-4 };
+						((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 127, 0, 0, 0, 114, 60, 0, 0};
+						((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {25, 66, 12, 25, 30, 0, 28, 26, 0, 0, 0, 0};
+						((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+						((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-						// ---- label1 ----
+						//---- label1 ----
 						label1.setText("Rule name");
-						panel3.add(label1, new GridBagConstraints(0, 0, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- ruleNameTextArea ----
+						//---- ruleNameTextArea ----
 						ruleNameTextArea.setEditable(false);
-						panel3.add(ruleNameTextArea, new GridBagConstraints(1,
-								0, 7, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(ruleNameTextArea, new GridBagConstraints(1, 0, 7, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label2 ----
+						//---- label2 ----
 						label2.setText("Rule Description");
 						label2.setVerticalAlignment(SwingConstants.TOP);
-						panel3.add(label2, new GridBagConstraints(0, 1, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ======== scrollPane1 ========
+						//======== scrollPane1 ========
 						{
 
-							// ---- ruleDescriptionTextArea ----
+							//---- ruleDescriptionTextArea ----
 							ruleDescriptionTextArea.setRows(4);
 							ruleDescriptionTextArea.setEditable(false);
-							scrollPane1
-									.setViewportView(ruleDescriptionTextArea);
+							scrollPane1.setViewportView(ruleDescriptionTextArea);
 						}
-						panel3.add(scrollPane1, new GridBagConstraints(1, 1, 7,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
-						panel3.add(separator1, new GridBagConstraints(0, 2, 8,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(scrollPane1, new GridBagConstraints(1, 1, 7, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(separator1, new GridBagConstraints(0, 2, 8, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label3 ----
+						//---- label3 ----
 						label3.setText("Component Name");
-						panel3.add(label3, new GridBagConstraints(0, 3, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- componentNameTextArea ----
+						//---- componentNameTextArea ----
 						componentNameTextArea.setEditable(false);
-						panel3.add(componentNameTextArea,
-								new GridBagConstraints(1, 3, 7, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER,
-										GridBagConstraints.BOTH, new Insets(0,
-												0, 5, 0), 0, 0));
+						panel3.add(componentNameTextArea, new GridBagConstraints(1, 3, 7, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label4 ----
+						//---- label4 ----
 						label4.setText("Detail");
 						label4.setVerticalAlignment(SwingConstants.TOP);
-						panel3.add(label4, new GridBagConstraints(0, 4, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label4, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ======== scrollPane3 ========
+						//======== scrollPane3 ========
 						{
 
-							// ---- caseDetails ----
+							//---- caseDetails ----
 							caseDetails.setRows(4);
 							caseDetails.setEditable(false);
 							scrollPane3.setViewportView(caseDetails);
 						}
-						panel3.add(scrollPane3, new GridBagConstraints(1, 4, 7,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
-						panel3.add(separator2, new GridBagConstraints(0, 5, 8,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(scrollPane3, new GridBagConstraints(1, 4, 7, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(separator2, new GridBagConstraints(0, 5, 8, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label5 ----
+						//---- label5 ----
 						label5.setText("Disposition status");
-						panel3.add(label5, new GridBagConstraints(0, 6, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- dispositionStatusCombo ----
-						dispositionStatusCombo
-								.addItemListener(new ItemListener() {
-									@Override
-									public void itemStateChanged(ItemEvent e) {
-										dispositionStatusComboItemStateChanged(e);
-									}
-								});
-						panel3.add(dispositionStatusCombo,
-								new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER,
-										GridBagConstraints.BOTH, new Insets(0,
-												0, 5, 5), 0, 0));
+						//---- dispositionStatusCombo ----
+						dispositionStatusCombo.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(ItemEvent e) {
+								dispositionStatusComboItemStateChanged(e);
+							}
+						});
+						panel3.add(dispositionStatusCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label6 ----
+						//---- label6 ----
 						label6.setText("Annotation");
-						panel3.add(label6, new GridBagConstraints(2, 6, 2, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label6, new GridBagConstraints(2, 6, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- annotation ----
+						//---- annotation ----
 						annotation.addKeyListener(new KeyAdapter() {
 							@Override
 							public void keyPressed(KeyEvent e) {
 								annotationKeyPressed(e);
 							}
 						});
-						panel3.add(annotation, new GridBagConstraints(4, 6, 4,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(annotation, new GridBagConstraints(4, 6, 4, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label14 ----
+						//---- label14 ----
 						label14.setText("Edited by");
-						panel3.add(label14, new GridBagConstraints(0, 7, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(dispositionStatusEditorLabel,
-								new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER,
-										GridBagConstraints.BOTH, new Insets(0,
-												0, 5, 5), 0, 0));
+						panel3.add(label14, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(dispositionStatusEditorLabel, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label15 ----
+						//---- label15 ----
 						label15.setText("Date");
-						panel3.add(label15, new GridBagConstraints(2, 7, 2, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(dispositionStatusEditionDate,
-								new GridBagConstraints(4, 7, 3, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER,
-										GridBagConstraints.BOTH, new Insets(0,
-												0, 5, 5), 0, 0));
-						panel3.add(separator3, new GridBagConstraints(0, 8, 8,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(label15, new GridBagConstraints(2, 7, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(dispositionStatusEditionDate, new GridBagConstraints(4, 7, 3, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(separator3, new GridBagConstraints(0, 8, 8, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- label7 ----
+						//---- label7 ----
 						label7.setText("Assigned to");
-						panel3.add(label7, new GridBagConstraints(0, 9, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label7, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- assignedTo ----
+						//---- assignedTo ----
 						assignedTo.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(ItemEvent e) {
 								assignedToItemStateChanged(e);
 							}
 						});
-						panel3.add(assignedTo, new GridBagConstraints(1, 9, 1,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(assignedTo, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label8 ----
+						//---- label8 ----
 						label8.setText("By");
-						panel3.add(label8, new GridBagConstraints(3, 9, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(by, new GridBagConstraints(4, 9, 2, 1, 0.0,
-								0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(label8, new GridBagConstraints(3, 9, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(by, new GridBagConstraints(4, 9, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label9 ----
+						//---- label9 ----
 						label9.setText("Date");
-						panel3.add(label9, new GridBagConstraints(6, 9, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(assignedDate, new GridBagConstraints(7, 9,
-								1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel3.add(label9, new GridBagConstraints(6, 9, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel3.add(assignedDate, new GridBagConstraints(7, 9, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- caseDetailsError ----
+						//---- caseDetailsError ----
 						caseDetailsError.setForeground(Color.red);
-						panel3.add(caseDetailsError, new GridBagConstraints(0,
-								10, 6, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 5), 0, 0));
+						panel3.add(caseDetailsError, new GridBagConstraints(0, 10, 6, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 					}
 					scrollPane2.setViewportView(panel3);
 				}
 				tabbedPane1.addTab("Case details", scrollPane2);
 
-				// ======== scrollPane5 ========
+
+				//======== scrollPane5 ========
 				{
 
-					// ======== panel4 ========
+					//======== panel4 ========
 					{
 						panel4.setBorder(new EmptyBorder(5, 5, 0, 0));
 						panel4.setLayout(new GridBagLayout());
-						((GridBagLayout) panel4.getLayout()).columnWidths = new int[] {
-								413, 0, 0 };
-						((GridBagLayout) panel4.getLayout()).rowHeights = new int[] {
-								0, 0, 0 };
-						((GridBagLayout) panel4.getLayout()).columnWeights = new double[] {
-								1.0, 0.0, 1.0E-4 };
-						((GridBagLayout) panel4.getLayout()).rowWeights = new double[] {
-								1.0, 0.0, 1.0E-4 };
+						((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {413, 0, 0};
+						((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
+						((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
 
-						// ======== scrollPane4 ========
+						//======== scrollPane4 ========
 						{
 							scrollPane4.setViewportView(commentsList);
 						}
-						panel4.add(scrollPane4, new GridBagConstraints(0, 0, 2,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel4.add(scrollPane4, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- addCommentButton ----
+						//---- addCommentButton ----
 						addCommentButton.setText("Add");
-						addCommentButton
-								.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										addCommentButtonActionPerformed(e);
-									}
-								});
-						panel4.add(addCommentButton, new GridBagConstraints(1,
-								1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+						addCommentButton.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								addCommentButtonActionPerformed(e);
+							}
+						});
+						panel4.add(addCommentButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 					}
 					scrollPane5.setViewportView(panel4);
 				}
 				tabbedPane1.addTab("Case comments", scrollPane5);
 
-				// ======== scrollPane6 ========
+
+				//======== scrollPane6 ========
 				{
 
-					// ======== panel5 ========
+					//======== panel5 ========
 					{
 						panel5.setBorder(new EmptyBorder(5, 5, 0, 0));
 						panel5.setLayout(new GridBagLayout());
-						((GridBagLayout) panel5.getLayout()).columnWidths = new int[] {
-								0, 449, 0, 0 };
-						((GridBagLayout) panel5.getLayout()).rowHeights = new int[] {
-								25, 25, 25, 25, 0, 0, 0, 0 };
-						((GridBagLayout) panel5.getLayout()).columnWeights = new double[] {
-								0.0, 0.0, 1.0, 1.0E-4 };
-						((GridBagLayout) panel5.getLayout()).rowWeights = new double[] {
-								0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+						((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 449, 0, 0};
+						((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {25, 25, 25, 25, 0, 0, 0, 0};
+						((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
+						((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
-						// ---- label10 ----
+						//---- label10 ----
 						label10.setText("Rule UUID");
-						panel5.add(label10, new GridBagConstraints(0, 0, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(label10, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- ruleUuidTxt ----
+						//---- ruleUuidTxt ----
 						ruleUuidTxt.setEditable(false);
-						panel5.add(ruleUuidTxt, new GridBagConstraints(1, 0, 1,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(ruleUuidTxt, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label11 ----
+						//---- label11 ----
 						label11.setText("Rule code");
-						panel5.add(label11, new GridBagConstraints(0, 1, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(label11, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- ruleCodeTxt ----
+						//---- ruleCodeTxt ----
 						ruleCodeTxt.setEditable(false);
-						panel5.add(ruleCodeTxt, new GridBagConstraints(1, 1, 1,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(ruleCodeTxt, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label12 ----
+						//---- label12 ----
 						label12.setText("Database");
-						panel5.add(label12, new GridBagConstraints(0, 2, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(label12, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- databaseTextA ----
+						//---- databaseTextA ----
 						databaseTextA.setEditable(false);
-						panel5.add(databaseTextA, new GridBagConstraints(1, 2,
-								1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(databaseTextA, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- label13 ----
+						//---- label13 ----
 						label13.setText("Path");
-						panel5.add(label13, new GridBagConstraints(0, 3, 1, 1,
-								0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(label13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- pathTextA ----
+						//---- pathTextA ----
 						pathTextA.setEditable(false);
-						panel5.add(pathTextA, new GridBagConstraints(1, 3, 1,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
-						panel5.add(separator4, new GridBagConstraints(0, 4, 3,
-								1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+						panel5.add(pathTextA, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(separator4, new GridBagConstraints(0, 4, 3, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
 
-						// ---- whiteListAllowed ----
+						//---- whiteListAllowed ----
 						whiteListAllowed.setText("Whitelist allowed");
 						whiteListAllowed.setEnabled(false);
-						panel5.add(whiteListAllowed, new GridBagConstraints(0,
-								5, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER,
-								GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+						panel5.add(whiteListAllowed, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-						// ---- resetWhiteListAllowed ----
-						resetWhiteListAllowed
-								.setText("Reset whitelist allowed");
+						//---- resetWhiteListAllowed ----
+						resetWhiteListAllowed.setText("Reset whitelist allowed");
 						resetWhiteListAllowed.setEnabled(false);
-						panel5.add(resetWhiteListAllowed,
-								new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
-										GridBagConstraints.CENTER,
-										GridBagConstraints.BOTH, new Insets(0,
-												0, 0, 5), 0, 0));
+						panel5.add(resetWhiteListAllowed, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 					}
 					scrollPane6.setViewportView(panel5);
 				}
@@ -733,11 +672,11 @@ public class QACaseDetailsPanel extends JPanel {
 			}
 			panel1.add(tabbedPane1, BorderLayout.CENTER);
 
-			// ======== panel2 ========
+			//======== panel2 ========
 			{
 				panel2.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 0));
 
-				// ---- button1 ----
+				//---- button1 ----
 				button1.setText("Refresh");
 				button1.addActionListener(new ActionListener() {
 					@Override
@@ -747,7 +686,7 @@ public class QACaseDetailsPanel extends JPanel {
 				});
 				panel2.add(button1);
 
-				// ---- saveButton ----
+				//---- saveButton ----
 				saveButton.setText("Save");
 				saveButton.setEnabled(false);
 				saveButton.addActionListener(new ActionListener() {
@@ -761,8 +700,8 @@ public class QACaseDetailsPanel extends JPanel {
 			panel1.add(panel2, BorderLayout.SOUTH);
 		}
 		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						0, 0, 0, 0), 0, 0));
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
