@@ -118,7 +118,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
             if (concept != null && !concept.isCanceled()) {
                 for (RefsetMember<?, ?>.Version v : member.getTuples()) {
-                    if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                    if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                         if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                             changed.set(true);
                             try {
@@ -155,7 +156,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         for (Image img : c.getImages()) {
             EImage eImg = null;
             for (Image.Version v : img.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         changed.set(true);
                         if (eImg == null) {
@@ -186,7 +188,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
             TkRelationship ecr = null;
             for (Relationship.Version v : r.getTuples()) {
                 if (v.sapIsInRange(minSapNid, maxSapNid)
-                        && v.getTime() != Long.MIN_VALUE
+                        && v.getTime() != Long.MIN_VALUE 
+                        && v.getTime() != Long.MAX_VALUE
                         && v.getAuthorNid() != classifier) {
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         try {
@@ -226,7 +229,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         for (Description d : c.getDescriptions()) {
             EDescription ecd = null;
             for (Description.Version v : d.getTuples()) {
-                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                     changed.set(true);
                     if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                         if (ecd == null) {
@@ -256,7 +260,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     private TkConceptAttributes processConceptAttributes(Concept c, AtomicBoolean changed) throws IOException {
         TkConceptAttributes eca = null;
         for (ConceptAttributes.Version v : c.getConceptAttributes().getTuples()) {
-            if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+            if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                 changed.set(true);
                 if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                     if (eca == null) {
@@ -296,7 +301,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
         if (v.getAdditionalIdentifierParts() != null) {
             for (IdentifierVersion idv : v.getAdditionalIdentifierParts()) {
                 TkIdentifier eIdv = null;
-                if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE) {
+                if (idv.getSapNid() >= minSapNid && idv.getSapNid() <= maxSapNid && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                     if (IdentifierVersionLong.class.isAssignableFrom(idv.getClass())) {
                         eIdv = new EIdentifierLong();
                     } else if (IdentifierVersionString.class.isAssignableFrom(idv.getClass())) {
@@ -325,7 +331,8 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                 Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
                 if (concept != null && !concept.isCanceled()) {
                     for (RefsetMember<?, ?>.Version mv : member.getTuples()) {
-                        if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE) {
+                        if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
+                            && v.getTime() != Long.MAX_VALUE) {
                             if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
                                 try {
                                     if (eMember == null) {
