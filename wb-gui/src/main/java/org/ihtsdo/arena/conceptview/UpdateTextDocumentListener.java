@@ -35,7 +35,10 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
 
 /**
@@ -50,6 +53,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     I_GetConceptData c;
     boolean update = false;
     I_ConfigAceFrame config;
+    Collection<? extends RefexChronicleBI<?>> refexes;
 
     public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
             DescriptionAnalogBI desc) throws TerminologyException, IOException {
@@ -113,12 +117,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
                 update = false;
 
-                Collection<? extends RefexChronicleBI<?>> refexes = desc.getCurrentAnnotations(config.getViewCoordinate());
+                refexes = desc.getCurrentAnnotations(config.getViewCoordinate());
                 //check for FSN or Pref term
                 int type = desc.getTypeNid();
-                int pref = WbDescType.PREFERRED.getLenient().getNid();
                 int fsn = WbDescType.FULLY_SPECIFIED.getLenient().getNid();
-                
+
                 //set initial word case sensitivity
                 String descText = editorPane.extractText();
                 String initialWord = null;
@@ -127,19 +130,17 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 } else {
                     initialWord = descText;
                 }
-                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true 
+                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
                         && desc.isInitialCaseSignificant() == false) {
                     desc.setInitialCaseSignificant(true);
-                }else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false 
+                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
                         && desc.isInitialCaseSignificant() == true) {
                     desc.setInitialCaseSignificant(false);
-                }else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true 
+                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
                         && desc.isInitialCaseSignificant() == false) {
                     desc.setInitialCaseSignificant(false);
                 }
-                
-                
-                // do syn Update
+
                 if (refexes.isEmpty()) { //check for previous changes
                     if (type == fsn) {
                         doFsnUpdate();
@@ -147,24 +148,26 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         doSynUpdate();
                     }
 
-                } else {
+                } else { //TODO modify uncomitted version
+                    RefexCnidAnalogBI gbRefex = null;
+                    RefexCnidAnalogBI usRefex = null;
                     for (RefexChronicleBI<?> descRefex : refexes) {
                         if (descRefex.isUncommitted()) {
-                            List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
-                            for (I_ExtendByRef ext : extensions) {
-                                Terms.get().forget(ext);
+                            if (descRefex.getCollectionNid() == Refsets.EN_GB_LANG.getLenient().getNid()) {
+                                gbRefex = (RefexCnidAnalogBI) descRefex;;
+                            } else if (descRefex.getCollectionNid() == Refsets.EN_US_LANG.getLenient().getNid()) {
+                                usRefex = (RefexCnidAnalogBI) descRefex;
                             }
                         }
                     }
                     if (type == fsn) {
-                        doFsnUpdate();
+                        doFsnUpdate(gbRefex, usRefex);
                     } else {
-                        doSynUpdate();
+                        doSynUpdate(gbRefex, usRefex);
                     }
                 }
-
                 I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-                Terms.get().addUncommitted(concept); 
+                Terms.get().addUncommitted(concept);
 
             }
         } catch (IOException ex) {
@@ -186,18 +189,19 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         desc.setText(editorPane.extractText());
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb") && th.checkTermSpelling(editorPane.extractText(), "en-us")) {
+            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
+                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
+                        Refsets.EN_US_LANG.getLenient().getNid());
                 refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
+                        Refsets.EN_GB_LANG.getLenient().getNid());
                 refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -205,21 +209,20 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            }
-            if (th.checkTermSpelling(editorPane.extractText(), "en-us")) {
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
+                        Refsets.EN_US_LANG.getLenient().getNid());
                 refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefex = tc.construct(refexSpecUs);
                 I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
                 Ts.get().addUncommitted(refex);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) {
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
+                        Refsets.EN_GB_LANG.getLenient().getNid());
                 refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefex = tc.construct(refexSpecGb);
                 I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -236,18 +239,19 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         desc.setText(editorPane.extractText());
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb") && th.checkTermSpelling(editorPane.extractText(), "en-us")) {
+            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
+                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in both 
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
+                        Refsets.EN_US_LANG.getLenient().getNid());
                 refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
+                        Refsets.EN_GB_LANG.getLenient().getNid());
                 refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -255,19 +259,18 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            }
-            if (th.checkTermSpelling(editorPane.extractText(), "en-us")) {
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
+                        Refsets.EN_US_LANG.getLenient().getNid());
                 refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
+                        Refsets.EN_GB_LANG.getLenient().getNid());
                 refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -275,18 +278,18 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) {
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")));
+                        Refsets.EN_GB_LANG.getLenient().getNid());
                 refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
-                        Ts.get().getNidForUuids(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")));
+                        Refsets.EN_US_LANG.getLenient().getNid());
                 refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.ACCEPTABLE.getLenient().getPrimUuid()));
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -294,6 +297,73 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
                 Ts.get().addUncommitted(refexUs);
+            }
+        }
+    }
+
+    private void doFsnUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex)
+            throws PropertyVetoException, IOException, InvalidCAB {
+        TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                config.getViewCoordinate());
+        TerminologyHelperDrools th = new TerminologyHelperDrools();
+
+        desc.setText(editorPane.extractText());
+
+
+
+        if (th.loadProperties()) {
+            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
+                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+                usRefex.setCnid1(AcceptabilityType.PREF.getLenient().getNid());
+                gbRefex.setCnid1(AcceptabilityType.PREF.getLenient().getNid());
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+                if (usRefex == null) {
+                    doFsnUpdate();
+                } else {
+                    usRefex.setCnid1(AcceptabilityType.PREF.getLenient().getNid());
+                }
+                //forget GB
+                List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+                for (I_ExtendByRef ext : extensions) {
+                    if (ext.getRefsetId() == Refsets.EN_GB_LANG.getLenient().getNid()) {
+                        Terms.get().forget(ext);
+                    }
+                }
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+                if (gbRefex == null) {
+                    doFsnUpdate();
+                } else {
+                    gbRefex.setCnid1(AcceptabilityType.PREF.getLenient().getNid());
+                }
+                //forget US
+                List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+                for (I_ExtendByRef ext : extensions) {
+                    if (ext.getRefsetId() == Refsets.EN_US_LANG.getLenient().getNid()) {
+                        Terms.get().forget(ext);
+                    }
+                }
+            }
+        }
+    }
+
+    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException, IOException, InvalidCAB {
+        TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                config.getViewCoordinate());
+        TerminologyHelperDrools th = new TerminologyHelperDrools();
+
+        desc.setText(editorPane.extractText());
+
+        if (th.loadProperties()) {
+            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
+                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+                usRefex.setCnid1(AcceptabilityType.ACCEPTABLE.getLenient().getNid());
+                gbRefex.setCnid1(AcceptabilityType.ACCEPTABLE.getLenient().getNid());
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+                usRefex.setCnid1(AcceptabilityType.ACCEPTABLE.getLenient().getNid());
+                gbRefex.setCnid1(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getNid());
+            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+                usRefex.setCnid1(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getNid());
+                gbRefex.setCnid1(AcceptabilityType.ACCEPTABLE.getLenient().getNid());
             }
         }
     }
