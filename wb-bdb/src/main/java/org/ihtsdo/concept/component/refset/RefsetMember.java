@@ -84,10 +84,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         public RefexCAB getRefexEditSpec() throws IOException {
-            if (index >= 0) {
+            if (index >= 0 && revisions != null) {
                 return revisions.get(index).getRefexEditSpec();
             } else {
-                return revisions.get(index).getRefexEditSpec();
+                return RefsetMember.this.getRefexEditSpec();
             }
         }
 
