@@ -127,7 +127,14 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
 
     @Override
     public boolean isInConflict(I_ConceptAttributeVersioned conceptAttribute) throws TerminologyException, IOException {
-        throw new UnsupportedOperationException();
+        if (isNull(conceptAttribute, config)) {
+            return false;
+        }
+        List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
+            conceptAttribute.addTuples(config.getAllowedStatus(),
+            config.getViewPositionSetReadOnly(), returnTuples, config.getPrecedence(),  
+            config.getConflictResolutionStrategy());
+        return doesConflictExist(returnTuples);
     }
 
     @Override

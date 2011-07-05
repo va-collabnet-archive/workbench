@@ -77,7 +77,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
         @Override
         public int getC1id() {
-            if (index >= 0) {
+            if (index >= 0 && revisions != null && index < revisions.size()) {
                 return revisions.get(index).getC1id();
             }
             return CidMember.this.getC1Nid();
@@ -85,7 +85,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
         @Override
         public void setC1id(int c1id) {
-            if (index >= 0) {
+            if (index >= 0 && revisions != null && index < revisions.size()) {
                 revisions.get(index).setC1id(c1id);
             }
             CidMember.this.setC1Nid(c1id);
@@ -93,7 +93,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
         @Override
         public int getCnid1() {
-            if (index >= 0) {
+            if (index >= 0 && revisions != null && index < revisions.size()) {
                 return revisions.get(index).getCnid1();
             }
             return CidMember.this.getCnid1();
@@ -101,7 +101,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
         @Override
         public void setCnid1(int c1id) {
-            if (index >= 0) {
+            if (index >= 0 && revisions != null && index < revisions.size()) {
                 revisions.get(index).setCnid1(c1id);
             }
             CidMember.this.setCnid1(c1id);

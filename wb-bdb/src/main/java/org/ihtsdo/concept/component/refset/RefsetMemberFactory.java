@@ -46,16 +46,15 @@ public class RefsetMemberFactory {
 
     public static RefsetMember<?, ?> reCreate(RefexCAB res, RefsetMember<?, ?> member, EditCoordinate ec) throws IOException, InvalidCAB {
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
-        int refexNid = Bdb.uuidToNid(res.getMemberUUID());
-        member.refsetNid  = refexNid;
-        member.nid = refexNid;
+        member.refsetNid = refexColCon.getNid();
+        member.nid = Bdb.uuidToNid(res.getMemberUUID());
         if (refexColCon.isAnnotationStyleRefex()) {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
-            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.enclosingConceptNid);
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
             Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
-       } else {
+        } else {
             member.enclosingConceptNid = refexColCon.getNid();
-            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
+            Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
             refexColCon.getData().add(member);
         }
         for (int i = 0; i < ec.getEditPaths().length; i++) {
@@ -164,7 +163,7 @@ public class RefsetMemberFactory {
         }
     }
 
-       public static RefsetMember<?, ?> createNoTx(RefexCAB res,
+    public static RefsetMember<?, ?> createNoTx(RefexCAB res,
             EditCoordinate ec, long time)
             throws IOException, InvalidCAB {
         RefsetMember<?, ?> member = createBlank(res);
@@ -175,7 +174,7 @@ public class RefsetMemberFactory {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
             Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
-       } else {
+        } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
             refexColCon.getData().add(member);
