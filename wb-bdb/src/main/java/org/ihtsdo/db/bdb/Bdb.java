@@ -373,11 +373,13 @@ public class Bdb {
 
     public static int getSapNid(TkRevision version) {
         assert version.getTime() != 0 : "Time is 0; was it initialized?";
-        assert version.getTime() != Long.MIN_VALUE : "Time is Long.MIN_VALUE; was it initialized?";
         assert version.getStatusUuid() != null : "Status is null; was it initialized?";
         assert version.getPathUuid() != null : "Path is null; was it initialized?";
         assert version.getAuthorUuid() != null : "Author is null; was it initialized?";
 
+        if (version.getTime() == Long.MIN_VALUE) {
+            return -1;
+        }
         String sapNidKey = version.getStatusUuid().toString() + version.getAuthorUuid() + version.getPathUuid() + version.getTime();
         Integer sapNid = sapNidCache.get(sapNidKey);
         if (sapNid != null) {
@@ -398,9 +400,11 @@ public class Bdb {
 
     public static int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
         assert time != 0 : "Time is 0; was it initialized?";
-        assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE; was it initialized?";
         assert statusNid != Integer.MIN_VALUE : "Status is Integer.MIN_VALUE; was it initialized?";
         assert pathNid != Integer.MIN_VALUE : "Path is Integer.MIN_VALUE; was it initialized?";
+        if (time == Long.MIN_VALUE) {
+            return -1;
+        }
         return statusAtPositionDb.getSapNid(statusNid, authorNid, pathNid, time);
     }
 

@@ -130,7 +130,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                             AceLog.getEditLog().fine("Read eConcept... " + eConcept);
                         }
                         if (!noCommit) {
-                            ACE.addImported(commitEConcept(eConcept, nextCommit, values));
+                            commitEConcept(eConcept, nextCommit, values);
                         }
                 } else {
                     unvalidated++;

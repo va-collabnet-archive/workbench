@@ -37,11 +37,15 @@ public class TkRevision implements I_VersionExternally {
          	authorUuid = unspecifiedUserUuid;
         }
         time = in.readLong();
-        assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE. Was it initialized?";
+        if (time == Long.MAX_VALUE) {
+            time = Long.MIN_VALUE;
+        }
     }
 
     public void writeExternal(DataOutput out) throws IOException {
-        assert time != Long.MIN_VALUE : "Time is Long.MIN_VALUE. Was it initialized?";
+        if (time == Long.MAX_VALUE) {
+            time = Long.MIN_VALUE;
+        }
         out.writeLong(pathUuid.getMostSignificantBits());
         out.writeLong(pathUuid.getLeastSignificantBits());
         
@@ -62,6 +66,7 @@ public class TkRevision implements I_VersionExternally {
      * 
      * @see org.ihtsdo.etypes.I_VersionExternal#getPathUuid()
      */
+    @Override
     public UUID getPathUuid() {
         return pathUuid;
     }
@@ -71,6 +76,7 @@ public class TkRevision implements I_VersionExternally {
      * 
      * @see org.ihtsdo.etypes.I_VersionExternal#getStatusUuid()
      */
+    @Override
     public UUID getStatusUuid() {
         return statusUuid;
     }
@@ -80,6 +86,7 @@ public class TkRevision implements I_VersionExternally {
      * 
      * @see org.ihtsdo.etypes.I_VersionExternal#getTime()
      */
+    @Override
     public long getTime() {
         return time;
     }
@@ -99,8 +106,9 @@ public class TkRevision implements I_VersionExternally {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(" statusUuid:");
         buff.append(this.statusUuid);
         buff.append(" authorUuid:");
@@ -108,7 +116,7 @@ public class TkRevision implements I_VersionExternally {
         buff.append(" pathUuid:");
         buff.append(this.pathUuid);
         buff.append(" Time:");
-        buff.append("(" + new Date(this.time) + " " + this.time + ")");
+        buff.append("(").append(new Date(this.time)).append(" ").append(this.time).append(")");
         return buff.toString();
     }
 
@@ -117,6 +125,7 @@ public class TkRevision implements I_VersionExternally {
      * 
      * @return a hash code value for this <tt>EVersion</tt>.
      */
+    @Override
     public int hashCode() {
         return Arrays.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
     }
@@ -131,6 +140,7 @@ public class TkRevision implements I_VersionExternally {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
@@ -162,6 +172,7 @@ public class TkRevision implements I_VersionExternally {
         return false;
     }
 
+    @Override
     public UUID getAuthorUuid() {
 		return authorUuid;
 	}

@@ -1125,7 +1125,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         // merge versions
         for (ConceptComponent<R, C>.Version v : another.getVersions()) {
-            if (!currentSapNids.contains(v.getSapNid())) {
+            if (v.getSapNid() != -1 && !currentSapNids.contains(v.getSapNid())) {
                 addRevision((R) v.getRevision());
             }
         }
@@ -1137,7 +1137,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                         another.additionalIdVersions;
             } else {
                 for (IdentifierVersion idv : another.additionalIdVersions) {
-                    if (!currentSapNids.contains(idv.getSapNid())) {
+                    if (idv.getSapNid() != -1 && !currentSapNids.contains(idv.getSapNid())) {
                         this.additionalIdVersions.add(idv);
                     }
                 }
@@ -1163,7 +1163,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     if (anotherAnnotation != null) {
                         for (@SuppressWarnings("rawtypes") RefsetMember.Version annotationVersion :
                                 anotherAnnotation.getVersions()) {
-                            if (!currentSapNids.contains(
+                            if (annotationVersion.getSapNid() != -1 && !currentSapNids.contains(
                                     annotationVersion.getSapNid())) {
                                 anotherAnnotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
                             }
