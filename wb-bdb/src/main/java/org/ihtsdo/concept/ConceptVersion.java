@@ -367,7 +367,10 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public String toUserString(TerminologySnapshotDI snapshot)
             throws IOException, ContraditionException {
-        return getPreferredDescription().getText();
+            if (getPreferredDescription() != null) {
+                return getPreferredDescription().getText();
+            }
+        return concept.getInitialText();
     }
 
     @Override
