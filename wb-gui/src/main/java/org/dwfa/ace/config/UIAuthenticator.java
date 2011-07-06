@@ -77,19 +77,18 @@ public class UIAuthenticator {
 			e.printStackTrace();
 		}
 	
-		AceLog.getAppLog().info("authenticate un "+this.prompt.getUsername()+" pw "+this.prompt.getPassword());
+		//AceLog.getAppLog().info("authenticate un "+this.prompt.getUsername()+" pw "+this.prompt.getPassword());
 		apm.setUserName(this.prompt.getUsername());
 		setProfile(apm.getProfile());
-		AceLog.getAppLog().info("authenticate this profile = "+getProfile().getAbsoluteFile());
+		//AceLog.getAppLog().info("authenticate this profile = "+getProfile().getAbsoluteFile());
 		
 		return "";
 	}
 	
 	private void initPrompter(){
 		if(prompt.getUsername() == null || prompt.getUsername().length() == 0){
-			AceLog.getAppLog().info("No name found so prompting");
-			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame());
-			//ald.setProfile(getProfile());
+			//AceLog.getAppLog().info("No name found so prompting");
+			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame(),apm.getNameProf());
 			ald.setSvnUrl(baseURL);
 			ald.setPrompt(prompt);
 			ald.setVisible(true);

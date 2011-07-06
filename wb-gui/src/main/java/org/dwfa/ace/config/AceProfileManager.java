@@ -20,8 +20,6 @@ public class AceProfileManager {
     
     public void processProfiles() throws Exception {
     	setProfiles();
-			
-		
     }
     
     private void setProfiles() throws Exception {
@@ -40,8 +38,7 @@ public class AceProfileManager {
                     getProfiles(f);
                 } else if (f.getName().toLowerCase().endsWith(profileFileEnding)) {
                 	nameProf.put(getUserNameFromProfileFN(f.getName()), f);
-                    //profiles.add(f);
-                    AceLog.getAppLog().info("getProfiles adding "+f.getName() + " user name = "+getUserNameFromProfileFN(f.getName()));
+                   // AceLog.getAppLog().info("getProfiles adding "+f.getName() + " user name = "+getUserNameFromProfileFN(f.getName()));
                 }
             }
         }
@@ -73,10 +70,10 @@ public class AceProfileManager {
 	}
 	public File getProfile() {
 		if(getUserName() != null && getUserName().length() > 0){
-			AceLog.getAppLog().info("getProfile nameProf size = "+nameProf.size() +" prompt.getUsername()) "+getUserName());
+			//AceLog.getAppLog().info("getProfile nameProf size = "+nameProf.size() +" prompt.getUsername()) "+getUserName());
         	if(nameProf.get(getUserName()) != null){
         		profile = nameProf.get(getUserName());
-        		AceLog.getAppLog().info("getProfile profile = "+profile.getName());
+        		//AceLog.getAppLog().info("getProfile profile = "+profile.getName());
         	}
 		}
 		return profile;
@@ -90,15 +87,12 @@ public class AceProfileManager {
 		String e_msg = null;
 		if(!profileDir.exists()){
 			e_msg = "Profile Directory does not exist";
-			//throw new FileNotFoundException("Profile Directory does not exist profileDirName = "+profileDirName);
 		}
 		if(!profileDir.isDirectory()){
 			e_msg = "Profile Directory exists but is not a directory";
-			//throw new FileNotFoundException("Profile Directory exists but is not a directory profileDirName = "+profileDirName);
 		}
 		if(!profileDir.canRead()){
 			e_msg = "Profile Directory exists but can't be read";
-			//throw new FileNotFoundException("Profile Directory exists but can't be read = "+profileDirName);
 		}
 		
 		if(e_msg != null){

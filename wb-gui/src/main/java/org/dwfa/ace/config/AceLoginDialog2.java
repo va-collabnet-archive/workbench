@@ -68,7 +68,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     
 	//Store UN etc in the SVN Prompter
 	public SvnPrompter prompt = new SvnPrompter();
-	
 
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel userLabel;
@@ -76,24 +75,21 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordField;
     private JComponent userControl;
-    //private javax.swing.JComboBox profileSelectionBox;
     private javax.swing.JCheckBox svnConnectCheckBox;
-    //private List<File> profiles = new ArrayList<File>();
-    
-    
-    //public String profileDirName = "profiles";
-    //public String profileFileEnding= ".ace";
-    //private File profile;
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
 
     
     public String svnUrl;
 
-    public AceLoginDialog2(JFrame topFrame) {
-
+    public AceLoginDialog2(JFrame topFrame,Hashtable<String,File> np) {
+    	this.nameProf = np;
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        //setProfiles();
+        initComponents();
+    }
+    
+    public AceLoginDialog2(JFrame topFrame) {
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
     }
     
@@ -110,7 +106,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     }
     
     private JComponent getUserControl(){
-    	//JComponent retval = null;
     	int pnum = nameProf.size();
     	
     	if(pnum == 0){
@@ -137,8 +132,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
             userControl = profileSelectionBox;
             return userControl;
     	}
-    	
-    	//return retval;
     }
     
 
@@ -236,7 +229,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
         }
 
         getRootPane().setDefaultButton(loginButton);
-        //profileSelectionBox.requestFocusInWindow();
         pack();
     }
 
@@ -261,26 +253,20 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
      * @param evt ActionEvent
      */
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        
-    	
     	// get the username
     	String un = getUserValue();
-    	
-    	AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
-    
+    	//AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
     	//if the password field is enabled get the password
     	String pw = null;
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
-    		AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
+    		//AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
     		boolean ok  = checkSVN(getSvnUrl(),un,pw);	
     		if(ok){
     			this.prompt.setUsername(un);
     			this.prompt.setPassword(pw);
-    			//getProfile();
     			this.dispose();
     		}
-    		//AceLog.getAppLog().info("em = "+em);
     	}
     	if(!passwordField.isEnabled()){
     		this.prompt.setUsername(un);
@@ -288,19 +274,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
 			//getProfile();
 			this.dispose();
     	}
-    	
-    	AceLog.getAppLog().info("Check4Debug");    	
-    	//if No profiles try to check out from SVN and then reload.
-    	
-    	
-    	//If Profiles found use the UserName that to get the profile
-
-    	
-    	//try to 
-    	
-    	
-    	
-    	
     }
     
     
@@ -308,36 +281,27 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	boolean ok = true;
     	SVNRepository repo= null;
     	 try { 
-    		 AceLog.getAppLog().info("checkSVN url = "+url);  
+    		 //AceLog.getAppLog().info("checkSVN url = "+url);  
     		 DAVRepositoryFactory.setup();
     	     SVNRepositoryFactoryImpl.setup();
     	     FSRepositoryFactory.setup();
     	     repo = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(url));
-    	     AceLog.getAppLog().info("checkSVN OK1");
+    	     //AceLog.getAppLog().info("checkSVN OK1");
     	     ISVNAuthenticationManager authManager = 
     	                  SVNWCUtil.createDefaultAuthenticationManager(uname, pw);
-    	     AceLog.getAppLog().info("checkSVN OK2");
+    	     //AceLog.getAppLog().info("checkSVN OK2");
     	     repo.setAuthenticationManager(authManager);
     	     repo.testConnection();
     	     
     	 }catch (SVNAuthenticationException svnAEx){
-    		 //AceLog.getAppLog().severe("Authorization Exception"); 
-    		 //setTitle("Authorization failed please check Username and Password");
     		 ok = false;
-    		 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Authorization failed please check Username and Password", svnAEx);
-
-    		 
+    		 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Authorization failed please check Username and Password", svnAEx);	 
     	 }
     	 catch (SVNException e){
     		 ok = false;
-    	     //e.printStackTrace();
-    	     //AceLog.getAppLog().severe("SVNException Exception");
-    		 //setTitle("Failed to connect to to repository");
     	     AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to connect to to repository. \n Please check network and URL. Currently trying to use: \n "+url+" \n Error = "+e.getMessage(), e);
     	 }
 
-    	
-    	
     	return ok;
     	
     }
@@ -378,56 +342,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     }
 
     /**
-     * Sets the profile dir and returns the
-     * 
-     * @param profileDirToSet the last profile used.
-     * @return File
-     * @throws TaskFailedException if there is no profile set. NB
-     *             profileDirToSet can be null.
-     */
-/*    public File getUserProfile() throws TaskFailedException {
-        //if (profileDirToSet != null) {
-            //List<File> profiles = new ArrayList<File>();
-            getProfiles(new File(profileDirName));
-
-            
-       // }
-
-        //setVisible(true);
-
-        return getProfile();
-    }
-    
-    public void setProfiles(){
-    	getProfiles(new File(profileDirName));
-
-    }*/
-   
-    
-   /*private void setProfileSelectionBox(){
-    	profileSelectionBox.setModel(new DefaultComboBoxModel(profiles.toArray()));
-        profileSelectionBox.validate();
-        //profileSelectionBox.setSelectedItem(profileDirToSet);
-        profileSelectionBox.setRenderer(new ProfileRenderer());
-    } */
-    
-
-/*    private void getProfiles(File dir) {
-        if (dir.listFiles() != null) {
-            for (File f : dir.listFiles()) {
-                if (f.isDirectory()) {
-                    getProfiles(f);
-                } else if (f.getName().toLowerCase().endsWith(profileFileEnding)) {
-                	
-                	nameProf.put(getUserNameFromProfileFN(f.getName()), f);
-                    //profiles.add(f);
-                    AceLog.getAppLog().info("getProfiles adding "+f.getName() + " user name = "+getUserNameFromProfileFN(f.getName()));
-                }
-            }
-        }
-    }
-*/
-    /**
      * Entered password.
      * 
      * @return String
@@ -448,28 +362,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     public boolean connectToSvn() {
         return svnConnectCheckBox.getModel().isSelected();
     }
-
-    /**
-     * Get the profile file to use.
-     * 
-     * @return File
-     * @throws TaskFailedException if the profile is null.
-     */
-   /* public File getProfile() {
-        //if (profile == null) {
-    	AceLog.getAppLog().info("getProfile nameProf size = "+nameProf.size() +" prompt.getUsername()) "+prompt.getUsername());
-        	if(nameProf.get(prompt.getUsername()) != null){
-        		profile = nameProf.get(prompt.getUsername());
-        		AceLog.getAppLog().info("getProfile profile = "+profile.getName());
-        	}
-            //throw new TaskFailedException("No Profile selected.");
-       // }
-        return profile;
-    }
-
-    public void setProfile(File profileToSet) {
-        this.profile = profileToSet;
-    }*/
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -501,5 +393,13 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
 
 	public void setPrompt(SvnPrompter prompt) {
 		this.prompt = prompt;
+	}
+
+	public Hashtable<String, File> getNameProf() {
+		return nameProf;
+	}
+
+	public void setNameProf(Hashtable<String, File> nameProf) {
+		this.nameProf = nameProf;
 	}
 }
