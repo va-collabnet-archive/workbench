@@ -93,14 +93,9 @@ public class WorkbenchRunner {
 	public static String[] svnUpdateOnStart = null;
 	public static File userProfile;
 	public static UIAuthenticator auth = new UIAuthenticator();
-	
+	public static SvnPrompter prompt;
 	
 	private String authenticate(SvnPrompter prompt, String baseURL){
-		
-		
-		
-		
-		
 		//String result = auth.authenticate(svnH);
 		//SvnPrompter prompt = new SvnPrompter();
 		String result = auth.authenticate(prompt, baseURL);
@@ -110,7 +105,7 @@ public class WorkbenchRunner {
 		}
 		
 		else{
-			AceLog.getAppLog().info("authenticate Called everything OK");
+			AceLog.getAppLog().info("authenticate Called everything OK prompt User = "+prompt.getUsername()+" pw = "+prompt.getPassword());
 		}
 		
 		return result;
@@ -193,7 +188,7 @@ public class WorkbenchRunner {
 			File wbPropertiesFile = new File("config", WB_PROPERTIES);
 			boolean acePropertiesFileExists = wbPropertiesFile.exists();
 			wbProperties = new Properties();
-			SvnPrompter prompter = new SvnPrompter();
+			//SvnPrompter prompter = new SvnPrompter();
 			
 			boolean initialized = false;
 			if (acePropertiesFileExists) {
@@ -204,18 +199,17 @@ public class WorkbenchRunner {
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
 			String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
 			AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
-			//TODO thorw some sort of error if url is empty or null
+			//TODO throw some sort of error if url is empty or null
 			
-			
-			
-			authenticate(prompter,testSVNURL);
-			
-			
+			authenticate(getPrompt(),testSVNURL);
+			AceLog.getAppLog().info("prompter userName = "+prompt.getUsername());
+			AceLog.getAppLog().info("prompter password = "+prompt.getPassword());
+			AceLog.getAppLog().info("prompter DEBUG HERE = "+prompt.getPassword());
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
-					svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
+					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompt);
 				} catch (Exception ex) {
-					AceLog.getAppLog().alertAndLogException(ex);
+					AceLog.getAppLog().alertAndLog(Level.SEVERE,"Problem getting initial checkout of profiles etc.",ex);
 					System.exit(0);
 				}
 			}
@@ -260,7 +254,7 @@ public class WorkbenchRunner {
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
 	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
-								"config", WB_PROPERTIES), prompter);
+								"config", WB_PROPERTIES), prompt);
 			}
 
 			if (wbConfigFile == null || !wbConfigFile.exists()) {
@@ -376,8 +370,8 @@ public class WorkbenchRunner {
 				AceConfig.config = (AceConfig) ois.readObject();
 				AceConfig.config.setProfileFile(userProfile);
 				AceConfig.config.getUsername();
-				prompter.setUsername(AceConfig.config.getUsername());
-				prompter.setPassword(profiler.getPassword());
+				//prompter.setUsername(AceConfig.config.getUsername());
+				//prompter.setPassword(profiler.getPassword());
 			} else {
 				if (initializeFromSubversion) {
 					JOptionPane
@@ -428,9 +422,14 @@ public class WorkbenchRunner {
 				if (ace.isActive()) {
 					AceFrameConfig afc = (AceFrameConfig) ace;
 					afc.setMasterConfig(AceConfig.config);
+					
+					
+					
+					
+					
 					boolean login = true;
 					while (login) {
-						if (frameCount == 1) {
+						/*if (frameCount == 1) {
 							if (ace.getPassword().equals(prompter.getPassword())) {
 								if (ace.getUsername().equals(prompter.getUsername()) == false) {
 									AceConfig.config.setUsername(ace.getUsername());
@@ -474,10 +473,26 @@ public class WorkbenchRunner {
 							if (n == JOptionPane.YES_OPTION) {
 								login = true;
 							}
-						}
+						}*/
 					}
+					
+					if (ace.isAdministrative()) {
+						successCount++;
+						handleAdministrativeFrame(prompt, ace);
+					}
+					else{
+						successCount++;
+						if (successCount == 1 && svnHelper != null) {
+							ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
+						}
+						handleNormalFrame(ace);
+					}	
+					
+					
 				}
 			}
+			
+			
 
 			if (successCount == 0) {
 				JOptionPane.showMessageDialog(LogWithAlerts
@@ -860,6 +875,19 @@ public class WorkbenchRunner {
 		catch(Exception E) {
 			AceLog.getAppLog().severe("checkCustom threw an error trying to get "+custPropFN,E);
 		}
+	}
+
+
+	public static SvnPrompter getPrompt() {
+		if (prompt == null){
+			prompt = new SvnPrompter();
+		}
+		return prompt;
+	}
+
+
+	public static void setPrompt(SvnPrompter prompt) {
+		WorkbenchRunner.prompt = prompt;
 	}
 
 }

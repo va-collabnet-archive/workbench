@@ -150,21 +150,31 @@ public class SvnHelper {
 		}
 	}
 
-	public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile,  SvnPrompter prompter) throws ConfigurationException,
+	public boolean initialSubversionOperationsAndChangeSetImport(File acePropertiesFile,  SvnPrompter prompter) throws ConfigurationException,
 	FileNotFoundException, IOException, TaskFailedException, ClientException {
 
+		boolean ok = false;
 		Properties wbProperties = new Properties();
 		wbProperties.setProperty("initial-svn-checkout", "true");
+		
+		String pw = prompter.getPassword();
+		
+		if(pw == null || pw.length() == 0 ){
+			connectToSubversion = false;
+		}
+		else{
+			connectToSubversion = true;
+		}
 
 		if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
 				|| (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
 				|| (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-			if (connectToSubversion == false) {
+			/*if (connectToSubversion == false) {
                 connectToSubversion =
                         (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
                             "Would you like to connect over the network to Subversion?", "Confirm network operation",
                             JOptionPane.YES_NO_OPTION));
-			}
+			}*/
 			Svn.setConnectedToSvn(connectToSubversion);
             try {
 			if (connectToSubversion) {
@@ -197,6 +207,7 @@ public class SvnHelper {
 						activity.setProgressInfoLower(elapsed);
 						activity.complete();
 					} catch (ComputationCanceled e) {
+						ok = false;
 						throw new TaskFailedException(e);
 					}
 				}
@@ -206,6 +217,7 @@ public class SvnHelper {
 				wbProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
 			} else {
 				if (new File("profiles").exists() == false) {
+					ok = false;
 					throw new TaskFailedException("User did not want to connect to Subversion.");
 				}
 			}
@@ -215,10 +227,13 @@ public class SvnHelper {
                     "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
                 connectToSubversion = false;
                 Svn.setConnectedToSvn(connectToSubversion);
+                ok = false;
             }
 		} else if (changeLocations.size() > 0) {
 			doChangeSetImport();
 		}
+		
+		return ok;
 	}
 
 	void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
