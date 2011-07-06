@@ -194,11 +194,11 @@ public class WorkflowHelper {
             writer.retireMember();
 			Terms.get().addUncommitted(writer.getRefsetConcept());
 			Terms.get().commit();
+			WorkflowHistoryRefsetWriter.unLockMutex();
 
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in retiring workflow history row: " + bean.toString() + "  with error: " + e.getMessage());
 		}
-		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
 	public static void updateModelers() 
@@ -259,8 +259,11 @@ public class WorkflowHelper {
 		if (modelers == null)
 			updateModelers();
 
-		if (!modelers.containsKey(name))
-		{
+		if (name == null) {
+			return defaultModeler;
+		} else if (modelers.containsKey(name)) {
+			return modelers.get(name);
+		} else {
 			try {
 				if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
 				{
@@ -283,11 +286,10 @@ public class WorkflowHelper {
             	AceLog.getAppLog().log(Level.WARNING, "Unable to lookup modeler: " + name + " with error: " + e.getMessage());
 			}
 
+			// Couldn't find modeler in list, so return default
 			return defaultModeler;
-		}
-		else
-			return modelers.get(name);
-    }
+    	}
+	}
 
 	public static I_GetConceptData getLeadModeler()
 	{
@@ -419,42 +421,47 @@ public class WorkflowHelper {
     @SuppressWarnings("unchecked")
 	public static Set<I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException
     {
-    	I_GetConceptData child = null;
 		Set<I_GetConceptData> resultSet = new HashSet<I_GetConceptData>();
 
-		if (currentNid == 0)
-			initialize();
-
-		resultSet.add(concept);
-		Collection<? extends I_RelVersioned> relationships = concept.getDestRels();
-
-
-    	if (relationships == null || relationships.size() == 0)
-    		return resultSet;
-
-    	Iterator itr = relationships.iterator();
-    	while (itr.hasNext())
-    	{
-    		I_RelVersioned rel = (I_RelVersioned)itr.next();
-    		 
-    		if (rel.getStatusNid() == currentNid &&
-    			rel.getTypeNid() == isARelNid)
-    		{
-    			child = Terms.get().getConcept(rel.getC1Id());
-    			resultSet.addAll(getChildren(child));
-    		}
-    	}
-
+		if (concept != null) {
+	    	I_GetConceptData child = null;
+	
+			if (currentNid == 0)
+				initialize();
+	
+			resultSet.add(concept);
+			Collection<? extends I_RelVersioned> relationships = concept.getDestRels();
+	
+	
+	    	if (relationships == null || relationships.size() == 0)
+	    		return resultSet;
+	
+	    	Iterator itr = relationships.iterator();
+	    	while (itr.hasNext())
+	    	{
+	    		I_RelVersioned rel = (I_RelVersioned)itr.next();
+	    		 
+	    		if (rel.getStatusNid() == currentNid &&
+	    			rel.getTypeNid() == isARelNid)
+	    		{
+	    			child = Terms.get().getConcept(rel.getC1Id());
+	    			resultSet.addAll(getChildren(child));
+	    		}
+	    	}
+		}
+		
     	return resultSet;
     }
 
 	public static I_GetConceptData lookupEditorCategory(String role) throws TerminologyException, IOException {
 		Set<? extends I_GetConceptData> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
-		for (I_GetConceptData roleConcept : allRoles)
-		{
-			if (identifyFSN(roleConcept).equalsIgnoreCase(role.trim()))
-				return roleConcept;
+		if (role != null) {
+			for (I_GetConceptData roleConcept : allRoles)
+			{
+				if (identifyFSN(roleConcept).equalsIgnoreCase(role.trim()))
+					return roleConcept;
+			}
 		}
 
 		return null;
@@ -473,9 +480,13 @@ public class WorkflowHelper {
 			}
 		}
 		
-		return states.get(state.toLowerCase());
+		if (state != null) {
+			return states.get(state.toLowerCase());
+		} else {
+			return null;
+		}
 	}
-
+	
 	public static I_GetConceptData lookupAction(String action) throws TerminologyException, IOException {
 		if (actions == null)
 		{
@@ -489,7 +500,11 @@ public class WorkflowHelper {
 			}
 		}
 
-		return actions.get(action.toLowerCase());
+		if (action != null) {
+			return actions.get(action.toLowerCase());
+		} else {
+			return null;
+		}
 	}
 	
 
@@ -497,10 +512,12 @@ public class WorkflowHelper {
 	public static I_GetConceptData lookupRoles(String role) throws TerminologyException, IOException {
 		Set<? extends I_GetConceptData> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
-		for (I_GetConceptData actionConcept : allActions)
-		{
-			if (identifyFSN(actionConcept).equalsIgnoreCase(role.trim()))
-				return actionConcept;
+		if (role != null) {
+			for (I_GetConceptData actionConcept : allActions)
+			{
+				if (identifyFSN(actionConcept).equalsIgnoreCase(role.trim()))
+					return actionConcept;
+			}
 		}
 
 		return null;
@@ -508,30 +525,33 @@ public class WorkflowHelper {
 
 	public static List<I_RelVersioned> getWorkflowRelationship(I_GetConceptData concept, Concept desiredRelationship) 
 	{
+		List<I_RelVersioned> rels = new LinkedList<I_RelVersioned>();
+
 		if (currentNid == 0)
 			initialize();
 		
-		List<I_RelVersioned> rels = new LinkedList<I_RelVersioned>();
-		try 
-		{
-			int searchRelId = Terms.get().uuidToNative(desiredRelationship.getPrimoridalUid());
-			
-			I_IntSet relType = Terms.get().newIntSet();
-			relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
-	
-			Collection<? extends I_RelVersioned> relList = concept.getSourceRels();
-			
-			for (I_RelVersioned rel : relList)
+		if (concept != null && desiredRelationship != null) {
+			try 
 			{
-				I_RelTuple tuple = rel.getLastTuple();
-				int relId = tuple.getTypeNid();
-				int statusId = tuple.getStatusNid();
+				int searchRelId = Terms.get().uuidToNative(desiredRelationship.getPrimoridalUid());
 				
-				if ((relId == searchRelId) && (statusId == currentNid)) 
-					rels.add(rel);
+				I_IntSet relType = Terms.get().newIntSet();
+				relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
+		
+				Collection<? extends I_RelVersioned> relList = concept.getSourceRels();
+				
+				for (I_RelVersioned rel : relList)
+				{
+					I_RelTuple tuple = rel.getLastTuple();
+					int relId = tuple.getTypeNid();
+					int statusId = tuple.getStatusNid();
+					
+					if ((relId == searchRelId) && (statusId == currentNid)) 
+						rels.add(rel);
+				}
+			} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute with error: " + e.getMessage());
 			}
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute with error: " + e.getMessage());
 		}
 		
 		return rels;
@@ -561,15 +581,16 @@ public class WorkflowHelper {
 	    	}
 		}
 
-    	if (beginWorkflowActions != null)
+    	if (beginWorkflowActions != null && actionConcept != null) {
     		return (beginWorkflowActions.contains(actionConcept.getPrimUuid()));
-    	else
+    	} else {
     		return false;
-	}
-
+    	}
+    }
+    
     private static boolean isEndWorkflowAction(I_GetConceptData actionConcept) {
 		
-    	if (endWorkflowActionUid  == null)
+    	if (endWorkflowActionUid  == null && actionConcept != null)
 		{
 			try
 	    	{
@@ -589,11 +610,12 @@ public class WorkflowHelper {
 	    	}
 		}
 
-    	if (endWorkflowActionUid != null)
+    	if (endWorkflowActionUid != null && actionConcept != null) {
     		return (endWorkflowActionUid.equals(actionConcept.getPrimUuid()));
-    	else
+    	} else {
     		return false;
-    }
+    	}
+	}
 
 	public static boolean isActiveModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
 		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
@@ -626,7 +648,7 @@ public class WorkflowHelper {
 	}
 
 	public static void setDefaultModeler(I_GetConceptData defMod) {
-		defaultModeler  = defMod;
+		defaultModeler = defMod;
 	}
 
 	public static I_GetConceptData getDefaultModeler() {
@@ -634,7 +656,8 @@ public class WorkflowHelper {
 	}
 
 	public void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
-		if (inBatch || !WorkflowHistoryRefsetWriter.isInUse()) // Not in the middle of an existing commit
+		if ((concept != null) && 
+			(inBatch || !WorkflowHistoryRefsetWriter.isInUse())) // Not in the middle of an existing commit
     	{
         	I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
 
@@ -815,12 +838,13 @@ public class WorkflowHelper {
     		endWorkflowStateUid = ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid();
 		}
 
-    	if (endWorkflowStateUid != null)
+    	if (endWorkflowStateUid != null && stateConcept != null) {
     		return (endWorkflowStateUid.equals(stateConcept.getPrimUuid()));
-    	else
+    	} else {
     		return false;
-	}
-
+    	}
+    }
+    	
 	public static UUID getAcceptAction() 
 	{
 		if (endWorkflowActionUid  == null)
@@ -859,28 +883,34 @@ public class WorkflowHelper {
 	}
 
 	public static String parseSemanticTag(I_GetConceptData con) throws IOException, TerminologyException {
-   		I_IntList descType = Terms.get().newIntList();
-   		descType.add(fullySpecifiedTermDescriptionTypeNid);
-   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
-
-		String s = tuple.getText();
-
-    	return parseSemanticTag(s);
+		if (con != null) {
+			I_IntList descType = Terms.get().newIntList();
+	   		descType.add(fullySpecifiedTermDescriptionTypeNid);
+	   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
+	
+			String s = tuple.getText();
+	
+	    	return parseSemanticTag(s);
+		} else {
+			return "";
+		}
 	}
 
 	public static String parseSemanticTag(String potentialTag) {
 		
-		int startIndex = potentialTag.lastIndexOf('(');
-		
-		if (startIndex >= 0)
-		{
-			int endIndex = potentialTag.lastIndexOf(')');
-			String retTag = potentialTag.substring(startIndex + 1, endIndex);
-
-			return WorkflowHelper.parseSpaces(retTag);
-		} else {
-			return "";
+		if (potentialTag != null) {
+			int startIndex = potentialTag.lastIndexOf('(');
+			
+			if (startIndex >= 0)
+			{
+				int endIndex = potentialTag.lastIndexOf(')');
+				String retTag = potentialTag.substring(startIndex + 1, endIndex);
+	
+				return WorkflowHelper.parseSpaces(retTag);
+			} 	
 		}
+		
+		return "";
 	}
 
 	public static WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException 
@@ -908,30 +938,33 @@ public class WorkflowHelper {
 	private static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
 			I_GetConceptData con) throws IOException, TerminologyException {
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
-		Set<String> ignoredWorkflows = new HashSet<String>();
-		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-		
-		long latestTimestamp = 0;
-		String currentWorkflowId = null;
 
-		List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
-		
-		for (I_ExtendByRef row : members) {
-			int idx = row.getTuples().size() - 1;
-			if (idx >= 0) {
-				if (row.getTuples().get(idx).getStatusNid() == currentNid) {
-					if (!ignoredWorkflows.contains(refset.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
-						WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
-						
-						if (latestTimestamp == 0 || latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId())) {
-							returnSet.clear();
-							ignoredWorkflows.add(currentWorkflowId);
+		if (con != null) {
+			Set<String> ignoredWorkflows = new HashSet<String>();
+			WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+			
+			long latestTimestamp = 0;
+			String currentWorkflowId = null;
+	
+			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
+			
+			for (I_ExtendByRef row : members) {
+				int idx = row.getTuples().size() - 1;
+				if (idx >= 0) {
+					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+						if (!ignoredWorkflows.contains(refset.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
+							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 							
-							currentWorkflowId = bean.getWorkflowId().toString();
-							latestTimestamp = bean.getWorkflowTime();
-						} 				
-						
-						returnSet.add(bean);
+							if (latestTimestamp == 0 || latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId())) {
+								returnSet.clear();
+								ignoredWorkflows.add(currentWorkflowId);
+								
+								currentWorkflowId = bean.getWorkflowId().toString();
+								latestTimestamp = bean.getWorkflowTime();
+							} 				
+							
+							returnSet.add(bean);
+						}
 					}
 				}
 			}
@@ -942,17 +975,20 @@ public class WorkflowHelper {
 
 	public static SortedSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
 			I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException {
-		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
-		List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
-		
-		for (I_ExtendByRef row : members) {
-			int idx = row.getTuples().size() - 1;
-			if (idx >= 0) {
-				if (row.getTuples().get(idx).getStatusNid() == currentNid) {
-					if (workflowId.equals(UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
-						returnSet.add(populateWorkflowHistoryJavaBean(row));
+		if (con != null && workflowId != null) {
+			WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+	
+			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
+			
+			for (I_ExtendByRef row : members) {
+				int idx = row.getTuples().size() - 1;
+				if (idx >= 0) {
+					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+						if (workflowId.equals(UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
+							returnSet.add(populateWorkflowHistoryJavaBean(row));
+						}
 					}
 				}
 			}
@@ -1030,38 +1066,44 @@ public class WorkflowHelper {
 	}
 
 	public static String getPreferredTerm(I_GetConceptData con) throws IOException, TerminologyException {
-		for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-		    for (I_DescriptionTuple p: descv.getTuples()) {
-				if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
-					p.getLang().equalsIgnoreCase("en"))
-					return p.getText();
-		    }
+		if (con != null) {
+			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+			    for (I_DescriptionTuple p: descv.getTuples()) {
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
+						p.getLang().equalsIgnoreCase("en"))
+						return p.getText();
+			    }
+			}
 		}
 		
 		return "";
 	}
 
 	public static String getFsnTerm(I_GetConceptData con) throws IOException, TerminologyException {
-		for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-		    for (I_DescriptionTuple p: descv.getTuples()) {
-				if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
-					p.getLang().equalsIgnoreCase("en"))
-					return p.getText();
-		    }
+		if (con != null) {
+			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
+			    for (I_DescriptionTuple p: descv.getTuples()) {
+					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
+						p.getLang().equalsIgnoreCase("en"))
+						return p.getText();
+			    }
+			}
 		}
 
 		return "";
 	}
 
 	public static String shrinkTermForDisplay(String term) {
-		StringBuffer retBuf = new StringBuffer();
-		
-		String words[] = term.split(" ");
-		for (int i = 0; i < words.length; i++) {
-			if (words[i].equalsIgnoreCase("workflow")) {
-				return retBuf.toString().trim();
-			} else {
-				retBuf.append(words[i] + " ");
+		if (term != null) {
+			StringBuffer retBuf = new StringBuffer();
+			
+			String words[] = term.split(" ");
+			for (int i = 0; i < words.length; i++) {
+				if (words[i].equalsIgnoreCase("workflow")) {
+					return retBuf.toString().trim();
+				} else {
+					retBuf.append(words[i] + " ");
+				}
 			}
 		}
 		
@@ -1083,7 +1125,7 @@ public class WorkflowHelper {
 			if (!hasBeenReleased && (getLatestWfHxForConcept(concept).size() == 0))
 				return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+            AceLog.getAppLog().log(Level.WARNING, "Cannot identify if concept is in already in wfHx database");
 		}
 
     	return true;
