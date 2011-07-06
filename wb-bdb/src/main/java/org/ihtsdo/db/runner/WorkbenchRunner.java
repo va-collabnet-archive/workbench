@@ -106,6 +106,8 @@ public class WorkbenchRunner {
 		
 		else{
 			AceLog.getAppLog().info("authenticate Called everything OK prompt User = "+prompt.getUsername()+" pw = "+prompt.getPassword());
+			AceLog.getAppLog().info("authenticate Called profile = " +auth.getProfile().getName());
+			AceLog.getAppLog().info("authenticate debug here");
 		}
 		
 		return result;
@@ -202,9 +204,9 @@ public class WorkbenchRunner {
 			//TODO throw some sort of error if url is empty or null
 			
 			authenticate(getPrompt(),testSVNURL);
-			AceLog.getAppLog().info("prompter userName = "+prompt.getUsername());
-			AceLog.getAppLog().info("prompter password = "+prompt.getPassword());
-			AceLog.getAppLog().info("prompter DEBUG HERE = "+prompt.getPassword());
+			AceLog.getAppLog().info("prompt userName = "+prompt.getUsername());
+			AceLog.getAppLog().info("prompt password = "+prompt.getPassword());
+			AceLog.getAppLog().info("prompt DEBUG HERE = "+prompt.getPassword());
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
 					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompt);
@@ -237,19 +239,10 @@ public class WorkbenchRunner {
 			} else {
 				wbConfigFile = new File("config/wb.config");
 			}
-
-			
-			
-			
 			
 			File profileDir = new File("profiles");
 			AceLog.getAppLog().info("About to initializeFromSubversion");
-			
-			
-			
-			
-			
-			
+
 			if ((profileDir.exists() == false && initializeFromSubversion)
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
@@ -565,8 +558,8 @@ public class WorkbenchRunner {
 		JFrame parentFrame = new JFrame();
 		boolean newFrame = false;
 		private File lastProfileDir;
-		private String password;
-		private AceLoginDialog loginDialog;
+		//private String password;
+		//private AceLoginDialog loginDialog;
 		CountDownLatch latch;
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -602,13 +595,13 @@ public class WorkbenchRunner {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}
-			AceLog.getAppLog().info("About to open loginDialog");
+			/*AceLog.getAppLog().info("About to open loginDialog");
 			loginDialog = new AceLoginDialog(parentFrame);
 			loginDialog.setConnectToSvn(initializeFromSubversion);
 			loginDialog.setLocation((d.width / 2)
 					- (loginDialog.getWidth() / 2), (d.height / 2)
 					- (loginDialog.getHeight() / 2));
-			this.latch = latch;
+			this.latch = latch;*/
 		}
 
 		@Override
@@ -656,9 +649,9 @@ public class WorkbenchRunner {
 			super.finished();
 			try {
 				// shows the AceLoginDialog
-				userProfile = loginDialog.getUserProfile(lastProfileDir);
-				password = new String(loginDialog.getPassword());
-		        Svn.setConnectedToSvn(loginDialog.connectToSvn());
+				//userProfile = loginDialog.getUserProfile(lastProfileDir);
+				//password = new String(loginDialog.getPassword());
+		        //Svn.setConnectedToSvn(loginDialog.connectToSvn());
 
 				wbProperties.setProperty("last-profile-dir", FileIO
 						.getRelativePath(userProfile));
@@ -669,15 +662,15 @@ public class WorkbenchRunner {
 				}
 				OpenFrames.removeFrameListener(fl);
                 latch.countDown();
-			} catch (TaskFailedException e) {
+			} catch (Exception e) {
                 latch.countDown();
 				AceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 
-		public String getPassword() {
+		/*public String getPassword() {
 			return password;
-		}
+		}*/
 	}
 
 	private static class StartupFrameListener implements ListDataListener {
