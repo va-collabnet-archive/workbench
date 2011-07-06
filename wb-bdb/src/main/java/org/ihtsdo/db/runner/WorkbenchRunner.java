@@ -99,8 +99,9 @@ public class WorkbenchRunner {
 		//String result = auth.authenticate(svnH);
 		//SvnPrompter prompt = new SvnPrompter();
 		String result = auth.authenticate(prompt, baseURL);
+		userProfile = auth.getProfile();
 		
-		if(result != null && result.length() > 0){
+		/*if(result != null && result.length() > 0){
 			AceLog.getAppLog().info("authenticate Called result = "+result);
 		}
 		
@@ -108,7 +109,7 @@ public class WorkbenchRunner {
 			AceLog.getAppLog().info("authenticate Called everything OK prompt User = "+prompt.getUsername()+" pw = "+prompt.getPassword());
 			AceLog.getAppLog().info("authenticate Called profile = " +auth.getProfile().getName());
 			AceLog.getAppLog().info("authenticate debug here");
-		}
+		}*/
 		
 		return result;
 	}
@@ -200,13 +201,13 @@ public class WorkbenchRunner {
 			}
 			SvnHelper svnHelper =  new SvnHelper(WorkbenchRunner.class, jiniConfig);
 			String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
-			AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
+			//AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
 			//TODO throw some sort of error if url is empty or null
 			
 			authenticate(getPrompt(),testSVNURL);
-			AceLog.getAppLog().info("prompt userName = "+prompt.getUsername());
+			/*AceLog.getAppLog().info("prompt userName = "+prompt.getUsername());
 			AceLog.getAppLog().info("prompt password = "+prompt.getPassword());
-			AceLog.getAppLog().info("prompt DEBUG HERE = "+prompt.getPassword());
+			AceLog.getAppLog().info("prompt DEBUG HERE = "+prompt.getPassword());*/
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
 					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompt);
@@ -362,7 +363,10 @@ public class WorkbenchRunner {
 								new FileInputStream(userProfile)));
 				AceConfig.config = (AceConfig) ois.readObject();
 				AceConfig.config.setProfileFile(userProfile);
-				AceConfig.config.getUsername();
+				AceConfig.config.setUsername(prompt.getUsername());
+				//AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername());
+				
+				
 				//prompter.setUsername(AceConfig.config.getUsername());
 				//prompter.setPassword(profiler.getPassword());
 			} else {
@@ -384,17 +388,16 @@ public class WorkbenchRunner {
 							false);
 				}
 			}
+
 			wbProperties.storeToXML(new FileOutputStream(wbPropertiesFile),
 					null);
 			ACE.setAceConfig(AceConfig.config);
-
 			String writerName = AceConfig.config.getChangeSetWriterFileName();
 			if (!writerName.endsWith(".eccs")) {
 				String firstPart = writerName.substring(0, writerName.lastIndexOf('.'));
 				writerName = firstPart.concat(".eccs");
 				AceConfig.config.setChangeSetWriterFileName(writerName);
 			}
-
 			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".eccs", new EConceptChangeSetWriter(
 					new File(AceConfig.config.getChangeSetRoot(),
 							AceConfig.config.getChangeSetWriterFileName()),
@@ -404,25 +407,19 @@ public class WorkbenchRunner {
 			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls", new CommitLog(new File(
 					AceConfig.config.getChangeSetRoot(), "commitLog.xls"),
 					new File(AceConfig.config.getChangeSetRoot(), "."
-							+ "commitLog.xls")));
-
-			
+							+ "commitLog.xls")));			
 			int successCount = 0;
 			int frameCount = 0;
 
 			for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
 				frameCount++;
+				AceLog.getAppLog().info("421");
 				if (ace.isActive()) {
 					AceFrameConfig afc = (AceFrameConfig) ace;
 					afc.setMasterConfig(AceConfig.config);
-					
-					
-					
-					
-					
 					boolean login = true;
-					while (login) {
-						/*if (frameCount == 1) {
+					/*while (login) {
+						if (frameCount == 1) {
 							if (ace.getPassword().equals(prompter.getPassword())) {
 								if (ace.getUsername().equals(prompter.getUsername()) == false) {
 									AceConfig.config.setUsername(ace.getUsername());
@@ -466,11 +463,12 @@ public class WorkbenchRunner {
 							if (n == JOptionPane.YES_OPTION) {
 								login = true;
 							}
-						}*/
-					}
+						}
+					}*/
 					
 					if (ace.isAdministrative()) {
 						successCount++;
+						AceLog.getAppLog().info("About to handleAdministrativeFrame"); 
 						handleAdministrativeFrame(prompt, ace);
 					}
 					else{
@@ -478,6 +476,7 @@ public class WorkbenchRunner {
 						if (successCount == 1 && svnHelper != null) {
 							ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
 						}
+						AceLog.getAppLog().info("About to handleNormalFrame"); 
 						handleNormalFrame(ace);
 					}	
 					
@@ -485,7 +484,7 @@ public class WorkbenchRunner {
 				}
 			}
 			
-			
+			AceLog.getAppLog().info("1");
 
 			if (successCount == 0) {
 				JOptionPane.showMessageDialog(LogWithAlerts
@@ -504,6 +503,9 @@ public class WorkbenchRunner {
 					processFile(dir, lc);
 				}
 			}
+			
+			AceLog.getAppLog().info(" About to AceConfig.config.save()");
+			
 			AceConfig.config.save();
 			// Startup other queues here...
 			List<String> queuesToRemove = new ArrayList<String>();
@@ -601,7 +603,8 @@ public class WorkbenchRunner {
 			loginDialog.setLocation((d.width / 2)
 					- (loginDialog.getWidth() / 2), (d.height / 2)
 					- (loginDialog.getHeight() / 2));
-			this.latch = latch;*/
+			*/
+			this.latch = latch;
 		}
 
 		@Override
@@ -663,6 +666,7 @@ public class WorkbenchRunner {
 				OpenFrames.removeFrameListener(fl);
                 latch.countDown();
 			} catch (Exception e) {
+				e.printStackTrace();
                 latch.countDown();
 				AceLog.getAppLog().alertAndLogException(e);
 			}
