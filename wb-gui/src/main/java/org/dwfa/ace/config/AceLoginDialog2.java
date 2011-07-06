@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Hashtable;
+import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -41,6 +42,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.svn.Svn;
+import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
@@ -82,6 +84,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     //private List<File> profiles = new ArrayList<File>();
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
+
     
     public String svnUrl;
 
@@ -161,7 +164,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
         loginButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(title);
+        setTitle(getTitle());
         setResizable(false);
         setModal(true);
 
@@ -171,7 +174,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
         if(nameProf.size() == 0){
         	svnConnectCheckBox.setEnabled(false);
         }
-        svnConnectCheckBox.setText("Connect to subversion");
+        svnConnectCheckBox.setText("Connect to network resources");
         svnConnectCheckBox.addActionListener(this);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -274,8 +277,16 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
     		AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
-    		String em = checkSVN(getSvnUrl(),un,pw);	
-    		AceLog.getAppLog().info("em = "+em);
+    		boolean ok  = checkSVN(getSvnUrl(),un,pw);	
+    		if(ok){
+    			this.prompt.setUsername(un);
+    			this.prompt.setPassword(pw);
+    			this.dispose();
+    		}
+    		//AceLog.getAppLog().info("em = "+em);
+    	}
+    	if(!passwordField.isEnabled()){
+    		this.prompt.setPassword(null);
     	}
     	
     	AceLog.getAppLog().info("Check4Debug");    	
@@ -293,8 +304,8 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     }
     
     
-    private String checkSVN(String url, String uname, String pw){
-    	
+    private boolean checkSVN(String url, String uname, String pw){
+    	boolean ok = true;
     	SVNRepository repo= null;
     	 try { 
     		 AceLog.getAppLog().info("checkSVN url = "+url);  
@@ -308,29 +319,26 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	     AceLog.getAppLog().info("checkSVN OK2");
     	     repo.setAuthenticationManager(authManager);
     	     repo.testConnection();
-    	 } catch (SVNException e){
-    	     e.printStackTrace();
     	     
+    	 }catch (SVNAuthenticationException svnAEx){
+    		 //AceLog.getAppLog().severe("Authorization Exception"); 
+    		 //setTitle("Authorization failed please check Username and Password");
+    		 ok = false;
+    		 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Authorization failed please check Username and Password", svnAEx);
+
+    		 
+    	 }
+    	 catch (SVNException e){
+    		 ok = false;
+    	     //e.printStackTrace();
+    	     //AceLog.getAppLog().severe("SVNException Exception");
+    		 //setTitle("Failed to connect to to repository");
+    	     AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to connect to to repository. \n Please check network and URL. Currently trying to use: \n "+url+" \n Error = "+e.getMessage(), e);
     	 }
 
     	
     	
-    	
-    	
-    	String err_msg = null;
-		//try to see if the login credentials work with svn
-		
-		
-		// see that there is a svn repo defined
-		
-		
-		// then see if you can reach it
-		
-		
-		// then see if the creds work
-    	
-    	
-    	return err_msg;
+    	return ok;
     	
     }
 
@@ -477,5 +485,20 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
 
 	public void setSvnUrl(String svnUrl) {
 		this.svnUrl = svnUrl;
+	}
+	
+    public String getTitle() {
+    	if(title == null || title.length() == 0){
+    		title = "Welcome to the Workbench";
+    	}
+    	return title;
+        }
+
+	public SvnPrompter getPrompt() {
+		return prompt;
+	}
+
+	public void setPrompt(SvnPrompter prompt) {
+		this.prompt = prompt;
 	}
 }

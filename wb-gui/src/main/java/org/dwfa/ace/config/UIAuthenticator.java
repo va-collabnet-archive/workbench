@@ -67,11 +67,11 @@ public class UIAuthenticator {
 		baseURL = testURL;
 		this.prompt = prompt;
 		initPrompter();
+		AceLog.getAppLog().info("authenticate un "+this.prompt.getUsername()+" pw "+this.prompt.getPassword());
 		
-		String result = testCredentials();
 		
 		
-		return result;
+		return "";
 	}
 	
 	private void initPrompter(){
@@ -79,6 +79,7 @@ public class UIAuthenticator {
 			AceLog.getAppLog().info("No name found so prompting");
 			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame());
 			ald.setSvnUrl(baseURL);
+			ald.setPrompt(prompt);
 			ald.setVisible(true);
 			//prompt.setParentContainer(getParentFrame());	
 			//prompt.prompt("please set password", userName);
