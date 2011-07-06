@@ -3,6 +3,7 @@ package org.dwfa.ace.config;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
@@ -11,6 +12,7 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.OpenFrames;
 /**
  * A shell around SVNPrompter to allow for changes 
@@ -19,7 +21,7 @@ import org.dwfa.bpa.util.OpenFrames;
  */
 public class UIAuthenticator {
 	
-	
+	public File profile;
 
 	//Store UN etc in the SVN Prompter
 	public SvnPrompter prompt = new SvnPrompter();
@@ -27,6 +29,7 @@ public class UIAuthenticator {
 	public String baseURL;
 	
 	private JFrame parentFrame = null;
+	private AceProfileManager apm = new AceProfileManager();
 	
 	public void setParentFrame(JFrame parentFrame) {
 		this.parentFrame = parentFrame;
@@ -66,10 +69,18 @@ public class UIAuthenticator {
 		public String authenticate(SvnPrompter prompt, String testURL){	
 		baseURL = testURL;
 		this.prompt = prompt;
-		initPrompter();
+		try {
+			apm.processProfiles();
+			initPrompter();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 		AceLog.getAppLog().info("authenticate un "+this.prompt.getUsername()+" pw "+this.prompt.getPassword());
-		
-		
+		apm.setUserName(this.prompt.getUsername());
+		setProfile(apm.getProfile());
+		AceLog.getAppLog().info("authenticate this profile = "+getProfile().getAbsoluteFile());
 		
 		return "";
 	}
@@ -78,11 +89,18 @@ public class UIAuthenticator {
 		if(prompt.getUsername() == null || prompt.getUsername().length() == 0){
 			AceLog.getAppLog().info("No name found so prompting");
 			AceLoginDialog2 ald = new AceLoginDialog2(getParentFrame());
+			//ald.setProfile(getProfile());
 			ald.setSvnUrl(baseURL);
 			ald.setPrompt(prompt);
 			ald.setVisible(true);
 			//prompt.setParentContainer(getParentFrame());	
 			//prompt.prompt("please set password", userName);
+			/*try {
+				AceLog.getAppLog().info("aaaa profile =  "+ald.getProfile().getName());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		}
 		else{
 			AceLog.getAppLog().info("Name found "+prompt.getUsername());
@@ -104,6 +122,19 @@ public class UIAuthenticator {
 
 	public void setPrompt(SvnPrompter prompt) {
 		this.prompt = prompt;
+	}
+
+
+	public File getProfile() {
+		if(profile == null){
+			profile = new File("");
+		}
+		return profile;
+	}
+
+
+	public void setProfile(File profile) {
+		this.profile = profile;
 	}
 
 	

@@ -65,7 +65,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
  */
 public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListener {
     private static final long serialVersionUID = -4458854470566944865L;
-    private File profile;
+    
 	//Store UN etc in the SVN Prompter
 	public SvnPrompter prompt = new SvnPrompter();
 	
@@ -78,10 +78,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private JComponent userControl;
     //private javax.swing.JComboBox profileSelectionBox;
     private javax.swing.JCheckBox svnConnectCheckBox;
-
-    public String profileDirName = "profiles";
-    public String profileFileEnding= ".ace";
     //private List<File> profiles = new ArrayList<File>();
+    
+    
+    //public String profileDirName = "profiles";
+    //public String profileFileEnding= ".ace";
+    //private File profile;
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
 
@@ -91,7 +93,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     public AceLoginDialog2(JFrame topFrame) {
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        setProfiles();
+        //setProfiles();
         initComponents();
     }
     
@@ -139,13 +141,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	//return retval;
     }
     
-    private String getUserNameFromProfileFN(String proFN){
-    	
-    	int i = proFN.indexOf(profileFileEnding);
-    	return proFN.substring(0,i);
-    	
-    	
-    }
+
 
     private void initComponents() {
 
@@ -281,12 +277,16 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     		if(ok){
     			this.prompt.setUsername(un);
     			this.prompt.setPassword(pw);
+    			//getProfile();
     			this.dispose();
     		}
     		//AceLog.getAppLog().info("em = "+em);
     	}
     	if(!passwordField.isEnabled()){
-    		this.prompt.setPassword(null);
+    		this.prompt.setUsername(un);
+			this.prompt.setPassword(null);
+			//getProfile();
+			this.dispose();
     	}
     	
     	AceLog.getAppLog().info("Check4Debug");    	
@@ -347,12 +347,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
      * 
      * @param profile
      */
-    private void loginButtonActionPerformed(File profile) {
+    /*private void loginButtonActionPerformed(File profile) {
         if (profile != null) {
             setProfile(profile);
         }
         dispose();
-    }
+    }*/
 
     private static class ProfileRenderer extends DefaultListCellRenderer {
 
@@ -385,13 +385,11 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
      * @throws TaskFailedException if there is no profile set. NB
      *             profileDirToSet can be null.
      */
-    public File getUserProfile() throws TaskFailedException {
+/*    public File getUserProfile() throws TaskFailedException {
         //if (profileDirToSet != null) {
             //List<File> profiles = new ArrayList<File>();
             getProfiles(new File(profileDirName));
-           /* if(profiles.size() > 1){
-            	setProfileSelectionBox();
-            }*/
+
             
        // }
 
@@ -402,10 +400,8 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     
     public void setProfiles(){
     	getProfiles(new File(profileDirName));
-        /*if(profiles.size() > 1){
-        	setProfileSelectionBox();
-        }*/
-    }
+
+    }*/
    
     
    /*private void setProfileSelectionBox(){
@@ -416,7 +412,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     } */
     
 
-    private void getProfiles(File dir) {
+/*    private void getProfiles(File dir) {
         if (dir.listFiles() != null) {
             for (File f : dir.listFiles()) {
                 if (f.isDirectory()) {
@@ -430,7 +426,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
             }
         }
     }
-
+*/
     /**
      * Entered password.
      * 
@@ -459,16 +455,21 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
      * @return File
      * @throws TaskFailedException if the profile is null.
      */
-    private File getProfile() throws TaskFailedException {
-        if (profile == null) {
-            throw new TaskFailedException("No Profile selected.");
-        }
+   /* public File getProfile() {
+        //if (profile == null) {
+    	AceLog.getAppLog().info("getProfile nameProf size = "+nameProf.size() +" prompt.getUsername()) "+prompt.getUsername());
+        	if(nameProf.get(prompt.getUsername()) != null){
+        		profile = nameProf.get(prompt.getUsername());
+        		AceLog.getAppLog().info("getProfile profile = "+profile.getName());
+        	}
+            //throw new TaskFailedException("No Profile selected.");
+       // }
         return profile;
     }
 
-    private void setProfile(File profileToSet) {
+    public void setProfile(File profileToSet) {
         this.profile = profileToSet;
-    }
+    }*/
 
     @Override
     public void actionPerformed(ActionEvent e) {
