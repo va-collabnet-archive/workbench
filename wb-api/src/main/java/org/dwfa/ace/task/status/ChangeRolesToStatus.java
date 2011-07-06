@@ -59,23 +59,30 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.WizardBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
-public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN)})
+public class ChangeRolesToStatus extends AbstractTask implements ActionListener {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
-
     private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private TermEntry newStatus = new TermEntry(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
@@ -84,15 +91,16 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
     private transient Condition returnCondition;
     protected transient boolean done;
     private I_ConfigAceFrame config;
+    private ViewCoordinate tempVc;
     private ViewCoordinate vc;
     private I_GetConceptData concept;
-    
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(newStatus);
         out.writeObject(activeConceptPropName);
         out.writeObject(uuidListListPropName);
-        
+
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -109,51 +117,53 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
-
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-    	 try {
-    		 done = false; //reset
-         	 wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
-         	 config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-             concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
-             vc = config.getViewCoordinate();
-             
-             DoSwing swinger = new DoSwing(process);
-             swinger.start();
-             swinger.get();
-             synchronized (this) {
-                 this.waitTillDone(worker.getLogger());
-             }
-             
-             if (SwingUtilities.isEventDispatchThread()) {
-                 doRun(process, worker);
-             } else {
-                 SwingUtilities.invokeAndWait(new Runnable() {
-                     public void run() {
-                         doRun(process, worker);
-                     }
-                 });
-             }
+        try {
+            done = false; //reset
+            wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
+            config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            concept = (I_GetConceptData) process.getProperty(activeConceptPropName);
+            ViewCoordinate vc = config.getViewCoordinate();
+            tempVc = new ViewCoordinate(vc);
+            tempVc.setRelAssertionType(RelAssertionType.STATED);
 
-         } catch (InterruptedException e) {
-             throw new TaskFailedException(e);
-         } catch (InvocationTargetException e) {
-             throw new TaskFailedException(e);
-         } catch (IllegalArgumentException e) {
-             throw new TaskFailedException(e);
-         } catch (ExecutionException e) {
-             throw new TaskFailedException(e);
-         } catch (IntrospectionException e) {
-        	 throw new TaskFailedException(e);
-         } catch (IllegalAccessException e) {
-        	 throw new TaskFailedException(e);
-         }
+            DoSwing swinger = new DoSwing(process);
+            swinger.start();
+            swinger.get();
+            synchronized (this) {
+                this.waitTillDone(worker.getLogger());
+            }
 
-         return returnCondition;
+            if (SwingUtilities.isEventDispatchThread()) {
+                doRun(process, worker);
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    public void run() {
+                        doRun(process, worker);
+                    }
+                });
+            }
+
+        } catch (InterruptedException e) {
+            throw new TaskFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalArgumentException e) {
+            throw new TaskFailedException(e);
+        } catch (ExecutionException e) {
+            throw new TaskFailedException(e);
+        } catch (IntrospectionException e) {
+            throw new TaskFailedException(e);
+        } catch (IllegalAccessException e) {
+            throw new TaskFailedException(e);
+        }
+
+        return returnCondition;
     }
-    
+
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
 
         try {
@@ -167,34 +177,34 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
             }
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
-            
+
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
-            	Collection<? extends RelationshipChronicleBI> relsOut = concept.getRelsOutgoing();
-            	//get rels that are NOT isa
+                Collection<? extends RelationshipChronicleBI> relsOut = concept.getRelsOutgoing();
+                //get rels that are NOT isa
                 for (RelationshipChronicleBI rel : relsOut) {
-                    for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                        if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
-                        	//change status
-                        	for (PathBI editPath : config.getEditingPathSet()) {
-                        		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-    	                    	I_RelPart newPart = (I_RelPart) relv.makeAnalog(
-    	                    			newStatusConcept.getConceptNid(), 
-    	                    			config.getDbConfig().getUserConcept().getNid(),
-    	                    			editPath.getConceptNid(), 
-    	                    			Long.MAX_VALUE);
-                        	}
+                    for (RelationshipVersionBI relv : rel.getVersions(tempVc)) {
+                        if (!(tempVc.getIsaTypeNids().contains(relv.getTypeNid()))) {
+                            //change status
+                            for (PathBI editPath : config.getEditingPathSet()) {
+                                Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
+                                I_RelPart newPart = (I_RelPart) relv.makeAnalog(
+                                        newStatusConcept.getConceptNid(),
+                                        config.getDbConfig().getUserConcept().getNid(),
+                                        editPath.getConceptNid(),
+                                        Long.MAX_VALUE);
+                            }
 
                         }
                     }
-                }                
+                }
                 Terms.get().addUncommitted(concept);
-                
-            }else if (returnCondition == Condition.PREVIOUS){
-            	process.setProperty(uuidListListPropName, uuidList);
-            	wizard.setWizardPanelVisible(false);
-            }else{
-            	 wizard.setWizardPanelVisible(false);
+
+            } else if (returnCondition == Condition.PREVIOUS) {
+                process.setProperty(uuidListListPropName, uuidList);
+                wizard.setWizardPanelVisible(false);
+            } else {
+                wizard.setWizardPanelVisible(false);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,15 +212,16 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
             wizard.setWizardPanelVisible(false);
         }
     }
-    
+
     private class DoSwing extends SwingWorker<Boolean> {
 
         I_EncodeBusinessProcess process;
-        
+
         public DoSwing(I_EncodeBusinessProcess process) {
             super();
             this.process = process;
             testForTarget();
+            testForRefersTo();
         }
 
         @Override
@@ -221,24 +232,24 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
 
         @Override
         protected void finished() {
-        	if(uuidList.size() == 0){
-            	returnCondition = Condition.CONTINUE;
-            	wizard.setWizardPanelVisible(false);
-            	done = true;
-    	        notifyTaskDone();
-            }else {
-            	wizard.setWizardPanelVisible(true);
-            	JPanel wizardPanel = wizard.getWizardPanel(); 
-            	//make wizard panel
-            	Component[] components = wizardPanel.getComponents();
+            if (uuidList.size() == 0) {
+                returnCondition = Condition.CONTINUE;
+                wizard.setWizardPanelVisible(false);
+                done = true;
+                notifyTaskDone();
+            } else {
+                wizard.setWizardPanelVisible(true);
+                JPanel wizardPanel = wizard.getWizardPanel();
+                //make wizard panel
+                Component[] components = wizardPanel.getComponents();
                 for (int i = 0; i < components.length; i++) {
                     wizardPanel.remove(components[i]);
                 }
-                
+
                 //add concepts
-                wizardPanel.add(new JLabel("The concept is a target of a relationship in another concept(s)."));
+                wizardPanel.add(new JLabel("<html>The concept is a target of a relationship in another concept(s) <br>or a target in the  'refers to' refset"));
                 wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"));
-                
+
                 //add buttons
                 wizardPanel.add(new JLabel(" "));
                 JButton updateButton = new JButton("add to list");
@@ -250,62 +261,94 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
             }
         }
     }
-    
-    private void testForTarget(){
-    	try{
-        	//find roles which concept is target of
+
+    private void testForTarget() {
+        try {
+            //find roles which concept is target of
             Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelsIncoming();
-            if(relsIn == null){
-            	returnCondition = Condition.CONTINUE;
-            	done = true;
-    	        notifyTaskDone();
-            }else{
-            	uuidList = new ArrayList<List<UUID>>();
+            if (relsIn == null) {
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                notifyTaskDone();
+            } else {
+                uuidList = new ArrayList<List<UUID>>();
                 for (RelationshipChronicleBI rel : relsIn) {
-                	//for(I_RelPart rp : rel.getMutableParts())
-                    for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                    	if(relv.isStated()){
-                    		if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
-                        		UUID uuid = Terms.get().nidToUuid(rel.getConceptNid());
-                        		List<UUID> list = new ArrayList<UUID>();
-                        		list.add(uuid);
-                        		uuidList.add(list);
-                        	}
-                    	}
+                    //for(I_RelPart rp : rel.getMutableParts())
+                    Collection<? extends RelationshipVersionBI> relVersions = rel.getVersions(tempVc);
+                    for (RelationshipVersionBI relv : relVersions) {
+                        if (relv.isStated()) {
+                            if (!(tempVc.getIsaTypeNids().contains(relv.getTypeNid()))) {
+                                UUID uuid = Terms.get().nidToUuid(rel.getConceptNid());
+                                List<UUID> list = new ArrayList<UUID>();
+                                list.add(uuid);
+                                uuidList.add(list);
+                            }
+                        }
                     }
                 }
-            }               
-        }catch (IOException e){
-        	e.printStackTrace();
-        	returnCondition = Condition.ITEM_CANCELED;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            returnCondition = Condition.ITEM_CANCELED;
         }
     }
-    
-    private class updateActionListener implements ActionListener{
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			returnCondition = Condition.PREVIOUS;
-			done = true;
-	        notifyTaskDone();
-		}
-    	
+    private void testForRefersTo() {
+
+        ConceptSpec REFERS_TO =
+                new ConceptSpec("Refers To Refset",
+                UUID.fromString("1b122b8f-172f-53d5-a2e2-eb1161737c2a"));
+
+        try {
+            //find if concept is member of Refers To refset
+            ConceptChronicleBI refexConcept = Ts.get().getConcept(REFERS_TO.getLenient().getNid());
+            Collection<? extends RefexCnidVersionBI<?>> refexMembers =
+                    (Collection<? extends RefexCnidVersionBI<?>>) refexConcept.getCurrentRefsetMembers(tempVc);
+            int count = 0;
+            for (RefexCnidVersionBI member : refexMembers) {
+                if (member.getCnid1() == concept.getNid()) {
+                    List<UUID> uuids = Ts.get().getUuidsForNid(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
+                    uuidList.add(uuids);
+                    count++;
+                }
+            }
+            if (count == 0) {
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                notifyTaskDone();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            returnCondition = Condition.ITEM_CANCELED;
+        }
     }
-    
+
+    private class updateActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            returnCondition = Condition.PREVIOUS;
+            done = true;
+            notifyTaskDone();
+        }
+    }
+
     @Override
-	public void actionPerformed(ActionEvent e) {
-		wizard.setWizardPanelVisible(false);
-		returnCondition = Condition.ITEM_CANCELED;
-		done = true;
+    public void actionPerformed(ActionEvent e) {
+        wizard.setWizardPanelVisible(false);
+        returnCondition = Condition.ITEM_CANCELED;
+        done = true;
         notifyTaskDone();
-	}
-    
-    protected void restore(final I_EncodeBusinessProcess process, final I_Work worker) throws 
-    				InterruptedException, InvocationTargetException {
+    }
+
+    protected void restore(final I_EncodeBusinessProcess process, final I_Work worker) throws
+            InterruptedException, InvocationTargetException {
         if (SwingUtilities.isEventDispatchThread()) {
             doRun(process, worker);
         } else {
             SwingUtilities.invokeAndWait(new Runnable() {
+
                 public void run() {
                     doRun(process, worker);
                 }
@@ -313,7 +356,6 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
         }
     }
 
-    
     protected void waitTillDone(Logger l) {
         while (!this.isDone()) {
             try {
@@ -323,23 +365,23 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
             }
         }
     }
-    
+
     protected void notifyTaskDone() {
-		synchronized (ChangeRolesToStatus.this) {
-			ChangeRolesToStatus.this.notifyAll();
+        synchronized (ChangeRolesToStatus.this) {
+            ChangeRolesToStatus.this.notifyAll();
         }
-	}
-    
+    }
+
     public boolean isDone() {
         return this.done;
     }
-    
+
     public Collection<Condition> getConditions() {
-    	return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
+        return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
 
     public String getActiveConceptPropName() {
@@ -357,7 +399,7 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener{
     public void setNewStatus(TermEntry newStatus) {
         this.newStatus = newStatus;
     }
-    
+
     public String getUuidListListPropName() {
         return uuidListListPropName;
     }
