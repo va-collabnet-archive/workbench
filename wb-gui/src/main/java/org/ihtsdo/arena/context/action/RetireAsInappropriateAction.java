@@ -113,7 +113,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
         c.weighty = 0;
         c.gridwidth = 2;
         c.anchor = GridBagConstraints.EAST;
-        wizardPanel.add(new JLabel("<html>Please add the concept(s) to which <br>the synonym should refer:"), c);
+        wizardPanel.add(new JLabel("<html>Please add the concept to which <br>the synonym should refer:"), c);
 
         // Add the processing buttons
         c.weightx = 0.0;
