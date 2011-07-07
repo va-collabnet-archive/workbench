@@ -20,7 +20,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetReader;
 
 /**
  * @author Jesse Efron
@@ -48,8 +48,8 @@ public class ListStateTransitionMojo extends AbstractMojo {
         try {
            
 
-            StateTransitionRefset refset = new StateTransitionRefset();
-            HashSet<String> members = getRefsetMembers(refset.getRefsetId());
+            StateTransitionRefsetReader reader = new StateTransitionRefsetReader();
+            HashSet<String> members = getRefsetMembers(reader.getRefsetNid());
             
             printRefsetMembers(members);
 		} catch (Exception e) {

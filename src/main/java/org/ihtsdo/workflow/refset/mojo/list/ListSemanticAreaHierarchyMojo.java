@@ -20,7 +20,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefset;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetReader;
 
 /**
  * @author Jesse Efron
@@ -46,8 +46,8 @@ public class ListSemanticAreaHierarchyMojo extends AbstractMojo {
     {
         System.setProperty("java.awt.headless", "true");
         try {
-            SemanticAreaHierarchyRefset refset = new SemanticAreaHierarchyRefset();
-            HashSet<String> members = getRefsetMembers(refset.getRefsetId());            
+            SemanticHierarchyRefsetReader reader = new SemanticHierarchyRefsetReader();
+            HashSet<String> members = getRefsetMembers(reader.getRefsetNid());            
             printRefsetMembers(members);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to read semantic area hierarchy refset with error: " + e.getMessage());

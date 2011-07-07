@@ -20,7 +20,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefset;
+import org.ihtsdo.workflow.refset.WorkflowRefset;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetReader;
 
 /**
  * @author Jesse Efron
@@ -46,8 +47,8 @@ public class ListEditorCategoryMojo extends AbstractMojo {
     {
         System.setProperty("java.awt.headless", "true");
         try {
-            EditorCategoryRefset refset = new EditorCategoryRefset();
-            HashSet<String> members = getRefsetMembers(refset.getRefsetId());
+        	EditorCategoryRefsetReader reader = new EditorCategoryRefsetReader();
+            HashSet<String> members = getRefsetMembers(reader.getRefsetNid());
             
             printRefsetMembers(members);
 		} catch (Exception e) {

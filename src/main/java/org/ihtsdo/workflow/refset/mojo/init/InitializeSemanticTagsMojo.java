@@ -13,7 +13,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetReader;
 import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetWriter;
 
 
@@ -56,7 +56,7 @@ public class InitializeSemanticTagsMojo extends AbstractMojo {
         System.setProperty("java.awt.headless", "true");
         try {
 
-        	SemanticTagsRefset refset = new SemanticTagsRefset();
+        	SemanticTagsRefsetReader refset = new SemanticTagsRefsetReader();
             I_TermFactory tf = Terms.get();
             
             writer = new SemanticTagsRefsetWriter();
