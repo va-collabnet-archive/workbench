@@ -574,7 +574,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 }
                 List<? extends I_ExtendByRefVersion> parts = new ArrayList<I_ExtendByRefVersion>();
                 if (!host.getShowHistory()) {
-                    parts = ext.getTuples(allowedStatus, null,
+                    parts = ext.getTuples(allowedStatus, host.getConfig().getViewPositionSetReadOnly(),
                             host.getConfig().getPrecedence(), host.getConfig().getConflictResolutionStrategy());
                 } else {
                     parts = ext.getTuples();
