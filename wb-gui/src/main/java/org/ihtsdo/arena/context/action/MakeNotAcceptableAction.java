@@ -40,95 +40,108 @@ public class MakeNotAcceptableAction extends AbstractAction {
         this.desc = fact.getComponent();
         this.dialect = dialect;
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
-    	I_ConfigAceFrame config;
-		try {
-			I_AmPart componentVersion;
-			config = Terms.get().getActiveAceFrameConfig();
-			TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
-	                config.getViewCoordinate());
-			ViewCoordinate vc = config.getViewCoordinate();
-			Collection<? extends RefexChronicleBI> refexes =
-                desc.getCurrentRefexes(vc);
-		
-			if(dialect.equals("en-us")){
-				int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
-	            if (refexes != null) {
-	                for (RefexChronicleBI refex : refexes) {
-	                	if (refex.getCollectionNid() == evalRefsetNid) {
-	                		//make analog
-	                		componentVersion = (I_AmPart) refex;
-	                		AnalogBI analog = null;
-	                		for (PathBI ep : config.getEditingPathSet()) {
-	                            analog = componentVersion.makeAnalog(
-	                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-	                                    config.getDbConfig().getUserConcept().getNid(),
-	                                    ep.getConceptNid(),
-	                                    Long.MAX_VALUE);
-	                        }
-	                		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-	                		//test member type
-		                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
-		                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-		                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
-		                			
-		                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+        I_ConfigAceFrame config;
+        try {
+            I_AmPart componentVersion;
+            config = Terms.get().getActiveAceFrameConfig();
+            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                    config.getViewCoordinate());
+            ViewCoordinate vc = config.getViewCoordinate();
+            Collection<? extends RefexChronicleBI> refexes =
+                    desc.getCurrentRefexes(vc);
 
-		                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-		                            Terms.get().addUncommitted(concept);
-		                			}else{
-				                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-				                	}
-		                	}
-	                	}
-	                }
-	            }else if(dialect.equals("en-gb")){
-	            	int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
-	            	if (refexes != null) {
-		                for (RefexChronicleBI refex : refexes) {
-		                	if (refex.getCollectionNid() == evalRefsetNid) {
-		                		//make analog
-		                		componentVersion = (I_AmPart) refex;
-		                		AnalogBI analog = null;
-		                		for (PathBI ep : config.getEditingPathSet()) {
-		                            analog = componentVersion.makeAnalog(
-		                                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-		                                    config.getDbConfig().getUserConcept().getNid(),
-		                                    ep.getConceptNid(),
-		                                    Long.MAX_VALUE);
-		                        }
-		                		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-		                		//test member type
-			                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
-			                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-			                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
-			                			
-			                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+            if (dialect.equals("en-us")) {
+                int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
+                if (refexes != null) {
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.getCollectionNid() == evalRefsetNid) {
+                            if (refex.isUncommitted()) {
+                                RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
+                                refexAnalog.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+                                I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
+                                Terms.get().addUncommitted(concept);
+                            } else {
+                                //make analog
+                                componentVersion = (I_AmPart) refex;
+                                AnalogBI analog = null;
+                                for (PathBI ep : config.getEditingPathSet()) {
+                                    analog = componentVersion.makeAnalog(
+                                            ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                            config.getDbConfig().getUserConcept().getNid(),
+                                            ep.getConceptNid(),
+                                            Long.MAX_VALUE);
+                                }
+                                RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
+                                //test member type
+                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
+                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 
-			                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-			                            Terms.get().addUncommitted(concept);
-			                			}else{
-					                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-					                	}
-			                	}
-		                	}
-		                }
-			}else{
-				throw new UnsupportedOperationException("Dialect not supported");
-			}
-			
-			
-		} catch (TerminologyException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (IOException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (PropertyVetoException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-    	
-       
+                                    rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+
+                                    I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
+                                    Terms.get().addUncommitted(concept);
+                                } else {
+                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (dialect.equals("en-gb")) {
+                int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
+                if (refexes != null) {
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.getCollectionNid() == evalRefsetNid) {
+                            if (refex.isUncommitted()) {
+                                RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
+                                refexAnalog.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+                                I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
+                                Terms.get().addUncommitted(concept);
+                            } else {
+                                //make analog
+                                componentVersion = (I_AmPart) refex;
+                                AnalogBI analog = null;
+                                for (PathBI ep : config.getEditingPathSet()) {
+                                    analog = componentVersion.makeAnalog(
+                                            ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                            config.getDbConfig().getUserConcept().getNid(),
+                                            ep.getConceptNid(),
+                                            Long.MAX_VALUE);
+                                }
+                                RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
+                                //test member type
+                                if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                    RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
+                                    RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
+
+                                    rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+
+                                    I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
+                                    Terms.get().addUncommitted(concept);
+                                } else {
+                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                throw new UnsupportedOperationException("Dialect not supported");
+            }
+
+
+        } catch (TerminologyException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
+
     }
- 
 }
