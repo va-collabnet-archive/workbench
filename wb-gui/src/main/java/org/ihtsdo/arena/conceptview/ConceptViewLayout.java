@@ -34,6 +34,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -653,7 +654,19 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         return;
                     }
                     settings.getNavigator().updateHistoryPanel();
-
+                    
+                    //show subpanels which are uncomitted
+                    for (DragPanelDescription dc : activeDescriptionPanels) {
+                        if (stop) {
+                            return;
+                        }
+                        for(JComponent ref : dc.getRefexSubpanels()) {
+                            DragPanelExtension rp = (DragPanelExtension) ref;
+                            if(rp.getThingToDrag().isUncommitted()){
+                                rp.setVisible(true);
+                            }
+                        }
+                    }
                     for (DragPanelDescription dc : inactiveDescriptionPanels) {
                         if (stop) {
                             return;
