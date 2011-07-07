@@ -37,17 +37,11 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
     public int countRelAdded; // ADDED TO LIST
     private int countRelCharStated;
     private int countRelCharDefining;
-    private int countRelCharStatedInferred;
-    private int countRelCharStatedSubsumed;
-    private int countRelCharInferred;
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
@@ -103,9 +97,6 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
         countRelCharStated = 0;
         countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
-        countRelCharInferred = 0;
 
         setupCoreNids();
     }
@@ -143,9 +134,6 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
         countRelCharStated = 0;
         countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
-        countRelCharInferred = 0;
 
         setupCoreNids();
     }
@@ -158,16 +146,8 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-        isCh_DEFINING_CHARACTERISTIC =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-        isCh_STATED_AND_INFERRED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-        isCh_STATED_AND_SUBSUMED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
-        isCh_INFERRED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
+        isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
 
         snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
@@ -272,15 +252,6 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
             } else if (charId == isCh_STATED_RELATIONSHIP) {
                 keep = true;
                 countRelCharStated++;
-            } else if (charId == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
-                keep = true;
-                countRelCharStatedInferred++;
-            } else if (charId == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
-                keep = true;
-                countRelCharStatedSubsumed++;
-            } else if (charId == isCh_INFERRED_RELATIONSHIP) {
-                keep = true;
-                countRelCharInferred++;
             }
 
             if (keep) {
@@ -621,13 +592,9 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
         s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
         s.append("\t # attribs.size() > 1");
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
-        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
-        s.append("\r\n::: Inferred:         \t").append(countRelCharInferred);
-        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
-                + countRelCharStatedSubsumed + countRelCharInferred;
+        s.append("\r\n::: Inferred / Defining:\t").append(countRelCharDefining);
+        s.append("\r\n::: Stated:             \t").append(countRelCharStated);
+        int total = countRelCharStated + countRelCharDefining;
         s.append("\r\n:::            TOTAL=\t").append(total);
 
         s.append("\r\n::: ");

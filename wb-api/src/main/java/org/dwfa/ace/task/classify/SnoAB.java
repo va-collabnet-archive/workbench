@@ -54,7 +54,7 @@ public class SnoAB {
         try {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
             isaNid = config.getClassifierIsaType().getConceptNid();
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            isCURRENT = Rfx.getIsCURRENT();
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
                     .getUids());
         } catch (TerminologyException e) {

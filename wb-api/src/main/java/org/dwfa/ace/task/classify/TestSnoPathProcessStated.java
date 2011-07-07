@@ -58,8 +58,6 @@ public class TestSnoPathProcessStated extends AbstractTask {
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
 
@@ -289,25 +287,14 @@ public class TestSnoPathProcessStated extends AbstractTask {
             }
 
             // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            isLIMITED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE
-                    .getUids());
-            isMANDATORY_REFINABILITY = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP
-                            .getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf
-                    .uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP
-                            .getUids());
+            isCURRENT = Rfx.getIsCURRENT();
+            isLIMITED = Rfx.getIsLIMITED();
+            isRETIRED = Rfx.getIsRETIRED();
+            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
+            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
+            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
+            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
+            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID
                     .getUids());
 

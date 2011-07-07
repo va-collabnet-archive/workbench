@@ -19,6 +19,7 @@ package org.dwfa.ace.task.classify;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
@@ -62,8 +63,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
     private int countRelDuplVersion = 0; // SAME PATH, SAME VERSION
     private int countRelCharStated = 0;
     private int countRelCharDefining = 0;
-    private int countRelCharStatedInferred = 0;
-    private int countRelCharStatedSubsumed = 0;
     private int countRelRefNot = 0;
     private int countRelRefOpt = 0;
     private int countRelRefMand = 0;
@@ -77,8 +76,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private int[] allowedRoles;
     // GUI
     I_ShowActivity gui = null;
@@ -109,8 +106,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
         countRelCharStated = 0;
         countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
 
         countRelRefNot = 0;
         countRelRefOpt = 0;
@@ -119,13 +114,13 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
     public void processConcept(I_GetConceptData concept) throws Exception {
         if (++countConSeen % 25000 == 0) {
-            logger.info("::: [SnoPathProcess] Concepts viewed:\t" + countConSeen);
+            logger.log(Level.INFO, "::: [SnoPathProcess] Concepts viewed:\t{0}", countConSeen);
         }
         int cNid = concept.getNid();
 
         if (concept.getConceptNid() != cNid) {
-            logger.info("::: [SnoPathProcess] concept.getConceptNid(" + concept.getConceptNid()
-                    + ") != concept.getNid(" + cNid + ")");
+            logger.log(Level.INFO, "::: [SnoPathProcess] concept.getConceptNid({0}) != concept.getNid({1})",
+                    new Object[]{concept.getConceptNid(), cNid});
         }
 
         if (cNid == rootNid) {
@@ -197,8 +192,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
         // STATISTICS VARIABLES
         int tmpCountRelCharStated = 0;
         int tmpCountRelCharDefining = 0;
-        int tmpCountRelCharStatedInferred = 0;
-        int tmpCountRelCharStatedSubsumed = 0;
         int tmpCountRelRefNot = 0;
         int tmpCountRelRefOpt = 0;
         int tmpCountRelRefMand = 0;
@@ -243,12 +236,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
                 } else if (p1c == isCh_STATED_RELATIONSHIP) {
                     keep = true;
                     tmpCountRelCharStated++;
-                } else if (p1c == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
-                    keep = true;
-                    tmpCountRelCharStatedInferred++;
-                } else if (p1c == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
-                    keep = true;
-                    tmpCountRelCharStatedSubsumed++;
                 }
 
                 // must FIND at least one SNOMED IS-A relationship
@@ -291,8 +278,6 @@ public class SnoPathProcess implements I_ProcessConcepts {
         if (isSnomedConcept || doNotCareIfHasSnomedIsa) {
             countRelCharStated += tmpCountRelCharStated;
             countRelCharDefining += tmpCountRelCharDefining;
-            countRelCharStatedInferred += tmpCountRelCharStatedInferred;
-            countRelCharStatedSubsumed += tmpCountRelCharStatedSubsumed;
 
             countRelRefNot += tmpCountRelRefNot;
             countRelRefOpt += tmpCountRelRefOpt;
@@ -312,18 +297,16 @@ public class SnoPathProcess implements I_ProcessConcepts {
             isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
             // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+            isCURRENT = Rfx.getIsCURRENT();
+            isRETIRED = Rfx.getIsRETIRED();
             // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
+            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
+            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
 
             // Characteristic
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
+            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
         } catch (TerminologyException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -355,12 +338,9 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
         s.append("\r\n::: rel version conflict:\t").append(countRelDuplVersion);
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
-        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
-        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
-                + countRelCharStatedSubsumed;
+        s.append("\r\n::: Defining/Inferred: \t").append(countRelCharDefining);
+        s.append("\r\n::: Stated:            \t").append(countRelCharStated);
+        int total = countRelCharStated + countRelCharDefining;
         s.append("\r\n:::            TOTAL=\t").append(total);
         s.append("\r\n::: ");
         s.append("\r\n::: Optional Refinability: \t").append(countRelRefOpt);

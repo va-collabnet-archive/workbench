@@ -1,7 +1,10 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,19 +35,13 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private int countConDuplVersion;
     private int countConAdded; // ADDED TO LIST
     public int countRelAdded; // ADDED TO LIST
-    private int countRelCharStated;
-    private int countRelCharDefining;
-    private int countRelCharStatedInferred;
-    private int countRelCharStatedSubsumed;
     private int countRelCharInferred;
+    private int countRelCharDefining;
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
-    private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
+    private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
@@ -55,6 +52,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private Logger logger;
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
+    private LinkedHashMap<Integer, Integer> charMap;
 
     public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
             I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos,
@@ -77,13 +75,12 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         countConAdded = 0; // ADDED TO SNOROCKET
         countRelAdded = 0; // ADDED TO SNOROCKET
 
-        countRelCharStated = 0;
-        countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
         countRelCharInferred = 0;
+        countRelCharDefining = 0;
 
         setupCoreNids();
+
+        charMap = new LinkedHashMap<Integer, Integer>(); // SCTID, COUNT
     }
 
     private void setupCoreNids() throws TerminologyException, IOException {
@@ -94,11 +91,8 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-        isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-        isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-        isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
-        isCh_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        isCh_INFERRED_RELATIONSHIP = Rfx.getIsCh_INFERRED_RELATIONSHIP();
+        isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
 
         snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
@@ -153,18 +147,17 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
                 if (charId == isCh_DEFINING_CHARACTERISTIC) {
                     keep = true;
                     countRelCharDefining++;
-                } else if (charId == isCh_STATED_RELATIONSHIP) {
-                    keep = true;
-                    countRelCharStated++;
-                } else if (charId == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
-                    keep = true;
-                    countRelCharStatedInferred++;
-                } else if (charId == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
-                    keep = true;
-                    countRelCharStatedSubsumed++;
                 } else if (charId == isCh_INFERRED_RELATIONSHIP) {
                     keep = true;
                     countRelCharInferred++;
+                } else {
+                    Integer count = charMap.get(charId);
+                    if (charMap.get(charId) == null) {
+                        charMap.put(charId, new Integer(0));
+                    } else {
+                        count += 1;
+                        charMap.put(charId, count);
+                    }
                 }
 
                 if (keep == true) {
@@ -206,16 +199,19 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
         s.append("\t # attribs.size() > 1");
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
-        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
-        s.append("\r\n::: Inferred:         \t").append(countRelCharInferred);
-        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
-                + countRelCharStatedSubsumed + countRelCharInferred;
+        s.append("\r\n::: Inferred:           \t").append(countRelCharInferred);
+        s.append("\r\n::: Defining:           \t").append(countRelCharDefining);
+        int total = countRelCharInferred + countRelCharDefining;
         s.append("\r\n:::            TOTAL=\t").append(total);
 
         s.append("\r\n::: ");
+        s.append("\r\n");
+
+        Set<Integer> ks = charMap.keySet();
+        for (Integer keyInteger : ks) {
+            s.append("\r\n::: Other char type: \t").append(keyInteger);
+            s.append("\tcount=\t").append(charMap.get(keyInteger));
+        }
         s.append("\r\n");
         return s.toString();
     }

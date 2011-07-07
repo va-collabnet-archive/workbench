@@ -177,7 +177,7 @@ public class SnoTable {
             return errStr;
         }
 
-        isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+        isCURRENT = Rfx.getIsCURRENT();
 
         if (config.getClassificationRoot() != null) {
             rootNid = tf.uuidToNative(config.getClassificationRoot().getUids());

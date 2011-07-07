@@ -86,8 +86,6 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int sourceUnspecifiedNid;
 
     // INPUT PATHS
@@ -656,18 +654,13 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 return Condition.STOP;
             }
 
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()); // 0
-            // CURRENT,
-            // 1
-            // RETIRED
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            isCURRENT = Rfx.getIsCURRENT(); // 0 CURRENT, 1 RETIRED
+            isRETIRED = Rfx.getIsRETIRED();
+            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
+            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
+            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
+            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
+            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
@@ -776,8 +769,6 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
 
         s.append("\r\n:::\t" + isCh_STATED_RELATIONSHIP + "\t : isCh_STATED_RELATIONSHIP");
         s.append("\r\n:::\t" + isCh_DEFINING_CHARACTERISTIC + "\t : isCh_DEFINING_CHARACTERISTIC");
-        s.append("\r\n:::\t" + isCh_STATED_AND_INFERRED_RELATIONSHIP + "\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
-        s.append("\r\n:::\t" + isCh_STATED_AND_SUBSUMED_RELATIONSHIP + "\t : isCh_STATED_AND_SUBSUMED_RELATIONSHIP");
         s.append("\r\n");
         return s.toString();
     }

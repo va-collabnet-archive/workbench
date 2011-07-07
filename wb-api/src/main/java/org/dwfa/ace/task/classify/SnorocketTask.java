@@ -74,6 +74,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 /**
  * 
@@ -132,8 +133,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
+    // :!!!:???: private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MIN_VALUE;
+    // :!!!:???: private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
@@ -156,7 +157,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     List<SnoRel> cClassSnoRels; // "Classifier Path" Relationships
     List<SnoRel> cRocketSnoRels; // "Snorocket Results Set" Relationships
     // USER INTERFACE
-    private Logger logger;
+    private static Logger logger;
     private I_TermFactory tf = null;
     private I_ConfigAceFrame config = null;
     private Precedence precedence;
@@ -166,6 +167,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     // INTERNAL
     private static boolean debug = false; // :DEBUG:
     private static boolean debugDump = false; // :DEBUG: save to files
+    private boolean usesRf2B = false;
 
     static {
         if (System.getProperties().get("SnorocketDebug") != null
@@ -350,8 +352,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             int[] rNidArray = setupRoleNids();
             int nextRIdx = rNidArray.length;
             if (rNidArray.length > 100) {
-                String errStr = "Role types exceeds 100. This will cause a memory issue. " +
-                        "Please check that role root is set to 'Concept mode attribute'";
+                String errStr = "Role types exceeds 100. This will cause a memory issue. "
+                        + "Please check that role root is set to 'Concept mode attribute'";
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
                         new TaskFailedException(errStr));
                 return Condition.STOP;
@@ -1267,13 +1269,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             // :TODO: isaNid & rootNid should come from preferences config
             isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
             rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
-            // :???: Should ROOT_ROLE be considered for addition to
-            // SNOMED.Concept
 
             if (config.getClassifierIsaType() != null) {
                 int checkIsaNid = tf.uuidToNative(config.getClassifierIsaType().getUids());
                 if (checkIsaNid != isaNid) {
-                    logger.severe("\r\n::: SERVERE ERROR isaNid MISMACTH ****");
+                    logger.severe("\r\n::: SEVERE ERROR isaNid MISMACTH ****");
                 }
             } else {
                 String errStr = "Classification 'Is a' not set in Classifier Preferences!";
@@ -1285,7 +1285,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             if (config.getClassificationRoot() != null) {
                 int checkRootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
                 if (checkRootNid != rootNid) {
-                    logger.severe("\r\n::: SERVERE ERROR rootNid MISMACTH ***");
+                    logger.severe("\r\n::: SEVERE ERROR rootNid MISMACTH ***");
                 }
             } else {
                 String errStr = "Classifier Root not set! Found: " + config.getEditingPathSet();
@@ -1305,17 +1305,15 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 return Condition.STOP;
             }
 
-            // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            isLIMITED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
+            isCURRENT = Rfx.getIsCURRENT();
+            isLIMITED = Rfx.getIsLIMITED();
+            isRETIRED = Rfx.getIsRETIRED();
+            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
+            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
+            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
+            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
+            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
+
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
@@ -1462,10 +1460,10 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
         s.append("\r\n:::\t").append(isCh_STATED_RELATIONSHIP).append("\t : isCh_STATED_RELATIONSHIP");
         s.append("\r\n:::\t").append(isCh_DEFINING_CHARACTERISTIC).append("\t : isCh_DEFINING_CHARACTERISTIC");
-        s.append("\r\n:::\t").append(isCh_STATED_AND_INFERRED_RELATIONSHIP);
-        s.append("\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
-        s.append("\r\n:::\t").append(isCh_STATED_AND_SUBSUMED_RELATIONSHIP);
-        s.append("\t : isCh_STATED_AND_SUBSUMED_RELATIONSHIP");
+        // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_INFERRED_RELATIONSHIP);
+        // :!!!:???: s.append("\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
+        // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_SUBSUMED_RELATIONSHIP);
+        // :!!!:???: s.append("\t : isCh_STATED_AND_SUBSUMED_RELATIONSHIP");
         s.append("\r\n");
         return s.toString();
     }
