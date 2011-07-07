@@ -55,8 +55,7 @@ import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
-import org.ihtsdo.tk.Ts; //this
-import org.dwfa.cement.ArchitectonicAuxiliary; //this
+import org.ihtsdo.tk.drools.facts.RefexFact;
 
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -113,6 +112,7 @@ rule "rule 4" #concept onto same concept
             component.time != Long.MAX_VALUE)
          not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
          not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
+         not $refex: RefexFact(context == Context.DROP_TARGET)
 
 
    then
