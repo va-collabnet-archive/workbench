@@ -9,6 +9,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.refset.WorkflowRefset;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
@@ -18,15 +19,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 * @author Jesse Efron
 * 
 */
-public class SemanticAreaHierarchyRefsetWriter extends WorkflowRefsetWriter {
+public class SemanticHierarchyRefsetWriter extends WorkflowRefsetWriter {
 	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMANTIC_PARENT_REL.getUids());
 	
-	public SemanticAreaHierarchyRefsetWriter() throws IOException, TerminologyException {
-		refset = new SemanticAreaHierarchyRefset();
+	public SemanticHierarchyRefsetWriter() throws IOException, TerminologyException {
+		super(WorkflowRefset.semanticAreaConcept);
 		fields = new SemanticAreaHierarchyRSFields();
-
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

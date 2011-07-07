@@ -2,12 +2,10 @@ package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -23,13 +21,9 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
 	private static boolean inUse = false;
 
-	public WorkflowHistoryRefsetWriter(boolean setupDatabaseObjects) throws IOException, TerminologyException {
-		super(setupDatabaseObjects);
-		refset = new WorkflowHistoryRefset(setupDatabaseObjects);
+	public WorkflowHistoryRefsetWriter() throws IOException, TerminologyException {
+		super(workflowHistoryConcept);
 		fields = new WorkflowHistoryRSFields();
-		
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId(), setupDatabaseObjects);
 	}
 	
 	// Statics

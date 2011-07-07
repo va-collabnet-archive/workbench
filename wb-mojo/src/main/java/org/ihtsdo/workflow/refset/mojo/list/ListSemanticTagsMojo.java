@@ -20,7 +20,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetReader;
 
 /**
  * @author Jesse Efron
@@ -46,8 +46,8 @@ public class ListSemanticTagsMojo extends AbstractMojo {
     {
         System.setProperty("java.awt.headless", "true");
         try {
-            SemanticTagsRefset refset = new SemanticTagsRefset();
-            HashSet<String> members = getRefsetMembers(refset.getRefsetId());            
+            SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
+            HashSet<String> members = getRefsetMembers(reader.getRefsetNid());            
             printRefsetMembers(members);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to read semantic tags refset with error: " + e.getMessage());

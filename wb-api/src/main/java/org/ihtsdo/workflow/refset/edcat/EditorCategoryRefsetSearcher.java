@@ -14,7 +14,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefsetSearcher;
+import org.ihtsdo.workflow.refset.WorkflowRefset;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -26,20 +27,20 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 */
 public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 {
+	EditorCategoryRefsetReader reader = null;
+	
 	public EditorCategoryRefsetSearcher()
 			throws TerminologyException, IOException
 	{
-		refset = new EditorCategoryRefset();
-
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		super(editorCategoryConcept);
+		reader = new EditorCategoryRefsetReader();
 	}
 
 	public boolean isAutomaticApprovalAvailable(I_GetConceptData modeler) throws NumberFormatException, TerminologyException, IOException, Exception {
 		// Get Editor Categories
 		for (String prop : searchForEditorCategoryListByModeler(modeler))
 		{
-			I_GetConceptData val = ((EditorCategoryRefset)refset).getEditorCategory(prop);
+			I_GetConceptData val = reader.getEditorCategory(prop);
 
 			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(val, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
 
@@ -61,12 +62,12 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		if (currentModelerPropertySet.isEmpty()) {
             return null;
         } else if (currentModelerPropertySet.size() == 1) {
-			String editorCategory = ((EditorCategoryRefset)refset).getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();
+			String editorCategory = reader.getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();
 			return WorkflowHelper.lookupRoles(editorCategory);
 		}
 		else
 		{
-			SemanticAreaHierarchyRefsetSearcher searcher = new SemanticAreaHierarchyRefsetSearcher();
+			SemanticHierarchyRefsetSearcher searcher = new SemanticHierarchyRefsetSearcher();
 
 			// Transform editor category list into a map of tags-to-categories
 			Map<String, I_GetConceptData> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet);
@@ -101,8 +102,8 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		Map<String, I_GetConceptData> results = new HashMap<String, I_GetConceptData>();
 
 		for (String props : set) {
-			String key = ((EditorCategoryRefset)refset).getSemanticTag(props);
-			I_GetConceptData val = ((EditorCategoryRefset)refset).getEditorCategory(props);
+			String key = reader.getSemanticTag(props);
+			I_GetConceptData val = reader.getEditorCategory(props);
 			results.put(key, val);
 		}
 
@@ -114,7 +115,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
       if (modeler == null) {
          return new HashSet<String>();
       }
-		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetId, modeler.getNid());
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, modeler.getNid());
 		Set<String> results = new HashSet<String>();
 
 		for (int i = 0; i < l.size(); i++)

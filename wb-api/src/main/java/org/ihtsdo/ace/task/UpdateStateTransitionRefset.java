@@ -39,7 +39,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefset;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -84,7 +83,7 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         try {
 
 
-        	StateTransitionRefset refset = new StateTransitionRefset();
+        	StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
             I_TermFactory tf = Terms.get();
 
          	 WorkflowHelper.updateWorkflowStates();
@@ -93,7 +92,7 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         	File f = new File("workflow/workflowStateTransitions.txt");
         	processTransitions(f, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
 
-	        tf.addUncommitted(refset.getRefsetConcept());
+	        tf.addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Couldn't Update State Transitions", e);
 		}
@@ -139,7 +138,12 @@ public class UpdateStateTransitionRefset extends AbstractTask {
 
 
         	try {
-	        	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[0]));
+        		String  category = columns[0];
+        		if (category.contains("Any")) {
+        			category = category.replace("Any", "All");
+        		}
+        		
+	        	writer.setCategory(WorkflowHelper.lookupEditorCategory(category));
 	        	writer.setInitialState(WorkflowHelper.lookupState(columns[1]));
 	        	writer.setAction(WorkflowHelper.lookupAction(columns[2]));
 	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3]));

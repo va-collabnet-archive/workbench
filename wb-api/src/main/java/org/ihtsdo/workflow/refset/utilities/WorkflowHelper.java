@@ -41,7 +41,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
 
@@ -172,7 +172,7 @@ public class WorkflowHelper {
 		WorkflowHistoryRefsetWriter writer;
 
 		try {
-			writer = new WorkflowHistoryRefsetWriter(true);
+			writer = new WorkflowHistoryRefsetWriter();
 
 			writer.setPathUid(bean.getPath());
 			writer.setModelerUid(bean.getModeler());
@@ -326,19 +326,19 @@ public class WorkflowHelper {
 	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(int id, UUID refComponentId, String fieldValues, long timeStamp) throws NumberFormatException, TerminologyException, IOException
     {
     	WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
-    	WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+    	WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 
     	bean.setConcept(refComponentId);
 
-    	bean.setWorkflowId(refset.getWorkflowId(fieldValues));
-    	bean.setState(refset.getStateUid(fieldValues));
-    	bean.setPath(refset.getPathUid(fieldValues));
-    	bean.setModeler(refset.getModelerUid(fieldValues));
-    	bean.setAction(refset.getActionUid(fieldValues));
-    	bean.setFSN(refset.getFSN(fieldValues));
-    	bean.setWorkflowTime(refset.getWorkflowTime(fieldValues));
-    	bean.setAutoApproved(refset.getAutoApproved(fieldValues));
-    	bean.setOverridden(refset.getOverridden(fieldValues));
+    	bean.setWorkflowId(reader.getWorkflowId(fieldValues));
+    	bean.setState(reader.getStateUid(fieldValues));
+    	bean.setPath(reader.getPathUid(fieldValues));
+    	bean.setModeler(reader.getModelerUid(fieldValues));
+    	bean.setAction(reader.getActionUid(fieldValues));
+    	bean.setFSN(reader.getFSN(fieldValues));
+    	bean.setWorkflowTime(reader.getWorkflowTime(fieldValues));
+    	bean.setAutoApproved(reader.getAutoApproved(fieldValues));
+    	bean.setOverridden(reader.getOverridden(fieldValues));
     	bean.setEffectiveTime(timeStamp);
         bean.setRxMemberId(id);
 
@@ -664,7 +664,7 @@ public class WorkflowHelper {
         	if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
         	{
         		I_TermFactory tf = Terms.get();
-        		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
+        		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
 
 				WorkflowHistoryRefsetWriter.lockMutex();
 
@@ -721,8 +721,7 @@ public class WorkflowHelper {
 		        // Write Member
 				writer.addMember();
 				
-				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-		        Terms.get().addUncommitted(refset.getRefsetConcept());
+		        Terms.get().addUncommitted(writer.getRefsetConcept());
         	}
     	}	
 	}
@@ -941,7 +940,7 @@ public class WorkflowHelper {
 
 		if (con != null) {
 			Set<String> ignoredWorkflows = new HashSet<String>();
-			WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 			
 			long latestTimestamp = 0;
 			String currentWorkflowId = null;
@@ -952,7 +951,7 @@ public class WorkflowHelper {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
 					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
-						if (!ignoredWorkflows.contains(refset.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
+						if (!ignoredWorkflows.contains(reader.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
 							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 							
 							if (latestTimestamp == 0 || latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId())) {
@@ -978,7 +977,7 @@ public class WorkflowHelper {
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null && workflowId != null) {
-			WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 	
 			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
 			
@@ -986,7 +985,7 @@ public class WorkflowHelper {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
 					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
-						if (workflowId.equals(UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
+						if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
 							returnSet.add(populateWorkflowHistoryJavaBean(row));
 						}
 					}
@@ -1002,8 +1001,8 @@ public class WorkflowHelper {
 	{
 		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
 		int counter = 0;
-		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-		for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(refset.getRefsetId(), Terms.get().uuidToNative(uuid))) 
+		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+		for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(reader.getRefsetNid(), Terms.get().uuidToNative(uuid))) 
 		{
 			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
@@ -1149,3 +1148,4 @@ public class WorkflowHelper {
 		}
 
 	}
+ 

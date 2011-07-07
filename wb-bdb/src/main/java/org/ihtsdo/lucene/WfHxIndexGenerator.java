@@ -29,7 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WfHxIndexGenerator extends IndexGenerator {
@@ -49,7 +49,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
         	initializeSemTags();
 
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-	    	int searcherId = searcher.getRefsetId();
+	    	int searcherId = searcher.getRefsetNid();
 			this.refsetId = searcherId;
 	    	
 			lastBeanInWfMap.clear();
@@ -98,7 +98,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	            vals = new WorkflowLuceneSearchResult(curLastRow);
 	            lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
 	        } else {
-				WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
+				WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 		        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(searcherId);
 		        
 		        AceLog.getAppLog().log(Level.INFO, "WfHx Lucene capability must first be built.");
@@ -108,7 +108,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 				int rowsProcessed = 0;
 				int tenthsProcessed = 0;
 				for (I_ExtendByRef row : members) {
-			    	UUID wfId = UUID.fromString(refset.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
+			    	UUID wfId = UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
 					
 			    	
 			    	if (rowsProcessed++ % progressMilestone == 0) {

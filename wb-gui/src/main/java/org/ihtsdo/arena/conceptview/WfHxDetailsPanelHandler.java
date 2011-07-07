@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.ihtsdo.arena.WfHxDetailsPanel;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 
 
 public class WfHxDetailsPanelHandler {
@@ -73,7 +73,7 @@ public class WfHxDetailsPanelHandler {
 		int height = 45;
 		boolean rowIdentifed = false;
 
-		if (detailsPanel.getCurrentHtml().contains(WorkflowHistoryRefset.chiefTermReplaceTerm)) {
+		if (detailsPanel.getCurrentHtml().contains(WorkflowHistoryRefsetReader.chiefTermReplaceTerm)) {
 			width = 390;
 		}
 	

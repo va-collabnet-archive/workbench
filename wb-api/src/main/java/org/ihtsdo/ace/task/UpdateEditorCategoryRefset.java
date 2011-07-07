@@ -38,7 +38,6 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefset;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -80,13 +79,10 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException 
     {
     	String line = "";
+        I_TermFactory tf = Terms.get();
     	
     	 try {
-             EditorCategoryRefset refset = new EditorCategoryRefset();
-             I_TermFactory tf = Terms.get();
-
              HashMap<String, I_GetConceptData> modelers = new HashMap<String, I_GetConceptData>();
-         	 refset = new EditorCategoryRefset();
              EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
              File f= new File("workflow/userPermissionRefset.txt");
 
@@ -121,7 +117,7 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
              	writer.addMember();
              };
 
- 	        tf.addUncommitted(refset.getRefsetConcept());
+ 	        tf.addUncommitted(writer.getRefsetConcept());
          } catch (Exception e) {
         	 AceLog.getAppLog().log(Level.WARNING, line, e);
  		}

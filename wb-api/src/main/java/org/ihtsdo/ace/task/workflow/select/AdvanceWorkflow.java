@@ -53,7 +53,7 @@ public class AdvanceWorkflow extends AbstractTask {
             List<WorkflowHistoryJavaBean> availableActions = (List<WorkflowHistoryJavaBean>) process.readAttachement(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name());
             
             
-    		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
+    		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
     		
     		for (WorkflowHistoryJavaBean bean : availableActions)
     		{

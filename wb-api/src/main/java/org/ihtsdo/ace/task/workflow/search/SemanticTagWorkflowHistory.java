@@ -18,7 +18,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefset;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetReader;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
                    @Spec(directory = "search/workflow", type = BeanType.TASK_BEAN) })
@@ -29,7 +29,7 @@ public class SemanticTagWorkflowHistory extends AbstractWorkflowHistorySearchTes
 
     private static final int dataVersion = 1;
 
-    private static SemanticTagsRefset refset = null;
+    private static SemanticTagsRefsetReader reader = null;
 
     private static I_ConfigAceFrame frameConfig = null;
     
@@ -71,7 +71,11 @@ public class SemanticTagWorkflowHistory extends AbstractWorkflowHistorySearchTes
     }
 
 	private I_GetConceptData translateStringToHierarchy(String testStr) throws Exception {
-        Collection<? extends I_ExtendByRef> exts = Terms.get().getRefsetExtensionMembers(refset.getRefsetId());
+        if (reader == null) {
+    		reader = new SemanticTagsRefsetReader();
+    	}
+        
+        Collection<? extends I_ExtendByRef> exts = Terms.get().getRefsetExtensionMembers(reader.getRefsetNid());
         
         for (I_ExtendByRef extension : exts) {
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension;
@@ -109,10 +113,6 @@ public class SemanticTagWorkflowHistory extends AbstractWorkflowHistorySearchTes
 	            if (frameConfig == null) {
 	    			frameConfig = Terms.get().getActiveAceFrameConfig();
 	            }
-	            
-	            if (refset == null) {
-	        		refset = new SemanticTagsRefset();
-            	}
 	            
 	            I_GetConceptData parentHierarchy = translateStringToHierarchy(testHierarchy);    		
 	            I_GetConceptData testConcept = Terms.get().getConcept(bean.getConcept());

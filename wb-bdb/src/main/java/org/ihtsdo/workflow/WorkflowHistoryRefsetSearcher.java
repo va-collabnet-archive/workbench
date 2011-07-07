@@ -12,7 +12,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -25,13 +25,10 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
 	private int currentStatusNid = 0;
 
-	public WorkflowHistoryRefsetSearcher()
+	public WorkflowHistoryRefsetSearcher() throws TerminologyException, IOException
 	{
+		super(workflowHistoryConcept);
 		try { 
-			refset = new WorkflowHistoryRefset();
-			setRefsetName(refset.getRefsetName());
-			setRefsetId(refset.getRefsetId());
-        	
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error creating Workflow History Refset Searcher with error: " + e.getMessage());
@@ -40,7 +37,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
 	public int getTotalCount() {
 		try {
-			return Terms.get().getRefsetExtensionMembers(refsetId).size();
+			return Terms.get().getRefsetExtensionMembers(refsetNid).size();
 		} catch (IOException e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset members with error: " + e.getMessage());
 		}
@@ -52,7 +49,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		WorkflowHistoryJavaBean lastBean = null;
 		
 		try {
-			for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(getRefsetId(), conceptNid)) {
+			for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(getRefsetNid(), conceptNid)) {
 				
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
@@ -81,8 +78,8 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	{
 		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
 		int counter = 0;
-		WorkflowHistoryRefset refset = new WorkflowHistoryRefset();
-		for (I_ExtendByRef row : Terms.get().getRefsetExtensionMembers(refset.getRefsetId())) 
+		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+		for (I_ExtendByRef row : Terms.get().getRefsetExtensionMembers(reader.getRefsetNid())) 
 		{
 			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
 			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());

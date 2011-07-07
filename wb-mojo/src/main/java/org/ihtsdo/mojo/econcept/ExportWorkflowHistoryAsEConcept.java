@@ -126,6 +126,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 	private DataOutputStream eConceptDOS = null;
 
+	private WorkflowHistoryRefsetWriter writer;
+
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
 		int conceptCounter = 0;
@@ -174,7 +176,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 	private void initializeExport() throws IOException, TerminologyException
 	{
-        initializeOutputFile();
+		writer = new WorkflowHistoryRefsetWriter(); 
+
+		initializeOutputFile();
 
         initializeConstantUuids();
 
@@ -259,7 +263,6 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 			long wfTimestamp = format.parse(row[refsetColumnTimeStampPosition]).getTime();
 
-        	WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(false); 
 			
 			writer.setWorkflowUid(UUID.fromString(row[workflowIdPosition]));
 			writer.setPathUid(UUID.fromString(row[pathPosition]));

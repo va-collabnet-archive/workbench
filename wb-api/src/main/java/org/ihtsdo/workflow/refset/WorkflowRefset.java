@@ -6,10 +6,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.RefsetAuxiliary.Concept;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 
 /* 
@@ -18,62 +18,55 @@ import org.dwfa.tapi.TerminologyException;
 */
 public abstract class WorkflowRefset 
 {
-	protected I_GetConceptData refset = null;
-	protected int refsetId = 0;
-	protected WorkflowRefsetFields fields = null;
+	public final static I_ConceptualizeUniversally editorCategoryConcept = RefsetAuxiliary.Concept.EDITOR_CATEGORY;
+	public final static I_ConceptualizeUniversally semanticAreaConcept = RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY;
+	public final static I_ConceptualizeUniversally semanticTagConcept = RefsetAuxiliary.Concept.SEMANTIC_TAGS;
+	public final static I_ConceptualizeUniversally stateTransitionConcept = RefsetAuxiliary.Concept.STATE_TRANSITION;
+	public final static I_ConceptualizeUniversally workflowHistoryConcept = RefsetAuxiliary.Concept.WORKFLOW_HISTORY;
+
+	protected Collection<UUID> refsetUids = null;
+	protected int refsetNid = 0;
 	protected String refsetName = null;
-	protected I_HelpRefsets helper = null;
-	
-	public abstract Collection<UUID> getRefsetUids() throws TerminologyException, IOException;
+	protected I_GetConceptData refsetConcept = null;
 
-	public WorkflowRefset(Concept con, boolean setupDatabaseObjects) throws IOException, TerminologyException {
-		this(con.localize().getNid(), con.toString(), setupDatabaseObjects);
-		if (setupDatabaseObjects) {
-			helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());
+	protected WorkflowRefsetFields fields = null;
+	
+	public WorkflowRefset(I_ConceptualizeUniversally initializingRefset) throws IOException, TerminologyException {
+		if (initializingRefset != null) {
+			refsetUids = initializingRefset.getUids();
+			refsetName = initializingRefset.toString();
+
+			if (Terms.get() != null) {
+				refsetNid = Terms.get().uuidToNative(refsetUids);
+				refsetConcept = Terms.get().getConcept(refsetUids);
+			}
+		} else {
+			throw new TerminologyException("Refset concept is null");
 		}
 	}
-	
-	public WorkflowRefset (int id, String name, boolean setupDatabaseObjects) {
-		setRefsetName(name);
-		setRefsetId(id, setupDatabaseObjects);
-		
-		if (setupDatabaseObjects) {
-			setRefsetConcept(id, setupDatabaseObjects);
-		}
-	}
-	
-	public WorkflowRefset() {
 
-	}
-
-	public void setRefsetId(int id) {
-		refsetId = id;
+	public void setRefsetConcept(int id) {
 		setRefsetConcept(id, true);
-	}
-
-	public void setRefsetId(int id, boolean setupDatabaseObjects) {
-		refsetId = id;
-		setRefsetConcept(id, setupDatabaseObjects);
-	}
-	
-	public void setRefsetName(String name) {
-		refsetName = name;
-	}
-	
-	public I_GetConceptData getRefsetConcept() {
-		return refset;
-	}
-	
-	public int getRefsetId() {
-		return refsetId;
-	}
-	
-	public String getRefsetName() {
-		return refsetName;
 	}
 	
 	public void setFields(WorkflowRefsetFields p) {
 		fields = p;
+	}
+
+	public I_GetConceptData getRefsetConcept() {
+		return refsetConcept;
+	}
+	
+	public int getRefsetNid() {
+		return refsetNid;
+	}
+	
+	public Collection<UUID> getRefsetUids() {
+		return refsetUids;
+	}
+	
+	public String getRefsetName() {
+		return refsetName;
 	}
 	
 	public WorkflowRefsetFields getProperties() {
@@ -81,7 +74,7 @@ public abstract class WorkflowRefset
 	}
 
 	public String toString() {
-		return "Refset: " + refsetName + " (refsetId: " + refsetId + ") with fields: " + 
+		return "Refset: " + refsetName + " (refsetId: " + refsetNid + ") with fields: " + 
 			   "\n" + fields.toString();
 	}
 
@@ -103,7 +96,7 @@ public abstract class WorkflowRefset
 	private void setRefsetConcept(int uid, boolean setupDatabaseObjects) {
 		if (setupDatabaseObjects) {
 			try {
-				refset = Terms.get().getConcept(uid);
+				refsetConcept = Terms.get().getConcept(uid);
 			} catch (Exception e) {
 	        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving Refset Concept: " + uid + " with error: " + e.getMessage());
 			}

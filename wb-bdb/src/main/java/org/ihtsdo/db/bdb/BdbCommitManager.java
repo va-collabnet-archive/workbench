@@ -79,7 +79,7 @@ import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -154,7 +154,7 @@ public class BdbCommitManager {
     private static class WfHxLuceneWriter implements Runnable {
 
         private static Set<I_ExtendByRef> wfExtensionsToUpdate;
-        private WorkflowHistoryRefset refset;
+        private WorkflowHistoryRefsetReader reader;
         private int batchSize = 200;
 
         public WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
@@ -162,7 +162,7 @@ public class BdbCommitManager {
             wfExtensionsToUpdate = uncommittedWfMemberIds;
             try {
 
-				refset = new WorkflowHistoryRefset();
+				reader = new WorkflowHistoryRefsetReader();
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
 			}
@@ -175,7 +175,7 @@ public class BdbCommitManager {
                 Set<UUID> workflowsUpdated = new HashSet<UUID>();
 
                 for (I_ExtendByRef row : wfExtensionsToUpdate) {
-                    UUID workflowId = refset.getWorkflowId(((I_ExtendByRefPartStr) row).getStringValue());
+                    UUID workflowId = reader.getWorkflowId(((I_ExtendByRefPartStr) row).getStringValue());
 
                     // If two rows to commit, both will be caught by method below, so do this once per WfId
                     if (!workflowsUpdated.contains(workflowId)) {

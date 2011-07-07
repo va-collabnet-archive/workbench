@@ -23,11 +23,8 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAG_UUID_REL.getUids());
 
 	public SemanticTagsRefsetWriter() throws IOException, TerminologyException {
-		refset = new SemanticTagsRefset();
+		super(semanticTagConcept);
 		fields = new SemanticTagRSFields();
-	
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

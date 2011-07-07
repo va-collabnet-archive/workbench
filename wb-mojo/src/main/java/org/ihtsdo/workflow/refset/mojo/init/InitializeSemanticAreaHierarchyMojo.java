@@ -9,7 +9,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.workflow.refset.semHier.SemanticAreaHierarchyRefsetWriter;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
 
 /**
  * @author Jesse Efron
@@ -48,7 +48,7 @@ public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
         System.setProperty("java.awt.headless", "true");
         try {
 
-            SemanticAreaHierarchyRefsetWriter writer = new SemanticAreaHierarchyRefsetWriter();
+            SemanticHierarchyRefsetWriter writer = new SemanticHierarchyRefsetWriter();
             String line = null;
         	BufferedReader inputFile = new BufferedReader(new FileReader(filePath));    	
 

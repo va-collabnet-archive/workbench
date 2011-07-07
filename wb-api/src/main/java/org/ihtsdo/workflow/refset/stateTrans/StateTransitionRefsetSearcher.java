@@ -25,13 +25,13 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 */
 public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher 
 {
+	private StateTransitionRefsetReader reader;
+
 	public StateTransitionRefsetSearcher()
 			throws TerminologyException, IOException 
 	{
-		refset = new StateTransitionRefset();
-		
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
+		super(stateTransitionConcept);
+		reader =  new StateTransitionRefsetReader();
 	}
 
 	// From Category and InitialState
@@ -54,7 +54,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			if (allRoleUid.equals(role.getPrimUuid()) ||
 				(role.getInitialText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
 			{
-				l = Terms.get().getRefsetExtensionsForComponent(refsetId,  role.getConceptNid());
+				l = Terms.get().getRefsetExtensionsForComponent(refsetNid,  role.getConceptNid());
 				results.putAll(findPossibleActions(l, testInitialState));
 			}
 		}
@@ -74,12 +74,12 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			for (int i = 0; i < l.size(); i++)
 			{
 				props = (I_ExtendByRefPartStr)l.get(i);
-				int testStateNid = ((StateTransitionRefset)refset).getInitialState(props.getStringValue()).getConceptNid();
+				int testStateNid = reader.getInitialState(props.getStringValue()).getConceptNid();
 
 				if (matchInitialStateNid == testStateNid) 
 				{
-					I_GetConceptData action =  ((StateTransitionRefset)refset).getAction(props.getStringValue());
-					I_GetConceptData finalState =  ((StateTransitionRefset)refset).getFinalState(props.getStringValue());
+					I_GetConceptData action =  reader.getAction(props.getStringValue());
+					I_GetConceptData finalState =  reader.getFinalState(props.getStringValue());
 					
 					if (addAutoApproval && action.getPrimUuid().equals(WorkflowHelper.getAcceptAction())) {
 						// On, but already have it, avoid DB hit (till use more UUID and lesse I_GetConceptData)

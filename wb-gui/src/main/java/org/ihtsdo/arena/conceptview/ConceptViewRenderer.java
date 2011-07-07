@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -43,6 +47,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
@@ -57,6 +62,7 @@ import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.arena.WizardPanel;
+import org.ihtsdo.arena.context.action.BpAction;
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -70,17 +76,11 @@ import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
+import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.SwingUtilities;
-import org.ihtsdo.arena.context.action.BpAction;
-import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 /**
  * @author Administrator
@@ -474,7 +474,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                         updateOopsButton(selectedConcept);
 	
 	                                    UUID selectedActionUid = (UUID) worker.readAttachement(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name());
-	                                    WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(true);
+	                                    WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
 	
 	                                    WorkflowHistoryJavaBean bean = new WorkflowHistoryJavaBean();
 	
@@ -535,7 +535,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                                         BpAction a = (BpAction) actionFactory.make(wfBpFile);
                                         a.getExtraAttachments().put(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), 
-                                                WorkflowHelper.lookupAction(a.getValue(Action.NAME) + WORKFLOW_ACTION_SUFFIX).getPrimUuid());
+                                                WorkflowHelper.lookupAction(WorkflowHelper.getPreferredTerm(actionConcept) + WORKFLOW_ACTION_SUFFIX).getPrimUuid());
                                         a.getExtraAttachments().put(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name(), 
                                                 possibleActions);
                                         

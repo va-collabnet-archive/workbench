@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.refset.WorkflowRefset;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
@@ -21,11 +22,8 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 {
 	public EditorCategoryRefsetWriter() throws IOException, TerminologyException 
 	{
-		refset = new EditorCategoryRefset();
+		super(editorCategoryConcept);
 		fields = new EditorCategoryRSFields();
-
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

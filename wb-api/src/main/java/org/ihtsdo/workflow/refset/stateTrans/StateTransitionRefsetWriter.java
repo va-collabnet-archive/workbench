@@ -9,6 +9,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter.EditorCategoryRSFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
 
@@ -20,11 +21,8 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 public class StateTransitionRefsetWriter extends WorkflowRefsetWriter 
 {
 	public StateTransitionRefsetWriter() throws IOException, TerminologyException {
-		refset = new StateTransitionRefset();
+		super(stateTransitionConcept);
 		fields = new StateTransitionRSFields();
-	
-		setRefsetName(refset.getRefsetName());
-		setRefsetId(refset.getRefsetId());
 	}
 	
 	public void setReferencedComponentId(UUID uid) {

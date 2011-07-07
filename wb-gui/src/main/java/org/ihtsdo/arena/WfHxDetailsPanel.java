@@ -24,7 +24,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.AceTableRenderer;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefset;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -299,7 +299,7 @@ public class WfHxDetailsPanel extends JPanel {
 		}
 		
 		for (WorkflowHistoryJavaBean bean : allRows) {
-			retStr.append("\n\t\t" + WorkflowHistoryRefset.generateXmlForXslt(bean));
+			retStr.append("\n\t\t" + WorkflowHistoryRefsetReader.generateXmlForXslt(bean));
 		}
 
 		if (allRows.size() > 0) {
