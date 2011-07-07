@@ -40,6 +40,8 @@ global ViewCoordinate vc;
 
 // Parameters for satisfiesConstraint: x = don't care, e = equals, k = kind of, r = regex
 
+//sample and demo templates are commented out
+/*
 rule "not satisfies FINDING_SITE_OUT constraint"
 	
 	when
@@ -48,8 +50,10 @@ rule "not satisfies FINDING_SITE_OUT constraint"
 				this not satisfiesConstraint[k,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());	
-end
+end 
+*/
 
+/*
 rule "FSN not satisfies desc constraint"
 	
 	when
@@ -66,7 +70,9 @@ rule "FSN not satisfies desc constraint"
    		    									  $d.getNid());
 		   } 	
 end
+*/
 
+/*
 rule "no FSN"
 	
 	when
@@ -82,8 +88,10 @@ rule "no FSN"
    		    									  $c.getNid());
 		} 	
 end
+*/
 
-/*rule "missing Dialect description EN_UK"
+/*
+rule "missing Dialect description EN_UK"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
@@ -96,7 +104,9 @@ end
          }
 		} 	
 end
+*/
 
+/*
 rule "missing Dialect description EN_US"
 	
 	when
@@ -109,8 +119,10 @@ rule "missing Dialect description EN_US"
                Language.EN_US, $c.getViewCoordinate()), $c.getNid());
          }
 		} 	
-end */
+end 
+*/
 
+/*
 rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 	
 	when
@@ -118,7 +130,7 @@ rule "isKindOf refset concept and not satisfies FINDING_SITE_OUT constraint"
 							  this not satisfiesConstraint[x,e,k] SnomedConstraints.FINDING_SITE_OUT);
 	then 
    		templates.put(SnomedRelSpec.FINDING_SITE, $c.getNid());
-end
+end */
 
 rule "isKindOf duplicate"
 	when
