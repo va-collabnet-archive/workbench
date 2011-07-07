@@ -325,19 +325,21 @@ public abstract class ArenaComponentSettings implements Serializable,
     }
 
     private void setPrefLocation() {
-        JLayeredPane layers = renderer.getRootPane().getLayeredPane();
-        Point loc = SwingUtilities.convertPoint(renderer, new Point(0, 0), layers);
-        if (layers.getWidth() > loc.x + renderer.getWidth() + getPreferences().getWidth()) {
-            loc.x = loc.x + renderer.getWidth();
-            getPreferences().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
-        } else {
-            loc.x = loc.x - getPreferences().getWidth();
-            getPreferences().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
-        }
-        getPreferences().setBounds(loc.x, loc.y, getPreferences().getWidth(), renderer.getHeight());
-        layers.add(getPreferences(), JLayeredPane.PALETTE_LAYER);
+    	if (renderer.getRootPane() != null) {
+	        JLayeredPane layers = renderer.getRootPane().getLayeredPane();
+	        Point loc = SwingUtilities.convertPoint(renderer, new Point(0, 0), layers);
+	        if (layers.getWidth() > loc.x + renderer.getWidth() + getPreferences().getWidth()) {
+	            loc.x = loc.x + renderer.getWidth();
+	            getPreferences().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
+	        } else {
+	            loc.x = loc.x - getPreferences().getWidth();
+	            getPreferences().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
+	        }
+	        getPreferences().setBounds(loc.x, loc.y, getPreferences().getWidth(), renderer.getHeight());
+	        layers.add(getPreferences(), JLayeredPane.PALETTE_LAYER);
+	    }
     }
-
+    
     private JButton getCollapseExpandButton() {
         JButton button = new JButton(new AbstractAction("", new ImageIcon(
                 ConceptViewRenderer.class.getResource(IMAGE_PATH + "minimize.gif"))) {

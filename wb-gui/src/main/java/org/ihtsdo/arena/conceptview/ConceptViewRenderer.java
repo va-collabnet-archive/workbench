@@ -110,6 +110,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                     @Override
                     public void run() {
                         settings.showNavigator();
+                        settings.setNavigatorLocation();
                     }
                 });
             }
@@ -133,6 +134,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                     @Override
                     public void run() {
                         settings.showNavigator();
+                        settings.setNavigatorLocation();
                     }
                 });
             }
@@ -167,6 +169,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                         @Override
                         public void run() {
                         	wfHxDetails.setWfHxLocation();
+                            settings.setNavigatorLocation();
                         }
                     });          
                 }

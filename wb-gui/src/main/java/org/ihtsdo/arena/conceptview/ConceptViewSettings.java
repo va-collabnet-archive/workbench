@@ -196,7 +196,15 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     }
 
     public boolean hideNavigator() {
-        if (navButton.isSelected()) {
+		if (preferences != null) {
+			JLayeredPane layers = renderer.getRootPane().getLayeredPane();
+	
+	        preferences.setVisible(false);
+	        preferences.invalidate();
+	        layers.remove(preferences);
+   		}
+
+    	if (navButton.isSelected()) {
             navButton.doClick();
             return true;
         }
@@ -320,7 +328,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return button;
     }
 
-    private void setNavigatorLocation() {
+    public void setNavigatorLocation() {
         int rightSpace = -1;
         int leftSpace = -1;
         JLayeredPane layers = renderer.getRootPane().getLayeredPane();
