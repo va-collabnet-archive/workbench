@@ -653,7 +653,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         return;
                     }
                     settings.getNavigator().updateHistoryPanel();
-                    //akf 
+
                     for (DragPanelDescription dc : inactiveDescriptionPanels) {
                         if (stop) {
                             return;
@@ -678,8 +678,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             rel.setVisible(true);
                         }
                     }
-                    //akf to here
-
                 }
             });
         }
