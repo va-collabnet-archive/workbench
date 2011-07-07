@@ -102,7 +102,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             sb.append(Rf2x.convertIdToUuidStr(l));
             sb.append("\r\n");
         }
-        Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
+        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
 
         return a;
     }
