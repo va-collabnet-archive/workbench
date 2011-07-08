@@ -78,7 +78,6 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private javax.swing.JCheckBox svnConnectCheckBox;
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
-
     
     public String svnUrl;
 
@@ -91,6 +90,15 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     public AceLoginDialog2(JFrame topFrame) {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         initComponents();
+    }
+    
+    private String getDefUser(){
+    	 String defUN = System.getProperty("user.name");
+    	 if(defUN == null){
+    		 defUN = ""; 
+    	 }
+    	 
+    	 return defUN;
     }
     
     private String getUserValue(){
@@ -111,7 +119,10 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	if(pnum == 0){
     		//no profiles 
     		title = "No Profiles found. Download them from subversion?";
-    		userControl = new JTextField();
+    		JTextField jtf = new JTextField();
+    		jtf.setText(getDefUser());
+    		userControl = jtf;
+    		
     		return userControl;
     	}
     	if(pnum == 1){
@@ -127,7 +138,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     		JComboBox profileSelectionBox = new JComboBox();
     		profileSelectionBox.setModel(new DefaultComboBoxModel(nameProf.keySet().toArray()));
             profileSelectionBox.validate();
-            profileSelectionBox.setSelectedItem(nameProf.keys().nextElement());
+            profileSelectionBox.setSelectedItem(getDefUser());
             profileSelectionBox.setRenderer(new ProfileRenderer());
             userControl = profileSelectionBox;
             return userControl;
@@ -255,12 +266,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	// get the username
     	String un = getUserValue();
-    	//AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
+    	AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
     	//if the password field is enabled get the password
     	String pw = null;
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
-    		//AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
+    		AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
     		boolean ok  = checkSVN(getSvnUrl(),un,pw);	
     		if(ok){
     			this.prompt.setUsername(un);
@@ -281,7 +292,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	boolean ok = true;
     	SVNRepository repo= null;
     	 try { 
-    		 //AceLog.getAppLog().info("checkSVN url = "+url);  
+    		 AceLog.getAppLog().info("checkSVN url = "+url +" pw = "+pw);  
     		 DAVRepositoryFactory.setup();
     	     SVNRepositoryFactoryImpl.setup();
     	     FSRepositoryFactory.setup();

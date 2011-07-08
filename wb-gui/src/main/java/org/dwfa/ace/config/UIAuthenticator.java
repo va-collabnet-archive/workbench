@@ -71,14 +71,17 @@ public class UIAuthenticator {
 		this.prompt = prompt;
 		try {
 			apm.processProfiles();
-			initPrompter();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+		try{
+			initPrompter();
+			apm.setUserName(this.prompt.getUsername());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		//AceLog.getAppLog().info("authenticate un "+this.prompt.getUsername()+" pw "+this.prompt.getPassword());
-		apm.setUserName(this.prompt.getUsername());
+		
 		setProfile(apm.getProfile());
 		//AceLog.getAppLog().info("authenticate this profile = "+getProfile().getAbsoluteFile());
 		
@@ -107,13 +110,7 @@ public class UIAuthenticator {
 		
 		
 	}
-	
-	public String testCredentials(){
-		String result = "";
-		
-		
-		return result;
-	}
+
 
 	public SvnPrompter getPrompt() {
 		return prompt;
@@ -125,15 +122,25 @@ public class UIAuthenticator {
 
 
 	public File getProfile() {
-		if(profile == null){
+		/*if(profile == null){
 			profile = new File("");
-		}
+		}*/
 		return profile;
 	}
 
 
 	public void setProfile(File profile) {
 		this.profile = profile;
+	}
+
+
+	public AceProfileManager getApm() {
+		return apm;
+	}
+
+
+	public void setApm(AceProfileManager apm) {
+		this.apm = apm;
 	}
 
 	

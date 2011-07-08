@@ -201,9 +201,13 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     afc.setMasterConfig(this);
                 }
             }
+            if(username != null && username.length() > 0){
+            	aceFrames.get(0).setUsername(username);
+            }
             if (username == null || username.equals("null")) {
                 username = aceFrames.get(0).getUsername();
             }
+
             if (objDataVersion >= 2) {
                 loggerRiverConfigFile = (String) in.readObject();
             } else {

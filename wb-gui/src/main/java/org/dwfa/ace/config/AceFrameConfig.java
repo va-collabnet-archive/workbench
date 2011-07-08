@@ -715,6 +715,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 15) {
                 username = (String) in.readObject();
+                AceLog.getAppLog().info("AceFrameConfig username = "+username);
                 password = (String) in.readObject();
             }
             if (objDataVersion >= 16) {

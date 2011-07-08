@@ -1380,4 +1380,12 @@ public class Svn implements I_HandleSubversion {
 		Svn.connectedToSvn = connectedToSvn;
 		ACE.setSynchronizeButtonIsEnabled(connectedToSvn);
 	}
+
+	public static SvnPrompter getPrompter() {
+		return prompter;
+	}
+
+	public static void setPrompter(SvnPrompter prompter) {
+		Svn.prompter = prompter;
+	}
 }

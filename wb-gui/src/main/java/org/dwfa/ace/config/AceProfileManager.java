@@ -81,24 +81,27 @@ public class AceProfileManager {
 	public void setProfile(File profile) {
 		this.profile = profile;
 	}
+
 	public File getProfileDir() throws FileNotFoundException {
-		
+
 		profileDir = new File(profileDirName);
 		String e_msg = null;
-		if(!profileDir.exists()){
+		if (!profileDir.exists()) {
 			e_msg = "Profile Directory does not exist";
+		} else {
+			if (!profileDir.isDirectory()) {
+				e_msg = "Profile Directory exists but is not a directory";
+			} else {
+				if (!profileDir.canRead()) {
+					e_msg = "Profile Directory exists but can't be read";
+				}
+			}
 		}
-		if(!profileDir.isDirectory()){
-			e_msg = "Profile Directory exists but is not a directory";
+		if (e_msg != null) {
+			throw new FileNotFoundException(e_msg + " Profile Directory = "
+					+ profileDir.getAbsolutePath());
 		}
-		if(!profileDir.canRead()){
-			e_msg = "Profile Directory exists but can't be read";
-		}
-		
-		if(e_msg != null){
-			throw new FileNotFoundException(e_msg +" Profile Directory = "+profileDirName);
-		}
-		
+
 		return profileDir;
 	}
 	public void setProfileDir(File profileDir) {
