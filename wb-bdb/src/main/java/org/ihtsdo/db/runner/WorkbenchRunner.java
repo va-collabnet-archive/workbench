@@ -100,6 +100,14 @@ public class WorkbenchRunner {
 		//SvnPrompter prompt = new SvnPrompter();
 		String result = auth.authenticate(prompt, baseURL);
 		userProfile = auth.getProfile();
+		if(userProfile == null){
+			//AceLog.getAppLog().info("up is null "+auth.getApm().getProfile().getAbsolutePath());
+			AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
+			
+		
+		
+		
+		}
 		
 		/*if(result != null && result.length() > 0){
 			AceLog.getAppLog().info("authenticate Called result = "+result);
@@ -339,6 +347,24 @@ public class WorkbenchRunner {
 			if (svnHelper != null) {
 				svnHelper.doChangeSetImport();
 			}
+			
+			if(userProfile == null){
+			
+			AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
+			auth.getApm().processProfiles();
+			userProfile = auth.getApm().getProfile();
+			
+			if(userProfile == null){
+				JOptionPane
+				.showMessageDialog(LogWithAlerts
+						.getActiveFrame(null),
+						"Unable to find a profile for user = "+auth.getApm().getUserName());
+				return;
+			}
+			
+			
+			}
+			
 			if (wbConfigFile != null && wbConfigFile.exists()
 					&& wbPropertiesFile.exists()) {
 
@@ -348,7 +374,12 @@ public class WorkbenchRunner {
 				GetProfileWorker profiler = new GetProfileWorker(latch);
 				profiler.start();
 				latch.await();
-
+				/*if(userProfile == null){
+					AceLog.getAppLog().info("userProfile is null");
+					}
+					else{
+						AceLog.getAppLog().info("userProfile = "+userProfile.getAbsolutePath());	
+					}*/
 				File jeUserPropertiesFile = new File(userProfile
 						.getParentFile(), "je.properties");
 				if (jeUserPropertiesFile.exists()) {
@@ -357,18 +388,28 @@ public class WorkbenchRunner {
 					FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
 				}
 				
-				
 				ObjectInputStream ois = new ObjectInputStream(
 						new BufferedInputStream(
 								new FileInputStream(userProfile)));
 				AceConfig.config = (AceConfig) ois.readObject();
 				AceConfig.config.setProfileFile(userProfile);
-				AceConfig.config.setUsername(prompt.getUsername());
-				//AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername());
 				
+				AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername() +" prompt.getUsername() = "+prompt.getUsername());
 				
-				//prompter.setUsername(AceConfig.config.getUsername());
-				//prompter.setPassword(profiler.getPassword());
+				if(!prompt.getUsername().equalsIgnoreCase(AceConfig.config.getUsername())){
+					AceLog.getAppLog().info("AceConfig UserName not the same so setting"); 
+					AceConfig.config.setUsername(prompt.getUsername());
+					AceConfig.config.save();
+					
+					ObjectInputStream ois2 = new ObjectInputStream(
+							new BufferedInputStream(
+									new FileInputStream(userProfile)));
+					AceConfig.config = (AceConfig) ois2.readObject();
+					AceConfig.config.setProfileFile(userProfile);
+					AceLog.getAppLog().info("AceConfig UserName2 = "+AceConfig.config.getUsername());
+				}
+
+				
 			} else {
 				if (initializeFromSubversion) {
 					JOptionPane
@@ -656,8 +697,7 @@ public class WorkbenchRunner {
 				//password = new String(loginDialog.getPassword());
 		        //Svn.setConnectedToSvn(loginDialog.connectToSvn());
 
-				wbProperties.setProperty("last-profile-dir", FileIO
-						.getRelativePath(userProfile));
+				//wbProperties.setProperty("last-profile-dir", FileIO.getRelativePath(userProfile));
 
 				if (newFrame) {
 					OpenFrames.removeFrame(parentFrame);

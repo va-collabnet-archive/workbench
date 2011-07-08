@@ -39,6 +39,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
+import org.tigris.subversion.javahl.SVNClientInterface;
 
 /**
  * Common SVN helper methods used by the Ace Runner and AceLoginDialog.
@@ -108,13 +109,13 @@ public class SvnHelper {
 				Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
 				try {
 					if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-						handleSvnProfileCheckout(aceProperties);
+						handleSvnProfileCheckout(aceProperties,prompter);
 					}
 
 					if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 						for (String svnSpec : svnCheckoutOnStart) {
 							activity.setProgressInfoLower("Checkout: " + svnSpec.substring(0, svnSpec.indexOf('|')));
-							handleSvnCheckout(changeLocations, svnSpec);
+							handleSvnCheckout(changeLocations, svnSpec,prompter);
 						}
 					}
 
@@ -183,13 +184,13 @@ public class SvnHelper {
 				Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
 				try {
 					if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-						handleSvnProfileCheckout(wbProperties);
+						handleSvnProfileCheckout(wbProperties,prompter);
 					}
 
 					if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
 						for (String svnSpec : svnCheckoutOnStart) {
 							activity.setProgressInfoLower("Checkout: " + svnSpec);
-							handleSvnCheckout(changeLocations, svnSpec);
+							handleSvnCheckout(changeLocations, svnSpec,prompter);
 						}
 					}
 
@@ -236,12 +237,13 @@ public class SvnHelper {
 		return ok;
 	}
 
-	void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
+	void handleSvnProfileCheckout(Properties aceProperties,SvnPrompter prompter) throws ClientException, TaskFailedException {
 		if (new File("profiles").exists()) {
 			// A checkout has previously completed. 
 			return;
 		}
 		SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
+		Svn.setPrompter(prompter);
 		List<String> listing = Svn.list(svd);
 		Map<String, String> profileMap = new HashMap<String, String>();
 		for (String item : listing) {
@@ -249,12 +251,25 @@ public class SvnHelper {
 				profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
 			}
 		}
+		
+		
+		String selectedPath = null;
+		String selectedProfile = prompter.getUsername();
+		AceLog.getAppLog().info("prompter UN = "+prompter.getUsername());
+		
+		if(profileMap.containsKey(selectedProfile)){
+			AceLog.getAppLog().info("UN found in profileMap");
+			selectedPath = profileMap.get(selectedProfile);
+		}
+		
+		else{
 		SortedSet<String> sortedProfiles = new TreeSet<String>(profileMap.keySet());
 		JFrame emptyFrame = new JFrame();
-        String selectedProfile =
+        selectedProfile =
                 (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
                     "Checkout profile:", sortedProfiles.toArray(), null, null);
-		String selectedPath = profileMap.get(selectedProfile);
+        selectedPath = profileMap.get(selectedProfile);
+		}
 		if (selectedPath == null) {
 			return;
 		}
@@ -301,7 +316,7 @@ public class SvnHelper {
 		changeLocations.add(new File(destPath));
 	}
 
-	private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException,
+	private void handleSvnCheckout(List<File> changeLocations, String svnSpec,SvnPrompter prompter) throws TaskFailedException,
 	ClientException {
 		AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
         String[] specParts =
@@ -327,6 +342,9 @@ public class SvnHelper {
 			int depth = Depth.infinity;
 			boolean ignoreExternals = false;
 			boolean allowUnverObstructions = false;
+			Svn.setPrompter(prompter);
+			//SVNClientInterface svnC = Svn.getSvnClient();
+			//svnC.setPrompt(prompter);
 			Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
 					allowUnverObstructions);
 			changeLocations.add(checkoutLocation);
