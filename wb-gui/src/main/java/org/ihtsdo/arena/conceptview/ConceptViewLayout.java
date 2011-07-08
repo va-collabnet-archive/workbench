@@ -645,7 +645,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
         settings.getConfig().addPropertyChangeListener("commit", pcal);
         GuiUtil.tickle(cView);
-        if (settings.getNavigator() != null) {
+        if (settings.getNavigator() != null) { 
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
