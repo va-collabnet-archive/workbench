@@ -22,24 +22,25 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 /**
- * @author Marc E. Campbell
  *
- * @goal sct-rf2-refset-c-to-arf
+ * @author marc
+ * @goal sct-rf2-dos-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
     /**
@@ -62,30 +63,29 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
     private String inputDir;
     /**
      * Directory used to output the eConcept format files
-     * Default value "/classes" set programmatically due to file separator
      *
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
-    String uuidSourceSnomedLongStr;
-    String uuidPathStr;
+
+        /**
+     * Directory used to output the eConcept format files
+     *
+     * @parameter default-value="generated-arf"
+     */
+    private String[] filters;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN SctRf2RefsetCToArfMojo");
+        getLog().info("::: BEGIN Rf2_RefsetCreateConceptMojo");
 
-        // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
         getLog().info("    POM Target Directory: " + targetDirectory.getAbsolutePath());
         getLog().info("    POM Target Sub Directory: " + targetSubDir);
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
         try {
-            // SETUP CONSTANTS
-            uuidSourceSnomedLongStr =
-                    ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString();
-
             // FILE & DIRECTORY SETUP
             // Create multiple directories
             String outDir = wDir + FILE_SEPARATOR + targetSubDir + FILE_SEPARATOR
@@ -95,13 +95,19 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
                 getLog().info("::: Output Directory: " + outDir);
             }
 
+            // SETUP EXCLUSIONS FILTER
+            Long[] exclusions = new Long[filters.length];
+            for (int i = 0; i < exclusions.length; i++) {
+                exclusions[i] = new Long(filters[i]);
+            }
+
             // CONCEPT REFSET FILES
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "concept_refsetc_rf2.refset"), "UTF-8"));
-            getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Association", ".txt");
+                    outDir + "concept_refsetDoS_rf2.refset"), "UTF-8"));
+            getLog().info("::: DoS REFSET FILE: " + outDir + "concept_refsetDoS_rf2.refset");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "AttributeValue", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                 }
@@ -109,20 +115,25 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             bw.flush();
             bw.close();
 
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SctRf2RefsetCToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo UnsupportedEncodingException", ex);
-        } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo Terminology error", ex);
-        } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo file error", ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo file name parse error", ex);
-        }
-        getLog().info("::: END SctRf2RefsetCToArfMojo");
-    }
+            // WRITE PARENT REFSET CONCEPT :!!!:INTERIM:
+            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
+            refsetIdList.add(new Rf2_RefsetId(449613003L, /* refsetSctIdOriginal */
+                    "2002.01.31", /* refsetDate */
+                    "8c230474-9f11-30ce-9cad-185a96fd03a2", /* refsetPathUuidStr */
+                    "Degree of Synonymy Refset (RF2)", /* refsetPrefTerm */
+                    "Degree of Synonymy Refset (RF2)", /* refsetFsName */
+                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
+            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
 
+            getLog().info("::: END Rf2_RefsetCreateConceptMojo");
+        } catch (TerminologyException ex) {
+            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(SctRf2DoSToMojo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

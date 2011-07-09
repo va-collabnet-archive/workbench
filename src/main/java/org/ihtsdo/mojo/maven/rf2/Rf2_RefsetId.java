@@ -74,6 +74,8 @@ public class Rf2_RefsetId {
             String uuidCurrentStr = ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid().toString();
             String infix = subsetIds.get(0).refsetFsName.replace(" ", "");
             infix = infix.replace("-", "");
+            infix = infix.replace("(", "");
+            infix = infix.replace(")", "");
 
             Writer concepts;
             concepts = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(

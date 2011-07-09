@@ -55,7 +55,8 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
     }
 
-    static Rf2_RefsetCRecord[] parseRefset(Rf2File f) throws IOException, ParseException {
+    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions)
+            throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
         Rf2_RefsetCRecord[] a = new Rf2_RefsetCRecord[count];
@@ -79,6 +80,17 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
             Long refsetIdL = Long.parseLong(line[REFSET_ID]);
+            boolean found = false;
+            if (exclusions != null) {
+                for (Long excludedId : exclusions) {
+                    if (excludedId == refsetIdL) {
+                        found = true;
+                    }
+                }
+            }
+            if (found) {
+                continue;
+            }
             idSet.add(refsetIdL);
 
             a[idx] = new Rf2_RefsetCRecord(line[ID],
