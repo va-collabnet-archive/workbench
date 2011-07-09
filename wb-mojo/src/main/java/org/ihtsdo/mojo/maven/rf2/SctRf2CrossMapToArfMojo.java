@@ -45,10 +45,7 @@ import org.dwfa.tapi.TerminologyException;
 public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
-    /**
-     * Line terminator is deliberately set to CR-LF which is DOS style
-     */
-    private static final String LINE_TERMINATOR = "\r\n";
+    private static final String LINE_TERMINATOR = "\r\n"; // DOS line terminator
     private static final String TAB_CHARACTER = "\t";
     /**
      * Location of the build directory.

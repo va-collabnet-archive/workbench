@@ -74,7 +74,6 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 /**
  * 
