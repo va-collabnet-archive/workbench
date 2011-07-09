@@ -67,6 +67,10 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    /**
+     * Directory used to output the eConcept format files
+     */
+    private String[] filters;
     String uuidSourceSnomedLongStr;
     String uuidPathStr;
 
@@ -86,6 +90,15 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             uuidSourceSnomedLongStr =
                     ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString();
 
+            // SETUP EXCLUSIONS FILTER
+            Long[] exclusions = null;
+            if (filters != null && filters.length > 0) {
+                exclusions = new Long[filters.length];
+                for (int i = 0; i < exclusions.length; i++) {
+                    exclusions[i] = Long.parseLong(filters[i]);
+                }
+            }
+
             // FILE & DIRECTORY SETUP
             // Create multiple directories
             String outDir = wDir + FILE_SEPARATOR + targetSubDir + FILE_SEPARATOR
@@ -101,7 +114,7 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Association", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                 }
@@ -124,5 +137,4 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
         }
         getLog().info("::: END SctRf2RefsetCToArfMojo");
     }
-
 }

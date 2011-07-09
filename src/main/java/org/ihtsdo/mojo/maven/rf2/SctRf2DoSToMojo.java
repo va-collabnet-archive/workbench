@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -68,13 +67,6 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
      */
     private String outputDir;
 
-        /**
-     * Directory used to output the eConcept format files
-     *
-     * @parameter default-value="generated-arf"
-     */
-    private String[] filters;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
@@ -95,19 +87,13 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
                 getLog().info("::: Output Directory: " + outDir);
             }
 
-            // SETUP EXCLUSIONS FILTER
-            Long[] exclusions = new Long[filters.length];
-            for (int i = 0; i < exclusions.length; i++) {
-                exclusions[i] = new Long(filters[i]);
-            }
-
             // CONCEPT REFSET FILES
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_refsetDoS_rf2.refset"), "UTF-8"));
             getLog().info("::: DoS REFSET FILE: " + outDir + "concept_refsetDoS_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "AttributeValue", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                 }
