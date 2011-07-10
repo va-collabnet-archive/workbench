@@ -74,6 +74,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
+import java.io.IOException;
 
 public class WorkbenchRunner {
 
@@ -120,7 +121,7 @@ public class WorkbenchRunner {
                 svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
                         String[].class, null);
                 DroolsExecutionManager.drools_dialect_java_compiler = (String) jiniConfig.getEntry(this.getClass().getName(), "drools_dialect_java_compiler",
-                		String.class, null);
+                        String.class, null);
                 ACE.refsetOnly = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "refsetOnly",
                         Boolean.class, Boolean.FALSE);
                 ACE.editMode = (Boolean) jiniConfig.getEntry(this.getClass().getName(), "allowEdit",
@@ -362,15 +363,23 @@ public class WorkbenchRunner {
                     FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
                 }
 
-
                 ObjectInputStream ois = new ObjectInputStream(
                         new BufferedInputStream(
                         new FileInputStream(userProfile)));
-                AceConfig.config = (AceConfig) ois.readObject();
-                AceConfig.config.setProfileFile(userProfile);
-                AceConfig.config.getUsername();
-                prompter.setUsername(AceConfig.config.getUsername());
-                prompter.setPassword(profiler.getPassword());
+                try {
+                    AceConfig.config = (AceConfig) ois.readObject();
+                    AceConfig.config.setProfileFile(userProfile);
+                    AceConfig.config.getUsername();
+                    prompter.setUsername(AceConfig.config.getUsername());
+                    prompter.setPassword(profiler.getPassword());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "Unable to open user file. Is it corrupt?");
+                    AceLog.getAppLog().log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+                    System.exit(-1);
+                } finally {
+                    ois.close();
+                }
             } else {
                 if (initializeFromSubversion) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),

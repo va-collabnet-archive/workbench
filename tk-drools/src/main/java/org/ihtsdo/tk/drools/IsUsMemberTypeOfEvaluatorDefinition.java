@@ -185,7 +185,7 @@ public class IsUsMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition 
     public static Operator NOT_IS_US_MEMBER_TYPE_OF = null;
     private static String[] SUPPORTED_IDS = null;
 
-    private static void init() {
+    private static synchronized void init() {
         if (IS_US_MEMBER_TYPE_OF == null) {
             IS_US_MEMBER_TYPE_OF = Operator.addOperatorToRegistry("isUsMemberTypeOf", false);
             NOT_IS_US_MEMBER_TYPE_OF = Operator.addOperatorToRegistry(IS_US_MEMBER_TYPE_OF.getOperatorString(), true);

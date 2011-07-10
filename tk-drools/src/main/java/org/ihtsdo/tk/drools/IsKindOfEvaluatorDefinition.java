@@ -144,7 +144,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
     public static Operator NOT_IS_KIND_OF = null;
     private static String[] SUPPORTED_IDS = null;
 
-    private static void init() {
+    private static synchronized void init() {
         if (IS_KIND_OF == null) {
             IS_KIND_OF = Operator.addOperatorToRegistry("isKindOf", false);
             NOT_IS_KIND_OF = Operator.addOperatorToRegistry(IS_KIND_OF.getOperatorString(), true);

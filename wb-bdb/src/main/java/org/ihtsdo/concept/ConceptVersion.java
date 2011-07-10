@@ -553,7 +553,7 @@ public class ConceptVersion implements ConceptVersionBI {
         if (fsnOrder == null) {
             fsnOrder = new IntList();
             fsnOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
-            fsnOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid());
+            fsnOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid());
             fsnOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
         }
         return concept.getDescTuple(fsnOrder,
@@ -573,7 +573,7 @@ public class ConceptVersion implements ConceptVersionBI {
             ContraditionException {
         if (preferredOrder == null) {
             preferredOrder = new IntList();
-            preferredOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid());
+            preferredOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid());
             preferredOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
             preferredOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
         }
@@ -592,7 +592,7 @@ public class ConceptVersion implements ConceptVersionBI {
         if (synonymOrder == null) {
             synonymOrder = new IntList();
             synonymOrder.add(ReferenceConcepts.ACCEPTABLE_ACCEPTABILITY.getNid());
-            synonymOrder.add(ReferenceConcepts.SYNONYM.getNid());
+            synonymOrder.add(ReferenceConcepts.SYNONYM_RF1.getNid());
         }
         throw new UnsupportedOperationException();
     }

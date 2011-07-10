@@ -20,7 +20,8 @@ public class ViewCoordinate {
 
         LANG_BEFORE_TYPE("language before type"),
         TYPE_BEFORE_LANG("type before language"),
-        LANG_REFEX("use language refex");
+        LANG_REFEX("use language refex"), 
+        RF2_LANG_REFEX("use RF2 language refex");;
         private String desc;
 
         private LANGUAGE_SORT(String desc) {

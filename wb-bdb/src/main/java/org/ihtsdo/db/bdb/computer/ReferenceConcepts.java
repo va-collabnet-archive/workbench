@@ -1,6 +1,7 @@
 package org.ihtsdo.db.bdb.computer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public enum ReferenceConcepts {
 
@@ -29,15 +31,23 @@ public enum ReferenceConcepts {
     SNOROCKET(ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()),
     PREFERRED_RF1(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()),
     FULLY_SPECIFIED_RF1(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()),
-    PREFERRED_ACCEPTABILITY(ArchitectonicAuxiliary.Concept.PREFERRED_ACCEPTABILITY.getUids()),
+    FULLY_SPECIFIED_RF2(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()),
+    PREFERRED_ACCEPTABILITY_RF1(ArchitectonicAuxiliary.Concept.PREFERRED_ACCEPTABILITY.getUids()),
+    PREFERRED_ACCEPTABILITY_RF2(SnomedMetadataRf2.PREFERRED_RF2.getUuids()),
     ACCEPTABLE_ACCEPTABILITY(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids()),
-    SYNONYM(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()),;
+    SYNONYM_RF1(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids()),
+    SYNONYM_RF2(SnomedMetadataRf2.SYNONYM_RF2.getUuids());
     private int nid;
     private List<UUID> uuids;
 
     private ReferenceConcepts(Collection<UUID> uuids) {
         this.uuids = new ArrayList<UUID>(uuids);
         this.nid = Bdb.uuidsToNid(uuids);
+    }
+
+    private ReferenceConcepts(UUID[] uuids) {
+        this.uuids = Arrays.asList(uuids);
+        this.nid = Bdb.uuidsToNid(this.uuids);
     }
 
     public int getNid() {

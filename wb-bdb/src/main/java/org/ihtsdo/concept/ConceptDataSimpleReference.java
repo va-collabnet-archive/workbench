@@ -196,6 +196,55 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
         }
     }
 
+    private RefexChronicleBI<?> getAnnotation(int nid) throws IOException {
+        RefexChronicleBI<?> cc = null;
+
+        //recursive search through all annotations...
+        if (getConceptAttributes() != null) {
+            cc = getAnnotation(getConceptAttributes().annotations, nid);
+            if (cc != null) {
+                return cc;
+            }
+        }
+
+        if (getDescriptions() != null) {
+            for (Description d : getDescriptions()) {
+                cc = getAnnotation(d.annotations, nid);
+                if (cc != null) {
+                    return cc;
+                }
+            }
+        }
+
+        if (getSourceRels() != null) {
+            for (Relationship r : getSourceRels()) {
+                cc = getAnnotation(r.annotations, nid);
+                if (cc != null) {
+                    return cc;
+                }
+            }
+        }
+
+        if (getImages() != null) {
+            for (Image i : getImages()) {
+                cc = getAnnotation(i.annotations, nid);
+                if (cc != null) {
+                    return cc;
+                }
+            }
+        }
+
+        if (getRefsetMembers() != null) {
+            for (RefsetMember r : getRefsetMembers()) {
+                cc = getAnnotation(r.annotations, nid);
+                if (cc != null) {
+                    return cc;
+                }
+            }
+        }
+        return null;
+    }
+
     private void removeRefsetReferences(ConceptComponent<?, ?> cc) throws IOException {
         for (RefexChronicleBI<?> rc : cc.getRefsetMembers()) {
             Concept refsetCon = Concept.get(rc.getCollectionNid());
@@ -505,7 +554,6 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                         }
                     }
                 }
-
                 ccList.removeAll(toRemove);
             }
         }
@@ -644,7 +692,11 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
         if (isAnnotationStyleRefex()) {
             if (getMemberNids().contains(memberNid)) {
-                return (RefsetMember<?, ?>) Bdb.getComponent(memberNid);
+                if (Bdb.getNidCNidMap().getCNid(memberNid) == getNid()) {
+                    return (RefsetMember<?, ?>) getAnnotation(memberNid);
+                } else {
+                    return (RefsetMember<?, ?>) Bdb.getComponent(memberNid);
+                }
             }
             return null;
         }
@@ -773,60 +825,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                 return group;
             }
         }
-        ComponentChroncileBI<?> cc = null;
-
-        //recursive search through all annotations...
-        if (getConceptAttributes() != null) {
-            cc = getAnnotation(getConceptAttributes().annotations, nid);
-            if (cc != null) {
-                return cc;
-            }
-        }
-
-        if (getDescriptions() != null) {
-            for (Description d : getDescriptions()) {
-                cc = getAnnotation(d.annotations, nid);
-                if (cc != null) {
-                    return cc;
-                }
-            }
-        }
-
-        if (getSourceRels() != null) {
-            for (Relationship r : getSourceRels()) {
-                cc = getAnnotation(r.annotations, nid);
-                if (cc != null) {
-                    return cc;
-                }
-            }
-        }
-
-        if (getImages() != null) {
-            for (Image i : getImages()) {
-                cc = getAnnotation(i.annotations, nid);
-                if (cc != null) {
-                    return cc;
-                }
-            }
-        }
-
-        if (getRefsetMembers() != null) {
-            for (RefsetMember r : getRefsetMembers()) {
-                cc = getAnnotation(r.annotations, nid);
-                if (cc != null) {
-                    return cc;
-                }
-            }
-        }
-
-
-
-
-
-        return null;
+        return getAnnotation(nid);
     }
 
-    private ComponentChroncileBI<?> getAnnotation(
+    private RefexChronicleBI<?> getAnnotation(
             Collection<? extends RefexChronicleBI<?>> annotations, int nid) throws IOException {
         if (annotations == null) {
             return null;
@@ -835,7 +837,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
             if (annotation.getNid() == nid) {
                 return annotation;
             }
-            ComponentChroncileBI<?> cc = getAnnotation(annotation.getAnnotations(), nid);
+            RefexChronicleBI<?> cc = getAnnotation(annotation.getAnnotations(), nid);
             if (cc != null) {
                 return cc;
             }

@@ -75,6 +75,7 @@ import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -133,7 +134,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public ConceptVersionBI getPrimordialVersion() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 
     public boolean addMemberNid(int nid) throws IOException {
         Set<Integer> memberNids = data.getMemberNids();
@@ -356,7 +356,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 cantResolve.add(er);
             }
         }
-        
+
         if (!cantResolve.isEmpty()) {
             AceLog.getAppLog().alertAndLogException(new Exception("Can't resolve some annotations on import: " + cantResolve));
         }
@@ -720,12 +720,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public int getConceptNid() {
         return nid;
     }
-    private static final NidSet rf2NidSet;
+    private static final NidSet rf1LangRefexNidSet;
 
     static {
-        rf2NidSet = new NidSet();
-        rf2NidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
-        rf2NidSet.add(ReferenceConcepts.SYNONYM.getNid());
+        rf1LangRefexNidSet = new NidSet();
+        rf1LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+        rf1LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+        rf1LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
+    }
+    private static final NidSet rf2LangRefexNidSet;
+
+    static {
+        rf2LangRefexNidSet = new NidSet();
+        rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF2.getNid());
+        rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF2.getNid());
+        rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+        rf2LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+        rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
     }
 
     @Override
@@ -747,12 +758,85 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         allowedStatus, positionSet, true);
             case LANG_REFEX:
                 return getRefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
-                        rf2NidSet, positionSet, precedencePolicy, contradictionManager),
+                        rf1LangRefexNidSet, positionSet, precedencePolicy, contradictionManager),
+                        typePrefOrder, langPrefOrder,
+                        allowedStatus, positionSet);
+            case RF2_LANG_REFEX:
+                return getRf2RefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
+                        rf2LangRefexNidSet, positionSet, precedencePolicy, contradictionManager),
                         typePrefOrder, langPrefOrder,
                         allowedStatus, positionSet);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
         }
+    }
+
+    private I_DescriptionTuple getRf2RefexSpecifiedDesc(
+            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
+            NidListBI typePrefOrder, NidListBI langRefexOrder,
+            NidSetBI allowedStatus, PositionSetBI positionSet) throws IOException, ToIoException {
+        ViewCoordinate vc = new ViewCoordinate(Precedence.PATH,
+                positionSet,
+                allowedStatus, null,
+                new IdentifyAllConflictStrategy(), Integer.MIN_VALUE,
+                Integer.MIN_VALUE,
+                RelAssertionType.STATED,
+                langRefexOrder,
+                LANGUAGE_SORT.RF2_LANG_REFEX);
+        if (descriptions.size() > 0) {
+            if (descriptions.size() > 1) {
+                if (langRefexOrder != null
+                        && langRefexOrder.getListValues() != null) {
+                    for (int langRefexNid : langRefexOrder.getListValues()) {
+                        for (int typePrefNid : typePrefOrder.getListArray()) {
+                            if (typePrefNid == ReferenceConcepts.FULLY_SPECIFIED_RF2.getNid()) {
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions,
+                                        typePrefNid, vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            } else if (typePrefNid == ReferenceConcepts.SYNONYM_RF2.getNid()) {
+                                // get Preferred or other
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions,
+                                        ReferenceConcepts.SYNONYM_RF2.getNid(), vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (langRefexOrder != null
+                        && langRefexOrder.getListValues() != null) {
+                    for (int langRefexNid : langRefexOrder.getListValues()) {
+                        for (int typePrefNid : typePrefOrder.getListArray()) {
+                            if (typePrefNid == ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid()) {
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions,
+                                        typePrefNid, vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            } else if (typePrefNid == ReferenceConcepts.SYNONYM_RF1.getNid()) {
+                                // get Preferred or other
+                                I_DescriptionTuple answer =
+                                        getPreferredAcceptability(descriptions,
+                                        ReferenceConcepts.SYNONYM_RF1.getNid(), vc, langRefexNid);
+                                if (answer != null) {
+                                    return answer;
+                                }
+                            }
+                        }
+                    }
+                }
+                return descriptions.iterator().next();
+            } else {
+                return descriptions.iterator().next();
+            }
+        }
+        return null;
     }
 
     private I_DescriptionTuple getRefexSpecifiedDesc(
@@ -782,7 +866,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             } else {
                                 // get Preferred or other
                                 I_DescriptionTuple answer =
-                                        getPreferredAcceptability(descriptions, ReferenceConcepts.SYNONYM.getNid(), vc, langRefexNid);
+                                        getPreferredAcceptability(descriptions, ReferenceConcepts.SYNONYM_RF1.getNid(), vc, langRefexNid);
                                 if (answer != null) {
                                     return answer;
                                 }
@@ -809,7 +893,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         RefexCnidVersionBI<?> langRefex =
                                 (RefexCnidVersionBI<?>) refex;
                         if (langRefex.getCnid1()
-                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY.getNid()) {
+                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid() ||
+                                langRefex.getCnid1()
+                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF2.getNid()) {
                             return d;
                         }
                     }
@@ -933,8 +1019,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public Description.Version getDescTuple(NidListBI descTypePreferenceList,
             I_ConfigAceFrame config) throws IOException {
-        return (Version) getDescTuple(descTypePreferenceList, config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(), config.getLanguageSortPref(),
-                config.getPrecedence(), config.getConflictResolutionStrategy());
+        return (Version) getDescTuple(descTypePreferenceList,
+                new NidList(config.getLanguagePreferenceList().getListArray()),
+                config.getAllowedStatus(),
+                config.getViewPositionSetReadOnly(),
+                config.getLanguageSortPref(),
+                config.getPrecedence(),
+                config.getConflictResolutionStrategy());
     }
     NidSetBI allowedStatus;
     NidSetBI allowedTypes;
@@ -1874,15 +1965,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return results;
     }
-    
-    
-     public boolean isAnnotationIndex() throws IOException {
-       return data.isAnnotationIndex();
-     }
 
-     public void setAnnotationIndex(boolean annotationIndex) throws IOException {
+    public boolean isAnnotationIndex() throws IOException {
+        return data.isAnnotationIndex();
+    }
+
+    public void setAnnotationIndex(boolean annotationIndex) throws IOException {
         data.setAnnotationIndex(annotationIndex);
-     }
+    }
 
     @Override
     public boolean isAnnotationStyleRefex() throws IOException {

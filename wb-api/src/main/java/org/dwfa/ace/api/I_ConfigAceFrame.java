@@ -80,7 +80,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
     public enum LANGUAGE_SORT_PREF {
         LANG_B4_TYPE("language before type"),
         TYPE_B4_LANG("type before language"),
-        LANG_REFEX("use language refex");
+        LANG_REFEX("use language refex"), 
+        RF2_LANG_REFEX("use RF2 language refex");
 
         private String desc;
 
@@ -101,6 +102,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
                     return LANGUAGE_SORT.LANG_REFEX;
                 case TYPE_B4_LANG:
                     return LANGUAGE_SORT.TYPE_BEFORE_LANG;
+                case RF2_LANG_REFEX:
+                    return LANGUAGE_SORT.RF2_LANG_REFEX;
             }
             throw new UnsupportedOperationException("Can't handle: " + this);
         }
@@ -112,6 +115,8 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
                     return LANG_REFEX;
                 case TYPE_BEFORE_LANG:
                     return TYPE_B4_LANG;
+                case RF2_LANG_REFEX:
+                    return RF2_LANG_REFEX;
             }
             throw new UnsupportedOperationException("Can't handle: " + sort);
         }
