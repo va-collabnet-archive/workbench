@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -378,7 +379,11 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer implements Pro
                                 aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy(),
                                 aceConfig.getClassifierConcept().getConceptNid(),
                                 helper.getAssertionType());
-                    int sourceRelTupleSize = versions.size(); 
+                    Set<Integer> parentSet = new HashSet<Integer>();
+                    for (I_RelTuple rt: versions) {
+                        parentSet.add(rt.getC2Id());
+                    }
+                    int sourceRelTupleSize = parentSet.size(); 
                     if (sourceRelTupleSize > 1) {
                         HashSet<I_RelTuple> unique = new HashSet<I_RelTuple>(versions);
                         sourceRelTupleSize = unique.size();

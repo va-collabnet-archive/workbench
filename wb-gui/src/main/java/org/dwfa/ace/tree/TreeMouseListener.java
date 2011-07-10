@@ -26,7 +26,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -341,6 +343,7 @@ public class TreeMouseListener extends MouseAdapter {
                 int[] newNodeIndices = new int[tuples.size()];
                 int index = 0;
                 int insertIndex = parentNode.getIndex(node);
+                Set<Integer> addedParents = new HashSet<Integer>();
                 for (I_RelTuple t : tuples) {
                     newNodeIndices[index++] = insertIndex;
 
@@ -349,6 +352,10 @@ public class TreeMouseListener extends MouseAdapter {
                         continue;
                     }
 
+                    if (addedParents.contains(t.getC2Id())) {
+                        continue;
+                    }
+                    addedParents.add(t.getC2Id());
                     ConceptBeanForTree extraParentBean =
                             ConceptBeanForTree.get(t.getC2Id(), t.getRelId(), treeBean.getParentDepth() + 1, true, ace
                                 .getAceFrameConfig());
