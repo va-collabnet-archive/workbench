@@ -185,7 +185,7 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
     public static Operator NOT_IS_PARENT_MEMBER_OF = null;
     private static String[] SUPPORTED_IDS = null;
 
-    private static void init() {
+    private static synchronized void init() {
         if (IS_PARENT_MEMBER_OF == null) {
             IS_PARENT_MEMBER_OF = Operator.addOperatorToRegistry("isParentMemberOf", false);
             NOT_IS_PARENT_MEMBER_OF = Operator.addOperatorToRegistry(IS_PARENT_MEMBER_OF.getOperatorString(), true);

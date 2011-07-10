@@ -224,7 +224,7 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
     public static Operator NOT_IS_MEMBER_OF = null;
     private static String[] SUPPORTED_IDS = null;
 
-    private static void init() {
+    private static synchronized void init() {
         if (IS_MEMBER_OF == null) {
             IS_MEMBER_OF = Operator.addOperatorToRegistry("isMemberOf", false);
             NOT_IS_MEMBER_OF = Operator.addOperatorToRegistry(IS_MEMBER_OF.getOperatorString(), true);

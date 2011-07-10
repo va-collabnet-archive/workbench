@@ -182,7 +182,7 @@ public class IsMissingDescForDialectEvaluatorDefinition implements EvaluatorDefi
    public static Operator NOT_IS_MISSING_DESC_FOR = null;
    private static String[] SUPPORTED_IDS = null;
 
-   private static void init() {
+   private static synchronized void init() {
       if (IS_MISSING_DESC_FOR == null) {
          IS_MISSING_DESC_FOR = Operator.addOperatorToRegistry("isMissingDescFor", false);
          NOT_IS_MISSING_DESC_FOR = Operator.addOperatorToRegistry(IS_MISSING_DESC_FOR.getOperatorString(), true);

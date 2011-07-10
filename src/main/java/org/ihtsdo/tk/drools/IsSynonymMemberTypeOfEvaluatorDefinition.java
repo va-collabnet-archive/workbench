@@ -121,7 +121,7 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
 
                 ConceptSpec SYNONYMY =
                         new ConceptSpec("Degree of Synonymy Refset",
-                        		synonymyRefset);
+                        synonymyRefset);
                 evalRefsetNid = SYNONYMY.get(vc).getNid();
 
                 if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
@@ -185,7 +185,7 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
     public static Operator NOT_IS_SYNONYM_MEMBER_TYPE_OF = null;
     private static String[] SUPPORTED_IDS = null;
 
-    private static void init() {
+    private static synchronized void init() {
         if (IS_SYNONYM_MEMBER_TYPE_OF == null) {
             IS_SYNONYM_MEMBER_TYPE_OF = Operator.addOperatorToRegistry("isSynonymMemberTypeOf", false);
             NOT_IS_SYNONYM_MEMBER_TYPE_OF = Operator.addOperatorToRegistry(IS_SYNONYM_MEMBER_TYPE_OF.getOperatorString(), true);
