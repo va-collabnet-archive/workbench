@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
@@ -71,13 +72,18 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -102,13 +108,226 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
     private static EnumSet<EConcept.REFSET_TYPES> allowedTypes =
             EnumSet.of(EConcept.REFSET_TYPES.CID_CID, EConcept.REFSET_TYPES.CID_CID_CID, EConcept.REFSET_TYPES.CID_CID_STR);
+
+    private class AddSpecMetadaListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                I_GetConceptData memberRefset = (I_GetConceptData) getTermComponent();
+                if (memberRefset == null) {
+                    return;
+                }
+                I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
+
+                String name = Ts.get().getConceptVersion(aceConfig.getViewCoordinate(), 
+                        memberRefset.getConceptNid()).getPreferredDescription().getText();
+                if (name.endsWith(" refset")) {
+                    name = name.replace(" refset", "");
+                }
+                I_GetConceptData status = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+                if (Ts.get().hasUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0])) {
+                    status = (I_GetConceptData) SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient();
+                }
+
+
+                I_GetConceptData refsetComputeType = Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
+
+                I_GetConceptData fsnConcept =
+                        Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+                I_GetConceptData ptConcept =
+                        Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+                I_GetConceptData isA = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+                I_GetConceptData supportingRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+                I_GetConceptData markedParentRel =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+                I_GetConceptData markedParentIsATypeRel =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
+                I_GetConceptData specifiesRefsetRel = Terms.get().getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+                I_GetConceptData commentsRel = Terms.get().getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+                I_GetConceptData editTimeRel = Terms.get().getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
+                I_GetConceptData computeTimeRel = Terms.get().getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+                I_GetConceptData purposeRel = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+                I_GetConceptData refsetComputeTypeRel =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+                I_GetConceptData stringAnnotation =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
+                I_GetConceptData markedParentAnnotation =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
+                I_GetConceptData enumeratedAnnotation =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
+                I_GetConceptData specAnnotation = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
+                I_GetConceptData ancillaryDataAnnotation =
+                        Terms.get().getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
+
+                // check that the name isn't null or empty etc
+                if (name == null || name.trim().equals("")) {
+                    throw new TaskFailedException("Refset name cannot be empty.");
+                }
+
+                String refsetSpecName = name + " refset spec";
+                String markedParentName = name + " marked parent";
+                String commentsName = name + " comments refset";
+                String editTimeName = name + " edit time refset";
+                String computeTimeName = name + " compute time refset";
+
+                // create new concepts
+                I_GetConceptData refsetSpec = newConcept(aceConfig, status);
+                I_GetConceptData markedParent = newConcept(aceConfig, status);
+                I_GetConceptData promotionRefset = newConcept(aceConfig, status);
+                I_GetConceptData commentsRefset = newConcept(aceConfig, status);
+                I_GetConceptData editTimeRefset = newConcept(aceConfig, status);
+                I_GetConceptData computeTimeRefset = newConcept(aceConfig, status);
+
+                // create FSN and PT for each
+                try {
+                    newDescription(refsetSpec, fsnConcept, refsetSpecName, aceConfig, status);
+                    newDescription(refsetSpec, ptConcept, refsetSpecName, aceConfig, status);
+
+                    newDescription(markedParent, fsnConcept, markedParentName, aceConfig, status);
+                    newDescription(markedParent, ptConcept, markedParentName, aceConfig, status);
+
+                    newDescription(commentsRefset, fsnConcept, commentsName, aceConfig, status);
+                    newDescription(commentsRefset, ptConcept, commentsName, aceConfig, status);
+
+                    newDescription(editTimeRefset, fsnConcept, editTimeName, aceConfig, status);
+                    newDescription(editTimeRefset, ptConcept, editTimeName, aceConfig, status);
+
+                    newDescription(computeTimeRefset, fsnConcept, computeTimeName, aceConfig, status);
+                    newDescription(computeTimeRefset, ptConcept, computeTimeName, aceConfig, status);
+                } catch (TerminologyException ex) {
+                    Terms.get().cancel();
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset wizard cannot be completed. "
+                            + ex.getMessage(), "", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // create relationships
+                newRelationship(memberRefset, markedParentRel, markedParent, aceConfig);
+                I_IntSet availableIsATypes = aceConfig.getDestRelTypes();
+                for (int isAType : availableIsATypes.getSetValues()) {
+                    newRelationship(memberRefset, markedParentIsATypeRel, Terms.get().getConcept(isAType), aceConfig);
+                }
+                newRelationship(refsetSpec, specifiesRefsetRel, memberRefset, aceConfig);
+
+                newRelationship(refsetSpec, isA, supportingRefset, aceConfig);
+                newRelationship(markedParent, isA, supportingRefset, aceConfig);
+                newRelationship(promotionRefset, isA, supportingRefset, aceConfig);
+                newRelationship(commentsRefset, isA, supportingRefset, aceConfig);
+                newRelationship(editTimeRefset, isA, supportingRefset, aceConfig);
+                newRelationship(computeTimeRefset, isA, supportingRefset, aceConfig);
+
+
+                newRelationship(memberRefset, commentsRel, commentsRefset, aceConfig);
+                newRelationship(memberRefset, editTimeRel, editTimeRefset, aceConfig);
+                newRelationship(memberRefset, computeTimeRel, computeTimeRefset, aceConfig);
+
+                newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
+
+                // supporting refsets purpose relationships
+                newRelationship(commentsRefset, purposeRel, stringAnnotation, aceConfig);
+                newRelationship(markedParent, purposeRel, markedParentAnnotation, aceConfig);
+                newRelationship(promotionRefset, purposeRel, enumeratedAnnotation, aceConfig);
+                newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
+                newRelationship(editTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
+                newRelationship(computeTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
+
+                // set the overall refset status to the specified status
+                RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
+                spec.modifyOverallSpecStatus(status);
+
+                Terms.get().addUncommittedNoChecks(refsetSpec);
+                Terms.get().addUncommittedNoChecks(markedParent);
+                Terms.get().addUncommittedNoChecks(promotionRefset);
+                Terms.get().addUncommittedNoChecks(commentsRefset);
+                Terms.get().addUncommittedNoChecks(editTimeRefset);
+                Terms.get().addUncommittedNoChecks(computeTimeRefset);
+                
+                Ts.get().commit(refsetSpec);
+                Ts.get().commit(markedParent);
+                Ts.get().commit(promotionRefset);
+                Ts.get().commit(commentsRefset);
+                Ts.get().commit(editTimeRefset);
+                Ts.get().commit(computeTimeRefset);
+            } catch (Exception exception) {
+                AceLog.getAppLog().alertAndLogException(exception);
+            }
+        }
+
+        public I_GetConceptData newConcept(I_ConfigAceFrame aceConfig, I_GetConceptData status) throws Exception {
+            boolean isDefined = true;
+
+            UUID conceptUuid = UUID.randomUUID();
+
+            I_GetConceptData newConcept = Terms.get().newConcept(conceptUuid, isDefined, aceConfig, status.getNid());
+            return newConcept;
+        }
+
+        public void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType, String description,
+                I_ConfigAceFrame aceConfig, I_GetConceptData status) throws TerminologyException, Exception {
+
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            I_IntSet actives = helper.getCurrentStatusIntSet();
+
+            if (descriptionType.getNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
+                String filteredDescription = description;
+                filteredDescription = filteredDescription.trim();
+                // new removal using native lucene escaping
+                filteredDescription = QueryParser.escape(filteredDescription);
+                SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
+                for (int i = 0; i < result.topDocs.totalHits; i++) {
+                    Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                    int cnid = Integer.parseInt(doc.get("cnid"));
+                    int dnid = Integer.parseInt(doc.get("dnid"));
+                    if (cnid == concept.getConceptNid()) {
+                        continue;
+                    }
+                    I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                        if (actives.contains(part_search.getStatusNid())
+                                && part_search.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid() && part_search.getText().equals(description)) {
+                            throw new TerminologyException("Concept already exists in database with FSN: " + description);
+                        }
+                    }
+                }
+            }
+            UUID descUuid = UUID.randomUUID();
+            Terms.get().newDescription(descUuid, concept, "en", description, descriptionType, Terms.get().getActiveAceFrameConfig(), status.getNid());
+            Terms.get().addUncommittedNoChecks(concept);
+
+        }
+
+        public void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType, I_GetConceptData destination,
+                I_ConfigAceFrame aceConfig) throws Exception {
+            int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
+            UUID relUuid = UUID.randomUUID();
+
+            I_GetConceptData charConcept =
+                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            I_GetConceptData refConcept =
+                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            int group = 0;
+            Terms.get().newRelationship(relUuid, concept, relationshipType, destination, charConcept, refConcept,
+                    Terms.get().getConcept(statusId), group, Terms.get().getActiveAceFrameConfig());
+            Terms.get().addUncommittedNoChecks(concept);
+
+        }
+    }
+    
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -595,6 +814,14 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         c.weightx = 1.0;
         topPanel.add(label, c);
         c.weightx = 0.0;
+        c.gridx++;
+
+        JButton addSPecMetaData = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_new.png")));
+
+        addSPecMetaData.addActionListener(new AddSpecMetadaListener());
+        addSPecMetaData.setToolTipText("Add metadata to enable refset specification for this concept.");
+        topPanel.add(addSPecMetaData, c);
+
         c.gridx++;
         componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
         componentHistoryButton.addActionListener(new ShowHistoryListener());
