@@ -45,7 +45,7 @@ import org.ihtsdo.arena.context.action.SetSynonymyAction;
 import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
-import org.ihtsdo.arena.context.action.ChangeRefexAction;
+//import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -63,6 +63,7 @@ import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.helper.dialect.DialectHelper;
 
 import org.ihtsdo.tk.example.binding.Language;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
@@ -300,7 +301,7 @@ rule "rule 14" #historical rel template onto rel"
 		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget));
 end
 
-rule "rule 15" #pref acceptability GB
+rule "rule 15" #pref acceptability GB Rf1
 	when
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.PREF, 
 							  context == Context.DROP_TARGET)
@@ -310,7 +311,17 @@ rule "rule 15" #pref acceptability GB
 		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
-rule "rule 16" #pref acceptibility US
+rule "rule 15.1" #pref acceptability GB Rf2
+	when
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRf2.PREFERRED_RF2, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
+end
+
+rule "rule 16" #pref acceptibility US Rf1
 	when
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.PREF, 
 							  context == Context.DROP_TARGET)
@@ -320,7 +331,17 @@ rule "rule 16" #pref acceptibility US
 		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
 end
 
-rule "rule 17" #acceptable acceptability GB
+rule "rule 16.1" #pref acceptibility US Rf2
+	when
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRf2.PREFERRED_RF2, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
+end
+
+rule "rule 17" #acceptable acceptability GB rf1
 	when
 		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.ACCEPTABLE, 
 							  context == Context.DROP_TARGET)
@@ -330,9 +351,29 @@ rule "rule 17" #acceptable acceptability GB
 		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
-rule "rule 18" #aceptable acceptibility US
+rule "rule 17.1" #acceptable acceptability GB rf2
+	when
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRf2.ACCEPTABLE_RF2, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
+		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
+end
+
+rule "rule 18" #aceptable acceptibility US Rf1
 	when
 		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.ACCEPTABLE, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us"));
+		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
+end
+
+rule "rule 18.1" #aceptable acceptibility US Rf2
+	when
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRf2.ACCEPTABLE_RF2, 
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
