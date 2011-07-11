@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
@@ -73,9 +72,6 @@ public class AnnotationWriter {
                         if (oldMember != null) {
                             refsetMember = oldMember;
                         }
-                    } else {
-                        AceLog.getAppLog().warning("\n########## Suppressing refset member:\n     " + refsetMember
-                                + "\n##########");
                     }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
