@@ -123,14 +123,14 @@ rule "rule 4" #concept onto same concept
       actions.add(new CloneAndRetireAction("clone & retire", $dropObject));
 end
 
-rule "rule 4.1" #refex onto refex
+/* rule "rule 4.1" #refex onto refex
 
    when
          $dropTarget: RefexFact(context == Context.DROP_TARGET)
          $dropObject: RefexFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
    then
       actions.add(new ChangeRefexAction("change", $dropObject));
-end
+end */
 
 rule "rule 5" #template onto concept
 
