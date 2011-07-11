@@ -45,6 +45,7 @@ import org.ihtsdo.arena.context.action.SetSynonymyAction;
 import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
+import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -119,6 +120,15 @@ rule "rule 4" #concept onto same concept
       actions.add(new RetireAction("retire", $dropObject));
       actions.add(new CloneAction("clone", $dropObject));
       actions.add(new CloneAndRetireAction("clone & retire", $dropObject));
+end
+
+rule "rule 4.1" #refex onto refex
+
+   when
+         $dropTarget: RefexFact(context == Context.DROP_TARGET)
+         $dropObject: RefexFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+   then
+      actions.add(new ChangeRefexAction("change", $dropObject));
 end
 
 rule "rule 5" #template onto concept
@@ -826,8 +836,8 @@ end
 rule "rule 53" #Body structure onto qualifier value
 	when
 	(and
-         ($dropTarget: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject));
