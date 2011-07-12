@@ -64,7 +64,7 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
         return longValue;
     }
 
-    public void setIntValue(long longValue) {
+    public void setLongValue(long longValue) {
         this.longValue = longValue;
     }
 
