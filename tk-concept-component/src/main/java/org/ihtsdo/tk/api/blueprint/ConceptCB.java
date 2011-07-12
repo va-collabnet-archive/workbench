@@ -23,7 +23,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -165,32 +168,46 @@ public class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     public DescCAB getFsnCAB() throws IOException {
+        //get rf1/rf2 concepts
+        UUID fsnUuid = null;
+        if (Ts.get().hasUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid())) {
+            fsnUuid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid();
+        } else {
+            fsnUuid = SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid();
+        }
         return new DescCAB(
                 getComponentUuid(),
-                WbDescType.FULLY_SPECIFIED.getLenient().getPrimUuid(),
+                fsnUuid,
                 getLang(),
                 getFullySpecifiedName(),
                 isInitialCaseSensitive());
     }
 
     public DescCAB getPreferredCAB() throws IOException {
+        //get rf1/rf2 concepts
+        UUID synUuid = null;
+        if (Ts.get().hasUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid())) {
+            synUuid = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid();
+        } else {
+            synUuid = SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid();
+        }
         return new DescCAB(
                 getComponentUuid(),
-                WbDescType.SYNONYM.getLenient().getPrimUuid(), //from PREFERRED
+                synUuid, //from PREFERRED
                 getLang(),
                 getPreferredName(),
                 isInitialCaseSensitive());
     }
 
     public List<RelCAB> getParentCABs() throws IOException {
-        List<RelCAB> parentCabs = 
+        List<RelCAB> parentCabs =
                 new ArrayList<RelCAB>(getParents().size());
-        for (UUID parentUuid: parents) {
+        for (UUID parentUuid : parents) {
             RelCAB parent = new RelCAB(
-                    getComponentUuid(), 
-                    isaType, 
-                    parentUuid, 
-                    0, 
+                    getComponentUuid(),
+                    isaType,
+                    parentUuid,
+                    0,
                     TkRelType.STATED_HIERARCHY);
             parentCabs.add(parent);
         }
