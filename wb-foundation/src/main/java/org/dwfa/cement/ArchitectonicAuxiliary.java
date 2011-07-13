@@ -1143,7 +1143,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	            WORKFLOW_ACTION("Workflow action", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 	            WORKFLOW_EDITOR_CATEGORY("Workflow editor category", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 	            WORKFLOW_EDITOR_HIERARCHY("Workflow editory hierarchy", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
-	            WORKFLOW_MODELER_VALUE("Workflow editor status", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
+	            WORKFLOW_EDITOR_STATUS("Workflow editor status", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 
 
 	            // Workflow Attribute Types (Driving Workflow)
 	            WORKFLOW_ACTION_VALUE("Workflow action value", new I_ConceptualizeUniversally[] { WORKFLOW_ATTRIBUTES }), 

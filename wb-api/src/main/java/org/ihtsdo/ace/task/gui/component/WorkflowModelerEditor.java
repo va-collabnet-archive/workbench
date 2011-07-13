@@ -62,7 +62,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 			
 			for (I_GetConceptData modeler : inactiveModelers)
 			{
-				List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+				List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 				boolean foundDefaultModeler = false;
 				for (I_RelVersioned  rel : relList)
@@ -102,7 +102,7 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     }
 
 	private boolean isLeadModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 		for (I_RelVersioned rel : relList)
 		{

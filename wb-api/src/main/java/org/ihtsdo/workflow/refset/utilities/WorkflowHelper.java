@@ -271,7 +271,7 @@ public class WorkflowHelper {
 	
 					for (I_GetConceptData modeler : modelers.values())
 					{
-						List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+						List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
 						for (I_RelVersioned rel : relList)
 						{
@@ -301,7 +301,7 @@ public class WorkflowHelper {
 	
 				for (I_GetConceptData modeler : modelers.values())
 				{
-					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
 					for (I_RelVersioned rel : relList)
 					{
@@ -618,7 +618,7 @@ public class WorkflowHelper {
 	}
 
 	public static boolean isActiveModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 		for (I_RelVersioned rel : relList)
 		{
@@ -631,7 +631,7 @@ public class WorkflowHelper {
 	}
 
 	public static boolean isDefaultModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE);
+		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 		for (I_RelVersioned rel : relList)
 		{

@@ -484,7 +484,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
         
         // Set user as active editor (for Workflow)
-        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_MODELER_VALUE
+        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS
                 .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()), tf
                 .getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), tf
                 .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
