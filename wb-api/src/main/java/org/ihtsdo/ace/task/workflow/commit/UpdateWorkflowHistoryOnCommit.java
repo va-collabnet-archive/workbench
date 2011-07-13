@@ -38,12 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /*
@@ -53,7 +55,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
                    
-public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest 
+public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest 
 {
 
     private static final long serialVersionUID = 1;
@@ -77,8 +79,14 @@ public class InitializeWorkflowHistoryOnCommit extends AbstractConceptTest
         
     	try 
         {
-        	wfHelper.initializeWorkflowForConcept(concept, false);
-        } catch (Exception e) {
+    		WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+    		
+    		if (latestBean == null ||
+    			!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()))) {
+    			wfHelper.initializeWorkflowForConcept(concept, false);
+    		}
+        }
+    		catch (Exception e) {
             throw new TaskFailedException(e);
         }
 
