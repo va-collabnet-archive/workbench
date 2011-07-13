@@ -72,6 +72,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 @BeanList(specs = {
@@ -294,14 +296,14 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
     }
 
     private void testForRefersTo() {
-
-        ConceptSpec REFERS_TO =
-                new ConceptSpec("Refers To Refset",
-                UUID.fromString("1b122b8f-172f-53d5-a2e2-eb1161737c2a"));
-
         try {
+            ConceptChronicleBI refexConcept = null;
+            if (Ts.get().hasUuid(SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getPrimUuid())) {
+                refexConcept = SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient();
+            } else {
+                refexConcept = SnomedMetadataRf1.REFERS_TO_REFSET_RF1.getLenient();
+            }
             //find if concept is member of Refers To refset
-            ConceptChronicleBI refexConcept = Ts.get().getConcept(REFERS_TO.getLenient().getNid());
             Collection<? extends RefexCnidVersionBI<?>> refexMembers =
                     (Collection<? extends RefexCnidVersionBI<?>>) refexConcept.getCurrentRefsetMembers(tempVc);
             int count = 0;
