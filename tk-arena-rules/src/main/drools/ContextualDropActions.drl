@@ -318,7 +318,6 @@ rule "rule 15.1" #pref acceptability GB Rf2
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
 rule "rule 16" #pref acceptibility US Rf1
@@ -338,7 +337,6 @@ rule "rule 16.1" #pref acceptibility US Rf2
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
 end
 
 rule "rule 17" #acceptable acceptability GB rf1
@@ -358,7 +356,6 @@ rule "rule 17.1" #acceptable acceptability GB rf2
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
 		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
 end
 
 rule "rule 18" #aceptable acceptibility US Rf1
@@ -378,7 +375,6 @@ rule "rule 18.1" #aceptable acceptibility US Rf2
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us"));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
 end
 
 rule "rule 19" #not acceptable acceptability GB
@@ -416,7 +412,7 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
       actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget));
 end
 
-rule "rule 22" #set degree of synonymy if not set
+rule "rule 22" #set degree of synonymy if not set rf1
 	when
 		$dropTarget: DescFact(this not isMemberOf Refsets.DEGREE_OF_SYNONYMY,
 							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
@@ -428,7 +424,19 @@ rule "rule 22" #set degree of synonymy if not set
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false));
 end
 
-rule "rule 23" #change synonymy from synonymous
+rule "rule 22.1" #set degree of synonymy if not set rf2
+	when
+		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2,
+							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonymous", $dropTarget, SynonymyType.SYNONYM, false));
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, false));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false));
+end
+
+rule "rule 23" #change synonymy from synonymous rf1
 	when
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
 							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
@@ -439,7 +447,18 @@ rule "rule 23" #change synonymy from synonymous
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
 end
 
-rule "rule 24" #change synonymy from near synonymous
+rule "rule 23.1" #change synonymy from synonymous rf2
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
+							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
+end
+
+rule "rule 24" #change synonymy from near synonymous rf1
 	when
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
 							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
@@ -450,10 +469,32 @@ rule "rule 24" #change synonymy from near synonymous
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
 end
 
-rule "rule 25" #change synonymy from non synonymous
+rule "rule 24.1" #change synonymy from near synonymous rf2
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
+							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
+end
+
+rule "rule 25" #change synonymy from non synonymous rf1
 	when
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
 							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
+		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
+end
+
+rule "rule 25.1" #change synonymy from non synonymous rf2
+	when
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
+							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -920,9 +961,18 @@ rule "rule 57" #change to non-case-sensitive
 		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget));
 end
 
-rule "rule 58" #retire inappropriate synonym
+rule "rule 58" #retire inappropriate synonym rf1
 	when
 		$dropTarget: DescFact(this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+                                        context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings));
+end
+
+rule "rule 58.1" #retire inappropriate synonym rf2
+	when
+		$dropTarget: DescFact(this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
                                         context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then

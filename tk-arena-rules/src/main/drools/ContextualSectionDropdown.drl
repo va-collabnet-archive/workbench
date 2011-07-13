@@ -48,13 +48,16 @@ import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.Ts;
-import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.spec.ValidationException;
+import java.io.IOException;
 
 
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
@@ -72,62 +75,217 @@ global Collection relActions;
 global BpActionFactoryNoPanel actionFactory;
 global ViewCoordinate vc;
 
-rule "add if not in refset: Non-Human refset"
+rule "add if not in refset: Non-Human refset (RF1)"
 	when
- 			$c: ConceptFact(this not isMemberOf Refsets.NON_HUMAN,
- 							this not isParentMemberOf Refsets.NON_HUMAN,
+ 			$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
+ 							this not isParentMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
  							context == Context.FOCUS_CONCEPT)
 
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/add-concept/add_to_Non-Human_refset.bp")));
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.NON_HUMAN_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_Non-Human_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 
 
-rule "remove if in refset: Non-Human refset"
+rule "remove if in refset: Non-Human refset (RF1)"
 	when
-		$c: ConceptFact(this isMemberOf Refsets.NON_HUMAN,
+		$c: ConceptFact(this isMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
  						context == Context.FOCUS_CONCEPT)
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/remove-concept/remove_from_Non-Human_refset.bp")));
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.NON_HUMAN_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_Non-Human_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 
-rule "add if not in refset: VMP refset"
+rule "add if not in refset: Non-Human refset (RF2)"
+	when
+ 			$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
+ 							this not isParentMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
+ 							context == Context.FOCUS_CONCEPT)
+
+	then 
+                    try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.NON_HUMAN_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_Non-Human_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+
+rule "remove if in refset: Non-Human refset (RF2)"
+	when
+		$c: ConceptFact(this isMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
+ 						context == Context.FOCUS_CONCEPT)
+	then 
+                 try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.NON_HUMAN_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_Non-Human_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+rule "add if not in refset: VMP refset (RF1)"
 	when 
-		$c: ConceptFact(this not isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
+		$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.VMP_RF1, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/add-concept/add_to_VMP_refset.bp")));
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.VMP_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_VMP_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 
 
-rule "remove if in refset: VMP refset"
+rule "remove if in refset: VMP refset (RF1)"
 	when
-		$c:ConceptFact(this isMemberOf Refsets.VMP, this isKindOf Snomed.PRODUCT,
+		$c:ConceptFact(this isMemberOf SnomedMetadataRf1.VMP_RF1, this isKindOf Snomed.PRODUCT,
 						context == Context.FOCUS_CONCEPT)
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/remove-concept/remove_from_VMP_refset.bp")));
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.VMP_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_VMP_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 
-rule "add if not in refset: VTM refset"
+rule "add if not in refset: VMP refset (RF2)"
 	when 
-		$c: ConceptFact(this not isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
+		$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.VMP_RF2, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/add-concept/add_to_VTM_refset.bp")));
+                 try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.VMP_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_VMP_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 
 
-rule "remove if in refset: VTM refset"
+rule "remove if in refset: VMP refset (RF2)"
 	when
-		$c: ConceptFact(this isMemberOf Refsets.VTM, this isKindOf Snomed.PRODUCT,
+		$c:ConceptFact(this isMemberOf SnomedMetadataRf2.VMP_RF2, this isKindOf Snomed.PRODUCT,
+						context == Context.FOCUS_CONCEPT)
+	then 
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.VMP_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_VMP_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+rule "add if not in refset: VTM refset (RF1)"
+	when 
+		$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.VTM_RF1, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
-		conceptActions.add(actionFactory.make(
-			new File("plugins/remove-concept/remove_from_VTM_refset.bp")));
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.VTM_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_VTM_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+
+rule "remove if in refset: VTM refset (RF1)"
+	when
+		$c: ConceptFact(this isMemberOf SnomedMetadataRf1.VTM_RF1, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+                 try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf1.VTM_RF1.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_VTM_refset.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+rule "add if not in refset: VTM refset (RF2)"
+	when 
+		$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.VTM_RF2, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.VTM_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/add-concept/add_to_VTM_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
+end
+
+
+rule "remove if in refset: VTM refset (RF2)"
+	when
+		$c: ConceptFact(this isMemberOf SnomedMetadataRf2.VTM_RF2, this isKindOf Snomed.PRODUCT,
+						 context == Context.FOCUS_CONCEPT)
+	then 
+                try{
+                        if (Ts.get().hasUuid(SnomedMetadataRf2.VTM_RF2.getLenient().getPrimUuid())) {
+                        conceptActions.add(actionFactory.make(
+                            new File("plugins/remove-concept/remove_from_VTM_refset_rf2.bp")));
+                        }
+                    }catch (ValidationException ex) {
+                        // do nothing
+                    } catch (IOException ex) {
+                        //do nothing
+                    }
 end
 

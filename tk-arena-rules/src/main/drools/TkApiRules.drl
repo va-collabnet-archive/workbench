@@ -18,6 +18,7 @@ import org.ihtsdo.tk.spec.SpecFactory;
 import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
 import org.ihtsdo.tk.example.binding.SnomedRelSpec;
 import org.ihtsdo.tk.example.binding.Taxonomies;
@@ -218,6 +219,81 @@ rule "isKindOf limited status"
 									$c.getNid());
 		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
 									ConceptInactivationType.LIMITED_STATUS_CONCEPT),
+									$c.getNid());
+end
+
+rule "isKindOf duplicate (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+									SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2),
+									$c.getNid());
+end
+
+
+rule "isKindOf ambiguous (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+			templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MAY_BE_A,
+									SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2),
+									$c.getNid());
+end
+
+rule "isKindOf erroneous (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+									SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2),
+									$c.getNid());
+end
+
+rule "isKindOf outdated (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.OUTDATED_COMPONENT_RF2,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.REPLACED_BY,
+									SnomedMetadataRf2.OUTDATED_COMPONENT_RF2),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									SnomedMetadataRf2.OUTDATED_COMPONENT_RF2),
+									$c.getNid());
+end
+
+/*rule "isKindOf moved elswhere (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.MOVED_ELSEWHERE,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MOVED_TO,
+									ConceptInactivationType.MOVED_ELSEWHERE),
+									$c.getNid());
+end */
+
+rule "isKindOf limited status (RF2)"
+	when
+		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.LIMITED_COMPONENT_RF2,
+				this not isKindOf TermAux.MOVED_TO,
+				hasHistoricalRels == false);
+	then
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.SAME_AS,
+									SnomedMetadataRf2.LIMITED_COMPONENT_RF2),
+									$c.getNid());
+		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.WAS_A,
+									SnomedMetadataRf2.LIMITED_COMPONENT_RF2),
 									$c.getNid());
 end
 
