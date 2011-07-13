@@ -29,10 +29,14 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec FULLY_SPECIFIED_NAME_RF2 =
             new ConceptSpec("Fully specified name (core metadata concept)",
             UUID.fromString("00791270-77c9-32b6-b34f-d932569bd2bf"));
+    
+    
     // SCT ID:	900000000000013009
     public static ConceptSpec SYNONYM_RF2 =
             new ConceptSpec("Synonym (core metadata concept)",
             UUID.fromString("8bfba944-3965-3946-9bcb-1e80a5da63a2"));
+    
+    
     // SCT ID:	900000000000548007
     public static ConceptSpec PREFERRED_RF2 =
             new ConceptSpec("Preferred (foundation metadata concept)",
@@ -41,6 +45,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec ACCEPTABLE_RF2 =
             new ConceptSpec("Acceptable (foundation metadata concept)",
             UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
+    
+    
     // SCT ID:	900000000000509007
     public static ConceptSpec US_ENGLISH_REFSET_RF2 =
             new ConceptSpec("US English",
@@ -49,6 +55,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec GB_ENGLISH_REFSET_RF2 =
             new ConceptSpec("GB English",
             UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
+    
+    
     // SCT ID:	900000000000017005
     public static ConceptSpec CASE_SENSITIVE_RF2 =
             new ConceptSpec("Case sensitive",
@@ -61,6 +69,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec CASE_INSENSITIVE_RF2 =
             new ConceptSpec("Case insensitive",
             UUID.fromString("ecea41a2-f596-3d98-99d1-771b667e55b8"));
+    
+    
     // SCT ID:	900000000000074008
     public static ConceptSpec PRIMITIVE_RF2 =
             new ConceptSpec("Primitive",
@@ -69,6 +79,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec DEFINED_RF2 =
             new ConceptSpec("Defined",
             UUID.fromString("6d9cd46e-8a8f-310a-a298-3e55dcf7a986"));
+    
+    
     // SCT ID:	447563008
     public static ConceptSpec ICD_9_CM_EQUIVALENCE_MAP_REFSET_RF2 =
             new ConceptSpec("ICD-9-CM equivalence complex map reference set (foundation metadata concept)",
@@ -77,6 +89,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec ICD_O_SIMPLE_MAP_REFSET_RF2 =
             new ConceptSpec("ICD-O simple map reference set (foundation metadata concept)",
             UUID.fromString("5ef10e09-8f16-398e-99b5-55cff5bd820a"));
+    
+    
     // SCT ID:	900000000000007000
     public static ConceptSpec NOT_REFINABLE_RF2 =
             new ConceptSpec("Not refinable (foundation metadata concept)",
@@ -89,6 +103,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec MANDATORY_REFINIBILITY_RF2 =
             new ConceptSpec("Mandatory refinability",
             UUID.fromString("67a79b5a-d56e-37f6-ad66-da712e39c453"));
+    
+    
     // SCT ID:	900000000000227009
     public static ConceptSpec ADDITIONAL_RELATIONSHIP_RF2 =
             new ConceptSpec("Additional relationship",
@@ -109,6 +125,8 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec QUALIFYING_RELATIONSSHIP_RF2 =
             new ConceptSpec("Qualifying relationship (core metadata concept)",
             UUID.fromString("569dac14-a8a5-3cf0-b608-5ae2f1c89461"));
+    
+    
     /** STATUS ***/
     // SCT ID:	900000000000486000
     public static ConceptSpec LIMITED_COMPONENT_RF2 =
@@ -194,4 +212,21 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec REFERS_TO_REFSET_RF2 =
             new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)",
             UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
+    
+    public static ConceptSpec DEGREE_OF_SYNONYMY_RF2 =
+            new ConceptSpec("Degree of Synonymy Refset (RF2)",
+            UUID.fromString("3bc6ad17-253e-53a9-bea6-049abfa467c8"));
+    
+    public static ConceptSpec VMP_RF2 =
+            new ConceptSpec("Virtual medicinal product simple reference set",
+            UUID.fromString("c259d808-8011-3772-bece-b4fbde18d375"));
+    
+    public static ConceptSpec VTM_RF2 =
+            new ConceptSpec("Virtual therapeutic moiety simple reference set",
+            UUID.fromString("1a090a21-28c4-3a87-9d04-766f04600494"));
+    
+    public static ConceptSpec NON_HUMAN_RF2 =
+            new ConceptSpec("Non-human simple reference set",
+            UUID.fromString("b1b1e773-3eb6-3bcc-a6c7-52ac5d0a53be"));
+
 }
