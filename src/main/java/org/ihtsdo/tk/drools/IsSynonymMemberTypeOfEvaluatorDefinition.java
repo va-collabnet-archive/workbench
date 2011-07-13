@@ -40,6 +40,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -114,15 +116,14 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 ConceptSpec possibleType = null;
                 int evalRefsetNid = 0;
                 int typeNid = 0;
-                UUID synonymyRefset = UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847");
-                if (!Ts.get().hasUuid(synonymyRefset)) {
+                
+                if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+                } else if (Ts.get().hasUuid(SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
+                } else{
                     return false;
                 }
-
-                ConceptSpec SYNONYMY =
-                        new ConceptSpec("Degree of Synonymy Refset",
-                        synonymyRefset);
-                evalRefsetNid = SYNONYMY.get(vc).getNid();
 
                 if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
                     possibleType = (ConceptSpec) value2;

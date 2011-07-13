@@ -40,6 +40,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class IsGbMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -115,14 +117,13 @@ public class IsGbMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition 
                 int evalRefsetNid = 0;
                 int typeNid = 0;
 
-                UUID enGbLangUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
-                if (!Ts.get().hasUuid(enGbLangUuid)) {
+                if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
+                } else if (Ts.get().hasUuid(SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
+                } else{
                     return false;
                 }
-                ConceptSpec EN_GB_LANG = 
-                        new ConceptSpec("GB English Dialect Subset",
-                        enGbLangUuid);
-                evalRefsetNid = EN_GB_LANG.getStrict(vc).getNid();
 
                 if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
                     possibleType = (ConceptSpec) value2;

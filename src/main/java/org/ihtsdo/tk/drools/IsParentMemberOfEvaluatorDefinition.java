@@ -33,6 +33,7 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -99,6 +100,17 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
 
                 //value1 (concept): this could be concept VersionBI or conceptFact
                 //value2 (refset): this will be put in Refset.java (tk-arena-rules) as a ConceptSpec
+                ConceptSpec refexConcept = (ConceptSpec) value2;
+
+                try {
+                    if (!Ts.get().hasUuid(refexConcept.getLenient().getPrimUuid())) {
+                        return false;
+                    }
+                } catch (ValidationException ex) {
+                    //do nothing
+                } catch (IOException ex) {
+                    //do nothing
+                }
 
                 ConceptVersionBI possibleMember = null;
                 if (ConceptVersionBI.class.isAssignableFrom(value1.getClass())) {
