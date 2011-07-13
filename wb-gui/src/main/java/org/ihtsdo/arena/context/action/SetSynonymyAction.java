@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.UUID;
 
 import javax.swing.AbstractAction;
 
@@ -13,15 +12,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.Refsets;
-import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.SynonymyType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -35,6 +31,7 @@ import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class SetSynonymyAction extends AbstractAction {
@@ -62,11 +59,15 @@ public class SetSynonymyAction extends AbstractAction {
             TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
-            UUID degreeOfSynonymy = Refsets.DEGREE_OF_SYNONYMY.getLenient().getPrimUuid();
+            int dosNid = 0;
+            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+            } else {
+                dosNid = Refsets.DEGREE_OF_SYNONYMY.getLenient().getNid();
+            }
 
             if (currentSynonymy) {
                 Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-                int synonymyCollectionNid = Ts.get().getNidForUuids(Refsets.DEGREE_OF_SYNONYMY.getLenient().getPrimUuid());
                 int synonymyTypeNid;
 
                 if (synonymy.equals(SynonymyType.NEAR_SYNONYMOUS)) {
@@ -79,7 +80,7 @@ public class SetSynonymyAction extends AbstractAction {
 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
-                        if (refex.getCollectionNid() == synonymyCollectionNid) {
+                        if (refex.getCollectionNid() == dosNid) {
                             //make analog
                             componentVersion = (I_AmPart) refex;
                             AnalogBI analog = null;
@@ -112,7 +113,7 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB syn = new RefexCAB(
                             TK_REFSET_TYPE.CID,
                             desc.getNid(),
-                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                            dosNid);
                     syn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(syn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -121,7 +122,7 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB nearSyn = new RefexCAB(
                             TK_REFSET_TYPE.CID,
                             desc.getNid(),
-                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                            dosNid);
                     nearSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(nearSyn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -130,7 +131,7 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB notSyn = new RefexCAB(
                             TK_REFSET_TYPE.CID,
                             desc.getNid(),
-                            Ts.get().getNidForUuids(degreeOfSynonymy));
+                            dosNid);
                     notSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(notSyn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());

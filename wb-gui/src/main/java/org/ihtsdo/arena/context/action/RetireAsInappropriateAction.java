@@ -45,6 +45,8 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class RetireAsInappropriateAction extends AbstractAction {
@@ -56,6 +58,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
     TerminologyList tl;
     WizardPanel wizard;
     ConceptViewSettings settings;
+    ConceptChronicleBI refexConcept;
 
     public RetireAsInappropriateAction(String actionName, DescFact fact, ConceptViewSettings settings) {
         super(actionName);
@@ -120,7 +123,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
         c.gridx = 2;
         c.gridwidth = 1;
         setUpButtons(wizardPanel, c);
-        
+
         //add concept list
         c.gridx = 0;
         c.gridy++;
@@ -227,18 +230,25 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     private void addToRefersToRefset(int nid) {
         try {
+            if (Ts.get().hasUuid(SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getPrimUuid())) {
+                refexConcept = SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient();
+            } else {
+                refexConcept = SnomedMetadataRf1.REFERS_TO_REFSET_RF1.getLenient();
+            }
+
             RefexCAB newSpec = new RefexCAB(
                     TK_REFSET_TYPE.CID,
                     component.getNid(),
-                    Ts.get().getNidForUuids(Refsets.REFERS_TO.getLenient().getPrimUuid()));
+                    refexConcept.getNid());
             newSpec.put(RefexProperty.CNID1, nid);
             TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
             tc.construct(newSpec);
-            ConceptChronicleBI refexConcept = Ts.get().getConcept(Refsets.REFERS_TO.getLenient().getNid());
             if (!refexConcept.isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(refexConcept);
+            Ts.get().addUncommitted(refexConcept);
             }
+            I_GetConceptData concept = Terms.get().getConceptForNid(component.getConceptNid());
+            Ts.get().addUncommitted(concept);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InvalidCAB e1) {

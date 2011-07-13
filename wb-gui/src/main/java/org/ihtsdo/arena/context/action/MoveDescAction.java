@@ -18,6 +18,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -36,6 +37,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class MoveDescAction extends AbstractAction {
 
@@ -70,19 +72,27 @@ public class MoveDescAction extends AbstractAction {
                 newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
                 TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                         config.getViewCoordinate());
+                int dosNid = 0;
+                if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                    dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+                } else {
+                    dosNid = Refsets.DEGREE_OF_SYNONYMY.getLenient().getNid();
+                }
                 for (RefexVersionBI refex : oldRefexes) {
-                    RefexCAB newSpec = new RefexCAB(
-                            TK_REFSET_TYPE.CID,
-                            newDesc.getNid(),
-                            refex.getCollectionNid());
-                    RefexCnidVersionBI cv =
-                            (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
-                    int typeNid = cv.getCnid1();
-                    newSpec.put(RefexProperty.CNID1, typeNid);
-                    tc.construct(newSpec);
-                    ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
-                    if (!refexConcept.isAnnotationStyleRefex()) {
-                        Ts.get().addUncommitted(refexConcept);
+                    if (refex.getCollectionNid() != dosNid) { //not cloning degree of synonymy refeset membership
+                        RefexCAB newSpec = new RefexCAB(
+                                TK_REFSET_TYPE.CID,
+                                newDesc.getNid(),
+                                refex.getCollectionNid());
+                        RefexCnidVersionBI cv =
+                                (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
+                        int typeNid = cv.getCnid1();
+                        newSpec.put(RefexProperty.CNID1, typeNid);
+                        tc.construct(newSpec);
+                        ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
+                        if (!refexConcept.isAnnotationStyleRefex()) {
+                            Ts.get().addUncommitted(refexConcept);
+                        }
                     }
                 }
             }

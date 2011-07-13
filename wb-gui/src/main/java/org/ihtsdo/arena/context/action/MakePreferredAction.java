@@ -28,6 +28,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class MakePreferredAction extends AbstractAction {
 
@@ -54,13 +56,26 @@ public class MakePreferredAction extends AbstractAction {
                     desc.getCurrentRefexes(vc);
 
             if (dialect.equals("en-us")) {
-                int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
+                int evalRefsetNid = 0;
+                if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
+                } else{
+                    evalRefsetNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
+                }
+                
+                int acceptabilityNid = 0;
+                if (Ts.get().hasUuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid())) {
+                    acceptabilityNid = SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
+                } else{
+                    acceptabilityNid = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid();
+                }
+                
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
                         if (refex.getCollectionNid() == evalRefsetNid) {
                             if (refex.isUncommitted()) {
                                 RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
-                                refexAnalog.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
+                                refexAnalog.setCnid1(acceptabilityNid);
                                 I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
                                 Terms.get().addUncommitted(concept);
                             } else {
@@ -80,7 +95,7 @@ public class MakePreferredAction extends AbstractAction {
                                     RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
                                     RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 
-                                    rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
+                                    rca.setCnid1(acceptabilityNid);
 
                                     I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
                                     Terms.get().addUncommitted(concept);
@@ -92,13 +107,26 @@ public class MakePreferredAction extends AbstractAction {
                     }
                 }
             } else if (dialect.equals("en-gb")) {
-                int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
+                int evalRefsetNid = 0;
+                if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                    evalRefsetNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
+                } else{
+                    evalRefsetNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
+                }
+                
+                int acceptabilityNid = 0;
+                if (Ts.get().hasUuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid())) {
+                    acceptabilityNid = SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
+                } else{
+                    acceptabilityNid = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid();
+                }
+                
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
                         if (refex.getCollectionNid() == evalRefsetNid) {
                             if (refex.isUncommitted()) {
                                 RefexCnidAnalogBI refexAnalog = (RefexCnidAnalogBI) refex;
-                                refexAnalog.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
+                                refexAnalog.setCnid1(acceptabilityNid);
                                 I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
                                 Terms.get().addUncommitted(concept);
                             } else {
@@ -118,7 +146,7 @@ public class MakePreferredAction extends AbstractAction {
                                     RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
                                     RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
 
-                                    rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.PREF.getLenient().getPrimUuid()));
+                                    rca.setCnid1(acceptabilityNid);
 
                                     I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
                                     Terms.get().addUncommitted(concept);
