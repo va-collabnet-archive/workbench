@@ -204,7 +204,28 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec MOVED_FROM_RF1 =
             new ConceptSpec("MOVED FROM (attribute)",
             UUID.fromString("9ceab5fa-7b4c-3618-b229-6997dc69ad65"));
-
+     
+    /*** Synonymy ***/
+     public static ConceptSpec DEGREE_OF_SYNONYMY_REFSET_RF1 =
+            new ConceptSpec("Degree of Synonymy Refset",
+            UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847"));
+     
+     public static ConceptSpec REFERS_TO_REFSET_RF1 =
+            new ConceptSpec("Refers To Refset",
+            UUID.fromString("1b122b8f-172f-53d5-a2e2-eb1161737c2a"));
+     
+     public static ConceptSpec VMP_RF1 =
+            new ConceptSpec("VMP subset",
+            UUID.fromString("d085216e-e34d-52e8-9785-d8af93939f99"));
+    
+    public static ConceptSpec VTM_RF1 =
+            new ConceptSpec("VTM subset",
+            UUID.fromString("e65ea362-72d4-3641-bfba-fe4429eea6f9"));
+    
+    public static ConceptSpec NON_HUMAN_RF1 =
+            new ConceptSpec("Non-human Subset",
+            UUID.fromString("0e2687b7-db28-5a01-b968-b98865648f2b"));
+    
     /* References */
     // Replaced_By 1
 //    public static ConceptSpec NAME_RF1 =
