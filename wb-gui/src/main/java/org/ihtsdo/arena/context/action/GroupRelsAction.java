@@ -72,84 +72,21 @@ public class GroupRelsAction extends AbstractAction {
             RelationshipVersionBI targetRel = (RelationshipVersionBI) targetComponent;
             RelationshipVersionBI sourceRel = (RelationshipVersionBI) sourceComponent;
 
-            if (targetComponent.getConceptNid() == sourceComponent.getConceptNid()) {
-                while (pathItr.hasNext()) {
-                    RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
-                            targetRel.getStatusNid(),
-                            targetRel.getAuthorNid(),
-                            pathItr.next().getConceptNid(),
-                            Long.MAX_VALUE);
-                    RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
-                            sourceRel.getStatusNid(),
-                            sourceRel.getAuthorNid(),
-                            pathItr.next().getConceptNid(),
-                            Long.MAX_VALUE);
-                    targetAnalog.setGroup(groupNumber);
-                    sourceAnalog.setGroup(groupNumber);
-                }
-                Terms.get().addUncommitted(concept);
-            } else {
-                I_RelVersioned newTargetRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
-                        targetRel.getTypeNid(),
-                        targetRel.getDestinationNid(),
-                        targetRel.getCharacteristicNid(),
-                        targetRel.getRefinabilityNid(),
-                        groupNumber, //assign new group number to rels
+            for (PathBI ep : config.getEditingPathSet()) {
+                RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
                         targetRel.getStatusNid(),
-                        config.getDbConfig().getUserConcept().getNid(),
-                        pathNid,
+                        targetRel.getAuthorNid(),
+                        ep.getConceptNid(),
                         Long.MAX_VALUE);
-
-                while (pathItr.hasNext()) {
-                    newTargetRel.makeAnalog(newTargetRel.getStatusNid(), newTargetRel.getAuthorNid(),
-                            pathItr.next().getConceptNid(), Long.MAX_VALUE);
-                }
-
-                I_RelVersioned newSourceRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
-                        sourceRel.getTypeNid(),
-                        sourceRel.getDestinationNid(),
-                        sourceRel.getCharacteristicNid(),
-                        sourceRel.getRefinabilityNid(),
-                        groupNumber, //assign new group number to rels
+                RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
                         sourceRel.getStatusNid(),
-                        config.getDbConfig().getUserConcept().getNid(),
-                        pathNid,
+                        sourceRel.getAuthorNid(),
+                        ep.getConceptNid(),
                         Long.MAX_VALUE);
-
-                while (pathItr.hasNext()) {
-                    newTargetRel.makeAnalog(newSourceRel.getStatusNid(), newSourceRel.getAuthorNid(),
-                            pathItr.next().getConceptNid(), Long.MAX_VALUE);
-                }
-
-                Terms.get().addUncommitted(concept);
-
-                if (I_AmPart.class.isAssignableFrom(targetComponent.getClass())) {
-                    I_AmPart componentVersionTarget = (I_AmPart) targetComponent;
-                    for (PathBI ep : config.getEditingPathSet()) {
-                        componentVersionTarget.makeAnalog(
-                                ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                                config.getDbConfig().getUserConcept().getNid(),
-                                ep.getConceptNid(),
-                                Long.MAX_VALUE);
-                    }
-                    I_GetConceptData retireConceptTarget = Terms.get().getConceptForNid(componentVersionTarget.getNid());
-                    Terms.get().addUncommitted(retireConceptTarget);
-                }
-
-                if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
-                    I_AmPart componentVersionSource = (I_AmPart) sourceComponent;
-                    for (PathBI ep : config.getEditingPathSet()) {
-                        componentVersionSource.makeAnalog(
-                                ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-                                config.getDbConfig().getUserConcept().getNid(),
-                                ep.getConceptNid(),
-                                Long.MAX_VALUE);
-                    }
-                    I_GetConceptData retireConceptSource = Terms.get().getConceptForNid(componentVersionSource.getNid());
-                    Terms.get().addUncommitted(retireConceptSource);
-                }
+                targetAnalog.setGroup(groupNumber);
+                sourceAnalog.setGroup(groupNumber);
             }
-
+            Terms.get().addUncommitted(concept);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
