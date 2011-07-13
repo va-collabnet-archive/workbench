@@ -23,7 +23,10 @@ import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -50,6 +53,11 @@ import org.ihtsdo.tk.example.binding.ConceptInactivationType;
 
 import org.ihtsdo.tk.api.WizardBI;
 import javax.swing.JPanel;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 
 
@@ -140,9 +148,9 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
             throw new TaskFailedException(e);
-        } catch (IllegalArgumentException e) {
+        } /*catch (IllegalArgumentException e) {
             throw new TaskFailedException(e);
-        } catch (ExecutionException e) {
+        } */catch (ExecutionException e) {
             throw new TaskFailedException(e);
         }
 
@@ -200,14 +208,14 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
         @Override
         protected void finished() {
-    
-        	JPanel wizardPanel = wizard.getWizardPanel(); 
-        	
-        	Component[] components = wizardPanel.getComponents();
+            try {
+                JPanel wizardPanel = wizard.getWizardPanel(); 
+                
+                Component[] components = wizardPanel.getComponents();
             for (int i = 0; i < components.length; i++) {
                 wizardPanel.remove(components[i]);
             }
-        	
+                
             wizardPanel.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH; 
@@ -223,14 +231,49 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             // Add the Refset Purpose List ComboBox
             c.gridx++;
             c.gridy = 0;
-            I_GetConceptData parentList[] = new I_GetConceptData[6];
+            
+            //get rf1/rf2 parent concepts
+            UUID ambiguousUuid = null;
+            UUID duplicateUuid = null;
+            UUID erroneousUuid = null;
+            UUID limitedUuid = null;
+            UUID outdatedUuid = null;
+            
+            if (Ts.get().hasUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid())) {
+                ambiguousUuid = SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid();
+            }else{
+                ambiguousUuid = SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid())) {
+                duplicateUuid = SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid();
+            }else{
+                duplicateUuid = SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid())) {
+                erroneousUuid = SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid();
+            }else{
+                erroneousUuid = SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid())) {
+                limitedUuid = SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid();
+            }else{
+                limitedUuid = SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.OUTDATED_COMPONENT_RF2.getLenient().getPrimUuid())) {
+                outdatedUuid = SnomedMetadataRf2.OUTDATED_COMPONENT_RF2.getLenient().getPrimUuid();
+            }else{
+                outdatedUuid = SnomedMetadataRf1.OUTDATED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
+            }
+            
+            
+            
+            I_GetConceptData parentList[] = new I_GetConceptData[5];
             try {
-            	parentList[0] = Terms.get().getConcept(ConceptInactivationType.AMBIGUOUS_CONCEPT.getUuids());
-            	parentList[1] = Terms.get().getConcept(ConceptInactivationType.DUPLICATE_CONCEPT.getUuids());
-            	parentList[2] = Terms.get().getConcept(ConceptInactivationType.ERRONEOUS_CONCEPT.getUuids());
-            	parentList[3] = Terms.get().getConcept(ConceptInactivationType.LIMITED_STATUS_CONCEPT.getUuids());
-            	parentList[4] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
-            	parentList[5] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
+                    parentList[0] = Terms.get().getConcept(ambiguousUuid);
+                    parentList[1] = Terms.get().getConcept(duplicateUuid);
+                    parentList[2] = Terms.get().getConcept(erroneousUuid);
+                    parentList[3] = Terms.get().getConcept(limitedUuid);
+                    parentList[4] = Terms.get().getConcept(outdatedUuid);
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -248,8 +291,13 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
             c.gridx = 0;
             c.gridy = 1;
             c.weightx = 0;
-        	c.weighty = 1;
+                c.weighty = 1;
             wizardPanel.add(new JPanel(), c);
+            } catch (ValidationException ex) {
+                Logger.getLogger(SelectInactiveParent.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(SelectInactiveParent.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
