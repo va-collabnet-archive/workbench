@@ -691,7 +691,7 @@ public class WorkflowHelper {
                 WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(concept);
                 
                 
-	            if (latestBean == null || !WorkflowHelper.getAcceptAction().equals(latestBean.getAction()))
+	            if (latestBean == null || WorkflowHelper.getAcceptAction().equals(latestBean.getAction()))
 	            	writer.setWorkflowUid(UUID.randomUUID());
 	            else
 	            	writer.setWorkflowUid(latestBean.getWorkflowId());
