@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <wsdl:definitions name="qadb-service" targetNamespace="http://www.ihtsdo.org/qadb/qadb-service/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ihtsdo.org/qadb/qadb-service/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   <wsdl:types>
     <xsd:schema targetNamespace="http://www.ihtsdo.org/qadb/qadb-service/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
