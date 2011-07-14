@@ -39,6 +39,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -78,6 +79,7 @@ public class WorkflowHelper {
 	private static int currentNid = 0;
 	private static int isARelNid = 0;
 	private static Set<UUID> beginWorkflowActions = null;
+	private static Set<UUID> commitWorkflowActions = null;
 	private static UUID endWorkflowActionUid = null;
 	private static UUID endWorkflowStateUid = null;
 
@@ -169,36 +171,50 @@ public class WorkflowHelper {
 
 	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean)
  	{
-		WorkflowHistoryRefsetWriter writer;
-
 		try {
-			writer = new WorkflowHistoryRefsetWriter();
-
-			writer.setPathUid(bean.getPath());
-			writer.setModelerUid(bean.getModeler());
-			writer.setConceptUid(bean.getConcept());
-			writer.setFSN(bean.getFSN());
-			writer.setActionUid(bean.getAction());
-			writer.setStateUid(bean.getState());
-
-			writer.setWorkflowUid(bean.getWorkflowId());
-
-			writer.setEffectiveTime(Long.MAX_VALUE);
-			// Must use previous Refset Timestamp to revert proper Str
-			writer.setWorkflowTime(bean.getWorkflowTime());
-
-			writer.setAutoApproved(bean.getAutoApproved());
-			writer.setOverride(bean.getOverridden());
+			boolean precedingCommitExists = WorkflowHelper.isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()));
 			
-			WorkflowHistoryRefsetWriter.lockMutex();
-            writer.retireMember();
-			Terms.get().addUncommitted(writer.getRefsetConcept());
-			Terms.get().commit();
-			WorkflowHistoryRefsetWriter.unLockMutex();
+			retireRow(bean);
 
+			if (precedingCommitExists) {
+				// Just retired preceding commit
+		    	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
+
+		    	// Retire original Row as previously retired original
+				retireRow(latestBean);
+	    	}	    	
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in retiring workflow history row: " + bean.toString() + "  with error: " + e.getMessage());
 		}
+	}
+
+	private static void retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+		WorkflowHistoryRefsetWriter writer;
+		writer = new WorkflowHistoryRefsetWriter();
+
+		writer.setPathUid(bean.getPath());
+		writer.setModelerUid(bean.getModeler());
+		writer.setConceptUid(bean.getConcept());
+		writer.setFSN(bean.getFSN());
+		writer.setActionUid(bean.getAction());
+		writer.setStateUid(bean.getState());
+
+		writer.setWorkflowUid(bean.getWorkflowId());
+
+		writer.setEffectiveTime(Long.MAX_VALUE);
+
+		// Must use previous Refset Timestamp to revert proper Str
+		writer.setWorkflowTime(bean.getWorkflowTime());
+
+		writer.setAutoApproved(bean.getAutoApproved());
+		writer.setOverride(bean.getOverridden());
+		
+		WorkflowHistoryRefsetWriter.lockMutex();
+        writer.retireMember();
+		Terms.get().addUncommitted(writer.getRefsetConcept());
+		Terms.get().commit();
+		
+		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
 	public static void updateModelers() 
@@ -588,6 +604,35 @@ public class WorkflowHelper {
     	}
     }
     
+    public static boolean isCommitWorkflowAction(I_GetConceptData actionConcept) {
+    	if (commitWorkflowActions  == null)
+		{
+    		commitWorkflowActions = new HashSet<UUID>();
+    		
+    		try
+	    	{
+    	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+    	    	{
+					for (I_RelVersioned rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE))
+					{
+						if (rel != null) {
+    						commitWorkflowActions.add(action.getPrimUuid());
+							break;
+						}
+					}
+    	    	}
+	    	} catch (Exception e) {
+	        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying if current action is a BEGIN-WORKFLOW action with error: " + e.getMessage());
+	    	}
+		}
+
+    	if (commitWorkflowActions != null && actionConcept != null) {
+    		return (commitWorkflowActions.contains(actionConcept.getPrimUuid()));
+    	} else {
+    		return false;
+    	}
+    }
+    
     private static boolean isEndWorkflowAction(I_GetConceptData actionConcept) {
 		
     	if (endWorkflowActionUid  == null && actionConcept != null)
@@ -934,7 +979,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	private static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
+	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
 			I_GetConceptData con) throws IOException, TerminologyException {
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 

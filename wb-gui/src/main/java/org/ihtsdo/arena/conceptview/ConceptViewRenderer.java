@@ -811,18 +811,23 @@ public class ConceptViewRenderer extends JLayeredPane {
         boolean enableOopsButton = true;
         try {
         	if (concept != null) {
-	            WorkflowHistoryJavaBean latestWfHxJavaBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+	            TreeSet<WorkflowHistoryJavaBean> latestWfHxSet = WorkflowHelper.getLatestWfHxForConcept(concept);
 	
-	            if (latestWfHxJavaBean == null) {
+	            if (latestWfHxSet == null) {
 	                enableOopsButton = false;
 	            } else {
-	                UUID latestModelerUUID = latestWfHxJavaBean.getModeler();
+	                UUID latestModelerUUID = latestWfHxSet.first().getModeler();
 	                UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
-	                boolean autoApproved = latestWfHxJavaBean.getAutoApproved();
+	                boolean islatestActionAutoApproved = latestWfHxSet.first().getAutoApproved();
 	
-	                if (autoApproved || 
+	                if (islatestActionAutoApproved || 
 	                    !currentModelerUUID.equals(latestModelerUUID) || 
-	                    WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) {
+	                    (latestWfHxSet.size() > 1))
+	                	/*
+	                 	|| 
+	                    WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) 
+	                    */
+	                { 
 	                    enableOopsButton = false;
 	                }
 	            }
