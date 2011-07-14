@@ -150,7 +150,6 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
                     try {
                         evalRefsetNid = possibleRefset.getStrict(vc).getNid();
                     } catch (ValidationException ve) {
-                        ve.printStackTrace();
                         return false;
                     }
                 } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
