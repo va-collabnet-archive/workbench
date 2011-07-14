@@ -39,7 +39,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -979,8 +978,9 @@ public class WorkflowHelper {
 		}
 	}
 
-	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
-			I_GetConceptData con) throws IOException, TerminologyException {
+	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) 
+		throws IOException, TerminologyException 
+	{
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null) {
@@ -999,7 +999,8 @@ public class WorkflowHelper {
 						if (!ignoredWorkflows.contains(reader.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
 							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 							
-							if (latestTimestamp == 0 || latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId())) {
+							if (latestTimestamp == 0 || 
+								(latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId().toString()))) {
 								returnSet.clear();
 								ignoredWorkflows.add(currentWorkflowId);
 								

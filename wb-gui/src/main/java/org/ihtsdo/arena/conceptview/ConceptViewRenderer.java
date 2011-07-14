@@ -464,8 +464,6 @@ public class ConceptViewRenderer extends JLayeredPane {
                                     }
 
                                     // TODO: REMOVE HARD CODING!!!
-                                    String action = getActionFromState(s);
-
                                     // TODO: Override Action Handler. . . Not sure how used
                                     worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid());
 
@@ -554,8 +552,6 @@ public class ConceptViewRenderer extends JLayeredPane {
                                             public void actionPerformed(ActionEvent e) {
 
                                                 try {
-                                                    final I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
                                                     // TODO: Remove Hardcoding and find better fix to issue of Pref-Term vs FSN
                                                 	workflowToggleButton.doClick();
                                                 	
@@ -740,31 +736,6 @@ public class ConceptViewRenderer extends JLayeredPane {
         return actions;
     }
 
-    private String getActionFromState(String state) {
-
-        if (state.equals("Approved")) {
-            return "Accept workflow action";
-        }
-        if (state.equals("Escalated")) {
-            return "Escalate workflow action";
-        }
-        if (state.equals("For Chief Terminologist review")) {
-            return "Chief Terminologist review workflow action";
-        }
-        if (state.equals("For discussion")) {
-            return "Discuss workflow action";
-        }
-        if (state.equals("For review")) {
-            return "Review workflow action";
-        }
-
-        return "";
-
-    }
-
-    /**
-     *
-     */
     public static ConceptViewRenderer getVertex(Component component) {
         while (component != null) {
             if (component instanceof ConceptViewRenderer) {
@@ -813,21 +784,15 @@ public class ConceptViewRenderer extends JLayeredPane {
         	if (concept != null) {
 	            TreeSet<WorkflowHistoryJavaBean> latestWfHxSet = WorkflowHelper.getLatestWfHxForConcept(concept);
 	
-	            if (latestWfHxSet == null) {
+	            if (latestWfHxSet == null || latestWfHxSet.size() <= 1) {
 	                enableOopsButton = false;
 	            } else {
-	                UUID latestModelerUUID = latestWfHxSet.first().getModeler();
+	                UUID latestModelerUUID = latestWfHxSet.last().getModeler();
 	                UUID currentModelerUUID = WorkflowHelper.getCurrentModeler().getPrimUuid();
-	                boolean islatestActionAutoApproved = latestWfHxSet.first().getAutoApproved();
+	                boolean islatestActionAutoApproved = latestWfHxSet.last().getAutoApproved();
 	
 	                if (islatestActionAutoApproved || 
-	                    !currentModelerUUID.equals(latestModelerUUID) || 
-	                    (latestWfHxSet.size() > 1))
-	                	/*
-	                 	|| 
-	                    WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestWfHxJavaBean.getAction()))) 
-	                    */
-	                { 
+	                    !currentModelerUUID.equals(latestModelerUUID)) { 
 	                    enableOopsButton = false;
 	                }
 	            }

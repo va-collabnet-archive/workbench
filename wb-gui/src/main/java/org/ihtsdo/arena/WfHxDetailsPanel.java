@@ -169,7 +169,7 @@ public class WfHxDetailsPanel extends JPanel {
 	        
 			// Create Table and set concept-specific fields
 	        table = new JTable(data, columnNames);
-	        currentLatestTimestamp = conceptWfBeans.first().getWorkflowTime();
+	        currentLatestTimestamp = conceptWfBeans.last().getWorkflowTime();
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Cannot create WfHx Details Panel Table");
 		}
@@ -183,7 +183,6 @@ public class WfHxDetailsPanel extends JPanel {
 				// Proper Concept
 				if (currentConcept == null || !arenaConcept.getPrimUuid().equals(currentConcept.getPrimUuid())) {
 					generateNewHtml = true;
-					currentConcept = arenaConcept;
 				}  
 	
 				try {
@@ -194,8 +193,6 @@ public class WfHxDetailsPanel extends JPanel {
 						if (latestBean.getWorkflowTime() != currentLatestTimestamp) {
 							generateNewHtml = true;
 						}
-		
-						currentLatestTimestamp = latestBean.getWorkflowTime();
 					}
 				} catch (Exception e) {
 					AceLog.getAppLog().log(Level.WARNING, "Failure to identify latest WfHx for concept: " + arenaConcept);
