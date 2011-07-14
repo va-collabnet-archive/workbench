@@ -107,35 +107,7 @@ public  class WorkflowHistoryRefsetReader extends WorkflowRefsetReader
 		}
 	}
 	
-	public static String generateXmlForXslt(WorkflowHistoryJavaBean bean) {
-		StringBuffer retStr = new StringBuffer();
-		
-		try { 
-			retStr.append("<workflow>");
-			retStr.append("<id>");
-			retStr.append(bean.getWorkflowId().toString());
-			retStr.append("</id>");
-			retStr.append("<action>");
-			retStr.append(processMetaForDisplay(Terms.get().getConcept(bean.getAction())));
-			retStr.append("</action>");
-			retStr.append("<state>");
-			retStr.append(processMetaForDisplay(Terms.get().getConcept(bean.getState())));
-			retStr.append("</state>");
-			retStr.append("<modeler>");
-			retStr.append(Terms.get().getConcept(bean.getModeler()).getInitialText());
-			retStr.append("</modeler>");
-			retStr.append("<time>");
-			retStr.append(WorkflowHelper.format.format(new Date(bean.getWorkflowTime())));
-			retStr.append("</time>");
-			retStr.append("</workflow>");
-		} catch (Exception e) { 
-			AceLog.getAppLog().log(Level.WARNING, "Unable to get process row for Xslt for bean: " + bean.toString() + " with error: " + e.getMessage());
-		}
-		
-		return retStr.toString();
-	}
-
-	private static String processMetaForDisplay(I_GetConceptData metaCon) throws IOException {
+	public String processMetaForDisplay(I_GetConceptData metaCon) throws IOException {
 		try {
 			String term = WorkflowHelper.getPreferredTerm(metaCon);
 			

@@ -14,7 +14,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.WfHxDetailsPanel;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 
 
 public class WfHxDetailsPanelHandler {
@@ -23,9 +22,7 @@ public class WfHxDetailsPanelHandler {
 	private ConceptViewSettings conceptSettings;
     private WfHxDetailsPanel detailsPanel;
 	private WfHxDetailsConceptChangeListener currentListener;
-	private final int rowHeightInPixels = 30;
     
-	private int idealHeight;
 	public class WfHxDetailsConceptChangeListener implements PropertyChangeListener {
 
         @Override
@@ -62,42 +59,8 @@ public class WfHxDetailsPanelHandler {
     	
     	currentlyDisplayed = true;
     	detailsPanel.setVisible(true);
-    	setWfHxPanelProperties();
+    	setWfHxLocation();
     }
-
-	private void setWfHxPanelProperties() {
-    	setWfHxDimensions();	
-    	setWfHxLocation();			
-	}
-	
-	private void setWfHxDimensions() {
-		int width = 325;
-		int height = 45;
-		boolean rowIdentifed = false;
-
-		if (detailsPanel.getCurrentHtml().contains(WorkflowHistoryRefsetReader.chiefTermReplaceTerm)) {
-			width = 390;
-		}
-	
-		String str = detailsPanel.getCurrentHtml();
-		String searchTerm = "</tr>";
-
-		// Exclude header from below calculation
-		str = str.substring(str.indexOf(searchTerm) + searchTerm.length()); 
-
-		while (str.indexOf(searchTerm) >= 0) {
-			rowIdentifed = true;
-			height += rowHeightInPixels;
-			str = str.substring(str.indexOf(searchTerm) + searchTerm.length());
-		}
-
-		if (!rowIdentifed) {
-			width = 250;
-		}
-		
-		idealHeight = height;
-		detailsPanel.setBounds(0, 0, width, height);
-	}
 	
 	public void hideWfHxDetailsPanel() {
 		if (detailsPanel != null) {
@@ -107,7 +70,6 @@ public class WfHxDetailsPanelHandler {
 	    	detailsPanel.invalidate();
 	        layers.remove(detailsPanel);
 	    	currentlyDisplayed = false;
-			idealHeight = 0;
 		}
 	}
 
@@ -123,10 +85,6 @@ public class WfHxDetailsPanelHandler {
         	if (conceptPanelRenderer.getRootPane() != null) {
 		        JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane(); 
 	
-		        if (idealHeight > detailsPanel.getHeight()) {
-		    		detailsPanel.setBounds(0, 0, detailsPanel.getWidth(), idealHeight);
-		        }
-		        
 	    		Point loc = SwingUtilities.convertPoint(conceptPanelRenderer, new Point(0, 0), layers);
 		        if (layers.getWidth() > loc.x + conceptPanelRenderer.getWidth() + detailsPanel.getWidth()) {
 		            loc.x = loc.x + conceptPanelRenderer.getWidth();
@@ -135,11 +93,8 @@ public class WfHxDetailsPanelHandler {
 		            loc.x = loc.x - detailsPanel.getWidth();
 		            detailsPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
 		        }
-		        if (conceptPanelRenderer.getHeight() <  detailsPanel.getHeight()) {
-		        	detailsPanel.setBounds(loc.x, loc.y, detailsPanel.getWidth(), conceptPanelRenderer.getHeight());
-		        } else{
-		        	detailsPanel.setBounds(loc.x, loc.y, detailsPanel.getWidth(), detailsPanel.getHeight());
-		        }
+
+		        detailsPanel.setBounds(loc.x, loc.y, detailsPanel.getWidth(), detailsPanel.getHeight());
 		        layers.add(detailsPanel, JLayeredPane.PALETTE_LAYER);
         	}
     	} catch (Exception e) {
@@ -157,7 +112,7 @@ public class WfHxDetailsPanelHandler {
             createNewWfPanel();
     	}
 
-    	setWfHxPanelProperties();
+    	setWfHxLocation();
         conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
     }
 

@@ -1,172 +1,180 @@
 package org.ihtsdo.arena;
 
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
-import java.io.IOException;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import javax.swing.JEditorPane;
 import javax.swing.JPanel;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.TransformerFactory;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.table.AceTableRenderer;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class WfHxDetailsPanel extends JPanel {
-	
 	private static final long serialVersionUID = 1L;
-	
-	private class Workflow {
-		private String id;
-		private String action;
-		private String state;
-		private String modeler;
-		private String time;
-		
-		public String getId() {
-			return id;
-		}
 
-		public String getAction() {
-			return action;
-		}
+	// Table-Based fields
+	private static final String[] columnNames = {"Action", "State", "Modeler", "Timestamp"};
+	private JTable table = null;
+	private List<Boolean> newWfUidIndices;
 
-		public String getState() {
-			return state;
-		}
-
-		public String getModeler() {
-			return modeler;
-		}
-
-		public String getTime() {
-			return time;
-		}
-
-		public void setId(String uuid) {
-			id = uuid;
-		}
-		
-		public void setAction(String act) {
-			action = act;
-		}
-		
-		public void setState(String st) {
-			state = st;
-		}
-		
-		public void setModeler(String mod) {
-			modeler = mod;
-		}
-
-		public void setTime(String t) {
-			time = t;
-		}
-	}
-	
-	public class WfHxXmlHandler extends DefaultHandler {
-		 
-	    private String tempVal;
-		private Workflow tempWorkflow;
-		
-		public void startDocument() throws SAXException {
-	        allWorkflows = new ArrayList<Workflow>();
-    		tempWorkflow = new Workflow();
-	    }
-
-	    public void endDocument() throws SAXException {
-	        
-	    }
-
-	    public void startElement(String uri, String localName,
-	    						 String qName, Attributes attributes)
-	    	throws SAXException {
-	    }
-
-	    public void endElement(String uri, String localName, String qName)
-	    	throws SAXException {
-	    	if(qName.equalsIgnoreCase("workflow")) {
-				//add it to the list
-	    		if (tempWorkflow != null) {
-	    			allWorkflows.add(tempWorkflow);	    
-	    		}
-	    		tempWorkflow = new Workflow();
-	    	} else if (qName.equalsIgnoreCase("Id")) {
-				tempWorkflow.setId(tempVal);
-	    	} else if (qName.equalsIgnoreCase("Action")) {
-				tempWorkflow.setAction(tempVal);
-			} else if (qName.equalsIgnoreCase("State")) {
-				tempWorkflow.setState(tempVal);
-			} else if (qName.equalsIgnoreCase("Modeler")) {
-				tempWorkflow.setModeler(tempVal);
-			} else if (qName.equalsIgnoreCase("Time")) {
-				tempWorkflow.setTime(tempVal);
-			}
-	    }
-
-	    public void characters(char ch[], int start, int length)
-	    throws SAXException {
-	        tempVal = new String(ch, start, length);
-	    }
-	}
-
-	private JEditorPane htmlPane = new JEditorPane();
-	private DefaultHandler xmlHandler;
-	
-	private List<Workflow> allWorkflows;
-
-	private String currentHtml;  
-
-	//	private boolean currentlyDisplayed = true;
-	private long currentLatestTimestamp = Long.MIN_VALUE;
+	// Data Storage fields
 	private I_GetConceptData currentConcept = null;
-	
-	private ConceptViewSettings settings;
+	private TreeSet<WorkflowHistoryJavaBean> conceptWfBeans;
+	private long currentLatestTimestamp = Long.MIN_VALUE;
+
 
 	public WfHxDetailsPanel(ConceptViewSettings settings) {
 		super(new GridLayout(1,1));
+		currentConcept = settings.getConcept();
 
-		this.settings = settings;
-
-        htmlPane.setContentType("text/html");
-        htmlPane.setEditable(false);
-    	currentHtml = generateWfHxAsHtml(settings.getConcept());
-    	currentConcept = settings.getConcept();
-		WorkflowHistoryJavaBean latestBean = null;
-		
-		try {
-			latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(settings.getConcept());
-		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Couldn't find Wf Hx for Arena Panel for Concept: " + settings.getConcept());
-		}
-		
-		if (latestBean != null) {
-			currentLatestTimestamp = latestBean.getWorkflowTime();
-		}
-
-		htmlPane.setText(currentHtml);
-		
-		add(htmlPane);
+		// Create Table
+    	generateWfHxTable();
+    	setupTablePanel();
+    	
+    	// Create & add Pane ScrollPane 
+    	JScrollPane scrollPane = new JScrollPane(table);
+    	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	add(scrollPane);
 	}
-	 
+
+	private void setupTablePanel() {
+    	TableColumn column = null;
+    	table.setFillsViewportHeight(true);
+
+    	// Setup Renderers
+    	WfHxDetailsPanelRenderer renderer = new WfHxDetailsPanelRenderer(newWfUidIndices);
+    	table.setDefaultRenderer(Object.class, renderer);  
+    	table.getTableHeader().setDefaultRenderer(renderer);  
+
+    	
+    	/* Calculate Preferred tableWidth */
+    	// Max width per column
+    	int[] columnWidths = calculateTableWidth();
+    	
+    	// size of margin * (n+1 margins for n columns)
+ 		int marginWidth = table.getColumnModel().getColumnMargin() * (columnWidths.length + 1);
+
+ 		// Initialize with margin and 
+ 		int tableWidth = marginWidth;
+
+    	for (int i = 0; i < table.getColumnCount(); i++) {
+    		// Calculate tableWidth
+        	tableWidth += columnWidths[i];
+
+        	// Set Column's Preferred-Widths 
+        	column = table.getColumnModel().getColumn(i);
+	        column.setPreferredWidth((int)(columnWidths[i] * 1.25)); 
+    	}
+    	
+    	
+    	/* Calculate Preferred tableHeight */
+    	// for # rows of data + header
+    	int totalRows = getRowCount() + 1; 
+    	
+    	// size of rows
+    	int rowHeight = table.getRowHeight() * totalRows;
+    	
+    	// size of margin *  ((n+1 margins for n data rows)  +  (1 for header's two margins)
+    	int marginHeight = table.getRowMargin() * (totalRows + 2);
+    	
+    	// row Height + margin Height
+    	int tableHeight = rowHeight + marginHeight;
+
+    	
+    	/* Set Panel Preferred-Size */
+    	setBounds(0, 0, tableWidth, tableHeight);
+	}
+
+	private int[] calculateTableWidth() {
+		TableColumnModel columns = table.getColumnModel();
+ 		TableModel data = table.getModel();
+ 		int counter = 0;
+ 		int[] columnWidths = new int[columns.getColumnCount()];
+
+ 		for (int column = 0; column < columns.getColumnCount(); column++) {
+ 			// In case header tag is longer than actual values
+ 			TableCellRenderer h = columns.getColumn(column).getHeaderRenderer();
+ 			if (h == null) {
+ 				h = table.getDefaultRenderer(Object.class);
+ 			}
+ 			
+ 			Component c = h.getTableCellRendererComponent(table, columns.getColumn(column).getHeaderValue(), false, false, -1, column);
+ 			int currentMaxWidth = (int)(c.getPreferredSize().width * 1.25);
+
+ 			for (int row = 0; row < table.getRowCount(); row++) {
+ 				TableCellRenderer r = table.getCellRenderer(row, column);
+ 				c = r.getTableCellRendererComponent(table, data.getValueAt(row, column), false, false, row, column);
+ 				currentMaxWidth = Math.max(currentMaxWidth, (int)(c.getPreferredSize().width * 1.25));
+ 			}	
+ 			
+ 			columnWidths[counter++] = currentMaxWidth;
+ 		}
+ 		
+ 		return columnWidths;
+	}
+
+	private void generateWfHxTable() {
+        int counter = 0;
+        boolean colorA = true;
+        UUID currentWfUid = UUID.randomUUID();
+        newWfUidIndices = new ArrayList<Boolean>();
+
+        try {
+			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+
+			conceptWfBeans = WorkflowHelper.getAllWorkflowHistory(currentConcept);
+	        Object[][] data = new Object[conceptWfBeans.size()][];
+
+			for (WorkflowHistoryJavaBean bean : conceptWfBeans) {
+	        	String[] row = new String[4];
+	        	
+	        	String action = reader.processMetaForDisplay(Terms.get().getConcept(bean.getAction()));
+	    		String state = reader.processMetaForDisplay(Terms.get().getConcept(bean.getState()));
+	    		String modeler = Terms.get().getConcept(bean.getModeler()).getInitialText();
+	    		String time = WorkflowHelper.format.format(new Date(bean.getWorkflowTime()));
+	    		
+	    		row[0] = action;
+	    		row[1] = state;
+	    		row[2] = modeler;
+	    		row[3] = time;
+	    		
+	    		data[counter++] = row;
+	        
+	    		if (!bean.getWorkflowId().equals(currentWfUid)) {
+	    			currentWfUid = bean.getWorkflowId();
+	    			
+	    			// new Wf Uid, flip color boolean
+	    			colorA = !colorA;
+	    		}
+
+    			newWfUidIndices.add(colorA);
+			}
+	        
+			// Create Table and set concept-specific fields
+	        table = new JTable(data, columnNames);
+	        currentLatestTimestamp = conceptWfBeans.first().getWorkflowTime();
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Cannot create WfHx Details Panel Table");
+		}
+	}
+
 	public boolean isNewHtmlCodeRequired(I_GetConceptData arenaConcept) {
 		boolean generateNewHtml = false;
 		
@@ -203,113 +211,7 @@ public class WfHxDetailsPanel extends JPanel {
 		return generateNewHtml;
 	}
 
-	private String generateWfHxAsHtml(I_GetConceptData arenaConcept) {
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        TreeSet<WorkflowHistoryJavaBean> allRows = WorkflowHelper.getAllWorkflowHistory(arenaConcept);
-        String inputXml = generateXsltXml(allRows);
-
-        return transformerWithoutXslt(inputXml);
-	}
-
-	private void parseDocument(String inputXml) {
-
-		//get a factory
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		try {
-
-			//get a new instance of parser
-			SAXParser sp = spf.newSAXParser();
-			xmlHandler = new WfHxXmlHandler();
-			//parse the file and also register this class for call backs
-			StringReader sr = new StringReader(inputXml);
-			sp.parse(new StringBufferInputStream(inputXml), xmlHandler);
-
-		}catch(SAXException se) {
-			se.printStackTrace();
-		}catch(ParserConfigurationException pce) {
-			pce.printStackTrace();
-		}catch (IOException ie) {
-			ie.printStackTrace();
-		}
-	}
-	private String transformerWithoutXslt(String inputXml) {
-		Color headerColor = Color.LIGHT_GRAY;
-		StringBuffer retStr = new StringBuffer();
-		
-		// Setup XML
-		retStr.append("\n<html><body>");
-		
-		// Setup Table
-		retStr.append("<TABLE border=\"1\" cellpadding=\"3\" cellspacing=\"0\"> 	<tbody>");
-		retStr.append("<tr bgcolor=\"" + colorToHtml(headerColor) + "\">	<th>Action</th>		<th>State</th> 	<th>Modeler</th>      <th>Timestamp</th>    </tr>");
-		
-		if (inputXml.length() > 0) {
-			parseDocument(inputXml);
-			Iterator<Workflow> itr = allWorkflows.iterator();
-			String currentUid = UUID.randomUUID().toString();
-			Color currentColor =  Color.WHITE;
-			
-			while(itr.hasNext()) {
-				Workflow currentWf = (Workflow)itr.next();
-				
-				if (!currentUid.equalsIgnoreCase(currentWf.getId())) {
-					currentUid = currentWf.getId();
-					if (currentColor.equals( AceTableRenderer.LEMON_CHIFFON)) {
-						currentColor = Color.WHITE;
-					} else {
-						currentColor = AceTableRenderer.LEMON_CHIFFON;
-					}
-				} 
-				
-				retStr.append("<tr bgcolor=\"" + colorToHtml(currentColor) + "\">");
-				
-				retStr.append(processColumn(currentWf.getAction()));
-				retStr.append(processColumn(currentWf.getState()));
-				retStr.append(processColumn(currentWf.getModeler()));
-				retStr.append(processColumn(currentWf.getTime()));
-
-				retStr.append("</tr>");
-			}
-		}
-		
-		retStr.append("\n</tbody></TABLE>");
-		retStr.append("\n</body></html>");
-		return retStr.toString();
-	}
-
-	private Object processColumn(String str) {
-		return "<td>" + 
-		   	"<font face='Dialog' size='3'>" + 
-			   str +
-			   "</font></td>";
-	}
-
-	private String colorToHtml(Color c) {
-        String r = (c.getRed() < 16) ? "0" + Integer.toHexString(c.getRed()) : Integer.toHexString(c.getRed());
-        String g = (c.getGreen() < 16) ? "0" + Integer.toHexString(c.getGreen()) : Integer.toHexString(c.getGreen());
-        String b = (c.getBlue() < 16) ? "0" + Integer.toHexString(c.getBlue()) : Integer.toHexString(c.getBlue());
-        return "#" + r + g + b;
-	}
-
-	private String generateXsltXml(TreeSet<WorkflowHistoryJavaBean> allRows) {
-		StringBuffer retStr = new StringBuffer();
-		
-		if (allRows.size() > 0) {
-			retStr.append("\n<workflows>");
-		}
-		
-		for (WorkflowHistoryJavaBean bean : allRows) {
-			retStr.append("\n\t\t" + WorkflowHistoryRefsetReader.generateXmlForXslt(bean));
-		}
-
-		if (allRows.size() > 0) {
-			retStr.append("\n</workflows>");
-		}
-
-		return retStr.toString();
-	}
-
-	public String getCurrentHtml() {
-		return currentHtml;
+	public int getRowCount() { 
+		return conceptWfBeans.size();
 	}
 }
