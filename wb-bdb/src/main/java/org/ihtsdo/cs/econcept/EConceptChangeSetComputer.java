@@ -331,9 +331,9 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                 Concept concept = Bdb.getConceptForComponent(member.getReferencedComponentNid());
                 if (concept != null && !concept.isCanceled()) {
                     for (RefsetMember<?, ?>.Version mv : member.getTuples()) {
-                        if (v.sapIsInRange(minSapNid, maxSapNid) && v.getTime() != Long.MIN_VALUE 
-                            && v.getTime() != Long.MAX_VALUE) {
-                            if (commitSapNids == null || commitSapNids.contains(v.getSapNid())) {
+                        if (mv.sapIsInRange(minSapNid, maxSapNid) && mv.getTime() != Long.MIN_VALUE 
+                            && mv.getTime() != Long.MAX_VALUE) {
+                            if (commitSapNids == null || commitSapNids.contains(mv.getSapNid())) {
                                 try {
                                     if (eMember == null) {
                                         eMember = mv.getERefsetMember();

@@ -1157,7 +1157,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                             (RefsetMember<?, ?>) annotation);
                 }
 
-                for (@SuppressWarnings("rawtypes") RefexChronicleBI annotation : this.annotations) {
+                for (@SuppressWarnings("rawtypes") RefsetMember annotation : this.annotations) {
                     RefsetMember<?, ?> anotherAnnotation =
                             anotherAnnotationMap.remove(annotation.getNid());
                     if (anotherAnnotation != null) {
@@ -1165,7 +1165,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                                 anotherAnnotation.getVersions()) {
                             if (annotationVersion.getSapNid() != -1 && !currentSapNids.contains(
                                     annotationVersion.getSapNid())) {
-                                anotherAnnotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
+                                annotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
                             }
                         }
                     }

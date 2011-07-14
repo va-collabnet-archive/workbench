@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -180,6 +182,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
+    public void cancel(ConceptChronicleBI concept) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void commit() throws IOException {
         BdbCommitManager.commit();
     }
@@ -195,13 +202,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public void cancel(ConceptChronicleBI cc) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void commit(ConceptChronicleBI cc) throws IOException {
-        throw new UnsupportedOperationException();
+        BdbCommitManager.commit((Concept) cc, ChangeSetPolicy.MUTABLE_ONLY,
+                ChangeSetWriterThreading.SINGLE_THREAD);
     }
 
     @Override
