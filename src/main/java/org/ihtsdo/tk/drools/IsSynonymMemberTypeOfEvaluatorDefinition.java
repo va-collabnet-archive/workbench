@@ -42,6 +42,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -116,13 +117,17 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 ConceptSpec possibleType = null;
                 int evalRefsetNid = 0;
                 int typeNid = 0;
-                
-                if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                    evalRefsetNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-                } else if (Ts.get().hasUuid(SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getPrimUuid())) {
-                    evalRefsetNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
-                } else{
-                    return false;
+
+                try {
+                    if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                        evalRefsetNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+                    } else if (Ts.get().hasUuid(SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getPrimUuid())) {
+                        evalRefsetNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
+                    } else {
+                        return false;
+                    }
+                } catch (ValidationException e) {
+                    //do nothing
                 }
 
                 if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
