@@ -218,6 +218,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
     private JButton collapseExpandButton;
     private CollapsePanel parentCollapsePanel;
     private boolean collapsed = true;
+    private int historicalRefexSubPanelCount = 0;
 
     public CollapsePanel getParentCollapsePanel() {
         return parentCollapsePanel;
@@ -355,7 +356,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
     }
 
     public int getHistorySubpanelCount() {
-        return historySubPanels.size() + historicalRefexSubPanels.size();
+        return historySubPanels.size() + historicalRefexSubPanelCount;
     }
 
     public int getTemplateSubpanelCount() {
@@ -473,7 +474,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
                 gbc.gridy++;
             }
         }
-
+        
         for (RefexVersionBI<?> rx : tempRefexList) {
             if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
                 DragPanelExtension dpe =
@@ -488,7 +489,16 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
                 gbc.gridy++;
             }
         }
-
+        historicalRefexSubPanelCount = 0;
+        historicalRefexSubPanelCount = historicalRefexSubPanels.size();
+        //add reviesed refexes to count
+        for (RefexVersionBI<?> rx : refexes) {
+            if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
+                if (rx.getVersions().size() > 1) {
+                    historicalRefexSubPanelCount++;
+                }
+            }
+        }
     }
 
     public List<JComponent> getHistoricalRefexSubPanels() {
