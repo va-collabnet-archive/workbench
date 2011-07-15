@@ -78,7 +78,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN)})
-public class ChangeRolesToStatus extends AbstractTask implements ActionListener {
+public class ChangeRolesToStatus extends AbstractTask /*implements ActionListener */ {
 
     /**
      * 
@@ -180,7 +180,7 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
             PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
 
-            // check return condition for CONTINUE or ITEM_CANCELLED
+            // check return condition for CONTINUE
             if (returnCondition == Condition.CONTINUE) {
                 Collection<? extends RelationshipChronicleBI> relsOut = concept.getRelsOutgoing();
                 //get rels that are NOT isa
@@ -203,6 +203,7 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
                 Terms.get().addUncommitted(concept);
 
             } else if (returnCondition == Condition.PREVIOUS) {
+                //move to list view
                 process.setProperty(uuidListListPropName, uuidList);
                 wizard.setWizardPanelVisible(false);
             } else {
@@ -234,7 +235,7 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
 
         @Override
         protected void finished() {
-            if (uuidList.size() == 0) {
+            if (uuidList.isEmpty()) {
                 returnCondition = Condition.CONTINUE;
                 wizard.setWizardPanelVisible(false);
                 done = true;
@@ -255,11 +256,11 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
                 //add buttons
                 wizardPanel.add(new JLabel(" "));
                 JButton updateButton = new JButton("add to list");
-                updateButton.addActionListener(new updateActionListener());
+                updateButton.addActionListener(new UpdateActionListener());
                 wizardPanel.add(updateButton);
-                JButton continueButton = new JButton("cancel");
-                wizardPanel.add(continueButton);
-                continueButton.addActionListener(ChangeRolesToStatus.this);
+                JButton cancelButton = new JButton("cancel");
+                wizardPanel.add(cancelButton);
+                cancelButton.addActionListener(new CancelActionListener());
             }
         }
     }
@@ -268,11 +269,7 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
         try {
             //find roles which concept is target of
             Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelsIncoming();
-            if (relsIn == null) {
-                returnCondition = Condition.CONTINUE;
-                done = true;
-                notifyTaskDone();
-            } else {
+            if (relsIn != null) {
                 uuidList = new ArrayList<List<UUID>>();
                 for (RelationshipChronicleBI rel : relsIn) {
                     //for(I_RelPart rp : rel.getMutableParts())
@@ -314,19 +311,13 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
                     count++;
                 }
             }
-            if (count == 0) {
-                returnCondition = Condition.CONTINUE;
-                done = true;
-                notifyTaskDone();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
             returnCondition = Condition.ITEM_CANCELED;
         }
     }
 
-    private class updateActionListener implements ActionListener {
+    private class UpdateActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -336,12 +327,15 @@ public class ChangeRolesToStatus extends AbstractTask implements ActionListener 
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        wizard.setWizardPanelVisible(false);
-        returnCondition = Condition.ITEM_CANCELED;
-        done = true;
-        notifyTaskDone();
+    private class CancelActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            wizard.setWizardPanelVisible(false);
+            returnCondition = Condition.ITEM_CANCELED;
+            done = true;
+            notifyTaskDone();
+        }
     }
 
     protected void restore(final I_EncodeBusinessProcess process, final I_Work worker) throws
