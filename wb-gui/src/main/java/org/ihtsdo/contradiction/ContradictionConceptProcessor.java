@@ -368,18 +368,14 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     	set.setMember(Terms.get().getConcept(UUID.fromString("aa4052f3-0faa-39dd-b838-a4d1802ccd59")).getConceptNid());
     }
     
+
+    public AtomicInteger getNumberContradictionsFound() {
+    	return found;
+    }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    public AtomicInteger getNumberConceptsProcessed() {
+    	return count;
+    }
     
     public ContradictionIdentificationResults getResults() {
         return results;
