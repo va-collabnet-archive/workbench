@@ -815,6 +815,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptViewPanel.setVisible(true);
         workflowToggleButton.setSelected(false);
         workflowToggleButton.setVisible(true);
+        wfHxDetailsToggleButton.setVisible(true);
         if (this.getIndexOf(conceptViewPanel) < 0) {
             add(conceptViewPanel, BorderLayout.CENTER);
         }
