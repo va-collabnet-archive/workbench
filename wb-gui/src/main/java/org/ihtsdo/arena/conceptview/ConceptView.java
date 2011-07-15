@@ -332,27 +332,7 @@ public class ConceptView extends JPanel {
         addCommitListener(settings);
         setupPrefMap();
         dropPanelMgr = new DropPanelActionManager();
-    }
-    
-    @Override
-    public void setBounds(int x, int y, int width, int height) {
-        super.setBounds(Math.max(x, 0), Math.max(y, 0), width, height);
-    }
-    
-    @Override
-    public void setBounds(Rectangle r) {
-        super.setBounds(new Rectangle(Math.max(r.x, 0), Math.max(r.y, 0), r.width, r.height));
-    }
-    
-    @Override
-    public void setLocation(int x, int y) {
-        super.setLocation(Math.max(x, 0), Math.max(y, 0));
-    }
-    
-    @Override
-    public void setLocation(Point p) {
-        super.setLocation(new Point(Math.max(p.x, 0), Math.max(p.y, 0)));
-    }
+    }    
     
     public Map<Integer, JCheckBox> getRowToPathCheckMap() {
         return cvLayout.getRowToPathCheckMap();

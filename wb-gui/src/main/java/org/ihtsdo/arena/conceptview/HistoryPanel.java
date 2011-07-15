@@ -364,6 +364,10 @@ public class HistoryPanel {
         }
         
     }
+    
+    HorizonatalScrollActionListener hsal = new HorizonatalScrollActionListener();
+    VerticalScrollActionListener vsal = new VerticalScrollActionListener();
+    
     public HistoryPanel(ConceptView view, JScrollPane historyScroller,
             ConceptNavigator navigator) throws IOException {
         this.view = view;
@@ -390,10 +394,16 @@ public class HistoryPanel {
         versionPanel.setPreferredSize(versionPanel.getSize());
         versionPanel.addHierarchyListener(new HistoryHierarchyListener());
         versionScroller.getHorizontalScrollBar().getModel().
-                addChangeListener(new HorizonatalScrollActionListener());
+                addChangeListener(hsal);
         ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().
-                getModel().addChangeListener(new VerticalScrollActionListener());
+                getModel().addChangeListener(vsal);
         redoLayout();
+    }
+    
+    public void removeListeners() {
+        versionScroller.getHorizontalScrollBar().getModel().removeChangeListener(hsal);
+        ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().
+                getModel().removeChangeListener(vsal);
     }
 
     private void reset() {

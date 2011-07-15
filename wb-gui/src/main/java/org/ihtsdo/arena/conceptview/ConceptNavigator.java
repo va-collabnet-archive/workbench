@@ -42,6 +42,9 @@ public class ConceptNavigator extends JPanel {
 
                 @Override
                 public void run() {
+                    if (historyPanel != null) {
+                        historyPanel.removeListeners();
+                    }
                     historyPanel = null;
                 }
             });
@@ -133,11 +136,17 @@ public class ConceptNavigator extends JPanel {
     }
 
     protected void resetHistoryPanel() {
+        if (historyPanel != null) {
+            historyPanel.removeListeners();
+        }
         historyPanel = null;
     }
 
     protected void updateHistoryPanel() {
         try {
+            if (historyPanel != null) {
+                historyPanel.removeListeners();
+            }
             historyPanel = new HistoryPanel(view, historyScroller, this);
             if (view.isHistoryShown()) {
                 treeScroller.setVisible(false);
