@@ -20,6 +20,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -275,7 +277,7 @@ public class SelectExtension extends PreviousNextOrCancel {
         JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
         cancelButton.setToolTipText("cancel");
         wizardPanel.add(cancelButton, c);
-        cancelButton.addActionListener(new StopActionListener());
+        cancelButton.addActionListener(new CancelActionListener());
         c.gridx++;
         wizardPanel.add(new JLabel("     "), c);
         wizardPanel.validate();
@@ -286,6 +288,17 @@ public class SelectExtension extends PreviousNextOrCancel {
         }
         continueButton.requestFocusInWindow();
         wizardPanel.repaint();
+    }
+    
+    private class CancelActionListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            returnCondition = Condition.ITEM_CANCELED;
+            done = true;
+            notifyTaskDone();
+        }
+        
     }
 
     /**
