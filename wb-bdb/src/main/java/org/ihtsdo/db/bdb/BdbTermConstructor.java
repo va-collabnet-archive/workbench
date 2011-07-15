@@ -4,6 +4,10 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
@@ -133,8 +137,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         return createRefex(blueprint);
     }
 
-    
-    private RefexChronicleBI<?> reCreateRefex(RefsetMember<?, ?> refex, 
+    private RefexChronicleBI<?> reCreateRefex(RefsetMember<?, ?> refex,
             RefexCAB blueprint)
             throws IOException, InvalidCAB {
         return RefsetMemberFactory.reCreate(blueprint, refex, ec);
@@ -425,10 +428,16 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         ConceptChronicleBI cc = getConcept(blueprint);
         if (cc == null) {
             return construct(blueprint);
+        } else {
+            I_GetConceptData concept = Terms.get().getConceptForNid(cc.getNid());
+            if (concept.isCanceled()) {
+                construct(blueprint);
+            }
+            throw new InvalidCAB(
+                    "Concept already exists: "
+                    + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
         }
-        throw new InvalidCAB(
-                "Concept already exists: "
-                + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
+
     }
 
     @Override
@@ -436,13 +445,23 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         int cNid = Bdb.uuidToNid(blueprint.getComponentUuid());
         Bdb.getNidCNidMap().setCNidForNid(cNid, cNid);
         Concept newC = Concept.get(cNid);
-        ConceptAttributes a = new ConceptAttributes();
-        a.nid = cNid;
-        a.enclosingConceptNid = cNid;
-        newC.setConceptAttributes(a);
+        ConceptAttributes a = null;
+        if (newC.getConceptAttributes() == null) {
+            a = new ConceptAttributes();
+            a.nid = cNid;
+            a.enclosingConceptNid = cNid;
+            newC.setConceptAttributes(a);
+        } else {
+            a = newC.getConceptAttributes();
+            a.nid = cNid;
+            a.enclosingConceptNid = cNid;
+        }
+
         a.setDefined(blueprint.isDefined());
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
         a.primordialSapNid = Integer.MIN_VALUE;
+
+
 
         for (int p : ec.getEditPaths()) {
             if (a.primordialSapNid == Integer.MIN_VALUE) {
