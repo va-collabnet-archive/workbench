@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.classify;
 
+import org.ihtsdo.snomed.release.Rfx;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;

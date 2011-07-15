@@ -1,5 +1,6 @@
 package org.dwfa.ace.task.classify;
 
+import org.ihtsdo.snomed.release.Rfx;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dwfa.ace.task.classify;
+package org.ihtsdo.snomed.release;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -34,77 +34,84 @@ import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 public class Rfx {
 
     private static int releaseFormat = 0;
-    private static int isCURRENT;
-    private static int isLIMITED;
-    private static int isRETIRED;
-    private static int isOPTIONAL_REFINABILITY;
-    private static int isNOT_REFINABLE;
-    private static int isMANDATORY_REFINABILITY;
-    private static int isCh_STATED_RELATIONSHIP;
-    private static int isCh_INFERRED_RELATIONSHIP;
-    private static int isCh_DEFINING_CHARACTERISTIC;
+    // NIDs
+    private static int CURRENT_NID;
+    private static int LIMITED_NID;
+    private static int RETIRED_NID;
+    private static int OPTIONAL_REFINABILITY_NID;
+    private static int NOT_REFINABLE_NID;
+    private static int MANDATORY_REFINABILITY_NID;
+    private static int CH_STATED_RELATIONSHIP_NID;
+    private static int Ch_INFERRED_RELATIONSHIP_NID;
+    private static int Ch_DEFINING_CHARACTERISTIC_NID;
+
+    private static int FULL_SPECIFIED_NAME_NID;
+    private static int SYNONYM_PREFERRED_NAME_NID;
+    // CONCEPT BEANS
+    private static I_GetConceptData FULL_SPECIFIED_NAME_CB;
+    private static I_GetConceptData SYNONYM_PREFERRED_NAME_CB;
 
     public static int getIsCURRENT() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isCURRENT;
+        return CURRENT_NID;
     }
 
     public static int getIsCh_DEFINING_CHARACTERISTIC() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isCh_DEFINING_CHARACTERISTIC;
+        return Ch_DEFINING_CHARACTERISTIC_NID;
     }
 
     public static int getIsCh_STATED_RELATIONSHIP() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isCh_STATED_RELATIONSHIP;
+        return CH_STATED_RELATIONSHIP_NID;
     }
 
     public static int getIsCh_INFERRED_RELATIONSHIP() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isCh_INFERRED_RELATIONSHIP;
+        return Ch_INFERRED_RELATIONSHIP_NID;
     }
 
     public static int getIsLIMITED() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isLIMITED;
+        return LIMITED_NID;
     }
 
     public static int getIsMANDATORY_REFINABILITY() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isMANDATORY_REFINABILITY;
+        return MANDATORY_REFINABILITY_NID;
     }
 
     public static int getIsNOT_REFINABLE() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isNOT_REFINABLE;
+        return NOT_REFINABLE_NID;
     }
 
     public static int getIsOPTIONAL_REFINABILITY() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isOPTIONAL_REFINABILITY;
+        return OPTIONAL_REFINABILITY_NID;
     }
 
     public static int getIsRETIRED() throws TerminologyException, IOException {
         if (releaseFormat != 1 && releaseFormat != 2) {
             setupSnoRf1Rf2();
         }
-        return isRETIRED;
+        return RETIRED_NID;
     }
 
     public static int getReleaseFormat() throws TerminologyException, IOException {
@@ -112,6 +119,34 @@ public class Rfx {
             setupSnoRf1Rf2();
         }
         return releaseFormat;
+    }
+
+    public static I_GetConceptData getFULL_SPECIFIED_NAME_CB() throws TerminologyException, IOException {
+        if (releaseFormat != 1 && releaseFormat != 2) {
+            setupSnoRf1Rf2();
+        }
+        return FULL_SPECIFIED_NAME_CB;
+    }
+
+    public static int getFULL_SPECIFIED_NAME_NID() throws TerminologyException, IOException {
+        if (releaseFormat != 1 && releaseFormat != 2) {
+            setupSnoRf1Rf2();
+        }
+        return FULL_SPECIFIED_NAME_NID;
+    }
+
+    public static I_GetConceptData getSYNONYM_PREFERRED_NAME_CB() throws TerminologyException, IOException {
+        if (releaseFormat != 1 && releaseFormat != 2) {
+            setupSnoRf1Rf2();
+        }
+        return SYNONYM_PREFERRED_NAME_CB;
+    }
+
+    public static int getSYNONYM_PREFERRED_NAME_NID() throws TerminologyException, IOException {
+        if (releaseFormat != 1 && releaseFormat != 2) {
+            setupSnoRf1Rf2();
+        }
+        return SYNONYM_PREFERRED_NAME_NID;
     }
 
     public static void setupSnoRf1Rf2() throws TerminologyException, IOException {
@@ -137,25 +172,43 @@ public class Rfx {
 
         if (releaseFormat == 1) {
             // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            isLIMITED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_INFERRED_RELATIONSHIP = tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
+            CURRENT_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+            LIMITED_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.LIMITED.getUids());
+            RETIRED_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+            OPTIONAL_REFINABILITY_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
+            NOT_REFINABLE_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
+            MANDATORY_REFINABILITY_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
+            CH_STATED_RELATIONSHIP_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
+            Ch_INFERRED_RELATIONSHIP_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+            Ch_DEFINING_CHARACTERISTIC_NID = tf.uuidToNative(
+                    ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
         } else if (releaseFormat == 2) {
-            isCURRENT = tf.uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
-            isLIMITED = tf.uuidToNative(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
-            isRETIRED = tf.uuidToNative(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids());
-            isNOT_REFINABLE = tf.uuidToNative(SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids());
-            isCh_INFERRED_RELATIONSHIP = tf.uuidToNative(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
+            CURRENT_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
+            LIMITED_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
+            RETIRED_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
+            OPTIONAL_REFINABILITY_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids());
+            NOT_REFINABLE_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
+            MANDATORY_REFINABILITY_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
+            CH_STATED_RELATIONSHIP_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids());
+            Ch_INFERRED_RELATIONSHIP_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
+            Ch_DEFINING_CHARACTERISTIC_NID = tf.uuidToNative(
+                    SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
         } else {
             String errStr = "releaseFormat must equal 1 or 2";
             TerminologyException ex = new TerminologyException(errStr);
