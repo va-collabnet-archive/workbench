@@ -59,8 +59,8 @@ public abstract class BatchActionTask {
      * @throws IOException 
      */
     public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-        RETIRED_NID = TermAux.RETIRED.getLenient().getNid();
-        CURRENT_NID = TermAux.CURRENT.getLenient().getNid();
+        RETIRED_NID = TermAux.RETIRED.getLenient().getNid(); // :!!!:RFX:
+        CURRENT_NID = TermAux.CURRENT.getLenient().getNid(); // :!!!:RFX:
         termConstructor = Ts.get().getTerminologyConstructor(ec, vc);
     }
 

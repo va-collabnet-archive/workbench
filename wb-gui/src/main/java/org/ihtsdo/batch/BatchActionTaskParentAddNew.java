@@ -80,8 +80,9 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
 //        if (c.getPrimUuid() == null) { // :!!!:???: is this really needed ?
 //            System.out.println("found bad: " + c.getPrimUuid());
 //        }
-        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 0, TkRelType.STATED_HIERARCHY);
-        termConstructor.construct(rc);
+        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 
+                0, TkRelType.STATED_HIERARCHY);  // :!!!:RFX: stated uses Aux workbench
+        termConstructor.construct(rc);  
 
         BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_ADD_NEW, BatchActionEventType.EVENT_SUCCESS, "added parent: " + nidToName(selectedDestNid)));
         return true;
