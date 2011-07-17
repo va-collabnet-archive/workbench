@@ -69,6 +69,7 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
     private String outputDir;
     /**
      * Directory used to output the eConcept format files
+     * @parameter
      */
     private String[] filters;
     String uuidSourceSnomedLongStr;
