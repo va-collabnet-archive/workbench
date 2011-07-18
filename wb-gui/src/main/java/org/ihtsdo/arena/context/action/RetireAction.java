@@ -28,12 +28,14 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class RetireAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
-    AnalogBI analog;
+    ComponentVersionBI analog;
 
     public RetireAction(String actionName, ComponentFact<ComponentVersionBI> fact) {
         super(actionName);
@@ -51,17 +53,17 @@ public class RetireAction extends AbstractAction {
                 I_AmPart componentVersion = (I_AmPart) component;
                 I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                 for (PathBI ep : config.getEditingPathSet()) {
-                    analog = componentVersion.makeAnalog(
+                    analog = (ComponentVersionBI) componentVersion.makeAnalog(
                             ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                 }
-                ComponentVersionBI newComponent = (ComponentVersionBI) analog;
+                
                 if(DescriptionVersionBI.class.isAssignableFrom(component.getClass())){
-                	makeNotAcceptable(newComponent);
+                	retireFromRefexes(component);
                 }
-                I_GetConceptData concept = Terms.get().getConceptForNid(newComponent.getNid());
+                I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
                 Terms.get().addUncommitted(concept);
             }
         } catch (TerminologyException e1) {
@@ -71,48 +73,46 @@ public class RetireAction extends AbstractAction {
         }
     }
     
-    private void makeNotAcceptable(ComponentVersionBI newComponent){
-    	DescriptionVersionBI desc = (DescriptionVersionBI) newComponent;
-    	try{
-    		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-    		I_AmPart componentVersion;
-    		ViewCoordinate vc = config.getViewCoordinate();
-        	Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-        	for(RefexChronicleBI refex : refexes){
-        		int refexNid = refex.getCollectionNid();
-        		int usNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
-        		int gbNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
-        		if(refexNid == gbNid || refexNid == usNid){
-        			componentVersion = (I_AmPart) refex;
-            		AnalogBI analog = null;
-            		for (PathBI ep : config.getEditingPathSet()) {
-                        analog = componentVersion.makeAnalog(
-                                ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+    private void retireFromRefexes(ComponentVersionBI component) {
+        DescriptionVersionBI desc = (DescriptionVersionBI) component;
+        try {
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            I_AmPart componentVersion;
+            ViewCoordinate vc = config.getViewCoordinate();
+            Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+            int usNid = 0;
+            int gbNid = 0;
+            if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
+            } else {
+                usNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                gbNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
+            } else {
+                gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
+            }
+            for (RefexChronicleBI refex : refexes) {
+                int refexNid = refex.getCollectionNid();
+                if (refexNid == gbNid || refexNid == usNid) {
+                    componentVersion = (I_AmPart) refex;
+                    for (PathBI ep : config.getEditingPathSet()) {
+                        componentVersion.makeAnalog(
+                                ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
                                 config.getDbConfig().getUserConcept().getNid(),
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);
                     }
-            		RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-            		//test member type
-                		if (RefexCnidVersionBI.class.isAssignableFrom(newRefex.getClass())){
-                			RefexCnidVersionBI rcv = (RefexCnidVersionBI) newRefex;
-                			RefexCnidAnalogBI rca = (RefexCnidAnalogBI) rcv;
-                			
-                			rca.setCnid1(Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-
-                			I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-                            Terms.get().addUncommitted(concept);
-                			}else{
-		                		throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-		                	}
-        		}
-        	}
-    	}catch(IOException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-    	}catch (TerminologyException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		} catch (PropertyVetoException ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
+                    I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
+                    Terms.get().addUncommitted(concept);
+                } else {
+                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                }
+            }
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (TerminologyException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
     }
 }
