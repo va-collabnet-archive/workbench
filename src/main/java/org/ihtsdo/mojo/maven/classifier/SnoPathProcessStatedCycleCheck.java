@@ -42,7 +42,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.snomed.release.Rfx;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
@@ -90,7 +90,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
             PositionSetReadOnly pathPos,
             Precedence precedence,
             I_ManageContradiction contradictionMgr)
-            throws TerminologyException, IOException {
+            throws Exception {
         this.logger = logger;
         this.snorels = snorels;
         this.fromPathPosPriority = null;
@@ -117,7 +117,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         SnoTable.updatePrefs(false);
     }
 
-    private void setupCoreNids() throws TerminologyException, IOException {
+    private void setupCoreNids() throws Exception {
         I_TermFactory tf = Terms.get();
 
         // SETUP CORE NATIVES IDs
@@ -125,9 +125,9 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
-        isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
-        isCh_INFERRED_RELATIONSHIP = Rfx.getIsCh_INFERRED_RELATIONSHIP();
+        isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
+        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
+        isCh_INFERRED_RELATIONSHIP = SnomedMetadataRfx.getCh_INFERRED_RELATIONSHIP_NID();
 
         snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
