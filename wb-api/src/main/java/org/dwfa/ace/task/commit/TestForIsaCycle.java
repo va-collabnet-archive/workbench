@@ -93,10 +93,8 @@ public class TestForIsaCycle extends AbstractConceptTest {
                     alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.WARNING,
                         "<html>Added IS_A relationship will create a cycle. ", concept));
             return alertList;
-        } catch (IOException e) {
+        } catch (Exception e) {
            throw new TaskFailedException(e);
-        } catch (TerminologyException e) {
-            throw new TaskFailedException(e);
         }
     }
 

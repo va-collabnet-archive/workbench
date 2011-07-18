@@ -16,13 +16,13 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -39,6 +39,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 public class SnoTable {
 
@@ -127,10 +128,8 @@ public class SnoTable {
     public SnoTable() {
         try {
             updatePrefs(true);
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(SnoTable.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -144,15 +143,14 @@ public class SnoTable {
         }
     }
 
-    public static String updatePrefs(boolean showDialogs) throws TerminologyException, IOException {
+    public static String updatePrefs(boolean showDialogs) throws Exception {
         tf = Terms.get();
         I_ConfigAceFrame config;
         config = tf.getActiveAceFrameConfig();
         return updatePrefs(showDialogs, config);
     }
 
-    private static String updatePrefs(boolean showDialogs, I_ConfigAceFrame config) throws TerminologyException,
-            IOException {
+    private static String updatePrefs(boolean showDialogs, I_ConfigAceFrame config) throws Exception {
         // Setup core constants
         if (config.getClassifierIsaType() != null) {
             isaNid = config.getClassifierIsaType().getConceptNid();
@@ -178,7 +176,7 @@ public class SnoTable {
             return errStr;
         }
 
-        isCURRENT = Rfx.getIsCURRENT();
+        isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
 
         if (config.getClassificationRoot() != null) {
             rootNid = tf.uuidToNative(config.getClassificationRoot().getUids());
@@ -203,11 +201,11 @@ public class SnoTable {
                     + config.getEditingPathSet();
             if (showDialogs) {
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr,
-                    new TaskFailedException(errStr));
+                        new TaskFailedException(errStr));
             } else {
                 AceLog.getAppLog().log(Level.SEVERE, errStr, new Exception(errStr));
             }
-            
+
             return errStr;
         }
         PathBI cEditPathBI = config.getEditingPathSet().iterator().next();
@@ -315,10 +313,7 @@ public class SnoTable {
             roleDiffFromProxPrimList = findRoleGrpDiffFromProxPrim(cBean, isaProxPrimList,
                     inferredPath, USER_SNOROCKET);
 
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -540,8 +535,7 @@ public class SnoTable {
      * Does starting at C2 ever end up at C1?<br>
      * If yes, then adding C1-ISA-C2 to C1 will create a cycle.<br>
      */
-    public static boolean findIsaCycle(int c1, int type, int c2, boolean isStatedUser) throws TerminologyException,
-            IOException {
+    public static boolean findIsaCycle(int c1, int type, int c2, boolean isStatedUser) throws Exception {
 
         if (cEditPath == null) {
             updatePrefs(true);
@@ -609,10 +603,7 @@ public class SnoTable {
             } else {
                 return 0;
             }
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-            return -1;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return -1;
         }
@@ -624,7 +615,7 @@ public class SnoTable {
      * If yes, then C2 is a child of at least one of the provided C1.<br>
      */
     public static boolean testIsaChildOf(int[] parents, int type, int c1, boolean isStatedUser)
-            throws TerminologyException, IOException {
+            throws Exception {
 
         if (cEditPath == null) {
             updatePrefs(true);
@@ -1035,10 +1026,7 @@ public class SnoTable {
         if (tf == null) {
             try {
                 updatePrefs(true);
-            } catch (TerminologyException e1) {
-                e1.printStackTrace();
-                return null;
-            } catch (IOException e1) {
+            } catch (Exception e1) {
                 e1.printStackTrace();
                 return null;
             }
@@ -1097,10 +1085,7 @@ public class SnoTable {
             }
             I_GetConceptData cb = tf.getConcept(nid);
             sb.append(String.valueOf(nid)).append("\t").append(cb.getInitialText()).append("\r\n");
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -1113,10 +1098,7 @@ public class SnoTable {
             if (tf == null) {
                 updatePrefs(false);
             }
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

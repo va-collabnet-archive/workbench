@@ -87,12 +87,12 @@ public class SnomedMetadataRf1 {
 
     /*** REFINABILITY ***/
     // notRefinable 0
-    public static ConceptSpec NAME_RF1 =
-            new ConceptSpec("",
-            UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66"));
-    // optional 1
     public static ConceptSpec NOT_REFINABLE_REFINABILITY_TYPE_RF1 =
             new ConceptSpec("not refinable (refinability type)",
+            UUID.fromString("e4cde443-8fb6-11db-b606-0800200c9a66"));
+    // optional 1
+    public static ConceptSpec OPTIONAL_REFINABILITY_TYPE_RF1 =
+            new ConceptSpec("optional (refinability type)",
             UUID.fromString("c3d997d3-b0a4-31f8-846f-03fa874f5479"));
     // mandatory 2
     public static ConceptSpec MANDATORY_REFINABILITY_TYPE_RF1 =

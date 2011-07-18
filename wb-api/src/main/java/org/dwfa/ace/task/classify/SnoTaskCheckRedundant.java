@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -50,6 +49,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 /**
  * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
@@ -345,20 +345,17 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
                 return Condition.STOP;
             }
 
-            isCURRENT = Rfx.getIsCURRENT(); // 0 CURRENT, 1 RETIRED
-            isRETIRED = Rfx.getIsRETIRED();
-            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
-            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
-            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
-            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
-            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
+            isCURRENT = SnomedMetadataRfx.getCURRENT_NID(); // 0 CURRENT, 1 RETIRED
+            isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
+            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
+            isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
+            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
+            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
+            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
             tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(SnoTaskCheckRedundant.class.getName()).log(Level.SEVERE, null, ex);
+            return Condition.STOP;
         }
         return Condition.CONTINUE;
     }

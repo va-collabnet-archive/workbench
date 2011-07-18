@@ -16,7 +16,8 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +32,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 /**
  * 
@@ -55,13 +57,11 @@ public class SnoAB {
         try {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
             isaNid = config.getClassifierIsaType().getConceptNid();
-            isCURRENT = Rfx.getIsCURRENT();
+            isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
                     .getUids());
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(SnoAB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
@@ -75,6 +74,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 /**
  * 
@@ -1305,24 +1305,21 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 return Condition.STOP;
             }
 
-            isCURRENT = Rfx.getIsCURRENT();
-            isLIMITED = Rfx.getIsLIMITED();
-            isRETIRED = Rfx.getIsRETIRED();
-            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
-            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
-            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
-            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
-            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
+            isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
+            isLIMITED = SnomedMetadataRfx.getLIMITED_NID();
+            isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
+            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
+            isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
+            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
+            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
+            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
 
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
 
-        } catch (TerminologyException e) {
-            logger.log(Level.INFO, e.toString());
-            return Condition.STOP;
-        } catch (IOException e) {
-            logger.log(Level.INFO, e.toString());
+        } catch (Exception ex) {
+            Logger.getLogger(SnorocketTask.class.getName()).log(Level.SEVERE, null, ex);
             return Condition.STOP;
         }
         statusSet = tf.newIntSet();

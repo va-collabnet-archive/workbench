@@ -1,7 +1,5 @@
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +18,8 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 public class SnoPathProcessInferred implements I_ProcessConcepts {
 
@@ -57,7 +55,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
             I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos,
             I_ShowActivity gui, Precedence precedence, I_ManageContradiction contradictionMgr)
-            throws TerminologyException, IOException {
+            throws Exception {
         this.logger = logger;
         this.snorels = snorels;
         this.fromPathPos = pathPos;
@@ -83,7 +81,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         charMap = new LinkedHashMap<Integer, Integer>(); // SCTID, COUNT
     }
 
-    private void setupCoreNids() throws TerminologyException, IOException {
+    private void setupCoreNids() throws Exception {
         I_TermFactory tf = Terms.get();
 
         // SETUP CORE NATIVES IDs
@@ -91,8 +89,8 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_INFERRED_RELATIONSHIP = Rfx.getIsCh_INFERRED_RELATIONSHIP();
-        isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
+        isCh_INFERRED_RELATIONSHIP = SnomedMetadataRfx.getCh_INFERRED_RELATIONSHIP_NID();
+        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
 
         snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }

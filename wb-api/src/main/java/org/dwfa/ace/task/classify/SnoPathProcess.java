@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.SNOMED;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 /**
  * 
@@ -82,7 +81,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
 
     public SnoPathProcess(Logger logger, List<SnoCon> snocons, List<SnoRel> snorels,
             int[] allowedRoles, List<PositionBI> fromPathPos, I_ShowActivity gui,
-            boolean doNotCareIfHasIsa) throws TerminologyException, IOException {
+            boolean doNotCareIfHasIsa) throws Exception {
         this.logger = logger;
         this.snocons = snocons;
         this.snorels = snorels;
@@ -289,29 +288,23 @@ public class SnoPathProcess implements I_ProcessConcepts {
         }
     }
 
-    private void setupCoreNids() {
+    private void setupCoreNids() throws Exception {
         I_TermFactory tf = Terms.get();
 
         // SETUP CORE NATIVES IDs
-        try {
-            isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
-            rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
-            // 0 CURRENT, 1 RETIRED
-            isCURRENT = Rfx.getIsCURRENT();
-            isRETIRED = Rfx.getIsRETIRED();
-            // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
-            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
-            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
+        isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
+        rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
+        // 0 CURRENT, 1 RETIRED
+        isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
+        isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
+        // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
+        isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
+        isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
+        isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
 
-            // Characteristic
-            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
-            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
-        } catch (TerminologyException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Characteristic
+        isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
+        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
     }
 
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)

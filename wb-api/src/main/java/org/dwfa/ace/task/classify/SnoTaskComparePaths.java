@@ -16,7 +16,6 @@
  */
 package org.dwfa.ace.task.classify;
 
-import org.ihtsdo.snomed.release.Rfx;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -51,6 +50,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
 
 /**
  * :NYI: NOT UPDATED FOR SNOROCKET AS A 'USER'
@@ -58,8 +58,10 @@ import org.ihtsdo.tk.api.PositionBI;
  * @author marc
  *
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN)})
 public class SnoTaskComparePaths extends AbstractTask implements ActionListener {
+
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
@@ -71,12 +73,10 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         final int objDataVersion = in.readInt();
 
         if (objDataVersion <= dataVersion) {
-
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
-
     // CORE NID CONSTANTS
     private static int isaNid = Integer.MIN_VALUE;
     private static int rootNid = Integer.MIN_VALUE;
@@ -88,21 +88,17 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int sourceUnspecifiedNid;
-
     // INPUT PATHS
     int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
     PathBI cEditIPath = null;
     List<PositionBI> cEditPathPos = null; // Edit (Stated) Path I_Positions
-
     // OUTPUT PATHS
     int cClassPathNid; // :TODO: move to logging
     PathBI cClassIPath; // Used for write back value
     List<PositionBI> cClassPathPos; // Classifier (Inferred) Path I_Positions
-
     // MASTER DATA SETS
     List<SnoRel> cEditSnoRels; // "Edit Path" Concepts
     List<SnoRel> cClassSnoRels; // "Classifier Path" Relationships
-
     // USER INTERFACE
     private Logger logger = null;
     I_TermFactory tf = null;
@@ -121,12 +117,14 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         logger.info("\r\n::: [SnoTaskComparePaths] evaluate() -- begin");
         tf = Terms.get();
 
-        if (setupCoreNids().equals(Condition.STOP))
+        if (setupCoreNids().equals(Condition.STOP)) {
             return Condition.STOP;
+        }
         logger.info(toStringNids());
 
-        if (setupPaths().equals(Condition.STOP))
+        if (setupPaths().equals(Condition.STOP)) {
             return Condition.STOP;
+        }
         logger.info(toStringPathPos(cEditPathPos, "Edit Path"));
         logger.info(toStringPathPos(cClassPathPos, "Classifier Path"));
 
@@ -154,7 +152,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             // ** GUI:DONE: 1. GET STATED PATH SNORELS **
             if (continueThisAction) {
                 gui.setProgressInfoLower("edit path rels = " + pcEdit.countRelAdded + ", lapsed time = "
-                    + toStringLapseSec(startTime));
+                        + toStringLapseSec(startTime));
                 gui.complete(); // PHASE 1. DONE
             } else {
                 gui.setProgressInfoLower("comparison stopped by user");
@@ -183,7 +181,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             // ** GUI:DONE: 2 -- done
             if (continueThisAction) {
                 gui.setProgressInfoLower("classifier path rels = " + pcClass.countRelAdded + ", lapsed time = "
-                    + toStringLapseSec(startTime));
+                        + toStringLapseSec(startTime));
                 gui.complete(); // 3 GET CLASSIFIER RESULTS -- done
                 pcClass = null; // :MEMORY:
             } else {
@@ -198,7 +196,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
             // activity
             // viewer
             gui.addRefreshActionListener(this);
-             gui.setProgressInfoUpper(guiStr);
+            gui.setProgressInfoUpper(guiStr);
             gui.setIndeterminate(true);
             // COMPARE RESULTS. Sort is performed in the compare routine.
             startTime = System.currentTimeMillis();
@@ -279,65 +277,74 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
 
                 // PROCESS WHILE BOTH HAVE GROUP 0
                 while (rel_A.c1Id == thisC1 && rel_B.c1Id == thisC1 && rel_A.group == 0 && rel_B.group == 0 && !done_A
-                    && !done_B) {
+                        && !done_B) {
                     // :TODO: process group 0
                     switch (compareSnoRel(rel_A, rel_B)) {
-                    case 1: // SAME
-                        // GATHER STATISTICS
-                        countSame++;
-                        countA_Total++;
-                        countB_Total++;
-                        if (rel_A.typeId == isaNid)
-                            countSameISA++;
-                        // NOTHING TO WRITE IN THIS CASE
-                        if (itA.hasNext())
-                            rel_A = itA.next();
-                        else
-                            done_A = true;
-                        if (itB.hasNext())
-                            rel_B = itB.next();
-                        else
-                            done_B = true;
-                        break;
-
-                    case 2: // REL_A > REL_B -- B has extra stuff
-                        // WRITEBACK REL_B (Classifier Results) AS CURRENT
-                        countB_Diff++;
-                        countB_Total++;
-                        if (rel_B.typeId == isaNid)
-                            countB_DiffISA++;
-                        if (histListB.size() < historySize)
-                            if (rel_B.c1Id >= historyStartC1Nid) {
-                                histListB.add(rel_B);
-                                updateSets(rel_B, histC1Set, histTypeSet, histC2Set);
+                        case 1: // SAME
+                            // GATHER STATISTICS
+                            countSame++;
+                            countA_Total++;
+                            countB_Total++;
+                            if (rel_A.typeId == isaNid) {
+                                countSameISA++;
                             }
-                        // :TODO: reportDiffCurrent(rel_B)
-
-                        if (itB.hasNext())
-                            rel_B = itB.next();
-                        else
-                            done_B = true;
-                        break;
-
-                    case 3: // REL_A < REL_B -- A has extra stuff
-                        // WRITEBACK REL_A (Classifier Input) AS RETIRED
-                        // GATHER STATISTICS
-                        countA_Diff++;
-                        countA_Total++;
-                        if (rel_A.typeId == isaNid)
-                            countA_DiffISA++;
-                        if (histListA.size() < historySize)
-                            if (rel_A.c1Id >= historyStartC1Nid) {
-                                histListA.add(rel_A);
-                                updateSets(rel_A, histC1Set, histTypeSet, histC2Set);
+                            // NOTHING TO WRITE IN THIS CASE
+                            if (itA.hasNext()) {
+                                rel_A = itA.next();
+                            } else {
+                                done_A = true;
                             }
-                        // :TODO: reportDiffRetired(rel_A)
+                            if (itB.hasNext()) {
+                                rel_B = itB.next();
+                            } else {
+                                done_B = true;
+                            }
+                            break;
 
-                        if (itA.hasNext())
-                            rel_A = itA.next();
-                        else
-                            done_A = true;
-                        break;
+                        case 2: // REL_A > REL_B -- B has extra stuff
+                            // WRITEBACK REL_B (Classifier Results) AS CURRENT
+                            countB_Diff++;
+                            countB_Total++;
+                            if (rel_B.typeId == isaNid) {
+                                countB_DiffISA++;
+                            }
+                            if (histListB.size() < historySize) {
+                                if (rel_B.c1Id >= historyStartC1Nid) {
+                                    histListB.add(rel_B);
+                                    updateSets(rel_B, histC1Set, histTypeSet, histC2Set);
+                                }
+                            }
+                            // :TODO: reportDiffCurrent(rel_B)
+
+                            if (itB.hasNext()) {
+                                rel_B = itB.next();
+                            } else {
+                                done_B = true;
+                            }
+                            break;
+
+                        case 3: // REL_A < REL_B -- A has extra stuff
+                            // WRITEBACK REL_A (Classifier Input) AS RETIRED
+                            // GATHER STATISTICS
+                            countA_Diff++;
+                            countA_Total++;
+                            if (rel_A.typeId == isaNid) {
+                                countA_DiffISA++;
+                            }
+                            if (histListA.size() < historySize) {
+                                if (rel_A.c1Id >= historyStartC1Nid) {
+                                    histListA.add(rel_A);
+                                    updateSets(rel_A, histC1Set, histTypeSet, histC2Set);
+                                }
+                            }
+                            // :TODO: reportDiffRetired(rel_A)
+
+                            if (itA.hasNext()) {
+                                rel_A = itA.next();
+                            } else {
+                                done_A = true;
+                            }
+                            break;
                     } // switch
                 }
 
@@ -345,18 +352,21 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 while (rel_A.c1Id == thisC1 && rel_A.group == 0 && !done_A) {
                     countA_Diff++;
                     countA_Total++;
-                    if (rel_A.typeId == isaNid)
+                    if (rel_A.typeId == isaNid) {
                         countA_DiffISA++;
-                    if (histListA.size() < historySize)
+                    }
+                    if (histListA.size() < historySize) {
                         if (rel_A.c1Id >= historyStartC1Nid) {
                             histListA.add(rel_A);
                             updateSets(rel_A, histC1Set, histTypeSet, histC2Set);
                         }
+                    }
                     // :TODO: reportDiffRetired(rel_A)
-                    if (itA.hasNext())
+                    if (itA.hasNext()) {
                         rel_A = itA.next();
-                    else
+                    } else {
                         done_A = true;
+                    }
                     break;
                 }
 
@@ -364,18 +374,21 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 while (rel_B.c1Id == thisC1 && rel_B.group == 0 && !done_B) {
                     countB_Diff++;
                     countB_Total++;
-                    if (rel_B.typeId == isaNid)
+                    if (rel_B.typeId == isaNid) {
                         countB_DiffISA++;
-                    if (histListB.size() < historySize)
+                    }
+                    if (histListB.size() < historySize) {
                         if (rel_B.c1Id >= historyStartC1Nid) {
                             histListB.add(rel_B);
                             updateSets(rel_B, histC1Set, histTypeSet, histC2Set);
                         }
+                    }
                     // :TODO: reportDiffCurrent(rel_B)
-                    if (itB.hasNext())
+                    if (itB.hasNext()) {
                         rel_B = itB.next();
-                    else
+                    } else {
                         done_B = true;
+                    }
                     break;
                 }
 
@@ -396,10 +409,11 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                     groupA.add(rel_A);
 
                     prevGroup = rel_A.group;
-                    if (itA.hasNext())
+                    if (itA.hasNext()) {
                         rel_A = itA.next();
-                    else
+                    } else {
                         done_A = true;
+                    }
                 }
                 // SEGMENT GROUPS IN LIST_B
                 prevGroup = Integer.MIN_VALUE;
@@ -412,10 +426,11 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                     groupB.add(rel_B);
 
                     prevGroup = rel_B.group;
-                    if (itA.hasNext())
+                    if (itA.hasNext()) {
                         rel_B = itB.next();
-                    else
+                    } else {
                         done_B = true;
+                    }
                 }
 
                 // FIND GROUPS IN GROUPLIST_A WITHOUT AN EQUAL IN GROUPLIST_B
@@ -423,35 +438,39 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 SnoGrpList groupList_NotEqual;
                 if (groupList_A.size() > 0) {
                     groupList_NotEqual = groupList_A.whichNotEqual(groupList_B);
-                    for (SnoGrp sg : groupList_NotEqual)
+                    for (SnoGrp sg : groupList_NotEqual) {
                         for (SnoRel sr_A : sg) {
                             countA_Diff++;
                             countA_Total++;
-                            if (histListA.size() < historySize)
+                            if (histListA.size() < historySize) {
                                 if (sr_A.c1Id >= historyStartC1Nid) {
                                     histListA.add(sr_A);
                                     updateSets(sr_A, histC1Set, histTypeSet, histC2Set);
                                 }
+                            }
                             // :TODO: reportDiffRetired(sr_A);
 
                         }
+                    }
                 }
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
-                    for (SnoGrp sg : groupList_NotEqual)
+                    for (SnoGrp sg : groupList_NotEqual) {
                         for (SnoRel sr_B : sg) {
                             countB_Diff++;
                             countB_Total++;
-                            if (histListB.size() < historySize)
+                            if (histListB.size() < historySize) {
                                 if (sr_B.c1Id >= historyStartC1Nid) {
                                     histListB.add(sr_B);
                                     updateSets(sr_B, histC1Set, histTypeSet, histC2Set);
                                 }
+                            }
                             // :TODO: reportDiffCurrent(sr_B);
                         }
+                    }
                 }
             } else if (rel_A.c1Id > rel_B.c1Id) {
                 // CASE 2: LIST_B HAS CONCEPT NOT IN LIST_A
@@ -460,13 +479,15 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 while (rel_B.c1Id == thisC1) {
                     countB_Diff++;
                     countB_Total++;
-                    if (rel_B.typeId == isaNid)
+                    if (rel_B.typeId == isaNid) {
                         countB_DiffISA++;
-                    if (histListB.size() < historySize)
+                    }
+                    if (histListB.size() < historySize) {
                         if (rel_B.c1Id >= historyStartC1Nid) {
                             histListB.add(rel_B);
                             updateSets(rel_B, histC1Set, histTypeSet, histC2Set);
                         }
+                    }
                     // :TODO: reportDiffCurrent(rel_B);
                     if (itB.hasNext()) {
                         rel_B = itB.next();
@@ -483,13 +504,15 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 while (rel_A.c1Id == thisC1) {
                     countA_Diff++;
                     countA_Total++;
-                    if (rel_A.typeId == isaNid)
+                    if (rel_A.typeId == isaNid) {
                         countA_DiffISA++;
-                    if (histListA.size() < historySize)
+                    }
+                    if (histListA.size() < historySize) {
                         if (rel_A.c1Id >= historyStartC1Nid) {
                             histListA.add(rel_A);
                             updateSets(rel_A, histC1Set, histTypeSet, histC2Set);
                         }
+                    }
                     // :TODO: reportDiffRetired(rel_A);
                     if (itA.hasNext()) {
                         rel_A = itA.next();
@@ -510,14 +533,16 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         while (!done_A) {
             countA_Diff++;
             countA_Total++;
-            if (rel_A.typeId == isaNid)
+            if (rel_A.typeId == isaNid) {
                 countA_DiffISA++;
+            }
             // COMPLETELY UPDATE ALL REMAINING REL_A AS RETIRED
-            if (histListA.size() < historySize)
+            if (histListA.size() < historySize) {
                 if (rel_A.c1Id >= historyStartC1Nid) {
                     histListA.add(rel_A);
                     updateSets(rel_A, histC1Set, histTypeSet, histC2Set);
                 }
+            }
             // :TODO: reportDiffRetired(rel_A);
             if (itA.hasNext()) {
                 rel_A = itA.next();
@@ -530,14 +555,16 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         while (!done_B) {
             countB_Diff++;
             countB_Total++;
-            if (rel_B.typeId == isaNid)
+            if (rel_B.typeId == isaNid) {
                 countB_DiffISA++;
+            }
             // COMPLETELY UPDATE ALL REMAINING REL_B AS NEW, CURRENT
-            if (histListB.size() < historySize)
+            if (histListB.size() < historySize) {
                 if (rel_B.c1Id >= historyStartC1Nid) {
                     histListB.add(rel_B);
                     updateSets(rel_B, histC1Set, histTypeSet, histC2Set);
                 }
+            }
             // :TODO: reportDiffCurrent(rel_B);
             if (itB.hasNext()) {
                 rel_B = itB.next();
@@ -551,7 +578,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         s.append("\r\n::: [SnoTaskComparePaths] compareResults()");
         long lapseTime = System.currentTimeMillis() - startTime;
         s.append("\r\n::: [Time] Sort/Compare Input & Output: \t" + lapseTime + "\t(mS)\t"
-            + (((float) lapseTime / 1000) / 60) + "\t(min)");
+                + (((float) lapseTime / 1000) / 60) + "\t(min)");
         s.append("\r\n");
         s.append("\r\n::: ");
         s.append("\r\n::: countSame:     \t" + countSame);
@@ -565,14 +592,17 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         s.append("\r\n::: ");
 
         s.append("\r\n::: CONCEPT IDS");
-        for (Integer nInt : histC1Set)
+        for (Integer nInt : histC1Set) {
             s.append("\r\n::: \t" + toStringNid(nInt.intValue()));
+        }
         s.append("\r\n::: ROLE_TYPE IDS");
-        for (Integer nInt : histTypeSet)
+        for (Integer nInt : histTypeSet) {
             s.append("\r\n::: \t" + toStringNid(nInt.intValue()));
+        }
         s.append("\r\n::: ROLE_VALUE IDS");
-        for (Integer nInt : histC2Set)
+        for (Integer nInt : histC2Set) {
             s.append("\r\n::: \t" + toStringNid(nInt.intValue()));
+        }
 
         s.append("\r\n::: EDIT PATH (STATED) RELS -- DIFFERENCES SNAPSHOT");
         if (histListA.size() > 0) {
@@ -606,7 +636,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
 
     private int compareSnoRel(SnoRel relA, SnoRel relB) {
         if ((relA.c1Id == relB.c1Id) && (relA.group == relB.group) && (relA.typeId == relB.typeId)
-            && (relA.c2Id == relB.c2Id)) {
+                && (relA.c2Id == relB.c2Id)) {
             return 1; // SAME
         } else if (relA.c1Id > relB.c1Id) {
             return 2; // ADDED -- B has extra stuff
@@ -615,7 +645,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         } else if ((relA.c1Id == relB.c1Id) && (relA.group == relB.group) && (relA.typeId > relB.typeId)) {
             return 2; // ADDED -- B has extra stuff
         } else if ((relA.c1Id == relB.c1Id) && (relA.group == relB.group) && (relA.typeId == relB.typeId)
-            && (relA.c2Id > relB.c2Id)) {
+                && (relA.c2Id > relB.c2Id)) {
             return 2; // ADDED -- B has extra stuff
         } else {
             return 3; // DROPPED -- A has extra stuff
@@ -638,7 +668,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 }
             } else {
                 String errStr = "Profile must have only one edit path. Found: "
-                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + tf.getActiveAceFrameConfig().getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
@@ -650,25 +680,23 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 }
             } else {
                 String errStr = "Profile must have only one edit path. Found: "
-                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + tf.getActiveAceFrameConfig().getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
 
-            isCURRENT = Rfx.getIsCURRENT(); // 0 CURRENT, 1 RETIRED
-            isRETIRED = Rfx.getIsRETIRED();
-            isOPTIONAL_REFINABILITY = Rfx.getIsOPTIONAL_REFINABILITY();
-            isNOT_REFINABLE = Rfx.getIsNOT_REFINABLE();
-            isMANDATORY_REFINABILITY = Rfx.getIsMANDATORY_REFINABILITY();
-            isCh_STATED_RELATIONSHIP = Rfx.getIsCh_STATED_RELATIONSHIP();
-            isCh_DEFINING_CHARACTERISTIC = Rfx.getIsCh_DEFINING_CHARACTERISTIC();
+            isCURRENT = SnomedMetadataRfx.getCURRENT_NID(); // 0 CURRENT, 1 RETIRED
+            isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
+            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
+            isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
+            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
+            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
+            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-        } catch (TerminologyException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            return Condition.STOP;
         }
         return Condition.CONTINUE;
     }
@@ -678,7 +706,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         try {
             if (config.getEditingPathSet().size() != 1) {
                 String errStr = "Profile must have only one edit path. Found: "
-                    + tf.getActiveAceFrameConfig().getEditingPathSet();
+                        + tf.getActiveAceFrameConfig().getEditingPathSet();
                 AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new TaskFailedException(errStr));
                 return Condition.STOP;
             }
@@ -779,9 +807,9 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         StringBuffer s = new StringBuffer();
         s.append("\r\n::: [SnorocketTaskExp] PATH ID -- " + pStr);
         for (PositionBI position : pathPos) {
-		    s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptNid() + "\tVersion:\t"
-		        + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUUIDs());
-		}
+            s.append("\r\n::: ... PathID:\t" + position.getPath().getConceptNid() + "\tVersion:\t"
+                    + position.getVersion() + "\tUUIDs:\t" + position.getPath().getUUIDs());
+        }
         s.append("\r\n:::");
         return s.toString();
     }
@@ -793,5 +821,4 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
-
 }

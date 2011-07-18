@@ -19,6 +19,7 @@ import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
@@ -61,6 +62,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
+import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -308,6 +311,35 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         return Bdb.hasUuid(memberUUID);
     }
 
+    private static boolean isReleaseFormatSetup = false;
+    private static int releaseFormat = 0;
+    @Override
+    public boolean usesRf2Metadata() throws Exception {
+        if (isReleaseFormatSetup == false) {
+            UUID snomedRootUuid  = SNOMED.Concept.ROOT.getUids().iterator().next();
+            int snomedRootNid = Bdb.uuidToNid(snomedRootUuid);
+            Concept cb = Bdb.getConcept(snomedRootNid);
+            int rootStatusNid = cb.getConAttrs().getVersions().iterator().next().getStatusNid();
+            int rf1CurrentNid = Bdb.uuidToNid(SnomedMetadataRf1.CURRENT_RF1.getUuids());
+            int rf2ActiveValueNid = Bdb.uuidToNid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
+            if (rootStatusNid == rf1CurrentNid) {
+                releaseFormat = 1;
+                isReleaseFormatSetup = true;
+            } else if (rootStatusNid == rf2ActiveValueNid) {
+                releaseFormat = 2;
+                isReleaseFormatSetup = true;
+            } else {
+                throw new IOException("usesRf2Metadata current/active status did not match Rf1 or Rf2.");
+            }
+        }
+
+        if (releaseFormat == 2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception {
         Bdb.getConceptDb().iterateConceptDataInParallel(processor);
@@ -503,21 +535,19 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate vc, boolean useCase) {
-		return new ContradictionIdentifier(vc, useCase);
+        return new ContradictionIdentifier(vc, useCase);
     }
-    
+
     @Override
-    public boolean hasUncommittedChanges(){
-    	if(Terms.get().getUncommitted().size() > 0){
-    		return true;
-    	}
-    	return false;
+    public boolean hasUncommittedChanges() {
+        if (Terms.get().getUncommitted().size() > 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public Collection<? extends ConceptChronicleBI> getUncommittedConcepts() {
         return BdbCommitManager.getUncommitted();
     }
-    
-    
 }
