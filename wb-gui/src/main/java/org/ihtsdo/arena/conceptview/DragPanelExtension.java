@@ -133,6 +133,10 @@ public class DragPanelExtension
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(extensionLabel, gbc);
+        if (!getRefexV().isActive(getSettings().getConfig().getAllowedStatus())) {
+            add(new JLabel(getGhostIcon()));
+            gbc.gridx++;
+        }
         gbc.weightx = 1;
        
         gbc.anchor = GridBagConstraints.NORTHWEST;
