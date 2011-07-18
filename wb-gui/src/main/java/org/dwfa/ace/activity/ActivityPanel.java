@@ -176,6 +176,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
         }
 
         public void update() {
+            JProgressBar localProgress = progressBar;
             if (!progressInfoUpper.getText().equals(progressInfoUpperStr)) {
                 progressInfoUpper.setText(progressInfoUpperStr);
             }
@@ -183,12 +184,11 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                 progressInfoLower.setText(progressInfoLowerStr);
             }
             if (stopButtonVisible) {
-                if (progressBar.isVisible() == false) {
-                    progressBar.setVisible(true);
+                if (localProgress != null && localProgress.isVisible() == false) {
+                    localProgress.setVisible(true);
                 }
             }
 
-            JProgressBar localProgress = progressBar;
             if (localProgress != null) {
                 if (max != localProgress.getMaximum()) {
                     if (localProgress.isVisible() == false) {
@@ -202,12 +202,12 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                     }
                     localProgress.setValue(value);
                 }
-                if (indeterminate != progressBar.isIndeterminate()) {
-                    progressBar.setIndeterminate(indeterminate);
+                if (indeterminate != localProgress.isIndeterminate()) {
+                    localProgress.setIndeterminate(indeterminate);
                 }
 
                 if (stringPainted != progressBar.isStringPainted()) {
-                    progressBar.setStringPainted(stringPainted);
+                    localProgress.setStringPainted(stringPainted);
                 }
             }
 
