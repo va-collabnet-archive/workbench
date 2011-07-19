@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -14,19 +13,12 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.AcceptabilityType;
-import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
@@ -82,6 +74,7 @@ public class RetireAction extends AbstractAction {
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
             int usNid = 0;
             int gbNid = 0;
+            int dosNid = 0;
             if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
                 usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
             } else {
@@ -92,9 +85,14 @@ public class RetireAction extends AbstractAction {
             } else {
                 gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
             }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+            } else {
+                dosNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
+            }
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
-                if (refexNid == gbNid || refexNid == usNid) {
+                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(

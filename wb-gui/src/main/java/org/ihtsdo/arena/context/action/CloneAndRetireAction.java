@@ -157,6 +157,7 @@ public class CloneAndRetireAction extends AbstractAction {
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
             int usNid = 0;
             int gbNid = 0;
+            int dosNid = 0;
             if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
                 usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
             } else {
@@ -167,9 +168,14 @@ public class CloneAndRetireAction extends AbstractAction {
             } else {
                 gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
             }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+            } else {
+                dosNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
+            }
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
-                if (refexNid == gbNid || refexNid == usNid) {
+                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
