@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.tk.example.binding;
+package org.ihtsdo.tk.binding.snomed;
 
 import java.io.IOException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 /**
- * @deprecated  see package org.ihtsdo.tk.binding.snomed
+ *
  * @author marc
  */
 public class SnomedMetadataRfx {

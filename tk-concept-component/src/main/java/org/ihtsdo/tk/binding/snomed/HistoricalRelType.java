@@ -1,13 +1,9 @@
-package org.ihtsdo.tk.example.binding;
+package org.ihtsdo.tk.binding.snomed;
 
 import java.util.UUID;
 
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-/**
- * @deprecated  see package org.ihtsdo.tk.binding.snomed
- *
- */
 public class HistoricalRelType {
 
 	public static ConceptSpec MAY_BE_A = 

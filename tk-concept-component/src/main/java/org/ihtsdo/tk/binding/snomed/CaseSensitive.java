@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.tk.example.binding;
+package org.ihtsdo.tk.binding.snomed;
 
 import java.util.UUID;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- * @deprecated  see package org.ihtsdo.tk.binding.snomed
+ *
  * @author AKF
  */
 public class CaseSensitive {
