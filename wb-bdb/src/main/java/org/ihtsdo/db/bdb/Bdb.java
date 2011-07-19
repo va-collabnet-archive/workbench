@@ -305,6 +305,7 @@ public class Bdb {
             inform(activity, "loading cross references...");
             xref = new Xref(readOnly, mutable);
             //watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
+            
             inform(activity, "Loading paths...");
             pathManager = BdbPathManager.get();
             tf.setPathManager(pathManager);
@@ -317,6 +318,9 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
+//            watchList.put(Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")), 
+//                            Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")));
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

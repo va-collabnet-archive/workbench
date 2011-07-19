@@ -63,6 +63,9 @@ public class ConceptBdb extends ComponentBdb {
 
     public Concept getConcept(int cNid) throws IOException {
         assert cNid != Integer.MAX_VALUE;
+        if (Bdb.watchList.containsKey(cNid)) {
+            AceLog.getAppLog().info("---!!! reading concept: " + cNid + "\n---!!! ");
+        }
         return Concept.get(cNid);
     }
 

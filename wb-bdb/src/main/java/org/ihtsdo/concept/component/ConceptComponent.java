@@ -1121,15 +1121,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public abstract boolean readyToWriteComponent();
 
     public ConceptComponent<R, C> merge(C another) throws IOException {
-        Set<Integer> currentSapNids = getComponentSapNids();
+        Set<Integer> versionSapNids = getVersionSapNids();
 
         // merge versions
         for (ConceptComponent<R, C>.Version v : another.getVersions()) {
-            if (v.getSapNid() != -1 && !currentSapNids.contains(v.getSapNid())) {
+            if (v.getSapNid() != -1 && !versionSapNids.contains(v.getSapNid())) {
                 addRevision((R) v.getRevision());
             }
         }
 
+        Set<Integer> identifierSapNids = getIdSapNids();
         // merge identifiers
         if (another.additionalIdVersions != null) {
             if (this.additionalIdVersions == null) {
@@ -1137,7 +1138,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                         another.additionalIdVersions;
             } else {
                 for (IdentifierVersion idv : another.additionalIdVersions) {
-                    if (idv.getSapNid() != -1 && !currentSapNids.contains(idv.getSapNid())) {
+                    if (idv.getSapNid() != -1 && !identifierSapNids.contains(idv.getSapNid())) {
                         this.additionalIdVersions.add(idv);
                     }
                 }
@@ -1145,6 +1146,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
 
+        Set<Integer> annotationSapNids = getAnnotationSapNids();
         // merge annotations
         if (another.annotations != null) {
             if (this.annotations == null) {
@@ -1163,7 +1165,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     if (anotherAnnotation != null) {
                         for (@SuppressWarnings("rawtypes") RefsetMember.Version annotationVersion :
                                 anotherAnnotation.getVersions()) {
-                            if (annotationVersion.getSapNid() != -1 && !currentSapNids.contains(
+                            if (annotationVersion.getSapNid() != -1 && !annotationSapNids.contains(
                                     annotationVersion.getSapNid())) {
                                 annotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
                             }
@@ -2038,17 +2040,28 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             size = size + annotations.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
+        
+        sapNids.addAll(getVersionSapNids());
+        sapNids.addAll(getIdSapNids());
+        sapNids.addAll(getAnnotationSapNids());
+        return sapNids;
+    }
+
+    public Set<Integer> getVersionSapNids() {
+        int size = 1;
+        if (revisions != null) {
+            size = size + revisions.size();
+        }
+        HashSet<Integer> sapNids = new HashSet<Integer>(size);
+        
         sapNids.add(primordialSapNid);
         if (revisions != null) {
             for (R r : revisions) {
                 sapNids.add(r.sapNid);
             }
         }
-        sapNids.addAll(getIdSapNids());
-        sapNids.addAll(getAnnotationSapNids());
         return sapNids;
     }
-
     public Set<Integer> getRefsetMemberSapNids()
             throws IOException {
         List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
