@@ -138,7 +138,7 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                 conceptSet.add(cv);
             }
         }
@@ -152,7 +152,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                     conceptSet.add(cv);
                 }
             }
@@ -166,7 +166,7 @@ public class ConceptVersion implements ConceptVersionBI {
         HashSet<ConceptVersionBI> conceptSet = new HashSet<ConceptVersionBI>();
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                 conceptSet.add(cv);
             }
         }
@@ -180,7 +180,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions(vc)) {
                 if (typeNids.contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                     conceptSet.add(cv);
                 }
             }
@@ -195,7 +195,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions(vc)) {
                 if (vc.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                     conceptSet.add(cv);
                 }
             }
@@ -210,7 +210,7 @@ public class ConceptVersion implements ConceptVersionBI {
         for (RelationshipChronicleBI rel : getRelsIncoming()) {
             for (RelationshipVersionBI relv : rel.getVersions()) {
                 if (vc.getIsaTypeNids().contains(relv.getTypeNid())) {
-                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getDestinationNid());
+                    ConceptVersionBI cv = Ts.get().getConceptVersion(vc, relv.getOriginNid());
                     conceptSet.add(cv);
                 }
             }
