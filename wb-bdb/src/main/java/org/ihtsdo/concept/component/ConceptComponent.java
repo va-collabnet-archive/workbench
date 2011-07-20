@@ -1042,15 +1042,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else if (cNid != this.enclosingConceptNid) {
             Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
             AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
-            AceLog.getAppLog().warning("Datafix warning. cNid " + 
-                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
-                    "\nincorrect for: " + this.nid + " " + 
-                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
-                    "\nshould have been: " + this.enclosingConceptNid +
-                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
-                    "\nprocessing: " + this.toString());
+            AceLog.getAppLog().warning("Datafix warning. cNid "
+                    + cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid)
+                    + "\nincorrect for: " + this.nid + " "
+                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.nid)
+                    + "\nshould have been: " + this.enclosingConceptNid
+                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid)
+                    + "\nprocessing: " + this.toString());
         }
-        
+
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
     }
@@ -1064,18 +1064,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         assert this.nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
         this.enclosingConceptNid = enclosingConceptNid;
         int cNid = Bdb.getNidCNidMap().getCNid(nid);
-         if (cNid == Integer.MAX_VALUE) {
+        if (cNid == Integer.MAX_VALUE) {
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
             Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
             AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
-            AceLog.getAppLog().warning("Datafix warning. cNid " + 
-                    cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + 
-                    "\nincorrect for: " + this.nid + " " + 
-                    Bdb.getUuidsToNidMap().getUuidsForNid(this.nid) + 
-                    "\nshould have been: " + this.enclosingConceptNid +
-                    Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid) + 
-                    "\nprocessing: " + this.toString());
+            AceLog.getAppLog().warning("Datafix warning. cNid "
+                    + cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid)
+                    + "\nincorrect for: " + this.nid + " "
+                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.nid)
+                    + "\nshould have been: " + this.enclosingConceptNid
+                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid)
+                    + "\nprocessing: " + this.toString());
         }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
@@ -1680,6 +1680,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
+    public final void resetUncommitted(int statusNid, int authorNid, int pathNid) {
+        if (getTime() != Long.MIN_VALUE) {
+            throw new UnsupportedOperationException(
+                    "Cannot resetUncommitted if time != Long.MIN_VALUE");
+        }
+        this.primordialSapNid = Bdb.getSapNid(statusNid,
+                authorNid,
+                pathNid, Long.MAX_VALUE);
+        this.getEnclosingConcept().setIsCanceled(false);
+        this.clearVersions();
+    }
+
     @Deprecated
     @Override
     public final void setStatusId(int statusId) {
@@ -2040,7 +2052,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             size = size + annotations.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
-        
+
         sapNids.addAll(getVersionSapNids());
         sapNids.addAll(getIdSapNids());
         sapNids.addAll(getAnnotationSapNids());
@@ -2053,7 +2065,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             size = size + revisions.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
-        
+
         sapNids.add(primordialSapNid);
         if (revisions != null) {
             for (R r : revisions) {

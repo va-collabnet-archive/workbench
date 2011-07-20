@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
@@ -431,13 +432,13 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         } else {
             I_GetConceptData concept = Terms.get().getConceptForNid(cc.getNid());
             if (concept.isCanceled()) {
-                construct(blueprint);
-            }
-            throw new InvalidCAB(
+                return construct(blueprint);
+            }else{
+                throw new InvalidCAB(
                     "Concept already exists: "
                     + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
+            }
         }
-
     }
 
     @Override
@@ -451,20 +452,22 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             a.nid = cNid;
             a.enclosingConceptNid = cNid;
             newC.setConceptAttributes(a);
-        } else {
+        } else if (newC.isCanceled()) {
             a = newC.getConceptAttributes();
+            for (int pathNid : ec.getEditPaths()) {
+                a.resetUncommitted(blueprint.getStatusNid(), ec.getAuthorNid(), pathNid);
+            }
             a.nid = cNid;
             a.enclosingConceptNid = cNid;
         }
 
         a.setDefined(blueprint.isDefined());
         a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
-        a.primordialSapNid = Integer.MIN_VALUE;
 
-
-
+        boolean primoridal = true;
         for (int p : ec.getEditPaths()) {
-            if (a.primordialSapNid == Integer.MIN_VALUE) {
+            if (primoridal) {
+                primoridal = false;
                 a.primordialSapNid =
                         Bdb.getSapDb().getSapNid(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE);

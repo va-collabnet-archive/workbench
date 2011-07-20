@@ -1675,7 +1675,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return canceled;
     }
-
+    
+    public void setIsCanceled(boolean isCanceled){
+        canceled  = isCanceled;
+    }
+    
     @Override
     public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException {
         return ConflictHelper.getCommonDescTuples(this, config);
