@@ -15,6 +15,7 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -33,9 +34,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyList;
@@ -49,6 +55,7 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -64,11 +71,11 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
-import org.ihtsdo.arena.spec.Refsets;
+import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
@@ -285,12 +292,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 if (lang.equals("en-us")) {
                     createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
                     createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
- //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                    //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
                 if (lang.equals("en-gb")) {
                     createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
                     createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
- //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                    //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
                 Ts.get().addUncommitted(newConcept);
 
@@ -994,9 +1001,63 @@ public class NewConcept extends PreviousNextOrCancel {
                         JOptionPane.ERROR_MESSAGE);
             } else if (fsn.extractText().length() != 0 && fsn.extractText().indexOf("(") > 0
                     && fsn.extractText().indexOf(")") > fsn.extractText().indexOf("(")) {
-                returnCondition = Condition.CONTINUE;
-                done = true;
-                NewConcept.this.notifyTaskDone();
+                //get text parts and make query term
+                String fullFsn = fsn.extractText();
+                String[] fsnWords = fullFsn.split("\\s");
+                HashSet<String> wordSet = new HashSet<String>();
+                for (String word : fsnWords) {
+                    if (!wordSet.contains(word) && word.length() > 1
+                            && !word.startsWith("(") && !word.endsWith(")")) {
+                        word = QueryParser.escape(word);
+                        wordSet.add(word);
+                    }
+                }
+                String queryTerm = null;
+                for (String word : wordSet) {
+                    if (queryTerm == null) {
+                        queryTerm = "+" + word;
+                    } else {
+                        queryTerm = queryTerm + " " + "+" + word;
+                    }
+                }
+                try {
+                    SearchResult result = Terms.get().doLuceneSearch(queryTerm);
+                    if (result.topDocs.totalHits == 0) {
+                        returnCondition = Condition.CONTINUE;
+                        done = true;
+                        NewConcept.this.notifyTaskDone();
+                    }
+                    NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
+                    search:
+                    for (int i = 0; i < result.topDocs.totalHits; i++) {
+                        Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                        int cnid = Integer.parseInt(doc.get("cnid"));
+                        int dnid = Integer.parseInt(doc.get("dnid"));
+
+                        I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                        if (potential_fsn != null) {
+                            for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                                if (allowedStatusNids.contains(part_search.getStatusNid())
+                                        && part_search.getText().equals(fullFsn)) {
+                                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                            "<html>FSN already used: " + fullFsn, "",
+                                            JOptionPane.ERROR_MESSAGE);
+                                    break search;
+                                } else {
+                                    returnCondition = Condition.CONTINUE;
+                                    done = true;
+                                    NewConcept.this.notifyTaskDone();
+                                }
+                            }
+                        }
+                    }
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (TerminologyException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ParseException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
             }
         }
     }
