@@ -162,10 +162,10 @@ public class BdbCommitManager {
             wfExtensionsToUpdate = uncommittedWfMemberIds;
             try {
 
-				reader = new WorkflowHistoryRefsetReader();
-			} catch (Exception e) {
-				AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
-			}
+                reader = new WorkflowHistoryRefsetReader();
+            } catch (Exception e) {
+                AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
+            }
 
         }
 
@@ -300,14 +300,14 @@ public class BdbCommitManager {
             try {
                 wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids());
             } catch (Exception e) {
-            	AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: " + e.getMessage());
+                AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: " + e.getMessage());
             }
         }
-           
+
         if (wfHistoryRefsetId == extension.getRefsetId()) {
-        	addUncommittedWfMemberId(extension);
+            addUncommittedWfMemberId(extension);
         }
-        
+
     }
 
     private static class SetNidsForCid implements Runnable {
@@ -428,7 +428,7 @@ public class BdbCommitManager {
                 && uncommittedCNidsNoChecks.cardinality() == 1
                 && uncommittedCNids.isMember(c.getNid())
                 && uncommittedCNidsNoChecks.isMember(c.getNid())) {
-            
+
             return commit(changeSetPolicy, changeSetWriterThreading);
 
         } else if (uncommittedCNids.cardinality() == 1
@@ -506,12 +506,12 @@ public class BdbCommitManager {
             }
 
             if (performCommit) {
-                
-                for (Concept annotationConcept: Bdb.annotationConcepts) {
+
+                for (Concept annotationConcept : Bdb.annotationConcepts) {
                     dbWriterService.execute(new ConceptWriter(annotationConcept));
                 }
                 Bdb.annotationConcepts.clear();
- 
+
                 KindOfComputer.reset();
                 KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
                 long commitTime = System.currentTimeMillis();
@@ -599,7 +599,7 @@ public class BdbCommitManager {
                             DataCheckRunner.cancelAll();
                             dataCheckMap.clear();
                             while (uncommittedCNidItr.next()) {
-                            	Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
+                                Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
                                 dataCheckMap.put(concept, warningsAndErrors);
 
@@ -661,7 +661,7 @@ public class BdbCommitManager {
 
                         if (performCommit) {
                             lastCommit = Bdb.gVersion.incrementAndGet();
-                            for (Concept annotationConcept: Bdb.annotationConcepts) {
+                            for (Concept annotationConcept : Bdb.annotationConcepts) {
                                 dbWriterService.execute(new ConceptWriter(annotationConcept));
                             }
                             Bdb.annotationConcepts.clear();
@@ -733,7 +733,7 @@ public class BdbCommitManager {
             }
             if (performCommit) {
                 Bdb.sync();
-            } 
+            }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InterruptedException e1) {
@@ -844,12 +844,12 @@ public class BdbCommitManager {
             Concept c = Concept.get(idItr.nid());
             if (c.isCanceled()) {
                 Terms.get().forget(c);
-                try {
-					KindOfComputer.updateIsaCaches((Concept) c);
-				} catch (Exception e) {
-					 AceLog.getAppLog().alertAndLog(Level.SEVERE,
-	                            "Canceling cache for: " + c.toString(), e);
-				}
+            }
+            try {
+                KindOfComputer.updateIsaCaches((Concept) c);
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                        "Canceling cache for: " + c.toString(), e);
             }
         }
     }
@@ -877,11 +877,11 @@ public class BdbCommitManager {
                 }
             }
             try {
-				KindOfComputer.updateIsaCaches((Concept) c);
-			} catch (Exception e) {
-				 AceLog.getAppLog().alertAndLog(Level.SEVERE,
-                            "Canceling cache for: " + c.toString(), e);
-			}
+                KindOfComputer.updateIsaCaches((Concept) c);
+            } catch (Exception e) {
+                AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                        "Canceling cache for: " + c.toString(), e);
+            }
             Terms.get().addUncommittedNoChecks(c);
         } else {
             a.primordialSapNid = -1;
@@ -921,11 +921,11 @@ public class BdbCommitManager {
         }
         c.modified();
         try {
-			KindOfComputer.updateIsaCaches((Concept) c);
-		} catch (Exception e) {
-			 AceLog.getAppLog().alertAndLog(Level.SEVERE,
-                        "Canceling cache for: " + c.toString(), e);
-		}
+            KindOfComputer.updateIsaCaches((Concept) c);
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                    "Canceling cache for: " + c.toString(), e);
+        }
         Terms.get().addUncommittedNoChecks(c);
     }
 
@@ -1038,8 +1038,8 @@ public class BdbCommitManager {
             }
         }
     }
-
     private static long lastDoUpdate = Long.MIN_VALUE;
+
     private static void doUpdate() {
         if (lastDoUpdate < Bdb.gVersion.get()) {
             lastDoUpdate = Bdb.gVersion.get();
@@ -1112,7 +1112,7 @@ public class BdbCommitManager {
             }
             if (getActiveFrame() != null) {
                 SwingUtilities.invokeLater(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         removeUncommittedUpdateFrame(concept);
@@ -1121,7 +1121,7 @@ public class BdbCommitManager {
             }
         }
     }
-    
+
     private static void removeUncommittedUpdateFrame(Concept concept) {
         for (I_ConfigAceFrame frameConfig : getActiveFrame().getDbConfig().getAceFrames()) {
             try {
@@ -1350,8 +1350,8 @@ public class BdbCommitManager {
             doUpdate();
         }
     }
-    
+
     public static ConcurrentHashMap<I_GetConceptData, Collection<AlertToDataConstraintFailure>> getDatacheckMap() {
-    	return dataCheckMap;
+        return dataCheckMap;
     }
 }
