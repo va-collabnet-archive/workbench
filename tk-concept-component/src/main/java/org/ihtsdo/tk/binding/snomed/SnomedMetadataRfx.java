@@ -40,91 +40,91 @@ public class SnomedMetadataRfx {
     private static int FULL_SPECIFIED_NAME_NID;
     private static int SYNONYM_PREFERRED_NAME_NID;
 
-    public static int getCURRENT_NID() throws Exception {
+    public static int getCURRENT_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return CURRENT_NID;
     }
 
-        public static int getCh_DEFINING_CHARACTERISTIC_NID() throws Exception {
+        public static int getCh_DEFINING_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return Ch_DEFINING_CHARACTERISTIC_NID;
     }
 
-    public static int getCh_STATED_RELATIONSHIP_NID() throws Exception {
+    public static int getCh_STATED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return CH_STATED_RELATIONSHIP_NID;
     }
 
-    public static int getCh_INFERRED_RELATIONSHIP_NID() throws Exception {
+    public static int getCh_INFERRED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return Ch_INFERRED_RELATIONSHIP_NID;
     }
 
-    public static int getLIMITED_NID() throws Exception {
+    public static int getLIMITED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return LIMITED_NID;
     }
 
-    public static int getMANDATORY_REFINABILITY_NID() throws Exception {
+    public static int getMANDATORY_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return MANDATORY_REFINABILITY_NID;
     }
 
-    public static int getNOT_REFINABLE_NID() throws Exception {
+    public static int getNOT_REFINABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return NOT_REFINABLE_NID;
     }
 
-    public static int getOPTIONAL_REFINABILITY_NID() throws Exception {
+    public static int getOPTIONAL_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return OPTIONAL_REFINABILITY_NID;
     }
 
-    public static int getRETIRED_NID() throws Exception {
+    public static int getRETIRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return RETIRED_NID;
     }
 
-    public static int getReleaseFormat() throws Exception {
+    public static int getReleaseFormat() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return releaseFormat;
     }
 
-    public static int getFULL_SPECIFIED_NAME_NID() throws Exception {
+    public static int getFULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return FULL_SPECIFIED_NAME_NID;
     }
 
-    public static int getSYNONYM_PREFERRED_NAME_NID() throws Exception {
+    public static int getSYNONYM_PREFERRED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return SYNONYM_PREFERRED_NAME_NID;
     }
 
-    private static void setupSnoRf1Rf2() throws Exception {
+    private static void setupSnoRf1Rf2() throws IOException {
         TerminologyStoreDI tf = Ts.get();
 
         if (tf.usesRf2Metadata()) {
