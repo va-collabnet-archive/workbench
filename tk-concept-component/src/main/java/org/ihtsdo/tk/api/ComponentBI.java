@@ -24,7 +24,12 @@ public interface ComponentBI {
     
     Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
 
+    Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException;
+
     Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
+
+    Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException;
 
     Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException;
 

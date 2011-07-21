@@ -35,9 +35,20 @@ public class RelGroupVersion
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-            ViewCoordinate xyz) throws IOException {
+    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+        return rg.getRefexes(refsetNid);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+            throws IOException {
         return rg.getCurrentRefexes(xyz);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+        return rg.getCurrentRefexes(xyz, refsetNid);
     }
 
     @Override

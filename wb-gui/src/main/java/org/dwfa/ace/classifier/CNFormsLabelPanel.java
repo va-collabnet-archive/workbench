@@ -102,58 +102,77 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         I_ConceptAttributeVersioned<?> core;
 
-        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-                ViewCoordinate xyz) throws IOException {
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+                throws IOException {
             return core.getCurrentRefexes(xyz);
         }
 
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+                throws IOException {
+            return core.getCurrentRefexes(xyz, refsetNid);
+        }
+
+        @Override
         public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
                 ViewCoordinate xyz) throws IOException {
             return core.getCurrentAnnotations(xyz);
         }
 
+        @Override
         public boolean isUncommitted() {
             return core.isUncommitted();
         }
 
+        @Override
         public String toUserString() {
             return core.toUserString();
         }
 
+        @Override
         public List<UUID> getUUIDs() {
             return core.getUUIDs();
         }
 
+        @Override
         public ConAttrVersionBI getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return core.getVersion(c);
         }
 
+        @Override
         public Collection<? extends ConAttrVersionBI> getVersions() {
             return core.getVersions();
         }
 
+        @Override
         public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
             return core.getVersions(c);
         }
         I_ConceptAttributePart part;
 
+        @Override
         public int getPathNid() {
             return part.getPathNid();
         }
 
+        @Override
         public int getStatusNid() {
             return part.getStatusNid();
         }
 
+        @Override
         public void setPathNid(int pathNid) {
             part.setPathNid(pathNid);
         }
 
+        @Override
         public void setStatusNid(int statusNid) {
             part.setStatusNid(statusNid);
         }
 
+        @Override
         public ArrayIntList getPartComponentNids() {
             return part.getPartComponentNids();
         }
@@ -179,6 +198,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConId()
          */
+        @Override
         public int getConId() {
             return core.getConId();
         }
@@ -189,6 +209,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConceptStatus()
          */
         @Deprecated
+        @Override
         public int getConceptStatus() {
             return part.getStatusId();
         }
@@ -199,6 +220,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.ace.api.I_AmPart#setStatusId(int)
          */
         @Deprecated
+        @Override
         public void setStatusId(int statusId) {
             part.setStatusId(statusId);
         }
@@ -209,6 +231,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getPathId()
          */
         @Deprecated
+        @Override
         public int getPathId() {
             return part.getPathId();
         }
@@ -219,6 +242,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getVersion()
          */
         @Deprecated
+        @Override
         public int getVersion() {
             return part.getVersion();
         }
@@ -228,6 +252,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#isDefined()
          */
+        @Override
         public boolean isDefined() {
             return part.isDefined();
         }
@@ -250,6 +275,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setDefined(boolean)
          */
+        @Override
         public void setDefined(boolean defined) {
             part.setDefined(defined);
 
@@ -260,6 +286,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#getConVersioned()
          */
+        @Override
         public I_ConceptAttributeVersioned getConVersioned() {
             return core;
         }
@@ -278,21 +305,25 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return hash;
         }
 
+        @Override
         public String toString() {
             return "ThinConTuple id: " + getConId() + " status: " + getConceptStatus() + " defined: " + isDefined()
                     + " path: " + getPathId() + " version: " + getVersion();
         }
 
+        @Override
         public I_ConceptAttributePart getMutablePart() {
             return part;
         }
 
         @Deprecated
+        @Override
         public int getStatusId() {
             return getConceptStatus();
         }
 
         @Deprecated
+        @Override
         public void setPathId(int pathId) {
             part.setPathId(pathId);
         }
@@ -301,27 +332,33 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public I_ConceptAttributeVersioned getFixedPart() {
             return core;
         }
 
         @Deprecated
+        @Override
         public I_ConceptAttributePart duplicate() {
             return part.duplicate();
         }
 
+        @Override
         public int getNid() {
             return core.getNid();
         }
 
+        @Override
         public long getTime() {
             return part.getTime();
         }
 
+        @Override
         public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
             return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
         }
 
+        @Override
         public ConAttrAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
             return (ConAttrAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
         }
@@ -373,6 +410,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
+        public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
         public Set getAllSapNids() throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -402,10 +444,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public ConceptAttrVersion getPrimordialVersion() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -420,48 +464,59 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         I_RelVersioned<?> fixedPart;
 
+        @Override
         public boolean isUncommitted() {
             return fixedPart.isUncommitted();
         }
 
+        @Override
         public String toUserString() {
             return fixedPart.toUserString();
         }
 
+        @Override
         public List<UUID> getUUIDs() {
             return fixedPart.getUUIDs();
         }
 
+        @Override
         public RelationshipVersionBI<?> getVersion(ViewCoordinate c)
                 throws ContraditionException {
             return fixedPart.getVersion(c);
         }
 
+        @Override
         public Collection<? extends RelationshipVersionBI> getVersions() {
             return fixedPart.getVersions();
         }
 
+        @Override
         public Collection<? extends RelationshipVersionBI> getVersions(
                 ViewCoordinate c) {
             return fixedPart.getVersions(c);
         }
 
+        @Override
         public int getCharacteristicNid() {
             return fixedPart.getCharacteristicNid();
         }
 
+        @Override
         public int getDestinationNid() {
             return fixedPart.getDestinationNid();
         }
 
+        @Override
         public int getOriginNid() {
             return fixedPart.getOriginNid();
         }
 
+        @Override
         public int getConceptNid() {
             return fixedPart.getOriginNid();
         }
 
+        @Override
         public int getRefinabilityNid() {
             return fixedPart.getRefinabilityNid();
         }
@@ -470,14 +525,17 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             fixedPart.setC2Id(destId);
         }
 
+        @Override
         public void setCharacteristicNid(int nid) {
             fixedPart.setCharacteristicNid(nid);
         }
 
+        @Override
         public void setDestinationNid(int nid) throws PropertyVetoException {
             fixedPart.setDestinationNid(nid);
         }
 
+        @Override
         public void setRefinabilityNid(int nid) {
             fixedPart.setRefinabilityNid(nid);
         }
@@ -488,35 +546,43 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
         I_RelPart part;
 
+        @Override
         public RelationshipAnalogBI makeAnalog(int statusNid, int authorNid, int pathNid,
                 long time) {
             return (RelationshipAnalogBI) part.makeAnalog(statusNid, authorNid, pathNid, time);
         }
 
+        @Override
         public int getPathNid() {
             return part.getPathNid();
         }
 
+        @Override
         public int getStatusNid() {
             return part.getStatusNid();
         }
 
+        @Override
         public void setPathNid(int pathNid) {
             part.setPathNid(pathNid);
         }
 
+        @Override
         public void setStatusNid(int statusNid) {
             part.setStatusNid(statusNid);
         }
 
+        @Override
         public int getAuthorNid() {
             return part.getAuthorNid();
         }
 
+        @Override
         public void setAuthorNid(int authorNid) {
             part.setAuthorNid(authorNid);
         }
 
+        @Override
         public ArrayIntList getPartComponentNids() {
             return part.getPartComponentNids();
         }
@@ -532,6 +598,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getC1Id()
          */
+        @Override
         public int getC1Id() {
             return fixedPart.getC1Id();
         }
@@ -541,6 +608,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getC2Id()
          */
+        @Override
         public int getC2Id() {
             return fixedPart.getC2Id();
         }
@@ -550,6 +618,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getRelId()
          */
+        @Override
         public int getRelId() {
             return fixedPart.getRelId();
         }
@@ -560,6 +629,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#getPathId()
          */
         @Deprecated
+        @Override
         public int getPathId() {
             return part.getPathId();
         }
@@ -569,6 +639,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getCharacteristicId()
          */
+        @Override
         public int getCharacteristicId() {
             return part.getCharacteristicId();
         }
@@ -578,6 +649,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getGroup()
          */
+        @Override
         public int getGroup() {
             return part.getGroup();
         }
@@ -587,6 +659,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getRefinabilityId()
          */
+        @Override
         public int getRefinabilityId() {
             return part.getRefinabilityId();
         }
@@ -597,10 +670,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#getTypeId()
          */
         @Deprecated
+        @Override
         public int getTypeId() {
             return part.getTypeId();
         }
 
+        @Override
         public int getTypeNid() {
             return part.getTypeNid();
         }
@@ -611,6 +686,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#getStatusId()
          */
         @Deprecated
+        @Override
         public int getStatusId() {
             return part.getStatusId();
         }
@@ -621,6 +697,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#getVersion()
          */
         @Deprecated
+        @Override
         public int getVersion() {
             return part.getVersion();
         }
@@ -631,11 +708,13 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#setTypeId(java.lang.Integer)
          */
         @Deprecated
+        @Override
         public void setTypeId(int typeId) {
             part.setTypeId(typeId);
 
         }
 
+        @Override
         public void setTypeNid(int typeNid) {
             part.setTypeNid(typeNid);
 
@@ -647,6 +726,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#setStatusId(java.lang.Integer)
          */
         @Deprecated
+        @Override
         public void setStatusId(int statusId) {
             part.setStatusId(statusId);
 
@@ -658,6 +738,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see
          * org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
          */
+        @Override
         public void setCharacteristicId(int characteristicId) {
             part.setCharacteristicId(characteristicId);
 
@@ -668,6 +749,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
          */
+        @Override
         public void setRefinabilityId(int refinabilityId) {
             part.setRefinabilityId(refinabilityId);
 
@@ -678,6 +760,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
          */
+        @Override
         public void setGroup(int group) {
             part.setGroup(group);
 
@@ -689,6 +772,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#duplicate()
          */
         @Deprecated
+        @Override
         public I_RelPart duplicate() {
             return part.duplicate();
         }
@@ -698,6 +782,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getRelVersioned()
          */
+        @Override
         public I_RelVersioned getRelVersioned() {
             return fixedPart;
         }
@@ -721,17 +806,19 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          *
          * @see org.dwfa.vodb.types.I_RelTuple#getFixedPart()
          */
+        @Override
         public I_RelVersioned getFixedPart() {
             return fixedPart;
         }
 
+        @Override
         public I_RelPart getMutablePart() {
             return part;
         }
 
         @Override
         public String toString() {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("ThinRelTuple: relId: ");
             buff.append(getRelId());
             buff.append(" c1id: ");
@@ -744,22 +831,27 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Deprecated
+        @Override
         public void setPathId(int pathId) {
             part.setPathId(pathId);
         }
 
+        @Override
         public void convertIds(I_MapNativeToNative jarToDbNativeMap) {
             // TODO
         }
 
+        @Override
         public int getNid() {
             return fixedPart.getNid();
         }
 
+        @Override
         public long getTime() {
             return part.getTime();
         }
 
+        @Override
         public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
             return (I_AmPart) part.makeAnalog(statusNid, pathNid, time);
         }
@@ -796,8 +888,19 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-                ViewCoordinate xyz) throws IOException {
+        public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+                throws IOException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+                throws IOException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
@@ -858,6 +961,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public boolean isActive(NidSetBI allowedStatusNids) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -1068,6 +1172,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             setConcept(theCBean, config);

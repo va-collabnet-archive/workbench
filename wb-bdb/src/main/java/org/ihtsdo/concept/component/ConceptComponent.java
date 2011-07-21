@@ -293,9 +293,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
-        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-                ViewCoordinate xyz) throws IOException {
+        public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid)
+                throws IOException {
+            return ConceptComponent.this.getRefexes(refsetNid);
+        }
+
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+                throws IOException {
             return ConceptComponent.this.getCurrentRefexes(xyz);
+        }
+
+        @Override
+        public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+                throws IOException {
+            return ConceptComponent.this.getCurrentRefexes(xyz, refsetNid);
         }
 
         @Override
@@ -2147,8 +2159,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-            ViewCoordinate xyz) throws IOException {
+    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid)
+               throws IOException {
+        Collection<? extends RefexChronicleBI<?>> r = getRefexes();
+        List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(r.size());
+        for (RefexChronicleBI<?> rcbi : r) {
+            if (rcbi.getCollectionNid() == refsetNid) {
+                returnValues.add(rcbi);
+            }
+        }
+        return returnValues;
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+            throws IOException {
         Collection<? extends RefexChronicleBI<?>> refexes = getRefexes();
         List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
         for (RefexChronicleBI<?> refex : refexes) {
@@ -2160,8 +2185,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(
-            ViewCoordinate xyz) throws IOException {
+    public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz)
+            throws IOException {
         Collection<? extends RefexVersionBI<?>> currentRefexes = new HashSet(getCurrentRefexes(xyz));
 
         Collection<? extends RefexChronicleBI<?>> refexes = getRefexes();
@@ -2176,6 +2201,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 if (!currentRefexes.contains(version)) {
                     returnValues.add(version);
                 }
+            }
+        }
+        return Collections.unmodifiableCollection(returnValues);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+               throws IOException {
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefexes(refsetNid);
+        List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
+                returnValues.add(version);
             }
         }
         return Collections.unmodifiableCollection(returnValues);

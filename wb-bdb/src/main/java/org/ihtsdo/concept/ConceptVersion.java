@@ -669,9 +669,20 @@ public class ConceptVersion implements ConceptVersionBI {
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-            ViewCoordinate xyz) throws IOException {
+    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+        return concept.getRefexes(refsetNid);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+            throws IOException {
         return concept.getCurrentRefexes(xyz);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+        return concept.getCurrentRefexes(xyz, refsetNid);
     }
 
     @Override

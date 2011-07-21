@@ -2017,10 +2017,24 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-            ViewCoordinate xyz) throws IOException {
+    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+        return getConceptAttributes().getRefexes(refsetNid);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+            throws IOException {
         if (getConceptAttributes() != null) {
             return getConceptAttributes().getCurrentRefexes(xyz);
+        }
+        return new ArrayList<RefexVersionBI<?>>(0);
+    }
+
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+        if (getConceptAttributes() != null) {
+            return getConceptAttributes().getCurrentRefexes(xyz, refsetNid);
         }
         return new ArrayList<RefexVersionBI<?>>(0);
     }

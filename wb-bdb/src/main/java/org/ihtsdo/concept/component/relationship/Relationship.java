@@ -224,6 +224,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int getTypeNid() {
             if (index >= 0) {
                 assert revisions.get(index).getTypeNid() != Integer.MAX_VALUE : Relationship.this;
@@ -460,7 +461,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
      */
     public String validate(Relationship another) throws IOException {
         assert another != null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         if (this.c2Nid != another.c2Nid) {
             buf.append("\tRelationship.initialCaseSignificant not equal: \n"
@@ -566,6 +567,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig)
             throws TerminologyException, IOException {
         List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
@@ -607,6 +609,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return returnTuples;
     }
 
+    @Override
     public boolean addVersion(I_RelPart part) {
         this.versions = null;
         return super.addRevision((RelationshipRevision) part);
@@ -648,10 +651,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
     List<Version> versions;
 
+    @Override
     public List<Version> getTuples() {
         return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
     }
 
+    @Override
     public List<Version> getVersions() {
         if (versions == null) {
             int count = 1;
@@ -674,11 +679,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         return versions;
     }
 
+    @Override
     public List<Version> getVersions(ContradictionManagerBI contradictionManager) {
         // TODO implement conflict resolution
         return getTuples();
     }
 
+    @Override
     public List<Version> getTuples(ContradictionManagerBI contradictionManager) {
         // TODO implement conflict resolution
         return getTuples();

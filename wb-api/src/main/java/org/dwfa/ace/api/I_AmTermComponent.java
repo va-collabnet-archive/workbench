@@ -29,6 +29,7 @@ public interface I_AmTermComponent extends ComponentBI {
     /**
      * @return The terminology component's identifier
      */
+    @Override
     public int getNid();
 
     /**

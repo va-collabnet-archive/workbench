@@ -73,70 +73,97 @@ import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
 
+    @Override
     public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
         return bean.getInactiveRefexes(xyz);
     }
 
+    @Override
     public Set<PositionBI> getPositions() throws IOException {
         return bean.getPositions();
     }
 
+    @Override
    public Set<Integer> getAllSapNids() throws IOException {
       return bean.getAllSapNids();
    }
 
+    @Override
    public void cancel() throws IOException {
       bean.cancel();
    }
 
+    @Override
    public boolean commit(ChangeSetGenerationPolicy changeSetPolicy, ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
       return bean.commit(changeSetPolicy, changeSetWriterThreading);
    }
 
+    @Override
    public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
       return bean.getRefsetMembers();
    }
 
+    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
       return bean.getCurrentRefsetMembers(vc);
    }
 
+    @Override
     public boolean isUncommitted() {
         return bean.isUncommitted();
     }
 
+    @Override
     public Collection<? extends ConceptVersionBI> getVersions() {
         return bean.getVersions();
     }
 
+    @Override
     public Collection<? extends ConceptVersionBI> getVersions(ViewCoordinate c) {
         return bean.getVersions(c);
     }
 
+    @Override
     public ConceptVersionBI getVersion(ViewCoordinate c) {
         return bean.getVersion(c);
     }
 
+    @Override
     public Collection<? extends RefexChronicleBI<?>> getRefexes()
 			throws IOException {
 		return bean.getRefexes();
 	}
 
-	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(
-			ViewCoordinate xyz) throws IOException {
+    @Override
+    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
+		return bean.getRefexes(refsetNid);
+    }
+
+    @Override
+	public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz)
+            throws IOException {
 		return bean.getCurrentRefexes(xyz);
 	}
 
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+            throws IOException {
+		return bean.getCurrentRefexes(xyz, refsetNid);
+    }
+
+    @Override
 	public boolean addAnnotation(RefexChronicleBI<?> annotation)
 			throws IOException {
 		return bean.addAnnotation(annotation);
 	}
 
+    @Override
 	public Collection<? extends RefexChronicleBI<?>> getAnnotations()
 			throws IOException {
 		return bean.getAnnotations();
 	}
 
+    @Override
 	public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(
 			ViewCoordinate xyz) throws IOException {
 		return bean.getCurrentAnnotations(xyz);
@@ -182,23 +209,28 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
                 relAssertionType);
     }
 
+    @Override
 	public String toUserString() {
 		return bean.toUserString();
 	}
 
+    @Override
 	public UUID getPrimUuid() {
 		return bean.getPrimUuid();
 	}
 
+    @Override
 	public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
 			throws IOException, ContraditionException {
 		return bean.getRelGroups(vc);
 	}
 
+    @Override
 	public List<UUID> getUUIDs() {
 		return bean.getUUIDs();
 	}
 
+    @Override
 	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
 			NidSetBI allowedStatus, PositionSetBI positions,
 			Precedence precedencePolicy,
@@ -208,6 +240,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
 			Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException,
@@ -216,6 +249,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_DescriptionTuple> getDescriptionTuples(
 			NidSetBI allowedStatus, NidSetBI allowedTypes,
 			PositionSetBI positionSet, Precedence precedencePolicy,
@@ -224,6 +258,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public I_DescriptionTuple getDescTuple(NidListBI typePrefOrder,
 			NidListBI langPrefOrder, NidSetBI allowedStatus,
 			PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
@@ -233,6 +268,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positionSet, sortPref, precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public Set<? extends I_GetConceptData> getDestRelOrigins(
 			NidSetBI allowedStatus, NidSetBI allowedTypes,
 			PositionSetBI positions, Precedence precedencePolicy,
@@ -242,6 +278,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedStatus,
 			NidSetBI allowedTypes, PositionSetBI positions,
 			Precedence precedencePolicy,
@@ -251,6 +288,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_RelTuple> getDestRelTuples(NidSetBI allowedTypes,
 			Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException,
@@ -259,6 +297,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_ImageTuple> getImageTuples(NidSetBI allowedStatus,
 			NidSetBI allowedTypes, PositionSetBI positions,
 			Precedence precedencePolicy,
@@ -268,6 +307,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public Set<? extends I_GetConceptData> getSourceRelTargets(
 			NidSetBI allowedStatus, NidSetBI allowedTypes,
 			PositionSetBI positions, Precedence precedencePolicy,
@@ -277,6 +317,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public Set<? extends I_GetConceptData> getSourceRelTargets(
 			NidSetBI allowedTypes, Precedence precedencePolicy,
 			ContradictionManagerBI contradictionManager) throws IOException,
@@ -285,6 +326,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				contradictionManager);
 	}
 
+    @Override
 	public List<? extends I_RelTuple> getSourceRelTuples(
 			NidSetBI allowedStatus, NidSetBI allowedTypes,
 			PositionSetBI positions, Precedence precedencePolicy,
@@ -294,6 +336,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public boolean promote(I_TestComponent test, I_Position viewPosition,
 			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
 			Precedence precedence) throws IOException, TerminologyException {
@@ -301,6 +344,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedence);
 	}
 
+    @Override
 	public boolean promote(PositionBI viewPosition,
 			PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
 			Precedence precedence) throws IOException, TerminologyException {
@@ -343,6 +387,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public Set<? extends I_GetConceptData> getDestRelOrigins(
 			NidSetBI allowedTypes) throws IOException, TerminologyException {
 		return bean.getDestRelOrigins(allowedTypes);
@@ -400,6 +445,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public boolean isParentOf(I_GetConceptData child, NidSetBI allowedStatus,
 			NidSetBI allowedTypes, PositionSetBI positions,
 			Precedence precedencePolicy,
@@ -409,6 +455,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public boolean isParentOfOrEqualTo(I_GetConceptData child,
 			NidSetBI allowedStatus, NidSetBI allowedTypes,
 			PositionSetBI positions, Precedence precedencePolicy,
@@ -436,24 +483,29 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				positions, precedencePolicy, contradictionManager);
 	}
 
+    @Override
 	public ConAttrChronicleBI getConAttrs() throws IOException {
 		return bean.getConAttrs();
 	}
 
+    @Override
 	public Collection<? extends DescriptionChronicleBI> getDescs()
 			throws IOException {
 		return bean.getDescs();
 	}
 
+    @Override
 	public Collection<? extends MediaChronicleBI> getMedia() throws IOException {
 		return bean.getMedia();
 	}
 
+    @Override
 	public Collection<? extends RelationshipChronicleBI> getRelsIncoming()
 			throws IOException {
 		return bean.getRelsIncoming();
 	}
 
+    @Override
 	public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
 			throws IOException {
 		return bean.getRelsOutgoing();
@@ -473,11 +525,13 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 				precedence);
 	}
 
+    @Override
 	public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config,
 			I_ShowActivity activity) throws IOException {
 		return bean.getPossibleKindOfConcepts(config, activity);
 	}
 
+    @Override
 	public boolean everHadSrcRelOfType(int typeNid) throws IOException {
 		return bean.everHadSrcRelOfType(typeNid);
 	}
@@ -487,10 +541,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getDestRelOrigins(allowedTypes);
     }
 
+    @Override
     public List<? extends I_DescriptionTuple> getDescriptionTuples() throws IOException, TerminologyException {
         return bean.getDescriptionTuples();
     }
 
+    @Override
     public List<? extends I_ImageTuple> getImageTuples() throws IOException, TerminologyException {
         return bean.getImageTuples();
     }
@@ -501,6 +557,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.isParentOf(child, allowedStatus, allowedTypes, positions, precedencePolicy, contradictionManager);
     }
 
+    @Override
     public boolean isParentOf(I_GetConceptData child) throws IOException, TerminologyException {
         return bean.isParentOf(child);
     }
@@ -512,6 +569,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
             contradictionManager);
     }
 
+    @Override
     public boolean isParentOfOrEqualTo(I_GetConceptData child) throws IOException, TerminologyException {
         return bean.isParentOfOrEqualTo(child);
     }
@@ -591,6 +649,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.promote(viewPosition, pomotionPaths, allowedStatus, precedence);
     }
 
+    @Override
     public I_RepresentIdSet getPossibleChildOfConcepts(I_ConfigAceFrame configFrame) throws IOException {
         return bean.getPossibleChildOfConcepts(configFrame);
     }
@@ -618,10 +677,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         this.config = config;
     }
 
+    @Override
     public I_ConceptAttributeVersioned getConceptAttributes() throws IOException {
         return bean.getConceptAttributes();
     }
 
+    @Override
     public int getConceptNid() {
         return bean.getConceptNid();
     }
@@ -631,10 +692,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
 
+    @Override
     public Collection<? extends I_DescriptionVersioned> getDescriptions() throws IOException {
         return bean.getDescriptions();
     }
 
+    @Override
     public Collection<? extends I_RelVersioned> getDestRels() throws IOException {
         if (parentDepth > 0) {
             return new ArrayList<I_RelVersioned>();
@@ -643,10 +706,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
 
+    @Override
     public Collection<? extends I_ImageVersioned> getImages() throws IOException {
         return bean.getImages();
     }
 
+    @Override
     public String getInitialText() throws IOException {
         I_DescriptionTuple tuple = this.getDescTuple(ConceptBeanForTree.this.config.getShortLabelDescPreferenceList(),
             ConceptBeanForTree.this.config);
@@ -657,14 +722,17 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getInitialText();
     }
 
+    @Override
     public Collection<? extends I_RelVersioned> getSourceRels() throws IOException {
         return bean.getSourceRels();
     }
 
+    @Override
     public List<UUID> getUids() throws IOException {
         return bean.getUids();
     }
 
+    @Override
     public boolean isLeaf(I_ConfigAceFrame aceConfig, boolean addUncommitted) throws IOException {
         if (parentDepth > 0) {
             return true;
@@ -672,56 +740,69 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.isLeaf(aceConfig, addUncommitted);
     }
 
+    @Override
     public String toString() {
         return bean.toString();
     }
 
+    @Override
     public int getParentDepth() {
         return parentDepth;
     }
 
+    @Override
     public boolean isParentOpened() {
         return parentOpened;
     }
 
+    @Override
     public boolean isSecondaryParentNode() {
         return secondaryParentNode;
     }
 
+    @Override
     public void setParentOpened(boolean opened) {
         this.parentOpened = opened;
 
     }
 
+    @Override
     public I_GetConceptData getCoreBean() {
         return bean;
     }
 
+    @Override
     public List<DefaultMutableTreeNode> getExtraParentNodes() {
         return extraParentNodes;
     }
 
+    @Override
     public I_Identify getIdentifier() throws IOException {
         return bean.getIdentifier();
     }
 
+    @Override
     public I_DescriptionTuple getDescTuple(I_ConfigAceFrame config) throws IOException {
         return bean.getDescTuple(config.getTreeDescPreferenceList(), config);
     }
 
+    @Override
     public I_DescriptionTuple getDescTuple(NidListBI prefOrder, I_ConfigAceFrame config) throws IOException {
         return bean.getDescTuple(prefOrder, config);
     }
 
+    @Override
     public NidSetBI getUncommittedIds() {
         return bean.getUncommittedIds();
     }
 
+    @Override
     public UniversalAceBean getUniversalAceBean() throws IOException, TerminologyException {
         return bean.getUniversalAceBean();
     }
 
 
+    @Override
     public int getRelId() {
         return relId;
     }
@@ -731,22 +812,27 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return getDescriptionTuples(allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
     }
 
+    @Override
     public Collection<? extends I_ExtendByRef> getExtensions() throws IOException, TerminologyException {
         return bean.getExtensions();
     }
 
+    @Override
     public Object getDenotation(int identifierScheme) throws IOException, TerminologyException {
         return bean.getDenotation(identifierScheme);
     }
 
+    @Override
     public I_RepresentIdSet getPossibleKindOfConcepts(I_ConfigAceFrame config) throws IOException {
         return bean.getPossibleKindOfConcepts(config);
     }
 
+    @Override
     public int getNid() {
         return bean.getNid();
     }
 
+    @Override
     public List<I_Identify> getUncommittedIdVersioned() {
         return bean.getUncommittedIdVersioned();
     }
@@ -756,32 +842,39 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
         return bean.getConceptNid() - o.bean.getConceptNid();
     }
 
+    @Override
 	public I_RelVersioned getDestRel(int relNid) throws IOException {
 		return bean.getDestRel(relNid);
 	}
 
+    @Override
 	public I_RelVersioned getSourceRel(int relNid) throws IOException {
 		return bean.getSourceRel(relNid);
 	}
 
+    @Override
 	public String toLongString() {
 		return bean.toLongString();
 	}
 
+    @Override
 	public boolean isCanceled() throws IOException {
 		return bean.isCanceled();
 	}
 
+    @Override
 	public Set<? extends I_ConceptAttributeTuple> getCommonConceptAttributeTuples(
 			I_ConfigAceFrame config) throws IOException, TerminologyException {
 		return bean.getCommonConceptAttributeTuples(config);
 	}
 
+    @Override
 	public Set<? extends I_DescriptionTuple> getCommonDescTuples(
 			I_ConfigAceFrame config) throws IOException {
 		return bean.getCommonDescTuples(config);
 	}
 
+    @Override
 	public Set<? extends I_RelTuple> getCommonRelTuples(I_ConfigAceFrame config) throws IOException, TerminologyException {
 		return bean.getCommonRelTuples(config);
 	}
