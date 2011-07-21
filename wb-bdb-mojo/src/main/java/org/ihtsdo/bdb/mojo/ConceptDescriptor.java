@@ -62,7 +62,7 @@ public class ConceptDescriptor {
             }
 
         } catch (Exception e) {
-            throw new Exception(e.getMessage() + " : " + description + " " + uuidList);
+            throw new Exception(e.getMessage() + " : " + description + " " + uuidList, e);
         }
         if (concept != null) {
             throw new Exception("Failed to find matching description: " + description + " " + uuidList
