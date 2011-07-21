@@ -553,8 +553,7 @@ public class ConceptVersion implements ConceptVersionBI {
         if (fsnOrder == null) {
             fsnOrder = new IntList();
             fsnOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
-            fsnOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid());
-            fsnOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+            fsnOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF2.getNid());
         }
         return concept.getDescTuple(fsnOrder,
                 vc.getLangPrefList(),
@@ -575,7 +574,9 @@ public class ConceptVersion implements ConceptVersionBI {
             preferredOrder = new IntList();
             preferredOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid());
             preferredOrder.add(ReferenceConcepts.PREFERRED_RF1.getNid());
-            preferredOrder.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+            preferredOrder.add(ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF2.getNid());
+            preferredOrder.add(ReferenceConcepts.SYNONYM_RF1.getNid());
+            preferredOrder.add(ReferenceConcepts.SYNONYM_RF2.getNid());
         }
         return concept.getDescTuple(preferredOrder,
                 vc.getLangPrefList(),
@@ -593,6 +594,7 @@ public class ConceptVersion implements ConceptVersionBI {
             synonymOrder = new IntList();
             synonymOrder.add(ReferenceConcepts.ACCEPTABLE_ACCEPTABILITY.getNid());
             synonymOrder.add(ReferenceConcepts.SYNONYM_RF1.getNid());
+            synonymOrder.add(ReferenceConcepts.SYNONYM_RF2.getNid());
         }
         throw new UnsupportedOperationException();
     }

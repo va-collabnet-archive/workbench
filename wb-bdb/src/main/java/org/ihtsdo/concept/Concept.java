@@ -745,27 +745,54 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             PositionSetBI positionSet, LANGUAGE_SORT_PREF sortPref,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException {
+        I_DescriptionTuple<DescriptionRevision> result = null;
         switch (sortPref) {
             case LANG_B4_TYPE:
-                return getLangPreferredDesc(getDescriptionTuples(allowedStatus,
+                result = getLangPreferredDesc(getDescriptionTuples(allowedStatus,
                         new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
                         typePrefOrder, langPrefOrder,
                         allowedStatus, positionSet, true);
+                if (result != null) {
+                    return result;
+                }
+                return getDescTuple(typePrefOrder,
+                        langPrefOrder, allowedStatus,
+                        positionSet, LANGUAGE_SORT_PREF.TYPE_B4_LANG,
+                        precedencePolicy, contradictionManager);
             case TYPE_B4_LANG:
-                return getTypePreferredDesc(getDescriptionTuples(allowedStatus,
+                result = getTypePreferredDesc(getDescriptionTuples(allowedStatus,
                         new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
                         typePrefOrder, langPrefOrder,
                         allowedStatus, positionSet, true);
+                if (result != null) {
+                    return result;
+                }
+                return (I_DescriptionTuple<DescriptionRevision>) 
+                        getDescs().iterator().next().getVersions().iterator().next();
             case LANG_REFEX:
-                return getRefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
-                        rf1LangRefexNidSet, positionSet, precedencePolicy, contradictionManager),
+                result = getRefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
+                        new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
                         typePrefOrder, langPrefOrder,
                         allowedStatus, positionSet);
+                if (result != null) {
+                    return result;
+                }
+                return getDescTuple(typePrefOrder,
+                        langPrefOrder, allowedStatus,
+                        positionSet, LANGUAGE_SORT_PREF.TYPE_B4_LANG,
+                        precedencePolicy, contradictionManager);
             case RF2_LANG_REFEX:
-                return getRf2RefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
-                        rf2LangRefexNidSet, positionSet, precedencePolicy, contradictionManager),
+                result = getRf2RefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
+                        new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),
                         typePrefOrder, langPrefOrder,
                         allowedStatus, positionSet);
+                if (result != null) {
+                    return result;
+                }
+                return getDescTuple(typePrefOrder,
+                        langPrefOrder, allowedStatus,
+                        positionSet, LANGUAGE_SORT_PREF.LANG_REFEX,
+                        precedencePolicy, contradictionManager);
             default:
                 throw new IOException("Can't handle sort type: " + sortPref);
         }
@@ -831,9 +858,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         }
                     }
                 }
-                return descriptions.iterator().next();
-            } else {
-                return descriptions.iterator().next();
             }
         }
         return null;
@@ -874,9 +898,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         }
                     }
                 }
-                return descriptions.iterator().next();
-            } else {
-                return descriptions.iterator().next();
             }
         }
         return null;
@@ -886,6 +907,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             Collection<I_DescriptionTuple<DescriptionRevision>> descriptions,
             int typePrefNid, ViewCoordinate vc, int langRefexNid) throws IOException {
         // get FSN
+        I_DescriptionTuple descOfType = null;
         for (I_DescriptionTuple d : descriptions) {
             if (d.getTypeNid() == typePrefNid) {
                 for (RefexVersionBI<?> refex : d.getCurrentRefexes(vc)) {
@@ -893,8 +915,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         RefexCnidVersionBI<?> langRefex =
                                 (RefexCnidVersionBI<?>) refex;
                         if (langRefex.getCnid1()
-                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid() ||
-                                langRefex.getCnid1()
+                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid()
+                                || langRefex.getCnid1()
                                 == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF2.getNid()) {
                             return d;
                         }
