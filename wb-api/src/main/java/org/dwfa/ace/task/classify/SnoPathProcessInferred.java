@@ -19,7 +19,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class SnoPathProcessInferred implements I_ProcessConcepts {
 

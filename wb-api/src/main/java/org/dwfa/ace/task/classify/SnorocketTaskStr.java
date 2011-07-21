@@ -65,7 +65,7 @@ import org.ihtsdo.tk.api.Precedence;
 import au.csiro.snorocket.snapi.Snorocket;
 import au.csiro.snorocket.snapi.I_Snorocket.I_Callback;
 import au.csiro.snorocket.snapi.I_Snorocket.I_EquivalentCallback;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 // import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataConCallback;
 // import au.csiro.snorocket.snapi.I_Snorocket.I_InternalDataRelCallback;

@@ -42,7 +42,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 

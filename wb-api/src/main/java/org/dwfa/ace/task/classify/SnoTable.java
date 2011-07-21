@@ -39,7 +39,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class SnoTable {
 
