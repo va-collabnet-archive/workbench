@@ -65,7 +65,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
     boolean hasUuid(UUID memberUUID);
 
-    boolean usesRf2Metadata() throws Exception ;
+    boolean usesRf2Metadata() throws IOException ;
 
     void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor)
             throws Exception;
