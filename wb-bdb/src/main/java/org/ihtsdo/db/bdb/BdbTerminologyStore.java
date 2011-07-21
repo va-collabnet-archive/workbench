@@ -314,7 +314,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     private static boolean isReleaseFormatSetup = false;
     private static int releaseFormat = 0;
     @Override
-    public boolean usesRf2Metadata() throws Exception {
+    public boolean usesRf2Metadata() throws IOException {
         if (isReleaseFormatSetup == false) {
             UUID snomedRootUuid  = SNOMED.Concept.ROOT.getUids().iterator().next();
             int snomedRootNid = Bdb.uuidToNid(snomedRootUuid);
