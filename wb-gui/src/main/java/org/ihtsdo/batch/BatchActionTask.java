@@ -24,6 +24,7 @@ import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.example.binding.TermAux;
 
 // :!!!: should BatchActionTask be abstract or interface?
@@ -59,8 +60,8 @@ public abstract class BatchActionTask {
      * @throws IOException 
      */
     public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-        RETIRED_NID = TermAux.RETIRED.getLenient().getNid(); // :!!!:RFX:
-        CURRENT_NID = TermAux.CURRENT.getLenient().getNid(); // :!!!:RFX:
+        RETIRED_NID = SnomedMetadataRfx.getRETIRED_NID(); // :!!!:RFX:
+        CURRENT_NID = SnomedMetadataRfx.getCURRENT_NID();
         termConstructor = Ts.get().getTerminologyConstructor(ec, vc);
     }
 
