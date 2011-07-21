@@ -126,7 +126,8 @@ public class FixedWidthJEditorPane extends JEditorPane {
             return getText();
         }
         String text = getText();
-        text = text.substring(text.indexOf("<body>") + "<body>".length(), text.length());
+        text = text.substring(text.indexOf("<body>") + "<body>".length(), 
+                text.length());
         text = text.substring(0, text.indexOf("</body>"));
         text = text.trim();
         return text;

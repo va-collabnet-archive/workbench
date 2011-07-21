@@ -35,11 +35,22 @@ public class ArenaEditor extends BasicGraphEditor {
 
         CONCEPT, TAXONOMY
     };
+    
+   
     /**
      * 
      */
     private static final long serialVersionUID = -7007225006753337933L;
     private List<? extends ArenaComponentSettings> arenaList;
+    boolean forAjudication = false;
+
+    public boolean isForAjudication() {
+        return forAjudication;
+    }
+
+    public void setForAjudication(boolean forAjudication) {
+        this.forAjudication = forAjudication;
+    }
 
     /**
      * @throws IOException 
@@ -100,7 +111,7 @@ public class ArenaEditor extends BasicGraphEditor {
             }
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
-        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(), 
+        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(true), 
                 new String[] {"view", "navigator", "navigatorTree", "navButton", "statedInferredButton"}, null, null));
         
         if (defaultArenaConfig.exists()) {
@@ -116,7 +127,7 @@ public class ArenaEditor extends BasicGraphEditor {
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, int link) {
-        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(link));
+        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(true, link));
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, ArenaComponentSettings settings) {

@@ -24,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.TermComponentLabel.LabelText;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
@@ -256,10 +257,10 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
     protected TermComponentLabel getLabel(int nid, boolean canDrop)
             throws IOException {
         try {
-            TermComponentLabel termLabel = new TermComponentLabel();
+            TermComponentLabel termLabel = new TermComponentLabel(LabelText.PREFERRED);
             termLabel.setLineWrapEnabled(true);
             termLabel.getDropTarget().setActive(canDrop);
-            termLabel.setFixedWidth(100);
+            termLabel.setFixedWidth(150);
             termLabel.setFont(termLabel.getFont().deriveFont(getSettings().getFontSize()));
             termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
             termLabel.setTermComponent(Terms.get().getConcept(nid));

@@ -16,12 +16,17 @@ public class Arena extends JPanel {
      */
     private static final long serialVersionUID = 1L;
 
+    ArenaEditor editor;
+
+    public ArenaEditor getEditor() {
+        return editor;
+    }
+    
     public Arena(I_ConfigAceFrame config, File defaultLayout) throws IOException {
         super(new BorderLayout());
         
-        ArenaEditor editor = new ArenaEditor(config, defaultLayout);
+        editor = new ArenaEditor(config, defaultLayout);
         add(editor, BorderLayout.CENTER);   
-
     }
     
 }

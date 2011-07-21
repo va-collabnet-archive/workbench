@@ -144,6 +144,7 @@ public class DragPanelExtension
         TermComponentLabel typeLabel = getLabel(getRefexV().getCollectionNid(), canDrop);
         add(typeLabel, gbc);
         gbc.gridx++;
+        gbc.weightx = 0;
         add(new JSeparator(SwingConstants.VERTICAL), gbc);
         gbc.weightx = 1;
         gbc.gridx++;

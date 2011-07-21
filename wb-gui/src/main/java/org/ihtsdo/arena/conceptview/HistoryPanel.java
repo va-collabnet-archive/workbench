@@ -10,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -127,7 +126,7 @@ public class HistoryPanel {
 
                     @Override
                     public void run() {
-                        if (changedSelections.size() > 0) {
+                        if (changedSelections.size() > 0 || view.getSettings().isForAjudciation()) {
                             navigator.getImplementButton().setEnabled(true);
                         } else {
                             navigator.getImplementButton().setEnabled(false);
@@ -311,8 +310,8 @@ public class HistoryPanel {
         @Override
         public void actionPerformed(ActionEvent ae) {
             try {
+                EditCoordinate ec = view.getConfig().getEditCoordinate();
                 for (JRadioButton button : changedSelections) {
-                    EditCoordinate ec = view.getConfig().getEditCoordinate();
                     ComponentVersionBI cv = buttonVersionMap.get(button);
                     for (int pathNid : ec.getEditPaths()) {
                         ((AnalogGeneratorBI) cv).makeAnalog(
@@ -321,8 +320,12 @@ public class HistoryPanel {
                                 pathNid, Long.MAX_VALUE);
                     }
                 }
+                if (view.getSettings().isForAjudciation()) {
+                    
+                }
                 Ts.get().addUncommitted(view.getConcept());
                 reset();
+                
                 navigator.getImplementButton().setEnabled(false);
             } catch (IOException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
@@ -377,6 +380,9 @@ public class HistoryPanel {
         positionPanelMap = view.getPositionPanelMap();
         this.navigator = navigator;
         navigator.getImplementButton().addActionListener(avcl);
+        if (view.getSettings().isForAjudciation()) {
+            navigator.getImplementButton().setEnabled(true);
+        }
 
         TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
         if (view.getPathRowMap() != null && positionOrderedSet != null) {

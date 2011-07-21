@@ -49,6 +49,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -74,10 +75,15 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
-public class TermComponentLabel extends JLabel implements FocusListener, I_ContainTermComponent, ClipboardOwner {
+public class TermComponentLabel extends JLabel
+        implements FocusListener, I_ContainTermComponent, ClipboardOwner {
 
     public class CommitListener implements PropertyChangeListener {
 
@@ -173,14 +179,21 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                     }
                     buff.append("  </concept-ids>\n");
                     buff.append("  <descriptions>\n");
-                    for (I_DescriptionTuple dt : concept.getDescriptionTuples(config.getAllowedStatus(), null,
-                            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
+                    for (I_DescriptionTuple dt :
+                            concept.getDescriptionTuples(config.getAllowedStatus(), null,
+                            config.getViewPositionSetReadOnly(), config.getPrecedence(),
+                            config.getConflictResolutionStrategy())) {
                         buff.append("    <description type='");
                         I_GetConceptData type = tf.getConcept(dt.getTypeNid());
 
-                        I_DescriptionTuple typeDesc = type.getDescTuple(config.getLongLabelDescPreferenceList(),
-                                config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                                config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+                        I_DescriptionTuple typeDesc = type.getDescTuple(
+                                config.getLongLabelDescPreferenceList(),
+                                config.getLanguagePreferenceList(),
+                                config.getAllowedStatus(),
+                                config.getViewPositionSetReadOnly(),
+                                config.getLanguageSortPref(),
+                                config.getPrecedence(),
+                                config.getConflictResolutionStrategy());
                         buff.append(typeDesc.getText());
                         buff.append("'\n                 text='");
                         buff.append(dt.getText());
@@ -201,7 +214,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
 
-        private void writeIdentifiersToBuff(String indent, StringBuffer buff, I_IdVersion idt) throws IOException {
+        private void writeIdentifiersToBuff(String indent, StringBuffer buff,
+                I_IdVersion idt) throws IOException {
             buff.append(indent);
             buff.append("<id source='");
             I_GetConceptData source;
@@ -210,9 +224,14 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
-            I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                    config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                    config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+            I_DescriptionTuple sourceDesc = source.getDescTuple(
+                    config.getLongLabelDescPreferenceList(),
+                    config.getLanguagePreferenceList(),
+                    config.getAllowedStatus(),
+                    config.getViewPositionSetReadOnly(),
+                    config.getLanguageSortPref(),
+                    config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("' value='");
             buff.append(idt.getDenotation().toString());
@@ -236,7 +255,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
                 } else {
                     I_GetConceptData concept = (I_GetConceptData) getTermComponent();
                     buff.append("cid source\tcid\tdesc\n");
-                    I_DescriptionTuple dt = concept.getDescTuple(config.getLongLabelDescPreferenceList(), config);
+                    I_DescriptionTuple dt = concept.getDescTuple(
+                            config.getLongLabelDescPreferenceList(), config);
                     for (I_IdVersion idt : concept.getIdentifier().getIdVersions()) {
                         writeIdentifiersToBuff(buff, idt, dt.getText());
                     }
@@ -249,16 +269,23 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
 
-        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt, String text) throws IOException {
+        private void writeIdentifiersToBuff(StringBuffer buff,
+                I_IdVersion idt,
+                String text) throws IOException {
             I_GetConceptData source;
             try {
                 source = Terms.get().getConcept(idt.getAuthorityNid());
             } catch (TerminologyException e) {
                 throw new IOException(e);
             }
-            I_DescriptionTuple sourceDesc = source.getDescTuple(config.getLongLabelDescPreferenceList(),
-                    config.getLanguagePreferenceList(), config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
-                    config.getLanguageSortPref(), config.getPrecedence(), config.getConflictResolutionStrategy());
+            I_DescriptionTuple sourceDesc = source.getDescTuple(
+                    config.getLongLabelDescPreferenceList(),
+                    config.getLanguagePreferenceList(),
+                    config.getAllowedStatus(),
+                    config.getViewPositionSetReadOnly(),
+                    config.getLanguageSortPref(),
+                    config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
             buff.append(sourceDesc.getText());
             buff.append("\t");
             buff.append(idt.getDenotation().toString());
@@ -298,7 +325,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             }
         }
 
-        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt) throws IOException {
+        private void writeIdentifiersToBuff(StringBuffer buff, I_IdVersion idt)
+                throws IOException {
             buff.append(idt.getDenotation().toString());
         }
     }
@@ -320,7 +348,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
             try {
-                dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+                dge.startDrag(DragSource.DefaultCopyDrop, dragImage,
+                        imageOffset, new ConceptTransferable(
                         (I_GetConceptData) termComponent), dsl);
             } catch (InvalidDnDOperationException e) {
                 AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
@@ -350,11 +379,34 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
      * 
      */
     private static final long serialVersionUID = 1L;
-    
     CommitListener commitListener = new CommitListener();
+
+    public enum LabelText {
+
+        FULLYSPECIFIED, PREFERRED
+    };
+    private LabelText textType = LabelText.FULLYSPECIFIED;
+
+    public LabelText getTextType() {
+        return textType;
+    }
+
+    public void setTextType(LabelText textType) {
+        this.textType = textType;
+    }
 
     public TermComponentLabel() throws TerminologyException, IOException {
         this(Terms.get().getActiveAceFrameConfig());
+    }
+
+    public TermComponentLabel(LabelText textType) throws TerminologyException, IOException {
+        this(Terms.get().getActiveAceFrameConfig());
+        this.textType = textType;
+    }
+
+    public TermComponentLabel(I_ConfigAceFrame config, LabelText textType) {
+        this(config);
+        this.textType = textType;
     }
 
     public TermComponentLabel(I_ConfigAceFrame config) {
@@ -370,7 +422,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
         setFocusable(true);
         setEnabled(true);
-        
+
         this.addHierarchyListener(new LabelHierarchyListener());
 
 
@@ -388,19 +440,26 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         });
 
         ActionMap map = this.getActionMap();
-        map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
-        map.put(TransferHandler.getCopyAction().getValue(Action.NAME), TransferHandler.getCopyAction());
-        map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteTask");
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "deleteTask");
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
+                TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
+                TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
+                TransferHandler.getPasteAction());
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+                "deleteTask");
+        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+                "deleteTask");
         map.put("deleteTask", new DeleteAction());
         map.put("Copy TDT", new CopyTDT());
         map.put("Copy XML", new CopyXML());
         map.put("Copy SCT ID", new CopySctId());
         setBorder(noFocusBorder);
     }
-    private static final Border hasFocusBorder = UIManager.getBorder("List.focusCellHighlightBorder");
-    private static final Border noFocusBorder = BorderFactory.createEmptyBorder(1, 1, 1, 1);
+    private static final Border hasFocusBorder =
+            UIManager.getBorder("List.focusCellHighlightBorder");
+    private static final Border noFocusBorder =
+            BorderFactory.createEmptyBorder(1, 1, 1, 1);
 
     @Override
     public void focusGained(FocusEvent e) {
@@ -458,17 +517,32 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         this.termComponent = termComponent;
         if (termComponent != null) {
             if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
-                I_GetConceptData cb = (I_GetConceptData) termComponent;
+                ConceptChronicleBI cb = (ConceptChronicleBI) termComponent;
+                ViewCoordinate vc = config.getViewCoordinate();
+                ConceptVersionBI cv = cb.getVersion(vc);
                 try {
-                    I_DescriptionTuple desc = cb.getDescTuple(config.getLongLabelDescPreferenceList(), config);
-                    if (desc != null) {
-                        this.setText(desc.getText());
-                    } else {
-                        this.setText(cb.getInitialText());
+                    switch (textType) {
+                        case FULLYSPECIFIED:
+                            this.setText(cv.getFullySpecifiedDescription().getText());
+                            break;
+                        case PREFERRED:
+                            this.setText(cv.getPreferredDescription().getText());
+                            break;
+                        default:
+                            this.setText(this.termComponent.toString());
                     }
                 } catch (IOException e) {
                     this.setText(e.getMessage());
                     AceLog.getAppLog().alertAndLogException(e);
+                } catch (ContraditionException e) {
+                    try {
+                        this.setText(cv.getDescsActive().iterator().next().getText());
+                        AceLog.getAppLog().alertAndLogException(e);
+                    } catch (IOException ex) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    } catch (ContraditionException ex) {
+                        AceLog.getAppLog().alertAndLogException(e);
+                    }
                 }
             } else {
                 this.setText(this.termComponent.toString());
@@ -497,10 +571,10 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             v.setSize(fixedWidth, 0);
             float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
             if (prefYSpan > 16) {
-                wrapSize = new Dimension(getWidth(), (int) (prefYSpan + 4));
+                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
                 setSize(wrapSize);
             } else {
-                wrapSize = new Dimension(getWidth(), (int) prefYSpan);
+                wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
                 setSize(wrapSize);
             }
         } else {
@@ -514,9 +588,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             if (d.height < wrapSize.height) {
                 d.height = wrapSize.height;
             }
-            if (d.width < wrapSize.width) {
-                d.width = wrapSize.width;
-            }
+            d.width = fixedWidth;
             super.setSize(d);
         } else {
             super.setSize(d);
@@ -529,10 +601,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             if (height < wrapSize.height) {
                 height = wrapSize.height;
             }
-            if (width < wrapSize.width) {
-                width = wrapSize.width;
-            }
-            super.setSize(width, height);
+            super.setSize(fixedWidth, height);
         } else {
             super.setSize(width, height);
         }
@@ -544,10 +613,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             if (height < wrapSize.height) {
                 height = wrapSize.height;
             }
-            if (width < wrapSize.width) {
-                width = wrapSize.width;
-            }
-            super.setBounds(x, y, width, height);
+            super.setBounds(x, y, fixedWidth, height);
         } else {
             super.setBounds(x, y, width, height);
         }
@@ -559,10 +625,7 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
             if (r.height < wrapSize.height) {
                 r.height = wrapSize.height;
             }
-            if (r.width < wrapSize.width) {
-                r.width = wrapSize.width;
-            }
-            setBounds(r.x, r.y, r.width, r.height);
+            setBounds(r.x, r.y, fixedWidth, r.height);
         } else {
             setBounds(r.x, r.y, r.width, r.height);
         }
@@ -571,6 +634,9 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     @Override
     public Dimension getMaximumSize() {
+        if (lineWrapEnabled) {
+            return wrapSize;
+        }
         return super.getMaximumSize();
     }
 
@@ -584,6 +650,9 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
 
     @Override
     public Dimension getPreferredSize() {
+        if (lineWrapEnabled) {
+            return wrapSize;
+        }
         return super.getPreferredSize();
     }
 
@@ -609,7 +678,8 @@ public class TermComponentLabel extends JLabel implements FocusListener, I_Conta
         og.setClip(dragLabel.getBounds());
         dragLabel.paint(og);
         og.dispose();
-        FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(), TermLabelMaker.getTransparentFilter());
+        FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(),
+                TermLabelMaker.getTransparentFilter());
         dragImage = Toolkit.getDefaultToolkit().createImage(fis);
         return dragImage;
     }

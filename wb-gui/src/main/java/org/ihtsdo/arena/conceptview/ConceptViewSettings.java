@@ -45,7 +45,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
+    private static final int dataVersion = 2;
         
     
     private transient ConceptChangedListener conceptChangedListener;
@@ -56,6 +56,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     };
     // dataVersion = 1;
     private Integer linkedTab = null;
+    // dataVersion = 2;
+    private boolean forAjudciation = false;
+
     // transient
     private transient ConceptView view;
     private transient ConceptNavigator navigator;
@@ -66,13 +69,19 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(linkedTab);
+        out.writeBoolean(forAjudciation);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion <= dataVersion) {
             linkedTab = (Integer) in.readObject();
+            if (dataVersion >= 2) {
+                forAjudciation = in.readBoolean();
+            } else {
+                forAjudciation = false;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -81,11 +90,23 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     public ConceptViewSettings() {
         super();
         this.linkedTab = 0;
+        this.forAjudciation = false;
     }
 
-    public ConceptViewSettings(Integer linkedTab) {
+    public ConceptViewSettings(boolean forAjudciation) {
+        super();
+        this.linkedTab = 0;
+        this.forAjudciation = forAjudciation;
+    }
+
+    public ConceptViewSettings(boolean forAjudciation, Integer linkedTab) {
         super();
         this.linkedTab = linkedTab;
+        this.forAjudciation = forAjudciation;
+    }
+
+    public boolean isForAjudciation() {
+        return forAjudciation;
     }
 
     private class ConceptChangedListener implements PropertyChangeListener {

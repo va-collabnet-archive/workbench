@@ -46,6 +46,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.TermComponentLabel.LabelText;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -934,10 +935,10 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
     private TermComponentLabel getLabel(int nid, boolean canDrop)
             throws TerminologyException, IOException {
-        TermComponentLabel termLabel = new TermComponentLabel();
+        TermComponentLabel termLabel = new TermComponentLabel(LabelText.PREFERRED);
         termLabel.setLineWrapEnabled(true);
         termLabel.getDropTarget().setActive(canDrop);
-        termLabel.setFixedWidth(100);
+        termLabel.setFixedWidth(150);
         termLabel.setFont(termLabel.getFont().deriveFont(settings.getFontSize()));
         termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
         termLabel.setTermComponent(Terms.get().getConcept(nid));

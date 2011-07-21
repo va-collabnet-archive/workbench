@@ -9,8 +9,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -27,7 +25,7 @@ import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.example.binding.CaseSensitive;
+import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 public class DragPanelDescription extends DragPanelComponentVersion<DescriptionAnalogBI> {
 
@@ -100,7 +98,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         setBorder(BorderFactory.createRaisedBevelBorder());
 
         JLabel descLabel = getJLabel(" ");
-        if (getParentCollapsePanel() == null || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
+        if (getParentCollapsePanel() == null || 
+                !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
             descLabel.setBackground(Color.ORANGE.darker());
         } else {
             descLabel.setBackground(Color.ORANGE);
@@ -136,7 +135,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                             try {
                                 getComponent().setTypeNid(newValue.getNid());
                                 if (getComponent().isUncommitted()) {
-                                    Terms.get().addUncommitted(Terms.get().getConcept(getComponent().getConceptNid()));
+                                    Terms.get().addUncommitted(
+                                            Terms.get().getConcept(getComponent().getConceptNid()));
                                 }
                             } catch (PropertyVetoException e) {
                                 AceLog.getAppLog().alertAndLogException(e);
@@ -177,7 +177,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             initialWord = descText;
         }
 
-        if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid())
+        if (CsWordsHelper.isIcTypeSignificant(initialWord, 
+                CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid())
                 && getDesc().isInitialCaseSignificant() == false && getDesc().isUncommitted()) {
             caseStr = "<html><font color = 'red'>Cs";
         } else if (getDesc().isInitialCaseSignificant()) {
