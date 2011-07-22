@@ -414,7 +414,7 @@ public class TerminologyHelperDrools {
 	}
 	
 	//Mock implementation
-	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
+	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
 		return false;
 	}
 	
@@ -426,6 +426,11 @@ public class TerminologyHelperDrools {
 	
 	//Mock implementation
 	public boolean isValidSemtag(String semtag){
+		return false;
+	}
+	
+	//Mock implementation
+	public boolean isValidSemtagInHierarchy(String semtag, String langCode, String conceptUuid){
 		return false;
 	}
 	
