@@ -119,7 +119,8 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                 }
                 return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                return false;
             }
         }
 
