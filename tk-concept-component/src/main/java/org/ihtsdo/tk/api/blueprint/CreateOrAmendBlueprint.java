@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
@@ -21,13 +20,15 @@ import java.util.List;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  *
  * @author kec
  */
 public abstract class CreateOrAmendBlueprint {
+
     private static UUID currentStatusUuid = null;
     private static UUID retiredStatusUuid = null;
     private UUID componentUuid;
@@ -36,8 +37,13 @@ public abstract class CreateOrAmendBlueprint {
     public CreateOrAmendBlueprint(UUID componentUuid) {
         if (currentStatusUuid == null) {
             try {
-                currentStatusUuid = TermAux.CURRENT.getLenient().getPrimUuid();
-                retiredStatusUuid = TermAux.RETIRED.getLenient().getPrimUuid();
+                if (Ts.get().usesRf2Metadata()) {
+                    currentStatusUuid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid();
+                    retiredStatusUuid = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();;
+                } else {
+                    currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
+                    retiredStatusUuid = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid();
+                }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -46,11 +52,10 @@ public abstract class CreateOrAmendBlueprint {
         this.componentUuid = componentUuid;
     }
 
-
     protected String getPrimoridalUuidStr(int nid)
             throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(nid);
-        if (component!= null) {
+        if (component != null) {
             return component.getPrimUuid().toString();
         }
         List<UUID> uuids = Ts.get().getUuidsForNid(nid);
@@ -63,7 +68,7 @@ public abstract class CreateOrAmendBlueprint {
     protected String getPrimoridalUuidStr(UUID uuid)
             throws IOException, InvalidCAB {
         ComponentBI component = Ts.get().getComponent(uuid);
-        if (component!= null) {
+        if (component != null) {
             return component.getPrimUuid().toString();
         }
         List<UUID> uuids = Ts.get().getUuidsForNid(component.getNid());
@@ -77,29 +82,26 @@ public abstract class CreateOrAmendBlueprint {
         return componentUuid;
     }
 
-    
     public void setComponentUuid(UUID componentUuid) {
         this.componentUuid = componentUuid;
     }
 
-    
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
     }
 
-    
     public UUID getStatusUuid() {
-         return statusUuid;
+        return statusUuid;
     }
 
     public int getStatusNid() throws IOException {
-         return Ts.get().getNidForUuids(statusUuid);
+        return Ts.get().getNidForUuids(statusUuid);
     }
 
     public void setStatusUuid(UUID statusUuid) {
         this.statusUuid = statusUuid;
     }
-    
+
     public void setCurrent() {
         this.statusUuid = currentStatusUuid;
     }
@@ -107,6 +109,4 @@ public abstract class CreateOrAmendBlueprint {
     public void setRetired() {
         this.statusUuid = retiredStatusUuid;
     }
-
-
 }

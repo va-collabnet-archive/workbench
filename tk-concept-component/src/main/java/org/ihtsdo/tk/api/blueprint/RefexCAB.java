@@ -44,6 +44,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
@@ -163,7 +164,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         this.properties.put(RefexProperty.RC_NID, rcNid);
         this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
         this.properties.put(RefexProperty.STATUS_NID,
-                TermAux.CURRENT.getStrict(Ts.get().getMetadataVC()).getNid());
+                SnomedMetadataRfx.getCURRENT_NID());
         if (getMemberUUID() != null) {
             this.properties.put(RefexProperty.MEMBER_UUID, memberUuid);
         }

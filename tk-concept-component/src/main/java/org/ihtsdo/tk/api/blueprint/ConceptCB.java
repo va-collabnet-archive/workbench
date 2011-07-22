@@ -24,10 +24,9 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
-import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
