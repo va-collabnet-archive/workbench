@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -26,7 +27,6 @@ import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.InstructAndWait;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.WizardPanel;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
@@ -39,9 +39,12 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
@@ -49,7 +52,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
-    AnalogBI analog;
+    ComponentVersionBI analog;
     I_ConfigAceFrame config;
     TerminologyList tl;
     WizardPanel wizard;
@@ -179,8 +182,9 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 TerminologyListModel model = (TerminologyListModel) tl.getModel();
                 List<Integer> nidList = model.getNidsInList();
                 for (int nid : nidList) {
-                    retireConcept();
+                    retireSynonym();
                     addToRefersToRefset(nid);
+                    retireFromRefexes(component);
                 }
             }
         }
@@ -201,7 +205,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
         return "/16x16/plain/navigate_cross.png";
     }
 
-    private void retireConcept() {
+    private void retireSynonym() {
         try {
             if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) component;
@@ -212,7 +216,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     statusNid = SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getNid();
                 }
                 for (PathBI ep : config.getEditingPathSet()) {
-                    analog = componentVersion.makeAnalog(
+                    analog = (ComponentVersionBI) componentVersion.makeAnalog(
                             statusNid,
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
@@ -225,6 +229,55 @@ public class RetireAsInappropriateAction extends AbstractAction {
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
+    
+        private void retireFromRefexes(ComponentVersionBI component) {
+        DescriptionVersionBI desc = (DescriptionVersionBI) component;
+        try {
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+            I_AmPart componentVersion;
+            ViewCoordinate vc = config.getViewCoordinate();
+            Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
+            int usNid = 0;
+            int gbNid = 0;
+            int dosNid = 0;
+            if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
+            } else {
+                usNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
+                gbNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
+            } else {
+                gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
+            }
+            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
+                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
+            } else {
+                dosNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
+            }
+            for (RefexChronicleBI refex : refexes) {
+                int refexNid = refex.getCollectionNid();
+                if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
+                    componentVersion = (I_AmPart) refex;
+                    for (PathBI ep : config.getEditingPathSet()) {
+                        componentVersion.makeAnalog(
+                                SnomedMetadataRfx.getRETIRED_NID(),
+                                config.getDbConfig().getUserConcept().getNid(),
+                                ep.getConceptNid(),
+                                Long.MAX_VALUE);
+                    }
+                    I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
+                    Terms.get().addUncommitted(concept);
+                } else {
+                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                }
+            }
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (TerminologyException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 
