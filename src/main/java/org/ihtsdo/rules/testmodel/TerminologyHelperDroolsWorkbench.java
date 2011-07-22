@@ -2,10 +2,14 @@ package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -13,6 +17,7 @@ import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -26,14 +31,16 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	private I_GetConceptData semtagsRoot;
-	private List<String> validSemtags;
+	private Map<String,I_GetConceptData> validSemtags;
 	private List<String> domains;
 
 	public TerminologyHelperDroolsWorkbench(){
@@ -47,10 +54,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 	}
 
-	public List<String> getValidSemtags() {
+	public Map<String,I_GetConceptData> getValidSemtags() {
 		if (validSemtags == null) {
 			I_TermFactory tf = Terms.get();
-			validSemtags = new ArrayList<String>();
+			validSemtags = new HashMap<String, I_GetConceptData>();
 			try {
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
@@ -59,7 +66,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
 							config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
-						validSemtags.add(tuple.getText());
+						validSemtags.put(tuple.getText(), semtagConcept);
 					}
 				}
 			} catch (TerminologyException e) {
@@ -122,62 +129,72 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		I_TermFactory tf = Terms.get();
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			int fsnTypeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid();
 			String originalSemTag = "";
 			String potentialMatchSemtag = "";
 
-			String query = "+\"" + QueryParser.escape(descText) + "\"";
-			SearchResult results = tf.doLuceneSearch(query);
-			TopDocs topDocs = results.topDocs;
-			ScoreDoc[] docs = topDocs.scoreDocs;
-			if (docs.length > 0) {
-				I_GetConceptData originalConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
-				I_DescriptionTuple originalFsn = null;
+			I_GetConceptData originalConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			I_DescriptionTuple originalFsn = null;
 
-				for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
-						config.getDescTypes(), config.getViewPositionSetReadOnly(), 
-						config.getPrecedence(), config.getConflictResolutionStrategy())) {
-					if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
-						originalFsn = loopDescription;
-						originalSemTag = originalFsn.getText().substring(originalFsn.getText().lastIndexOf("(")).trim();
-					}
+			for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
+					config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), config.getConflictResolutionStrategy())) {
+				if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+					originalFsn = loopDescription;
+					originalSemTag = originalFsn.getText().substring(originalFsn.getText().lastIndexOf("(")).trim();
 				}
-				for (int i = 0 ; i < docs.length  ; i++) {
-					try{
-						Document doc = results.searcher.doc(docs[i].doc);
-						int cnid = Integer.parseInt(doc.get("cnid"));
-						int dnid = Integer.parseInt(doc.get("dnid"));
+			}
 
-						if (originalConcept.getConceptNid() != cnid) {
+			if (!originalSemTag.isEmpty()) {
 
-							DescriptionVersionBI description = (DescriptionVersionBI) 
-							Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
-							//						System.out.println("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
+				String query = "+\"" + QueryParser.escape(descText) + "\"";
+				SearchResult results = tf.doLuceneSearch(query);
+				TopDocs topDocs = results.topDocs;
+				ScoreDoc[] docs = topDocs.scoreDocs;
 
-							if (description != null && description.getText().toLowerCase().equals(descText.toLowerCase())) { 
+				if (docs.length > 0) {
+					for (int i = 0 ; i < docs.length  ; i++) {
+						try{
+							Document doc = results.searcher.doc(docs[i].doc);
+							int cnid = Integer.parseInt(doc.get("cnid"));
+							int dnid = Integer.parseInt(doc.get("dnid"));
 
-								I_GetConceptData potentialMatchConcept = Terms.get().getConcept(Integer.parseInt(doc.get("cnid")));
+							if (originalConcept.getConceptNid() != cnid) {
 
-								I_DescriptionTuple potentialMatchFsn = null;
+								DescriptionVersionBI description = (DescriptionVersionBI) 
+								Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
+								//						System.out.println("Evaluating match - Description: " + description.getText() + "Concept: " + potentialMatchConcept);
 
-								for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
-										config.getDescTypes(), config.getViewPositionSetReadOnly(), 
-										config.getPrecedence(), config.getConflictResolutionStrategy())) {
-									if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
-										potentialMatchFsn = loopDescription;
-										potentialMatchSemtag = potentialMatchFsn.getText().substring(potentialMatchFsn.getText().lastIndexOf("(")).trim();
+								if (description != null && description.getText().toLowerCase().equals(descText.toLowerCase())) { 
+
+									I_GetConceptData potentialMatchConcept = Terms.get().getConcept(Integer.parseInt(doc.get("cnid")));
+
+									if (isActive(potentialMatchConcept.getUids().iterator().next().toString())) {
+										I_DescriptionTuple potentialMatchFsn = null;
+
+										for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
+												config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+												config.getPrecedence(), config.getConflictResolutionStrategy())) {
+											if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
+												potentialMatchFsn = loopDescription;
+												potentialMatchSemtag = potentialMatchFsn.getText().substring(potentialMatchFsn.getText().lastIndexOf("(")).trim();
+											}
+										}
+
+										if (potentialMatchSemtag != null &&
+												originalSemTag.equals(potentialMatchSemtag)) {
+											result = true;
+											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
+													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
+													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
+											break;
+										}
 									}
 								}
-
-								if (originalSemTag.equals(potentialMatchSemtag)) {
-									result = true;
-									System.out.println("Hierarchy match found: " + originalFsn + " & " + potentialMatchFsn.getText());
-									break;
-								}
 							}
+						}catch(Exception e){
+							e.printStackTrace();
 						}
-					}catch(Exception e){
-						//Do Nothing
 					}
 				}
 			}
@@ -192,43 +209,49 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	}
 
 	@Override
-	public boolean isFsnTextNotUnique(String fsn, String conceptUuid) throws Exception{
+	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
 		try {
-			int fsnTypeNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			fsn = "+\"" + QueryParser.escape(fsn) + "\"";
-			SearchResult results = tf.doLuceneSearch(fsn);
+			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
+			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+			int sourceConceptNid = tf.uuidToNative(UUID.fromString(conceptUuid));
+			String filteredDescription = "+" + QueryParser.escape(fsn);
+			Pattern p = Pattern.compile("[\\s\\(]");
+			Matcher m = p.matcher(filteredDescription);
+			filteredDescription = m.replaceAll(" +");
+			System.out.println(fsn + "  ---->  " + filteredDescription);
+			SearchResult results = tf.doLuceneSearch(filteredDescription);
 			TopDocs topDocs = results.topDocs;
 			ScoreDoc[] docs = topDocs.scoreDocs;
 			for (int i = 0 ; i < docs.length  ; i++) {
-				try{
-					Document doc = results.searcher.doc(docs[i].doc);
-					int cnid = Integer.parseInt(doc.get("cnid"));
-					int dnid = Integer.parseInt(doc.get("dnid"));
-					I_DescriptionVersioned potential_fsn = Terms.get().getDescription(dnid, cnid);
-					if (potential_fsn != null) {
-
-						DescriptionVersionBI description = (DescriptionVersionBI) 
-						Ts.get().getComponentVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), dnid);
-
-						if (description.getTypeNid() == fsnTypeNid
-								&& description.getText().equals(fsn)
-								&& description.getLang().equals(potential_fsn.getLang())) {
-							result = true;
+				Document doc = results.searcher.doc(docs[i].doc);
+				int cnid = Integer.parseInt(doc.get("cnid"));
+				int dnid = Integer.parseInt(doc.get("dnid"));
+				if (cnid != sourceConceptNid) {
+					try {
+						I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+						if (potential_fsn != null) {
+							for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+								if (part_search.getStatusNid() == activeNid
+										&& part_search.getTypeNid() == fsnTypeNid
+										&& part_search.getText().equals(fsn)
+										&& part_search.getLang().equals(langCode)) {
+									result = true;
+								}
+							}
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				}catch(Exception e){
-					//Do Nothing
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
 		}
+
 		return result;
 	}
 
@@ -240,7 +263,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(conceptUUID));
 			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate()).getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
-					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid()) {
+					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid() ||
+					status == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
 				result = true;
 			}
 
@@ -257,7 +281,54 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	@Override
 	public boolean isValidSemtag(String semtag){
-		return getValidSemtags().contains(semtag);
+		return getValidSemtags().keySet().contains(semtag);
+	}
+	
+	@Override
+	public boolean isValidSemtagInHierarchy(String semtag, String langCode, String conceptUuid){
+		boolean result = true;
+		
+		try {
+			I_TermFactory termFactory = Terms.get();
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			
+			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
+			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+			
+			I_GetConceptData testedConcept = termFactory.getConcept(UUID.fromString(conceptUuid));
+			List<I_GetConceptData> parents = new ArrayList<I_GetConceptData>();
+			
+			I_IntSet allowedTypes = termFactory.newIntSet();
+			allowedTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
+			
+			parents.addAll(testedConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, 
+					config.getViewPositionSetReadOnly(), Precedence.PATH, config.getConflictResolutionStrategy()));
+			
+			Set<String> parentSemtags = new HashSet<String>();
+			for (I_GetConceptData loopParent : parents) {
+				for (I_DescriptionTuple loopDescription : loopParent.getDescriptionTuples(config.getAllowedStatus(), 
+						null, config.getViewPositionSetReadOnly(), 
+						Precedence.PATH, config.getConflictResolutionStrategy())) {
+					if (loopDescription.getStatusNid() == activeNid &&
+							loopDescription.getTypeNid() == fsnTypeNid && 
+							loopDescription.getLang().equals(langCode)) {
+						parentSemtags.add(loopDescription.getText().substring(loopDescription.getText().lastIndexOf('(')+1,loopDescription.getText().lastIndexOf(')')));
+					}
+						
+				}
+			}
+			
+			if (parentSemtags.size() > 1) {
+				result = false;
+			}
+			
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
@@ -346,7 +417,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
 					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 					config.getConflictResolutionStrategy())) {
-				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid() 
+				if (tuple.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() 
 						&& tuple.getLang().equals("en")) {
 					if (tuple.getText().lastIndexOf("(") > -1 && tuple.getText().lastIndexOf(")") > -1) {
 						currentSemtags.add(tuple.getText().substring(tuple.getText().lastIndexOf("(")+1,tuple.getText().lastIndexOf(")")));
@@ -354,7 +425,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				}
 			}
 
-			if (getValidSemtags().containsAll(currentSemtags)) {
+			if (getValidSemtags().keySet().containsAll(currentSemtags)) {
 				result = true;
 			}
 		} catch (TerminologyException e) {

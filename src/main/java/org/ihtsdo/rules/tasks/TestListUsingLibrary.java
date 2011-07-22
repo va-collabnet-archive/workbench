@@ -130,7 +130,7 @@ public class TestListUsingLibrary extends AbstractTask {
 
 				ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(conceptInList, 
 						Terms.get().getConcept(RefsetAuxiliary.Concept.BATCH_QA_CONTEXT.getUids()), false, 
-						config, INFERRED_VIEW_ORIGIN.FULL);
+						config, INFERRED_VIEW_ORIGIN.INFERRED);
 
 				results.put(conceptInList, resultsCollector.getAlertList());
 
