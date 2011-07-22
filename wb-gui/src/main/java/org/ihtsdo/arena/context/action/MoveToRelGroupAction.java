@@ -24,6 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
@@ -88,7 +89,7 @@ public class MoveToRelGroupAction extends AbstractAction {
 				I_AmPart componentVersion = (I_AmPart) sourceComponent;
 				for (PathBI ep: config.getEditingPathSet()) {
 					componentVersion.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+							SnomedMetadataRfx.getRETIRED_NID(), 
 							config.getDbConfig().getUserConcept().getNid(),
 							ep.getConceptNid(), 
 							Long.MAX_VALUE);

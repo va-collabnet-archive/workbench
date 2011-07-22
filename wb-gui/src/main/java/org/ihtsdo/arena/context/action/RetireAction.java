@@ -19,6 +19,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
 import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
@@ -46,7 +47,7 @@ public class RetireAction extends AbstractAction {
                 I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = (ComponentVersionBI) componentVersion.makeAnalog(
-                            ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                            SnomedMetadataRfx.getRETIRED_NID(),
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
@@ -96,7 +97,7 @@ public class RetireAction extends AbstractAction {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
-                                ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+                                SnomedMetadataRfx.getRETIRED_NID(),
                                 config.getDbConfig().getUserConcept().getNid(),
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);

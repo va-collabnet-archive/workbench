@@ -12,13 +12,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -27,6 +25,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
 public class MakeNotAcceptableAction extends AbstractAction {
@@ -69,7 +68,7 @@ public class MakeNotAcceptableAction extends AbstractAction {
                                 AnalogBI analog = null;
                                 for (PathBI ep : config.getEditingPathSet()) {
                                     analog = componentVersion.makeAnalog(
-                                            ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                            SnomedMetadataRfx.getCURRENT_NID(),
                                             config.getDbConfig().getUserConcept().getNid(),
                                             ep.getConceptNid(),
                                             Long.MAX_VALUE);
@@ -107,7 +106,7 @@ public class MakeNotAcceptableAction extends AbstractAction {
                                 AnalogBI analog = null;
                                 for (PathBI ep : config.getEditingPathSet()) {
                                     analog = componentVersion.makeAnalog(
-                                            ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                            SnomedMetadataRfx.getCURRENT_NID(),
                                             config.getDbConfig().getUserConcept().getNid(),
                                             ep.getConceptNid(),
                                             Long.MAX_VALUE);

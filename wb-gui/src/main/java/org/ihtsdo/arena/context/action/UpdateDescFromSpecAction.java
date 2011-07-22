@@ -22,6 +22,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;//THIS
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
@@ -75,7 +76,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 							descSpec.getLangText(), 
 							descSpec.getDescText(), 
 							Terms.get().getConcept(descSpec.getDescTypeSpec().get(component.getViewCoordinate()).getNid()), 
-							config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+							config, SnomedMetadataRfx.getCURRENT_NID());
 					Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 				}
 				
@@ -91,7 +92,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 							ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 							ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 							0, 
-							ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+							SnomedMetadataRfx.getCURRENT_NID(), 
 							config.getDbConfig().getUserConcept().getNid(),
 							pathItr.next().getConceptNid(), 
 				            Long.MAX_VALUE);
@@ -108,7 +109,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 					I_AmPart componentVersion = (I_AmPart) desc;
 					for (PathBI ep: config.getEditingPathSet()) {
 						componentVersion.makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(), 
+								SnomedMetadataRfx.getRETIRED_NID(), 
 								config.getDbConfig().getUserConcept().getNid(),
 								ep.getConceptNid(), 
 								Long.MAX_VALUE);
@@ -122,7 +123,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 				I_DescriptionVersioned<?> description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
 				I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
 				I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
-						ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+						SnomedMetadataRfx.getCURRENT_NID(), 
 						config.getEditingPathSet().iterator().next().getConceptNid(), 
 						Long.MAX_VALUE);
 				newPart.setText(descSpec.getDescText());

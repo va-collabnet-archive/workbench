@@ -19,6 +19,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
@@ -63,7 +64,7 @@ public class AddToRelGroupAction extends AbstractAction {
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
 				Terms.get().getConcept(descSpec.getDescTypeSpec().get(config.getViewCoordinate()).getNid()), 
-				config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+				config, SnomedMetadataRfx.getCURRENT_NID());
 		Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
 	}
 	
@@ -81,7 +82,7 @@ public class AddToRelGroupAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					group.getRelGroup(), //set to relGroup
-					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+					SnomedMetadataRfx.getCURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 
 		            Long.MAX_VALUE);

@@ -16,6 +16,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -49,7 +50,7 @@ public class CreateRelAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					0, 
-					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+					SnomedMetadataRfx.getCURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 
 		            Long.MAX_VALUE);

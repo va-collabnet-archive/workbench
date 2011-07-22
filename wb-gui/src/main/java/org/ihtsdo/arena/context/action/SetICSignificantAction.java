@@ -18,6 +18,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
 public class SetICSignificantAction extends AbstractAction {
@@ -66,7 +67,7 @@ public class SetICSignificantAction extends AbstractAction {
                         } else {
                             for (PathBI ep : config.getEditingPathSet()) {
                                 analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                        SnomedMetadataRfx.getCURRENT_NID(),
                                         config.getDbConfig().getUserConcept().getNid(),
                                         ep.getConceptNid(),
                                         Long.MAX_VALUE);
@@ -84,7 +85,7 @@ public class SetICSignificantAction extends AbstractAction {
                         } else {
                             for (PathBI ep : config.getEditingPathSet()) {
                                 analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                        SnomedMetadataRfx.getCURRENT_NID(),
                                         config.getDbConfig().getUserConcept().getNid(),
                                         ep.getConceptNid(),
                                         Long.MAX_VALUE);

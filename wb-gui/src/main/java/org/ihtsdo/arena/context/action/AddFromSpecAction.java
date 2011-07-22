@@ -16,6 +16,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
@@ -60,7 +61,7 @@ public class AddFromSpecAction extends AbstractAction {
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
 				Terms.get().getConcept(descSpec.getDescTypeSpec().get(concept.getViewCoordinate()).getNid()), 
-				config, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+				config, SnomedMetadataRfx.getCURRENT_NID());
 		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 	}
 	
@@ -78,7 +79,7 @@ public class AddFromSpecAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					0, 
-					ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+					SnomedMetadataRfx.getCURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 
 		            Long.MAX_VALUE);

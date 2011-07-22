@@ -12,12 +12,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 
@@ -55,7 +55,7 @@ public class UngroupRelGroupAction extends AbstractAction {
 						I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 						for (PathBI ep: config.getEditingPathSet()) {
 									I_AmPart part = (I_AmPart) componentVersion.makeAnalog(
-									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+									SnomedMetadataRfx.getCURRENT_NID(), 
 									config.getDbConfig().getUserConcept().getNid(),
 									ep.getConceptNid(), 
 									Long.MAX_VALUE);

@@ -28,11 +28,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.arena.WizardPanel;
-import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
-import org.ihtsdo.swing.wizard.WizardBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -43,11 +40,10 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
-import org.ihtsdo.util.swing.GuiUtil;
 
 public class RetireAsInappropriateAction extends AbstractAction {
 
@@ -209,9 +205,15 @@ public class RetireAsInappropriateAction extends AbstractAction {
         try {
             if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) component;
+                int statusNid = 0;
+                if(Ts.get().usesRf2Metadata()){
+                    statusNid = SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getNid();
+                }else{
+                    statusNid = SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getNid();
+                }
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = componentVersion.makeAnalog(
-                            ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid(),
+                            statusNid,
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
@@ -221,8 +223,6 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 I_GetConceptData concept = Terms.get().getConceptForNid(newComponent.getNid());
                 Terms.get().addUncommitted(concept);
             }
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
