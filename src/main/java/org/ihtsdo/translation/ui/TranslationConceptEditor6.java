@@ -20,6 +20,7 @@ package org.ihtsdo.translation.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -75,15 +76,16 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -103,11 +105,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.app.DwfaEnv;
-import org.dwfa.bpa.process.Condition;
-import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -312,6 +310,11 @@ public class TranslationConceptEditor6 extends JPanel {
 		refTable.setOpaque(false);
 		// populateTree();
 		splitPane4.setResizeWeight(.4d);
+
+		Dimension dimension = new Dimension(650, 350);
+		termZoomDialog.setMaximumSize(dimension);
+		termZoomDialog.setMinimumSize(dimension);
+		termZoomDialog.setSize(dimension);
 	}
 
 	public class SourceTableMouselistener extends MouseAdapter {
@@ -1331,6 +1334,29 @@ public class TranslationConceptEditor6 extends JPanel {
 		viewComment();
 	}
 
+	private void targetTextFieldMouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			termZoomDialog.setVisible(true);
+			termZoomDialog.pack();
+			zoomTextArea.setText(targetTextField.getText());
+			zoomTextArea.revalidate();
+			zoomTextArea.repaint();
+		}
+	}
+
+	private void saveZoomButtonActionPerformed(ActionEvent e) {
+		targetTextField.setText(zoomTextArea.getText());
+		termZoomDialog.dispose();
+		zoomTextArea.setText("");
+	}
+
+	private void cancelZoomChangeActionPerformed(ActionEvent e) {
+		termZoomDialog.dispose();
+		zoomTextArea.setText("");
+	}
+
+	private HashMap<Object, Boolean> normalStates;
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1382,7 +1408,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 
 	}
-
+	
 	/**
 	 * Inits the components.
 	 */
@@ -1466,6 +1492,12 @@ public class TranslationConceptEditor6 extends JPanel {
 		popupMenu1 = new JPopupMenu();
 		menuItem2 = new JMenuItem();
 		menuItem3 = new JMenuItem();
+		termZoomDialog = new JDialog();
+		panel12 = new JPanel();
+		scrollPane2 = new JScrollPane();
+		zoomTextArea = new JTextArea();
+		saveZoomButton = new JButton();
+		cancelZoomChange = new JButton();
 
 		//======== this ========
 		setBackground(new Color(238, 238, 238));
@@ -1866,6 +1898,12 @@ public class TranslationConceptEditor6 extends JPanel {
 								//---- targetTextField ----
 								targetTextField.setRows(2);
 								targetTextField.setLineWrap(true);
+								targetTextField.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent e) {
+										targetTextFieldMouseClicked(e);
+									}
+								});
 								scrollPane5.setViewportView(targetTextField);
 							}
 							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
@@ -2144,6 +2182,62 @@ public class TranslationConceptEditor6 extends JPanel {
 			popupMenu1.add(menuItem3);
 		}
 
+		//======== termZoomDialog ========
+		{
+			termZoomDialog.setModal(true);
+			Container termZoomDialogContentPane = termZoomDialog.getContentPane();
+			termZoomDialogContentPane.setLayout(new BorderLayout());
+
+			//======== panel12 ========
+			{
+				panel12.setBorder(new EmptyBorder(5, 5, 5, 5));
+				panel12.setLayout(new GridBagLayout());
+				((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0E-4};
+
+				//======== scrollPane2 ========
+				{
+					scrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+					//---- zoomTextArea ----
+					zoomTextArea.setLineWrap(true);
+					scrollPane2.setViewportView(zoomTextArea);
+				}
+				panel12.add(scrollPane2, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
+				//---- saveZoomButton ----
+				saveZoomButton.setText("Save");
+				saveZoomButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						saveZoomButtonActionPerformed(e);
+					}
+				});
+				panel12.add(saveZoomButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 5), 0, 0));
+
+				//---- cancelZoomChange ----
+				cancelZoomChange.setText("Cancel");
+				cancelZoomChange.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						cancelZoomChangeActionPerformed(e);
+					}
+				});
+				panel12.add(cancelZoomChange, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+					new Insets(0, 0, 0, 0), 0, 0));
+			}
+			termZoomDialogContentPane.add(panel12, BorderLayout.CENTER);
+			termZoomDialog.pack();
+			termZoomDialog.setLocationRelativeTo(termZoomDialog.getOwner());
+		}
+
 		//---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rbYes);
@@ -2235,6 +2329,12 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JPopupMenu popupMenu1;
 	private JMenuItem menuItem2;
 	private JMenuItem menuItem3;
+	private JDialog termZoomDialog;
+	private JPanel panel12;
+	private JScrollPane scrollPane2;
+	private JTextArea zoomTextArea;
+	private JButton saveZoomButton;
+	private JButton cancelZoomChange;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/** The concept. */
