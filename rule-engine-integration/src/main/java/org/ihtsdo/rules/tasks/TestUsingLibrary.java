@@ -101,7 +101,7 @@ public class TestUsingLibrary extends AbstractConceptTest {
 			} else {
 			alertList =  RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), false, 
-					getFrameConfig(), INFERRED_VIEW_ORIGIN.FULL).getAlertList();
+					getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
 			}
 			
 			return alertList;

@@ -115,7 +115,7 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 
-	public enum INFERRED_VIEW_ORIGIN {CLASSIFIER, CONSTRAINT_NORMAL_FORM, FULL};
+	public enum INFERRED_VIEW_ORIGIN {STATED, CONSTRAINT_NORMAL_FORM, INFERRED};
 
 	public static I_IntSet allRels;
 	public static I_IntSet histRels;
@@ -142,13 +142,13 @@ public class RulesLibrary {
 			boolean onlyUncommittedContent, I_ConfigAceFrame config) 
 	throws Exception {
 		RulesContextHelper contextHelper = new RulesContextHelper(config);
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 
 			boolean onlyUncommittedContent, I_ConfigAceFrame config, RulesContextHelper contextHelper) 
 	throws Exception {
-		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.CLASSIFIER);
+		return checkConcept(concept, context, onlyUncommittedContent, config, contextHelper, INFERRED_VIEW_ORIGIN.STATED);
 	}
 
 	public static ResultsCollectorWorkBench checkConcept(I_GetConceptData concept, I_GetConceptData context, 

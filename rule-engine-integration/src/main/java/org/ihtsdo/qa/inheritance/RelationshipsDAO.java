@@ -13,10 +13,10 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class RelationshipsDAO {
 
@@ -25,7 +25,7 @@ public class RelationshipsDAO {
 	private I_IntSet allowedStatus;
 	private I_ConfigAceFrame config;
 	private I_TermFactory termFactory;
-	private I_GetConceptData definingChar;
+	private I_GetConceptData inferred;
 
 	private Set<Integer> setDefChar;
 	public enum TEST_RESULTS {CONCEPT1_ANCESTOROF_CONCEPT2,CONCEPT2_ANCESTOROF_CONCEPT1,CONCEPTS_DIFF_HIERARCHY,
@@ -47,11 +47,11 @@ public class RelationshipsDAO {
 
 			//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			allowedStatus=config.getAllowedStatus();
-			definingChar=termFactory.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid());
+			inferred=termFactory.getConcept(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
 			//inferred=ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
 			
 			setDefChar=new HashSet<Integer>();
-			setDefChar.add(definingChar.getConceptNid());
+			setDefChar.add(inferred.getConceptNid());
 			
 			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
@@ -425,7 +425,7 @@ public class RelationshipsDAO {
 				return true;
 			}
 			I_GetConceptData charactConcept = termFactory.getConcept(characteristicId);
-			if (definingChar.isParentOf(charactConcept,allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())){
+			if (inferred.isParentOf(charactConcept,allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())){
 				setDefChar.add(characteristicId);
 				return true;
 			}				
