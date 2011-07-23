@@ -82,7 +82,7 @@ public class RF2StatedRelationshipPostMojo extends AbstractMojo {
 			File relationshipFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_STATED_RELATIONSHIP, new File( rf2FullFolder),
 					relationshipFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
 			pExp.postProcess();
