@@ -116,7 +116,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 

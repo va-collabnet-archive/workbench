@@ -77,8 +77,8 @@ import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.example.binding.Snomed;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**

@@ -54,8 +54,8 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.WizardBI;
 import javax.swing.JPanel;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ValidationException;
 
 
