@@ -89,7 +89,7 @@ public class MoveToRelGroupAction extends AbstractAction {
 				I_AmPart componentVersion = (I_AmPart) sourceComponent;
 				for (PathBI ep: config.getEditingPathSet()) {
 					componentVersion.makeAnalog(
-							SnomedMetadataRfx.getRETIRED_NID(), 
+							SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
 							config.getDbConfig().getUserConcept().getNid(),
 							ep.getConceptNid(), 
 							Long.MAX_VALUE);

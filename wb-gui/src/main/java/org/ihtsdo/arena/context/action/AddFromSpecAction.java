@@ -61,7 +61,7 @@ public class AddFromSpecAction extends AbstractAction {
 				descSpec.getLangText(), 
 				descSpec.getDescText(), 
 				Terms.get().getConcept(descSpec.getDescTypeSpec().get(concept.getViewCoordinate()).getNid()), 
-				config, SnomedMetadataRfx.getCURRENT_NID());
+				config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
 		Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 	}
 	
@@ -79,7 +79,7 @@ public class AddFromSpecAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					0, 
-					SnomedMetadataRfx.getCURRENT_NID(), 
+					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 
 		            Long.MAX_VALUE);

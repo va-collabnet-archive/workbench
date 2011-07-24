@@ -27,80 +27,100 @@ public class SnomedMetadataRfx {
 
     private static boolean isReleaseFormatSetupB = false;
     private static int releaseFormat = 0;
-    // NIDs
-    private static int CURRENT_NID;
-    private static int LIMITED_NID;
-    private static int RETIRED_NID;
-    private static int OPTIONAL_REFINABILITY_NID;
-    private static int NOT_REFINABLE_NID;
-    private static int MANDATORY_REFINABILITY_NID;
-    private static int CH_STATED_RELATIONSHIP_NID;
-    private static int Ch_INFERRED_RELATIONSHIP_NID;
-    private static int Ch_DEFINING_CHARACTERISTIC_NID;
-    private static int FULL_SPECIFIED_NAME_NID;
-    private static int SYNONYM_PREFERRED_NAME_NID;
+    // --- NIDs ---
+    // DESCRIPTION NIDs
+    private static int DES_FULL_SPECIFIED_NAME_NID;
+    private static int DES_SYNONYM_PREFERRED_NAME_NID;
+    // RELATIONSHIP NIDs
+    private static int REL_CH_DEFINING_CHARACTERISTIC_NID;
+    private static int REL_CH_INFERRED_RELATIONSHIP_NID;
+    private static int REL_CH_QUALIFIER_CHARACTERISTIC_NID;
+    private static int REL_CH_STATED_RELATIONSHIP_NID;
+    private static int REL_HISTORY_HISTORIC_NID;
+    private static int REL_HISTORY_MOVED_TO_NID;
+    private static int REL_OPTIONAL_REFINABILITY_NID;
+    private static int REL_NOT_REFINABLE_NID;
+    private static int REL_MANDATORY_REFINABILITY_NID;
+    // STATUS NIDs
+    private static int STATUS_CURRENT_NID;
+    private static int STATUS_LIMITED_NID;
+    private static int STATUS_RETIRED_NID;
 
-    public static int getCURRENT_NID() throws IOException {
+    public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return CURRENT_NID;
+        return DES_FULL_SPECIFIED_NAME_NID;
     }
 
-        public static int getCh_DEFINING_CHARACTERISTIC_NID() throws IOException {
+    public static int getDES_SYNONYM_PREFERRED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return Ch_DEFINING_CHARACTERISTIC_NID;
+        return DES_SYNONYM_PREFERRED_NAME_NID;
     }
 
-    public static int getCh_STATED_RELATIONSHIP_NID() throws IOException {
+    public static int getREL_CH_DEFINING_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return CH_STATED_RELATIONSHIP_NID;
+        return REL_CH_DEFINING_CHARACTERISTIC_NID;
     }
 
-    public static int getCh_INFERRED_RELATIONSHIP_NID() throws IOException {
+    public static int getREL_CH_INFERRED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return Ch_INFERRED_RELATIONSHIP_NID;
+        return REL_CH_INFERRED_RELATIONSHIP_NID;
     }
 
-    public static int getLIMITED_NID() throws IOException {
+    public static int getREL_CH_QUALIFIER_CHARACTERISTIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return LIMITED_NID;
+        return REL_CH_QUALIFIER_CHARACTERISTIC_NID;
     }
 
-    public static int getMANDATORY_REFINABILITY_NID() throws IOException {
+    public static int getREL_CH_STATED_RELATIONSHIP_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return MANDATORY_REFINABILITY_NID;
+        return REL_CH_STATED_RELATIONSHIP_NID;
     }
 
-    public static int getNOT_REFINABLE_NID() throws IOException {
+    public static int getREL_HISTORY_HISTORIC_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return NOT_REFINABLE_NID;
+        return REL_HISTORY_HISTORIC_NID;
     }
 
-    public static int getOPTIONAL_REFINABILITY_NID() throws IOException {
+    public static int getREL_HISTORY_MOVED_TO_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return OPTIONAL_REFINABILITY_NID;
+        return REL_HISTORY_MOVED_TO_NID;
     }
 
-    public static int getRETIRED_NID() throws IOException {
+    public static int getREL_MANDATORY_REFINABILITY_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return RETIRED_NID;
+        return REL_MANDATORY_REFINABILITY_NID;
+    }
+
+    public static int getREL_NOT_REFINABLE_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REL_NOT_REFINABLE_NID;
+    }
+
+    public static int getREL_OPTIONAL_REFINABILITY_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REL_OPTIONAL_REFINABILITY_NID;
     }
 
     public static int getReleaseFormat() throws IOException {
@@ -110,18 +130,25 @@ public class SnomedMetadataRfx {
         return releaseFormat;
     }
 
-    public static int getFULL_SPECIFIED_NAME_NID() throws IOException {
+    public static int getSTATUS_CURRENT_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return FULL_SPECIFIED_NAME_NID;
+        return STATUS_CURRENT_NID;
     }
 
-    public static int getSYNONYM_PREFERRED_NAME_NID() throws IOException {
+    public static int getSTATUS_LIMITED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return SYNONYM_PREFERRED_NAME_NID;
+        return STATUS_LIMITED_NID;
+    }
+
+    public static int getSTATUS_RETIRED_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_RETIRED_NID;
     }
 
     private static void setupSnoRf1Rf2() throws IOException {
@@ -136,45 +163,70 @@ public class SnomedMetadataRfx {
         }
 
         if (releaseFormat == 1) {
-            // 0 CURRENT, 1 RETIRED
-            CURRENT_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.CURRENT_RF1.getUuids());
-            LIMITED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getUuids());
-            RETIRED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
-            OPTIONAL_REFINABILITY_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.OPTIONAL_REFINABILITY_TYPE_RF1.getUuids());
-            NOT_REFINABLE_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.NOT_REFINABLE_REFINABILITY_TYPE_RF1.getUuids());
-            MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.MANDATORY_REFINABILITY_TYPE_RF1.getUuids());
-            CH_STATED_RELATIONSHIP_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
-            Ch_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
-            Ch_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
+            // DESCRIPTIONS
+            DES_FULL_SPECIFIED_NAME_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUuids());
+            DES_SYNONYM_PREFERRED_NAME_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getUuids());
+            // RELATIONSHIPS
+            REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
+            REL_CH_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
+            REL_CH_QUALIFIER_CHARACTERISTIC_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.QUALIFIER_CHARACTERISTICS_TYPE_RF1.getUuids());
+            REL_CH_STATED_RELATIONSHIP_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
+            REL_HISTORY_HISTORIC_NID =
+                    tf.getNidForUuids(SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getUuids());
+            REL_HISTORY_MOVED_TO_NID =
+                    tf.getNidForUuids(SnomedMetadataRf1.MOVED_TO_RF1.getUuids());
+            REL_OPTIONAL_REFINABILITY_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.OPTIONAL_REFINABILITY_TYPE_RF1.getUuids());
+            REL_NOT_REFINABLE_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.NOT_REFINABLE_REFINABILITY_TYPE_RF1.getUuids());
+            REL_MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.MANDATORY_REFINABILITY_TYPE_RF1.getUuids());
+            // STATUS: 0 CURRENT, 1 RETIRED
+            STATUS_CURRENT_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.CURRENT_RF1.getUuids());
+            STATUS_LIMITED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getUuids());
+            STATUS_RETIRED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
 
         } else if (releaseFormat == 2) {
-            CURRENT_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
-            LIMITED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
-            RETIRED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
-            OPTIONAL_REFINABILITY_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids());
-            NOT_REFINABLE_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
-            MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
-            CH_STATED_RELATIONSHIP_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids());
-            Ch_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(
-                    SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
-            Ch_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
+            // DESCRIPTIONS
+            DES_FULL_SPECIFIED_NAME_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids());
+            DES_SYNONYM_PREFERRED_NAME_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.SYNONYM_RF2.getUuids());
+            // RELATIONSHIPS
+            REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
+            REL_CH_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
+            REL_CH_QUALIFIER_CHARACTERISTIC_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.QUALIFYING_RELATIONSSHIP_RF2.getUuids());
+            REL_CH_STATED_RELATIONSHIP_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids());
+            REL_HISTORY_HISTORIC_NID =
+                    tf.getNidForUuids(SnomedMetadataRf2.HISTORICAL_RELATIONSSHIP_RF2.getUuids());
+            REL_HISTORY_MOVED_TO_NID =
+                    tf.getNidForUuids(SnomedMetadataRf2.MOVED_TO_REFSET_RF2.getUuids());
+            REL_OPTIONAL_REFINABILITY_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids());
+            REL_NOT_REFINABLE_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
+            REL_MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
+            STATUS_CURRENT_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
+            STATUS_LIMITED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
+            STATUS_RETIRED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
+
         } else {
             throw new IOException("SnomedMetadataRfx releaseFormat must equal 1 or 2.");
         }

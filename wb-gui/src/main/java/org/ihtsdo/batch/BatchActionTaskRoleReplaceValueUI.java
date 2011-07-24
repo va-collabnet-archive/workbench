@@ -22,7 +22,6 @@ import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;

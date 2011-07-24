@@ -35,6 +35,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
@@ -107,14 +108,22 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
 
         try {
+            // parentLinkages from preference settings
+            I_IntSet parentLinkageTypes = ace.aceFrameConfig.getDestRelTypes();
+            int[] types = parentLinkageTypes.getSetValues();
+            for (int typeNid : types) {
+                ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
+                parentLinkages.add(cvbi);
+            }
+
             for (int i = 0; i < termList.getSize(); i++) {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
                 if (!cb.isCanceled()) {
                     // EXISTING PARENTS
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
                         for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
-                            if (rvbi.isStated()) {
-                                setParents.add(rvbi.getDestinationNid());
+                            if (rvbi.isStated() && parentLinkageTypes.contains(rvbi.getTypeNid())) {
+                                setParents.add(rvbi.getNid());
                             }
                         }
                     }
@@ -128,7 +137,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                         }
                     }
 
-                    //
+                    // EXISTING REFSETS
                     Collection<? extends RefexVersionBI<?>> cr = cb.getCurrentRefexes(vc);
                     for (RefexVersionBI<?> rvbi : cr) {
                         int refexNid = rvbi.getCollectionNid();
@@ -137,10 +146,6 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                             RefexStrVersionBI r = (RefexStrVersionBI) rvbi;
                         } else if (RefexBooleanVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                             RefexBooleanVersionBI r = (RefexBooleanVersionBI) rvbi;
-
-                            // rvbi.getRefexEditSpec() throws exception on internal index = -1
-                            // RefexBooleanAnalogBI ra = (RefexBooleanAnalogBI) r.makeAnalog(r.getStatusNid(), r.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
-                            // ra.setBoolean1(true);
                         } else if (RefexCnidVersionBI.class.isAssignableFrom(rvbi.getClass())) {
                             RefexCnidVersionBI r = (RefexCnidVersionBI) rvbi;
                         } else if (RefexIntVersionBI.class.isAssignableFrom(rvbi.getClass())) {
@@ -172,12 +177,6 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 if (cvbi != null) {
                     existingRoles.add(cvbi);
                 }
-            }
-
-            int[] types = ace.aceFrameConfig.getDestRelTypes().getSetValues();
-            for (int typeNid : types) {
-                ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
-                parentLinkages.add(cvbi);
             }
 
             // UPDATE TASK DETAILS

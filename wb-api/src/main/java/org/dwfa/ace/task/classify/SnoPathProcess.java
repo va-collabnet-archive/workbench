@@ -295,16 +295,16 @@ public class SnoPathProcess implements I_ProcessConcepts {
         isaNid = tf.uuidToNative(SNOMED.Concept.IS_A.getUids());
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
         // 0 CURRENT, 1 RETIRED
-        isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
-        isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
+        isCURRENT = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
+        isRETIRED = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
         // NOT_REFINABLE | OPTIONAL_REFINABILITY | MANDATORY_REFINABILITY
-        isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
-        isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
-        isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
+        isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID();
+        isNOT_REFINABLE = SnomedMetadataRfx.getREL_NOT_REFINABLE_NID();
+        isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
-        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
+        isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
+        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
     }
 
     // STATS FROM PROCESS CONCEPTS (CLASSIFIER INPUT)

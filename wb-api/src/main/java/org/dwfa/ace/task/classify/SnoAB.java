@@ -57,7 +57,7 @@ public class SnoAB {
         try {
             I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
             isaNid = config.getClassifierIsaType().getConceptNid();
-            isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
+            isCURRENT = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
                     .getUids());
         } catch (Exception ex) {

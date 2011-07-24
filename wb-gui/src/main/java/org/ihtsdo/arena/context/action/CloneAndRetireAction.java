@@ -122,7 +122,7 @@ public class CloneAndRetireAction extends AbstractAction {
                 ComponentVersionBI analog = null;
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = (ComponentVersionBI) componentVersion.makeAnalog(
-                            SnomedMetadataRfx.getRETIRED_NID(),
+                            SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
@@ -180,7 +180,7 @@ public class CloneAndRetireAction extends AbstractAction {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
-                                SnomedMetadataRfx.getRETIRED_NID(),
+                                SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                                 config.getDbConfig().getUserConcept().getNid(),
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);

@@ -199,7 +199,8 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         }
 
         // INITIALIZE DETAIL PANEL
-        taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(), editor.getExistingRoles(), editor.getParentLinkages());
+        taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(),
+                editor.getExistingRoles(), editor.getParentLinkages());
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelTaskDetail, taskDetailUI.getPanel());
         jPanelTaskDetail = taskDetailUI.getPanel();
@@ -230,7 +231,8 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         return taskDetailUI.getTask(ec, vc);
     }
 
-    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,
+            List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
     }
 }

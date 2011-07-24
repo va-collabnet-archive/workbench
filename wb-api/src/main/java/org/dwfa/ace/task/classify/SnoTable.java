@@ -176,7 +176,7 @@ public class SnoTable {
             return errStr;
         }
 
-        isCURRENT = SnomedMetadataRfx.getCURRENT_NID();
+        isCURRENT = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
 
         if (config.getClassificationRoot() != null) {
             rootNid = tf.uuidToNative(config.getClassificationRoot().getUids());

@@ -22,8 +22,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  *
@@ -56,19 +56,26 @@ class JComboBoxExistingParentsRender extends JLabel implements ListCellRenderer 
             }
         }
 
+        System.out.println(":!!!:DEBUG --- ExistingParentRender");
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
-        ConceptVersionBI cvbi = (ConceptVersionBI) model.getElementAt(index);
+        RelationshipVersionBI rvbi = (RelationshipVersionBI) model.getElementAt(index);
+        int roleTypeNid = rvbi.getTypeNid();
+        int roleValueNid = rvbi.getDestinationNid();
+
+        String roleTypeStr;
         try {
-            if (cvbi.getFullySpecifiedDescription() != null) { // :!!!:RFX:
-                setText(cvbi.getFullySpecifiedDescription().getText());
-            } else {
-                setText(cvbi.getDescsActive().iterator().next().getText());
-            }
+            roleTypeStr = Ts.get().getComponent(roleTypeNid).toUserString();
         } catch (IOException ex) {
-            setText(cvbi.toUserString() + " -- FSN missing");
-        } catch (ContraditionException ex) {
-            setText(cvbi.toUserString() + " -- FSN missing");
+            roleTypeStr = "role_type_error";
         }
+        String roleValueStr;
+        try {
+            roleValueStr = Ts.get().getComponent(roleValueNid).toUserString();
+        } catch (IOException ex) {
+            roleValueStr = "role_value_error";
+        }
+
+        setText(roleTypeStr + " :: " + roleValueStr);
 
         if (isSelected) {
             setBackground(jlist.getSelectionBackground());

@@ -60,7 +60,7 @@ public class SetDefinedAction extends AbstractAction {
             		//make analog
     	            for (PathBI ep: config.getEditingPathSet()) {
     					AnalogBI newAnalog = part.makeAnalog(
-    							SnomedMetadataRfx.getCURRENT_NID(), 
+    							SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
     							config.getDbConfig().getUserConcept().getNid(),
     							ep.getConceptNid(), 
     							Long.MAX_VALUE);

@@ -50,7 +50,7 @@ public class CreateRelAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 					0, 
-					SnomedMetadataRfx.getCURRENT_NID(), 
+					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(), 
 		            Long.MAX_VALUE);

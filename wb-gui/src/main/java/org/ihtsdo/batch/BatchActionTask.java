@@ -52,7 +52,8 @@ public abstract class BatchActionTask {
     public BatchActionTask() {
     }
 
-    public abstract boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception;
+    public abstract boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
+            throws Exception;
 
     /**
      * Call once prior to execution of task to setup common values used to process all tasks.
@@ -60,8 +61,8 @@ public abstract class BatchActionTask {
      * @throws IOException 
      */
     public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-        RETIRED_NID = SnomedMetadataRfx.getRETIRED_NID(); // :!!!:RFX:
-        CURRENT_NID = SnomedMetadataRfx.getCURRENT_NID();
+        RETIRED_NID = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+        CURRENT_NID = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
         termConstructor = Ts.get().getTerminologyConstructor(ec, vc);
     }
 

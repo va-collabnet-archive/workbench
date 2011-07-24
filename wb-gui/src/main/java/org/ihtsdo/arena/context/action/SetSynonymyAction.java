@@ -87,7 +87,7 @@ public class SetSynonymyAction extends AbstractAction {
                             AnalogBI analog = null;
                             for (PathBI ep : config.getEditingPathSet()) {
                                 analog = componentVersion.makeAnalog(
-                                        SnomedMetadataRfx.getCURRENT_NID(),
+                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                                         config.getDbConfig().getUserConcept().getNid(),
                                         ep.getConceptNid(),
                                         Long.MAX_VALUE);

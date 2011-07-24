@@ -76,7 +76,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 							descSpec.getLangText(), 
 							descSpec.getDescText(), 
 							Terms.get().getConcept(descSpec.getDescTypeSpec().get(component.getViewCoordinate()).getNid()), 
-							config, SnomedMetadataRfx.getCURRENT_NID());
+							config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
 					Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
 				}
 				
@@ -92,7 +92,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 							ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
 							ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
 							0, 
-							SnomedMetadataRfx.getCURRENT_NID(), 
+							SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
 							config.getDbConfig().getUserConcept().getNid(),
 							pathItr.next().getConceptNid(), 
 				            Long.MAX_VALUE);
@@ -109,7 +109,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 					I_AmPart componentVersion = (I_AmPart) desc;
 					for (PathBI ep: config.getEditingPathSet()) {
 						componentVersion.makeAnalog(
-								SnomedMetadataRfx.getRETIRED_NID(), 
+								SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
 								config.getDbConfig().getUserConcept().getNid(),
 								ep.getConceptNid(), 
 								Long.MAX_VALUE);
@@ -123,7 +123,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 				I_DescriptionVersioned<?> description = Terms.get().getDescription(Terms.get().uuidToNative(descSpec.getUuids()));
 				I_DescriptionPart descPart = description.getTuples(config.getConflictResolutionStrategy()).iterator().next().getMutablePart();
 				I_DescriptionPart newPart = (I_DescriptionPart) descPart.makeAnalog(
-						SnomedMetadataRfx.getCURRENT_NID(), 
+						SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
 						config.getEditingPathSet().iterator().next().getConceptNid(), 
 						Long.MAX_VALUE);
 				newPart.setText(descSpec.getDescText());

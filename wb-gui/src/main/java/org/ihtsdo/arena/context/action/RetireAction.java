@@ -46,7 +46,7 @@ public class RetireAction extends AbstractAction {
                 I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = (ComponentVersionBI) componentVersion.makeAnalog(
-                            SnomedMetadataRfx.getRETIRED_NID(),
+                            SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
@@ -96,7 +96,7 @@ public class RetireAction extends AbstractAction {
                     componentVersion = (I_AmPart) refex;
                     for (PathBI ep : config.getEditingPathSet()) {
                         componentVersion.makeAnalog(
-                                SnomedMetadataRfx.getRETIRED_NID(),
+                                SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                                 config.getDbConfig().getUserConcept().getNid(),
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);

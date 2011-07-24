@@ -67,7 +67,7 @@ public class SetICSignificantAction extends AbstractAction {
                         } else {
                             for (PathBI ep : config.getEditingPathSet()) {
                                 analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        SnomedMetadataRfx.getCURRENT_NID(),
+                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                                         config.getDbConfig().getUserConcept().getNid(),
                                         ep.getConceptNid(),
                                         Long.MAX_VALUE);
@@ -85,7 +85,7 @@ public class SetICSignificantAction extends AbstractAction {
                         } else {
                             for (PathBI ep : config.getEditingPathSet()) {
                                 analog = (DescriptionAnalogBI) descVersion.makeAnalog(
-                                        SnomedMetadataRfx.getCURRENT_NID(),
+                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                                         config.getDbConfig().getUserConcept().getNid(),
                                         ep.getConceptNid(),
                                         Long.MAX_VALUE);

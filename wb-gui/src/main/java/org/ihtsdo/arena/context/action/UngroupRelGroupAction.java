@@ -55,7 +55,7 @@ public class UngroupRelGroupAction extends AbstractAction {
 						I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 						for (PathBI ep: config.getEditingPathSet()) {
 									I_AmPart part = (I_AmPart) componentVersion.makeAnalog(
-									SnomedMetadataRfx.getCURRENT_NID(), 
+									SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 									config.getDbConfig().getUserConcept().getNid(),
 									ep.getConceptNid(), 
 									Long.MAX_VALUE);

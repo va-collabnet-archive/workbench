@@ -685,13 +685,13 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
                 return Condition.STOP;
             }
 
-            isCURRENT = SnomedMetadataRfx.getCURRENT_NID(); // 0 CURRENT, 1 RETIRED
-            isRETIRED = SnomedMetadataRfx.getRETIRED_NID();
-            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getOPTIONAL_REFINABILITY_NID();
-            isNOT_REFINABLE = SnomedMetadataRfx.getNOT_REFINABLE_NID();
-            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getMANDATORY_REFINABILITY_NID();
-            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getCh_STATED_RELATIONSHIP_NID();
-            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getCh_DEFINING_CHARACTERISTIC_NID();
+            isCURRENT = SnomedMetadataRfx.getSTATUS_CURRENT_NID(); // 0 CURRENT, 1 RETIRED
+            isRETIRED = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID();
+            isNOT_REFINABLE = SnomedMetadataRfx.getREL_NOT_REFINABLE_NID();
+            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
+            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
+            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
             sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
         } catch (Exception e) {
             // TODO Auto-generated catch block

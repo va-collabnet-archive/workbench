@@ -22,18 +22,13 @@ import java.util.UUID;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.example.binding.TermAux;
 
 /**
  *
@@ -153,14 +148,14 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
 
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
-        ConceptVersionBI fromParentBI = (ConceptVersionBI) dcbm.getSelectedItem();
-        UUID uuidIsa = fromParentBI.getPrimUuid();
+        ConceptVersionBI fromParentLinkageBI = (ConceptVersionBI) dcbm.getSelectedItem();
+        UUID uuidParentLinkage = fromParentLinkageBI.getPrimUuid(); // 'Is a', 'is a'
 
-        I_AmTermComponent termNewParent = ((ValueDndConceptUI) jPanelDndNewParent).getTermComponent();
-        if (termNewParent != null && termNewParent.getUUIDs().size() > 0) {
-            UUID uuidNewParent = termNewParent.getUUIDs().get(0);
-            ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidIsa);
-            ((BatchActionTaskParentAddNew) task).setSelectedDestUuid(uuidNewParent);
+        I_AmTermComponent termNewParentDest = ((ValueDndConceptUI) jPanelDndNewParent).getTermComponent();
+        if (termNewParentDest != null && termNewParentDest.getUUIDs().size() > 0) {
+            UUID uuidNewParentDest = termNewParentDest.getUUIDs().get(0);
+            ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidParentLinkage);
+            ((BatchActionTaskParentAddNew) task).setSelectedDestUuid(uuidNewParentDest);
             return task;
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.PARENT_ADD_NEW,

@@ -86,7 +86,7 @@ public class ReplaceAction extends AbstractAction {
 					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(),
 					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(),
 					0,
-					SnomedMetadataRfx.getCURRENT_NID(),
+					SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
 					config.getDbConfig().getUserConcept().getNid(),
 					pathItr.next().getConceptNid(),
 		            Long.MAX_VALUE);
@@ -109,7 +109,7 @@ public class ReplaceAction extends AbstractAction {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			for (PathBI ep: config.getEditingPathSet()) {
 				componentVersion.makeAnalog(
-						SnomedMetadataRfx.getRETIRED_NID(),
+						SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
 						config.getDbConfig().getUserConcept().getNid(),
 						ep.getConceptNid(),
 						Long.MAX_VALUE);
