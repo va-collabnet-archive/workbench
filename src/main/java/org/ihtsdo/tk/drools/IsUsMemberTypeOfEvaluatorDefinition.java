@@ -40,8 +40,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class IsUsMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 

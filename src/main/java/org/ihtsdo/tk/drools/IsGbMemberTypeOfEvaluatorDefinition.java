@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.drools.base.BaseEvaluator;
 import org.drools.base.ValueType;
@@ -40,8 +39,8 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf1;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class IsGbMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
