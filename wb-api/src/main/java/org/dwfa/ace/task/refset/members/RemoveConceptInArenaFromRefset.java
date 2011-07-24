@@ -44,6 +44,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.TermAux;
 
@@ -126,7 +127,7 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
             refexSpec.with(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
             refexSpec.with(RefexCAB.RefexProperty.STATUS_NID, 
-                    TermAux.RETIRED.get(config.getViewCoordinate()).getNid());
+                    SnomedMetadataRfx.getSTATUS_RETIRED_NID());
             
             ammender.constructIfNotCurrent(refexSpec); 
 

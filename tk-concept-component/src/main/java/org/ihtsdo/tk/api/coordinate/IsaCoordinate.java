@@ -2,7 +2,6 @@ package org.ihtsdo.tk.api.coordinate;
 
 import java.io.IOException;
 
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -10,7 +9,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.example.binding.TermAux;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class IsaCoordinate {
@@ -74,7 +73,7 @@ public class IsaCoordinate {
         assert allowedStatus != null : "Cannot use null wildcard for allowed status.";
         assert allowedStatus.size() != 0 : "Cannot use an empty set for allowed status.";
         try {
-            assert allowedStatus.contains(TermAux.RETIRED.get(Ts.get().getMetadataVC()).getNid()) == false :
+            assert allowedStatus.contains(SnomedMetadataRfx.getSTATUS_RETIRED_NID()) == false :
                     "Cannot include a retired status. May surface cycles: " + allowedStatus;
         } catch (IOException e) {
             e.printStackTrace();
