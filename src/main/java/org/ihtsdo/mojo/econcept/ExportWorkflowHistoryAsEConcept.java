@@ -27,9 +27,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 /**
@@ -252,8 +253,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
         authorUuid = ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
 
-        currentStatus = Terms.get().nidToUuid(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        currentStatus = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 	}
+
 
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException
 	{
