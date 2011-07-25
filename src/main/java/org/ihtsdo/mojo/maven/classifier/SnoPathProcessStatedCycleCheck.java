@@ -42,6 +42,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
@@ -54,16 +55,12 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
     public int countRelAdded; // ADDED TO LIST
     private int countRelCharStated;
     private int countRelCharDefining;
-    private int countRelCharStatedInferred;
-    private int countRelCharStatedSubsumed;
     private int countRelCharInferred;
     // CORE CONSTANTS
     private int rootNid;
     private int isaNid;
     private static int isCh_STATED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MAX_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MAX_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int isCh_INFERRED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int snorocketAuthorNid = Integer.MAX_VALUE;
     private I_IntSet roleTypeSet;
@@ -93,7 +90,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
             PositionSetReadOnly pathPos,
             Precedence precedence,
             I_ManageContradiction contradictionMgr)
-            throws TerminologyException, IOException {
+            throws Exception {
         this.logger = logger;
         this.snorels = snorels;
         this.fromPathPosPriority = null;
@@ -114,15 +111,13 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
         countRelCharStated = 0;
         countRelCharDefining = 0;
-        countRelCharStatedInferred = 0;
-        countRelCharStatedSubsumed = 0;
         countRelCharInferred = 0;
 
         setupCoreNids();
         SnoTable.updatePrefs(false);
     }
 
-    private void setupCoreNids() throws TerminologyException, IOException {
+    private void setupCoreNids() throws Exception {
         I_TermFactory tf = Terms.get();
 
         // SETUP CORE NATIVES IDs
@@ -130,16 +125,9 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         rootNid = tf.uuidToNative(SNOMED.Concept.ROOT.getUids());
 
         // Characteristic
-        isCh_STATED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-        isCh_DEFINING_CHARACTERISTIC =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-        isCh_STATED_AND_INFERRED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-        isCh_STATED_AND_SUBSUMED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
-        isCh_INFERRED_RELATIONSHIP =
-                tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids());
+        isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
+        isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
+        isCh_INFERRED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
 
         snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
     }
@@ -235,12 +223,6 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
             } else if (charId == isCh_STATED_RELATIONSHIP) {
                 keep = true;
                 countRelCharStated++;
-            } else if (charId == isCh_STATED_AND_INFERRED_RELATIONSHIP) {
-                keep = true;
-                countRelCharStatedInferred++;
-            } else if (charId == isCh_STATED_AND_SUBSUMED_RELATIONSHIP) {
-                keep = true;
-                countRelCharStatedSubsumed++;
             } else if (charId == isCh_INFERRED_RELATIONSHIP) {
                 keep = true;
                 countRelCharInferred++;
@@ -584,13 +566,10 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         s.append("\r\n::: con version conflict:\t").append(countConDuplVersion);
         s.append("\t # attribs.size() > 1");
         s.append("\r\n::: ");
-        s.append("\r\n::: Defining:         \t").append(countRelCharDefining);
-        s.append("\r\n::: Stated:           \t").append(countRelCharStated);
-        s.append("\r\n::: Stated & Inferred:\t").append(countRelCharStatedInferred);
-        s.append("\r\n::: Stated & Subsumed:\t").append(countRelCharStatedSubsumed);
+        s.append("\r\n::: Defining/Inferred: \t").append(countRelCharDefining);
+        s.append("\r\n::: Stated:            \t").append(countRelCharStated);
         s.append("\r\n::: Inferred:         \t").append(countRelCharInferred);
-        int total = countRelCharStated + countRelCharDefining + countRelCharStatedInferred
-                + countRelCharStatedSubsumed + countRelCharInferred;
+        int total = countRelCharStated + countRelCharDefining + countRelCharInferred;
         s.append("\r\n:::            TOTAL=\t").append(total);
 
         s.append("\r\n::: ");

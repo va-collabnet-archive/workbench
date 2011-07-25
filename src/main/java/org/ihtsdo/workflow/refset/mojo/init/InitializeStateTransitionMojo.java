@@ -14,6 +14,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -53,28 +56,30 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
     private static final int numberOfColumns = finalStatePosition + 1;			// 4
 
     private StateTransitionRefsetWriter writer = null;
+
+	private ViewCoordinate viewCoord;
     
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
         System.setProperty("java.awt.headless", "true");
         try {
+            viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
             writer = new StateTransitionRefsetWriter();
             processStateTransitions(filePath);
-        	Terms.get().addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize state transition refset with error: " + e.getMessage());
 		}
 	}
 
-    private void processStateTransitions(String resourceFilePath) throws TerminologyException, IOException {
+    private void processStateTransitions(String resourceFilePath) throws TerminologyException, IOException, ContraditionException {
     	processTransitions(new File(resourceFilePath), Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
     }
 
-    private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException {
+    private void processTransitions(File f, I_GetConceptData useType) throws TerminologyException, IOException, ContraditionException {
     	BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
     	writer.setWorkflowType(useType);
     	String line = null;
-
+    	
     	while ((line = inputFile.readLine()) != null)
         {
         	if (line.trim().length() == 0) {
@@ -85,18 +90,26 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
 
         	if (columns.length == numberOfColumns)
         	{
-	        	I_GetConceptData category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition]);
-    			
-	        	writer.setCategory(category);
-    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition]));
-	        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition]));
-	        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition]));
+	        	ConceptVersionBI category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition], viewCoord);
 
+	        	try {
+		        	writer.setCategory(category);
+	    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition], viewCoord));
+		        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition], viewCoord));
+		        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition], viewCoord));
+	        	} catch (Exception e) {
+	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset on line: " + line);        
+	        	}
 	        	writer.addMember();
         	}
     		else if (reportErrors) {
-            	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
+            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset on line: " + line);        
         	}
         }
+    	try {
+        	Terms.get().addUncommitted(writer.getRefsetConcept());
+    	} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.WARNING, "Writer: " + writer + "\nwith refset writer Concept" + writer.getRefsetConcept().getInitialText());        
+    	}
     }
 }

@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -26,6 +27,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
@@ -126,6 +129,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 	private DataOutputStream eConceptDOS = null;
 
+	private WorkflowHistoryRefsetWriter writer;
+
 	public void execute() throws MojoExecutionException, MojoFailureException
 	{
 		int conceptCounter = 0;
@@ -174,7 +179,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 	private void initializeExport() throws IOException, TerminologyException
 	{
-        initializeOutputFile();
+		writer = new WorkflowHistoryRefsetWriter(); 
+
+		initializeOutputFile();
 
         initializeConstantUuids();
 
@@ -245,9 +252,10 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         snomedPathUid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
 
         authorUuid = ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
-        
-        currentStatus = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+
+        currentStatus = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 	}
+
 
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException
 	{
@@ -259,7 +267,6 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 			long wfTimestamp = format.parse(row[refsetColumnTimeStampPosition]).getTime();
 
-        	WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter(false); 
 			
 			writer.setWorkflowUid(UUID.fromString(row[workflowIdPosition]));
 			writer.setPathUid(UUID.fromString(row[pathPosition]));
@@ -417,9 +424,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		} else if (state.equalsIgnoreCase("For Chief Terminologist review workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Concept having no prior workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NO_WFHX_STATE.getPrimoridalUid();
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Concept not previously existing workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NOT_EXISTING_STATE.getPrimoridalUid();
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Escalated workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATED_STATE.getPrimoridalUid();
 		} else if ((state.equalsIgnoreCase("New workflow state")) || (state.equalsIgnoreCase("first review")))  {

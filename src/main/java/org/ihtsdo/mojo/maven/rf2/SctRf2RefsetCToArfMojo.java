@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,18 +35,13 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-lrs-to-arf
+ * @goal sct-rf2-refset-c-to-arf
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
-public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
+public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable {
 
     private static final String FILE_SEPARATOR = File.separator;
-    /**
-     * Line terminator is deliberately set to CR-LF which is DOS style
-     */
-    private static final String LINE_TERMINATOR = "\r\n";
-    private static final String TAB_CHARACTER = "\t";
     /**
      * Location of the build directory.
      *
@@ -74,13 +67,18 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    /**
+     * Directory used to output the eConcept format files
+     * @parameter
+     */
+    private String[] filters;
     String uuidSourceSnomedLongStr;
     String uuidPathStr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN SctRf2LrsToArfMojo");
+        getLog().info("::: BEGIN SctRf2RefsetCToArfMojo");
 
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
@@ -93,7 +91,14 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
             uuidSourceSnomedLongStr =
                     ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString();
 
-
+            // SETUP EXCLUSIONS FILTER
+            Long[] exclusions = null;
+            if (filters != null && filters.length > 0) {
+                exclusions = new Long[filters.length];
+                for (int i = 0; i < exclusions.length; i++) {
+                    exclusions[i] = Long.parseLong(filters[i]);
+                }
+            }
 
             // FILE & DIRECTORY SETUP
             // Create multiple directories
@@ -103,80 +108,34 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
             if (success) {
                 getLog().info("::: Output Directory: " + outDir);
             }
-            // BufferedWriter bwIds = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-            //        outDir + "ids.txt"), "UTF-8"));
-            // getLog().info("::: IDS OUTPUT: " + outDir + "ids_lrs.txt");
 
-            // WRITE REFSET CONCEPTS
-//            ArrayList<Rf2_RefsetId> refsetIdList = new ArrayList<Rf2_RefsetId>();
-//            refsetIdList.add(new Rf2_RefsetId(900000000000509007L, /* refsetSctIdOriginal */
-//                    "2002.01.31",  /* refsetDate */
-//                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
-//                    "US Language Refset", /* refsetPrefTerm */
-//                    "US Language Refset", /* refsetFsName */
-//                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
-//            refsetIdList.add(new Rf2_RefsetId(900000000000508004L, /* refsetSctIdOriginal */
-//                    "2002.01.31",  /* refsetDate */
-//                    "8c230474-9f11-30ce-9cad-185a96fd03a2",  /* refsetPathUuidStr */
-//                    "GB Language Refset", /* refsetPrefTerm */
-//                    "GB Language Refset", /* refsetFsName */
-//                    "3e0cd740-2cc6-3d68-ace7-bad2eb2621da")); /* refsetParentUuid */
-//            Rf2_RefsetId.saveRefsetConcept(outDir, refsetIdList);
-
-            // LANGUAGE REFSET FILES "der2_cRefset_Language"
+            // CONCEPT REFSET FILES
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    outDir + "concept_language_rf2.refset"), "UTF-8"));
-            getLog().info("::: LANGUAGE REFSET FILE: " + outDir + "concept_language_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Language", ".txt");
+                    outDir + "concept_refsetc_rf2.refset"), "UTF-8"));
+            getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Association", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
-                    // writeSctSnomedLongId(bwIds, m.id, m.effDateStr, m.pathStr);
                 }
             }
             bw.flush();
             bw.close();
 
-            // bwIds.flush();
-            // bwIds.close();
-//        } catch (NoSuchAlgorithmException ex) {
-//            Logger.getLogger(SctRf2LrsToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-//            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo NoSuchAlgorithmException", ex);
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(SctRf2LrsToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo UnsupportedEncodingException", ex);
+            Logger.getLogger(SctRf2RefsetCToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo UnsupportedEncodingException", ex);
         } catch (TerminologyException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo Terminology error", ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo Terminology error", ex);
         } catch (IOException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo file error", ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo file error", ex);
         } catch (ParseException ex) {
             Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
-            throw new MojoFailureException("RF2/ARF SctRf2LrsToArfMojo file name parse error", ex);
+            throw new MojoFailureException("RF2/ARF SctRf2RefsetCToArfMojo file name parse error", ex);
         }
-        getLog().info("::: END SctRf2LrsToArfMojo");
-    }
-
-    private void writeSctSnomedLongId(BufferedWriter writer, long sctId, String date, String path)
-            throws IOException, TerminologyException {
-        // Primary UUID
-        writer.append(Rf2x.convertIdToUuidStr(sctId) + TAB_CHARACTER);
-
-        // Source System UUID
-        writer.append(uuidSourceSnomedLongStr + TAB_CHARACTER);
-
-        // Source Id
-        writer.append(Long.toString(sctId) + TAB_CHARACTER);
-
-        // Status UUID
-        writer.append(Rf2x.convertActiveToStatusUuid(true) + TAB_CHARACTER);
-
-        // Effective Date   yyyy-MM-dd HH:mm:ss
-        writer.append(Rf2x.convertEffectiveTimeToDate(date) + TAB_CHARACTER);
-
-        // Path UUID
-        writer.append(path + LINE_TERMINATOR);
+        getLog().info("::: END SctRf2RefsetCToArfMojo");
     }
 }

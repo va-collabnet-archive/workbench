@@ -16,7 +16,6 @@ package org.ihtsdo.mojo.mojo;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -28,11 +27,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 
-
 public class ConceptDescriptor {
 
-	private String pathFsDesc;
-	private String uuid;
+    private String pathFsDesc;
+    private String uuid;
     private String description;
 
     public ConceptDescriptor() {
@@ -48,8 +46,8 @@ public class ConceptDescriptor {
         // concept's descriptions
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null, 
-            config.getPrecedence(), config.getConflictResolutionStrategy());
+        List<? extends I_DescriptionTuple> descriptionTuples = concept.getDescriptionTuples(null, null, null,
+                config.getPrecedence(), config.getConflictResolutionStrategy());
         for (I_DescriptionTuple tuple : descriptionTuples) {
             if (description.toLowerCase().trim().equals(tuple.getText().toLowerCase().trim())) {
                 return true;
@@ -60,10 +58,10 @@ public class ConceptDescriptor {
 
     public I_GetConceptData getVerifiedConcept() throws Exception {
 
-    	if (uuid == null && pathFsDesc != null) {
-    		uuid = Type5UuidFactory.get(
-    				Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc).toString();
-    	}
+        if (uuid == null && pathFsDesc != null) {
+            uuid = Type5UuidFactory.get(
+                    Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathFsDesc).toString();
+        }
         if (uuid == null) {
             throw new Exception("UUID parameter must be specified.");
         } else if (description == null) {
@@ -81,11 +79,11 @@ public class ConceptDescriptor {
             }
 
         } catch (Exception e) {
-            throw new Exception(e.getMessage() + " : " + description + " " + uuidList);
+            throw new Exception(description + " " + uuidList, e);
         }
         if (concept != null) {
             throw new Exception("Failed to find matching description: " + description + " " + uuidList
-                + " in concept: " + concept);
+                    + " in concept: " + concept);
         }
         throw new Exception("Failed to find matching description: " + description + " " + uuidList);
     }
@@ -109,14 +107,12 @@ public class ConceptDescriptor {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public String getPathFsDesc() {
-		return pathFsDesc;
-	}
+        return pathFsDesc;
+    }
 
-	public void setPathFsDesc(String pathFsDesc) {
-		this.pathFsDesc = pathFsDesc;
-	}
-
-
+    public void setPathFsDesc(String pathFsDesc) {
+        this.pathFsDesc = pathFsDesc;
+    }
 }

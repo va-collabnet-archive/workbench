@@ -18,6 +18,7 @@ package org.ihtsdo.mojo.maven.rf2;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
@@ -35,6 +36,10 @@ public class Rf2x {
         return formatter.parse(date).getTime();
     }
 
+    static String convertTimeToDate(long time) throws ParseException {
+        return formatter.format(new Date(time));
+    }
+
     static boolean convertStringToBoolean(String s) {
         if (s.startsWith("1")) {
             return true;
@@ -48,9 +53,11 @@ public class Rf2x {
         // RF2 "0" inactive, "1" active
         // ARF Status UUID <-- most general
         if (active) {
-            return ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid().toString();
+            // return ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid().toString();
+            return "d12702ee-c37f-385f-a070-61d56d4d0f1f"; // RF2 Active
         } else {
-            return ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid().toString();
+            // return ArchitectonicAuxiliary.Concept.RETIRED.getPrimoridalUid().toString();
+            return "a5daba09-7feb-37f0-8d6d-c3cadfc7f724"; // RF2 Inactive
         }
     }
 

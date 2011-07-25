@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -55,10 +56,12 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
     }
 
-    static Rf2_RefsetCRecord[] parseRefset(Rf2File f) throws IOException, ParseException {
+    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions)
+            throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
-        Rf2_RefsetCRecord[] a = new Rf2_RefsetCRecord[count];
+        int countExludedMembers = 0;
+        ArrayList<Rf2_RefsetCRecord> a = new ArrayList<Rf2_RefsetCRecord>();
 
         // DATA COLUMNS
         int ID = 0;// id
@@ -73,27 +76,37 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
                 "UTF-8"));
         Set idSet = new HashSet<Long>();
 
-        int idx = 0;
         br.readLine(); // Header row
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
 
             Long refsetIdL = Long.parseLong(line[REFSET_ID]);
+            boolean found = false;
+            if (exclusions != null) {
+                for (Long excludedId : exclusions) {
+                    if (excludedId.compareTo(refsetIdL) == 0) {
+                        found = true;
+                    }
+                }
+            }
+            if (found) {
+                countExludedMembers++;
+                continue;
+            }
             idSet.add(refsetIdL);
 
-            a[idx] = new Rf2_RefsetCRecord(line[ID],
+            a.add(new Rf2_RefsetCRecord(line[ID],
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[REFSET_ID]),
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-                    Long.parseLong(line[VALUE_ID]));
-            idx++;
+                    Long.parseLong(line[VALUE_ID])));
         }
 
         Long[] aLongs = (Long[]) idSet.toArray(new Long[0]);
         StringBuilder sb = new StringBuilder();
-        sb.append("Concept Refset SCT IDs:\r\n");
+        sb.append("Concept Refset SCT IDs kept:\r\n");
         sb.append(f.file.getName());
         sb.append("\r\n");
         for (Long l : aLongs) {
@@ -102,9 +115,44 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             sb.append(Rf2x.convertIdToUuidStr(l));
             sb.append("\r\n");
         }
-        Logger.getLogger(Rf2_CrossmapRecord.class.getName()).info(sb.toString());
+        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
 
-        return a;
+        sb = new StringBuilder();
+        sb.append("Concept Refset SCT IDs excluded:\r\n");
+        sb.append(f.file.getName());
+        sb.append("\r\n");
+        if (exclusions != null) {
+            for (Long l : exclusions) {
+                sb.append(l.toString());
+                sb.append("\t");
+                sb.append(Rf2x.convertIdToUuidStr(l));
+                sb.append("\r\n");
+            }
+        } else {
+            sb.append("none.\r\n");
+        }
+        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
+
+        sb = new StringBuilder();
+        sb.append("Filter Stats\r\n");
+        sb.append(f.file.getName());
+        sb.append("\r\nTotal members viewed   =\t");
+        sb.append(count);
+        sb.append("\r\nTotal members kept     =\t");
+        sb.append(a.size());
+        sb.append("\r\nTotal members excluded =\t");
+        sb.append(countExludedMembers);
+        sb.append("\r\n");
+        Logger.getLogger(Rf2_RefsetCRecord.class.getName()).info(sb.toString());
+
+        Rf2_RefsetCRecord[] b = new Rf2_RefsetCRecord[a.size()];
+        int idx = 0;
+        for (Rf2_RefsetCRecord rec : a) {
+            b[idx] = rec;
+            idx++;
+        }
+
+        return b;
     }
 
     public void writeArf(BufferedWriter writer) throws IOException, TerminologyException {
