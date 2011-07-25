@@ -31,12 +31,12 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 public class WorkflowActionEditor extends AbstractComboEditor {
 
     private ViewCoordinate vc;
-	private TreeSet<? extends ConceptVersionBI> actions;
+    private TreeSet<? extends ConceptVersionBI> actions;
 
 	@Override
     public EditorComponent setupEditor() {
     	//Sort the list by name
-		WorkflowConceptCollection editors = new WorkflowConceptCollection();
+	WorkflowConceptCollection editors = new WorkflowConceptCollection();
 
     	try {
         	actions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();

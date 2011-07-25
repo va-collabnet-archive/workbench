@@ -73,20 +73,5 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		
 		return null;
 	}
-
-	public static void listWorkflowHistory() throws NumberFormatException, IOException, TerminologyException 
-	{
-		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
-		int counter = 0;
-		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-		for (I_ExtendByRef row : Terms.get().getRefsetExtensionMembers(reader.getRefsetNid())) 
-		{
-			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
-			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
-		}
-		outputFile.flush();
-		outputFile.close();
-	}
 }
 

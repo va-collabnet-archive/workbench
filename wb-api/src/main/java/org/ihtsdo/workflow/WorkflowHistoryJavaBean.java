@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.hash.Hashcode;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -172,7 +173,7 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			return "Failed to identify referencedComponentId or WorkflowHistory" + 
 				   "\nError msg: " + io.getMessage();
 		} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString(), e);
+			AceLog.getAppLog().log(Level.WARNING, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString());
 			return "";
 		}
 	}
@@ -211,23 +212,25 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
     }
 
 	@Override
-	public String getModelerForTitleBar() throws IOException{
+	public String getModelerForTitleBar(ViewCoordinate coordinate) throws IOException{
 		try { 
-//			return WorkflowHelper.identifyPrefTerm(getModeler(), ));
+			String term = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(getModeler()), coordinate);
+			return WorkflowHelper.shrinkTermForDisplay(term);
 		} catch (Exception e) {
-			throw new IOException(e);
+			AceLog.getAppLog().log(Level.WARNING, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString());
 		}
 		return "";
 	}
 
 	@Override
-	public String getStateForTitleBar() throws IOException{
+	public String getStateForTitleBar(ViewCoordinate coordinate) throws IOException{
 		try {
-//			String term = WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getState()));
-			
-			return WorkflowHelper.shrinkTermForDisplay("");
+			String term = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(getState()), coordinate);
+			return WorkflowHelper.shrinkTermForDisplay(term);
 		} catch (Exception e) {
-			throw new IOException(e);
+			AceLog.getAppLog().log(Level.WARNING, "Failed to access fields of WorkflowHistoryJavaBean: " + this.toString());
 		}
+		
+		return "";
 	}
 }

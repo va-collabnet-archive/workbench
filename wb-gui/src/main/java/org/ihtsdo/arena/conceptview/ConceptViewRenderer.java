@@ -67,12 +67,10 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.util.swing.GuiUtil;
-import org.ihtsdo.workflow.WorkflowHandler;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -356,9 +354,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 
             	List<UUID> availableActions = null;
                 Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions = null;
-                WorkflowHandlerBI wfHandler = new WorkflowHandler();
                 
-                // Application Workflow
+		// Application Workflow
                 Collection<Action> actions = getKbActions();
                 for (Action a : actions) {
                     applicationWorkflowPanel.add(new JButton(a));
@@ -374,10 +371,10 @@ public class ConceptViewRenderer extends JLayeredPane {
                         if (settings.getConcept() != null) {
                         	// Must hit DB b/c of casting of getConcept() from I_TermComp to I_GCD
                             I_GetConceptData concept = Terms.get().getConcept(settings.getConcept().getConceptNid());
-                            availableActions = wfHandler.getAllAvailableWorkflowActionUids();
-                            possibleActions = wfHandler.getAvailableWorkflowActions(concept.getVersion(viewCoord), viewCoord);
+                            availableActions = WorkflowHelper.getAllAvailableWorkflowActionUids();
+                            possibleActions = WorkflowHelper.getAvailableWorkflowActions(concept.getVersion(viewCoord), viewCoord);
 
-                            capWorkflowSetup(capWorkflow, availableActions, wfBpFile, wfHandler, possibleActions);
+                            capWorkflowSetup(capWorkflow, availableActions, wfBpFile, possibleActions);
                             capOopsButton();
                         }
                     } catch (Exception e1) {
@@ -520,7 +517,6 @@ public class ConceptViewRenderer extends JLayeredPane {
 
             private void capWorkflowSetup(boolean capWorkflow,
                 Collection<UUID> availableActions, File wfBpFile,
-                WorkflowHandlerBI wfHandler,
                 Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
 
                 try {
@@ -565,12 +561,18 @@ public class ConceptViewRenderer extends JLayeredPane {
                                                 }
                                             } catch (Exception e1) {
                                                 AceLog.getAppLog().log(Level.WARNING, "Error Advancing Workflow with error: " + e1.getMessage());
+                                                // As no available actions will exist for null concept, this check for completeness
+                                                if (settings.getConcept() != null) {
+                                                    updateOopsButton(settings.getConcept());
+                                                }
+                                            } catch (Exception e1) {
+                                                AceLog.getAppLog().log(Level.WARNING, "Error Advancing Workflow with error: " + e1.getMessage());
                                             }
 
                                         }
                                     });
 
-                                    if (wfHandler.isActiveAction(possibleActions, action)) {
+                                    if (WorkflowHelper.isActiveAction(possibleActions, action)) {
                                         actionButton.setEnabled(true);
                                     } else {
                                         actionButton.setEnabled(false);
@@ -664,9 +666,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         gbc.gridx++;
 
-        workflowStatusLabel = new JLabel("");
-        footerPanel.add(workflowStatusLabel, gbc);
-
+    	workflowStatusLabel = new JLabel("");
+    	footerPanel.add(workflowStatusLabel, gbc);
 
 
         gbc.gridx++;
@@ -774,8 +775,20 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 // Update workfllow status label here... 
                 if (capWorkflow) {
-                    //WorkflowHistoryJavaBean hxBean = WorkflowHelper.getLatestWfHxForConcept(concept);
-                    workflowStatusLabel.setText("WF Status");
+                    try {
+			WorkflowHistoryJavaBean hxBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+			ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+
+			if (hxBean != null) {
+		            workflowStatusLabel.setText("WF Status: " + hxBean.getStateForTitleBar(coordinate));
+	                    workflowStatusLabel.setText("\t");
+		            workflowStatusLabel.setText("WF Modeler: " + hxBean.getModelerForTitleBar(coordinate));
+			} else {
+			    workflowStatusLabel.setText("");
+			}
+		    } catch (Exception e) {
+            		AceLog.getAppLog().log(Level.WARNING, "Error in identifying wf display values for arena");
+		    }
                 }
             }
 

@@ -3,6 +3,7 @@ package org.ihtsdo.tk.api.workflow;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public interface WorkflowHistoryJavaBeanBI {
 	public void setConcept(UUID id);
@@ -31,8 +32,8 @@ public interface WorkflowHistoryJavaBeanBI {
 	public boolean getOverridden();
 	public int getRxMemberId();
 	
-	public String getStateForTitleBar() throws IOException;
-	public String getModelerForTitleBar() throws IOException;
+	public String getStateForTitleBar(ViewCoordinate coordinate) throws IOException;
+	public String getModelerForTitleBar(ViewCoordinate coordinate) throws IOException;
 	
 	public String toString();
 }
