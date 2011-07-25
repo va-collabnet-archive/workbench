@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -283,27 +284,27 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isValidSemtag(String semtag){
 		return getValidSemtags().keySet().contains(semtag);
 	}
-	
+
 	@Override
 	public boolean isValidSemtagInHierarchy(String semtag, String langCode, String conceptUuid){
 		boolean result = true;
-		
+
 		try {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
-			
+
 			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-			
+
 			I_GetConceptData testedConcept = termFactory.getConcept(UUID.fromString(conceptUuid));
 			List<I_GetConceptData> parents = new ArrayList<I_GetConceptData>();
-			
+
 			I_IntSet allowedTypes = termFactory.newIntSet();
 			allowedTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-			
+
 			parents.addAll(testedConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, 
 					config.getViewPositionSetReadOnly(), Precedence.PATH, config.getConflictResolutionStrategy()));
-			
+
 			Set<String> parentSemtags = new HashSet<String>();
 			for (I_GetConceptData loopParent : parents) {
 				for (I_DescriptionTuple loopDescription : loopParent.getDescriptionTuples(config.getAllowedStatus(), 
@@ -314,20 +315,20 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 							loopDescription.getLang().equals(langCode)) {
 						parentSemtags.add(loopDescription.getText().substring(loopDescription.getText().lastIndexOf('(')+1,loopDescription.getText().lastIndexOf(')')));
 					}
-						
+
 				}
 			}
-			
+
 			if (parentSemtags.size() > 1) {
 				result = false;
 			}
-			
+
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
@@ -355,10 +356,19 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	@Override
 	public boolean isParentOfStatedChildren(String conceptUuid){
 		boolean result = false;
-		//TODO implement for Stated when the definitive structure is defined
 		if (conceptUuid != null) {
 			try {
-				result = getDescendants(new HashSet<I_GetConceptData>(), Terms.get().getConcept(UUID.fromString(conceptUuid))).size() > 0;
+				I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+				int isaType = Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+				for (I_RelTuple loopTuple : concept.getDestRelTuples(config.getAllowedStatus(), 
+						config.getDestRelTypes(), config.getViewPositionSetReadOnly(), 
+						config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					if (loopTuple.getTypeNid() == isaType &&
+							loopTuple.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+						result = true;
+					}
+				}
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {

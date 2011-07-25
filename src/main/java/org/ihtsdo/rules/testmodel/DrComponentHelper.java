@@ -271,23 +271,28 @@ public class DrComponentHelper {
 			}
 			concept.getDefiningRoleSets().add(statedRolesSet);
 
-			// TODO: incoming rels is heavy on performance, evaluate requirements
-			//			for (RelationshipVersionBI relTuple : conceptBi.getRelsIncomingActive()) {
-			//				DrRelationship loopRel = new DrRelationship();
-			//				loopRel.setModifierUuid("someUuid");
-			//				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-			//				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-			//				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-			//				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-			//				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-			//				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-			//				loopRel.setRelGroup(relTuple.getGroup());
-			//				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-			//				loopRel.setTime(relTuple.getTime());
-			//				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-			//				loopRel.setFactContextName(factContextName);
-			//				concept.getIncomingRelationships().add(loopRel);
-			//			}
+			//TODO: incoming rels is heavy on performance, only inserting incoming historical rels
+			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
+					null, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					config.getConflictResolutionStrategy())) {
+				if (relTuple.getCharacteristicNid() == historical) {
+					DrRelationship loopRel = new DrRelationship();
+					loopRel.setModifierUuid("someUuid");
+					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
+					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
+					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
+					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
+					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
+					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+					loopRel.setRelGroup(relTuple.getGroup());
+					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
+					loopRel.setTime(relTuple.getTime());
+					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
+					loopRel.setFactContextName(factContextName);
+					concept.getIncomingRelationships().add(loopRel);
+				}
+			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
