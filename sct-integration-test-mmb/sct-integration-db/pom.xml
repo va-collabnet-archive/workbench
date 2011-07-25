@@ -16,8 +16,9 @@
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
-            <groupId>org.ihtsdo.sct</groupId>
-            <artifactId>sct-all-version-sct-en-es-vtmvmp</artifactId>
+            <groupId>org.ihtsdo.sct.rf2</groupId>
+            <artifactId>sct-rf2-arf-econcept-full</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
         <dependency>
@@ -65,9 +66,10 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.ihtsdo.sct</groupId>
-                                    <artifactId>sct-all-version-sct-en-es-vtmvmp</artifactId>
-                                    <type>zip</type>
+	                                    <groupId>org.ihtsdo.sct.rf2</groupId>
+	                                    <artifactId>sct-rf2-arf-econcept-full</artifactId>
+	                                    <version>1.0-SNAPSHOT</version>
+	                                    <type>zip</type>
                                 </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/generated-resources/pre</outputDirectory>
@@ -565,6 +567,153 @@
                             </origins>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>create-baseline-development-origin-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>baseline/development origin path</pathFsDesc>
+                            <pathPrefDesc>baseline/development origin path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+                                        <description>SNOMED Core</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>create-author-1-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>author 1 path</pathFsDesc>
+                            <pathPrefDesc>author 1 path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>baseline/development origin path</pathFsDesc>
+                                        <description>baseline/development origin path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-author-2-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>author 2 path</pathFsDesc>
+                            <pathPrefDesc>author 2 path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>baseline/development origin path</pathFsDesc>
+                                        <description>baseline/development origin path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-resolution-origin-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>resolution origin path</pathFsDesc>
+                            <pathPrefDesc>resolution origin path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>author 1 path</pathFsDesc>
+                                        <description>author 1 path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>author 2 path</pathFsDesc>
+                                        <description>author 2 path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-ajudication-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>ajudication path</pathFsDesc>
+                            <pathPrefDesc>ajudication path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>resolution origin path</pathFsDesc>
+                                        <description>resolution origin path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-release-candidate-path</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>vodb-create-new-path</goal>
+                        </goals>
+                        <configuration>
+                            <pathParent>
+                                <uuid>e89c2b90-c85a-3dfb-978e-8df49046592b</uuid>
+                                <description>development</description>
+                            </pathParent>
+                            <pathFsDesc>release candidate path</pathFsDesc>
+                            <pathPrefDesc>release candidate path</pathPrefDesc>
+                            <origins>
+                                <SimpleUniversalAcePath>
+                                    <pathConcept>
+                                        <pathFsDesc>ajudication path</pathFsDesc>
+                                        <description>ajudication path</description>
+                                    </pathConcept>
+                                </SimpleUniversalAcePath>
+                            </origins>
+                        </configuration>
+                    </execution>
+
+
                     <execution>
                         <id>vodb-commit2</id>
                         <phase>process-resources</phase>
