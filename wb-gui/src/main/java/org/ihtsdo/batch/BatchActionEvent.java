@@ -82,7 +82,7 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
 
             sb.append(actionTaskType.toString());
             sb.append("\t");
-            if (conceptA.getPreferredDescription() != null) { // :!!!:RFX:
+            if (conceptA.getPreferredDescription() != null) {
                 sb.append(conceptA.getPreferredDescription().getText());
             } else {
                 sb.append(conceptA.getDescsActive().iterator().next().getText());

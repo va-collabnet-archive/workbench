@@ -72,7 +72,7 @@ public class BatchActionEventReporter {
                     // EVENT CONCEPT
                     sb.append("\t");
                     if (bae.getConceptA() != null) {
-                        if (bae.getConceptA().getPreferredDescription() != null) { // :!!!:RFX:
+                        if (bae.getConceptA().getPreferredDescription() != null) {
                             sb.append(bae.getConceptA().getPreferredDescription().getText());
                         } else {
                             sb.append(bae.getConceptA().getDescsActive().iterator().next().getText());
@@ -139,7 +139,7 @@ public class BatchActionEventReporter {
                     sb.append(bae.getEventType());
                     // EVENT CONCEPT
                     sb.append("</font></td><td><font color='black' face='Dialog' size='3'>");
-                    if (bae.getConceptA() != null) {  // :!!!:RFX:
+                    if (bae.getConceptA() != null) {
                         if (bae.getConceptA().getPreferredDescription() != null) {
                             sb.append(bae.getConceptA().getPreferredDescription().getText());
                         } else {

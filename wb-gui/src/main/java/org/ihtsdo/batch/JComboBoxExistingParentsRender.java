@@ -56,7 +56,6 @@ class JComboBoxExistingParentsRender extends JLabel implements ListCellRenderer 
             }
         }
 
-        System.out.println(":!!!:DEBUG --- ExistingParentRender");
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
         RelationshipVersionBI rvbi = (RelationshipVersionBI) model.getElementAt(index);
         int roleTypeNid = rvbi.getTypeNid();

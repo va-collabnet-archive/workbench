@@ -18,16 +18,13 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.UUID;
-import org.eclipse.jdt.core.dom.ThisExpression;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.example.binding.TermAux;
 
-// :!!!: should BatchActionTask be abstract or interface?
 public abstract class BatchActionTask {
 
     public static int RETIRED_NID;

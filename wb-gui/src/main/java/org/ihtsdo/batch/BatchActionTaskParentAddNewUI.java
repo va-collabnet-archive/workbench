@@ -29,6 +29,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  *
@@ -65,7 +66,12 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         jPanelDndNewParent = new javax.swing.JPanel();
 
         jComboBoxLinkage.setModel(jComboBoxLinkage.getModel());
-        jComboBoxLinkage.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
+        jComboBoxLinkage.setRenderer(new org.ihtsdo.batch.JComboBoxParentLinksRender());
+        jComboBoxLinkage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxLinkageActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelDndNewParentLayout = new javax.swing.GroupLayout(jPanelDndNewParent);
         jPanelDndNewParent.setLayout(jPanelDndNewParentLayout);
@@ -82,10 +88,10 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jComboBoxLinkage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
             .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jComboBoxLinkage, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(83, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -95,6 +101,11 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
                 .addComponent(jPanelDndNewParent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBoxLinkageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxLinkageActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBoxLinkageActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxLinkage;
     private javax.swing.JPanel jPanelDndNewParent;
@@ -106,7 +117,7 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -115,7 +126,7 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
             dcbm.addElement(componentVersionBI);
         }
 
-                if (dcbm.getSize() == 0) {
+        if (dcbm.getSize() == 0) {
             // empty list
         } else if (selectedItem == null) {
             // no prior selection

@@ -24,9 +24,7 @@ import java.util.UUID;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.cement.SNOMED;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
@@ -34,7 +32,6 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 /**
  *
@@ -120,15 +117,15 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     }
 
     @Override  // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+        RelationshipVersionBI selectedItem = (RelationshipVersionBI) dcbm.getSelectedItem();
 
         // Sort existing parents by name.
-        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
+        Comparator<RelationshipVersionBI> cmp = new Comparator<RelationshipVersionBI>() {
 
             @Override
-            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
+            public int compare(RelationshipVersionBI o1, RelationshipVersionBI o2) {
                 return o1.toUserString().compareToIgnoreCase(o2.toUserString());
             }
         };
@@ -136,8 +133,8 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         // Add exitings parents to JComboBox model.
         Collections.sort(existingParents, cmp);
         dcbm.removeAllElements();
-        for (ComponentVersionBI componentVersionBI : existingParents) {
-            dcbm.addElement(componentVersionBI);
+        for (RelationshipVersionBI relationshipVersionBI : existingParents) {
+            dcbm.addElement(relationshipVersionBI);
         }
 
         if (dcbm.getSize() == 0) {
@@ -149,10 +146,10 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
             // Search by nid
             int selectedIdx = -1;
             for (int i = 0; i < dcbm.getSize(); i++) {
-                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
-                if (cvbi.getNid() == selectedItem.getNid()) {
+                RelationshipVersionBI rvbi = (RelationshipVersionBI) dcbm.getElementAt(i);
+                if (rvbi.getNid() == selectedItem.getNid()) {
                     selectedIdx = i;
-                    selectedItem = cvbi;
+                    selectedItem = rvbi;
                     break;
                 }
             }

@@ -20,11 +20,11 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import org.dwfa.ace.ACE;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 /**
  *
@@ -231,7 +231,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         return taskDetailUI.getTask(ec, vc);
     }
 
-    void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,
+    void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,
             List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
     }

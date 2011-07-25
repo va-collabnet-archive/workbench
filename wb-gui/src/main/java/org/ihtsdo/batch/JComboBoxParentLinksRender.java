@@ -29,11 +29,11 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
  *
  * @author marc
  */
-class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer {
+class JComboBoxParentLinksRender extends JLabel implements ListCellRenderer {
 
-    public JComboBoxExistingRefsetsRender() {
+    public JComboBoxParentLinksRender() {
         setOpaque(true);
-        setText("(add concept with to list)");
+        setText("(add concept to list)");
     }
 
     @Override

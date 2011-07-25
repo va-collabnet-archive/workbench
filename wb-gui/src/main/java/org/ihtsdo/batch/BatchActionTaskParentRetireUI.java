@@ -87,15 +87,15 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<ComponentVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
+        RelationshipVersionBI selectedItem = (RelationshipVersionBI) dcbm.getSelectedItem();
 
         // Sort existing parents by name.
-        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
+        Comparator<RelationshipVersionBI> cmp = new Comparator<RelationshipVersionBI>() {
 
             @Override // Comparator
-            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
+            public int compare(RelationshipVersionBI o1, RelationshipVersionBI o2) {
                 return o1.toUserString().compareToIgnoreCase(o2.toUserString());
             }
         };
@@ -103,8 +103,8 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
         // Add exitings parents to JComboBox model.
         Collections.sort(existingParents, cmp);
         dcbm.removeAllElements();
-        for (ComponentVersionBI componentVersionBI : existingParents) {
-            dcbm.addElement(componentVersionBI);
+        for (RelationshipVersionBI relationshipVersionBI : existingParents) {
+            dcbm.addElement(relationshipVersionBI);
         }
 
         if (dcbm.getSize() == 0) {
@@ -116,7 +116,7 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             // Search by nid
             int selectedIdx = -1;
             for (int i = 0; i < dcbm.getSize(); i++) {
-                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
+                RelationshipVersionBI cvbi = (RelationshipVersionBI) dcbm.getElementAt(i);
                 if (cvbi.getNid() == selectedItem.getNid()) {
                     selectedIdx = i;
                     selectedItem = cvbi;
