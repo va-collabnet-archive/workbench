@@ -21,6 +21,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -37,7 +38,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.ihtsdo.tk.spec.ConceptSpec;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
@@ -51,12 +51,11 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
-import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -65,6 +64,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.PathSpec;
 
 /**
@@ -90,12 +90,6 @@ public class LoadBdbMulti extends AbstractMojo {
      */
     private String[] rstaFileNames;
     /**
-     * workflow history text file to speed up lucene indexing.
-     * 
-     * @parameter
-     */
-    private String inputWfHxFilePath;
-    /**
      * Generated resources directory.
      * 
      * @parameter expression="${project.build.directory}/generated-resources"
@@ -108,12 +102,6 @@ public class LoadBdbMulti extends AbstractMojo {
      * @required
      */
     private File berkeleyDir;
-    /**
-     * Generated resources directory.
-     * 
-     * @parameter expression="${project.build.directory}/workflow"
-     */
-    private File wfLuceneDir;
     /**
      * 
      * @parameter default-value=true
@@ -159,10 +147,6 @@ public class LoadBdbMulti extends AbstractMojo {
 //            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
 //                    berkeleyDir);
 
-            if (inputWfHxFilePath != null) {
-                Bdb.allowWfLuceneSetup(true);
-            }
-
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
                 getLog().info("initialPaths: " + Arrays.asList(initialPaths));
@@ -174,7 +158,20 @@ public class LoadBdbMulti extends AbstractMojo {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
-                FileInputStream fis = new FileInputStream(conceptsFile);
+                // Can revert this part once wfHistory.jbin is worked out
+				FileInputStream  fis = null;
+				try {
+		            	fis = new FileInputStream(conceptsFile);
+				} catch (FileNotFoundException e) {
+					getLog().info("Could not locate eConcept file: " + conceptsFile.getAbsolutePath());	
+					
+					if (conceptsFile.getAbsolutePath().contains("wfHistory.jbin")) {
+						continue;
+					} else {
+						throw e;
+					}
+				}
+
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
@@ -572,11 +569,5 @@ public class LoadBdbMulti extends AbstractMojo {
     public void createLuceneIndices() throws Exception {
         LuceneManager.setLuceneRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
         LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
-
-        if (inputWfHxFilePath != null) {
-            LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-            WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
-            LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
-        }
     }
 }

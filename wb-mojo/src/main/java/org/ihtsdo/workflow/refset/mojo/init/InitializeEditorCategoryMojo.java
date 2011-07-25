@@ -9,10 +9,11 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -57,15 +58,17 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
 
     private static final int numberOfColumns = categoryPosition + 1;		// 3
 
+    private static ViewCoordinate viewCoord;
+    
    @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         System.setProperty("java.awt.headless", "true");
         String line = null;
-
+        
         try {
+            viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
-
         	BufferedReader inputFile = new BufferedReader(new FileReader(filePath));    	
 
         	while ((line = inputFile.readLine()) != null)
@@ -78,9 +81,9 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
 
         		if (columns.length == numberOfColumns)
         		{
-        			writer.setEditor(getEditor(columns[editorPosition]));
+        			writer.setEditor(getEditor(columns[editorPosition]).getVersion(viewCoord));
 	            	writer.setSemanticArea(columns[semanticAreaPosition]);
-	            	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[categoryPosition]));
+	            	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[categoryPosition], viewCoord));
 
 	            	writer.addMember();
         		} else if (reportErrors) {
@@ -102,7 +105,7 @@ public class InitializeEditorCategoryMojo extends AbstractMojo {
         this.targetDirectory = targetDirectory;
 	}
 
-    private I_GetConceptData getEditor(String editor) throws TerminologyException, IOException {
+    private ConceptVersionBI getEditor(String editor) throws TerminologyException, IOException {
     	return WorkflowHelper.lookupModeler(editor);
     }
 }

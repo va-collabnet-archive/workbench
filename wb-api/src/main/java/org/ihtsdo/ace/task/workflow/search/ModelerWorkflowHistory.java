@@ -3,23 +3,20 @@ package org.ihtsdo.ace.task.workflow.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.PrimordialId;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.ace.task.gui.component.WorkflowConceptVersion;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -33,7 +30,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
    /**
     * Property name for the Modeler being searched.
     */
-   private I_GetConceptData testModeler = null;
+   private WorkflowConceptVersion testModeler = null;
 
    private void writeObject(ObjectOutputStream out) throws IOException {
       out.writeInt(dataVersion);
@@ -47,7 +44,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
     	  Object obj = in.readObject();
     	  
           if (obj instanceof I_GetConceptData) {
-        	  this.testModeler = (I_GetConceptData) obj;
+        	  this.testModeler = (WorkflowConceptVersion) obj;
           } else {
         	  this.testModeler = null;
           }
@@ -56,16 +53,18 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
           {
             try 
             {
-               I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
+            	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            	
+            	ConceptVersionBI leadModeler = WorkflowHelper.getLeadModeler(vc);
 
-               if (leadModeler != null) {
-                  this.testModeler = WorkflowHelper.getLeadModeler();
-               } else {
-                  Iterator<String> itr = WorkflowHelper.getModelerKeySet().iterator();
-                  if (itr.hasNext()) {
-                     this.testModeler = WorkflowHelper.lookupModeler(itr.next());
-                  }
-               }
+            	if (leadModeler != null) {
+            		this.testModeler = new WorkflowConceptVersion(WorkflowHelper.getLeadModeler(vc));
+            	} else {
+            		Iterator<String> itr = WorkflowHelper.getModelerKeySet().iterator();
+            		if (itr.hasNext()) {
+            			this.testModeler = new WorkflowConceptVersion(WorkflowHelper.lookupModeler(itr.next()));
+            		}
+            	}
             } catch (Exception e) {
             	AceLog.getAppLog().log(Level.WARNING, "Error in initializing drop-down value", e);
             }
@@ -79,7 +78,7 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
            throws TaskFailedException {
 
       try {
-         UUID testUUID = validateModeler(testModeler);
+         UUID testUUID = testModeler.getPrimUuid();
 
          if (testUUID == null) {
             return false;
@@ -99,37 +98,13 @@ public class ModelerWorkflowHistory extends AbstractWorkflowHistorySearchTest {
       }
    }
 
-   public I_GetConceptData getTestModeler() {
+   public WorkflowConceptVersion getTestModeler() {
       return testModeler;
    }
 
-   public void setTestModeler(I_GetConceptData testModeler) {
+   public void setTestModeler(WorkflowConceptVersion testModeler) {
       this.testModeler = testModeler;
    }
-
-   private UUID validateModeler(I_GetConceptData mod) throws IOException, TerminologyException {
-      I_GetConceptData cap = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
-
-      final long pathNid = cap.getConceptAttributes().getPathNid();
-      final long relTypeNid = Terms.get().getConcept(PrimordialId.IS_A_REL_ID.getUids()).getConceptNid();
-      final long currentNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
-
-      for (I_RelVersioned version : cap.getDestRels()) {
-         List<? extends I_RelPart> parts = version.getMutableParts();
-         for (I_RelPart relAttrPart : parts) {
-            if ((relAttrPart.getPathNid() == pathNid)
-                    && (relAttrPart.getTypeNid() == relTypeNid)
-                    && (relAttrPart.getStatusNid() == currentNid)) {
-               if (Terms.get().getConcept(version.getC1Id()).getInitialText().equalsIgnoreCase(mod.getInitialText())) {
-                  return Terms.get().nidToUuid(version.getC1Id());
-               }
-            }
-         }
-      }
-
-      return null;
-   }
-   
 
    public UUID getCurrentTestUUID() throws TaskFailedException {
        return testModeler.getPrimUuid();

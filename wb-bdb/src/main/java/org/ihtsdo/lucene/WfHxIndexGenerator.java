@@ -27,6 +27,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -36,17 +38,19 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	private int memberCounter = 0;
 	private int refsetId = 0;
     private int feedbackInterval = 100;
+	private ViewCoordinate viewCoord;
 	private static File inputFile = null;
     private static Set<WorkflowHistoryJavaBean> wfHxJavaBeansToWrite  = new HashSet<WorkflowHistoryJavaBean>();
     private static Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap = new HashMap<UUID, WorkflowLuceneSearchResult>();
     private static SortedSet<String> semanticTags = null;
     
-	public WfHxIndexGenerator(IndexWriter writer) throws IOException, ParseException {
+	public WfHxIndexGenerator(IndexWriter writer, ViewCoordinate vc) throws IOException, ParseException {
 		super(writer);
 		WorkflowLuceneSearchResult vals = null;
-	
+		viewCoord = vc;
+		
 		try {
-        	initializeSemTags();
+        	initializeSemTags(vc);
 
         	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 	    	int searcherId = searcher.getRefsetNid();
@@ -72,7 +76,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					
 					if (curLastRow != null) {
 						if (!currentWfId.equals(wfId)) {
-							vals = new WorkflowLuceneSearchResult(curLastRow);
+							vals = new WorkflowLuceneSearchResult(curLastRow, viewCoord);
 							lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
 
 							curLastRow = row;
@@ -95,7 +99,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					}
 				}
 
-	            vals = new WorkflowLuceneSearchResult(curLastRow);
+	            vals = new WorkflowLuceneSearchResult(curLastRow, viewCoord);
 	            lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
 	        } else {
 				WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
@@ -131,23 +135,23 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		}
 	}
 
-	public static void initializeSemTags() {
+	public static void initializeSemTags(ViewCoordinate vc) {
 		if (semanticTags == null) {
 			try {
 				I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());
-		    	Set<I_GetConceptData> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept);
+
+				Set<ConceptVersionBI> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept.getVersion(vc));
 		    	semanticTags = new TreeSet<String>();
 		    	
-		    	for (I_GetConceptData con : semTagConcepts) {
-		    		// FSN & Pref Term Same Tag
-		    		String semTag = con.getDescriptions().iterator().next().getText();
+		    	for (ConceptVersionBI con : semTagConcepts) {
+		    		String semTag = con.getFullySpecifiedDescription().getText();
 		    		
 		    		semTag = WorkflowHelper.parseSpaces(semTag);
 		
 		    		semanticTags.add(semTag);
 		    	}
 			} catch (Exception e) {
-			    AceLog.getAppLog().info("Error initializing semantic tags for search with error,: " + e.getMessage());
+			    AceLog.getAppLog().info("Error initializing semantic tags for wf lucene index generator with error,: " + e.getMessage());
 			}
 		}
 	}

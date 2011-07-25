@@ -39,7 +39,6 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
-import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 
 /**
@@ -58,12 +57,6 @@ public class LoadBdb extends AbstractMojo {
 	 */
 	private String conceptsFileName;
 	/**
-     * workflow history text file to speed up lucene indexing.
-	 * 
-	 * @parameter 
-	 */
-	private String inputWfHxFilePath;
-	/**
 	 * Generated resources directory.
 	 * 
 	 * @parameter expression="${project.build.directory}/generated-resources"
@@ -78,12 +71,6 @@ public class LoadBdb extends AbstractMojo {
      */
     private File berkeleyDir;
     
-    /**
-     * Generated resources directory.
-     * 
-     * @parameter expression="${project.build.directory}/workflow"
-     */
-    private File wfLuceneDir;
     
 	/**
 	 * 
@@ -112,10 +99,6 @@ public class LoadBdb extends AbstractMojo {
 
 			FileIO.recursiveDelete(berkeleyDir);
             
-            if (inputWfHxFilePath != null) {
-            	Bdb.allowWfLuceneSetup(true);
-            }
-
 			Bdb.setup(berkeleyDir.getAbsolutePath());
 
 			FileInputStream fis = new FileInputStream(conceptsFile);
@@ -239,11 +222,5 @@ public class LoadBdb extends AbstractMojo {
     public void createLuceneIndices() throws Exception {
         LuceneManager.setLuceneRootDir(berkeleyDir, LuceneSearchType.DESCRIPTION);
         LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
-
-        if (inputWfHxFilePath != null) {
-        	LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-        	WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
-        	LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
-        }
     }
 }

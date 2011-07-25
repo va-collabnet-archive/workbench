@@ -71,6 +71,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.ClientException;
@@ -1366,42 +1367,42 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
 		return baseFrame.getWorkflowRoles();
 	}
 
 	@Override
-	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+	public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
 		baseFrame.setWorkflowRoles(roles);
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
 		return baseFrame.getWorkflowStates();
 	}
 
 	@Override
-	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+	public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
 		baseFrame.setWorkflowStates(states);
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
 		return baseFrame.getWorkflowActions();
 	}
 
 	@Override
-	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+	public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
 		baseFrame.setWorkflowActions(actions);
 	}
 
 	@Override
-	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+	public List<UUID> getAllAvailableWorkflowActionUids() {
 		return baseFrame.getAllAvailableWorkflowActionUids();
 	}
 
 	@Override
-	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+	public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
 		baseFrame.setAllAvailableWorkflowActionUids(actions);
 	}
 }

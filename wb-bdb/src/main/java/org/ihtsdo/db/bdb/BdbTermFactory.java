@@ -1557,7 +1557,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     new QueryParser(LuceneManager.version, "desc", new StandardAnalyzer(LuceneManager.version)).parse(query);
             if (LuceneManager.indexExists(LuceneSearchType.DESCRIPTION) == false) {
                 stringUpdater.setProgressInfo("Making lucene index -- this may take a while...");
-                LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION);
+                LuceneManager.createLuceneIndex(LuceneSearchType.DESCRIPTION, config.getViewCoordinate());
             }
             stringUpdater.setIndeterminate(true);
             stringUpdater.setProgressInfo("Starting StandardAnalyzer lucene query...");
@@ -1704,7 +1704,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
                     wfHxUpdater.setProgressInfo("Making lucene index -- this may take a while...");
                     WfHxIndexGenerator.setSourceInputFile(null);
-                    LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY);
+                    LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY, config.getViewCoordinate());
                 }
             }
 

@@ -2,22 +2,19 @@ package org.ihtsdo.ace.task.workflow.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.PrimordialId;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.ace.task.gui.component.WorkflowConceptVersion;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -33,7 +30,7 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
     /**
      * Property name for the Modeler being searched.
      */
-     private I_GetConceptData testModeler = null;
+     private WorkflowConceptVersion testModeler = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -41,23 +38,25 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException, TerminologyException {
         int objDataVersion = in.readInt();
         if (objDataVersion == 1) {
          Object obj = in.readObject();
-         if (obj instanceof I_GetConceptData) {
-          this.testModeler = (I_GetConceptData) obj;
+         if (obj instanceof WorkflowConceptVersion) {
+          this.testModeler = (WorkflowConceptVersion) obj;
          } else {
             this.testModeler = null;
          }
 			if (this.testModeler == null)
 			{
-				I_GetConceptData leadModeler = WorkflowHelper.getLeadModeler();
+				ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+				
+				ConceptVersionBI leadModeler = WorkflowHelper.getLeadModeler(vc);
 
 				if (leadModeler != null)
-					this.testModeler = WorkflowHelper.getLeadModeler();
+					this.testModeler = new WorkflowConceptVersion(leadModeler);
 				else
-					this.testModeler = WorkflowHelper.lookupModeler(WorkflowHelper.getModelerKeySet().iterator().next());
+					this.testModeler = new WorkflowConceptVersion(WorkflowHelper.lookupModeler(WorkflowHelper.getModelerKeySet().iterator().next()));
 			}
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -70,7 +69,7 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 			throws TaskFailedException {
 
     	 try {
-             UUID modUUID =  validateModeler(testModeler);
+             UUID modUUID =  testModeler.getPrimUuid();
 
 			 if (modUUID != null && getCurrent(wfHistory).getModeler().equals(modUUID))
 				return true;
@@ -101,40 +100,14 @@ public class ModelerLastWorkflowHistory extends AbstractWorkflowHistorySearchTes
 
 
 
-    public I_GetConceptData getTestModeler() {
+    public WorkflowConceptVersion getTestModeler() {
         return testModeler;
     }
 
-    public void setTestModeler(I_GetConceptData testModeler) {
+    public void setTestModeler(WorkflowConceptVersion testModeler) {
         this.testModeler = testModeler;
     }
 
-    private UUID validateModeler(I_GetConceptData mod) throws IOException, TerminologyException {
-		I_GetConceptData cap = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
-
-    	final long pathNid = cap.getConceptAttributes().getPathNid();
-    	final long relTypeNid = Terms.get().getConcept(PrimordialId.IS_A_REL_ID.getUids()).getConceptNid();
-    	final long currentNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getConceptNid();
-
-		for (I_RelVersioned version : cap.getDestRels())
-		{
-			List<? extends I_RelPart> parts = version.getMutableParts();
-			for (I_RelPart relAttrPart : parts)
-			{
-				if ((relAttrPart.getPathNid() == pathNid) &&
-					(relAttrPart.getTypeNid() == relTypeNid) &&
-					(relAttrPart.getStatusNid() == currentNid))
-				{
-					if (version.getC1Id() == mod.getConceptNid())
-					{
-						return Terms.get().nidToUuid(version.getC1Id());
-					}
-				}
-			}
-		}
-
-		return null;
-    }
 
     public UUID getCurrentTestUUID() throws TaskFailedException {
         return testModeler.getPrimUuid();

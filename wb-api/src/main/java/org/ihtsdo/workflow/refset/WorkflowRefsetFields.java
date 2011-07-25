@@ -1,14 +1,10 @@
 package org.ihtsdo.workflow.refset;
 
-import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter.WorkflowHistoryRSFields;
 
 
 
@@ -18,8 +14,8 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter.WorkflowHi
 * 
 */
 public abstract class WorkflowRefsetFields {
-	private I_GetConceptData referencedComponent = null;
 	private UUID referencedComponentUid = null;
+	private int referencedComponentNid = 0;
 	
 	public abstract String toString();
 	public abstract boolean valuesExist();
@@ -29,36 +25,21 @@ public abstract class WorkflowRefsetFields {
 		
 	}
 
-	public void setReferencedComponent(I_GetConceptData con) {
-		referencedComponent = con;
-		referencedComponentUid = con.getPrimUuid();
-	}
-
-	public void setReferencedComponentId(UUID refCompId) {
-		referencedComponentUid = refCompId;
-		
+	public void setReferencedComponentUid(UUID uid) {
+		referencedComponentUid = uid;
 		try {
-			referencedComponent = Terms.get().getConcept(refCompId);
+			referencedComponentNid = Terms.get().uuidToNative(uid);
 		} catch (Exception e) {
-			referencedComponent = null;
 		}
 	}
 
-	public void setReferencedComponentUid(UUID uid) {
-		setReferencedComponentId(uid);
-	}
 
-
-	public I_GetConceptData getReferencedComponent() {
-		return referencedComponent;
-	}
-
-	public UUID getReferencedComponentId() {
+	public UUID getReferencedComponentUid() {
 		return referencedComponentUid;
 	}
-	
-	public UUID getReferencedComponentUid() {
-		return getReferencedComponentId();
+
+	public int getReferencedComponentNid() {
+		return referencedComponentNid;
 	}
-	
+
 }

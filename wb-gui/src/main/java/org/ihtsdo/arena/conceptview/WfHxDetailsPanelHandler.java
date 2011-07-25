@@ -14,6 +14,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.WfHxDetailsPanel;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 
 public class WfHxDetailsPanelHandler {
@@ -22,6 +23,7 @@ public class WfHxDetailsPanelHandler {
 	private ConceptViewSettings conceptSettings;
     private WfHxDetailsPanel detailsPanel;
 	private WfHxDetailsConceptChangeListener currentListener;
+	private ViewCoordinate viewCoord;
     
 	public class WfHxDetailsConceptChangeListener implements PropertyChangeListener {
 
@@ -46,6 +48,7 @@ public class WfHxDetailsPanelHandler {
     	conceptSettings = settings;
 		currentListener = new WfHxDetailsConceptChangeListener();
 		conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+		viewCoord = settings.getConfig().getViewCoordinate();
 
     }
 	public void showWfHxDetailsPanel(I_GetConceptData concept) {
@@ -74,7 +77,7 @@ public class WfHxDetailsPanelHandler {
 	}
 
     private void createNewWfPanel() {
-        detailsPanel = new WfHxDetailsPanel(conceptSettings);
+        detailsPanel = new WfHxDetailsPanel(conceptSettings, viewCoord);
         detailsPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
         detailsPanel.setOpaque(true);
     }

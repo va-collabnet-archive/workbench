@@ -1,15 +1,11 @@
 package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetReader;
 
@@ -107,9 +103,9 @@ public  class WorkflowHistoryRefsetReader extends WorkflowRefsetReader
 		}
 	}
 	
-	public String processMetaForDisplay(I_GetConceptData metaCon) throws IOException {
+	public String processMetaForDisplay(I_GetConceptData metaCon, ViewCoordinate vc) throws IOException {
 		try {
-			String term = WorkflowHelper.getPreferredTerm(metaCon);
+			String term = WorkflowHelper.identifyPrefTerm(metaCon.getConceptNid(), vc);
 			
 			if (term.contains(" Workflow ")) {
 				term = WorkflowHelper.shrinkTermForDisplay(term);

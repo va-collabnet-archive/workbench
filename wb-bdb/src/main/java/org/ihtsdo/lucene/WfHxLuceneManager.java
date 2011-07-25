@@ -12,7 +12,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
 
@@ -25,7 +25,7 @@ public class WfHxLuceneManager extends LuceneManager {
 	private static int matchLimit = 0;
 	private static UUID workflowIdToUpdate = null;
 
-	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans) throws CorruptIndexException, IOException {
+	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws CorruptIndexException, IOException {
         int idx = beans.size() - 1;
 
         if (workflowIdToUpdate == null) {
@@ -48,7 +48,7 @@ public class WfHxLuceneManager extends LuceneManager {
 			if (idx >= 0) {
 	            WorkflowHistoryJavaBean lastBean = ((WorkflowHistoryJavaBean)beans.toArray()[idx]);
 	            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
-	            WfHxIndexGenerator.initializeSemTags();
+	            WfHxIndexGenerator.initializeSemTags(viewCoord);
 
 	            for (WorkflowHistoryJavaBean bean : beans) {
 			        writerCopy.addDocument(WfHxIndexGenerator.createDoc(bean, vals));

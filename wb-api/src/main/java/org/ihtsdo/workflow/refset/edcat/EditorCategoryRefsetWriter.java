@@ -2,13 +2,10 @@ package org.ihtsdo.workflow.refset.edcat;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.WorkflowRefset;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
@@ -27,41 +24,35 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
-		((EditorCategoryRSFields)fields).setReferencedComponentUid(uid);
+		((EditorCategoryRSFields)fields).setEditor(uid);
 	}
 	
-	public void setEditor(I_GetConceptData user) {
+	public void setEditor(ConceptVersionBI user) {
 		setReferencedComponentId(user.getPrimUuid());
 	}
 
+	public UUID getReferencedComponentUid() {
+		return ((EditorCategoryRSFields)fields).getEditor();
+	}
+
+	public UUID getEditorUid() {
+		return getReferencedComponentUid();
+	}
+	
+	public String getSemanticArea() {
+		return ((EditorCategoryRSFields)fields).getSemanticArea();
+	}
+	
 	public void setSemanticArea(String area) {
 		((EditorCategoryRSFields)fields).setSemanticArea(area);
 	}	
 	
-	public void setCategory(I_GetConceptData category) {
-		((EditorCategoryRSFields)fields).setCategory(category);
-	}
-	
-	public UUID getReferencedComponentUid() {
-		return ((EditorCategoryRSFields)fields).getReferencedComponentId();
-	}
-
-	public I_GetConceptData getEditor() {
-		try {
-			return Terms.get().getConcept(getReferencedComponentUid());
-		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the EditorCategory Refset");
-		}
-		
-		return null;
-	}
-
-	public I_GetConceptData getCategory() {
+	public UUID getCategoryUid() {
 		return ((EditorCategoryRSFields)fields).getCategory();
 	}
 
-	public String getSemanticArea() {
-		return ((EditorCategoryRSFields)fields).getSemanticArea();
+	public void setCategory(ConceptVersionBI category) {
+		((EditorCategoryRSFields)fields).setCategory(category);
 	}
 
 	
@@ -70,62 +61,40 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 	public class EditorCategoryRSFields extends WorkflowRefsetFields
 	{
 		private String semanticArea = null;
-		private I_GetConceptData editorCategory = null;
+		private UUID editorCategory = null;
+
+		private void setEditor(UUID editor) {
+			setReferencedComponentUid(editor);
+		}
+				
+		public UUID getEditor() {
+			return getReferencedComponentUid();
+		}
 
 		private void setSemanticArea(String area) {
 			semanticArea = area;
-		}
-
-		private void setCategory(I_GetConceptData category) {
-			editorCategory = category;
-		}
-		
-		public void setReferencedComponentUid(UUID uid) {
-			try {
-				setReferencedComponentId(uid);
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid);
-			}
-		}
-		
-		private void setEditor(I_GetConceptData editor) {
-			setReferencedComponentUid(editor.getPrimUuid());
-		}
-				
-		public I_GetConceptData getReferencedComponent() {
-			try {
-				return Terms.get().getConcept(getReferencedComponentId());
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId");
-			}
-			
-			return null;
-		}
-		
-		public UUID getReferencedComponentUid() {
-			return getReferencedComponentId();
-		}
-		
-		public I_GetConceptData getEditor() {
-			return getReferencedComponent();
 		}
 		
 		private String getSemanticArea() {
 			return semanticArea;
 		}
 		
-		private I_GetConceptData getCategory() {
+		private void setCategory(ConceptVersionBI category) {
+			editorCategory = category.getPrimUuid();
+		}
+		
+		private UUID getCategory() {
 			return editorCategory;
 		}
 		
 		public String toString() {
 			try {
-				return "\nReferenced Component Id(Editor SCT) = " + getReferencedComponent().getInitialText() + 
-					   "(" + getReferencedComponent().getConceptNid() + ")" +
+				return "\nReferenced Component Id(Editor SCT) = " + Terms.get().getConcept(getReferencedComponentUid()).getInitialText() + 
+					   "(" + getReferencedComponentUid() + ")" +
 					   "\nSemantic Area = " + semanticArea +
-					   "\nEditor Category = " + editorCategory.getInitialText() +
-					   "(" + editorCategory.getConceptNid() + ")";
-			} catch (IOException io) {
+					   "\nEditor Category = " + Terms.get().getConcept(editorCategory).getInitialText() +
+					   "(" + editorCategory + ")";
+			} catch (Exception io) {
 				return "Failed to identify referencedComponentId or editorCategory" + 
 					   "\nError msg: " + io.getMessage();
 			}
@@ -140,7 +109,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			boolean retVal =  ((getReferencedComponentId() != null) && 
+			boolean retVal =  ((getReferencedComponentUid() != null) && 
 					(semanticArea != null) && (semanticArea.length() > 0) && 
 					(editorCategory != null));
 			
@@ -148,7 +117,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 			{
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to Editor Category Refset");
-				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nReferencedComponentId:" + getReferencedComponentUid());
 				str.append("\nsemanticArea:" + semanticArea);
 				str.append("\neditorCategory:" + editorCategory);
 			}
@@ -162,7 +131,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 		return "<properties>\n" +
 				   	"<property>\n" +
 				   		"<key>editorCategory</key>" +
-				   		"<value>" + getCategory().getPrimUuid() + "</value>" +
+				   		"<value>" + getCategoryUid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 			   		"<key>semanticArea</key>" +

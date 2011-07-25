@@ -213,18 +213,19 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	@Override
 	public String getModelerForTitleBar() throws IOException{
 		try { 
-			return WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getModeler()));
+//			return WorkflowHelper.identifyPrefTerm(getModeler(), ));
 		} catch (Exception e) {
 			throw new IOException(e);
 		}
+		return "";
 	}
 
 	@Override
 	public String getStateForTitleBar() throws IOException{
 		try {
-			String term = WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getState()));
+//			String term = WorkflowHelper.getPreferredTerm(Terms.get().getConcept(getState()));
 			
-			return WorkflowHelper.shrinkTermForDisplay(term);
+			return WorkflowHelper.shrinkTermForDisplay("");
 		} catch (Exception e) {
 			throw new IOException(e);
 		}

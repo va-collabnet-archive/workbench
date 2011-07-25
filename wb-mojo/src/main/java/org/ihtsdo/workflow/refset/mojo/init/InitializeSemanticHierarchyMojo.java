@@ -18,7 +18,7 @@ import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
  * @requiresDependencyResolution compile
  */ 
 
-public class InitializeSemanticAreaHierarchyMojo extends AbstractMojo {
+public class InitializeSemanticHierarchyMojo extends AbstractMojo {
 
     /**
      * The name of the database to create. All sql inserts will be against this

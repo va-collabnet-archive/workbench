@@ -14,6 +14,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -35,24 +37,24 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 	}
 
 	// From Category and InitialState
-	public Map<I_GetConceptData, I_GetConceptData> searchForPossibleActionsAndFinalStates(int categoryNid, int testInitialState) throws Exception 
+	public Map<UUID, UUID> searchForPossibleActionsAndFinalStates(int categoryNid, int testInitialState, ViewCoordinate vc) throws Exception 
 	{
-		Map<I_GetConceptData, I_GetConceptData> results = new HashMap<I_GetConceptData, I_GetConceptData> ();
+		Map<UUID, UUID> results = new HashMap<UUID, UUID> ();
 		I_ExtendByRefPartStr props = null;
 		List<? extends I_ExtendByRef> l = null;
 
-		String categoryString = Terms.get().getConcept(categoryNid).getInitialText();
+		String categoryString = WorkflowHelper.identifyPrefTerm(categoryNid, vc);
 		int categoryIndex = categoryString.length() - 1;
 		UUID allRoleUid = ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_ALL.getPrimoridalUid();
 
-		for (I_GetConceptData role : Terms.get().getActiveAceFrameConfig().getWorkflowRoles())
+		for (ConceptVersionBI role : Terms.get().getActiveAceFrameConfig().getWorkflowRoles())
 		{
-			int roleIndex = role.getInitialText().length() - 1;
+			int roleIndex = role.getPreferredDescription().getText().length() - 1;
 			
 			// TODO
 			// If ALL or Last Letter of Action (A,B,C,D) is less or equal than Last Letter of CategoryNid (A,B,C,D)  
 			if (allRoleUid.equals(role.getPrimUuid()) ||
-				(role.getInitialText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
+				(role.getPreferredDescription().getText().charAt(roleIndex) <= categoryString.charAt(categoryIndex)))
 			{
 				l = Terms.get().getRefsetExtensionsForComponent(refsetNid,  role.getConceptNid());
 				results.putAll(findPossibleActions(l, testInitialState));
@@ -62,9 +64,9 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		return results;
 	}
 	
-	private Map<I_GetConceptData, I_GetConceptData> findPossibleActions(List<? extends I_ExtendByRef> l, int matchInitialStateNid) 
+	private Map<UUID, UUID> findPossibleActions(List<? extends I_ExtendByRef> l, int matchInitialStateNid) 
 	{
-		Map<I_GetConceptData, I_GetConceptData> results = new HashMap<I_GetConceptData, I_GetConceptData> ();
+		Map<UUID, UUID> results = new HashMap<UUID, UUID> ();
 		I_ExtendByRefPartStr props = null;
 
 		try {
@@ -86,14 +88,14 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 						addAutoApproval = false;
 					}
 					
-					results.put(action, finalState);
+					results.put(action.getPrimUuid(), finalState.getPrimUuid());
 				}
 			}
 
 			if (addAutoApproval) {
 				I_GetConceptData action = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid());
 				I_GetConceptData state = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid());
-				results.put(action,state);
+				results.put(action.getPrimUuid(),state.getPrimUuid());
             }
 		} catch (Exception e) {
 			StringBuffer str = new StringBuffer();

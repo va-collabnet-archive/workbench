@@ -18,16 +18,16 @@ package org.ihtsdo.ace.task.gui.component;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WorkflowStateEditor extends AbstractComboEditor {
@@ -35,19 +35,20 @@ public class WorkflowStateEditor extends AbstractComboEditor {
     @Override
     public EditorComponent setupEditor() {
     	//Sort the list by name
-    	LinkedList<I_GetConceptData> states = new LinkedList<I_GetConceptData>();
+    	WorkflowConceptCollection states = new WorkflowConceptCollection();
 
     	try {
-    		for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
+    		TreeSet<? extends ConceptVersionBI> allStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
+    		for (ConceptVersionBI state : allStates)
     		{
-				List<I_RelVersioned> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+				List<RelationshipVersionBI> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 
 				boolean foundUseCase = false;
 				{
-					for (I_RelVersioned rel : useCaseRels)
+					for (RelationshipVersionBI rel : useCaseRels)
 					if (rel != null &&
-					    (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid() ||
-						 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))
+					    (rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid() ||
+						 rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))
 						foundUseCase = true;
 				}
 
@@ -58,7 +59,7 @@ public class WorkflowStateEditor extends AbstractComboEditor {
 			AceLog.getAppLog().log(Level.WARNING, "Couldn't Set up State Editor Constraint", e);
 		}
     	
-    	EditorComponent ec = new EditorComponent(states.toArray());
+    	EditorComponent ec = new EditorComponent(states.getElements());
     	
 
     	Dimension d = ec.getPreferredSize();

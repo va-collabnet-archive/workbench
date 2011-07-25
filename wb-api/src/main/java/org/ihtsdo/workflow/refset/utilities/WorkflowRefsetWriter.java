@@ -42,8 +42,8 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
 
-				I_ExtendByRef ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponent().getConceptNid(),
-																		REFSET_TYPES.STR, propMap, UUID.randomUUID());
+				I_ExtendByRef ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+			
 				Terms.get().addUncommitted(ref);
 			} 
 		} catch (Exception io) {
@@ -62,10 +62,10 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
 			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				I_ExtendByRef ref = helper.getRefsetExtension(refsetNid, fields.getReferencedComponent().getConceptNid(), propMap);
-				retVal = helper.retireRefsetStrExtension(refsetNid, 
-														 fields.getReferencedComponent().getConceptNid(), 
-														 propMap);
+				I_ExtendByRef ref = helper.getRefsetExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+
+				retVal = helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+				
 				Terms.get().addUncommitted(ref);
 			}
 		} catch (Exception io) {

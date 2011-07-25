@@ -18,7 +18,7 @@ public  class SemanticHierarchyRefsetReader extends WorkflowRefsetReader
 {
 	public SemanticHierarchyRefsetReader() throws TerminologyException, IOException
 	{
-		super(semanticAreaConcept);
+		super(semanticHierarchyConcept);
 	}
 /*
  * 	"<properties>\n" +

@@ -8,8 +8,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
-import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter.EditorCategoryRSFields;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
 
@@ -32,132 +32,126 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 	public void setCategory(I_GetConceptData category) {
 		setReferencedComponentId(category.getPrimUuid());
 	}
+
+	public void setCategory(ConceptVersionBI category) {
+		setReferencedComponentId(category.getPrimUuid());
+	}
+
+	public UUID getReferencedComponentUid() {
+		return ((StateTransitionRSFields)fields).getReferencedComponentUid();
+	}
+	
+	public UUID getCategoryUid() {
+		return getReferencedComponentUid();
+	}
+
+	
 	
 	public void setWorkflowType(I_GetConceptData type) {
-		((StateTransitionRSFields)fields).setWorkflowType(type);
+		((StateTransitionRSFields)fields).setWorkflowType(type.getPrimUuid());
 	}
 
 	public void setInitialState(I_GetConceptData state) {
-		((StateTransitionRSFields)fields).setInitialState(state);
+		((StateTransitionRSFields)fields).setInitialState(state.getPrimUuid());
 	}
 
 	public void setAction(I_GetConceptData action) {
-		((StateTransitionRSFields)fields).setAction(action);
+		((StateTransitionRSFields)fields).setAction(action.getPrimUuid());
 	}
 
 	public void setFinalState(I_GetConceptData state) {
-		((StateTransitionRSFields)fields).setFinalState(state);
-	}
-	
-	public UUID getReferencedComponentUid() {
-		return ((StateTransitionRSFields)fields).getReferencedComponentId();
+		((StateTransitionRSFields)fields).setFinalState(state.getPrimUuid());
 	}
 
-	public I_GetConceptData getCategory() {
-		try {
-			return Terms.get().getConcept(getReferencedComponentUid());
-		} catch (Exception e) {
-	    	AceLog.getAppLog().log(Level.SEVERE, "Unable to get the Category (refCompId) from the StateTransitionRefset with error: " + e.getMessage()); 
-		}
-		
-		return null;
+	public void setWorkflowType(ConceptVersionBI type) {
+		((StateTransitionRSFields)fields).setWorkflowType(type.getPrimUuid());
 	}
 
-	public I_GetConceptData getWorkflowType() {
+	public void setInitialState(ConceptVersionBI state) {
+		((StateTransitionRSFields)fields).setInitialState(state.getPrimUuid());
+	}
+
+	public void setAction(ConceptVersionBI action) {
+		((StateTransitionRSFields)fields).setAction(action.getPrimUuid());
+	}
+
+	public void setFinalState(ConceptVersionBI state) {
+		((StateTransitionRSFields)fields).setFinalState(state.getPrimUuid());
+	}
+
+	public UUID getWorkflowTypeUid() {
 		return ((StateTransitionRSFields)fields).getWorkflowType();
 	}
 
-	public I_GetConceptData getInitialState() {
+	public UUID getInitialStateUid() {
 		return ((StateTransitionRSFields)fields).getInitialState();
 	}
 
-	public I_GetConceptData getAction() {
+	public UUID getActionUid() {
 		return ((StateTransitionRSFields)fields).getAction();
 	}
 
-	public I_GetConceptData getFinalState() {
+	public UUID getFinalStateUid() {
 		return ((StateTransitionRSFields)fields).getFinalState();
 	}
 
 	private class StateTransitionRSFields extends WorkflowRefsetFields {
-		private I_GetConceptData workflowType = null;
-		private I_GetConceptData initialState = null;
-		private I_GetConceptData action = null;
-		private I_GetConceptData finalState = null;
+		private UUID workflowType = null;
+		private UUID initialState = null;
+		private UUID action = null;
+		private UUID finalState = null;
 		 		
-		public void setReferencedComponentUid(UUID uid) {
-			try {
-				setReferencedComponentId(uid);
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid + " with error: " + e.getMessage());
-			}
-		}
-		
-		public void setCategoryUid(UUID uid) {
+		public void setCategory(UUID uid) {
 			setReferencedComponentUid(uid);
 		}
 		
 
-		private void setWorkflowType(I_GetConceptData type) {
+		private void setWorkflowType(UUID type) {
 			workflowType = type;
 		}
 
-		private void setInitialState(I_GetConceptData state) {
+		private void setInitialState(UUID state) {
 			initialState = state;
 		}
 
-		private void setAction(I_GetConceptData a) {
+		private void setAction(UUID a) {
 			action = a;
 		}
 
-		private void setFinalState(I_GetConceptData state) {
+		private void setFinalState(UUID state) {
 			finalState = state;
 		}
-		
-		public I_GetConceptData getReferencedComponent() {
-			try {
-				return Terms.get().getConcept(getReferencedComponentId());
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId with error: " + e.getMessage());
-			}
-			
-			return null;
+
+		public UUID getCategory() {
+			return getReferencedComponentUid();
 		}
 		
-		public UUID getReferencedComponentUid() {
-			return getReferencedComponentId();
-		}
-		
-		public I_GetConceptData getCategory() {
-			return getReferencedComponent();
-		}
-		
-		private I_GetConceptData getAction() {
+		private UUID getAction() {
 			return action;
 		}
 
-		private I_GetConceptData getFinalState() {
+		private UUID getFinalState() {
 			return finalState;
 		}
 		
-		private I_GetConceptData getWorkflowType() {
+		private UUID getWorkflowType() {
 			return workflowType;
 		}
 
-		private I_GetConceptData getInitialState() {
+		private UUID getInitialState() {
 			return initialState;
 		}
 
 
 		public String toString() {
 			try {
-				I_GetConceptData con = Terms.get().getConcept(getReferencedComponentId());
+				I_GetConceptData con = Terms.get().getConcept(getReferencedComponentUid());
 				return "\nReferenced Component Id (Editor Category) = " + con.getInitialText() + 
 					   "(" + con.getConceptNid() + ")" +
-					   "\nWorkflow Type = " + workflowType.getInitialText() +
-					   "\nInitial State = " + initialState.getInitialText() +
-					   "\nAction = " + action.getInitialText() +
-					   "\nFinal State= " + finalState.getInitialText();
+					   "\nWorkflow Type = " + Terms.get().getConcept(workflowType).getInitialText() +
+					   "\nInitial State = " + Terms.get().getConcept(initialState).getInitialText() +
+					   "\nAction = " + Terms.get().getConcept(action).getInitialText() +
+					   "\nFinal State= " + Terms.get().getConcept(finalState).getInitialText();
 			} catch (Exception e) {
 		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to identify the relCompId of the row with error: " + e.getMessage());
 				return ""; 
@@ -174,7 +168,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			boolean retVal = ((getReferencedComponentId() != null) && 
+			boolean retVal = ((getReferencedComponentUid() != null) && 
 					(initialState != null) &&  
 					(action != null) &&  
 					(finalState != null));
@@ -183,7 +177,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 			{
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to State Transition Refset");
-				str.append("\nReferencedComponentId:" + getReferencedComponentId());
+				str.append("\nReferencedComponentId:" + getReferencedComponentUid());
 				str.append("\ninitialState:" + initialState);
 				str.append("\naction:" + action);
 				str.append("\nfinalState:" + finalState);
@@ -198,19 +192,19 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		return  "<properties>\n" +
 				   	"<property>\n" +
 				   		"<key>workflowType</key>" +
-				   		"<value>" + getWorkflowType().getPrimUuid() + "</value>" +
+				   		"<value>" + getWorkflowTypeUid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 			   			"<key>initialState</key>" +
-			   			"<value>" + getInitialState().getPrimUuid() + "</value>" +
+			   			"<value>" + getInitialStateUid() + "</value>" +
 			   		"</property>" + 
 					   	"<property>" +
 				   		"<key>action</key>" +
-				   		"<value>" + getAction().getPrimUuid() + "</value>" +
+				   		"<value>" + getActionUid() + "</value>" +
 				   	"</property>" + 
 				   	"<property>" +
 				   		"<key>finalState</key>" +
-				   		"<value>" + getFinalState().getPrimUuid() + "</value>" +
+				   		"<value>" + getFinalStateUid() + "</value>" +
 				   	"</property>" +
 				"</properties>"; 
 	}

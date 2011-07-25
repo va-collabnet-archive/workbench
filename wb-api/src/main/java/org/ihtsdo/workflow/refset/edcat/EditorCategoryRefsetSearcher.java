@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.WorkflowRefset;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
@@ -36,25 +37,25 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		reader = new EditorCategoryRefsetReader();
 	}
 
-	public boolean isAutomaticApprovalAvailable(I_GetConceptData modeler) throws NumberFormatException, TerminologyException, IOException, Exception {
+	public boolean isAutomaticApprovalAvailable(ConceptVersionBI modeler, ViewCoordinate vc) throws NumberFormatException, TerminologyException, IOException, Exception {
 		// Get Editor Categories
 		for (String prop : searchForEditorCategoryListByModeler(modeler))
 		{
 			I_GetConceptData val = reader.getEditorCategory(prop);
 
-			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(val, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
+			List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(val.getVersion(vc), ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
 
-			for (I_RelVersioned rel : relList)
+			for (RelationshipVersionBI rel : relList)
 			{
 				if (rel != null &&
-					rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())
+					rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())
 						return true;
 			}
 		}
 
 		return false;
 	}
-	public I_GetConceptData searchForCategoryForConceptByModeler(I_GetConceptData modeler, I_GetConceptData con) throws Exception
+	public ConceptVersionBI searchForCategoryForConceptByModeler(ConceptVersionBI modeler, ConceptVersionBI concept, ViewCoordinate vc) throws Exception
 	{
 		// Get Editor Categories
 		Set<String> currentModelerPropertySet = searchForEditorCategoryListByModeler(modeler);
@@ -62,18 +63,18 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		if (currentModelerPropertySet.isEmpty()) {
             return null;
         } else if (currentModelerPropertySet.size() == 1) {
-			String editorCategory = reader.getEditorCategory(currentModelerPropertySet.iterator().next()).getInitialText();
-			return WorkflowHelper.lookupRoles(editorCategory);
+			String editorCategory = WorkflowHelper.identifyPrefTerm(reader.getEditorCategory(currentModelerPropertySet.iterator().next()).getConceptNid(), vc);
+			return WorkflowHelper.lookupRoles(editorCategory, vc);
 		}
 		else
 		{
 			SemanticHierarchyRefsetSearcher searcher = new SemanticHierarchyRefsetSearcher();
 
 			// Transform editor category list into a map of tags-to-categories
-			Map<String, I_GetConceptData> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet);
+			Map<String, ConceptVersionBI> hierarchyToCategoryMap = getHierarchyToCategoryMap(currentModelerPropertySet, vc);
 
 			// Find Tag
-			String tag = searcher.getConceptHierarchyTagFromEditorCategoryTags(con, hierarchyToCategoryMap.keySet());
+			String tag = searcher.getConceptHierarchyTagFromEditorCategoryTags(concept, hierarchyToCategoryMap.keySet());
 
 			// Find category
 			return identifyModelerCategoryFromTag(hierarchyToCategoryMap, tag);
@@ -81,8 +82,8 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 	}
 
-	private I_GetConceptData identifyModelerCategoryFromTag(Map<String, I_GetConceptData> hierarchyToCategoryMap, String tag) throws Exception {
-		I_GetConceptData category = null;
+	private ConceptVersionBI identifyModelerCategoryFromTag(Map<String, ConceptVersionBI> hierarchyToCategoryMap, String tag) throws Exception {
+		ConceptVersionBI category = null;
 
 
 		for (String key : hierarchyToCategoryMap.keySet()) {
@@ -98,19 +99,19 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 		return category;
 	}
-	private Map<String, I_GetConceptData> getHierarchyToCategoryMap(Set<String> set) throws Exception {
-		Map<String, I_GetConceptData> results = new HashMap<String, I_GetConceptData>();
+	private Map<String, ConceptVersionBI> getHierarchyToCategoryMap(Set<String> set, ViewCoordinate vc) throws Exception {
+		Map<String, ConceptVersionBI> results = new HashMap<String, ConceptVersionBI>();
 
 		for (String props : set) {
 			String key = reader.getSemanticTag(props);
 			I_GetConceptData val = reader.getEditorCategory(props);
-			results.put(key, val);
+			results.put(key, val.getVersion(vc));
 		}
 
 		return results;
 	}
 
-	private Set<String> searchForEditorCategoryListByModeler(I_GetConceptData modeler) throws Exception
+	private Set<String> searchForEditorCategoryListByModeler(ConceptVersionBI modeler) throws Exception
 	{
       if (modeler == null) {
          return new HashSet<String>();

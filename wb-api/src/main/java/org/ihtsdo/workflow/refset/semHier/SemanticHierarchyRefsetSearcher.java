@@ -8,12 +8,11 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -25,20 +24,18 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 */
 public  class SemanticHierarchyRefsetSearcher extends WorkflowRefsetSearcher 
 {
-	private static int currentStatusNid = 0;
 	private SemanticHierarchyRefsetReader reader = null;
 	
 	public SemanticHierarchyRefsetSearcher()
 			throws TerminologyException, IOException 
 	{
-		super(semanticAreaConcept);
+		super(semanticHierarchyConcept);
 		reader = new SemanticHierarchyRefsetReader();
-		currentStatusNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getNid();	
 	}
 
-	public String getConceptHierarchyTagFromEditorCategoryTags(I_GetConceptData con, Set<String> possibleTags) throws Exception {
+	public String getConceptHierarchyTagFromEditorCategoryTags(ConceptVersionBI concept, Set<String> possibleTags) throws Exception {
 		try {
-			String semTag = WorkflowHelper.parseSemanticTag(con);
+			String semTag = WorkflowHelper.parseSemanticTag(concept);
 		
 			return findFirstTag(semTag, possibleTags);
 		} catch (Exception e) {

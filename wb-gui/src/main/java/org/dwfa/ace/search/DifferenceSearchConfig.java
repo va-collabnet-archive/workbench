@@ -69,6 +69,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.ClientException;
@@ -1241,43 +1242,43 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
 		return frameConfig.getWorkflowRoles();
 	}
 
 	@Override
-	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+	public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
 		frameConfig.setWorkflowRoles(roles);
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
 		return frameConfig.getWorkflowStates();
 	}
 
 	@Override
-	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+	public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
 		frameConfig.setWorkflowStates(states);
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
 		return frameConfig.getWorkflowActions();
 	}
 
 	@Override
-	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+	public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
 		frameConfig.setWorkflowActions(actions);
 	}
 
 
 	@Override
-	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+	public List<UUID> getAllAvailableWorkflowActionUids() {
 		return frameConfig.getAllAvailableWorkflowActionUids();
 	}
 
 	@Override
-	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+	public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
 		frameConfig.setAllAvailableWorkflowActionUids(actions);
 	}
 }

@@ -18,30 +18,37 @@ package org.ihtsdo.ace.task.gui.component;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.util.LinkedList;
+import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 
 public class WorkflowActionEditor extends AbstractComboEditor {
 
-    @Override
+    private ViewCoordinate vc;
+	private TreeSet<? extends ConceptVersionBI> actions;
+
+	@Override
     public EditorComponent setupEditor() {
     	//Sort the list by name
-    	LinkedList<I_GetConceptData> editors = new LinkedList<I_GetConceptData>();
-    	
+		WorkflowConceptCollection editors = new WorkflowConceptCollection();
+
     	try {
-			for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions()) 
+        	actions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();
+			
+        	for (ConceptVersionBI action : actions) {
 				editors.add(action);
+			}
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Couldn't Set up Action Editor Constraint", e);
 		}
 
-    	EditorComponent ec = new EditorComponent(editors.toArray());
+    	EditorComponent ec = new EditorComponent(editors.getElements());
 
     	Dimension d = ec.getPreferredSize();
     	d.width = 275;

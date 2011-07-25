@@ -45,6 +45,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -75,15 +76,15 @@ public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest
     @Override
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException 
     {
-    	WorkflowHelper wfHelper = new WorkflowHelper();
-        
     	try 
         {
-    		WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+
+        	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
     		
     		if (latestBean == null ||
-    			!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()))) {
-    			wfHelper.initializeWorkflowForConcept(concept, false);
+    			!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc))) {
+    			WorkflowHelper.initializeWorkflowForConcept(concept, false);
     		}
         }
     		catch (Exception e) {

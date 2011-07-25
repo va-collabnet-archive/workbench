@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -38,6 +37,8 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -80,15 +81,16 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
     {
     	String line = "";
         I_TermFactory tf = Terms.get();
-    	
+        
     	 try {
-             HashMap<String, I_GetConceptData> modelers = new HashMap<String, I_GetConceptData>();
+    	     ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
+             HashMap<String, ConceptVersionBI> modelers = new HashMap<String, ConceptVersionBI>();
              EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
              File f= new File("workflow/userPermissionRefset.txt");
 
          	 BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
 
-          	 WorkflowHelper.updateModelers();
+          	 WorkflowHelper.updateModelers(vc);
              modelers = WorkflowHelper.getModelers();
 
 
@@ -113,7 +115,7 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
              	writer.setEditor(modelers.get(columns[0]));
              	writer.setSemanticArea(columns[1]);
 
-             	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2]));
+             	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2], vc));
              	writer.addMember();
              };
 

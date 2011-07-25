@@ -2,11 +2,9 @@ package org.ihtsdo.workflow.refset.semTag;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -20,6 +18,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 */
 public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter 
 {
+	// Immutable refCompId
 	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAG_UUID_REL.getUids());
 
 	public SemanticTagsRefsetWriter() throws IOException, TerminologyException {
@@ -28,25 +27,25 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
-		((SemanticTagRSFields)fields).setReferencedComponentUid(uid);
+		setReferencedComponentId(uid);
 	}
 	
 	public UUID getReferencedComponentUid() {
-		return ((SemanticTagRSFields)fields).getReferencedComponentId();
+		return getReferencedComponentUid();
 	}
 
 	public void setSemanticTag(String semTag) {
 		((SemanticTagRSFields)fields).setSemanticTag(semTag);
 	}
 	
-	public void setUUID(String uid) {
-		((SemanticTagRSFields)fields).setUid(uid);
-	}
-	
 	public String getSemanticTag() {
 		return ((SemanticTagRSFields)fields).getSemanticTag();
 	}
 
+	public void setSemanticTagUUID(String uid) {
+		((SemanticTagRSFields)fields).setUid(uid);
+	}
+	
 	public String getUid() {
 		return ((SemanticTagRSFields)fields).getUid();
 	}
@@ -61,38 +60,20 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 		private String uid = null;
 		 		
 		private SemanticTagRSFields() {
-			setReferencedComponentId(identifiedReferencedComponent.getPrimUuid());
+			// Immutable refCompId
+			setReferencedComponentUid(identifiedReferencedComponent.getPrimUuid());
 		}
-		
-		public void setReferencedComponentUid(UUID uid) {
-			try {
-				setReferencedComponentId(uid);
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId: " + uid + " with error: " + e.getMessage());
-			}
-		}
-
-		public I_GetConceptData getReferencedComponent() {
-			try {
-				return Terms.get().getConcept(getReferencedComponentId());
-			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.SEVERE, "Unable to set WorkflowHistoryRefset's refCompId with error: " + e.getMessage());
-			}
-			
-			return null;
-		}
-		
 		
 		private void setSemanticTag(String semTag) {
 			semanticTag = semTag;
 		}
 		
-		private void setUid(String uid) {
-			this.uid = uid;
-		}
-
 		public String getSemanticTag() {
 			return semanticTag;
+		}
+
+		private void setUid(String uid) {
+			this.uid = uid;
 		}
 
 		public String getUid() {
@@ -112,7 +93,7 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 
 		@Override
 		public boolean valuesExist() {
-			boolean retVal = ((getReferencedComponentId() != null) && 
+			boolean retVal = ((getReferencedComponentUid() != null) && 
 							  (semanticTag != null) &&
 							  (uid != null));
 									
@@ -120,7 +101,7 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 			{
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to Semantic Area Search Refset");
-				str.append("\nReferencedComponentId:" + getReferencedComponent().getPrimUuid());
+				str.append("\nReferencedComponentId:" + getReferencedComponentUid());
 				str.append("\nsearchTerm:" + semanticTag);
 			}
 			

@@ -5,9 +5,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 
 public class ContradictionIdentificationResults {
@@ -17,8 +18,13 @@ public class ContradictionIdentificationResults {
     private Set<Integer> nonConflictingConcepts = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> duplicateEdit = new ConcurrentSkipListSet<Integer>();
     private Set<Integer> duplicateNew = new ConcurrentSkipListSet<Integer>();
+    private ViewCoordinate viewCoord;
     
-    public void addConflict(Integer nid) {
+    public ContradictionIdentificationResults(ViewCoordinate vc) {
+    	viewCoord = vc;
+    }
+
+	public void addConflict(Integer nid) {
         conflictingConcepts.add(nid);
     }
 
@@ -37,12 +43,12 @@ public class ContradictionIdentificationResults {
         nonConflictingConcepts.add(nid);
     }
 
-    public TreeSet<I_GetConceptData> getConflictingConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
+    public TreeSet<ConceptVersionBI> getConflictingConcepts() {
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
         try {
             for (Integer i : conflictingConcepts) {
-                I_GetConceptData con = Terms.get().getConcept(i);
+                ConceptVersionBI con = Terms.get().getConcept(i).getVersion(viewCoord);
                 sortedConcepts.add(con);
             }
         } catch (Exception e) {
@@ -52,12 +58,12 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getDuplicateEditCompId() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
+    public TreeSet<ConceptVersionBI> getDuplicateEditCompId() {
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
         try {
             for (Integer i : duplicateEdit) {
-                I_GetConceptData con = Terms.get().getConcept(i);
+                ConceptVersionBI con = Terms.get().getConcept(i).getVersion(viewCoord);
                 sortedConcepts.add(con);
             }
         } catch (Exception e) {
@@ -67,12 +73,12 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getDuplicateNewCompId() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
+    public TreeSet<ConceptVersionBI> getDuplicateNewCompId() {
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
         try {
             for (Integer i : duplicateNew) {
-                I_GetConceptData con = Terms.get().getConcept(i);
+                ConceptVersionBI con = Terms.get().getConcept(i).getVersion(viewCoord);
                 sortedConcepts.add(con);
             }
         } catch (Exception e) {
@@ -82,12 +88,12 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getSingleConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
+    public TreeSet<ConceptVersionBI> getSingleConcepts() {
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
         try {
             for (Integer i : singleConcepts) {
-                I_GetConceptData con = Terms.get().getConcept(i);
+                ConceptVersionBI con = Terms.get().getConcept(i).getVersion(viewCoord);
                 sortedConcepts.add(con);
             }
         } catch (Exception e) {
@@ -97,12 +103,12 @@ public class ContradictionIdentificationResults {
         return sortedConcepts;
     }
 
-    public TreeSet<I_GetConceptData> getNoneConflictingConcepts() {
-        TreeSet<I_GetConceptData> sortedConcepts = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
+    public TreeSet<ConceptVersionBI> getNoneConflictingConcepts() {
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
         try {
             for (Integer i : nonConflictingConcepts) {
-                I_GetConceptData con = Terms.get().getConcept(i);
+                ConceptVersionBI con = Terms.get().getConcept(i).getVersion(viewCoord);
                 sortedConcepts.add(con);
             }
         } catch (Exception e) {

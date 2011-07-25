@@ -49,6 +49,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
@@ -717,19 +718,19 @@ public interface I_ConfigAceFrame extends I_HandleSubversion {
 
     public void setOverride(boolean b);
 
-    public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles);
+    public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles);
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowRoles();
+    public TreeSet<? extends ConceptVersionBI> getWorkflowRoles();
 
-	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states);
+	public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states);
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowStates();
+    public TreeSet<? extends ConceptVersionBI> getWorkflowStates();
 
-	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions);
+	public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions);
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowActions();
+    public TreeSet<? extends ConceptVersionBI> getWorkflowActions();
 
-	public TreeSet<UUID> getAllAvailableWorkflowActionUids();
+	public List<UUID> getAllAvailableWorkflowActionUids();
 
-	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions);
+	public void setAllAvailableWorkflowActionUids(List<UUID> actions);
 }

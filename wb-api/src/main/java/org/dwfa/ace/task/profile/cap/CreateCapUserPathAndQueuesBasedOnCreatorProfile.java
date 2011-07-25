@@ -65,6 +65,9 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
@@ -173,7 +176,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             userQueueRoot.mkdirs();
 
             // Create new concept for user if not already in existence...
-            if (userNonExistent(newConfig.getDbConfig().getFullName(), newConfig.getUsername())) {
+            if (userNonExistent(newConfig.getDbConfig().getFullName(), newConfig.getUsername(), newConfig.getViewCoordinate())) {
             	createUser(newConfig, creatorConfig, parentConceptForUser);
             }
             
@@ -337,19 +340,19 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         return Condition.TRUE;
     }
 
-    private boolean userNonExistent(String fsn, String preferred) {
+    private boolean userNonExistent(String fsn, String preferred, ViewCoordinate vc) {
     	if (existingUserStrings == null) {
     		try {
 	    		existingUserStrings = new HashSet<String>();
 	    		
 	    		I_GetConceptData userCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 	    		
-	    		for (I_GetConceptData user : WorkflowHelper.getChildren(userCon)) {
-	    			String s = WorkflowHelper.getFsnTerm(user);
+	    		for (ConceptVersionBI user : WorkflowHelper.getChildren(userCon.getVersion(vc))) {
+	    			String s = user.getFullySpecifiedDescription().getText();
 	    			if (s.length() > 0) {
 	    				existingUserStrings.add(s);
 	
-		    			s = WorkflowHelper.getPreferredTerm(user);
+		    			s = user.getPreferredDescription().getText();
 		    			if (s.length() > 0) {
 		    				existingUserStrings.add(s);
 		    			}
@@ -470,25 +473,25 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
 
         // Needs a description record...
         tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getDbConfig().getFullName(), Terms.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), creatorConfig);
+            .getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()), creatorConfig);
         tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername(), Terms.get().getConcept(
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), creatorConfig);
+        		SnomedMetadataRf2.PREFERRED_RF2.getUuids()), creatorConfig);
         tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername() + ".inbox", Terms.get()
             .getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()), creatorConfig);
 
         // Needs a relationship record...
         tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
             .getUids()), parentConcept, tf
-            .getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), tf
-            .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
-            .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
+            .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
+            .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
+            .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, creatorConfig);
         
         // Set user as active editor (for Workflow)
         tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS
                 .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()), tf
-                .getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), tf
-                .getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()), tf
-                .getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, creatorConfig);
+                .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
+                .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
+                .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, creatorConfig);
             
         newConfig.getDbConfig().setUserConcept(userConcept);
 
@@ -571,17 +574,17 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
 
         // Needs a description record...
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", fsnPathName,
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), 
+        		Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()), 
         		commitConfig);
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", prefPathName,
-            Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), commitConfig);
+            Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getUuids()), commitConfig);
 
         // Needs a relationship record...
         Terms.get().newRelationship(UUID.randomUUID(), pathConcept,
         		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), parentConceptForPath,
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
-        		Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, commitConfig);
+        		Terms.get().getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()),
+        		Terms.get().getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()),
+        		Terms.get().getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, commitConfig);
 
         Terms.get().addUncommitted(pathConcept);
         

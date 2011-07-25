@@ -185,7 +185,7 @@ public class BdbCommitManager {
                         SortedSet<WorkflowHistoryJavaBean> latestWorkflow = WorkflowHelper.getLatestWfHxForConcept(con, workflowId);
 
                         WfHxLuceneManager.setWorkflowId(workflowId);
-                        LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY);
+                        LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY, getActiveFrame().getViewCoordinate());
                     }
                 }
             } catch (Exception e) {

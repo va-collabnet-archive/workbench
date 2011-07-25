@@ -39,6 +39,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -85,9 +86,9 @@ public class UpdateStateTransitionRefset extends AbstractTask {
 
         	StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
             I_TermFactory tf = Terms.get();
-
-         	 WorkflowHelper.updateWorkflowStates();
-          	 WorkflowHelper.updateWorkflowActions();
+            ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
+            WorkflowHelper.updateWorkflowStates(vc);
+            WorkflowHelper.updateWorkflowActions(vc);
 
         	File f = new File("workflow/workflowStateTransitions.txt");
         	processTransitions(f, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
@@ -106,6 +107,7 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
         writer.setWorkflowType(useType);
         String line = null;
+        ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         
     	while ((line = inputFile.readLine()) != null)
         {
@@ -143,10 +145,10 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         			category = category.replace("Any", "All");
         		}
         		
-	        	writer.setCategory(WorkflowHelper.lookupEditorCategory(category));
-	        	writer.setInitialState(WorkflowHelper.lookupState(columns[1]));
-	        	writer.setAction(WorkflowHelper.lookupAction(columns[2]));
-	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3]));
+	        	writer.setCategory(WorkflowHelper.lookupEditorCategory(category, vc));
+	        	writer.setInitialState(WorkflowHelper.lookupState(columns[1], vc));
+	        	writer.setAction(WorkflowHelper.lookupAction(columns[2], vc));
+	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3], vc));
 	
 	        	writer.addMember();
         	} catch (Exception e) {
@@ -155,7 +157,6 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         };
 
         Terms.get().addUncommitted(writer.getRefsetConcept());
-        writer.setWorkflowType(null);
     }
      public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

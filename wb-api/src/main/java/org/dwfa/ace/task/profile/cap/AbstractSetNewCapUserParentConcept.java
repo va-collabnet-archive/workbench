@@ -16,14 +16,14 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -59,34 +59,35 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
 
     protected abstract JLabel getInstruction(); 
 
-    protected String[] generatePotentialParentConcepts(I_GetConceptData parentNode) {
+    protected String[] generatePotentialParentConcepts(I_GetConceptData parentConcept, ViewCoordinate vc) {
 	   try {
-    		Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
-    		
-    		SortedSet<I_GetConceptData> sortedPotentialParents = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparerNoCase());
-
-    		sortedPotentialParents.addAll(potentialParentConcepts);
-    		
-    		String[] parentConcepts = new String[sortedPotentialParents.size()];
-    		
-    		int i = 0;
-    		for (I_GetConceptData con : sortedPotentialParents) {
-    			if (con.equals(parentNode)) {
-    				initialIndex = i;
-    			}
-				String displayStr = WorkflowHelper.getPreferredTerm(con);
+		   ConceptVersionBI parentVersioned = parentConcept.getVersion(vc);
+		   Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentVersioned);
+    			
+		   SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+		   
+			sortedPotentialParents.addAll(potentialParentConcepts);
+		
+			String[] parentConcepts = new String[sortedPotentialParents.size()];
+		
+			int i = 0;
+			for (ConceptVersionBI con : sortedPotentialParents) {
+				if (con.equals(parentVersioned)) {
+					initialIndex = i;
+				}
+				String displayStr = con.getPreferredDescription().getText();
 				if (displayStr == null || displayStr.length() == 0) { 
-					displayStr =  WorkflowHelper.getFsnTerm(con);
+					displayStr =  con.getFullySpecifiedDescription().getText();
 				}
 
 				parentConcepts[i] = displayStr;
 	    		parentIds.add(i++, con.getConceptNid());
     		}
-    		
-        	return parentConcepts;
-    	} catch (Exception e) {
-    		
-    	}
+			
+			return parentConcepts;
+	   	} catch (Exception e) {
+		
+		}
 
     	String[] emptyList = new String[] { "" };
     	return emptyList;

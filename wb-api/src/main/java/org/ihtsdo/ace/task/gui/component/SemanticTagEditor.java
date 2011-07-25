@@ -23,13 +23,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class SemanticTagEditor extends AbstractComboEditor {
@@ -37,7 +37,7 @@ public class SemanticTagEditor extends AbstractComboEditor {
     @Override
     public EditorComponent setupEditor() {
     	try {
-        	SortedSet<String> displayTags = generateSemanticTags();
+        	SortedSet<String> displayTags = generateSemanticTags(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 
         	EditorComponent ec = new EditorComponent(displayTags.toArray());
 	
@@ -56,19 +56,17 @@ public class SemanticTagEditor extends AbstractComboEditor {
 		return null;
     }
 
-	private SortedSet<String> generateSemanticTags() {
+	private SortedSet<String> generateSemanticTags(ViewCoordinate vc) {
 		SortedSet<String> displayTags = new TreeSet<String>();
 
 		try {
 			I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());
-	    	Set<I_GetConceptData> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept);
+	    	Set<ConceptVersionBI> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept.getVersion(vc));
 	
-	    	for (I_GetConceptData con : semTagConcepts) {
+	    	for (ConceptVersionBI con : semTagConcepts) {
 	    		if (!semTagConcepts.equals(con)) {
-		        	// Get Pref to display
-		        	I_DescriptionTuple tupleToDisplay = con.getDescTuple(Terms.get().getActiveAceFrameConfig().getTableDescPreferenceList(), Terms.get().getActiveAceFrameConfig());
-		        	DescriptionVersionBI versionToDisplay = (DescriptionVersionBI) tupleToDisplay.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-		        	String semTag = versionToDisplay.getText();
+		        	// Get FSN to display
+	    			String semTag = con.getFullySpecifiedDescription().getText();
 		
 		        	displayTags.add(semTag);
 		    	}

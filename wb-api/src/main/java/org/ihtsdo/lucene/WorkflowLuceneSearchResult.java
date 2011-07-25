@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -28,13 +29,13 @@ public class WorkflowLuceneSearchResult {
 		fsn = bean.getFSN();
 	}
 	
-	WorkflowLuceneSearchResult(String[] row) {
+	public WorkflowLuceneSearchResult(String[] row, ViewCoordinate vc) {
 		
 		try {
 			if (WorkflowHelper.hasBeenInitialized()) {
-				action = WorkflowHelper.lookupAction(row[WorkflowHelper.actionPosition]).getInitialText();
-				state = WorkflowHelper.lookupState(row[WorkflowHelper.statePosition]).getInitialText();
-				modeler = WorkflowHelper.lookupModeler(row[WorkflowHelper.modelerPosition]).getInitialText();
+				action = WorkflowHelper.lookupAction(row[WorkflowHelper.actionPosition], vc).getPreferredDescription().getText();
+				state = WorkflowHelper.lookupState(row[WorkflowHelper.statePosition], vc).getPreferredDescription().getText();
+				modeler = WorkflowHelper.lookupModeler(row[WorkflowHelper.modelerPosition]).getPreferredDescription().getText();
 			} else {
 				// Should only be used when building database
 				action = lookupAction(row[WorkflowHelper.actionPosition]).toString();

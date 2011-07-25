@@ -23,6 +23,7 @@ import org.ihtsdo.arena.editor.EditorActions.NewAction;
 import org.ihtsdo.arena.editor.EditorActions.OpenAction;
 import org.ihtsdo.arena.editor.EditorActions.PrintAction;
 import org.ihtsdo.arena.editor.EditorActions.SaveAction;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -139,7 +140,7 @@ public class ArenaEditorToolBar extends JToolBar
 	        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
 	        int index = tp.getSelectedIndex();
 			
-			if (isAutoApprovalAvailable(index))
+			if (isAutoApprovalAvailable(index, config.getViewCoordinate()))
 		        add(autoApproval);
 			
 		} catch (Exception e) {
@@ -231,12 +232,12 @@ public class ArenaEditorToolBar extends JToolBar
         });
     }
 
-	private boolean isAutoApprovalAvailable(int index) throws Exception {
+	private boolean isAutoApprovalAvailable(int index, ViewCoordinate viewCoord) throws Exception {
 		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
 		
 		// Get Modeler
 		String modelerStr = Terms.get().getActiveAceFrameConfig().getUsername();
 		
-		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.lookupModeler(modelerStr));
+		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.lookupModeler(modelerStr), viewCoord);
 	}
 }

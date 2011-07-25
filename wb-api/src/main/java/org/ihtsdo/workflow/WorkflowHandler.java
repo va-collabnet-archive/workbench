@@ -8,14 +8,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.bpa.process.I_Work;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -26,7 +23,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class WorkflowHandler implements WorkflowHandlerBI {
 
 	@Override
-	public Collection<UUID> getAllAvailableWorkflowActionUids() 
+	public List<UUID> getAllAvailableWorkflowActionUids() 
 	{
 		try {
 			return Terms.get().getActiveAceFrameConfig().getAllAvailableWorkflowActionUids();
@@ -38,18 +35,15 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 	}
 
 	@Override
-	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI conVer) throws IOException, ContraditionException {
+	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContraditionException {
 		
 		EditorCategoryRefsetSearcher searcher = null;		
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
 		
 		try {
-			searcher = new EditorCategoryRefsetSearcher();
+            ConceptVersionBI modeler = WorkflowHelper.getCurrentModeler();
 
-            I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
-            I_GetConceptData concept = Terms.get().getConcept(conVer.getConceptNid());
-
-			List<WorkflowHistoryJavaBean> possibleActions = searchForPossibleActions(modeler, concept);
+			List<WorkflowHistoryJavaBean> possibleActions = searchForPossibleActions(modeler, concept, vc);
 			
 			for (int i = 0; i < possibleActions.size();i++) {
 				retSet.add(possibleActions.get(i));
@@ -87,13 +81,14 @@ public class WorkflowHandler implements WorkflowHandlerBI {
  		return false;
 	}
 
-	private static List<WorkflowHistoryJavaBean> searchForPossibleActions(I_GetConceptData modeler, I_GetConceptData concept) throws Exception
+	private static List<WorkflowHistoryJavaBean> searchForPossibleActions(ConceptVersionBI modeler, ConceptVersionBI concept, ViewCoordinate vc) throws Exception
 	{
-		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
         ArrayList<WorkflowHistoryJavaBean> retList = new ArrayList<WorkflowHistoryJavaBean>();
 
 		// Get Editor Category by modeler and Concept
-        I_GetConceptData category = categegorySearcher.searchForCategoryForConceptByModeler(modeler, concept);
+        EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
+
+        ConceptVersionBI category = categegorySearcher.searchForCategoryForConceptByModeler(modeler, concept, vc);
         if (category == null) {
             return new ArrayList<WorkflowHistoryJavaBean>();
         }
@@ -101,18 +96,18 @@ public class WorkflowHandler implements WorkflowHandlerBI {
         int categoryNid = category.getConceptNid();
 
 		// Get Current WF Status for Concept
-        WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+        WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(concept.getConceptNid()));
 
         if ((latestBean != null) && (!WorkflowHelper.getAcceptAction().equals(latestBean.getAction())))
 	    {
 	        // Get Possible Next Actions to Next State Map from Editor Category and Current WF's useCase and state (which now will mean INITIAL-State)
 	        int initialStateNid = Terms.get().uuidToNative(latestBean.getState());
 	        StateTransitionRefsetSearcher stateTransitionSearcher = new StateTransitionRefsetSearcher();
-	        Map<I_GetConceptData, I_GetConceptData> actionMap = stateTransitionSearcher.searchForPossibleActionsAndFinalStates(categoryNid, initialStateNid);
+	        Map<UUID, UUID> actionMap = stateTransitionSearcher.searchForPossibleActionsAndFinalStates(categoryNid, initialStateNid, vc);
 
 
 	        // Create Beans for future update.  Only differences in Beans will be action & state (which now will mean NEXT-State)
-	        for (I_GetConceptData key : actionMap.keySet())
+	        for (UUID key : actionMap.keySet())
 	        {
 	        	// Such as done via Commit
 	    		WorkflowHistoryJavaBean templateBean = new WorkflowHistoryJavaBean();
@@ -122,8 +117,8 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 	            templateBean.setFSN(latestBean.getFSN());
 	            templateBean.setModeler(latestBean.getModeler());
 	            templateBean.setPath(latestBean.getPath());
-	            templateBean.setAction(key.getUids().get(0));
-	            templateBean.setState(actionMap.get(key).getUids().get(0));
+	            templateBean.setAction(key);
+	            templateBean.setState(actionMap.get(key));
 	            templateBean.setEffectiveTime(latestBean.getEffectiveTime());
 	            templateBean.setWorkflowTime(latestBean.getWorkflowTime());
 	            templateBean.setOverridden(latestBean.getOverridden());

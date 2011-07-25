@@ -18,23 +18,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTree;
+
 import org.dwfa.ace.api.BundleType;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF;
-import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_FilterTaxonomyRels;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
-import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
-import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
@@ -45,6 +42,9 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
+import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
+import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -59,6 +59,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.tigris.subversion.javahl.ClientException;
@@ -186,11 +187,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.showListView();
     }
 
-    public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+    public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
         config.setWorkflowStates(states);
     }
 
-    public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+    public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
         config.setWorkflowRoles(roles);
     }
 
@@ -198,7 +199,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.setWorkflowDetailSheetDimensions(dim);
     }
 
-    public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+    public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
         config.setWorkflowActions(actions);
     }
 
@@ -574,7 +575,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.setAllowedStatus(allowedStatus);
     }
 
-    public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+    public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
         config.setAllAvailableWorkflowActionUids(actions);
     }
 
@@ -731,11 +732,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.invalidate();
     }
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+    public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
         return config.getWorkflowStates();
     }
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+    public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
         return config.getWorkflowRoles();
     }
 
@@ -747,7 +748,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getWorkflowDetailsSheet();
     }
 
-    public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+    public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
         return config.getWorkflowActions();
     }
 
@@ -1158,7 +1159,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         return config.getAllConflictResolutionStrategies();
     }
 
-    public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+    public List<UUID> getAllAvailableWorkflowActionUids() {
         return config.getAllAvailableWorkflowActionUids();
     }
 

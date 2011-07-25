@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -28,6 +29,7 @@ import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
 
 /**
@@ -249,8 +251,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
         snomedPathUid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
 
         authorUuid = ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid();
-        
-        currentStatus = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
+
+        currentStatus = Terms.get().nidToUuid(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
 	}
 
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException

@@ -22,6 +22,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -39,10 +40,13 @@ public class WfHxDetailsPanel extends JPanel {
 	private TreeSet<WorkflowHistoryJavaBean> conceptWfBeans;
 	private long currentLatestTimestamp = Long.MIN_VALUE;
 
+	private ViewCoordinate viewCoord;
 
-	public WfHxDetailsPanel(ConceptViewSettings settings) {
+
+	public WfHxDetailsPanel(ConceptViewSettings settings, ViewCoordinate vc) {
 		super(new GridLayout(1,1));
 		currentConcept = settings.getConcept();
+		viewCoord = vc;
 
 		// Create Table
     	generateWfHxTable();
@@ -145,9 +149,9 @@ public class WfHxDetailsPanel extends JPanel {
 			for (WorkflowHistoryJavaBean bean : conceptWfBeans) {
 	        	String[] row = new String[4];
 	        	
-	        	String action = reader.processMetaForDisplay(Terms.get().getConcept(bean.getAction()));
-	    		String state = reader.processMetaForDisplay(Terms.get().getConcept(bean.getState()));
-	    		String modeler = Terms.get().getConcept(bean.getModeler()).getInitialText();
+	        	String action = reader.processMetaForDisplay(Terms.get().getConcept(bean.getAction()), viewCoord);
+	    		String state = reader.processMetaForDisplay(Terms.get().getConcept(bean.getState()), viewCoord);
+	    		String modeler = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(bean.getModeler()), viewCoord);
 	    		String time = WorkflowHelper.format.format(new Date(bean.getWorkflowTime()));
 	    		
 	    		row[0] = action;

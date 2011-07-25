@@ -19,7 +19,7 @@ import org.dwfa.tapi.TerminologyException;
 public abstract class WorkflowRefset 
 {
 	public final static I_ConceptualizeUniversally editorCategoryConcept = RefsetAuxiliary.Concept.EDITOR_CATEGORY;
-	public final static I_ConceptualizeUniversally semanticAreaConcept = RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY;
+	public final static I_ConceptualizeUniversally semanticHierarchyConcept = RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY;
 	public final static I_ConceptualizeUniversally semanticTagConcept = RefsetAuxiliary.Concept.SEMANTIC_TAGS;
 	public final static I_ConceptualizeUniversally stateTransitionConcept = RefsetAuxiliary.Concept.STATE_TRANSITION;
 	public final static I_ConceptualizeUniversally workflowHistoryConcept = RefsetAuxiliary.Concept.WORKFLOW_HISTORY;

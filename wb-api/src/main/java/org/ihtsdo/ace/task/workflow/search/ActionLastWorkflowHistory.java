@@ -6,13 +6,14 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.ace.task.gui.component.WorkflowConceptVersion;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
 @BeanList(specs = {
@@ -25,7 +26,7 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
     /**
      * Property name for the Action being searched.
      */
-    private I_GetConceptData testAction = null;
+    private WorkflowConceptVersion testAction = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -40,8 +41,8 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         {
         	Object obj = in.readObject();
         	
-            if (obj instanceof I_GetConceptData) {
-            	this.testAction = (I_GetConceptData) obj;
+            if (obj instanceof WorkflowConceptVersion) {
+            	this.testAction = (WorkflowConceptVersion) obj;
             } else {
             	this.testAction = null;
             }
@@ -50,10 +51,8 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         	{
                 try 
                 {
-                    Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowActions().iterator();
-                    
-                    if (itr.hasNext()) {
-                        this.testAction = itr.next();
+                    for (ConceptVersionBI  action : Terms.get().getActiveAceFrameConfig().getWorkflowActions()) {
+                        this.testAction = new WorkflowConceptVersion(action);
                     }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -95,11 +94,11 @@ public class ActionLastWorkflowHistory extends AbstractWorkflowHistorySearchTest
         return testAction.getPrimUuid();
     }
 
-    public I_GetConceptData getTestAction() {
+    public WorkflowConceptVersion getTestAction() {
         return testAction;
     }
 
-    public void setTestAction(I_GetConceptData testAction) {
+    public void setTestAction(WorkflowConceptVersion testAction) {
         this.testAction = testAction;
     }
 

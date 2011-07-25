@@ -7,10 +7,8 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,15 +18,10 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -39,6 +32,14 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -68,15 +69,13 @@ public class WorkflowHelper {
 
 	public final static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private static HashMap<String, I_GetConceptData> modelers = null;
-	private static HashMap<String, I_GetConceptData> actions = null;
-	private static HashMap<String, I_GetConceptData> states = null;
+	private static HashMap<String, ConceptVersionBI> modelers = null;
+	private static HashMap<String, ConceptVersionBI> actions = null;
+	private static HashMap<String, ConceptVersionBI> states = null;
 	
-	private static I_GetConceptData leadModeler = null;
-	private static I_GetConceptData defaultModeler = null;
+	private static ConceptVersionBI leadModeler = null;
+	private static ConceptVersionBI defaultModeler = null;
 
-	private static int currentNid = 0;
-	private static int isARelNid = 0;
 	private static Set<UUID> beginWorkflowActions = null;
 	private static Set<UUID> commitWorkflowActions = null;
 	private static UUID endWorkflowActionUid = null;
@@ -87,97 +86,45 @@ public class WorkflowHelper {
 	public static final int EARLIEST_WORKFLOW_HISTORY_DATE = 19;
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
 	
-	private static int fullySpecifiedTermDescriptionTypeNid = 0;
 	private static UUID overrideActionUid = null;
-    
-
-	public WorkflowHelper() {
-		initialize();
-	}
 	
-	public static void initialize() {
-
-		try {
-			currentNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
-			isARelNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid());
-			fullySpecifiedTermDescriptionTypeNid = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid();	
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in creating WF Class WorkflowHelper with error: " + e.getMessage());
-		}
-	}
-
-	private static class WfHxConceptComparer implements Comparator<I_GetConceptData> {
-		@Override
-		public int compare(I_GetConceptData o1, I_GetConceptData o2) {
-			try {
-				return (o1.getInitialText().toLowerCase().compareTo(o2.getInitialText().toLowerCase()));
-			} catch (IOException e) {
-	        	AceLog.getAppLog().log(Level.WARNING, "Error in creating WF Class WfHxConceptComparer with error: " + e.getMessage());
-			}
-			return -1;
-		}
-	}
-
-	private static class WfHxUidConceptComparer implements Comparator<UUID> {
-		@Override
-		public int compare(UUID o1, UUID o2) {
-			try {
-				return (Terms.get().getConcept(o1).getInitialText().toLowerCase().compareTo(Terms.get().getConcept(o2).getInitialText().toLowerCase()));
-			} catch (Exception e) {
-	        	AceLog.getAppLog().log(Level.WARNING, "Error in creating WF Class WfHxUidConceptComparer with error: " + e.getMessage());
-			}
-			return -1;
-		}
-	}
-
-	public static I_GetConceptData getCurrentModeler() throws TerminologyException, IOException {
+	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static String identifyPrefTerm(I_GetConceptData con)  {
-        try {
-			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
-						p.getLang().equalsIgnoreCase("en"))
-						return p.getText();
-			    }
-			}
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current editor with error: " + e.getMessage());
-		}
-
-        return "";
-    }
-	@SuppressWarnings("unchecked")
-	public static String identifyFSN(I_GetConceptData con)  {
+	public static String identifyPrefTerm(int conceptNid, ViewCoordinate vc)  {
 		try {
-			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
-						p.getLang().equalsIgnoreCase("en"))
-						return p.getText();
-		   		}
-	   		}
+			TerminologySnapshotDI dbSnapshot = Ts.get().getSnapshot(vc);
+			return dbSnapshot.getConceptVersion(conceptNid).getPreferredDescription().getText();
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's FSN with error: " + e.getMessage());
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's Preferred with msg: \n" + e.getMessage() + "\n");
 		}
 
    		return "";
 		
     }
 
-	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean)
+	public static String identifyFSN(int conceptNid, ViewCoordinate vc)  {
+		try {
+			TerminologySnapshotDI dbSnapshot = Ts.get().getSnapshot(vc);
+			return dbSnapshot.getConceptVersion(conceptNid).getFullySpecifiedDescription().getText();
+		} catch (Exception e) {
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's FSN with msg: \n" + e.getMessage() + "\n");
+		}
+
+   		return "";		
+    }
+
+	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean, ViewCoordinate vc)
  	{
 		try {
-			boolean precedingCommitExists = WorkflowHelper.isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()));
+			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
 			retireRow(bean);
 
 			if (precedingCommitExists) {
 				// Just retired preceding commit
-		    	WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
+		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
 		    	// Retire original Row as previously retired original
 				retireRow(latestBean);
@@ -216,16 +163,17 @@ public class WorkflowHelper {
 		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
-	public static void updateModelers() 
+	public static void updateModelers(ViewCoordinate vc) 
 	{
-		try {
-	    	modelers = new HashMap<String, I_GetConceptData>();
-	
+    	modelers = new HashMap<String, ConceptVersionBI>();
+
+    	try {
 			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-			Set<I_GetConceptData> editors = getChildren(parentEditorConcept);
+	
+			Set<ConceptVersionBI> editors = getChildren(parentEditorConcept.getVersion(vc));
 			editors.remove(parentEditorConcept);
 	
-			for (I_GetConceptData editor : editors)
+			for (ConceptVersionBI editor : editors)
 			{
 				if (defaultModeler == null && isDefaultModeler(editor))
 				{
@@ -240,15 +188,13 @@ public class WorkflowHelper {
     }
 	
 
-	private static String getLoginId(I_GetConceptData con) throws TerminologyException, IOException {
-    	String id = identifyPrefTerm(con);
-
-   		return id;
+	private static String getLoginId(ConceptVersionBI con) throws ContraditionException, IOException {
+    	return con.getPreferredDescription().getText();
 	}
 
 	public static boolean isActiveModeler(String name) throws Exception
 	{
-		I_GetConceptData modeler = lookupModeler(name);
+		ConceptVersionBI modeler = lookupModeler(name);
 
 		return isActiveModeler(modeler);
 	}
@@ -266,32 +212,35 @@ public class WorkflowHelper {
 	/**
 	 * @param name
 	 * @return
+	 * @throws IOException 
+	 * @throws TerminologyException 
 	 * @throws TerminologyException
 	 * @throws IOException
 	 */
-	public static I_GetConceptData lookupModeler(String name) 
+	public static ConceptVersionBI lookupModeler(String name) throws TerminologyException, IOException 
 	{
-		if (modelers == null)
-			updateModelers();
-
+		if (modelers == null) {
+			updateModelers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		}
+		
 		if (name == null) {
 			return defaultModeler;
 		} else if (modelers.containsKey(name)) {
 			return modelers.get(name);
 		} else {
 			try {
-				if (getDefaultModeler() != null && !getDefaultModeler().getInitialText().equalsIgnoreCase(name))
+				if (getDefaultModeler() != null && !getDefaultModeler().getPreferredDescription().getText().equalsIgnoreCase(name))
 				{
 					AceLog.getAppLog().log(Level.WARNING, unrecognizedLoginMessage);
 	
-					for (I_GetConceptData modeler : modelers.values())
+					for (ConceptVersionBI modeler : modelers.values())
 					{
-						List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+						List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
-						for (I_RelVersioned rel : relList)
+						for (RelationshipVersionBI rel : relList)
 						{
 							if (rel != null &&
-							    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
+							    rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
 								return modeler;
 						}
 	
@@ -306,22 +255,22 @@ public class WorkflowHelper {
     	}
 	}
 
-	public static I_GetConceptData getLeadModeler()
+	public static ConceptVersionBI getLeadModeler(ViewCoordinate vc)
 	{
 		try {
 			if (leadModeler  == null)
 			{
 				if (modelers == null)
-					updateModelers();
+					updateModelers(vc);
 	
-				for (I_GetConceptData modeler : modelers.values())
+				for (ConceptVersionBI modeler : modelers.values())
 				{
-					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+					List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
-					for (I_RelVersioned rel : relList)
+					for (RelationshipVersionBI rel : relList)
 					{
 						if (rel != null &&
-						    rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
+						    rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
 							leadModeler = modeler;
 					}
 				}
@@ -360,13 +309,13 @@ public class WorkflowHelper {
     	return bean;
     }
 
-    public static void updateWorkflowUserRoles() {
-		TreeSet <I_GetConceptData> sortedRoles = new TreeSet<I_GetConceptData>(new WfHxConceptComparer());
+    public static void updateWorkflowUserRoles(ViewCoordinate vc) {
+    	TreeSet <ConceptVersionBI> sortedRoles = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
    	   	try {
    			I_GetConceptData rolesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getPrimoridalUid());
 
-   			Set<? extends I_GetConceptData> workflowRoles = getChildren(rolesParentConcept);
+   			Set<? extends ConceptVersionBI> workflowRoles = getChildren(rolesParentConcept.getVersion(vc));
     		workflowRoles.remove(rolesParentConcept);
 
     		sortedRoles.addAll(workflowRoles);
@@ -377,13 +326,13 @@ public class WorkflowHelper {
     	}
     }
 
-    public static void updateWorkflowStates() {
-		TreeSet <I_GetConceptData> sortedStates = new TreeSet<I_GetConceptData>(new WfHxConceptComparer());
+    public static void updateWorkflowStates(ViewCoordinate vc) {
+    	TreeSet <ConceptVersionBI> sortedStates = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
 		try {
 			I_GetConceptData statesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
 
-    		Set<? extends I_GetConceptData> workflowStates = getChildren(statesParentConcept);
+    		Set<? extends ConceptVersionBI> workflowStates = getChildren(statesParentConcept.getVersion(vc));
     		workflowStates.remove(statesParentConcept);
 
     		sortedStates.addAll(workflowStates);
@@ -394,28 +343,28 @@ public class WorkflowHelper {
     	}
     }
 
-    public static void updateWorkflowActions() {
+    public static void updateWorkflowActions(ViewCoordinate vc) {
 		Set<UUID> availableActions = new HashSet<UUID>();
-		TreeSet <I_GetConceptData> sortedActions = new TreeSet<I_GetConceptData>(new WfHxConceptComparer());
-		TreeSet <UUID> sortedAvailableActions = new TreeSet<UUID>(new WfHxUidConceptComparer());
+    	TreeSet <ConceptVersionBI> sortedActions = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+		List<UUID> sortedAvailableActions = new LinkedList<UUID>();
 
 		try {
     		I_GetConceptData actionParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIONS.getPrimoridalUid());
 
-    		Set<? extends I_GetConceptData> workflowActions = getChildren(actionParentConcept);
+    		Set<? extends ConceptVersionBI> workflowActions = getChildren(actionParentConcept.getVersion(vc));
     		workflowActions.remove(actionParentConcept);
 
-    		for (I_GetConceptData action : workflowActions)
+    		for (ConceptVersionBI action : workflowActions)
     		{
     			// Only add non-Commit actions
-    			List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+    			List<RelationshipVersionBI> relList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
     			boolean foundCommitValue = false;
-				for (I_RelVersioned rel : relList)
+				for (RelationshipVersionBI rel : relList)
 				{
 					if (rel != null &&
-						(rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid() ||
-						 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT.getPrimoridalUid()).getConceptNid()))
+						(rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid() ||
+						 rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT.getPrimoridalUid()).getConceptNid()))
 						foundCommitValue = true;
 				}
 
@@ -424,7 +373,12 @@ public class WorkflowHelper {
     		}
 
     		sortedActions.addAll(workflowActions);
-    		sortedAvailableActions.addAll(availableActions);
+    		
+    		for (ConceptVersionBI action : sortedActions) {
+    			if (availableActions.contains(action.getPrimUuid())) {
+    				sortedAvailableActions.add(action.getPrimUuid());
+    			}
+    		}
 
     		Terms.get().getActiveAceFrameConfig().setWorkflowActions(sortedActions);
     		Terms.get().getActiveAceFrameConfig().setAllAvailableWorkflowActionUids(sortedAvailableActions);
@@ -433,65 +387,54 @@ public class WorkflowHelper {
     	}
     }
 
-    @SuppressWarnings("unchecked")
-	public static Set<I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException
+	public static Set<ConceptVersionBI> getChildren(ConceptVersionBI concept) throws IOException, ContraditionException 
     {
-		Set<I_GetConceptData> resultSet = new HashSet<I_GetConceptData>();
+		Set<ConceptVersionBI> resultSet = new HashSet<ConceptVersionBI>();
 
-		if (concept != null) {
-	    	I_GetConceptData child = null;
-	
-			if (currentNid == 0)
-				initialize();
-	
+		if (concept != null) {		
 			resultSet.add(concept);
-			Collection<? extends I_RelVersioned> relationships = concept.getDestRels();
+			Collection<? extends ConceptVersionBI> children = concept.getRelsIncomingOriginsActiveIsa();
+
 	
-	
-	    	if (relationships == null || relationships.size() == 0)
+	    	if (children == null || children.size() == 0) {
 	    		return resultSet;
-	
-	    	Iterator itr = relationships.iterator();
-	    	while (itr.hasNext())
-	    	{
-	    		I_RelVersioned rel = (I_RelVersioned)itr.next();
-	    		 
-	    		if (rel.getStatusNid() == currentNid &&
-	    			rel.getTypeNid() == isARelNid)
-	    		{
-	    			child = Terms.get().getConcept(rel.getC1Id());
+			}
+	    	
+	    	for (ConceptVersionBI child : children) {
+	    		 if (child.getConceptNid() != concept.getConceptNid()) {
 	    			resultSet.addAll(getChildren(child));
-	    		}
+	    		 }
 	    	}
 		}
 		
     	return resultSet;
     }
 
-	public static I_GetConceptData lookupEditorCategory(String role) throws TerminologyException, IOException {
-		Set<? extends I_GetConceptData> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
+	public static ConceptVersionBI lookupEditorCategory(String role, ViewCoordinate vc) throws TerminologyException, IOException, ContraditionException {
+		Set<? extends ConceptVersionBI> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
 		if (role != null) {
-			for (I_GetConceptData roleConcept : allRoles)
+			for (ConceptVersionBI roleConcept : allRoles)
 			{
-				if (identifyFSN(roleConcept).equalsIgnoreCase(role.trim()))
+				if (roleConcept.getFullySpecifiedDescription().getText().equalsIgnoreCase(role.trim())) {
 					return roleConcept;
+				}
 			}
 		}
 
 		return null;
 	}
 
-	public static I_GetConceptData lookupState(String state) throws TerminologyException, IOException {
+	public static ConceptVersionBI lookupState(String state, ViewCoordinate vc) throws TerminologyException, IOException {
 		if (states == null)
 		{
-			states = new HashMap<String, I_GetConceptData>();
+			states = new HashMap<String, ConceptVersionBI>();
 
-			Set<? extends I_GetConceptData> allStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
+			Set<? extends ConceptVersionBI> allStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
 	
-			for (I_GetConceptData stateConcept : allStates)
+			for (ConceptVersionBI stateConcept : allStates)
 			{
-				states.put(identifyFSN(stateConcept).toLowerCase(), stateConcept);
+				states.put(identifyFSN(stateConcept.getConceptNid(), vc).toLowerCase(), stateConcept);
 			}
 		}
 		
@@ -502,16 +445,16 @@ public class WorkflowHelper {
 		}
 	}
 	
-	public static I_GetConceptData lookupAction(String action) throws TerminologyException, IOException {
+	public static ConceptVersionBI lookupAction(String action, ViewCoordinate vc) throws TerminologyException, IOException {
 		if (actions == null)
 		{
-			actions = new HashMap<String, I_GetConceptData>();
+			actions = new HashMap<String, ConceptVersionBI>();
 
-			Set<? extends I_GetConceptData> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();
+			Set<? extends ConceptVersionBI> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();
 		
-			for (I_GetConceptData actionConcept : allActions)
+			for (ConceptVersionBI actionConcept : allActions)
 			{
-				actions.put(identifyFSN(actionConcept).toLowerCase(), actionConcept);
+				actions.put(identifyFSN(actionConcept.getConceptNid(), vc).toLowerCase(), actionConcept);
 			}
 		}
 
@@ -524,13 +467,13 @@ public class WorkflowHelper {
 	
 
 
-	public static I_GetConceptData lookupRoles(String role) throws TerminologyException, IOException {
-		Set<? extends I_GetConceptData> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
+	public static ConceptVersionBI lookupRoles(String role, ViewCoordinate vc) throws TerminologyException, IOException {
+		Set<? extends ConceptVersionBI> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
 		if (role != null) {
-			for (I_GetConceptData actionConcept : allActions)
+			for (ConceptVersionBI actionConcept : allActions)
 			{
-				if (identifyFSN(actionConcept).equalsIgnoreCase(role.trim()))
+				if (identifyFSN(actionConcept.getConceptNid(), vc).equalsIgnoreCase(role.trim()))
 					return actionConcept;
 			}
 		}
@@ -538,13 +481,10 @@ public class WorkflowHelper {
 		return null;
 	}
 
-	public static List<I_RelVersioned> getWorkflowRelationship(I_GetConceptData concept, Concept desiredRelationship) 
+	public static List<RelationshipVersionBI> getWorkflowRelationship(ConceptVersionBI concept, Concept desiredRelationship) 
 	{
-		List<I_RelVersioned> rels = new LinkedList<I_RelVersioned>();
+		List<RelationshipVersionBI> rels = new LinkedList<RelationshipVersionBI>();
 
-		if (currentNid == 0)
-			initialize();
-		
 		if (concept != null && desiredRelationship != null) {
 			try 
 			{
@@ -553,16 +493,16 @@ public class WorkflowHelper {
 				I_IntSet relType = Terms.get().newIntSet();
 				relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
 		
-				Collection<? extends I_RelVersioned> relList = concept.getSourceRels();
+				Collection<? extends RelationshipVersionBI> relList = concept.getRelsOutgoingActive();
 				
-				for (I_RelVersioned rel : relList)
+				for (RelationshipVersionBI rel : relList)
 				{
-					I_RelTuple tuple = rel.getLastTuple();
-					int relId = tuple.getTypeNid();
-					int statusId = tuple.getStatusNid();
+
+					int relId = rel.getTypeNid();
 					
-					if ((relId == searchRelId) && (statusId == currentNid)) 
+					if (relId == searchRelId) {
 						rels.add(rel);
+					}
 				}
 			} catch (Exception e) {
 	        	AceLog.getAppLog().log(Level.WARNING, "Error in getting workflow-based attribute with error: " + e.getMessage());
@@ -572,19 +512,19 @@ public class WorkflowHelper {
 		return rels;
 	}
 
-    public static boolean isBeginWorkflowAction(I_GetConceptData actionConcept) {
+    public static boolean isBeginWorkflowAction(ConceptVersionBI actionConcept) {
     	if (beginWorkflowActions  == null)
 		{
     		beginWorkflowActions = new HashSet<UUID>();
     		
     		try
 	    	{
-    	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+    	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
     	    	{
-					for (I_RelVersioned rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
+					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
 					{
 						if (rel != null &&
-			    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+			    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
 						{
     						beginWorkflowActions.add(action.getPrimUuid());
 							break;
@@ -603,16 +543,16 @@ public class WorkflowHelper {
     	}
     }
     
-    public static boolean isCommitWorkflowAction(I_GetConceptData actionConcept) {
+    public static boolean isCommitWorkflowAction(ConceptVersionBI actionConcept) {
     	if (commitWorkflowActions  == null)
 		{
     		commitWorkflowActions = new HashSet<UUID>();
     		
     		try
 	    	{
-    	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+    	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
     	    	{
-					for (I_RelVersioned rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE))
+					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE))
 					{
 						if (rel != null) {
     						commitWorkflowActions.add(action.getPrimUuid());
@@ -632,18 +572,18 @@ public class WorkflowHelper {
     	}
     }
     
-    private static boolean isEndWorkflowAction(I_GetConceptData actionConcept) {
+    private static boolean isEndWorkflowAction(ConceptVersionBI actionConcept) {
 		
     	if (endWorkflowActionUid  == null && actionConcept != null)
 		{
 			try
 	    	{
-				List<I_RelVersioned> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+				List<RelationshipVersionBI> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 	
-				for (I_RelVersioned rel : relList)
+				for (RelationshipVersionBI rel : relList)
 				{
 					if (rel != null &&
-		    			 rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+		    			 rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
 					{
 						endWorkflowActionUid = actionConcept.getPrimUuid();
 						break;
@@ -661,51 +601,52 @@ public class WorkflowHelper {
     	}
 	}
 
-	public static boolean isActiveModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+	public static boolean isActiveModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
+		List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (I_RelVersioned rel : relList)
+		for (RelationshipVersionBI rel : relList)
 		{
 			if (rel != null &&
-    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid()).getConceptNid())
+    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid()).getConceptNid())
 				return true;
 		}
 
 		return false;
 	}
 
-	public static boolean isDefaultModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+	public static boolean isDefaultModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
+		List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (I_RelVersioned rel : relList)
+		for (RelationshipVersionBI rel : relList)
 		{
 			if (rel != null &&
-    			rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
+    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
 				return true;
 		}
 
 		return false;
 	}
 
-	public static HashMap<String, I_GetConceptData> getModelers() {
+	public static HashMap<String, ConceptVersionBI> getModelers() {
 		return modelers;
 	}
 
-	public static void setDefaultModeler(I_GetConceptData defMod) {
+	public static void setDefaultModeler(ConceptVersionBI defMod) {
 		defaultModeler = defMod;
 	}
 
-	public static I_GetConceptData getDefaultModeler() {
+	public static ConceptVersionBI getDefaultModeler() {
 		return defaultModeler;
 	}
 
-	public void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
+	public static void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
 		if ((concept != null) && 
 			(inBatch || !WorkflowHistoryRefsetWriter.isInUse())) // Not in the middle of an existing commit
     	{
-        	I_GetConceptData modeler = WorkflowHelper.getCurrentModeler();
-
-        	if (modeler != null && WorkflowHelper.isActiveModeler(modeler))
+			ConceptVersionBI modeler = getCurrentModeler();
+        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+        	
+        	if (modeler != null && isActiveModeler(modeler))
         	{
         		I_TermFactory tf = Terms.get();
         		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
@@ -717,25 +658,25 @@ public class WorkflowHelper {
 	            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
 
 	            // Modeler
-	            writer.setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
+	            writer.setModelerUid(getCurrentModeler().getPrimUuid());
 
 	            // Concept & FSN
 	            writer.setConceptUid(concept.getPrimUuid());
-	            writer.setFSN(WorkflowHelper.identifyFSN(concept));
+	            writer.setFSN(identifyFSN(concept.getConceptNid(), vc));
 
             	// Action
             	UUID actionUid = identifyAction();
                 writer.setActionUid(actionUid);
 
                 // State
-                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid);
+                UUID initialState = identifyNextState(writer.getModelerUid(), concept, actionUid, vc);
                 writer.setStateUid(initialState);
 
                 // Worfklow Id
                 WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(concept);
                 
                 
-	            if (latestBean == null || WorkflowHelper.getAcceptAction().equals(latestBean.getAction()))
+	            if (latestBean == null || getAcceptAction().equals(latestBean.getAction()))
 	            	writer.setWorkflowUid(UUID.randomUUID());
 	            else
 	            	writer.setWorkflowUid(latestBean.getWorkflowId());
@@ -749,7 +690,7 @@ public class WorkflowHelper {
 	            	writer.setActionUid(acceptActionUid);
 
 	            	// Identify and overwrite Next State
-	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid);
+	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid, vc);
 					writer.setStateUid(nextState);
 	            } else
 	            	writer.setAutoApproved(false);
@@ -770,26 +711,26 @@ public class WorkflowHelper {
     	}	
 	}
 
-	private UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid)
+	private static UUID identifyNextState(UUID modelerUid, I_GetConceptData concept, UUID commitActionUid, ViewCoordinate vc)
 	{
-		I_GetConceptData initialState = null;
+		ConceptVersionBI initialState = null;
 		boolean existsInDb = isConceptInDatabase(concept);
 		
 		try {
 			WorkflowHistoryJavaBean bean = getLatestWfHxJavaBeanForConcept(concept);
 			if (bean != null) {
-				initialState = Terms.get().getConcept(bean.getState());
+				initialState = Terms.get().getConcept(bean.getState()).getVersion(vc);
 			} else {
 				
-				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
+				for (ConceptVersionBI state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
 				{
-					List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+					List<RelationshipVersionBI> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 		
-		    		for (I_RelVersioned rel : relList)
+		    		for (RelationshipVersionBI rel : relList)
 		    		{
 		    			if ((rel != null) &&
-							((existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
-							 (!existsInDb && (rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
+							((existsInDb && (rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
+							 (!existsInDb && (rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))))
 		    			{
 							initialState = state;
 		    			}
@@ -802,16 +743,16 @@ public class WorkflowHelper {
 		
 			EditorCategoryRefsetSearcher categorySearcher = new EditorCategoryRefsetSearcher();
 			I_GetConceptData modeler = Terms.get().getConcept(modelerUid);
-			I_GetConceptData category = categorySearcher.searchForCategoryForConceptByModeler(modeler, concept);
+			ConceptVersionBI category = categorySearcher.searchForCategoryForConceptByModeler(modeler.getVersion(vc), concept.getVersion(vc), vc);
 		
 			StateTransitionRefsetSearcher nextStateSearcher = new StateTransitionRefsetSearcher();
-			Map<I_GetConceptData, I_GetConceptData> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid());
+			Map<UUID, UUID> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid(), vc);
 		
-			for (I_GetConceptData transitionAction : possibleActions.keySet())
+			for (UUID transitionAction : possibleActions.keySet())
 			{
-				if (transitionAction.getPrimUuid().equals(commitActionUid))
+				if (transitionAction.equals(commitActionUid))
 				{
-					return possibleActions.get(transitionAction).getPrimUuid();
+					return possibleActions.get(transitionAction);
 				}
 			}
 		} catch (Exception e) {
@@ -821,21 +762,21 @@ public class WorkflowHelper {
 		return null;
 	}
 		
-	private UUID identifyAction() 
+	private static UUID identifyAction() 
 	{
     	UUID commitActionUid = null;
     	try
     	{
-	    	for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
 	    	{
-	    		if (WorkflowHelper.isBeginWorkflowAction(action))
+	    		if (isBeginWorkflowAction(action))
 	    		{
-	    			List<I_RelVersioned> commitRelList = WorkflowHelper.getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+	    			List<RelationshipVersionBI> commitRelList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
-    	    		for (I_RelVersioned commitRel : commitRelList)
+    	    		for (RelationshipVersionBI commitRel : commitRelList)
     	    		{
 						if (commitRel != null &&
-							commitRel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
+							commitRel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
 						{
 								commitActionUid = action.getPrimUuid();
 						}
@@ -858,9 +799,9 @@ public class WorkflowHelper {
 		{
 			try
 			{
-				for (I_GetConceptData state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
+				for (ConceptVersionBI state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
 				{
-					if (WorkflowHelper.isEndWorkflowState(state))
+					if (isEndWorkflowState(state))
 					{
 						endWorkflowStateUid = state.getPrimUuid();
 						break;
@@ -874,7 +815,7 @@ public class WorkflowHelper {
 		return endWorkflowStateUid;
     }
 
-	private static boolean isEndWorkflowState(I_GetConceptData stateConcept) throws IOException, TerminologyException {
+	private static boolean isEndWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
     	if (endWorkflowStateUid  == null)
 		{
     		// TODO: Remove hardcode and add to metadata
@@ -894,9 +835,10 @@ public class WorkflowHelper {
 		{
 			try
 			{
-				for (I_GetConceptData action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+				TreeSet<? extends ConceptVersionBI> allActions = Terms.get().getActiveAceFrameConfig().getWorkflowActions();
+				for (ConceptVersionBI action : allActions)
 				{
-					if (WorkflowHelper.isEndWorkflowAction(action))
+					if (isEndWorkflowAction(action))
 					{
 						endWorkflowActionUid = action.getPrimUuid();
 						break;
@@ -925,13 +867,9 @@ public class WorkflowHelper {
 		return bean;
 	}
 
-	public static String parseSemanticTag(I_GetConceptData con) throws IOException, TerminologyException {
-		if (con != null) {
-			I_IntList descType = Terms.get().newIntList();
-	   		descType.add(fullySpecifiedTermDescriptionTypeNid);
-	   		I_DescriptionTuple tuple = con.getDescTuple(descType, Terms.get().getActiveAceFrameConfig());
-	
-			String s = tuple.getText();
+	public static String parseSemanticTag(ConceptVersionBI conceptVersionBI) throws ContraditionException, IOException {
+		if (conceptVersionBI != null) {
+			String s = conceptVersionBI.getPreferredDescription().getText();
 	
 	    	return parseSemanticTag(s);
 		} else {
@@ -949,7 +887,7 @@ public class WorkflowHelper {
 				int endIndex = potentialTag.lastIndexOf(')');
 				String retTag = potentialTag.substring(startIndex + 1, endIndex);
 	
-				return WorkflowHelper.parseSpaces(retTag);
+				return parseSpaces(retTag);
 			} 	
 		}
 		
@@ -984,6 +922,7 @@ public class WorkflowHelper {
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null) {
+
 			Set<String> ignoredWorkflows = new HashSet<String>();
 			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 			
@@ -995,7 +934,7 @@ public class WorkflowHelper {
 			for (I_ExtendByRef row : members) {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
 						if (!ignoredWorkflows.contains(reader.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
 							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 							
@@ -1030,7 +969,7 @@ public class WorkflowHelper {
 			for (I_ExtendByRef row : members) {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
 						if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
 							returnSet.add(populateWorkflowHistoryJavaBean(row));
 						}
@@ -1099,7 +1038,7 @@ public class WorkflowHelper {
 				int idx = row.getTuples().size() - 1;
 	
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == currentNid) {
+					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
 						retSet.add(populateWorkflowHistoryJavaBean(row));
 					}
 				}
@@ -1108,34 +1047,6 @@ public class WorkflowHelper {
 			AceLog.getAppLog().log(Level.WARNING, "Cannot access Workflow History Refset members with error: " + e.getMessage());
 		}
 		return retSet;
-	}
-
-	public static String getPreferredTerm(I_GetConceptData con) throws IOException, TerminologyException {
-		if (con != null) {
-			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid() &&
-						p.getLang().equalsIgnoreCase("en"))
-						return p.getText();
-			    }
-			}
-		}
-		
-		return "";
-	}
-
-	public static String getFsnTerm(I_GetConceptData con) throws IOException, TerminologyException {
-		if (con != null) {
-			for (I_DescriptionVersioned<?> descv: con.getDescriptions()) {
-			    for (I_DescriptionTuple p: descv.getTuples()) {
-					if (p.getTypeNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid() &&
-						p.getLang().equalsIgnoreCase("en"))
-						return p.getText();
-			    }
-			}
-		}
-
-		return "";
 	}
 
 	public static String shrinkTermForDisplay(String term) {
@@ -1155,7 +1066,7 @@ public class WorkflowHelper {
 		return "";
 	}
 
-	private boolean isConceptInDatabase(I_GetConceptData concept) {
+	private static boolean isConceptInDatabase(I_GetConceptData concept) {
 		boolean hasBeenReleased = false;
 
 		try {

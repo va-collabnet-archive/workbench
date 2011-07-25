@@ -3,7 +3,6 @@ package org.ihtsdo.workflow.refset.history;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
@@ -87,11 +86,11 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 	
 	// Getters
 	public UUID getReferencedComponentUid() {
-		return ((WorkflowHistoryRSFields)fields).getReferencedComponentId();
+		return ((WorkflowHistoryRSFields)fields).getReferencedComponentUid();
 	}
 	
 	public UUID getConceptUid() {
-		return ((WorkflowHistoryRSFields)fields).getReferencedComponentId();
+		return getReferencedComponentUid();
 	}
 	
 	public UUID getWorkflowUid() {
@@ -197,10 +196,6 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			this.override = b;
 		}
 		
-		public I_GetConceptData getConcept() {
-			return getReferencedComponent();
-		}
-		
 		public UUID getConceptUid() {
 			return getReferencedComponentUid();
 		}
@@ -248,7 +243,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			try { 
 				I_TermFactory tf = Terms.get();
 
-				return "\nConcept (Referenced Component Id) = " + getReferencedComponent().getInitialText() + 
+				return "\nConcept (Referenced Component Id) = " + Terms.get().getConcept(getReferencedComponentUid()).getInitialText() + 
 					   "\nWorkflow Uid = " + workflowId.toString() +
 					   "\nPath = " + tf.getConcept(path).getInitialText() +
 					   "\nModeler = " + tf.getConcept(modeler).getInitialText() +
@@ -297,7 +292,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			{
 				StringBuffer str = new StringBuffer();
 				str.append("\nError in adding to Workflow History Refset");
-				str.append("\nConcept (ReferencedComponentId):" + getReferencedComponentId());
+				str.append("\nConcept (ReferencedComponentId):" + getReferencedComponentUid());
 				str.append("\nworkflowId:" + workflowId);
 				str.append("\npath:" + path);
 				str.append("\nmodeler:" + modeler);

@@ -19,18 +19,17 @@ package org.ihtsdo.ace.task.gui.component;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.tasks.editor.AbstractComboEditor;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -39,15 +38,15 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     @Override
     public EditorComponent setupEditor() {
     	
-    	TreeSet<I_GetConceptData> activeModelers = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparer());
-    	TreeSet<I_GetConceptData> inactiveModelers = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparer());
-    	List<I_GetConceptData> modelers = new LinkedList<I_GetConceptData>();
-		I_GetConceptData defaultModeler = null;
+    	ConceptVersionBI defaultModeler = null;
+    	TreeSet<ConceptVersionBI> activeModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet<ConceptVersionBI> inactiveModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	WorkflowConceptCollection modelers = new WorkflowConceptCollection();
 
     	try {
     		for (String mod : WorkflowHelper.getModelerKeySet())
     		{
-    			I_GetConceptData modeler = WorkflowHelper.lookupModeler(mod);
+    			ConceptVersionBI modeler = WorkflowHelper.lookupModeler(mod);
 
     			if (isLeadModeler(modeler))
     				modelers.add(modeler);
@@ -57,18 +56,18 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 					inactiveModelers.add(modeler);
 			}
 	    	
-			for (I_GetConceptData modeler : activeModelers)
+			for (ConceptVersionBI modeler : activeModelers)
 				modelers.add(modeler);
 			
-			for (I_GetConceptData modeler : inactiveModelers)
+			for (ConceptVersionBI modeler : inactiveModelers)
 			{
-				List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+				List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 				boolean foundDefaultModeler = false;
-				for (I_RelVersioned  rel : relList)
+				for (RelationshipVersionBI  rel : relList)
 				{
 					if (rel != null &&
-						rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
+						rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
 					{
 						foundDefaultModeler = true;
 						defaultModeler = modeler;
@@ -84,11 +83,11 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 				modelers.add(defaultModeler);
 			}
     	
-			EditorComponent ec = new EditorComponent(modelers.toArray());
+			EditorComponent ec = new EditorComponent(modelers.getElements());
 
 	    	Dimension d = ec.getPreferredSize();
 	    	d.width = 275;
-	    	ec.setPreferredSize(d);
+	    	ec.setPreferredSize(d); 
 	    	Rectangle r = new Rectangle(d);
 	    	
 	    	ec.setBounds(r);
@@ -101,13 +100,13 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 		return null;
     }
 
-	private boolean isLeadModeler(I_GetConceptData modeler) throws TerminologyException, IOException {
-		List<I_RelVersioned> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+	private boolean isLeadModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
+		List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (I_RelVersioned rel : relList)
+		for (RelationshipVersionBI rel : relList)
 		{
 			if (rel != null &&
-				rel.getC2Id() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
+				rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
 				return true;
 		}
 		

@@ -32,7 +32,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     public ContradictionConceptProcessor(ViewCoordinate viewCoord, I_ShowActivity actvityPanel) {
         // Via Task
 
-        results = new ContradictionIdentificationResults();
+        results = new ContradictionIdentificationResults(viewCoord);
         detector = Ts.get().getConflictIdentifier(viewCoord, false);
 
         this.cNids = buildInvestigationSet();
@@ -47,7 +47,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     public ContradictionConceptProcessor(ViewCoordinate viewCoord, NidBitSetBI nidBitSetBI, I_ShowActivity actvityPanel) {
         // Via Task
 
-        results = new ContradictionIdentificationResults();
+        results = new ContradictionIdentificationResults(viewCoord);
         detector = Ts.get().getConflictIdentifier(viewCoord, false);
 
         this.cNids = nidBitSetBI;

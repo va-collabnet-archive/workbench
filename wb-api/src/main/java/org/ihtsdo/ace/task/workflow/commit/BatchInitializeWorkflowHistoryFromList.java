@@ -60,8 +60,6 @@ public class BatchInitializeWorkflowHistoryFromList extends AbstractTask
     
 	public Condition evaluate(I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException 
 	{
-        WorkflowHelper wfHelper = new WorkflowHelper();
-        	
        	try 
        	{
         	// Get List of Concepts from Props
@@ -71,7 +69,7 @@ public class BatchInitializeWorkflowHistoryFromList extends AbstractTask
         	for (int i = 0; i < model.getSize(); i++)
         	{
         		I_GetConceptData con = model.getElementAt(i);
-        		wfHelper.initializeWorkflowForConcept(con, true);        
+        		WorkflowHelper.initializeWorkflowForConcept(con, true);        
         	}
         } catch (Exception e) {
             throw new TaskFailedException(e);

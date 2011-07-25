@@ -1,7 +1,6 @@
 package org.dwfa.ace.task.profile.cap;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
@@ -16,6 +15,7 @@ import java.util.UUID;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel;
@@ -24,6 +24,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.swing.SwingWorker;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -51,24 +52,24 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
         }
     }
 
-    protected String[] generatePotentialParentConcepts(I_GetConceptData parentNode) {
+    protected String[] generatePotentialParentConcepts(ConceptVersionBI parentNode) {
 	   try {
-    		Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
+    		Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
     		
-    		SortedSet<I_GetConceptData> sortedPotentialParents = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createPreferredTermComparerNoCase());
+    		SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
 
     		sortedPotentialParents.addAll(potentialParentConcepts);
     		
     		String[] parentConcepts = new String[sortedPotentialParents.size()];
     		
     		int i = 0;
-    		for (I_GetConceptData con : sortedPotentialParents) {
+    		for (ConceptVersionBI con : sortedPotentialParents) {
     			if (con.equals(parentNode)) {
     				initialIndex = i;
     			}
-				String displayStr = WorkflowHelper.getPreferredTerm(con);
+				String displayStr = con.getPreferredDescription().getText();
 				if (displayStr == null || displayStr.length() == 0) { 
-					displayStr =  WorkflowHelper.getFsnTerm(con);
+					displayStr =  con.getFullySpecifiedDescription().getText();
 				}
 
 				parentConcepts[i] = displayStr;
@@ -209,7 +210,11 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
     	try {
 	    	parentIds = new LinkedList<Integer>();
 	    	I_GetConceptData parentNode = Terms.get().getConcept(getParentNode());
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
+	    	String creatorProfilePropName = "JESSE";
+	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+	    	ConceptVersionBI parentVersioned = parentNode.getVersion(newConfig.getViewCoordinate());
+	    	
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentVersioned);
 	    	
 	        instruction = getInstruction();
 	        pathList = new JComboBox(potentialParentConcepts);

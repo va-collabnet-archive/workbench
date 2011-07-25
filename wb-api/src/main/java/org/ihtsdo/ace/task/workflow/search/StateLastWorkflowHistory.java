@@ -2,19 +2,20 @@ package org.ihtsdo.ace.task.workflow.search;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.ace.task.gui.component.WorkflowConceptVersion;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
@@ -29,7 +30,7 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
     /**
      * Property name for the State being searched.
      */
-     private I_GetConceptData testState = null;
+     private WorkflowConceptVersion testState = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -43,8 +44,8 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
         {
             Object obj = in.readObject();
 
-            if (obj instanceof I_GetConceptData) {
-            	this.testState = (I_GetConceptData) obj;
+            if (obj instanceof WorkflowConceptVersion) {
+            	this.testState = (WorkflowConceptVersion) obj;
             } else {
             	this.testState = null;
             }
@@ -52,9 +53,10 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
 			if (this.testState == null)
 			{
 				try {
-               Iterator<? extends I_GetConceptData> itr = Terms.get().getActiveAceFrameConfig().getWorkflowStates().iterator();
-               if (itr.hasNext()) {
-                  this.testState = itr.next();
+               TreeSet<? extends ConceptVersionBI> states = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
+
+               if (states.size() > 0) {
+                  this.testState = new WorkflowConceptVersion(states.first());
                }
 	            } catch (Exception e) {
 	            	AceLog.getAppLog().log(Level.WARNING, "Error in initializing drop-down value", e);
@@ -94,11 +96,11 @@ public class StateLastWorkflowHistory extends AbstractWorkflowHistorySearchTest 
     	return testState.getPrimUuid();
 	}
     
-    public I_GetConceptData getTestState() {
+    public WorkflowConceptVersion getTestState() {
         return testState;
     }
 
-    public void setTestState(I_GetConceptData testState) {
+    public void setTestState(WorkflowConceptVersion testState) {
         this.testState = testState;
     }
     

@@ -126,12 +126,12 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -368,13 +368,13 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     private boolean overrideOn = false;
 
-    private TreeSet<? extends I_GetConceptData> workflowRoles = null;
+    private TreeSet<? extends ConceptVersionBI> workflowRoles = null;
 
-    private TreeSet<? extends I_GetConceptData> workflowStates = null;
+    private TreeSet<? extends ConceptVersionBI> workflowStates = null;
 
-    private TreeSet<? extends I_GetConceptData> workflowActions = null;
+    private TreeSet<? extends ConceptVersionBI> workflowActions = null;
 
-    private TreeSet<UUID> availableWorkflowActions = null;
+    private List<UUID> availableWorkflowActions = null;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -3284,54 +3284,54 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowRoles() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowRoles() {
 		if (workflowRoles == null)
-			WorkflowHelper.updateWorkflowUserRoles();
+			WorkflowHelper.updateWorkflowUserRoles(getViewCoordinate());
 
 		return workflowRoles;
 	}
 
 	@Override
-	public void setWorkflowRoles(TreeSet<? extends I_GetConceptData> roles) {
+	public void setWorkflowRoles(TreeSet<? extends ConceptVersionBI> roles) {
 		workflowRoles = roles;
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowStates() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowStates() {
 		if (workflowStates == null)
-			WorkflowHelper.updateWorkflowStates();
+			WorkflowHelper.updateWorkflowStates(getViewCoordinate());
 
 		return workflowStates;
 	}
 
 	@Override
-	public void setWorkflowStates(TreeSet<? extends I_GetConceptData> states) {
+	public void setWorkflowStates(TreeSet<? extends ConceptVersionBI> states) {
 		workflowStates = states;
 	}
 
 	@Override
-	public TreeSet<? extends I_GetConceptData> getWorkflowActions() {
+	public TreeSet<? extends ConceptVersionBI> getWorkflowActions() {
 		if (workflowActions == null)
-			WorkflowHelper.updateWorkflowActions();
+			WorkflowHelper.updateWorkflowActions(getViewCoordinate());
 
 		return workflowActions;
 	}
 
 	@Override
-	public void setWorkflowActions(TreeSet<? extends I_GetConceptData> actions) {
+	public void setWorkflowActions(TreeSet<? extends ConceptVersionBI> actions) {
 		workflowActions = actions;
 	}
 
 	@Override
-	public TreeSet<UUID> getAllAvailableWorkflowActionUids() {
+	public List<UUID> getAllAvailableWorkflowActionUids() {
 		if (availableWorkflowActions == null)
-			WorkflowHelper.updateWorkflowActions();
+			WorkflowHelper.updateWorkflowActions(getViewCoordinate());
 
 		return availableWorkflowActions;
 	}
 
 	@Override
-	public void setAllAvailableWorkflowActionUids(TreeSet<UUID> actions) {
+	public void setAllAvailableWorkflowActionUids(List<UUID> actions) {
 		availableWorkflowActions = actions;
 	}
 }

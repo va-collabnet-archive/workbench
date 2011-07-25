@@ -21,24 +21,19 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.workflow.refset.utilities.WfComparator;
-import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
 public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapUserParentConcept {
@@ -68,7 +63,11 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
     	try {
 	    	parentIds = new LinkedList<Integer>();
 	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid());
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
+	    	String creatorProfilePropName = "JESSE";
+	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+
+	    	
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 	    	
 	        instruction = getInstruction();
 	        parentConceptList = new JComboBox(potentialParentConcepts);

@@ -26,6 +26,7 @@ import org.apache.lucene.util.Version;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public abstract class LuceneManager {
 
@@ -158,14 +159,21 @@ public abstract class LuceneManager {
         }
     }
 
-    public static synchronized void writeToLucene(Collection items, LuceneSearchType type) throws IOException {
+    public static void writeToLucene(Collection items, LuceneSearchType type) throws IOException {
+    	if (type == LuceneSearchType.WORKFLOW_HISTORY) 
+    		throw new IOException("Cannot call this for WfHxLuceneManager-based functionality");
+    	
+    	writeToLucene(items, type, null);
+    }
+    
+    public static synchronized void writeToLucene(Collection items, LuceneSearchType type, ViewCoordinate viewCoord) throws IOException {
         init(type);
         try {
             rwl.writeLock().lock();
             if (type == LuceneSearchType.DESCRIPTION) {
             	DescriptionLuceneManager.writeToLuceneNoLock(items);
             } else {
-            	WfHxLuceneManager.writeToLuceneNoLock(items);
+            	WfHxLuceneManager.writeToLuceneNoLock(items, viewCoord);
             }
         } catch (CorruptIndexException e) {
             throw new IOException(e);
@@ -266,6 +274,11 @@ public abstract class LuceneManager {
     
 
 	public static void createLuceneIndex(LuceneSearchType type) throws Exception {
+		if (type != LuceneSearchType.WORKFLOW_HISTORY) {
+			createLuceneIndex(type, null);
+		}
+	}
+		public static void createLuceneIndex(LuceneSearchType type, ViewCoordinate viewCoord) throws Exception {
 		IndexWriter writer;
 		
 		init(type);
@@ -298,7 +311,7 @@ public abstract class LuceneManager {
             AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
             Bdb.getConceptDb().iterateConceptDataInSequence(descIndexer);
         } else {
-        	wfIndexer = new WfHxIndexGenerator(writer);
+        	wfIndexer = new WfHxIndexGenerator(writer, viewCoord);
             AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
         	wfIndexer.initializeWfHxLucene();
         }
