@@ -767,8 +767,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 if (result != null) {
                     return result;
                 }
-                return (I_DescriptionTuple<DescriptionRevision>) 
-                        getDescs().iterator().next().getVersions().iterator().next();
+                if (getDescs() != null && getDescs().size() > 0) {
+                    return (I_DescriptionTuple<DescriptionRevision>) 
+                            getDescs().iterator().next().getVersions().iterator().next();
+                }
+                return null;
             case LANG_REFEX:
                 result = getRefexSpecifiedDesc(getDescriptionTuples(allowedStatus,
                         new NidSet(typePrefOrder.getListArray()), positionSet, precedencePolicy, contradictionManager),

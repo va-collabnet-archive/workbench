@@ -49,7 +49,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -79,6 +78,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
@@ -523,10 +523,22 @@ public class TermComponentLabel extends JLabel
                 try {
                     switch (textType) {
                         case FULLYSPECIFIED:
-                            this.setText(cv.getFullySpecifiedDescription().getText());
+                            DescriptionVersionBI fsn = cv.getFullySpecifiedDescription();
+                            if (fsn != null) {
+                                this.setText(fsn.getText());
+                            } else {
+                                this.setText("No fsn for: " + termComponent);
+                                AceLog.getAppLog().warning("No fsn for: " + termComponent);
+                            }
                             break;
                         case PREFERRED:
-                            this.setText(cv.getPreferredDescription().getText());
+                            DescriptionVersionBI pt = cv.getPreferredDescription();
+                            if (pt != null) {
+                                this.setText(pt.getText());
+                            } else {
+                               this.setText("No pt for: " + termComponent);
+                               AceLog.getAppLog().warning("No pt for: " + termComponent);
+                            }
                             break;
                         default:
                             this.setText(this.termComponent.toString());
