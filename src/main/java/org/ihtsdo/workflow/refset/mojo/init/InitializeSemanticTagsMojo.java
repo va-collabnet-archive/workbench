@@ -56,14 +56,13 @@ public class InitializeSemanticTagsMojo extends AbstractMojo {
         System.setProperty("java.awt.headless", "true");
         try {
 
-        	SemanticTagsRefsetReader refset = new SemanticTagsRefsetReader();
             I_TermFactory tf = Terms.get();
             
             writer = new SemanticTagsRefsetWriter();
 
             processHierarchies(new File(filePath));
        
-	        tf.addUncommitted(refset.getRefsetConcept());
+	        tf.addUncommitted(writer.getRefsetConcept());
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize semantic tag refset with error: " + e.getMessage());
 		}
@@ -85,7 +84,7 @@ public class InitializeSemanticTagsMojo extends AbstractMojo {
         		if (columns.length == numberOfColumns)
         		{
         			writer.setSemanticTag(columns[semTagPosition]);
-        			writer.setUUID(columns[uidPosition]);
+        			writer.setSemanticTagUUID(columns[uidPosition]);
 
             		writer.addMember();
         		} else if (reportErrors) {
