@@ -124,6 +124,10 @@ public class ViewCoordinate {
         return contradictionManager;
     }
 
+    public void setContradictionManager(ContradictionManagerBI contradictionManager) {
+		this.contradictionManager = contradictionManager;
+	}
+
     public int getLanguageNid() {
         return languageNid;
     }
