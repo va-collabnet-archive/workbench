@@ -182,9 +182,9 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 TerminologyListModel model = (TerminologyListModel) tl.getModel();
                 List<Integer> nidList = model.getNidsInList();
                 for (int nid : nidList) {
+                    retireFromRefexes(component);
                     retireSynonym();
                     addToRefersToRefset(nid);
-                    retireFromRefexes(component);
                 }
             }
         }
@@ -224,7 +224,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                 }
 
                 I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
-                Terms.get().addUncommitted(concept);
+                Ts.get().addUncommitted(concept);
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
@@ -267,8 +267,8 @@ public class RetireAsInappropriateAction extends AbstractAction {
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);
                     }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-                    Terms.get().addUncommitted(concept);
+                    I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                    Ts.get().addUncommitted(concept);
                 } 
             }
         } catch (IOException ex) {
