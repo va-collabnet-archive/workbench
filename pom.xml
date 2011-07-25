@@ -221,6 +221,7 @@
         <module>wb-foundation</module>
         <module>wb-core</module>
         <module>wb-api</module>
+        <module>wb-release-process</module>
         <module>wb-mojo</module>
         <module>wb-gui</module>
         <module>wb-bdb</module>
