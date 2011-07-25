@@ -565,10 +565,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                                 if (settings.getConcept() != null) {
                                                     updateOopsButton(settings.getConcept());
                                                 }
-                                            } catch (Exception e1) {
-                                                AceLog.getAppLog().log(Level.WARNING, "Error Advancing Workflow with error: " + e1.getMessage());
-                                            }
-
+					    }
                                         }
                                     });
 
