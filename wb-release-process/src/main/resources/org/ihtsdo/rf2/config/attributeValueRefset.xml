@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>der2_cRefset_AttributeValueFull_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>id</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>effectiveTime</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>active</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>moduleId</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>refsetId</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>referencedComponentId</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>valueId</name>
+		<description></description>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>
