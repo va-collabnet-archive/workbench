@@ -91,22 +91,25 @@ public class InitializeStateTransitionMojo extends AbstractMojo {
         	if (columns.length == numberOfColumns)
         	{
 	        	ConceptVersionBI category = WorkflowHelper.lookupEditorCategory(columns[categoryPosition], viewCoord);
-    			
-	        	writer.setCategory(category);
-    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition], viewCoord));
-	        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition], viewCoord));
-	        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition], viewCoord));
 
+	        	try {
+		        	writer.setCategory(category);
+	    			writer.setInitialState(WorkflowHelper.lookupState(columns[initialStatePosition], viewCoord));
+		        	writer.setAction(WorkflowHelper.lookupAction(columns[actionPosition], viewCoord));
+		        	writer.setFinalState(WorkflowHelper.lookupState(columns[finalStatePosition], viewCoord));
+	        	} catch (Exception e) {
+	            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset on line: " + line);        
+	        	}
 	        	writer.addMember();
         	}
     		else if (reportErrors) {
-            	AceLog.getAppLog().log(Level.WARNING, line, new Exception("Unable to import this row into state transition refset"));        
+            	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset on line: " + line);        
         	}
         }
     	try {
         	Terms.get().addUncommitted(writer.getRefsetConcept());
     	} catch (Exception e) {
-    		System.out.println("Writer: " + writer + "\nwith refset writer Concept" + writer.getRefsetConcept().getInitialText());
+        	AceLog.getAppLog().log(Level.WARNING, "Writer: " + writer + "\nwith refset writer Concept" + writer.getRefsetConcept().getInitialText());        
     	}
     }
 }

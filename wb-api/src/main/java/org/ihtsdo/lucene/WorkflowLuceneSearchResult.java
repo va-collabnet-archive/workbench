@@ -167,9 +167,9 @@ public class WorkflowLuceneSearchResult {
 		} else if (state.equalsIgnoreCase("For Chief Terminologist review workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Concept having no prior workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NO_WFHX_STATE.getPrimoridalUid();
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Concept not previously existing workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_EMPTY_NOT_EXISTING_STATE.getPrimoridalUid();
+			return ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Escalated workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATED_STATE.getPrimoridalUid();
 		} else if ((state.equalsIgnoreCase("New workflow state")) || (state.equalsIgnoreCase("first review")))  {
