@@ -35,18 +35,16 @@ public abstract class CreateOrAmendBlueprint {
     private UUID statusUuid;
 
     public CreateOrAmendBlueprint(UUID componentUuid) {
-        if (currentStatusUuid == null) {
-            try {
-                if (Ts.get().usesRf2Metadata()) {
-                    currentStatusUuid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid();
-                    retiredStatusUuid = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();;
-                } else {
-                    currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
-                    retiredStatusUuid = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid();
-                }
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+        try {
+            if (Ts.get().usesRf2Metadata()) {
+                currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
+                retiredStatusUuid = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid();
+            } else {
+                currentStatusUuid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid();
+                retiredStatusUuid = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
             }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         statusUuid = currentStatusUuid;
         this.componentUuid = componentUuid;
