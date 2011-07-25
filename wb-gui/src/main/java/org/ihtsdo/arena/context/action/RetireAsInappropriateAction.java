@@ -52,7 +52,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
-    ComponentVersionBI analog;
+    ComponentVersionBI analogComponent;
     I_ConfigAceFrame config;
     TerminologyList tl;
     WizardPanel wizard;
@@ -216,15 +216,14 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     statusNid = SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getNid();
                 }
                 for (PathBI ep : config.getEditingPathSet()) {
-                    analog = (ComponentVersionBI) componentVersion.makeAnalog(
+                    analogComponent = (ComponentVersionBI) componentVersion.makeAnalog(
                             statusNid,
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                 }
-                ComponentVersionBI newComponent = (ComponentVersionBI) analog;
 
-                I_GetConceptData concept = Terms.get().getConceptForNid(newComponent.getNid());
+                I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
                 Terms.get().addUncommitted(concept);
             }
         } catch (IOException e1) {
@@ -268,11 +267,9 @@ public class RetireAsInappropriateAction extends AbstractAction {
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);
                     }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
+                    I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
                     Terms.get().addUncommitted(concept);
-                } else {
-                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-                }
+                } 
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -291,7 +288,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
             RefexCAB newSpec = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    component.getNid(),
+                    analogComponent.getNid(),
                     refexConcept.getNid());
             newSpec.put(RefexProperty.CNID1, nid);
             TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
@@ -300,7 +297,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
             if (!refexConcept.isAnnotationStyleRefex()) {
             Ts.get().addUncommitted(refexConcept);
             }
-            I_GetConceptData concept = Terms.get().getConceptForNid(component.getConceptNid());
+            I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
             Ts.get().addUncommitted(concept);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
