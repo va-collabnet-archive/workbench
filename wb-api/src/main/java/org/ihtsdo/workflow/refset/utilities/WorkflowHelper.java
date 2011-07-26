@@ -41,7 +41,8 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -69,6 +70,9 @@ public class WorkflowHelper {
 
     public final static int numberOfColumns = timeStampPosition + 1;				// 10
 
+    private static int activeNidRf1 = 0;
+    private static int activeNidRf2 = 0;
+    
 	public final static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static HashMap<String, ConceptVersionBI> modelers = null;
@@ -921,6 +925,11 @@ public class WorkflowHelper {
 	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) 
 		throws IOException, TerminologyException 
 	{
+		if (activeNidRf1 == 0) {
+			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+		}
+
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null) {
@@ -935,7 +944,8 @@ public class WorkflowHelper {
 			for (I_ExtendByRef row : members) {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+					int statusNid = row.getTuples().get(idx).getStatusNid();
+					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
 						if (!ignoredWorkflows.contains(reader.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
 							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
 							
@@ -960,6 +970,10 @@ public class WorkflowHelper {
 
 	public static SortedSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
 			I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException {
+		if (activeNidRf1 == 0) {
+			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+		}
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null && workflowId != null) {
@@ -970,7 +984,8 @@ public class WorkflowHelper {
 			for (I_ExtendByRef row : members) {
 				int idx = row.getTuples().size() - 1;
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+					int statusNid = row.getTuples().get(idx).getStatusNid();
+					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
 						if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
 							returnSet.add(populateWorkflowHistoryJavaBean(row));
 						}
@@ -1027,8 +1042,12 @@ public class WorkflowHelper {
 		return semTag;
 	}
 
-	public static TreeSet<WorkflowHistoryJavaBean> getAllWorkflowHistory(I_GetConceptData concept) {
+	public static TreeSet<WorkflowHistoryJavaBean> getAllWorkflowHistory(I_GetConceptData concept) throws TerminologyException, IOException {
 		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
+		if (activeNidRf1 == 0) {
+			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+		}
 		
 		try {
 			List<? extends I_ExtendByRef> members = 
@@ -1039,7 +1058,8 @@ public class WorkflowHelper {
 				int idx = row.getTuples().size() - 1;
 	
 				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+					int statusNid = row.getTuples().get(idx).getStatusNid();
+					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
 						retSet.add(populateWorkflowHistoryJavaBean(row));
 					}
 				}
