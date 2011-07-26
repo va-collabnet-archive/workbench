@@ -10,6 +10,8 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -67,18 +69,28 @@ public class WfHxLuceneManager extends LuceneManager {
 
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
         recalculateMatchLimit = true;
-        WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
-    	
-        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
 
-        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+        WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
         
-        if (result.topDocs.totalHits > 0) {
-            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
-        } else {
-            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
-        }
+        SearchResult result;
+		if (searcher.getTotalCount() > 0) {
+	        WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
+	    	
+	        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
+	
 
+            result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+	        if (result.topDocs.totalHits > 0) {
+	            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
+	        } else {
+	            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
+	        }
+        } else {
+            TopDocs emptyDocs = new TopDocs(0, new ScoreDoc[0], 0);
+
+            result = new SearchResult(emptyDocs, null);
+        }
+	        
         return result;
 	}
 
