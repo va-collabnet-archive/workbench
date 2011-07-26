@@ -19,8 +19,6 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter 
 {
 	// Immutable refCompId
-	private final I_GetConceptData identifiedReferencedComponent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAG_UUID_REL.getUids());
-
 	public SemanticTagsRefsetWriter() throws IOException, TerminologyException {
 		super(semanticTagConcept);
 		fields = new SemanticTagRSFields();
@@ -61,7 +59,11 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 		 		
 		private SemanticTagRSFields() {
 			// Immutable refCompId
-			setReferencedComponentUid(identifiedReferencedComponent.getPrimUuid());
+			try {
+				setReferencedComponentUid(ArchitectonicAuxiliary.Concept.SEMTAG_UUID_REL.getPrimoridalUid());
+			} catch (Exception e) {
+				
+			}
 		}
 		
 		private void setSemanticTag(String semTag) {
