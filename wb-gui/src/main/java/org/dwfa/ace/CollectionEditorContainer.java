@@ -186,70 +186,17 @@ public class CollectionEditorContainer extends JPanel {
         }
     }
 
-    private class ShowComponentActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (showComponentView.isSelected()) {
-                showCollectionArena.setSelected(false);
-                bottomTabs.setSelectedIndex(0);
-                listDetailSplit.setBottomComponent(conceptPanel);
-                if (lastDividerLocation > 0) {
-                    listDetailSplit.setDividerLocation(lastDividerLocation);
-                } else {
-                    listDetailSplit.setDividerLocation(0.30);
-                }
-            }
-            if (showOnlyList()) {
-                showListOnly();
-            }
-        }
-    }
-
-    private class ShowListArenaActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (showCollectionArena.isSelected()) {
-                showComponentView.setSelected(false);
-                listDetailSplit.setBottomComponent(listArena);
-                if (lastDividerLocation > 0) {
-                    listDetailSplit.setDividerLocation(lastDividerLocation);
-                } else {
-                    listDetailSplit.setDividerLocation(0.30);
-                }
-            }
-            if (showOnlyList()) {
-                showListOnly();
-            }
-        }
-    }
-
-    private void showListOnly() {
-        int dividerLocation = listDetailSplit.getDividerLocation();
-        if (dividerLocation != 3000) {
-            lastDividerLocation = dividerLocation;
-            listDetailSplit.setBottomComponent(new JPanel());
-            listDetailSplit.setDividerLocation(3000);
-        }
-    }
-
-    private boolean showOnlyList() {
-        return showComponentView.isSelected() == false && showCollectionArena.isSelected() == false;
-    }
-    int lastDividerLocation = -1;
+ 
+     int lastDividerLocation = -1;
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     private JComponent listArena;
-    private JToggleButton showComponentView;
-    private JToggleButton showCollectionArena;
     private JSplitPane listDetailSplit;
     private JSplitPane listActionSplit;
     private ACE ace;
     private ConceptPanel conceptPanel;
-    private ShowComponentActionListener showComponentActionListener;
     private TerminologyList list;
     private JTabbedPane bottomTabs = new JTabbedPane();
     private JScrollPane batchResultsScroller;
@@ -281,8 +228,10 @@ public class CollectionEditorContainer extends JPanel {
         conceptPanel.setAce(ace, LINK_TYPE.LIST_LINK);
         conceptPanel.setLinkedList(list);
         conceptPanel.changeLinkListener(LINK_TYPE.LIST_LINK);
-        bottomTabs.addTab("concept details", conceptPanel);
-        bottomTabs.addTab("batch action results", batchResultsScroller);
+        bottomTabs.addTab("classic view", new ImageIcon(ACE.class.getResource("/16x16/plain/component.png")), 
+                conceptPanel, "view list selection using the classic view");
+        bottomTabs.addTab("batch action results", new ImageIcon(ACE.class.getResource("/16x16/plain/navigate_check.png")), 
+                batchResultsScroller, "view batch action results");
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -295,12 +244,12 @@ public class CollectionEditorContainer extends JPanel {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
         add(getListSplit(list, ace), c);
-        showComponentView.setSelected(true);
-        showComponentActionListener.actionPerformed(new ActionEvent(showComponentView, 0, "show"));
     }
 
     public void setupArena() throws IOException {
         this.listArena = new Arena(ace.getAceFrameConfig(), new File("arena/listView.mxe"));
+        bottomTabs.insertTab("arena view", new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), 
+                listArena, "view list selection using the arena view", 1);
     }
 
     private JSplitPane getListSplit(JList list, ACE ace) throws IOException, ClassNotFoundException {
@@ -327,18 +276,6 @@ public class CollectionEditorContainer extends JPanel {
         c.weighty = 0;
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
-        showComponentView = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/component.png")));
-        showComponentActionListener = new ShowComponentActionListener();
-        showComponentView.setVisible(ACE.editMode);
-        showComponentView.addActionListener(showComponentActionListener);
-        showComponentView.setToolTipText("Show component view associated with list view");
-        listEditorTopPanel.add(showComponentView, c);
-        c.gridx++;
-        showCollectionArena = new Toggle32x32(new ImageIcon(ACE.class.getResource("/32x32/plain/eye.png")));
-        listEditorTopPanel.add(showCollectionArena, c);
-        showCollectionArena.setToolTipText("Show arena associated with list view");
-        showCollectionArena.addActionListener(new ShowListArenaActionListener());
-        c.gridx++;
 
         JButton eraseListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_delete.png")));
         eraseListButton.setVisible(ACE.editMode);
