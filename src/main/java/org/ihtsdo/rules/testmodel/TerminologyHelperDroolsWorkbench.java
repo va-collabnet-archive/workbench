@@ -42,6 +42,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	private I_GetConceptData semtagsRoot;
 	private Map<String,I_GetConceptData> validSemtags;
+	private Map<String,Set<String>> semtagParents;
 	private List<String> domains;
 
 	public TerminologyHelperDroolsWorkbench(){
@@ -78,6 +79,47 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			return validSemtags;
 		} else {
 			return validSemtags;
+		}
+
+	}
+
+	public Map<String,Set<String>> getSemtagParents() {
+		if (semtagParents == null) {
+			I_TermFactory tf = Terms.get();
+			semtagParents = new HashMap<String, Set<String>>();
+			try {
+				int preferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+				int isa = tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
+				descendants = getDescendants(descendants, semtagsRoot);
+				for (I_GetConceptData semtagConcept : descendants) {
+					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
+							config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getConflictResolutionStrategy())) {
+						if (tuple.getTypeNid() == preferred && !semtagParents.keySet().contains(tuple.getText())) {
+							Set<String> parents = new HashSet<String>();
+							for (I_RelTuple relTuple : semtagConcept.getSourceRelTuples(
+									config.getAllowedStatus(), config.getDestRelTypes(), 
+									config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+									config.getConflictResolutionStrategy())) {
+								if (relTuple.getTypeNid() == isa) {
+									I_GetConceptData parent = tf.getConcept(relTuple.getDestinationNid());
+									parents.add(parent.toString());
+								}
+							}
+							semtagParents.put(tuple.getText(), parents);
+						}
+					}
+				}
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return semtagParents;
+		} else {
+			return semtagParents;
 		}
 
 	}
@@ -290,6 +332,13 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = true;
 
 		try {
+			Map<String, I_GetConceptData> localValidSemtags = getValidSemtags();
+			Map<String, Set<String>> localSemtagsParents = getSemtagParents();
+
+			if (!localSemtagsParents.containsKey(semtag)) {
+				return false;
+			}
+
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
@@ -315,11 +364,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 							loopDescription.getLang().equals(langCode)) {
 						parentSemtags.add(loopDescription.getText().substring(loopDescription.getText().lastIndexOf('(')+1,loopDescription.getText().lastIndexOf(')')));
 					}
-
 				}
 			}
+			
+			if (parentSemtags.size() == 1 &&
+					parentSemtags.iterator().next().equals(semtag)) {
+				return true;
+			}
 
-			if (parentSemtags.size() > 1) {
+
+			if (!localSemtagsParents.get(semtag).containsAll(parentSemtags)) {
 				result = false;
 			}
 
