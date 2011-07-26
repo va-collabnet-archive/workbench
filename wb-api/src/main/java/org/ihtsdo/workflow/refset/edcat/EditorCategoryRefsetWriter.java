@@ -31,6 +31,10 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 		setReferencedComponentId(user.getPrimUuid());
 	}
 
+	public void setEditor(UUID uid) {
+		setReferencedComponentId(uid);
+	}
+
 	public UUID getReferencedComponentUid() {
 		return ((EditorCategoryRSFields)fields).getEditor();
 	}
@@ -52,10 +56,13 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 	}
 
 	public void setCategory(ConceptVersionBI category) {
-		((EditorCategoryRSFields)fields).setCategory(category);
+		((EditorCategoryRSFields)fields).setCategory(category.getPrimUuid());
 	}
 
-	
+	public void setCategory(UUID uid) {
+		((EditorCategoryRSFields)fields).setCategory(uid);
+	}
+
 	
 	
 	public class EditorCategoryRSFields extends WorkflowRefsetFields
@@ -79,8 +86,8 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 			return semanticArea;
 		}
 		
-		private void setCategory(ConceptVersionBI category) {
-			editorCategory = category.getPrimUuid();
+		private void setCategory(UUID uid) {
+			editorCategory = uid;
 		}
 		
 		private UUID getCategory() {

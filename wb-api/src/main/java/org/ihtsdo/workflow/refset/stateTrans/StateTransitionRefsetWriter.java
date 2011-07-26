@@ -37,6 +37,10 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		setReferencedComponentId(category.getPrimUuid());
 	}
 
+	public void setCategory(UUID uid) {
+		setReferencedComponentId(uid);
+	}
+
 	public UUID getReferencedComponentUid() {
 		return ((StateTransitionRSFields)fields).getReferencedComponentUid();
 	}
@@ -54,13 +58,25 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 	public void setInitialState(I_GetConceptData state) {
 		((StateTransitionRSFields)fields).setInitialState(state.getPrimUuid());
 	}
+	
+	public void setInitialState(UUID uid) {
+		((StateTransitionRSFields)fields).setInitialState(uid);
+	}
 
 	public void setAction(I_GetConceptData action) {
 		((StateTransitionRSFields)fields).setAction(action.getPrimUuid());
 	}
 
+	public void setAction(UUID uid) {
+		((StateTransitionRSFields)fields).setAction(uid);
+	}
+
 	public void setFinalState(I_GetConceptData state) {
 		((StateTransitionRSFields)fields).setFinalState(state.getPrimUuid());
+	}
+
+	public void setFinalState(UUID uid) {
+		((StateTransitionRSFields)fields).setFinalState(uid);
 	}
 
 	public void setWorkflowType(ConceptVersionBI type) {
