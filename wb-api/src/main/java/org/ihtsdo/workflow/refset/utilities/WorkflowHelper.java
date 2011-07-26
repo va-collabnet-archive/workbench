@@ -23,6 +23,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -491,16 +492,17 @@ public class WorkflowHelper {
 				int searchRelId = Terms.get().uuidToNative(desiredRelationship.getPrimoridalUid());
 				
 				I_IntSet relType = Terms.get().newIntSet();
-				relType.add(Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid());
+				int relTypeNid = Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid();
 		
-				Collection<? extends RelationshipVersionBI> relList = concept.getRelsOutgoingActive();
+				I_GetConceptData con = Terms.get().getConcept(concept.getPrimUuid());
 				
-				for (RelationshipVersionBI rel : relList)
+				Collection<? extends I_RelVersioned> allRels = con.getSourceRels();
+				for (I_RelVersioned rel : allRels)
 				{
-
-					int relId = rel.getTypeNid();
-					
-					if (relId == searchRelId) {
+					RelationshipVersionBI relVersion = rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					if (relVersion != null && 
+						relVersion.getTypeNid() == searchRelId &&
+						relVersion.isActive(Terms.get().getActiveAceFrameConfig().getAllowedStatus())) {
 						rels.add(rel);
 					}
 				}
