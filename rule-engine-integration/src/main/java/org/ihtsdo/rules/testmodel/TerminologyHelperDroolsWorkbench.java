@@ -99,6 +99,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 							config.getConflictResolutionStrategy())) {
 						if (tuple.getTypeNid() == preferred && !semtagParents.keySet().contains(tuple.getText())) {
 							Set<String> parents = new HashSet<String>();
+							parents.add(tuple.getText());
 							for (I_RelTuple relTuple : semtagConcept.getSourceRelTuples(
 									config.getAllowedStatus(), config.getDestRelTypes(), 
 									config.getViewPositionSetReadOnly(), config.getPrecedence(), 
