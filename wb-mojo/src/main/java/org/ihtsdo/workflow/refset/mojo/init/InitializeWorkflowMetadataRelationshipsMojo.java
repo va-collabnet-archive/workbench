@@ -60,7 +60,7 @@ public class InitializeWorkflowMetadataRelationshipsMojo extends AbstractMojo {
 			createWfRelationship(2, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT);
 			createWfRelationship(3, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT);
 			createWfRelationship(4, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT);
-			createWfRelationship(5, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT);
+			createWfRelationship(5, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT);
 			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()));
 			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION.getPrimoridalUid()));
 			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION.getPrimoridalUid()));
