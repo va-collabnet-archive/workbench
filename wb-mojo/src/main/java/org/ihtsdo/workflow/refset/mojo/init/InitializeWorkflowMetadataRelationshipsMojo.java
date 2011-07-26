@@ -61,20 +61,34 @@ public class InitializeWorkflowMetadataRelationshipsMojo extends AbstractMojo {
 			createWfRelationship(3, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT);
 			createWfRelationship(4, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT);
 			createWfRelationship(5, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_BATCH_COMMIT);
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION.getPrimoridalUid()));
 
 			createWfRelationship(6, ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE, ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT);
 			createWfRelationship(7, ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE, ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT);
 			createWfRelationship(8, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_C, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL);
 			createWfRelationship(9, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_D, ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL);
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_C.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_D.getPrimoridalUid()));
 			
 			createWfRelationship(10, ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION);
 			createWfRelationship(11, ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION);
 			createWfRelationship(12, ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSS_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION);
 			createWfRelationship(13, ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATE_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION);
 			createWfRelationship(14, ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_ACTION, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE, ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION);
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSS_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATE_ACTION.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_ACTION.getPrimoridalUid()));
 			
 			createWfRelationship(15, ArchitectonicAuxiliary.Concept.GENERIC_USER, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS, ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER);
 			createWfRelationship(16, ArchitectonicAuxiliary.Concept.MONIQUE_VAN_BERKUM, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS, ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER);
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.GENERIC_USER.getPrimoridalUid()));
+			Terms.get().addUncommitted(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.MONIQUE_VAN_BERKUM.getPrimoridalUid()));
 			
         } catch (Exception e) {
 			   AceLog.getAppLog().log(Level.WARNING, "Failed to initialize ConfigAceFrame");

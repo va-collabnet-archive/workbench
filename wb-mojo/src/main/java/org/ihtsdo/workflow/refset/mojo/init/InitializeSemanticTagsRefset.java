@@ -19,16 +19,16 @@ import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetWriter;
   
 public class InitializeSemanticTagsRefset implements I_InitializeWorkflowRefset {
 
-	private static final int refCompIdPosition = 0;  // immutable
-    private static final int semTagPosition = 1;
-    private static final int uidPosition = 2;
-    private static final int numberOfColumns = 3;
+	private static final int refCompIdPosition = -1;  // immutable
+    private static final int semTagPosition = 0;
+    private static final int uidPosition = 1;
+    private static final int numberOfColumns = 2;
 
-    private String fileName = "";
+    private String fileName = "semanticTags.txt";
 
     private SemanticTagsRefsetWriter writer = null;
     
-    public void execute() throws MojoExecutionException, MojoFailureException 
+    public InitializeSemanticTagsRefset() 
     {
         try {
             writer = new SemanticTagsRefsetWriter();
@@ -55,6 +55,8 @@ public class InitializeSemanticTagsRefset implements I_InitializeWorkflowRefset 
 	
         		if (columns.length == numberOfColumns)
         		{
+        			int ss = columns.length;
+        			String s = columns[semTagPosition];
         			writer.setSemanticTag(columns[semTagPosition]);
         			writer.setSemanticTagUUID(columns[uidPosition]);
 
