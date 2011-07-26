@@ -550,7 +550,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     public final int compareTo(I_ExtendByRefPart<R> o) {
-        return this.toString().compareTo(o.toString());
+        if (getNid() != o.getNid()) {
+            return getNid() - o.getNid();
+        }
+        return this.getSapNid() - o.getSapNid();
     }
 
     protected abstract VersionComputer<RefsetMember<R, C>.Version> getVersionComputer();
