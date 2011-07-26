@@ -503,7 +503,7 @@ public class WorkflowHelper {
 				Collection<? extends I_RelVersioned> allRels = con.getSourceRels();
 				for (I_RelVersioned rel : allRels)
 				{
-					RelationshipVersionBI relVersion = rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					RelationshipVersionBI relVersion = (RelationshipVersionBI) rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 					if (relVersion != null && 
 						relVersion.getTypeNid() == searchRelId &&
 						relVersion.isActive(Terms.get().getActiveAceFrameConfig().getAllowedStatus())) {
