@@ -41,13 +41,13 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
         task = new BatchActionTaskRoleRetire();
 
         // Setup DnD Retire Role Type Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("Role Type:");
+        ValueDndNidUI tmp = new ValueDndNidUI("Role Type:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRetireRoleType, tmp.getPanel());
         jPanelDndRetireRoleType = tmp.getPanel();
 
         // Setup DnD Retire Role Type Panel
-        tmp = new ValueDndConceptUI("Role Value:");
+        tmp = new ValueDndNidUI("Role Value:");
         layout.replace(jPanelDndRetireRoleValue, tmp.getPanel());
         jPanelDndRetireRoleValue = tmp.getPanel();
     }
@@ -114,7 +114,7 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // SET ROLE TYPE
-        I_AmTermComponent termRoleType = ((ValueDndConceptUI) jPanelDndRetireRoleType).getTermComponent();
+        I_AmTermComponent termRoleType = ((ValueDndNidUI) jPanelDndRetireRoleType).getTermComponent();
         if (termRoleType != null) {
             ((BatchActionTaskRoleRetire) task).setRoleNid(termRoleType.getNid());
         } else {
@@ -124,7 +124,7 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
         }
 
         // SET ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndRetireRoleValue).getTermComponent();
+        I_AmTermComponent termRoleValue = ((ValueDndNidUI) jPanelDndRetireRoleValue).getTermComponent();
         if (termRoleValue != null) {
             ((BatchActionTaskRoleRetire) task).setValueNid(termRoleValue.getNid());
         } else {

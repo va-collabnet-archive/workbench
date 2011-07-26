@@ -51,13 +51,13 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         this.task = new BatchActionTaskRefsetMoveMember();
 
         // Setup DnD Move To Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("Move To:");
+        ValueDndNidUI tmp = new ValueDndNidUI("Move To:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRefsetMoveTo, tmp.getPanel());
         jPanelDndRefsetMoveTo = tmp.getPanel();
 
         // Setup Filter Value Panel
-        tmp = new ValueDndConceptUI("Concept Match Value:");
+        tmp = new ValueDndNidUI("Concept Match Value:");
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
 
@@ -188,13 +188,13 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                     break;
                 case 1: // concept
                     // FILTER PANEL
-                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Concept Match Value:");
+                    ValueDndNidUI tmpC = new ValueDndNidUI("Concept Match Value:");
                     layout.replace(jPanelValueMatch, tmpC.getPanel());
                     jPanelValueMatch = tmpC.getPanel();
                     break;
                 case 2: // integer
                     // FILTER PANEL
-                    ValueIntegerUI tmpI = new ValueIntegerUI("Integer Match Value:");
+                    ValueIntUI tmpI = new ValueIntUI("Integer Match Value:");
                     layout.replace(jPanelValueMatch, tmpI.getPanel());
                     jPanelValueMatch = tmpI.getPanel();
                     break;
@@ -295,7 +295,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
         }
 
         // SET REFSET DND COLLECTION NID
-        I_AmTermComponent refsetMoveToCB = ((ValueDndConceptUI) jPanelDndRefsetMoveTo).getTermComponent();
+        I_AmTermComponent refsetMoveToCB = ((ValueDndNidUI) jPanelDndRefsetMoveTo).getTermComponent();
         if (refsetMoveToCB != null) {
             ((BatchActionTaskRefsetMoveMember) task).setCollectionToNid(refsetMoveToCB.getConceptNid());
         } else {
@@ -323,7 +323,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                 break;
             case 1:
                 ((BatchActionTaskRefsetMoveMember) task).setRefsetType(TK_REFSET_TYPE.CID);
-                Integer valConcept = ((ValueDndConceptUI) jPanelValueMatch).getValue();
+                Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetMoveMember) task).setMatchValue(valConcept);
                     return task;
@@ -331,7 +331,7 @@ public class BatchActionTaskRefsetMoveMemberUI extends javax.swing.JPanel implem
                 break;
             case 2:
                 ((BatchActionTaskRefsetMoveMember) task).setRefsetType(TK_REFSET_TYPE.INT);
-                Integer valInt = ((ValueIntegerUI) jPanelValueMatch).getValue();
+                Integer valInt = ((ValueIntUI) jPanelValueMatch).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetMoveMember) task).setMatchValue(valInt);
                     return task;

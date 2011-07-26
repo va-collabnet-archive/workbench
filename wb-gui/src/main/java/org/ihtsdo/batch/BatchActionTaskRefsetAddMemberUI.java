@@ -46,13 +46,13 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         this.task = new BatchActionTaskRefsetAddMember();
 
         // Setup DnD Add Value Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("To Refset:");
+        ValueDndNidUI tmp = new ValueDndNidUI("To Refset:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRefsetAddTo, tmp.getPanel());
         jPanelDndRefsetAddTo = tmp.getPanel();
 
         // Setup Add Value Panel
-        tmp = new ValueDndConceptUI("Add Concept Value:");
+        tmp = new ValueDndNidUI("Add Concept Value:");
         layout.replace(jPanelValueNew, tmp.getPanel());
         jPanelValueNew = tmp.getPanel();
 
@@ -143,13 +143,13 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
                     break;
                 case 1: // concept
                     // MEMBER VALUE PANEL
-                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Add Concept Value:");
+                    ValueDndNidUI tmpC = new ValueDndNidUI("Add Concept Value:");
                     layout.replace(jPanelValueNew, tmpC.getPanel());
                     jPanelValueNew = tmpC.getPanel();
                     break;
                 case 2: // integer
                     // MEMBER VALUE PANEL
-                    ValueIntegerUI tmpI = new ValueIntegerUI("Add Integer Value:");
+                    ValueIntUI tmpI = new ValueIntUI("Add Integer Value:");
                     layout.replace(jPanelValueNew, tmpI.getPanel());
                     jPanelValueNew = tmpI.getPanel();
                     break;
@@ -189,7 +189,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         // referenced component provided at execution time
 
         // SET REFSET DND COLLECTION NID
-        I_AmTermComponent refsetAddToCB = ((ValueDndConceptUI) jPanelDndRefsetAddTo).getTermComponent();
+        I_AmTermComponent refsetAddToCB = ((ValueDndNidUI) jPanelDndRefsetAddTo).getTermComponent();
         if (refsetAddToCB != null) {
             ((BatchActionTaskRefsetAddMember) task).setCollectionNid(refsetAddToCB.getConceptNid());
         } else {
@@ -202,15 +202,35 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
         switch (jComboBoxType.getSelectedIndex()) {
             case 0:
                 ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.BOOLEAN);
+                Boolean b = ((ValueBooleanUI) jPanelValueNew).getValue();
+                if (b != null) {
+                    ((BatchActionTaskRefsetAddMember) task).setRefsetValue(b);
+                    return task;
+                }
                 break;
             case 1:
                 ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.CID);
+                Integer cNid = ((ValueDndNidUI) jPanelValueNew).getValue();
+                if (cNid != null) {
+                    ((BatchActionTaskRefsetAddMember) task).setRefsetValue(cNid);
+                    return task;
+                }
                 break;
             case 2:
                 ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.INT);
+                Integer i = ((ValueIntUI) jPanelValueNew).getValue();
+                if (i != null) {
+                    ((BatchActionTaskRefsetAddMember) task).setRefsetValue(i);
+                    return task;
+                }
                 break;
             case 3:
                 ((BatchActionTaskRefsetAddMember) task).setRefsetType(TK_REFSET_TYPE.STR);
+                String s = ((ValueStringUI) jPanelValueNew).getValue();
+                if (s != null) {
+                    ((BatchActionTaskRefsetAddMember) task).setRefsetValue(s);
+                    return task;
+                }
                 break;
             default:
                 throw new AssertionError();
@@ -218,14 +238,8 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
 
 
 
-        // SET DND MEMBER VALUE
-        I_AmTermComponent memberValueCB = ((ValueDndConceptUI) jPanelValueNew).getTermComponent();
-        if (memberValueCB != null) {
-            // :!!!: ((BatchActionTaskRefsetAddMember) task).(memberValueCB.getConceptNid());
-        } else {
-            ((BatchActionTaskRefsetAddMember) task).setRefsetValue(null);
-        }
-
-        return task;
+        BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_ADD_MEMBER,
+                BatchActionEventType.TASK_INVALID, "match value not set"));
+        return null;
     }
 }

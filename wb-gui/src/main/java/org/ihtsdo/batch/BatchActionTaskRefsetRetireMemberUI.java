@@ -50,7 +50,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
         this.task = new BatchActionTaskRefsetRetireMember();
 
         // Setup Filter Value Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("Concept Match Value:");
+        ValueDndNidUI tmp = new ValueDndNidUI("Concept Match Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
@@ -175,13 +175,13 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                     break;
                 case 1: // concept
                     // FILTER PANEL
-                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Concept Match Value:");
+                    ValueDndNidUI tmpC = new ValueDndNidUI("Concept Match Value:");
                     layout.replace(jPanelValueMatch, tmpC.getPanel());
                     jPanelValueMatch = tmpC.getPanel();
                     break;
                 case 2: // integer
                     // FILTER PANEL
-                    ValueIntegerUI tmpI = new ValueIntegerUI("Integer Match Value:");
+                    ValueIntUI tmpI = new ValueIntUI("Integer Match Value:");
                     layout.replace(jPanelValueMatch, tmpI.getPanel());
                     jPanelValueMatch = tmpI.getPanel();
                     break;
@@ -298,7 +298,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 break;
             case 1:
                 ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.CID);
-                Integer valConcept = ((ValueDndConceptUI) jPanelValueMatch).getValue();
+                Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valConcept);
                     return task;
@@ -306,7 +306,7 @@ public class BatchActionTaskRefsetRetireMemberUI extends javax.swing.JPanel impl
                 break;
             case 2:
                 ((BatchActionTaskRefsetRetireMember) task).setRefsetType(TK_REFSET_TYPE.INT);
-                Integer valInt = ((ValueIntegerUI) jPanelValueMatch).getValue();
+                Integer valInt = ((ValueIntUI) jPanelValueMatch).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetRetireMember) task).setMatchValue(valInt);
                     return task;

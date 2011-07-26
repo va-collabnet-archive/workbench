@@ -47,7 +47,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         this.task = new BatchActionTaskParentReplace();
 
         // Setup DnD Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("With Parent:");
+        ValueDndNidUI tmp = new ValueDndNidUI("With Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndParentReplace, tmp.getPanel());
         jPanelDndParentReplace = tmp.getPanel();
@@ -175,7 +175,7 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
         RelationshipVersionBI fromParentBI = (RelationshipVersionBI) dcbm.getSelectedItem();
 
         // MOVE TO
-        I_AmTermComponent termParentTo = ((ValueDndConceptUI) jPanelDndParentReplace).getTermComponent();
+        I_AmTermComponent termParentTo = ((ValueDndNidUI) jPanelDndParentReplace).getTermComponent();
 
         if (fromParentBI != null && termParentTo != null && termParentTo.getUUIDs().size() > 0) {
             int nidOldParent = fromParentBI.getDestinationNid();

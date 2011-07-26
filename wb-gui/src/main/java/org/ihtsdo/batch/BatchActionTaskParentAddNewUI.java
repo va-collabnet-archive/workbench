@@ -47,7 +47,7 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         // Setup Linkage Types
 
         // Setup DnD Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("New Parent:");
+        ValueDndNidUI tmp = new ValueDndNidUI("New Parent:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndNewParent, tmp.getPanel());
         jPanelDndNewParent = tmp.getPanel();
@@ -162,7 +162,7 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
         ConceptVersionBI fromParentLinkageBI = (ConceptVersionBI) dcbm.getSelectedItem();
         UUID uuidParentLinkage = fromParentLinkageBI.getPrimUuid(); // 'Is a', 'is a'
 
-        I_AmTermComponent termNewParentDest = ((ValueDndConceptUI) jPanelDndNewParent).getTermComponent();
+        I_AmTermComponent termNewParentDest = ((ValueDndNidUI) jPanelDndNewParent).getTermComponent();
         if (termNewParentDest != null && termNewParentDest.getUUIDs().size() > 0) {
             UUID uuidNewParentDest = termNewParentDest.getUUIDs().get(0);
             ((BatchActionTaskParentAddNew) task).setSelectedRoleTypeUuid(uuidParentLinkage);

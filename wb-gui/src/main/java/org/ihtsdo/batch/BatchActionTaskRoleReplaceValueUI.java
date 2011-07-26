@@ -44,7 +44,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         this.task = new BatchActionTaskRoleReplaceValue();
 
         // Setup DnD Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("New Role Value:");
+        ValueDndNidUI tmp = new ValueDndNidUI("New Role Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
         jPanelDndRoleValueNew = tmp.getPanel();
@@ -181,7 +181,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         // SET OLD ROLE VALUE
 
         // SET NEW ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndRoleValueNew).getTermComponent();
+        I_AmTermComponent termRoleValue = ((ValueDndNidUI) jPanelDndRoleValueNew).getTermComponent();
         if (termRoleValue != null) {
             ((BatchActionTaskRoleReplaceValue) task).setValueNewNid(termRoleValue.getNid());
         } else {

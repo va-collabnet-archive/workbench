@@ -23,10 +23,10 @@ import javax.swing.JPanel;
  *
  * @author marc
  */
-public class ValueIntegerUI extends javax.swing.JPanel {
+public class ValueIntUI extends javax.swing.JPanel {
 
-    /** Creates new form ValueIntegerUI */
-    public ValueIntegerUI(String title) {
+    /** Creates new form ValueIntUI */
+    public ValueIntUI(String title) {
         initComponents();
 
         setBorder(BorderFactory.createTitledBorder(title));

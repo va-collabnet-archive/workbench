@@ -50,13 +50,13 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
         this.task = new BatchActionTaskRefsetReplaceValue();
 
         // Setup DnD Replace Value Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("Replace Concept With:");
+        ValueDndNidUI tmp = new ValueDndNidUI("Replace Concept With:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelValueReplace, tmp.getPanel());
         jPanelValueReplace = tmp.getPanel();
 
         // Setup Filter Value Panel
-        tmp = new ValueDndConceptUI("Concept Match Value:");
+        tmp = new ValueDndNidUI("Concept Match Value:");
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
 
@@ -187,21 +187,21 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                     break;
                 case 1: // concept
                     // MEMBER VALUE PANEL
-                    ValueDndConceptUI tmpC = new ValueDndConceptUI("Replace Concept With:");
+                    ValueDndNidUI tmpC = new ValueDndNidUI("Replace Concept With:");
                     layout.replace(jPanelValueReplace, tmpC.getPanel());
                     jPanelValueReplace = tmpC.getPanel();
                     // FILTER PANEL
-                    tmpC = new ValueDndConceptUI("Concept Match Value:");
+                    tmpC = new ValueDndNidUI("Concept Match Value:");
                     layout.replace(jPanelValueMatch, tmpC.getPanel());
                     jPanelValueMatch = tmpC.getPanel();
                     break;
                 case 2: // integer
                     // MEMBER VALUE PANEL
-                    ValueIntegerUI tmpI = new ValueIntegerUI("Replace Integer With:");
+                    ValueIntUI tmpI = new ValueIntUI("Replace Integer With:");
                     layout.replace(jPanelValueReplace, tmpI.getPanel());
                     jPanelValueReplace = tmpI.getPanel();
                     // FILTER PANEL
-                    tmpI = new ValueIntegerUI("Integer Match Value:");
+                    tmpI = new ValueIntUI("Integer Match Value:");
                     layout.replace(jPanelValueMatch, tmpI.getPanel());
                     jPanelValueMatch = tmpI.getPanel();
                     break;
@@ -319,7 +319,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 break;
             case 1:
                 ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.CID);
-                Integer valConcept = ((ValueDndConceptUI) jPanelValueReplace).getValue();
+                Integer valConcept = ((ValueDndNidUI) jPanelValueReplace).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setRefsetValue(valConcept);
                 } else {
@@ -330,7 +330,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 break;
             case 2:
                 ((BatchActionTaskRefsetReplaceValue) task).setRefsetType(TK_REFSET_TYPE.INT);
-                Integer valInt = ((ValueIntegerUI) jPanelValueReplace).getValue();
+                Integer valInt = ((ValueIntUI) jPanelValueReplace).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
                 } else {
@@ -370,14 +370,14 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
                 }
                 break;
             case 1:
-                Integer valConcept = ((ValueDndConceptUI) jPanelValueMatch).getValue();
+                Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valConcept);
                     return task;
                 }
                 break;
             case 2:
-                Integer valInt = ((ValueIntegerUI) jPanelValueMatch).getValue();
+                Integer valInt = ((ValueIntUI) jPanelValueMatch).getValue();
                 if (valInt != null) {
                     ((BatchActionTaskRefsetReplaceValue) task).setMatchValue(valInt);
                     return task;

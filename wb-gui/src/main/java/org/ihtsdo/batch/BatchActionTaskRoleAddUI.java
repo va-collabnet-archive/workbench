@@ -41,13 +41,13 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
         this.task = new BatchActionTaskRoleAdd();
 
         // Setup DnD Add Role Type Panel
-        ValueDndConceptUI tmp = new ValueDndConceptUI("New Role Type:");
+        ValueDndNidUI tmp = new ValueDndNidUI("New Role Type:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndNewRoleType, tmp.getPanel());
         jPanelDndNewRoleType = tmp.getPanel();
 
         // Setup DnD Add Role Type Panel
-        tmp = new ValueDndConceptUI("New Role Value:");
+        tmp = new ValueDndNidUI("New Role Value:");
         layout.replace(jPanelDndNewRoleValue, tmp.getPanel());
         jPanelDndNewRoleValue = tmp.getPanel();
 }
@@ -114,7 +114,7 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
     @Override
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // SET ROLE TYPE
-        I_AmTermComponent termRoleType = ((ValueDndConceptUI) jPanelDndNewRoleType).getTermComponent();
+        I_AmTermComponent termRoleType = ((ValueDndNidUI) jPanelDndNewRoleType).getTermComponent();
         if (termRoleType != null) {
             ((BatchActionTaskRoleAdd) task).setRoleNid(termRoleType.getNid());
         } else {
@@ -124,7 +124,7 @@ public class BatchActionTaskRoleAddUI extends javax.swing.JPanel implements I_Ba
         }
 
         // SET ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueDndConceptUI) jPanelDndNewRoleValue).getTermComponent();
+        I_AmTermComponent termRoleValue = ((ValueDndNidUI) jPanelDndNewRoleValue).getTermComponent();
         if (termRoleValue != null) {
             ((BatchActionTaskRoleAdd) task).setValueNid(termRoleValue.getNid());
         } else {
