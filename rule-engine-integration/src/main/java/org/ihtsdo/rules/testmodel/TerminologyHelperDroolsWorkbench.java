@@ -373,8 +373,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				return true;
 			}
 
-
-			if (!localSemtagsParents.get(semtag).containsAll(parentSemtags)) {
+			Set<String> validParentSemtags = localSemtagsParents.get(semtag);
+			if (!validParentSemtags.containsAll(parentSemtags)) {
 				result = false;
 			}
 
