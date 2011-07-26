@@ -180,7 +180,7 @@ public class BatchActionTaskRefsetAddMemberUI extends javax.swing.JPanel impleme
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 

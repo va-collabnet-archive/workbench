@@ -137,7 +137,7 @@ public class BatchActionTaskRoleRetireUI extends javax.swing.JPanel implements I
     }
 
     @Override
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 }

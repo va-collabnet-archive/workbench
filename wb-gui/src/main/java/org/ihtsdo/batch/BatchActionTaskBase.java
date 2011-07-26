@@ -232,7 +232,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     }
 
     void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,
-            List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+            List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         taskDetailUI.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
     }
 }

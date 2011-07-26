@@ -124,7 +124,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -140,8 +140,8 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
         // Add exitings parents to JComboBox model.
         Collections.sort(existingRoles, cmp);
         dcbm.removeAllElements();
-        for (ComponentVersionBI componentVersionBI : existingRoles) {
-            dcbm.addElement(componentVersionBI);
+        for (RelationshipVersionBI relationshipVersionBI : existingRoles) {
+            dcbm.addElement(relationshipVersionBI);
         }
 
         if (dcbm.getSize() == 0) {
@@ -153,10 +153,10 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
             // Search by nid
             int selectedIdx = -1;
             for (int i = 0; i < dcbm.getSize(); i++) {
-                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
-                if (cvbi.getNid() == selectedItem.getNid()) {
+                RelationshipVersionBI rvbi = (RelationshipVersionBI) dcbm.getElementAt(i);
+                if (rvbi.getNid() == selectedItem.getNid()) {
                     selectedIdx = i;
-                    selectedItem = cvbi;
+                    selectedItem = rvbi;
                     break;
                 }
             }

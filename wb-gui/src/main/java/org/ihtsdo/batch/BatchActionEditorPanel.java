@@ -71,7 +71,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     private JTextPane resultsTextArea;
     private List<RelationshipVersionBI> existingParents;
     private List<ComponentVersionBI> existingRefsets;
-    private List<ComponentVersionBI> existingRoles;
+    private List<RelationshipVersionBI> existingRoles;
     private List<ComponentVersionBI> parentLinkages;
     private Map<Integer, Class> existingRefsetTypes;
 
@@ -87,7 +87,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         return existingRefsetTypes.get(nid);
     }
 
-    public List<ComponentVersionBI> getExistingRoles() {
+    public List<RelationshipVersionBI> getExistingRoles() {
         return existingRoles;
     }
 
@@ -98,13 +98,11 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     public void updateExistingLists(ListModel termList) {
         existingParents = new ArrayList<RelationshipVersionBI>();
         existingRefsets = new ArrayList<ComponentVersionBI>();
-        existingRoles = new ArrayList<ComponentVersionBI>();
+        existingRoles = new ArrayList<RelationshipVersionBI>();
         existingRefsetTypes = new HashMap<Integer, Class>();
         parentLinkages = new ArrayList<ComponentVersionBI>();
 
-        LinkedHashSet<Integer> setParents = new LinkedHashSet<Integer>();
         LinkedHashSet<Integer> setRefsets = new LinkedHashSet<Integer>();
-        LinkedHashSet<Integer> setRoles = new LinkedHashSet<Integer>();
         ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
 
         try {
@@ -123,8 +121,15 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
                         for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
                             if (rvbi.isStated() && parentLinkageTypes.contains(rvbi.getTypeNid())) {
-                                if (setParents.contains(rvbi.getNid()) == false) {
-                                    setParents.add(rvbi.getNid());
+                                // Check if role-value already exists
+                                Boolean found = false;
+                                for (RelationshipVersionBI parent : existingParents) {
+                                    if (parent.getTypeNid() == rvbi.getTypeNid()
+                                            && parent.getDestinationNid() == rvbi.getDestinationNid()) {
+                                        found = true;
+                                    }
+                                }
+                                if (found == false) {
                                     existingParents.add(rvbi);
                                 }
                             }
@@ -135,7 +140,17 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                     for (ConceptVersionBI cvbi : cb.getVersions(vc)) {
                         for (RelationshipVersionBI rvbi : cvbi.getRelsOutgoingActive()) {
                             if (rvbi.isStated()) {
-                                setRoles.add(rvbi.getNid());
+                                // Check if role-value already exists
+                                Boolean found = false;
+                                for (RelationshipVersionBI role : existingRoles) {
+                                    if (role.getTypeNid() == rvbi.getTypeNid()
+                                            && role.getDestinationNid() == rvbi.getDestinationNid()) {
+                                        found = true;
+                                    }
+                                }
+                                if (found == false) {
+                                    existingRoles.add(rvbi);
+                                }
                             }
                         }
                     }
@@ -165,13 +180,6 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 ComponentVersionBI cvbi = ts.getComponentVersion(vc, nid);
                 if (cvbi != null) {
                     existingRefsets.add(cvbi);
-                }
-            }
-
-            for (Integer nid : setRoles) {
-                ComponentVersionBI cvbi = ts.getComponentVersion(vc, nid);
-                if (cvbi != null) {
-                    existingRoles.add(cvbi);
                 }
             }
 
@@ -226,7 +234,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
         existingParents = new ArrayList<RelationshipVersionBI>();
         existingRefsets = new ArrayList<ComponentVersionBI>();
-        existingRoles = new ArrayList<ComponentVersionBI>();
+        existingRoles = new ArrayList<RelationshipVersionBI>();
         updateExistingLists(batchConceptList.getModel());
     }
 

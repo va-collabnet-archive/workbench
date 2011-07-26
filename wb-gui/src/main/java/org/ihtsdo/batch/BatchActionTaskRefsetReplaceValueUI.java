@@ -239,7 +239,7 @@ public class BatchActionTaskRefsetReplaceValueUI extends javax.swing.JPanel impl
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
