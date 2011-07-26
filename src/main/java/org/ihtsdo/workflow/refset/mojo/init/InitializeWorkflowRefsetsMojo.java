@@ -37,7 +37,7 @@ public class InitializeWorkflowRefsetsMojo extends AbstractMojo {
         initializer = new InitializeSemanticTagsRefset();
         initializer.initializeRefset(filePath);
 
-        initializer = new InitializeSemanticTagsRefset();
+        initializer = new InitializeStateTransitionRefset();
         initializer.initializeRefset(filePath);
     }
 }

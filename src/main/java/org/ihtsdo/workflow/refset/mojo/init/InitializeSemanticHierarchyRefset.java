@@ -15,12 +15,12 @@ import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
  */ 
 
 public class InitializeSemanticHierarchyRefset implements I_InitializeWorkflowRefset {
-	private static final int refCompIdPosition = 0;  // immutable
-    private static final int childSemanticAreaPosition = 1;
-    private static final int parentSemanticAreaPosition = 2;
-    private static final int numberOfColumns = 3;
+	private static final int refCompIdPosition = -1;  // immutable
+    private static final int childSemanticAreaPosition = 0;
+    private static final int parentSemanticAreaPosition = 1;
+    private static final int numberOfColumns = 2;
 
-    private String fileName = "";
+    private String fileName = "semParRefset.txt";
 
     private SemanticHierarchyRefsetWriter writer;
     
@@ -32,7 +32,7 @@ public class InitializeSemanticHierarchyRefset implements I_InitializeWorkflowRe
         } catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Unable to initialize semantic hierarchy refset with error: " + e.getMessage());
         }
-    }
+    } 
 
     @Override
     public boolean initializeRefset(String resourceFilePath)  {
