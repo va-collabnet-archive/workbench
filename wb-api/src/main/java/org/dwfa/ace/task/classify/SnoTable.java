@@ -94,9 +94,9 @@ public class SnoTable {
     // private int countFindSelfDuplPartGE2 = 0;
     private int countIsCDefinedDuplPartGE2 = 0;
     // Setup Strings
-    String xStr = new String(String.valueOf('\u2022')); // &bull; U+2022 (8226)
-    String bStr = new String(" ");
-    String errStr = new String("*");
+    String xStr = String.valueOf('\u2022'); // &bull; U+2022 (8226)
+    String bStr = " ";
+    String errStr = "*";
     String typeFont = "<font face='Dialog' size='3' color='#000066'>";
     String valueFont = "<font face='Dialog' size='3' color='#006600'>";
     // INTERNAL
@@ -1017,8 +1017,8 @@ public class SnoTable {
     // This routine is a simple version for check role roots.
     // Expansion would be needed to properly format more complex ancestry.
     static public String toStringIsaAncestry(int conceptNid, List<PositionBI> posList, boolean isStatedUser) {
-        String barStr = new String(" || ");
-        String commaStr = new String(", ");
+        String barStr = " || ";
+        String commaStr = ", ";
         String delimStr = commaStr;
         StringBuilder sb = new StringBuilder(512);
         sb.insert(0, String.valueOf(conceptNid));
