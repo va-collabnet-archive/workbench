@@ -626,12 +626,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     if (stopWork) {
                         return false;
                     }
-                    if (allTuples == null) {
+                    List allTupleRef = allTuples;
+                    if (allTupleRef == null) {
                         AceLog.getAppLog().info("all tuples for RefsetMemberTableModel is  null");
                         return false;
                     }
                     conceptsToFetch.add(ext.getRefsetId());
-                    allTuples.add(tuple);
+                    allTupleRef.add(tuple);
                 }
             }
 
