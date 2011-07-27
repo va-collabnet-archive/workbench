@@ -61,14 +61,14 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContraditionException, InvalidCAB {
         int conceptNid = c.getNid();
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelsIncomingActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : rels) {
             if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueOldNid) {
                 rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
 
                 RelCAB rc = new RelCAB(rvbi.getOriginNid(), rvbi.getTypeNid(), valueNewNid, rvbi.getGroup(),
                         TkRelType.STATED_HIERARCHY);
-                termConstructor.construct(rc);
+                tsSnapshot.construct(rc);
 
                 BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_REPLACE_VALUE,
                         BatchActionEventType.EVENT_SUCCESS, "retired rel: " + nidToName(conceptNid) + " :: "

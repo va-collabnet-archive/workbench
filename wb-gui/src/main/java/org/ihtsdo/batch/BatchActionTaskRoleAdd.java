@@ -16,11 +16,15 @@
  */
 package org.ihtsdo.batch;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
 
 /**
@@ -44,15 +48,45 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
     public void setValueNid(int valueNid) {
         this.valueNid = valueNid;
     }
-    
+
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
-        int conceptNid = c.getNid();
-        RelCAB relSpec = new RelCAB(conceptNid, roleNid, valueNid, 0, TkRelType.STATED_ROLE);
-        termConstructor.construct(relSpec);
+        // Check if role-value already exists and is active.
+        Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
+        for (RelationshipVersionBI rvbi : checkParents) {
+            if (rvbi.getTypeNid() == roleNid
+                    && rvbi.getDestinationNid() == valueNid
+                    && rvbi.isStated()) {
+                BatchActionEventReporter.add(new BatchActionEvent(c,
+                        BatchActionTaskType.ROLE_ADD,
+                        BatchActionEventType.EVENT_NOOP,
+                        "already has role-value: "
+                        + nidToName(roleNid) + " :: " + nidToName(valueNid)));
+                return false;
+            }
+        }
 
-        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_ADD, BatchActionEventType.EVENT_SUCCESS, 
-                "added relationship: " + nidToName(conceptNid) + " :: " + nidToName(roleNid) + " :: " + nidToName(valueNid)));
-        return true;
+        //        RelCAB relSpec = new RelCAB(c.getNid(), roleNid, valueNid, 0, TkRelType.STATED_ROLE);
+        List<UUID> roleUuids = ts.getUuidsForNid(roleNid);
+        List<UUID> valueUuids = ts.getUuidsForNid(valueNid);
+        if (roleUuids.size() > 0 && valueUuids.size() > 0) {
+            RelCAB relSpec = new RelCAB(c.getPrimUuid(), roleUuids.get(0), valueUuids.get(0),
+                    0, TkRelType.STATED_ROLE);
+            tsSnapshot.construct(relSpec);
+
+            BatchActionEventReporter.add(new BatchActionEvent(c,
+                    BatchActionTaskType.ROLE_ADD,
+                    BatchActionEventType.EVENT_SUCCESS,
+                    "added role-value: "
+                    + " :: " + nidToName(roleNid) + " :: " + nidToName(valueNid)));
+            return true;
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(c,
+                    BatchActionTaskType.ROLE_ADD,
+                    BatchActionEventType.EVENT_ERROR,
+                    "could not find role-value uuids: "
+                    + nidToName(roleNid) + " :: " + nidToName(valueNid)));
+            return false;
+        }
     }
 }

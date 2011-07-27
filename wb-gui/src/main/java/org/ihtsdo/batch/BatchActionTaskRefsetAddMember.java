@@ -19,6 +19,7 @@ package org.ihtsdo.batch;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -62,7 +63,8 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getCollectionNid() == collectionNid) {
-                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER, BatchActionEventType.EVENT_NOOP, "already member of: " + nidToName(collectionNid)));
+                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER,
+                        BatchActionEventType.EVENT_NOOP, "already member of: " + nidToName(collectionNid)));
                 return false;
             }
         }
@@ -80,7 +82,18 @@ public class BatchActionTaskRefsetAddMember extends BatchActionTask {
         }
 
         refexSpec.setMemberContentUuid();
-        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER, BatchActionEventType.EVENT_SUCCESS, "member added to: " + nidToName(collectionNid)));
-        return true;
+        tsSnapshot.constructIfNotCurrent(refexSpec);
+
+        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_ADD_MEMBER,
+                BatchActionEventType.EVENT_SUCCESS, "member added to: " + nidToName(collectionNid)));
+
+        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
+        if (collectionConcept.isAnnotationStyleRefex()) {
+            // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+            return true; // pass to BatchActionProcessor
+        } else {
+            ts.addUncommitted(collectionConcept);
+            return false;
+        }
     }
 }

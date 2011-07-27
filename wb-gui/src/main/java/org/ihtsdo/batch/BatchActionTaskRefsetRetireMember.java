@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -37,7 +38,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
     // FILTER
     private TK_REFSET_TYPE refsetType;
     private Object matchValue;
-    
+
     public BatchActionTaskRefsetRetireMember() {
         this.collectionNid = Integer.MAX_VALUE;
         this.matchValue = null;
@@ -54,24 +55,35 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
     public void setMatchValue(Object matchValue) {
         this.matchValue = matchValue;
     }
-    
+
     // BatchActionTask
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException {
 
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
         boolean changed = false;
-        boolean matched = false;
+        boolean changedReferencedConcept = false;
+        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getCollectionNid() == collectionNid) {
                 if (matchValue == null) {
                     rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                    if (collectionConcept.isAnnotationStyleRefex()) {
+                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+                        changedReferencedConcept = true; // pass to BatchActionProcessor
+                    } else {
+                        ts.addUncommitted(collectionConcept);
+                    }
+
                     changed = true;
-                    BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                            BatchActionEventType.EVENT_SUCCESS, "retired member of: " + nidToName(collectionNid)));
+                    BatchActionEventReporter.add(new BatchActionEvent(c,
+                            BatchActionTaskType.REFSET_RETIRE_MEMBER,
+                            BatchActionEventType.EVENT_SUCCESS,
+                            "retired member of: " + nidToName(collectionNid)));
                 } else {
                     // CHECK FILTER
                     RefexCAB spec = rvbi.getRefexEditSpec();
+                    boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:
                             if ((Boolean) matchValue == spec.getBoolean(RefexCAB.RefexProperty.BOOLEAN1)) {
@@ -99,9 +111,18 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
 
                     if (matched) {
                         rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                        if (collectionConcept.isAnnotationStyleRefex()) {
+                            // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+                            changedReferencedConcept = true; // pass to BatchActionProcessor
+                        } else {
+                            ts.addUncommitted(collectionConcept);
+                        }
+
                         changed = true;
-                        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                                BatchActionEventType.EVENT_SUCCESS, "retired member of (value matched): " + nidToName(collectionNid)));
+                        BatchActionEventReporter.add(new BatchActionEvent(c,
+                                BatchActionTaskType.REFSET_RETIRE_MEMBER,
+                                BatchActionEventType.EVENT_SUCCESS,
+                                "retired member of (value matched): " + nidToName(collectionNid)));
                     }
                     matched = false;
                 }
@@ -110,12 +131,14 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
 
         if (!changed && matchValue == null) {
             BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                    BatchActionEventType.EVENT_NOOP, "was not member of: " + nidToName(collectionNid)));
+                    BatchActionEventType.EVENT_NOOP,
+                    "was not member of: " + nidToName(collectionNid)));
         } else if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                    BatchActionEventType.EVENT_NOOP, "member not retired (not matched): " + nidToName(collectionNid)));
+                    BatchActionEventType.EVENT_NOOP,
+                    "member not retired (not matched): " + nidToName(collectionNid)));
         }
 
-        return changed;
+        return changedReferencedConcept;
     }
 }

@@ -74,7 +74,9 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
         // RETIRE EXISTING PARENT
         boolean changed = false;
         for (RelationshipVersionBI r : c.getRelsOutgoingActive()) {
-            if (r.getDestinationNid() == moveFromDestNid && r.getTypeNid() == moveFromRoleTypeNid && r.isStated()) {
+            if (r.getDestinationNid() == moveFromDestNid 
+                    && r.getTypeNid() == moveFromRoleTypeNid
+                    && r.isStated()) {
                 r.makeAnalog(RETIRED_NID, ec.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
                 changed = true;
             }
@@ -83,14 +85,17 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
         // IF PARENT REMOVED, THEN ADD NEW PARENT
         if (changed) {
             RelCAB rc = new RelCAB(c.getPrimUuid(), moveToRoleTypeUuid, moveToDestUuid, 0, TkRelType.STATED_HIERARCHY);
-            termConstructor.construct(rc);
+            tsSnapshot.construct(rc);
 
-            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_REPLACE,
+            BatchActionEventReporter.add(new BatchActionEvent(c,
+                    BatchActionTaskType.PARENT_REPLACE,
                     BatchActionEventType.EVENT_SUCCESS,
                     "from: " + nidToName(moveFromDestNid) + " to: " + uuidToName(moveToDestUuid)));
         } else {
-            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_REPLACE,
-                    BatchActionEventType.EVENT_NOOP, "does not have parent: " + nidToName(moveFromDestNid)));
+            BatchActionEventReporter.add(new BatchActionEvent(c,
+                    BatchActionTaskType.PARENT_REPLACE,
+                    BatchActionEventType.EVENT_NOOP,
+                    "does not have parent: " + nidToName(moveFromDestNid)));
         }
 
         return changed;

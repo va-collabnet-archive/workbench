@@ -176,17 +176,33 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) {
 
-        // SET ROLE TYPE
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
+        RelationshipVersionBI oldRoleValueBI = (RelationshipVersionBI) dcbm.getSelectedItem();
 
-        // SET OLD ROLE VALUE
+        if (oldRoleValueBI != null) {
+            // SET OLD ROLE TYPE
+            int oldRoleTypeNid = oldRoleValueBI.getTypeNid();
+            ((BatchActionTaskRoleReplaceValue) task).setRoleNid(oldRoleTypeNid);
+            // SET OLD ROLE VALUE
+            int oldValueNid = oldRoleValueBI.getDestinationNid();
+            ((BatchActionTaskRoleReplaceValue) task).setValueOldNid(oldValueNid);
+        } else {
+            BatchActionEventReporter.add(new BatchActionEvent(null,
+                    BatchActionTaskType.ROLE_REPLACE_VALUE,
+                    BatchActionEventType.TASK_INVALID,
+                    "no selected role"));
+            return null;
+        }
 
         // SET NEW ROLE VALUE
         I_AmTermComponent termRoleValue = ((ValueDndNidUI) jPanelDndRoleValueNew).getTermComponent();
         if (termRoleValue != null) {
             ((BatchActionTaskRoleReplaceValue) task).setValueNewNid(termRoleValue.getNid());
         } else {
-            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.ROLE_REPLACE_VALUE,
-                    BatchActionEventType.TASK_INVALID, "value not set"));
+            BatchActionEventReporter.add(new BatchActionEvent(null,
+                    BatchActionTaskType.ROLE_REPLACE_VALUE,
+                    BatchActionEventType.TASK_INVALID,
+                    "new value not set"));
             return null;
         }
 

@@ -47,23 +47,30 @@ public class BatchActionTaskRoleRetire extends BatchActionTask {
     
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
-        int conceptNid = c.getNid();
         boolean changed = false;
-        Collection<? extends RelationshipVersionBI> rels = c.getRelsIncomingActive();
+        Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : rels) {
-            if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueNid) {
+            if (rvbi.getTypeNid() == roleNid 
+                    && rvbi.getDestinationNid() == valueNid
+                    && rvbi.isStated()) {
+
                 rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
-                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_RETIRE,
-                        BatchActionEventType.EVENT_SUCCESS, "retired rel: " + nidToName(conceptNid) + " :: "
-                        + nidToName(roleNid) + " :: " + nidToName(valueNid)));
                 changed = true;
+
+                BatchActionEventReporter.add(new BatchActionEvent(c,
+                        BatchActionTaskType.ROLE_RETIRE,
+                        BatchActionEventType.EVENT_SUCCESS,
+                        "retired rel: " + nidToName(c.getNid())
+                        + " :: " + nidToName(roleNid) + " :: " + nidToName(valueNid)));
             }
         }
 
         if (!changed) {
-            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_RETIRE,
-                    BatchActionEventType.EVENT_NOOP, "does have rel: " + nidToName(conceptNid) + " :: "
-                    + nidToName(roleNid) + " :: " + nidToName(valueNid)));
+            BatchActionEventReporter.add(new BatchActionEvent(c,
+                    BatchActionTaskType.ROLE_RETIRE,
+                    BatchActionEventType.EVENT_NOOP, 
+                    "does not have rel to retire: " + nidToName(c.getNid())
+                    + " :: " + nidToName(roleNid) + " :: " + nidToName(valueNid)));
         }
 
         return changed;

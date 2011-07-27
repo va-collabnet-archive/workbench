@@ -78,6 +78,7 @@ public class RelCAB extends CreateOrAmendBlueprint {
                         ts.getUuidsForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID()).get(0);
                 break;
             case STATED_ROLE:
+                characteristicUuid =
                         ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()).get(0);
                 refinabilityUuid =
                         ts.getUuidsForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID()).get(0);

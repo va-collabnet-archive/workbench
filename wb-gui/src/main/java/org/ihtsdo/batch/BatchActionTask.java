@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -29,7 +30,8 @@ public abstract class BatchActionTask {
 
     public static int RETIRED_NID;
     public static int CURRENT_NID;
-    public static TerminologyConstructorBI termConstructor;
+    public static TerminologyStoreDI ts;
+    public static TerminologyConstructorBI tsSnapshot;
 
     public enum BatchActionTaskType {
 
@@ -60,7 +62,8 @@ public abstract class BatchActionTask {
     public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
         RETIRED_NID = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
         CURRENT_NID = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
-        termConstructor = Ts.get().getTerminologyConstructor(ec, vc);
+        ts = Ts.get();
+        tsSnapshot = ts.getTerminologyConstructor(ec, vc);
     }
 
     public static String nidToName(int nid) throws IOException {

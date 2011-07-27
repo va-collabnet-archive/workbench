@@ -70,18 +70,26 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
         // Check if parent already exists and is active.
         Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : checkParents) {
-            if (rvbi.getDestinationNid() == selectedDestNid && rvbi.getTypeNid() == selectedRoleTypeNid & rvbi.isStated()) {
-                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_ADD_NEW, BatchActionEventType.EVENT_NOOP, "already has parent: " + nidToName(selectedDestNid)));
+            if (rvbi.getTypeNid() == selectedRoleTypeNid
+                    && rvbi.getDestinationNid() == selectedDestNid
+                    && rvbi.isStated()) {
+                BatchActionEventReporter.add(new BatchActionEvent(c,
+                        BatchActionTaskType.PARENT_ADD_NEW,
+                        BatchActionEventType.EVENT_NOOP,
+                        "already has parent: " + nidToName(selectedDestNid)));
                 return false;
             }
         }
 
         // If parent does not already exist, than add a new parent record.
-        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid, 
+        RelCAB rc = new RelCAB(c.getPrimUuid(), selectedRoleTypeUuid, selectedDestUuid,
                 0, TkRelType.STATED_HIERARCHY);
-        termConstructor.construct(rc);  
+        tsSnapshot.construct(rc);
 
-        BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.PARENT_ADD_NEW, BatchActionEventType.EVENT_SUCCESS, "added parent: " + nidToName(selectedDestNid)));
+        BatchActionEventReporter.add(new BatchActionEvent(c,
+                BatchActionTaskType.PARENT_ADD_NEW,
+                BatchActionEventType.EVENT_SUCCESS,
+                "added parent: " + nidToName(selectedDestNid)));
         return true;
     }
 }
