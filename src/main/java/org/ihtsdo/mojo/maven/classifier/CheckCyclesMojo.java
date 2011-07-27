@@ -44,6 +44,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
@@ -109,9 +110,6 @@ public class CheckCyclesMojo extends AbstractMojo {
     private static int isMANDATORY_REFINABILITY = Integer.MAX_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MAX_VALUE;
-    private static int isCh_STATED_AND_INFERRED_RELATIONSHIP = Integer.MAX_VALUE;
-    private static int isCh_STATED_AND_SUBSUMED_RELATIONSHIP = Integer.MAX_VALUE;
-    private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MAX_VALUE;
     private static int snorocketAuthorNid = Integer.MAX_VALUE;
     // NID SETS
@@ -260,25 +258,14 @@ public class CheckCyclesMojo extends AbstractMojo {
             rootRoleNid = tf.uuidToNative(UUID.fromString(uuidRoleRoot));
 
             // 0 CURRENT, 1 RETIRED
-            isCURRENT = tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-            isLIMITED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids());
-            isRETIRED = tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-            isOPTIONAL_REFINABILITY = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids());
-            isNOT_REFINABLE = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids());
-            isMANDATORY_REFINABILITY = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.MANDATORY_REFINABILITY.getUids());
-            isCh_STATED_RELATIONSHIP = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids());
-            isCh_DEFINING_CHARACTERISTIC = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids());
-            isCh_STATED_AND_INFERRED_RELATIONSHIP = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids());
-            isCh_STATED_AND_SUBSUMED_RELATIONSHIP = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids());
-            sourceUnspecifiedNid = tf.uuidToNative(
-                    ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
+            isCURRENT = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
+            isLIMITED = SnomedMetadataRfx.getSTATUS_LIMITED_NID();
+            isRETIRED = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+            isOPTIONAL_REFINABILITY = SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID();
+            isNOT_REFINABLE = SnomedMetadataRfx.getREL_NOT_REFINABLE_NID();
+            isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
+            isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
+            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
 
             snorocketAuthorNid = tf.uuidToNative(
                     ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
