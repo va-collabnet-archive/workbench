@@ -63,7 +63,6 @@ public class TestSnoPathProcessInferred extends AbstractTask {
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
-    private static int sourceUnspecifiedNid;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     private UUID uuidSourceSnomedLong = null;
@@ -300,7 +299,6 @@ public class TestSnoPathProcessInferred extends AbstractTask {
             isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
             isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
             isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
-            sourceUnspecifiedNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
 
