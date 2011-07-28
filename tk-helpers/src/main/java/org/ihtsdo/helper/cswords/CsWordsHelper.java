@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
-import org.ihtsdo.tk.example.binding.CaseSensitive;
+import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 /**
  *
@@ -42,7 +42,7 @@ public class CsWordsHelper {
     private static Map<Integer, Set<String>> csWordSetMap = null;
     private static Lock initLock = new ReentrantLock();
 
-    private static void lazyInit()
+    public static void lazyInit()
             throws IOException {
         if (csWordSetMap == null) {
             initLock.lock();
@@ -50,13 +50,16 @@ public class CsWordsHelper {
                 if (csWordSetMap == null) {
                     ViewCoordinate vc = Ts.get().getMetadataVC();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
-                    csWordSetMap = new HashMap<Integer, Set<String>>();
+                    HashMap csWordSetMap = new HashMap<Integer, Set<String>>();
                     ConceptVersionBI csWordsRefsetC =
                             CaseSensitive.CS_WORDS_REFSET.get(Ts.get().getMetadataVC());
                     Collection<? extends RefexChronicleBI<?>> csWords =
                             csWordsRefsetC.getRefexes();
 
                     Set<String> csWordSet = new HashSet<String>();
+                    
+                    int icSigNid = CaseSensitive.IC_SIGNIFICANT.getLenient().getNid();
+                    int maybeSigNid = CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid();
                     Set<String> maybeCsWordSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : csWords) {
 
@@ -65,14 +68,15 @@ public class CsWordsHelper {
                         RefexCnidVersionBI cv =
                                 (RefexCnidVersionBI) refex.getVersion(vc);
                         int typeNid = cv.getCnid1();
-                        if (typeNid == CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) {
+                        if (typeNid == icSigNid) {
                             csWordSet.add(sv.getStr1());
                         } else {
                             maybeCsWordSet.add(sv.getStr1());
                         }
                     }
-                    csWordSetMap.put(CaseSensitive.IC_SIGNIFICANT.getLenient().getNid(), csWordSet);
-                    csWordSetMap.put(CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid(), maybeCsWordSet);
+                    csWordSetMap.put(icSigNid, csWordSet);
+                    csWordSetMap.put(maybeSigNid, maybeCsWordSet);
+                    CsWordsHelper.csWordSetMap = csWordSetMap;
                 }
             } catch (ContraditionException ex) {
                 throw new IOException(ex);

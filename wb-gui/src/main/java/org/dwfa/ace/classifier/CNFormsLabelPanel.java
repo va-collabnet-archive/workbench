@@ -74,6 +74,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -456,6 +457,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public boolean sapIsInRange(int min, int max) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isBaselineGeneration() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
@@ -968,6 +979,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public boolean sapIsInRange(int min, int max) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isBaselineGeneration() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }

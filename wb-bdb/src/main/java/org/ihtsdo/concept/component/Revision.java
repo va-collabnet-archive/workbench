@@ -31,6 +31,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
 public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
         implements I_AmPart<V>,
@@ -463,4 +464,15 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         }
         return toString();
     }
+    
+        @Override
+    public boolean isBaselineGeneration() {
+        return sapNid > Bdb.getSapDb().getReadOnlyMax();
+    }
+
+        
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+        return primordialComponent.makeAdjudicationAnalogs(ec, vc);
+    }
+
 }

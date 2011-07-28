@@ -15,6 +15,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -27,6 +28,11 @@ public class RelGroupVersion
         implements RelGroupVersionBI {
 
     private RelGroupChronicleBI rg;
+
+    @Override
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        return rg.makeAdjudicationAnalogs(ec, vc);
+    }
 
     @Override
     public Collection<? extends RefexChronicleBI<?>> getRefexes()
@@ -120,6 +126,20 @@ public class RelGroupVersion
         }
         return results;
     }
+
+    @Override
+    public boolean isBaselineGeneration() {
+        for (RelationshipChronicleBI rc: getRels()) {
+            for (RelationshipVersionBI rv: rc.getVersions()) {
+                if (!rv.isBaselineGeneration()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
 
     @Override
     public Collection<? extends RelationshipVersionBI> getAllRels() throws ContraditionException {

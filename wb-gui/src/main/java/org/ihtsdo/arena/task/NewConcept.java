@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -74,6 +75,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.example.binding.Snomed;
@@ -193,23 +195,25 @@ public class NewConcept extends PreviousNextOrCancel {
 
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
+            new Thread(
+            new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        CsWordsHelper.lazyInit();
+                    } catch (IOException ex) {
+                       AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                }
+            }).start();
+            
             synchronized (this) {
                 this.waitTillDone(worker.getLogger());
             }
+            MakeNewConcept maker = new MakeNewConcept();
+            maker.execute();
             restore();
-
-            if (SwingUtilities.isEventDispatchThread()) {
-                doRun(process, worker);
-            } else {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        doRun(process, worker);
-                    }
-                });
-            }
-
+            maker.getLatch().await();
         } catch (InterruptedException e) {
             throw new TaskFailedException(e);
         } catch (InvocationTargetException e) {
@@ -221,10 +225,16 @@ public class NewConcept extends PreviousNextOrCancel {
         return returnCondition;
     }
 
-    public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
-        wizard.setWizardPanelVisible(false);
+    private class MakeNewConcept extends SwingWorker<Object, Object> {
 
-        try {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        public CountDownLatch getLatch() {
+            return latch;
+        }
+        
+        @Override
+        protected Object doInBackground() throws Exception {
             // check return condition for CONTINUE or ITEM_CANCELLED
             if (returnCondition == Condition.CONTINUE) {
                 createBlueprintConcept();
@@ -299,21 +309,27 @@ public class NewConcept extends PreviousNextOrCancel {
                     createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
                     //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
-                Ts.get().addUncommitted(newConcept);
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        I_AmTermComponent newTerm = (I_AmTermComponent) newConcept;
-                        host.setTermComponent(newTerm);
-                        wizard.setWizardPanelVisible(false);
-                    }
-                });
+                
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            returnCondition = Condition.ITEM_CANCELED;
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                get();
+                I_AmTermComponent newTerm = (I_AmTermComponent) newConcept;
+                wizard.setWizardPanelVisible(false);
+                host.setTermComponent(newTerm);
+                Ts.get().addUncommitted(newConcept);
+                //wizard.setWizardPanelVisible(false);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                returnCondition = Condition.ITEM_CANCELED;
+                host.setTermComponent(null);
+            } finally {
+                latch.countDown();
+            }
         }
     }
 

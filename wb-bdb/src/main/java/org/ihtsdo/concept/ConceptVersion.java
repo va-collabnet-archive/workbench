@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.constraint.DescriptionConstraint;
 import org.ihtsdo.tk.api.constraint.RelConstraint;
 import org.ihtsdo.tk.api.constraint.RelConstraintIncoming;
 import org.ihtsdo.tk.api.constraint.RelConstraintOutgoing;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -820,5 +821,15 @@ public class ConceptVersion implements ConceptVersionBI {
     @Override
     public boolean sapIsInRange(int min, int max) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean isBaselineGeneration() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        return concept.makeAdjudicationAnalogs(ec, vc);
     }
 }

@@ -53,6 +53,7 @@ import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.description.Description.Version;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.image.Image;
+import org.ihtsdo.concept.component.processor.AdjudicationAnalogCreator;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
@@ -82,12 +83,14 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.ProcessComponentChronicleBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
@@ -768,8 +771,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     return result;
                 }
                 if (getDescs() != null && getDescs().size() > 0) {
-                    return (I_DescriptionTuple<DescriptionRevision>) 
-                            getDescs().iterator().next().getVersions().iterator().next();
+                    return (I_DescriptionTuple<DescriptionRevision>) getDescs().iterator().next().getVersions().iterator().next();
                 }
                 return null;
             case LANG_REFEX:
@@ -1700,11 +1702,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
         return canceled;
     }
-    
-    public void setIsCanceled(boolean isCanceled){
-        canceled  = isCanceled;
+
+    public void setIsCanceled(boolean isCanceled) {
+        canceled = isCanceled;
     }
-    
+
     @Override
     public final Set<I_DescriptionTuple> getCommonDescTuples(I_ConfigAceFrame config) throws IOException {
         return ConflictHelper.getCommonDescTuples(this, config);
@@ -2142,6 +2144,40 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             return new FoundContradictionVersions(result, identifier.getReturnVersions());
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    @Override
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        AdjudicationAnalogCreator aac = new AdjudicationAnalogCreator(ec, vc);
+        processComponentChronicles(aac);
+        return aac.isComponentChanged();
+    }
+    
+    
+    public void processComponentChronicles(ProcessComponentChronicleBI processor) throws Exception {
+        if (getConceptAttributes() != null) {
+            processor.process(getConceptAttributes());
+        }
+        if (getDescriptions() != null) {
+            for (ComponentChroncileBI cc : getDescriptions()) {
+                processor.process(cc);
+            }
+        }
+        if (getSourceRels() != null) {
+            for (ComponentChroncileBI cc : getSourceRels()) {
+                processor.process(cc);
+            }
+        }
+        if (getImages() != null) {
+            for (ComponentChroncileBI cc : getImages()) {
+                processor.process(cc);
+            }
+        }
+        if (getRefsetMembers() != null) {
+            for (ComponentChroncileBI cc : getRefsetMembers()) {
+                processor.process(cc);
+            }
         }
     }
 }

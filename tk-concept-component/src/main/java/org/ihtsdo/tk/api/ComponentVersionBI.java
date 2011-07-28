@@ -6,6 +6,12 @@ import java.io.IOException;
 public interface ComponentVersionBI extends ComponentBI {
 
     boolean isActive(NidSetBI allowedStatusNids);
+    /**
+     * 
+     * @return  <code>true</code> if this version is stored in the read-only
+     * database, rather than in the mutable database. <code>false</code> otherwise.
+     */
+    boolean isBaselineGeneration();
     int getStatusNid();
     int getAuthorNid();
     int getPathNid();

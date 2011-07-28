@@ -49,6 +49,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -519,7 +520,12 @@ public class TermComponentLabel extends JLabel
             if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
                 ConceptChronicleBI cb = (ConceptChronicleBI) termComponent;
                 ViewCoordinate vc = config.getViewCoordinate();
-                ConceptVersionBI cv = cb.getVersion(vc);
+                ConceptVersionBI cv;
+                try {
+                    cv = cb.getVersion(vc);
+                } catch (ContraditionException ex) {
+                    cv = cb.getVersions(vc).iterator().next();
+                }
                 try {
                     switch (textType) {
                         case FULLYSPECIFIED:

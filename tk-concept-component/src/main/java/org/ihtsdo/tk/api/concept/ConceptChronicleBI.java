@@ -45,10 +45,7 @@ public interface ConceptChronicleBI extends
     boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException;
 
-    void cancel() throws IOException;
-    
-    @Override
-    ConceptVersionBI getVersion(ViewCoordinate vc);
+    void cancel() throws IOException;    
     
     FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
     

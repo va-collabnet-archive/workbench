@@ -61,6 +61,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
@@ -72,6 +73,11 @@ import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
 public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<ConceptBeanForTree> {
     I_GetConceptData bean;
+
+    @Override
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
+        return bean.makeAdjudicationAnalogs(ec, vc);
+    }
 
     @Override
     public Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException {
@@ -124,7 +130,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     }
 
     @Override
-    public ConceptVersionBI getVersion(ViewCoordinate c) {
+    public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
         return bean.getVersion(c);
     }
 

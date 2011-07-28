@@ -48,6 +48,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -321,13 +322,15 @@ public class HistoryPanel {
                     }
                 }
                 if (view.getSettings().isForAjudciation()) {
-                    
+                    ConceptChronicleBI cc = view.getConcept();
+                    cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(), 
+                            view.getConfig().getViewCoordinate());
                 }
                 Ts.get().addUncommitted(view.getConcept());
                 reset();
                 
                 navigator.getImplementButton().setEnabled(false);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }

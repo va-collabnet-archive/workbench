@@ -74,6 +74,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>> implements
@@ -249,6 +250,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         protected int index = -1;
         private boolean dup = false;
 
+        public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+            return ConceptComponent.this.makeAdjudicationAnalogs(ec, vc);
+        }
+
         @Override
         public ComponentChroncileBI getChronicle() {
             return ConceptComponent.this.getChronicle();
@@ -276,6 +281,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 return revisions.get(index).toUserString(snapshot);
             }
             return ConceptComponent.this.toUserString(snapshot);
+        }
+
+        @Override
+        public boolean isBaselineGeneration() {
+             if (index >= 0 && revisions != null && index < revisions.size()) {
+                return revisions.get(index).isBaselineGeneration();
+            }
+            return ConceptComponent.this.isBaselineGeneration();
         }
 
         @Override
@@ -2086,6 +2099,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
         return sapNids;
     }
+
     public Set<Integer> getRefsetMemberSapNids()
             throws IOException {
         List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
@@ -2160,7 +2174,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid)
-               throws IOException {
+            throws IOException {
         Collection<? extends RefexChronicleBI<?>> r = getRefexes();
         List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(r.size());
         for (RefexChronicleBI<?> rcbi : r) {
@@ -2208,7 +2222,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
-               throws IOException {
+            throws IOException {
         Collection<? extends RefexChronicleBI<?>> refexes = getRefexes(refsetNid);
         List<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>(refexes.size());
         for (RefexChronicleBI<?> refex : refexes) {
@@ -2285,5 +2299,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             Logger.getLogger(ConceptComponent.class.getName()).log(Level.SEVERE, null, ex);
         }
         return toString();
+    }
+
+    @Override
+    public boolean isBaselineGeneration() {
+        return primordialSapNid > Bdb.getSapDb().getReadOnlyMax();
+    }
+    
+    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+            throw new UnsupportedOperationException();
     }
 }
