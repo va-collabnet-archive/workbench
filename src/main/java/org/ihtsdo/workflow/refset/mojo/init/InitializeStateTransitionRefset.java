@@ -93,7 +93,7 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Initial history workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Create concept workflow state")) {
+		} else if (state.equalsIgnoreCase("Concept creation workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE.getPrimoridalUid();
 		} else if (state.equalsIgnoreCase("Escalated workflow state")) {
 			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATED_STATE.getPrimoridalUid();
