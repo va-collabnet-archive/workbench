@@ -175,101 +175,117 @@ public class RulesLibrary {
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
-		if (kbase != null) {
-			//			int a1 = kbase.getKnowledgePackages().size();
-			//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
-			if (!(kbase.getKnowledgePackages().size() == 0) && 
-					!(kbase.getKnowledgePackages().size() == 1 &&
-							kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
-				activity.setProgressInfoLower("Creating session...");
-				config.setStatusMessage("Creating session...");
+		try {
+			if (kbase != null) {
+				//			int a1 = kbase.getKnowledgePackages().size();
+				//			int a2 = kbase.getKnowledgePackages().iterator().next().getRules().size();
+				if (!(kbase.getKnowledgePackages().size() == 0) && 
+						!(kbase.getKnowledgePackages().size() == 1 &&
+								kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
+					activity.setProgressInfoLower("Creating session...");
+					config.setStatusMessage("Creating session...");
 
-				StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
+					StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
-				//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+					//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
-				ksession.setGlobal("resultsCollector", results);
-				ksession.setGlobal("terminologyHelper", getTerminologyHelper());
+					ksession.setGlobal("resultsCollector", results);
+					ksession.setGlobal("terminologyHelper", getTerminologyHelper());
 
-				ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
-				
-				activity.setProgressInfoLower("Converting concept...");
-				config.setStatusMessage("Converting concept...");
+					ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
 
-				DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-				
-				activity.setProgressInfoLower("Testing concept...");
-				config.setStatusMessage("Testing concept...");
+					activity.setProgressInfoLower("Converting concept...");
+					config.setStatusMessage("Converting concept...");
 
-				ksession.insert(testConcept);
+					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
-				ksession.startProcess("org.ihtsdo.qa-execution2");
-				ksession.fireAllRules();
+					activity.setProgressInfoLower("Testing concept...");
+					config.setStatusMessage("Testing concept...");
 
-				//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
+					ksession.insert(testConcept);
 
-				for (ResultsItem resultsItem : results.getResultsItems() ) {
-					ALERT_TYPE alertType = ALERT_TYPE.ERROR;
+					ksession.startProcess("org.ihtsdo.qa-execution2");
+					ksession.fireAllRules();
 
-					if (resultsItem.getSeverity() != null && !resultsItem.getSeverity().isEmpty()) {
-						if (resultsItem.getSeverity().trim().equals(Severity.NOTIFICATION.getSeverityUuid().toString())) {
-							alertType = ALERT_TYPE.INFORMATIONAL;
-						} else if (resultsItem.getSeverity().trim().equals(Severity.WARNING.getSeverityUuid().toString())) {
-							alertType = ALERT_TYPE.WARNING;
-						}
-					}
+					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
 
-					results.getAlertList().add(new AlertToDataConstraintFailure(
-							alertType, 
-							resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
-							concept));
-				}
+					for (ResultsItem resultsItem : results.getResultsItems() ) {
+						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
-				List<String> relTypesList = new ArrayList<String>();
-				List<String> textList = new ArrayList<String>();
-				for (AbstractTemplate template : results.getTemplates()) {
-					if (template.getType().equals(TemplateType.DESCRIPTION)) {
-						DescriptionTemplate dtemplate = (DescriptionTemplate) template;
-						if (!textList.contains(dtemplate.getText())) {
-							textList.add(dtemplate.getText());
-							DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
-									UUID.fromString(dtemplate.getComponentUuid()));
-							DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
-							if (dtemplate.getText() != null) {
-								dSpec.setDescText(dtemplate.getText());
+						if (resultsItem.getSeverity() != null && !resultsItem.getSeverity().isEmpty()) {
+							if (resultsItem.getSeverity().trim().equals(Severity.NOTIFICATION.getSeverityUuid().toString())) {
+								alertType = ALERT_TYPE.INFORMATIONAL;
+							} else if (resultsItem.getSeverity().trim().equals(Severity.WARNING.getSeverityUuid().toString())) {
+								alertType = ALERT_TYPE.WARNING;
 							}
-							//TODO: implement other properties
-							results.getWbTemplates().put(dSpec, description.getNid());
 						}
+
+						results.getAlertList().add(new AlertToDataConstraintFailure(
+								alertType, 
+								resultsItem.getErrorCode() + " - " + resultsItem.getMessage(), 
+								concept));
 					}
 
-					if (template.getType().equals(TemplateType.RELATIONSHIP)) {
-						RelationshipTemplate rtemplate = (RelationshipTemplate) template;
-						if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
-							relTypesList.add(rtemplate.getTypeUuid().trim());
-							ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
-									UUID.fromString(rtemplate.getSourceUuid()));
-							ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
-									UUID.fromString(rtemplate.getTypeUuid()));
-							ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
-									UUID.fromString(rtemplate.getTargetUuid()));
-							RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
-							//TODO: implement other properties
-							results.getWbTemplates().put(relSpec, concept.getConceptNid());
+					List<String> relTypesList = new ArrayList<String>();
+					List<String> textList = new ArrayList<String>();
+					for (AbstractTemplate template : results.getTemplates()) {
+						if (template.getType().equals(TemplateType.DESCRIPTION)) {
+							DescriptionTemplate dtemplate = (DescriptionTemplate) template;
+							if (!textList.contains(dtemplate.getText())) {
+								textList.add(dtemplate.getText());
+								DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
+										UUID.fromString(dtemplate.getComponentUuid()));
+								DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
+								if (dtemplate.getText() != null) {
+									dSpec.setDescText(dtemplate.getText());
+								}
+								//TODO: implement other properties
+								results.getWbTemplates().put(dSpec, description.getNid());
+							}
 						}
+
+						if (template.getType().equals(TemplateType.RELATIONSHIP)) {
+							RelationshipTemplate rtemplate = (RelationshipTemplate) template;
+							if (!relTypesList.contains(rtemplate.getTypeUuid().trim())) {
+								relTypesList.add(rtemplate.getTypeUuid().trim());
+								ConceptSpec sourceConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getSourceUuid())).toString(),
+										UUID.fromString(rtemplate.getSourceUuid()));
+								ConceptSpec typeConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTypeUuid())).toString(),
+										UUID.fromString(rtemplate.getTypeUuid()));
+								ConceptSpec targetConceptSpec = new ConceptSpec(Terms.get().getConcept(UUID.fromString(rtemplate.getTargetUuid())).toString(),
+										UUID.fromString(rtemplate.getTargetUuid()));
+								RelSpec relSpec = new RelSpec(sourceConceptSpec, typeConceptSpec, targetConceptSpec);
+								//TODO: implement other properties
+								results.getWbTemplates().put(relSpec, concept.getConceptNid());
+							}
+						}
+						//TODO: implement other templates
 					}
-					//TODO: implement other templates
+
+					ksession.dispose();
 				}
-
-				ksession.dispose();
 			}
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			String result = "Error";
+			activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
+					" for " + context.toString());
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+			try {
+				activity.complete();
+			} catch (ComputationCanceled e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "Done";
 		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
-					" for " + context.toString());
+				" for " + context.toString());
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
 		try {
 			activity.complete();
@@ -490,7 +506,7 @@ public class RulesLibrary {
 				kbase = kagent.getKnowledgeBase();
 				try {
 					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					out.writeObject( kbase.getKnowledgePackages() );
+					//out.writeObject( kbase.getKnowledgePackages() );
 					out.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
@@ -588,7 +604,7 @@ public class RulesLibrary {
 				e.printStackTrace();
 			}
 		}
-		
+
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
@@ -636,7 +652,7 @@ public class RulesLibrary {
 		kbase = kagent.getKnowledgeBase();
 		try {
 			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-			out.writeObject( kbase );
+			//out.writeObject( kbase );
 			out.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -761,7 +777,7 @@ public class RulesLibrary {
 
 			try {
 				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-				out.writeObject( kbuilder.getKnowledgePackages() );
+				//out.writeObject( kbuilder.getKnowledgePackages() );
 				out.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
