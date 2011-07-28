@@ -198,7 +198,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
 
             
             if (userWithoutActiveModeler(userConcept, newConfig)) {
-             	setNewUserAsActiveModeler(userConcept, newConfig);
+             	setNewUserAsActiveModeler(userConcept, creatorConfig);
             }
             // Create new paths for user...
             createDevPath(newConfig, creatorConfig, releaseDate, pathsForView, pathsForOrigin, addToPathOrigin);
@@ -364,7 +364,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     	return !WorkflowHelper.isActiveModeler(userConcept.getVersion(newConfig.getViewCoordinate()));
 	}
 
-	private void setNewUserAsActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame newConfig) throws TerminologyException, IOException {
+	private void setNewUserAsActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame creatorConfig) throws TerminologyException, IOException {
         I_TermFactory tf = Terms.get();
         
         // Set user as active editor (for Workflow)
@@ -373,7 +373,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
                 .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
                 .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
                 .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, 
-                newConfig);
+                creatorConfig);
             
         tf.addUncommitted(userConcept);
 	}
