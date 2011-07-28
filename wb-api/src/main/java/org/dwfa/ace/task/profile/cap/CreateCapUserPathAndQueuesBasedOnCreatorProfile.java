@@ -61,6 +61,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -175,11 +176,30 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             File userQueueRoot = new File("queues", newConfig.getUsername());
             userQueueRoot.mkdirs();
 
+            I_GetConceptData userConcept = null;
             // Create new concept for user if not already in existence...
             if (userNonExistent(newConfig.getDbConfig().getFullName(), newConfig.getUsername(), newConfig.getViewCoordinate())) {
-            	createUser(newConfig, creatorConfig, parentConceptForUser);
+            	userConcept = createUser(newConfig, creatorConfig, parentConceptForUser);
+            } else {
+	    		I_GetConceptData parentCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+	    		
+	    		for (ConceptVersionBI user : WorkflowHelper.getChildren(parentCon.getVersion(newConfig.getViewCoordinate()))) {
+	    			String childFsnName = user.getFullySpecifiedDescription().getText();
+	    			String childPrefName = user.getPreferredDescription().getText();
+	    			
+	    			if (childPrefName.equals(newConfig.getUsername()))
+	    			{
+	    				userConcept = Terms.get().getConcept(user.getPrimUuid());
+	    			}
+	    		}
             }
             
+            newConfig.getDbConfig().setUserConcept(userConcept);
+
+            
+            if (userWithoutActiveModeler(userConcept, newConfig)) {
+             	setNewUserAsActiveModeler(userConcept, newConfig);
+            }
             // Create new paths for user...
             createDevPath(newConfig, creatorConfig, releaseDate, pathsForView, pathsForOrigin, addToPathOrigin);
 
@@ -340,7 +360,25 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         return Condition.TRUE;
     }
 
-    private boolean userNonExistent(String fsn, String preferred, ViewCoordinate vc) {
+    private boolean userWithoutActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame newConfig) throws TerminologyException, IOException, ContraditionException {
+    	return !WorkflowHelper.isActiveModeler(userConcept.getVersion(newConfig.getViewCoordinate()));
+	}
+
+	private void setNewUserAsActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame newConfig) throws TerminologyException, IOException {
+        I_TermFactory tf = Terms.get();
+        
+        // Set user as active editor (for Workflow)
+        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS
+                .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()), tf
+                .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
+                .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
+                .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, 
+                newConfig);
+            
+        tf.addUncommitted(userConcept);
+	}
+
+	private boolean userNonExistent(String fsn, String preferred, ViewCoordinate vc) {
     	if (existingUserStrings == null) {
     		try {
 	    		existingUserStrings = new HashSet<String>();
@@ -459,7 +497,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         }
     }
 
-    private void createUser(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig, I_GetConceptData parentConcept) throws TaskFailedException,
+    private I_GetConceptData createUser(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig, I_GetConceptData parentConcept) throws TaskFailedException,
             TerminologyException, IOException {
         AceLog.getAppLog().info("Create new path for user: " + newConfig.getDbConfig().getFullName());
         if (newConfig.getDbConfig().getFullName() == null || newConfig.getDbConfig().getFullName().length() == 0) {
@@ -485,17 +523,12 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
             .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
             .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, creatorConfig);
-        
-        // Set user as active editor (for Workflow)
-        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS
-                .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()), tf
-                .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
-                .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
-                .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, creatorConfig);
             
         newConfig.getDbConfig().setUserConcept(userConcept);
 
         tf.addUncommitted(userConcept);
+        
+        return userConcept;
     }
 
     private void createDevPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig, String releaseDate, PathBI pathsForView, PathBI pathsForOrigin, PathBI addToPathOrigin) throws Exception {
