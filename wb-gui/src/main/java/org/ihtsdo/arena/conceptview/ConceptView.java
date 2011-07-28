@@ -7,7 +7,6 @@ import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -422,7 +421,17 @@ public class ConceptView extends JPanel {
         return changedVersionSelections;
     }
     
+    long lastLayoutSequence = Long.MIN_VALUE;
+    
     public void layoutConcept(I_GetConceptData concept) throws IOException {
+        if (concept != null) {
+            if (lastLayoutSequence == concept.getLastModificationSequence() &&
+                concept == this.concept) {
+                return;
+            }
+            lastLayoutSequence = concept.getLastModificationSequence();
+        }
+        
         removeAll();
         if (concept == null
                 || this.concept == null

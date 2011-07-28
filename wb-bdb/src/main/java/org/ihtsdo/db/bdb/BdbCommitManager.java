@@ -455,6 +455,8 @@ public class BdbCommitManager {
         try {
             int errorCount = 0;
             int warningCount = 0;
+            performCommit = true;
+
             Set<AlertToDataConstraintFailure> warningsAndErrors =
                     new HashSet<AlertToDataConstraintFailure>();
             dataCheckMap.put(c, warningsAndErrors);
@@ -525,6 +527,7 @@ public class BdbCommitManager {
                 KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
                 long commitTime = System.currentTimeMillis();
                 NidSetBI sapNidsFromCommit = c.setCommitTime(commitTime);
+                c.modified();
                 Bdb.getConceptDb().writeConcept(c);
 
 
@@ -854,6 +857,8 @@ public class BdbCommitManager {
             if (c.isCanceled()) {
                 Terms.get().forget(c);
             }
+            c.modified();
+            c.setLastWrite(Bdb.gVersion.incrementAndGet());
             try {
                 KindOfComputer.updateIsaCaches((Concept) c);
             } catch (Exception e) {
