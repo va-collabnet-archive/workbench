@@ -244,6 +244,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     }
     private JPanel conceptViewPanel = new JPanel(new BorderLayout());
     private Set<File> kbFiles = new HashSet<File>();
+	private File wfBpFile;
 
     /**
      *
@@ -309,6 +310,8 @@ public class ConceptViewRenderer extends JLayeredPane {
             conceptScrollPane.setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.GRAY));
         }
 
+        wfBpFile = new File("plugins" + File.separator + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile);
+        capWorkflow = wfBpFile.exists();
 
         JPanel footerPanel = new JPanel();
         footerPanel.setLayout(new GridBagLayout());
@@ -362,8 +365,6 @@ public class ConceptViewRenderer extends JLayeredPane {
                 }
 
                 // Advancing Workflow
-                File wfBpFile = new File("plugins" + File.separator + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile);
-                capWorkflow = wfBpFile.exists();
 
                 if (capWorkflow) {
 
@@ -664,6 +665,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         gbc.gridx++;
 
     	workflowStatusLabel = new JLabel("");
+    	setWorkflowStatusLabel(settings.getConcept());
     	footerPanel.add(workflowStatusLabel, gbc);
 
 
@@ -772,25 +774,13 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 // Update workfllow status label here... 
                 if (capWorkflow) {
-                    try {
-			WorkflowHistoryJavaBean hxBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
-			ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
-
-			if (hxBean != null) {
-		            workflowStatusLabel.setText("WF Status: " + hxBean.getStateForTitleBar(coordinate));
-	                    workflowStatusLabel.setText("\t");
-		            workflowStatusLabel.setText("WF Modeler: " + hxBean.getModelerForTitleBar(coordinate));
-			} else {
-			    workflowStatusLabel.setText("");
-			}
-		    } catch (Exception e) {
-            		AceLog.getAppLog().log(Level.WARNING, "Error in identifying wf display values for arena");
-		    }
+                	setWorkflowStatusLabel(concept);
                 }
             }
 
             updateCancelAndCommit();
         }
+
     }
 
     protected void updateCancelAndCommit() {
@@ -806,7 +796,27 @@ public class ConceptViewRenderer extends JLayeredPane {
         }
     }
 
-    private void updateOopsButton(I_GetConceptData concept) {
+	private void setWorkflowStatusLabel(I_GetConceptData concept) {
+        try {
+			WorkflowHistoryJavaBean hxBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(concept);
+			ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
+
+			if (hxBean != null) {
+				StringBuffer str = new StringBuffer();
+				str.append("WF Status: " + hxBean.getStateForTitleBar(coordinate));
+				str.append("-----");
+				str.append("WF Modeler: " + hxBean.getModelerForTitleBar(coordinate));
+
+	            workflowStatusLabel.setText(str.toString());
+			} else {
+			    workflowStatusLabel.setText("");
+			}
+	    } catch (Exception e) {
+        		AceLog.getAppLog().log(Level.WARNING, "Error in identifying wf display values for arena");
+	    }
+	}
+
+	private void updateOopsButton(I_GetConceptData concept) {
         boolean enableOopsButton = true;
         try {
             if (concept != null) {

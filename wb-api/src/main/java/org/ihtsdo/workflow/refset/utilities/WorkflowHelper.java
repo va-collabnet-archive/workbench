@@ -1071,8 +1071,8 @@ public class WorkflowHelper {
 	}
 
 	public static String shrinkTermForDisplay(String term) {
+		StringBuffer retBuf = new StringBuffer();
 		if (term != null) {
-			StringBuffer retBuf = new StringBuffer();
 			
 			String words[] = term.split(" ");
 			for (int i = 0; i < words.length; i++) {
@@ -1084,7 +1084,7 @@ public class WorkflowHelper {
 			}
 		}
 		
-		return "";
+		return retBuf.toString();
 	}
 
 	private static boolean isConceptInDatabase(I_GetConceptData concept) {
