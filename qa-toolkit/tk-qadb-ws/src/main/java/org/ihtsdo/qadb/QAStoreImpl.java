@@ -600,9 +600,12 @@ public class QAStoreImpl implements QAStoreBI {
 		long queryEndTime = System.currentTimeMillis();
 		logger.info(ruleCases.size() + " Rule cases selected in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
 
-		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) || filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()))) {
+		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
 			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
 			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
+			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
 			logger.debug("Disposition Status Filter " + dispoFilterValue);
 			logger.debug("Status Filter" + statusFilterValue);
 			for (QACase qaCase : ruleCases) {
@@ -626,6 +629,11 @@ public class QAStoreImpl implements QAStoreBI {
 						continue;
 					} else if (!qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Open")) {
 						logger.debug("Ignoring status filtered case");
+						continue;
+					}
+				}
+				if(assignedToFilter != null){
+					if(qaCase.getAssignedTo() == null || !qaCase.getAssignedTo().equals(assignedToFilter.toString())){
 						continue;
 					}
 				}

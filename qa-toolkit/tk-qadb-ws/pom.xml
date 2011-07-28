@@ -15,6 +15,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<qa-ws-client.version>2.6.0-trek-17-SNAPSHOT</qa-ws-client.version>
 	</properties>
 
 	<dependencies>
@@ -32,7 +33,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>tk-qa-ws-client</artifactId>
-			<version>${project.version}</version>
+			<version>${qa-ws-client.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.axis2</groupId>
@@ -147,8 +148,8 @@
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
 									<artifactId>tk-qa-ws-client</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
+									<version>${qa-ws-client.version}</version>
+									<type>jar</type>
 								</artifactItem>
 							</artifactItems>
 							<outputDirectory>${project.build.directory}</outputDirectory>
@@ -233,8 +234,8 @@
 							</fileSets>
 							<classesDirectory></classesDirectory>
 							<axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50042/axis2/axis2-admin</axis2AdminConsoleURL>
-							<axis2AdminPassword>axis2</axis2AdminPassword>
-							<axis2AdminUser>admin</axis2AdminUser>
+							<axis2AdminPassword>termmed</axis2AdminPassword>
+							<axis2AdminUser>termmed</axis2AdminUser>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -261,7 +262,7 @@
 						<!-- common configuration shared by all executions -->
 						<configuration>
 							<driver>com.mysql.jdbc.Driver</driver>
-							<url>jdbc:mysql://mgr.servers.aceworkspace.net:50040</url>
+							<url>jdbc:mysql://mgr.servers.aceworkspace.net:50010</url>
 							<username>root</username>
 							<password>snomed11</password>
 						</configuration>
@@ -306,7 +307,7 @@
 									<autocommit>true</autocommit>
 									<delimiter>//</delimiter>
 									<delimiterType>normal</delimiterType>
-									<url>jdbc:mysql://mgr.servers.aceworkspace.net:50040/qa_db</url>
+									<url>jdbc:mysql://mgr.servers.aceworkspace.net:50010/qa_db</url>
 									<srcFiles>
 										<srcFile>src/main/sql/procedure.sql</srcFile>
 									</srcFiles>
@@ -320,7 +321,7 @@
 								</goals>
 								<configuration>
 									<autocommit>true</autocommit>
-									<url>jdbc:mysql://mgr.servers.aceworkspace.net:50040/qa_db</url>
+									<url>jdbc:mysql://mgr.servers.aceworkspace.net:50010/qa_db</url>
 									<srcFiles>
 										<srcFile>src/main/sql/inserts.sql</srcFile>
 									</srcFiles>

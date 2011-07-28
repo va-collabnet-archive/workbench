@@ -369,6 +369,7 @@ public class WsConverter {
 		if(filter != null && filter.length != 0){
 			result = new HashMap<Integer, Object>();
 			for (IntStrKeyValue element : filter) {
+				logger.info("Filter: " + element.getKey() + " Value: " + element.getValue());
 				result.put(element.getKey(), element.getValue());
 			}
 		}
