@@ -126,59 +126,55 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        try {
+    	WorkflowLuceneSearchResult result = null;
+
+  	try {
             if (rowIndex >= getRowCount() || rowIndex < 0 || columnIndex < 0 || columnIndex >= getColumnCount()) {
                 return null;
             }
-            WorkflowLuceneSearchResult result = wfHistoryList.get(rowIndex);
+            result = wfHistoryList.get(rowIndex);
 
             if (result == null) {
                 return null;
             }
 
-        	// Attribute Tuple for drag
-        	I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(result.getConcept()));
-        	I_ConceptAttributeTuple dragTuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
-        	String term = null;
+            // Attribute Tuple for drag
+            I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(result.getConcept()));
+            I_ConceptAttributeTuple dragTuple = (I_ConceptAttributeTuple) concept.getConceptAttributes().getTuples().get(0);
+            String term = "";
         	
-        	switch (columns[columnIndex]) {
+            switch (columns[columnIndex]) {
                 case FSN:
-                	// Get Pref to display
-                	I_DescriptionTuple tuple = concept.getDescTuple(config.getTableDescPreferenceList(), config);
-                	DescriptionVersionBI version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                	if (version != null) {	
-                		term = version.getText(); 
-                	} else {
-                		return "";
-                	}
-                	break;
+                    // Get Pref to display
+                    I_DescriptionTuple tuple = concept.getDescTuple(config.getTableDescPreferenceList(), config);
+                    DescriptionVersionBI version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
+                    if (version != null) {	
+                    	term = version.getText(); 
+                    } 
+                    break;
         /*
         *          case ACTION:
         *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
         */
                 case STATE:
-                	// Get State to display
-                	I_GetConceptData con = Terms.get().getConcept(UUID.fromString(result.getState()));
-                	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                	version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                	if (version != null) {	
-                		term = version.getText(); 
-                	} else {
-                		return "";
-                	}
-                	break;
+                    // Get State to display
+                    I_GetConceptData con = Terms.get().getConcept(UUID.fromString(result.getState()));
+                    tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
+                    version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
+                    if (version != null) {	
+                    	term = version.getText(); 
+                    } 
+                    break;
 
                 case EDITOR:
-                	con = Terms.get().getConcept(UUID.fromString(result.getModeler()));
-                	tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                	version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                	if (version != null) {	
-                		term = version.getText(); 
-                	} else {
-                		return "";
-                	}
-                	break;
-	
+                    con = Terms.get().getConcept(UUID.fromString(result.getModeler()));
+                    tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
+                    version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
+                    if (version != null) {	
+                    	term = version.getText(); 
+                    } 
+                    break;
+    
 /*
 *              case PATH:
 *           		I_GetConceptData path = Terms.get().getConcept(bean.getPath());
@@ -196,7 +192,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
 	               
 	        	return new WorkflowStringWithConceptTuple(term, dragTuple, false);
 	        } catch (Exception e) {
-	            AceLog.getAppLog().alertAndLogException(e);
+	            AceLog.getAppLog().log(Level.WARNING, "Error on row: \n" + result.toString());
 	        }
 	    return null;
 	}    
@@ -308,7 +304,7 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     	}
     	
  		String data[][] = new String[wfHistoryList.size()][]; 
-    	WorkflowLuceneSearchResult result = null;
+    	        WorkflowLuceneSearchResult result = null;
  		Iterator<WorkflowLuceneSearchResult> itr = wfHistoryList.iterator();
  		int i = 0;
  		int errorConceptCount = 0;
@@ -319,9 +315,9 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
  		{ 
  			try {
  				
- 				result = itr.next();
- 				
- 				final String workflowId = null;
+ 			result = itr.next();
+ 			
+ 			final String workflowId = null;
          	 	final String action = null;
          	 	final String conceptId = null;
          	 	final String path = null;

@@ -211,5 +211,19 @@ public class WorkflowLuceneSearchResult {
 		// return val < 0 means:     wfMatchA is older than THIS
 		return new Long(this.getTime()).compareTo(new Long(wfMatchA.getTime()));	
 	}
+
+        @Override
+        public String toString() {
+                StringBuffer str = new StringBuffer();
+ 
+                str.append("Concept: " + getConcept() + "\n");
+                str.append("Modeler: " + getModeler() + "\n");
+                str.append("Action: " + getAction() + "\n");
+                str.append("State: " + getState() + "\n");
+                str.append("Time: " + getTime() + "\n");
+ 
+                return str.toString();
+        }
+
 }
 
