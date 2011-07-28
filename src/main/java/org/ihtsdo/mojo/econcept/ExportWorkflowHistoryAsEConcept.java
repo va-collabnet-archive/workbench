@@ -107,16 +107,14 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
     private final int workflowIdPosition = 0;								// 0
     private final int conceptIdPosition = workflowIdPosition + 1;			// 1
-    private final int useCaseIgnorePosition = conceptIdPosition + 1;			// 2
-    private final int pathPosition = useCaseIgnorePosition + 1;				// 3
-    private final int modelerPosition = pathPosition + 1;					// 4
-    private final int actionPosition = modelerPosition + 1;					// 5
-    private final int statePosition = actionPosition + 1;					// 6
-    private final int fsnPosition = statePosition + 1;						// 7
-    private final int refsetColumnTimeStampPosition = fsnPosition + 1;		// 8
-    private final int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 9
+    private final int modelerPosition = conceptIdPosition + 1;				// 2
+    private final int actionPosition = modelerPosition + 1;					// 3
+    private final int statePosition = actionPosition + 1;					// 4
+    private final int fsnPosition = statePosition + 1;						// 5
+    private final int refsetColumnTimeStampPosition = fsnPosition + 1;		// 6
+    private final int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 7
     
-    private final int numberOfColumns = timeStampPosition + 1;				// 10
+    private final int numberOfColumns = timeStampPosition + 1;				// 8
 
 	private BufferedReader inputFile = null;
 	private List<TkRefsetAbstractMember<?>> memberList = null;
@@ -126,6 +124,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private UUID snomedPathUid = null;
 	private UUID authorUuid = null;
 	private UUID currentStatus = null;
+	private UUID snomedPath = null;
 
 	private DataOutputStream eConceptDOS = null;
 
@@ -187,7 +186,9 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
         // Open Input File
         File txtFile = getInputTextFile();
-        inputFile =  new BufferedReader(new FileReader(txtFile));    	
+        inputFile =  new BufferedReader(new FileReader(txtFile));
+        
+        snomedPath = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
 	}
 
 	private void initializeOutputFile() throws FileNotFoundException {
@@ -269,7 +270,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 
 			
 			writer.setWorkflowUid(UUID.fromString(row[workflowIdPosition]));
-			writer.setPathUid(UUID.fromString(row[pathPosition]));
+			writer.setPathUid(snomedPath);
 			writer.setModelerUid(modeler);
 			writer.setActionUid(action);
 			writer.setStateUid(state);
