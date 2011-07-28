@@ -451,6 +451,10 @@
           <boolean>true</boolean> 
          </void> 
         </object> 
+        <void method="setProperty"> 
+         <string>visible</string> 
+         <boolean>false</boolean> 
+        </void> 
         <void property="name"> 
          <string>panel4</string> 
         </void> 

@@ -89,7 +89,6 @@ public class QAStoreBIImpl implements QAStoreBI {
 		QadbServiceStub service = null;
 		try {
 			service = new QadbServiceStub(url);
-
 			ComponentRequest componentRequest = new ComponentRequest();
 			componentRequest.setComponentUuid(componentUuid.toString());
 			ComponentResponse response = service.getComponent(componentRequest);
