@@ -363,6 +363,10 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.EMMA_MELHUISH.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("dkonice")) {
     		return ArchitectonicAuxiliary.Concept.DEBORAH_KONICEK.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("skeni")) {
+    		return ArchitectonicAuxiliary.Concept.SARITA_KENI.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("sspence")) {
+    		return ArchitectonicAuxiliary.Concept.SAMANTHA_SPENCER.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("jogo")) {
     		return ArchitectonicAuxiliary.Concept.JO_GOULDING.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("clundbe")) {
