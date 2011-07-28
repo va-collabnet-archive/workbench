@@ -169,7 +169,7 @@ public class RulesContextHelper {
 				
 				try {
 					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					out.writeObject( kbase );
+					//out.writeObject( kbase );
 					//out.writeObject( kbase.getKnowledgePackages() );
 					out.close();
 				} catch (FileNotFoundException e) {
