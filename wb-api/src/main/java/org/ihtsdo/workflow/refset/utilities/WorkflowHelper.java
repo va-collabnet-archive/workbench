@@ -582,17 +582,18 @@ public class WorkflowHelper {
 		{
 			try
 	    	{
-				List<RelationshipVersionBI> relList = getWorkflowRelationship(actionConcept, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
-	
-				for (RelationshipVersionBI rel : relList)
-				{
-					if (rel != null &&
-		    			 rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+    	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
+    	    	{
+					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
 					{
-						endWorkflowActionUid = actionConcept.getPrimUuid();
-						break;
+						if (rel != null &&
+			    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
+						{
+							endWorkflowActionUid = action.getPrimUuid();
+							break;
+						}
 					}
-				}
+    	    	}
 	    	} catch (Exception e) {
 	        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying if current action is a END-WORKFLOW action with error: " + e.getMessage());
 	    	}
