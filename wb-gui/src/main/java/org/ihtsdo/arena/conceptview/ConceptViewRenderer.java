@@ -803,9 +803,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 			if (hxBean != null) {
 				StringBuffer str = new StringBuffer();
-				str.append("WF Status: " + hxBean.getStateForTitleBar(coordinate));
+				str.append("status: " + hxBean.getStateForTitleBar(coordinate));
 				str.append("-----");
-				str.append("WF Modeler: " + hxBean.getModelerForTitleBar(coordinate));
+				str.append("modeler: " + hxBean.getModelerForTitleBar(coordinate));
 
 	            workflowStatusLabel.setText(str.toString());
 			} else {
