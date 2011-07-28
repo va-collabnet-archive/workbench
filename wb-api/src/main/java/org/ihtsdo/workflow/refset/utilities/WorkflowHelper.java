@@ -57,18 +57,16 @@ import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
 */
 public class WorkflowHelper {
 
-	public final static int workflowIdPosition = 0;								// 0
-    public final static int conceptIdPosition = workflowIdPosition + 1;			// 1
-    public final static int useCaseIgnorePosition = conceptIdPosition + 1;			// 2
-    public final static int pathPosition = useCaseIgnorePosition + 1;				// 3
-    public final static int modelerPosition = pathPosition + 1;					// 4
-    public final static int actionPosition = modelerPosition + 1;					// 5
-    public final static int statePosition = actionPosition + 1;					// 6
-    public final static int fsnPosition = statePosition + 1;						// 7
-    public final static int refsetColumnTimeStampPosition = fsnPosition + 1;		// 8
-    public final static int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 9
+	public final static int workflowIdPosition = 0;									// 0
+    public final static int conceptIdPosition = workflowIdPosition + 1;				// 1
+    public final static int modelerPosition = conceptIdPosition + 1;				// 2
+    public final static int actionPosition = modelerPosition + 1;					// 3
+    public final static int statePosition = actionPosition + 1;						// 4
+    public final static int fsnPosition = statePosition + 1;						// 5
+    public final static int refsetColumnTimeStampPosition = fsnPosition + 1;		// 6
+    public final static int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 7
 
-    public final static int numberOfColumns = timeStampPosition + 1;				// 10
+    public final static int numberOfColumns = timeStampPosition + 1;				// 8
 
     private static int activeNidRf1 = 0;
     private static int activeNidRf2 = 0;
