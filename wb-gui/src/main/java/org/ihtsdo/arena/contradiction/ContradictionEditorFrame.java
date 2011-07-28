@@ -9,6 +9,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.rmi.MarshalledObject;
@@ -56,7 +58,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  *
  * @author kec
  */
-public class ContradictionEditorFrame extends ComponentFrame {
+public class ContradictionEditorFrame extends ComponentFrame implements PropertyChangeListener {
     
     private static final long serialVersionUID = 1L;
     private static final Color ivoryColor = new Color(0xFFFFF0);
@@ -100,6 +102,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
         // Set the title for the frame
         setTitle(getNextFrameName());
         this.newFrameConfig = new ContradictionConfig(this, origConfig);
+        this.newFrameConfig.addPropertyChangeListener(this);
         this.viewCoord = this.newFrameConfig.getViewCoordinate();
 
         // Set the position and size of frame
@@ -344,7 +347,7 @@ public class ContradictionEditorFrame extends ComponentFrame {
         return progressBar.getMaximum();
     }
     
-    public I_ConfigAceFrame getActiveFrame() {
+    public I_ConfigAceFrame getActiveFrameConfig() {
         return newFrameConfig;
     }
     
@@ -355,4 +358,18 @@ public class ContradictionEditorFrame extends ComponentFrame {
     public void enableStopButton(boolean show) {
         stopButton.setEnabled(show);
     }
+    
+       @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("commit")) {
+
+        } else if (evt.getPropertyName().equals("commitEnabled")) {
+
+        } else if (evt.getPropertyName().equals("lastViewed")) {
+
+        } else if (evt.getPropertyName().equals("uncommitted")) {
+            // Nothing to do...
+        } 
+    }
+
 }

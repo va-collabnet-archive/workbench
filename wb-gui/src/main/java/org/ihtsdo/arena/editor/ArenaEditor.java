@@ -132,8 +132,8 @@ public class ArenaEditor extends BasicGraphEditor {
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, ArenaComponentSettings settings) {
 
-        mxGeometry geometry = new mxGeometry(20, 20, 300, 200);
-        geometry.setAlternateBounds(new mxRectangle(0, 0, 300, 20));
+        mxGeometry geometry = new mxGeometry(20, 20, 475, 500);
+        geometry.setAlternateBounds(new mxRectangle(0, 0, 475, 20));
         settings.setBounds(geometry);
         settings.setAlternateBounds(geometry.getAlternateBounds());
         mxCell tableTemplate = new mxCell(label, geometry, null);

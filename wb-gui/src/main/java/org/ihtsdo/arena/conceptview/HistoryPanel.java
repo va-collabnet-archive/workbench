@@ -373,6 +373,7 @@ public class HistoryPanel {
     
     HorizonatalScrollActionListener hsal = new HorizonatalScrollActionListener();
     VerticalScrollActionListener vsal = new VerticalScrollActionListener();
+    TopChangeListener tcl = new TopChangeListener();
     
     public HistoryPanel(ConceptView view, JScrollPane historyScroller,
             ConceptNavigator navigator) throws IOException {
@@ -410,6 +411,8 @@ public class HistoryPanel {
     }
     
     public void removeListeners() {
+        navigator.getImplementButton().removeActionListener(avcl);
+        topHistoryPanel.removeComponentListener(tcl);
         versionScroller.getHorizontalScrollBar().getModel().removeChangeListener(hsal);
         ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().
                 getModel().removeChangeListener(vsal);

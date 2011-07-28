@@ -57,6 +57,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.svn.Svn;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
@@ -397,14 +398,22 @@ public class BdbCommitManager {
         @Override
         public void run() {
             if (getActiveFrame() != null) {
+                updateAlerts();
                 I_ConfigAceFrame activeFrame = getActiveFrame();
-                for (I_ConfigAceFrame frameConfig : activeFrame.getDbConfig().getAceFrames()) {
-                    frameConfig.setCommitEnabled(true);
-                    updateAlerts();
-                    if (c.isUncommitted()) {
-                        frameConfig.addUncommitted(c);
-                    } else {
-                        frameConfig.removeUncommitted(c);
+                for (Frame f : OpenFrames.getFrames()) {
+                    I_ConfigAceFrame frameConfig = null;
+                    if (f instanceof ContradictionEditorFrame) {
+                        frameConfig = ((ContradictionEditorFrame) f).getActiveFrameConfig();
+                    } else if (f instanceof AceFrame) {
+                       frameConfig = ((AceFrame) f).getCdePanel().getAceFrameConfig();
+                    }
+                    if (frameConfig != null) {
+                        frameConfig.setCommitEnabled(true);
+                        if (c.isUncommitted()) {
+                            frameConfig.addUncommitted(c);
+                        } else {
+                            frameConfig.removeUncommitted(c);
+                        }
                     }
                 }
             }
@@ -1073,6 +1082,14 @@ public class BdbCommitManager {
                             aceInstance.aceFrameConfig.fireCommit();
                         } else {
                             aceInstance.aceFrameConfig.setCommitEnabled(true);
+                        }
+                    } else if (ContradictionEditorFrame.class.isAssignableFrom(f.getClass())) {
+                        ContradictionEditorFrame cef = (ContradictionEditorFrame) f;
+                        if (uncommittedCNids.cardinality() == 0) {
+                            cef.getActiveFrameConfig().setCommitEnabled(false);
+                            cef.getActiveFrameConfig().fireCommit();
+                        } else {
+                            cef.getActiveFrameConfig().setCommitEnabled(true);
                         }
                     }
                 }

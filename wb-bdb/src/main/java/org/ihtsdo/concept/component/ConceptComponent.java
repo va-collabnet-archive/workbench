@@ -73,6 +73,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.util.Arrays;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -285,7 +286,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public boolean isBaselineGeneration() {
-             if (index >= 0 && revisions != null && index < revisions.size()) {
+            if (index >= 0 && revisions != null && index < revisions.size()) {
                 return revisions.get(index).isBaselineGeneration();
             }
             return ConceptComponent.this.isBaselineGeneration();
@@ -2303,10 +2304,37 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @Override
     public boolean isBaselineGeneration() {
-        return primordialSapNid > Bdb.getSapDb().getReadOnlyMax();
+        return primordialSapNid <= Bdb.getSapDb().getReadOnlyMax();
     }
-    
+
+    public abstract List<? extends Version> getVersions(ViewCoordinate c);
+
     public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
-            throw new UnsupportedOperationException();
+        boolean changed = false;
+        Collection<? extends Version> versions = this.getVersions(vc);
+        if (ec.getEditPaths().length != 1) {
+            throw new IOException("To many edit paths: " + ec);
+        }
+        int pathNid = ec.getEditPaths()[0];
+        if (versions.size() == 1) {
+            for (Version cv : versions) {
+                if (!cv.isBaselineGeneration() && cv.getPathNid() != pathNid &&
+                        cv.getTime() != Long.MAX_VALUE) {
+                    changed = true;
+                    cv.makeAnalog(cv.getStatusNid(), ec.getAuthorNid(),
+                            pathNid, Long.MAX_VALUE);
+                }
+            }
+        }
+
+        // don't adjudicate ids
+
+        // annotations
+        if (annotations != null) {
+            for (RefsetMember<?, ?> a : annotations) {
+                changed = changed || a.makeAdjudicationAnalogs(ec, vc);
+            }
+        }
+        return changed;
     }
 }

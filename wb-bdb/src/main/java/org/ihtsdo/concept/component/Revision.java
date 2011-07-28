@@ -467,7 +467,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     
         @Override
     public boolean isBaselineGeneration() {
-        return sapNid > Bdb.getSapDb().getReadOnlyMax();
+        return sapNid <= Bdb.getSapDb().getReadOnlyMax();
     }
 
         

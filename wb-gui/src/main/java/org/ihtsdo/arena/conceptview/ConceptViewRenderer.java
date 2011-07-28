@@ -802,10 +802,10 @@ public class ConceptViewRenderer extends JLayeredPane {
 			ViewCoordinate coordinate = settings.getConfig().getViewCoordinate();
 
 			if (hxBean != null) {
-				StringBuffer str = new StringBuffer();
-				str.append("status: " + hxBean.getStateForTitleBar(coordinate));
-				str.append("-----");
-				str.append("modeler: " + hxBean.getModelerForTitleBar(coordinate));
+				StringBuilder str = new StringBuilder();
+				str.append(hxBean.getStateForTitleBar(coordinate));
+				str.append(": ");
+				str.append(hxBean.getModelerForTitleBar(coordinate));
 
 	            workflowStatusLabel.setText(str.toString());
 			} else {

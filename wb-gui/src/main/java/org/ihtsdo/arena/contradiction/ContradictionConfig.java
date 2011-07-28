@@ -8,7 +8,9 @@ package org.ihtsdo.arena.contradiction;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.beans.VetoableChangeSupport;
 import java.io.File;
 import java.io.IOException;
@@ -48,12 +50,14 @@ import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -524,7 +528,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public void setCommitAbortButtonsVisible(boolean visible) {
-        config.setCommitAbortButtonsVisible(visible);
+        //editor.setCommitAbortButtonsVisible(visible);
     }
 
     public void setColorForPath(int pathNid, Color pathColor) {
@@ -627,17 +631,12 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     public void removeViewPosition(PositionBI p) {
         config.removeViewPosition(p);
     }
-
-    public void removeUncommitted(I_GetConceptData uncommitted) {
-        config.removeUncommitted(uncommitted);
-    }
-
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        config.removePropertyChangeListener(propertyName, listener);
+        changeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        config.removePropertyChangeListener(listener);
+        changeSupport.removePropertyChangeListener(listener);
     }
 
     public void removePromotionPath(PathBI p) {
@@ -1184,7 +1183,9 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public void fireCommit() {
-        config.fireCommit();
+        PropertyChangeEvent pce = new PropertyChangeEvent(this, "commit", null, null);
+        pce.setPropagationId(AceFrameConfig.propigationId.incrementAndGet());
+        changeSupport.firePropertyChange(pce);
     }
 
     public void closeFrame() {
@@ -1195,16 +1196,23 @@ public class ContradictionConfig implements I_ConfigAceFrame {
         config.addViewPosition(p);
     }
 
-    public void addUncommitted(I_GetConceptData conceptBean) {
-        config.addUncommitted(conceptBean);
+   private transient PropertyChangeSupport changeSupport = new PropertyChangeSupportWithPropagationId(this);
+
+
+    public void addUncommitted(I_GetConceptData uncommitted) {
+        this.changeSupport.firePropertyChange("uncommitted", null, uncommitted);
+    }
+
+    public void removeUncommitted(I_GetConceptData uncommitted) {
+        this.changeSupport.firePropertyChange("uncommitted", uncommitted, null);
     }
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        config.addPropertyChangeListener(propertyName, listener);
+        changeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        config.addPropertyChangeListener(listener);
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     public void addPromotionPath(PathBI p) {

@@ -1,4 +1,4 @@
-package org.ihtsdo.concept;
+    package org.ihtsdo.concept;
 
 import java.io.IOException;
 import java.util.Collection;
