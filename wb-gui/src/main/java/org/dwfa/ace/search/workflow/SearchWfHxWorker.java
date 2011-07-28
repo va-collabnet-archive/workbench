@@ -88,6 +88,7 @@ public class SearchWfHxWorker extends SwingWorker<I_UpdateProgress> implements I
             wfSearchPanel.setProgressInfo("cancelled by user");
             wfSearchPanel.setProgressIndeterminate(false);
             wfSearchPanel.setProgressValue(0);
+            wfSearchPanel.setShowProgress(false);
           /*  if (completeLatch != null) {
                 while (completeLatch.getCount() > 0) {
                     completeLatch.countDown();
