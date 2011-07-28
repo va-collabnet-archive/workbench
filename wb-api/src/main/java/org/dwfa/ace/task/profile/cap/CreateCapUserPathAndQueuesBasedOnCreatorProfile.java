@@ -506,7 +506,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     	
     	String suffix = " author path";
         String prefName = releaseDate + " " + newConfig.getUsername() + suffix;
-        String fsnName = newConfig.getDbConfig().getFullName() + suffix;
+        String fsnName = releaseDate + " " + newConfig.getDbConfig().getFullName() + suffix;
         PathBI devPath = createNewPath(newConfig, creatorConfig, inputSet, fsnName, prefName);
         newConfig.addEditingPath(devPath);
         I_GetConceptData devPathConcept = Terms.get().getConcept(devPath.getConceptNid());

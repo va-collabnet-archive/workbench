@@ -45,13 +45,15 @@ public class SetNewCapUserPathsForView extends AbstractSetNewCapUserPaths {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(pathsForViewPropName);
-    }
+        out.writeObject(newProfilePropName);
+   }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
         	pathsForViewPropName = (String) in.readObject();
-        } else {
+            newProfilePropName = (String) in.readObject();
+       } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -80,5 +82,14 @@ public class SetNewCapUserPathsForView extends AbstractSetNewCapUserPaths {
 
     public void setPathsForViewPropName(String prop) {
         this.pathsForViewPropName = prop;
+    }
+
+
+    public String getNewProfilePropName() {
+        return newProfilePropName;
+    }
+
+    public void setNewProfilePropName(String prop) {
+        this.newProfilePropName = prop;
     }
 }

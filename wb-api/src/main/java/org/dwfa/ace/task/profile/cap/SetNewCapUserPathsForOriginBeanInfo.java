@@ -35,7 +35,15 @@ public class SetNewCapUserPathsForOriginBeanInfo extends PreviousNextOrCancelBea
             pathsForOriginPropName.setDisplayName("<html><font color='green'>Origin paths prop:");
             pathsForOriginPropName.setShortDescription("The property name to hold the origin paths for new user.");
 
-            PropertyDescriptor rv[] = { pathsForOriginPropName };
+
+            PropertyDescriptor newProfilePropName = new PropertyDescriptor("newProfilePropName",
+                    getBeanDescriptor().getBeanClass());
+                newProfilePropName.setBound(true);
+                newProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+                newProfilePropName.setDisplayName("<html><font color='green'>new profile prop:");
+                newProfilePropName.setShortDescription("The property that contains the new profile.");
+
+            PropertyDescriptor rv[] = { pathsForOriginPropName, newProfilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.profile.cap;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
@@ -147,6 +148,7 @@ public class SetNewCapUserReleaseDate extends PreviousNextOrCancel {
             c.gridx++;
             c.weightx = 0.0;
             setupPreviousNextOrCancelButtons(workflowPanel, c);
+        	workflowPanel.setMinimumSize(new Dimension((int)workflowPanel.getPreferredSize().getWidth() * 2, (int)workflowPanel.getPreferredSize().getHeight()));
             workflowPanel.setVisible(true);
             releaseDate.requestFocusInWindow();
         }

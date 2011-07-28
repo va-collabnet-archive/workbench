@@ -42,17 +42,20 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
     private static final int dataVersion = 1;
 
     private String parentConceptForPathPropName = ProcessAttachmentKeys.PARENT_CONCEPT_FOR_PATH.getAttachmentKey();
+    private String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(parentConceptForPathPropName);
-    }
+        out.writeObject(newProfilePropName);
+   }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
         	parentConceptForPathPropName = (String) in.readObject();
-        } else {
+            newProfilePropName = (String) in.readObject();
+       } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
@@ -60,14 +63,13 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
     protected void setupInput(I_EncodeBusinessProcess process)  throws IllegalArgumentException,
     	IntrospectionException, IllegalAccessException, InvocationTargetException 
     {
-    	try {
-	    	parentIds = new LinkedList<Integer>();
-	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid());
-	    	String creatorProfilePropName = "JESSE";
-	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+        parentIds = new LinkedList<Integer>();
 
-	    	
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+        try {
+            I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
+	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid());
+
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, newConfig.getViewCoordinate());
 	    	
 	        instruction = getInstruction();
 	        parentConceptList = new JComboBox(potentialParentConcepts);
@@ -97,5 +99,13 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
 
     public void setParentConceptForPathPropName(String prop) {
         this.parentConceptForPathPropName = prop;
+    }
+
+    public String getNewProfilePropName() {
+        return newProfilePropName;
+    }
+
+    public void setNewProfilePropName(String newProfilePropName) {
+        this.newProfilePropName = newProfilePropName;
     }
 }

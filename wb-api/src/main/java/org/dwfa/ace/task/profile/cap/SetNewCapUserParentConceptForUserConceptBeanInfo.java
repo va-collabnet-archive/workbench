@@ -33,7 +33,15 @@ public class SetNewCapUserParentConceptForUserConceptBeanInfo extends PreviousNe
             parentConceptForUserPropName.setDisplayName("<html><font color='green'>Parent of user concept prop:");
             parentConceptForUserPropName.setShortDescription("The property name to hold the parent concept for the concept representing the new user.");
 
-            PropertyDescriptor rv[] = { parentConceptForUserPropName };
+            PropertyDescriptor newProfilePropName = new PropertyDescriptor("newProfilePropName",
+                    getBeanDescriptor().getBeanClass());
+                newProfilePropName.setBound(true);
+                newProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+                newProfilePropName.setDisplayName("<html><font color='green'>new profile prop:");
+                newProfilePropName.setShortDescription("The property that contains the new profile.");
+
+
+                PropertyDescriptor rv[] = { parentConceptForUserPropName, newProfilePropName};
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

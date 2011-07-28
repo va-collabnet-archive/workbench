@@ -24,6 +24,7 @@ import java.util.UUID;
 import javax.swing.JLabel;
 import javax.swing.JList;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -45,12 +46,14 @@ public class SetNewCapUserDevPathAsOrigin extends AbstractSetNewCapUserPaths {
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(addToPathOriginPropName);
+        out.writeObject(newProfilePropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
         	addToPathOriginPropName = (String) in.readObject();
+            newProfilePropName = (String) in.readObject();
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
@@ -80,5 +83,14 @@ public class SetNewCapUserDevPathAsOrigin extends AbstractSetNewCapUserPaths {
 
     public void setAddToPathOriginPropName(String prop) {
         this.addToPathOriginPropName = prop;
+    }
+
+
+    public String getNewProfilePropName() {
+        return newProfilePropName;
+    }
+
+    public void setNewProfilePropName(String prop) {
+        this.newProfilePropName = prop;
     }
 }

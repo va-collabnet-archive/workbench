@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.profile.cap;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import javax.swing.JLabel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.wfpanel.PreviousNextOrCancel;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -151,7 +153,8 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
             c.gridx++;
             c.weightx = 0.0;
             setupPreviousNextOrCancelButtons(workflowPanel, c);
-            workflowPanel.setVisible(true);
+        	workflowPanel.setMinimumSize(new Dimension((int)workflowPanel.getPreferredSize().getWidth() * 2, (int)workflowPanel.getPreferredSize().getHeight()));
+        	workflowPanel.setVisible(true);
             pathList.requestFocusInWindow();
         }
 
@@ -187,6 +190,8 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
 
     protected abstract UUID getParentNode(); 
 
+    protected String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+
 	protected void readInput(I_EncodeBusinessProcess process) {
 
 		try {
@@ -210,8 +215,9 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
     	try {
 	    	parentIds = new LinkedList<Integer>();
 	    	I_GetConceptData parentNode = Terms.get().getConcept(getParentNode());
-	    	String creatorProfilePropName = "JESSE";
-	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+	    	
+	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
+
 	    	ConceptVersionBI parentVersioned = parentNode.getVersion(newConfig.getViewCoordinate());
 	    	
 	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentVersioned);

@@ -34,7 +34,15 @@ public class SetNewCapUserPathsForViewBeanInfo extends PreviousNextOrCancelBeanI
             pathsForViewPropName.setDisplayName("<html><font color='green'>View paths prop:");
             pathsForViewPropName.setShortDescription("The property name to hold the view paths for new user.");
 
-            PropertyDescriptor rv[] = { pathsForViewPropName };
+            PropertyDescriptor newProfilePropName = new PropertyDescriptor("newProfilePropName",
+                    getBeanDescriptor().getBeanClass());
+                newProfilePropName.setBound(true);
+                newProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+                newProfilePropName.setDisplayName("<html><font color='green'>new profile prop:");
+                newProfilePropName.setShortDescription("The property that contains the new profile.");
+
+
+            PropertyDescriptor rv[] = { pathsForViewPropName, newProfilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());

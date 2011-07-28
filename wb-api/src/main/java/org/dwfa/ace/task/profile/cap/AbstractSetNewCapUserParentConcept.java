@@ -1,6 +1,7 @@
 package org.dwfa.ace.task.profile.cap;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.beans.IntrospectionException;
@@ -147,6 +148,7 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
             setupPreviousNextOrCancelButtons(workflowPanel, c);
             workflowPanel.setVisible(true);
         	parentConceptList.requestFocusInWindow();
+        	workflowPanel.setMinimumSize(new Dimension((int)workflowPanel.getPreferredSize().getWidth() * 2, (int)workflowPanel.getPreferredSize().getHeight()));
         }
 
     }

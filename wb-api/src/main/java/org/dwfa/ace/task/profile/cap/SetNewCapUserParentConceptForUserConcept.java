@@ -16,8 +16,10 @@
  */
 package org.dwfa.ace.task.profile.cap;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import javax.swing.JComboBox;
@@ -32,7 +34,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
 public class SetNewCapUserParentConceptForUserConcept extends AbstractSetNewCapUserParentConcept {
@@ -41,32 +42,34 @@ public class SetNewCapUserParentConceptForUserConcept extends AbstractSetNewCapU
     private static final int dataVersion = 1;
 
     private String parentConceptForUserPropName = ProcessAttachmentKeys.PARENT_CONCEPT_FOR_USER.getAttachmentKey();
-	private int initialIndex;
+    private String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(parentConceptForUserPropName);
+        out.writeObject(newProfilePropName);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
         	parentConceptForUserPropName = (String) in.readObject();
-        } else {
+            newProfilePropName = (String) in.readObject();
+       } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
     }
 
-    protected void setupInput(I_EncodeBusinessProcess process) {
-    	try {
-	    	parentIds = new LinkedList<Integer>();
+    protected void setupInput(I_EncodeBusinessProcess process)  throws IllegalArgumentException,
+    	IntrospectionException, IllegalAccessException, InvocationTargetException 
+    {
+        parentIds = new LinkedList<Integer>();
+
+        try {
+            I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
 	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-	    	String creatorProfilePropName = "JESSE";
-            I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
-            
-            ViewCoordinate vc = newConfig.getViewCoordinate();
-            
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, vc);
+
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, newConfig.getViewCoordinate());
 	    	
 	        instruction = getInstruction();
 	        parentConceptList = new JComboBox(potentialParentConcepts);
@@ -96,5 +99,13 @@ public class SetNewCapUserParentConceptForUserConcept extends AbstractSetNewCapU
 
     public void setParentConceptForUserPropName(String prop) {
         this.parentConceptForUserPropName = prop;
+    }
+
+    public String getNewProfilePropName() {
+        return newProfilePropName;
+    }
+
+    public void setNewProfilePropName(String newProfilePropName) {
+        this.newProfilePropName = newProfilePropName;
     }
 }

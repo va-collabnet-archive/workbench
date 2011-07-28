@@ -34,7 +34,15 @@ public class SetNewCapUserDevPathAsOriginBeanInfo extends PreviousNextOrCancelBe
             addToPathOriginPropName.setDisplayName("<html><font color='green'>Add new path as origin:");
             addToPathOriginPropName.setShortDescription("The property name to add new dev path as origin.");
 
-            PropertyDescriptor rv[] = { addToPathOriginPropName };
+            PropertyDescriptor newProfilePropName = new PropertyDescriptor("newProfilePropName",
+                    getBeanDescriptor().getBeanClass());
+                newProfilePropName.setBound(true);
+                newProfilePropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+                newProfilePropName.setDisplayName("<html><font color='green'>new profile prop:");
+                newProfilePropName.setShortDescription("The property that contains the new profile.");
+
+
+            PropertyDescriptor rv[] = { addToPathOriginPropName, newProfilePropName };
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
