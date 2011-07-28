@@ -75,6 +75,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     I_GetConceptData bean;
 
     @Override
+    public long getLastModificationSequence() {
+        return bean.getLastModificationSequence();
+    }
+
+    @Override
     public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
         return bean.makeAdjudicationAnalogs(ec, vc);
     }

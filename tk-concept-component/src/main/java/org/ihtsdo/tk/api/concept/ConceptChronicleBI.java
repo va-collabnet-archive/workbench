@@ -49,12 +49,16 @@ public interface ConceptChronicleBI extends
     
     FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
     
+    long getLastModificationSequence();
+    
    /**
     * Returns a longer - more complete - string representation of the chronicle. 
     * Useful for diagnostic purposes.
     *
     * @return
     */
-   public String toLongString();
+   String toLongString();
+   
+   
 
 }

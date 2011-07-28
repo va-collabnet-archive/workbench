@@ -491,7 +491,7 @@ public class TermComponentLabel extends JLabel
     public void setFixedWidth(int fixedWidth) {
         this.fixedWidth = fixedWidth;
     }
-
+    long lastChange = Long.MIN_VALUE;
     /*
      * (non-Javadoc)
      * 
@@ -499,6 +499,7 @@ public class TermComponentLabel extends JLabel
      * org.dwfa.ace.I_ContainTermComponent#setTermComponent(org.dwfa.vodb.types
      * .I_AmTermComponent)
      */
+
     @Override
     public void setTermComponent(I_AmTermComponent termComponent) {
         if (isFrozen()) {
@@ -516,52 +517,59 @@ public class TermComponentLabel extends JLabel
         }
         Object old = this.termComponent;
         this.termComponent = termComponent;
+        boolean changed = false;
         if (termComponent != null) {
             if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
                 ConceptChronicleBI cb = (ConceptChronicleBI) termComponent;
-                ViewCoordinate vc = config.getViewCoordinate();
-                ConceptVersionBI cv;
-                try {
-                    cv = cb.getVersion(vc);
-                } catch (ContraditionException ex) {
-                    cv = cb.getVersions(vc).iterator().next();
-                }
-                try {
-                    switch (textType) {
-                        case FULLYSPECIFIED:
-                            DescriptionVersionBI fsn = cv.getFullySpecifiedDescription();
-                            if (fsn != null) {
-                                this.setText(fsn.getText());
-                            } else {
-                                this.setText("No fsn for: " + termComponent);
-                                AceLog.getAppLog().warning("No fsn for: " + termComponent);
-                            }
-                            break;
-                        case PREFERRED:
-                            DescriptionVersionBI pt = cv.getPreferredDescription();
-                            if (pt != null) {
-                                this.setText(pt.getText());
-                            } else {
-                               this.setText("No pt for: " + termComponent);
-                               AceLog.getAppLog().warning("No pt for: " + termComponent);
-                            }
-                            break;
-                        default:
-                            this.setText(this.termComponent.toString());
-                    }
-                } catch (IOException e) {
-                    this.setText(e.getMessage());
-                    AceLog.getAppLog().alertAndLogException(e);
-                } catch (ContraditionException e) {
+                if (lastChange != cb.getLastModificationSequence()
+                        || old != termComponent) {
+                    lastChange = cb.getLastModificationSequence();
+                    changed = true;
+                    ViewCoordinate vc = config.getViewCoordinate();
+                    ConceptVersionBI cv;
                     try {
-                        this.setText(cv.getDescsActive().iterator().next().getText());
-                        AceLog.getAppLog().alertAndLogException(e);
-                    } catch (IOException ex) {
-                        AceLog.getAppLog().alertAndLogException(e);
+                        cv = cb.getVersion(vc);
                     } catch (ContraditionException ex) {
+                        cv = cb.getVersions(vc).iterator().next();
+                    }
+                    try {
+                        switch (textType) {
+                            case FULLYSPECIFIED:
+                                DescriptionVersionBI fsn = cv.getFullySpecifiedDescription();
+                                if (fsn != null) {
+                                    this.setText(fsn.getText());
+                                } else {
+                                    this.setText("No fsn for: " + termComponent);
+                                    AceLog.getAppLog().warning("No fsn for: " + termComponent);
+                                }
+                                break;
+                            case PREFERRED:
+                                DescriptionVersionBI pt = cv.getPreferredDescription();
+                                if (pt != null) {
+                                    this.setText(pt.getText());
+                                } else {
+                                    this.setText("No pt for: " + termComponent);
+                                    AceLog.getAppLog().warning("No pt for: " + termComponent);
+                                }
+                                break;
+                            default:
+                                this.setText(this.termComponent.toString());
+                        }
+                    } catch (IOException e) {
+                        this.setText(e.getMessage());
                         AceLog.getAppLog().alertAndLogException(e);
+                    } catch (ContraditionException e) {
+                        try {
+                            this.setText(cv.getDescsActive().iterator().next().getText());
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (IOException ex) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        } catch (ContraditionException ex) {
+                            AceLog.getAppLog().alertAndLogException(e);
+                        }
                     }
                 }
+
             } else {
                 this.setText(this.termComponent.toString());
             }
@@ -570,7 +578,7 @@ public class TermComponentLabel extends JLabel
         }
         if (old == null) {
             firePropertyChange("termComponent", old, termComponent);
-        } else if (old.equals(termComponent)) {
+        } else if (old.equals(termComponent) && changed) {
             firePropertyChange("termComponent", null, termComponent);
         } else {
             firePropertyChange("termComponent", old, termComponent);

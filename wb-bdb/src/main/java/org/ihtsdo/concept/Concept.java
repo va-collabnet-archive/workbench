@@ -2180,4 +2180,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
     }
+
+    @Override
+    public long getLastModificationSequence() {
+        return data.getLastChange();
+    }
+    
+    
 }

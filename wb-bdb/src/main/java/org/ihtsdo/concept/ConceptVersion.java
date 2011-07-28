@@ -60,6 +60,11 @@ public class ConceptVersion implements ConceptVersionBI {
     private Concept concept;
 
     @Override
+    public long getLastModificationSequence() {
+        return concept.getLastModificationSequence();
+    }
+
+    @Override
     public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException {
         return concept.getRelGroups(vc);
     }
