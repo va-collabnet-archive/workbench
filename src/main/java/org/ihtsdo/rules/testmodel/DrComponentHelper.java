@@ -2,6 +2,7 @@ package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +62,22 @@ public class DrComponentHelper {
 			}
 
 			Collection<? extends DescriptionVersionBI> descsActive = conceptBi.getDescsActive();
+
+			HashMap<Integer,DrLanguageDesignationSet> languageDesignationSetsMap = new HashMap<Integer,DrLanguageDesignationSet>();
+			
+			for (DescriptionVersionBI descriptionVersion : descsActive) {
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				for (RefexVersionBI<?> annotation : currentAnnotations) {
+					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
+					int languageNid = annotationCnid.getCollectionNid();
+					if (!languageDesignationSetsMap.containsKey(languageNid)) {
+						DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
+						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+						languageDesignationSetsMap.put(languageNid, langDefSet);
+					}
+				}
+			}
+
 			for (DescriptionVersionBI descriptionVersion : descsActive) {
 				DrDescription loopDescription = new DrDescription();
 				loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
@@ -79,25 +96,33 @@ public class DrComponentHelper {
 				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
 					try {
+						DrDescription langDescription = new DrDescription();
+						langDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
+						langDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
+						langDescription.setInitialCaseSignificant(descriptionVersion.isInitialCaseSignificant());
+						langDescription.setLang(descriptionVersion.getLang());
+						langDescription.setText(descriptionVersion.getText());
+						langDescription.setTime(descriptionVersion.getTime());
+						langDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()).toString());
+						langDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
+						langDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
+						langDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
+						langDescription.setFactContextName(factContextName);
 						RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
-						boolean newLangDesSet = true;
-						DrLanguageDesignationSet langDefSet = new DrLanguageDesignationSet();
-						langDefSet.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
-						for (DrLanguageDesignationSet loopLangDefSet : concept.getLanguageDesignationSets()) {
-							if (tf.nidToUuid(annotationCnid.getCollectionNid()).toString().equals(loopLangDefSet.getLanguageRefsetUuid())) {
-								newLangDesSet = false;
-								langDefSet = loopLangDefSet;
-							}
-						}
-						loopDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getCnid1()).toString());
-						loopDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
-						langDefSet.getDescriptions().add(loopDescription);
-						if (newLangDesSet) concept.getLanguageDesignationSets().add(langDefSet);
+						int languageNid = annotationCnid.getCollectionNid();
+						DrLanguageDesignationSet langDefSet = languageDesignationSetsMap.get(languageNid);
+						langDescription.setAcceptabilityUuid(tf.nidToUuid(annotationCnid.getCnid1()).toString());
+						langDescription.setLanguageRefsetUuid(tf.nidToUuid(annotationCnid.getCollectionNid()).toString());
+						langDefSet.getDescriptions().add(langDescription);
 					} catch (Exception e) {
 						// not cnid annotation, ignore
 					}
 				}
 
+			}
+			
+			for (DrLanguageDesignationSet langSet : languageDesignationSetsMap.values()) {
+				concept.getLanguageDesignationSets().add(langSet);
 			}
 
 			if (allRels == null) {
