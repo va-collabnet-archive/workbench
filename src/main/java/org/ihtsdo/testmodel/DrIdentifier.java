@@ -1,17 +1,47 @@
 package org.ihtsdo.testmodel;
 
+import java.util.UUID;
+
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+
 public class DrIdentifier extends DrComponent {
-	
+
 	private String primordialUuid;
-	
+
 	private String componentUuid;
-	
+
 	private String authorityUuid;
 	private String denotation;
-	
-	//Inferred properties
-	//none yet
-	
+
+	// Inferred properties
+	// none yet
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("");
+		try {
+			sb.append("primordialUuid: " + primordialUuid + ",");
+
+			try {
+				ConceptChronicleBI component = Ts.get().getConcept(UUID.fromString(componentUuid));
+				sb.append(" Source Rel: " + component + " (" + componentUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			try {
+				ConceptChronicleBI authority = Ts.get().getConcept(UUID.fromString(authorityUuid));
+				sb.append(" Type: " + authority + " (" + authorityUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			sb.append(" Denotation: " + denotation + ",");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
+
 	public DrIdentifier() {
 		// TODO Auto-generated constructor stub
 	}
