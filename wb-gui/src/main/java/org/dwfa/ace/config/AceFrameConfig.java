@@ -612,7 +612,9 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
             if (objDataVersion >= 4) {
                 childrenExpandedNodes = IntSet.readIntSetIgnoreMapErrors(in);
+                childrenExpandedNodes.clear();
                 parentExpandedNodes = IntSet.readIntSetIgnoreMapErrors(in);
+                parentExpandedNodes.clear();
             } else {
                 childrenExpandedNodes = new IntSet();
                 parentExpandedNodes = new IntSet();
