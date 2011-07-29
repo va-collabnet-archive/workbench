@@ -16,7 +16,6 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;//THIS
@@ -89,8 +88,8 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 							originConcept, 
 							relSpec.getRelTypeSpec().get(component.getViewCoordinate()).getNid(), 
 							relSpec.getDestinationSpec().get(component.getViewCoordinate()).getNid(),
-							ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
-							ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
+							SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
+							SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(), 
 							0, 
 							SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
 							config.getDbConfig().getUserConcept().getNid(),

@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -76,8 +75,8 @@ public class AddFromSpecAction extends AbstractAction {
 					originConcept, 
 					relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(), 
 					relSpec.getDestinationSpec().get(concept.getViewCoordinate()).getNid(),
-					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
-					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
+					SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
+					SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(), 
 					0, 
 					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),

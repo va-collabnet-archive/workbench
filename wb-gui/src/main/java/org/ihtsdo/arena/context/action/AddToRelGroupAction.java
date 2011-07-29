@@ -12,15 +12,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
@@ -79,8 +75,8 @@ public class AddToRelGroupAction extends AbstractAction {
 					originConcept, 
 					relSpec.getRelTypeSpec().get(config.getViewCoordinate()).getNid(), 
 					relSpec.getDestinationSpec().get(config.getViewCoordinate()).getNid(),
-					ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid(), 
-					ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.localize().getNid(), 
+					SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
+					SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(), 
 					group.getRelGroup(), //set to relGroup
 					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
 					config.getDbConfig().getUserConcept().getNid(),
