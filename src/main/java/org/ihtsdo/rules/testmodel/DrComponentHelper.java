@@ -1,6 +1,7 @@
 package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +60,8 @@ public class DrComponentHelper {
 				concept.setFactContextName(factContextName);
 			}
 
-			for (DescriptionVersionBI descriptionVersion : conceptBi.getDescsActive()) {
+			Collection<? extends DescriptionVersionBI> descsActive = conceptBi.getDescsActive();
+			for (DescriptionVersionBI descriptionVersion : descsActive) {
 				DrDescription loopDescription = new DrDescription();
 				loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
 				loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
@@ -74,7 +76,8 @@ public class DrComponentHelper {
 				loopDescription.setFactContextName(factContextName);
 				concept.getDescriptions().add(loopDescription);
 
-				for (RefexVersionBI<?> annotation : descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate())) {
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				for (RefexVersionBI<?> annotation : currentAnnotations) {
 					try {
 						RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
 						boolean newLangDesSet = true;

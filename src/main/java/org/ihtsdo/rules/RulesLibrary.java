@@ -272,7 +272,7 @@ public class RulesLibrary {
 			String result = "Error";
 			activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
 					" for " + context.toString());
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+			activity.setProgressInfoLower("Error: elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
 			try {
 				activity.complete();
 			} catch (ComputationCanceled e1) {
