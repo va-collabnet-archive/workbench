@@ -128,6 +128,9 @@ public class SubversionData implements Serializable {
 		buf.append(" url: ");
 		buf.append(repositoryUrlStr);
 		
+		buf.append(" url: ");
+		buf.append(preferredReadRepository);
+		
 		return buf.toString();
 	}
 }

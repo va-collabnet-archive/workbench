@@ -63,9 +63,16 @@ public abstract class AbstractAllSvnEntriesTask extends AbstractTask {
         try {
             I_ConfigAceFrame config =
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            worker.getLogger().info(" config.getSubversionMap() size = " + config.getSubversionMap().size());
+            
             for (String key : config.getSubversionMap().keySet()) {
                 SubversionData svd = config.getSubversionMap().get(key);
-                worker.getLogger().info(" processing: " + key);
+                worker.getLogger().info(" Printing getSubversionMap key = " + key+" SubversionData = "+svd);
+                }
+            
+            for (String key : config.getSubversionMap().keySet()) {
+                SubversionData svd = config.getSubversionMap().get(key);
+                worker.getLogger().info(" processing: " + key+" SubversionData = "+svd);
                 doSvnTask(config, svd, key);
             }
             return Condition.CONTINUE;
