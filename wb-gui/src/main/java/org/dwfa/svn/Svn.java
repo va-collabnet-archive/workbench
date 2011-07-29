@@ -1382,6 +1382,9 @@ public class Svn implements I_HandleSubversion {
 	}
 
 	public static SvnPrompter getPrompter() {
+		if (prompter == null){
+			prompter = new SvnPrompter();
+		}
 		return prompter;
 	}
 
