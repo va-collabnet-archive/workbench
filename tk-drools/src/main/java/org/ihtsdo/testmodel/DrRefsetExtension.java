@@ -2,6 +2,10 @@ package org.ihtsdo.testmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class DrRefsetExtension extends DrComponent{
 	private String primordialUuid;
@@ -24,6 +28,63 @@ public class DrRefsetExtension extends DrComponent{
 	//Inferred properties
 	// none yet
 
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("");
+		try {
+			sb.append(" String Value: " + strValue + "(" + primordialUuid +"),");
+			sb.append(" Boolean Value: " + booleanValue + ",");
+			sb.append(" Float Value: " + floatValue + ",");
+			sb.append(" Int Value: " + intValue + ",");
+			sb.append(" Long Value: " + longValue + ",");
+			sb.append(" Refset Type: " + refsetType + ",");
+			
+			try {
+				ConceptChronicleBI refset = Ts.get().getConcept(UUID.fromString(refsetUuid));
+				sb.append(" Refset: " + refset + " (" + refsetUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			try {
+				ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c1Uuid));
+				sb.append(" C1: " + c1 + " (" + c1Uuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+			
+			try {
+				ConceptChronicleBI c2 = Ts.get().getConcept(UUID.fromString(c2Uuid));
+				sb.append(" C2: " + c2 + " (" + c2Uuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+			
+			try {
+				ConceptChronicleBI c3 = Ts.get().getConcept(UUID.fromString(c3Uuid));
+				sb.append(" C3: " + c3 + " (" + c3Uuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+			
+			try {
+				ConceptChronicleBI c1 = Ts.get().getConcept(UUID.fromString(c1Uuid));
+				sb.append(" C1: " + c1 + " (" + c1Uuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+			
+			sb.append("\nIdentifiers: [");
+			if (identifiers != null) {
+				for (DrIdentifier identifier : identifiers) {
+					int i = 0;
+					sb.append(identifier.toString() + (i == identifiers.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			sb.append("]");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
+	
 	public DrRefsetExtension() {
 		identifiers = new ArrayList<DrIdentifier>();
 	}

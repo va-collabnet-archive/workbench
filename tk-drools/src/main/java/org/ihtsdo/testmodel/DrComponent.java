@@ -1,20 +1,57 @@
 package org.ihtsdo.testmodel;
 
+import java.util.UUID;
+
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+
 public abstract class DrComponent {
-	
+
 	private String statusUuid;
 	private String pathUuid;
 	private String authorUuid;
 	private Long time;
-	
+
 	private String factContextName;
-	
-	//Inferred properties
+
+	// Inferred properties
 	private boolean published = false;
 	private boolean extensionComponent = false;
 	private String extensionId = "";
 	private boolean active = false;
-	
+
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("");
+		try {
+			try {
+				ConceptChronicleBI status = Ts.get().getConcept(UUID.fromString(statusUuid));
+				sb.append(" Status: " + status + " (" + statusUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			try {
+				ConceptChronicleBI path = Ts.get().getConcept(UUID.fromString(pathUuid));
+				sb.append(" Path: " + path + " (" + pathUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			try {
+				ConceptChronicleBI author = Ts.get().getConcept(UUID.fromString(authorUuid));
+				sb.append(" Author: " + author + " (" + authorUuid + "),");
+			} catch (IllegalArgumentException ex) {
+			}
+
+			sb.append(" Time: " + time + ",");
+			sb.append(" Fact Context Name: " + factContextName + ",");
+			sb.append(" Published: " + published + ",");
+			sb.append(" Extension Component: " + extensionComponent + ",");
+			sb.append(" Active: " + active);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
 
 	public String getStatusUuid() {
 		return statusUuid;

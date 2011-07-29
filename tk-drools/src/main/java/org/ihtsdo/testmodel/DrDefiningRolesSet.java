@@ -2,6 +2,10 @@ package org.ihtsdo.testmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class DrDefiningRolesSet {
 	
@@ -10,6 +14,20 @@ public class DrDefiningRolesSet {
 	
 	//Inferred properties
 	private int numberOfIsas = 0;
+	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer("");
+		try {
+			sb.append("RolesSetType: " + rolesSetType + ",");
+			sb.append("NumberOfIsas: " + numberOfIsas + ",");
+
+			sb.append("\nRelationships: " + relationships);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
 	
 	public DrDefiningRolesSet() {
 		super();
