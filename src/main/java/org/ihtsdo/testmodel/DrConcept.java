@@ -1,11 +1,16 @@
 package org.ihtsdo.testmodel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class DrConcept extends DrComponent{
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+
+public class DrConcept extends DrComponent {
 	private String primordialUuid;
-	
+
 	private boolean defined;
 	private List<DrDescription> descriptions;
 	private List<DrRelationship> incomingRelationships;
@@ -14,8 +19,8 @@ public class DrConcept extends DrComponent{
 	private List<DrLanguageDesignationSet> languageDesignationSets;
 	private List<DrRefsetExtension> extensions;
 	private List<DrIdentifier> identifiers;
-	
-	//Inferred properties
+
+	// Inferred properties
 	private String specialConceptCategory = "";
 	private int numberOfStatedParents = 0;
 	private int numberOfIncomingAssociations = 0;
@@ -27,8 +32,108 @@ public class DrConcept extends DrComponent{
 	private boolean variantEvaluationCandidate = false;
 	private List<String> listOfDomainsUuids;
 	private String effectiveDomain = "";
-	
-	
+
+	@Override
+	public String toString() {
+		StringBuffer conceptSb = new StringBuffer("");
+		ConceptChronicleBI concept = null;
+		try {
+			concept = Ts.get().getConcept(UUID.fromString(primordialUuid));
+			conceptSb.append(concept.toString() + "(" + primordialUuid + "),");
+			conceptSb.append(" defined: " + defined + ",");
+			conceptSb.append(" specialConceptCategory: " + specialConceptCategory + ",");
+			conceptSb.append(" numberOfStatedParents: " + numberOfStatedParents + ",");
+			conceptSb.append(" numberOfIncomingAssociations: " + numberOfIncomingAssociations + ",");
+			conceptSb.append(" parentOfStatedChildren: " + parentOfStatedChildren + ",");
+			conceptSb.append(" sourceOfDefiningRole: " + sourceOfDefiningRole + ",");
+			conceptSb.append(" targetOfDefiningRole: " + targetOfDefiningRole + ",");
+			conceptSb.append(" targetOfHistoricalAssociation: " + targetOfHistoricalAssociation + ",");
+			conceptSb.append(" semanticTag: " + semanticTag + ",");
+			conceptSb.append(" variantEvaluationCandidate: " + variantEvaluationCandidate + ",");
+			conceptSb.append(" specialConceptCategory: " + specialConceptCategory + ",");
+			conceptSb.append(" effectiveDomain: " + effectiveDomain + ",");
+			conceptSb.append("tdomainUuids: [");
+			if (listOfDomainsUuids != null) {
+				for (String domainUuid : listOfDomainsUuids) {
+					ConceptChronicleBI domainConcept = Ts.get().getConcept(UUID.fromString(domainUuid));
+					conceptSb.append(domainConcept + " (" + domainUuid + "),");
+				}
+			}
+			conceptSb.append("], ");
+
+			conceptSb.append("Descriptions: [");
+			if (descriptions != null) {
+				int i = 0;
+				for (DrDescription description : descriptions) {
+					conceptSb.append(description.toString() + (i == descriptions.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			conceptSb.append("], ");
+
+			conceptSb.append("Incoming Relationships: [");
+			if (incomingRelationships != null) {
+				int i = 0;
+				for (DrRelationship incomingRel : incomingRelationships) {
+					conceptSb.append(incomingRel.toString() + (i == incomingRelationships.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+
+			conceptSb.append("Outgoing Relationships: [");
+			if (outgoingRelationships != null) {
+				int i = 0;
+				for (DrRelationship outgoingRel : outgoingRelationships) {
+					conceptSb.append(outgoingRel.toString() + (i == outgoingRelationships.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			conceptSb.append("], ");
+
+			conceptSb.append("Defining Roles: [");
+			if (definingRoleSets != null) {
+				int i = 0;
+				for (DrDefiningRolesSet defRole : definingRoleSets) {
+					conceptSb.append(defRole.toString() + (i == definingRoleSets.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+
+			conceptSb.append("Language Designation Sets: [");
+			if (languageDesignationSets != null) {
+				int i = 0;
+				for (DrLanguageDesignationSet langDes : languageDesignationSets) {
+					conceptSb.append(langDes.toString() + (i == languageDesignationSets.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			conceptSb.append("], ");
+
+			conceptSb.append("Extensions: [");
+			if (extensions != null) {
+				int i = 0;
+				for (DrRefsetExtension ext : extensions) {
+					conceptSb.append(ext.toString() + (i == extensions.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			conceptSb.append("], ");
+
+			conceptSb.append("Identifiers: [");
+			if (identifiers != null) {
+				for (DrIdentifier identifier : identifiers) {
+					int i = 0;
+					conceptSb.append(identifier.toString() + (i == identifiers.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			conceptSb.append("]");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return conceptSb.toString();
+	}
+
 	public DrConcept() {
 		descriptions = new ArrayList<DrDescription>();
 		incomingRelationships = new ArrayList<DrRelationship>();
@@ -37,13 +142,13 @@ public class DrConcept extends DrComponent{
 		languageDesignationSets = new ArrayList<DrLanguageDesignationSet>();
 		extensions = new ArrayList<DrRefsetExtension>();
 		identifiers = new ArrayList<DrIdentifier>();
-		numberOfStatedParents=0;
-		variantEvaluationCandidate=true;
-		parentOfStatedChildren=false;
-		sourceOfDefiningRole=false;
-		targetOfHistoricalAssociation=false;
-		targetOfDefiningRole=false;
-		
+		numberOfStatedParents = 0;
+		variantEvaluationCandidate = true;
+		parentOfStatedChildren = false;
+		sourceOfDefiningRole = false;
+		targetOfHistoricalAssociation = false;
+		targetOfDefiningRole = false;
+
 	}
 
 	public String getPrimordialUuid() {
@@ -146,8 +251,7 @@ public class DrConcept extends DrComponent{
 		return targetOfHistoricalAssociation;
 	}
 
-	public void setTargetOfHistoricalAssociation(
-			boolean targetOfHistoricalAssociation) {
+	public void setTargetOfHistoricalAssociation(boolean targetOfHistoricalAssociation) {
 		this.targetOfHistoricalAssociation = targetOfHistoricalAssociation;
 	}
 
@@ -195,8 +299,7 @@ public class DrConcept extends DrComponent{
 		return languageDesignationSets;
 	}
 
-	public void setLanguageDesignationSets(
-			List<DrLanguageDesignationSet> languageDesignationSets) {
+	public void setLanguageDesignationSets(List<DrLanguageDesignationSet> languageDesignationSets) {
 		this.languageDesignationSets = languageDesignationSets;
 	}
 

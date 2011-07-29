@@ -2,10 +2,14 @@ package org.ihtsdo.testmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class DrDescription extends DrComponent{
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+
+public class DrDescription extends DrComponent {
 	private String primordialUuid;
-	
+
 	private String text;
 	private String conceptUuid;
 	private boolean initialCaseSignificant;
@@ -13,21 +17,75 @@ public class DrDescription extends DrComponent{
 	private String typeUuid;
 	private String acceptabilityUuid;
 	private String languageRefsetUuid;
-	
+
 	private List<DrIdentifier> identifiers;
 	private List<DrRefsetExtension> extensions;
 
-	//Inferred properties
-	private String referToConceptUuid = ""; //null if has no refer to concept extension
+	// Inferred properties
+	private String referToConceptUuid = ""; // null if has no refer to concept
+											// extension
 	private String caseSignificantCategory = "";
 	private boolean variantGenerationCandidate = false;
 	private boolean uniqueInConcept = true;
-	
-	
+
 	public DrDescription() {
 		identifiers = new ArrayList<DrIdentifier>();
 		extensions = new ArrayList<DrRefsetExtension>();
-		referToConceptUuid=null;
+		referToConceptUuid = null;
+	}
+
+	@Override
+	public String toString() {
+		StringBuffer descriptionSb = new StringBuffer("");
+
+		try {
+			descriptionSb.append("description: " + text + " (" + primordialUuid + "),");
+
+			if (conceptUuid != null && !conceptUuid.equals("")) {
+				ConceptChronicleBI concept = Ts.get().getConcept(UUID.fromString(conceptUuid));
+				descriptionSb.append(" concept: " + concept + " (" + conceptUuid + "),");
+			}
+
+			descriptionSb.append(" initialCaseSignificant: " + initialCaseSignificant);
+			descriptionSb.append(" lang: " + lang);
+			if (typeUuid != null && !typeUuid.equals("")) {
+				ConceptChronicleBI type = Ts.get().getConcept(UUID.fromString(typeUuid));
+				descriptionSb.append(" type: " + type + " (" + typeUuid + "),");
+			}
+
+			if (acceptabilityUuid != null && !acceptabilityUuid.equals("")) {
+				ConceptChronicleBI acceptability = Ts.get().getConcept(UUID.fromString(acceptabilityUuid));
+				descriptionSb.append(" acceptability: " + acceptability + " (" + acceptabilityUuid + "),");
+			}
+
+			if (languageRefsetUuid != null && !languageRefsetUuid.equals("")) {
+				ConceptChronicleBI languageRefset = Ts.get().getConcept(UUID.fromString(languageRefsetUuid));
+				descriptionSb.append(" languageRefset: " + languageRefset + " (" + languageRefsetUuid + "),");
+			}
+
+			descriptionSb.append("Extensions: [");
+			if (extensions != null) {
+				int i = 0;
+				for (DrRefsetExtension ext : extensions) {
+					descriptionSb.append(ext.toString() + (i == extensions.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			descriptionSb.append("], ");
+
+			descriptionSb.append("Identifiers: [");
+			if (identifiers != null) {
+				for (DrIdentifier identifier : identifiers) {
+					int i = 0;
+					descriptionSb.append(identifier.toString() + (i == identifiers.size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			descriptionSb.append("]");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return descriptionSb.toString();
 	}
 
 	public String getPrimordialUuid() {
