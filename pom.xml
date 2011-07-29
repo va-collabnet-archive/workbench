@@ -42,12 +42,11 @@
     </scm>
     <properties>
         <branch>trek</branch>
-        <ace.devstyle.version>1.1-SNAPSHOT</ace.devstyle.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <drools.version>5.1.1</drools.version>
         <mvel2.version>2.0.16</mvel2.version>
         <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
-        <wb-icons-version>1.0.8-SNAPSHOT</wb-icons-version>
+        <wb-icons-version>1.0.7</wb-icons-version>
         <je.version>4.1.10</je.version>
         <svnusername>${relusername}</svnusername>
         <svnpassword>${relpassword}</svnpassword>
