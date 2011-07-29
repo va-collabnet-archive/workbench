@@ -40,6 +40,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
@@ -514,8 +515,28 @@ public class WorkbenchRunner {
 					}
 					else{
 						successCount++;
+						//AceLog.getAppLog().info("Workbench runner 517 successCount = "+successCount); 
 						if (successCount == 1 && svnHelper != null) {
+							/*AceLog.getAppLog().info("Workbench runner 519 svnHelper.getSubversionMap().size = "+svnHelper.getSubversionMap().size()); 
+							for (String key : svnHelper.getSubversionMap().keySet()) {
+				                SubversionData svd = svnHelper.getSubversionMap().get(key);
+				                AceLog.getAppLog().info(" Printing svnHelper.getSubversionMap key = " + key+" SubversionData = "+svd);
+				                }
+							
+							AceLog.getAppLog().info("Workbench runner 520 ace.getSubversionMap().size() 1 = "+ace.getSubversionMap().size()); 
+							for (String key : ace.getSubversionMap().keySet()) {
+				                SubversionData svd = ace.getSubversionMap().get(key);
+				                AceLog.getAppLog().info(" Printing ace key = " + key+" SubversionData = "+svd);
+				                }*/
+							
+							ace.getSubversionMap().clear();
 							ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
+							AceLog.getAppLog().info("Workbench runner 534 ace.getSubversionMap().size() = "+ace.getSubversionMap().size()); 
+							for (String key : ace.getSubversionMap().keySet()) {
+				                SubversionData svd = ace.getSubversionMap().get(key);
+				                AceLog.getAppLog().info(" Printing ace svnMap info key = " + key+" SubversionData = "+svd);
+				                }
+							
 						}
 						AceLog.getAppLog().info("About to handleNormalFrame"); 
 						handleNormalFrame(ace);
