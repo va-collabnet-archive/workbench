@@ -162,7 +162,8 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 }
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                return false;
             }
 
             return this.getOperator().isNegated() ^ (isMemberType);

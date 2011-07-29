@@ -71,9 +71,9 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
         }
 
         public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
-            super(type, isNegated ? 
-                    IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF : 
-                    IsKindOfEvaluatorDefinition.IS_KIND_OF);
+            super(type, isNegated
+                    ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF
+                    : IsKindOfEvaluatorDefinition.IS_KIND_OF);
         }
 
         @Override
@@ -91,7 +91,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 
             return testKindOf(value1, value2);
         }
-        
+
         private boolean testKindOf(final Object value1, final Object value2) {
             try {
                 ConceptVersionBI possibleKind = null;
@@ -111,7 +111,7 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                     try {
                         parentKind = ((ConceptSpec) value2).getStrict(coordinate);
                     } catch (ValidationException ex) {
-                        throw new RuntimeException(ex);
+                        return false;
                     }
                 } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
                     ConceptFact fact = (ConceptFact) value2;
@@ -119,7 +119,6 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                 }
                 return this.getOperator().isNegated() ^ (possibleKind.isKindOf(parentKind));
             } catch (IOException e) {
-                e.printStackTrace();
                 return false;
             }
         }
