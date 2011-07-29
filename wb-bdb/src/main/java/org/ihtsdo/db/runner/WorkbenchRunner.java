@@ -94,7 +94,7 @@ public class WorkbenchRunner {
 	public static String[] svnUpdateOnStart = null;
 	public static File userProfile;
 	public static UIAuthenticator auth = new UIAuthenticator();
-	public static SvnPrompter prompt;
+	//public static SvnPrompter prompt;
 	
 	private String authenticate(SvnPrompter prompt, String baseURL){
 		//String result = auth.authenticate(svnH);
@@ -213,13 +213,13 @@ public class WorkbenchRunner {
 			//AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
 			//TODO throw some sort of error if url is empty or null
 			
-			authenticate(getPrompt(),testSVNURL);
+			authenticate(Svn.getPrompter(),testSVNURL);
 			/*AceLog.getAppLog().info("prompt userName = "+prompt.getUsername());
 			AceLog.getAppLog().info("prompt password = "+prompt.getPassword());
 			AceLog.getAppLog().info("prompt DEBUG HERE = "+prompt.getPassword());*/
 			if (acePropertiesFileExists == false || initialized == false) {
 				try {
-					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompt);
+					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, Svn.getPrompter());
 				} catch (Exception ex) {
 					AceLog.getAppLog().alertAndLog(Level.SEVERE,"Problem getting initial checkout of profiles etc.",ex);
 					System.exit(0);
@@ -257,7 +257,7 @@ public class WorkbenchRunner {
 					|| (svnUpdateOnStart != null)) {
 	            Svn.setConnectedToSvn(true);
 	            svnHelper.initialSubversionOperationsAndChangeSetImport(new File(
-								"config", WB_PROPERTIES), prompt);
+								"config", WB_PROPERTIES), Svn.getPrompter());
 			}
 
 			if (wbConfigFile == null || !wbConfigFile.exists()) {
@@ -395,11 +395,11 @@ public class WorkbenchRunner {
 				AceConfig.config = (AceConfig) ois.readObject();
 				AceConfig.config.setProfileFile(userProfile);
 				
-				AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername() +" prompt.getUsername() = "+prompt.getUsername());
+				AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername() +" prompt.getUsername() = "+Svn.getPrompter().getUsername());
 				
-				if(!prompt.getUsername().equalsIgnoreCase(AceConfig.config.getUsername())){
+				if(!Svn.getPrompter().getUsername().equalsIgnoreCase(AceConfig.config.getUsername())){
 					AceLog.getAppLog().info("AceConfig UserName not the same so setting"); 
-					AceConfig.config.setUsername(prompt.getUsername());
+					AceConfig.config.setUsername(Svn.getPrompter().getUsername());
 					AceConfig.config.save();
 					
 					ObjectInputStream ois2 = new ObjectInputStream(
@@ -511,7 +511,7 @@ public class WorkbenchRunner {
 					if (ace.isAdministrative()) {
 						successCount++;
 						AceLog.getAppLog().info("About to handleAdministrativeFrame"); 
-						handleAdministrativeFrame(prompt, ace);
+						handleAdministrativeFrame(Svn.getPrompter(), ace);
 					}
 					else{
 						successCount++;
@@ -937,15 +937,12 @@ public class WorkbenchRunner {
 
 
 	public static SvnPrompter getPrompt() {
-		if (prompt == null){
-			prompt = new SvnPrompter();
-		}
-		return prompt;
+		return Svn.getPrompter();
 	}
 
 
-	public static void setPrompt(SvnPrompter prompt) {
+	/*public static void setPrompt(SvnPrompter prompt) {
 		WorkbenchRunner.prompt = prompt;
-	}
+	}*/
 
 }
