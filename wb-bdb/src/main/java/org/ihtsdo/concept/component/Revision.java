@@ -71,6 +71,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         primordialComponent.clearVersions();
         assert primordialComponent != null;
         assert statusAtPositionNid != Integer.MAX_VALUE;
+        this.primordialComponent.getEnclosingConcept().modified();
     }
 
     public Revision(int statusNid, int authorNid, int pathNid,
@@ -81,6 +82,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
         primordialComponent.clearVersions();
         assert primordialComponent != null;
         assert sapNid != Integer.MAX_VALUE;
+        this.primordialComponent.getEnclosingConcept().modified();
     }
 
     public Revision(TupleInput input, C conceptComponent) {
