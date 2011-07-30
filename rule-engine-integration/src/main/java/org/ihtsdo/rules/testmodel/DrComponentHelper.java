@@ -272,7 +272,7 @@ public class DrComponentHelper {
 			inferredRolesSet.setRolesSetType("Inferred");
 			
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
-			inferredRolesSet.setRolesSetType("Modelers");
+			modelersRolesSet.setRolesSetType("Modelers");
 
 			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
 					null, 
