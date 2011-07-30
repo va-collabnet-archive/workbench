@@ -41,6 +41,7 @@ import org.dwfa.ace.search.workflow.LuceneWfHxMatch;
 import org.dwfa.ace.table.StringWithTuple;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
 import org.ihtsdo.lucene.WorkflowLuceneSearchResult;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class WorkflowHistoryTableModel extends DefaultTableModel {
@@ -53,8 +54,8 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
     private ArrayList<WorkflowLuceneSearchResult> wfHistoryList = new ArrayList<WorkflowLuceneSearchResult>();
 
     public enum WORKFLOW_FIELD { 
-    	FSN("FSN", 5, 400, 600), EDITOR("Editor", 5, 150, 180), 
-    	STATE("State", 5, 115, 150), TIMESTAMP("TimeStamp", 5, 75, 200);
+    	FSN("FSN", 5, 800, 650), EDITOR("Editor", 5, 250, 250), 
+    	STATE("State", 5, 250, 250), TIMESTAMP("TimeStamp", 5, 75, 200);
 
  /*
   *  FSN("FSN", 5, 400, 600), 	  	STATE("State", 5, 115, 150), 	ACTION("Action", 5, 115, 150), 	  
@@ -146,41 +147,22 @@ public class WorkflowHistoryTableModel extends DefaultTableModel {
             switch (columns[columnIndex]) {
                 case FSN:
                     // Get Pref to display
-                    I_DescriptionTuple tuple = concept.getDescTuple(config.getTableDescPreferenceList(), config);
-                    DescriptionVersionBI version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                    if (version != null) {	
-                    	term = version.getText(); 
-                    } 
+                	ConceptVersionBI conVersion = concept.getVersion(config.getViewCoordinate());
+                	term = conVersion.getFullySpecifiedDescription().getText();
                     break;
-        /*
-        *          case ACTION:
-        *               return new WorkflowTextFieldEditor(getPrefText(bean.getAction()), false);
-        */
                 case STATE:
                     // Get State to display
-                    I_GetConceptData con = Terms.get().getConcept(UUID.fromString(result.getState()));
-                    tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                    version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                    if (version != null) {	
-                    	term = version.getText(); 
-                    } 
+                    I_GetConceptData stateCon = Terms.get().getConcept(UUID.fromString(result.getState()));
+                	ConceptVersionBI stateVersion = stateCon.getVersion(config.getViewCoordinate());
+                	term = stateVersion.getFullySpecifiedDescription().getText();
                     break;
 
                 case EDITOR:
-                    con = Terms.get().getConcept(UUID.fromString(result.getModeler()));
-                    tuple = con.getDescTuple(config.getTableDescPreferenceList(), config);
-                    version = (DescriptionVersionBI) tuple.getVersion(config.getViewCoordinate());
-                    if (version != null) {	
-                    	term = version.getText(); 
-                    } 
+                    // Get State to display
+                    I_GetConceptData modelerCon = Terms.get().getConcept(UUID.fromString(result.getModeler()));
+                	ConceptVersionBI modelerVersion = modelerCon.getVersion(config.getViewCoordinate());
+                	term = modelerVersion.getFullySpecifiedDescription().getText();
                     break;
-    
-/*
-*              case PATH:
-*           		I_GetConceptData path = Terms.get().getConcept(bean.getPath());
-*           		I_ConceptAttributeTuple pTuple = path.getConceptAttributes().getTuples().get(0);
-*               	return new WorkflowStringWithConceptTuple(getPrefText(bean.getPath()), pTuple, false);
-*/
                 case TIMESTAMP:
                 	Date d = new Date(result.getTime());
                 	term = formatter.format(d);
