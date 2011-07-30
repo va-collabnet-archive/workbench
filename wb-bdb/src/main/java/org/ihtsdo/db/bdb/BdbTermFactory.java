@@ -964,6 +964,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         c.getDescriptions().add(d);
+        c.modified();
         return d;
     }
 
@@ -1283,6 +1284,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
         }
         c.getSourceRels().add(r);
+        c.modified();
         return r;
     }
 
@@ -1313,6 +1315,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 Bdb.getSapDb().getSapNid(relStatusNid,
                 getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), pathNid, effectiveDate);
         c.getSourceRels().add(r);
+        c.modified();
         return r;
     }
 
@@ -1335,6 +1338,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setGroup(group);
         r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, authorNid, pathNid, effectiveDate);
         c.getSourceRels().add(r);
+        c.modified();
         return r;
     }
 
