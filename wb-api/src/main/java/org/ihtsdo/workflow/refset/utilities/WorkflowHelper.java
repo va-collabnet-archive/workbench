@@ -173,9 +173,14 @@ public class WorkflowHelper {
 
     	try {
 			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-			Set<ConceptVersionBI> editors = getChildren(parentEditorConcept.getVersion(vc));
-			editors.remove(parentEditorConcept);
-	
+			Set<ConceptVersionBI> editors = new HashSet<ConceptVersionBI>();
+			
+			for (ConceptVersionBI con : getChildren(parentEditorConcept.getVersion(vc))) {
+				if (!con.getPrimUuid().equals(parentEditorConcept.getPrimUuid())) {
+					editors.add(con);
+				}
+			}
+			
 			for (ConceptVersionBI editor : editors)
 			{
 				if (defaultModeler == null && isDefaultModeler(editor))
@@ -318,8 +323,13 @@ public class WorkflowHelper {
    	   	try {
    			I_GetConceptData rolesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getPrimoridalUid());
 
-   			Set<? extends ConceptVersionBI> workflowRoles = getChildren(rolesParentConcept.getVersion(vc));
-    		workflowRoles.remove(rolesParentConcept);
+   			Set<ConceptVersionBI> workflowRoles =new HashSet<ConceptVersionBI>();
+   			
+   			for (ConceptVersionBI con: getChildren(rolesParentConcept.getVersion(vc))) {
+   				if (!con.getPrimUuid().equals(rolesParentConcept.getPrimUuid())) {
+   					workflowRoles.add(con);
+   				}
+   			}
 
     		sortedRoles.addAll(workflowRoles);
 
@@ -335,8 +345,13 @@ public class WorkflowHelper {
 		try {
 			I_GetConceptData statesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
 
-    		Set<? extends ConceptVersionBI> workflowStates = getChildren(statesParentConcept.getVersion(vc));
-    		workflowStates.remove(statesParentConcept);
+   			Set<ConceptVersionBI> workflowStates = new HashSet<ConceptVersionBI>();
+   			
+   			for (ConceptVersionBI con: getChildren(statesParentConcept.getVersion(vc))) {
+   				if (!con.getPrimUuid().equals(statesParentConcept.getPrimUuid())) {
+   					workflowStates.add(con);
+   				}
+   			}
 
     		sortedStates.addAll(workflowStates);
 
@@ -354,8 +369,13 @@ public class WorkflowHelper {
 		try {
     		I_GetConceptData actionParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIONS.getPrimoridalUid());
 
-    		Set<? extends ConceptVersionBI> workflowActions = getChildren(actionParentConcept.getVersion(vc));
-    		workflowActions.remove(actionParentConcept);
+    		Set<ConceptVersionBI> workflowActions = new HashSet<ConceptVersionBI>();
+    		
+    		for (ConceptVersionBI con : getChildren(actionParentConcept.getVersion(vc))) {
+    			if (!con.getPrimUuid().equals(actionParentConcept.getPrimUuid())) { 
+    				workflowActions.add(con);
+	    		}
+			}
 
     		for (ConceptVersionBI action : workflowActions)
     		{

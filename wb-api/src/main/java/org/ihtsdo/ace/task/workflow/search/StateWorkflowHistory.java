@@ -44,16 +44,8 @@ public class StateWorkflowHistory extends AbstractWorkflowHistorySearchTest {
          if (obj instanceof WorkflowConceptVersion) {
         	 this.testState = (WorkflowConceptVersion) obj;
          } else {
-        	 this.testState = null;
-         }
-         
-         if (this.testState == null) {
-            try {
-               TreeSet<? extends ConceptVersionBI> states = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
-
-               if (states.size() > 0) {
-                  this.testState = new WorkflowConceptVersion(states.first());
-               }
+			try {
+              this.testState = new WorkflowConceptVersion(Terms.get().getActiveAceFrameConfig().getWorkflowStates().first());
             } catch (Exception e) {
             	AceLog.getAppLog().log(Level.WARNING, "Error in initializing drop-down value", e);
             }
