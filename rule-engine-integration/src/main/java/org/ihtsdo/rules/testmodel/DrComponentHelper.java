@@ -270,6 +270,9 @@ public class DrComponentHelper {
 
 			DrDefiningRolesSet inferredRolesSet = new DrDefiningRolesSet();
 			inferredRolesSet.setRolesSetType("Inferred");
+			
+			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
+			inferredRolesSet.setRolesSetType("Modelers");
 
 			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
 					null, 
@@ -296,8 +299,13 @@ public class DrComponentHelper {
 				if (relTuple.getCharacteristicNid() == stated) {
 					statedRolesSet.getRelationships().add(loopRel);
 				}
+				
+				if (relTuple.getCharacteristicNid() != inferred) {
+					modelersRolesSet.getRelationships().add(loopRel);
+				}
 			}
 			concept.getDefiningRoleSets().add(statedRolesSet);
+			concept.getDefiningRoleSets().add(modelersRolesSet);
 
 			//TODO: incoming rels is heavy on performance, only inserting incoming historical rels
 			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
