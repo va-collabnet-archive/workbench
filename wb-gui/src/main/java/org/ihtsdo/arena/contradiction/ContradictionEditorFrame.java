@@ -31,6 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -124,6 +125,13 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         topSplit.setRightComponent(conceptTabsPane);
         topSplit.setDividerLocation(350);
         resultsPane.setMinimumSize(new Dimension(350, cp.getHeight()));
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                newFrameConfig.getConceptViewer(1).setTermComponent(null);
+            }
+        });
     }
     
     private void createLeftComponent() {
@@ -204,7 +212,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                 conceptTabsPane, 1, "plugins/contradiction");
         conceptTabsPane.add(c1Panel);
         
-        arena = new Arena(newFrameConfig, new File("arena/ajudicate.mxe"));
+        arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"));
         arena.getEditor().setForAjudication(true);
         conceptTabsPane.addTab("arena",
                 new ImageIcon(ACE.class.getResource("/16x16/plain/eye.png")), arena);
@@ -296,7 +304,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                 MarshalledObject<I_ConfigAceFrame> marshalledFrame =
                         new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
                 AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
-                
+                newFrameConfig.setDbConfig(AceConfig.config.getActiveConfig().getDbConfig());
                 
                 ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
                 newFrame.setVisible(true);

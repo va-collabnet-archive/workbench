@@ -952,7 +952,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public I_HostConceptPlugins getListConceptViewer() {
-        return config.getListConceptViewer();
+        return editor.getC1Panel();
     }
 
     public I_GetConceptData getLastViewed() {
