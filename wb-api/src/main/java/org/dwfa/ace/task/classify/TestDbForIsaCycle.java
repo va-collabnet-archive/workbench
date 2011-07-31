@@ -13,92 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.mojo.maven.classifier;
+package org.dwfa.ace.task.classify;
 
-import org.apache.maven.plugin.logging.Log;
-import org.dwfa.ace.task.classify.SnoPathProcessStatedCycleCheck;
-import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.classify.SnoCon;
+import org.dwfa.bpa.process.Condition;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.Bdb;
+import org.dwfa.util.bean.BeanList;
+import org.dwfa.util.bean.BeanType;
+import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
  * @author marc
  */
-/**
- *
- * @goal run-cycle-check
- *
- * @phase process-resources
- * @requiresDependencyResolution compile
- */
-public class CheckCyclesMojo extends AbstractMojo {
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN)})
+public class TestDbForIsaCycle extends AbstractTask {
 
-    /**
-     * Directory of the berkeley database.
-     *
-     * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
-     * @required
-     */
-    private File berkeleyDir;
-    /**
-    <uuidClassRoot>ee9ac5d2-a07c-3981-a57a-f7f26baf38d8</uuidClassRoot>
-    <uuidClassIsa>c93a30b9-ba77-3adb-a9b8-4589c9f8fb25</uuidClassIsa>
-    <uuidClassUserId>7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9</uuidClassUserId>
-     */
-    /**
-     * The uuid for role root.
-     *
-     * @parameter expression="6155818b-09ed-388e-82ce-caa143423e99"
-     * @required
-     */
-    private String uuidRoleRoot;
-    /**
-     * The uuid for the tested path.
-     *
-     * @parameter
-     * @required
-     */
-    private String uuidEditPath;
-    /**
-     * The time for the test in yyyy.mm.dd hh:mm:ss format
-     *
-     * @parameter
-     */
-    private String dateTimeStr;
-    /**
-     * Report Cycles File Name<br>
-     * No report file generated if not provided.
-     *
-     * @parameter
-     */
-    private String reportCycles;
+    private String uuidRoleRoot = "6155818b-09ed-388e-82ce-caa143423e99";
+    private String reportCycles = "CycleReport";
     // CORE CONSTANTS
     private static int isaNid = Integer.MAX_VALUE;
     private static int rootNid = Integer.MAX_VALUE;
@@ -119,7 +77,7 @@ public class CheckCyclesMojo extends AbstractMojo {
     PositionSetReadOnly cEditPosSet = null;
     I_IntSet allowedRoleTypes = null;
     // INPUT PATHS
-    int cEditPathNid = Integer.MAX_VALUE; // :TODO: move to logging
+    int cEditPathNid = Integer.MIN_VALUE; // :TODO: move to logging
     PathBI cEditPathBI = null;
     List<PositionBI> cEditPathListPositionBI = null; // Edit (Stated) Path I_Positions
     // OUTPUT PATHS
@@ -129,25 +87,18 @@ public class CheckCyclesMojo extends AbstractMojo {
     // MASTER DATA SETS
     List<SnoCon> cycleSnoCons; // "Edit Path" Concepts
     // USER INTERFACE
-    private Log logger;
+    private static final Logger logger = Logger.getLogger(TestDbForIsaCycle.class.getName());
     private I_TermFactory tf = null;
-    private I_ConfigAceFrame config;
-    private Precedence precedence;
-    private I_ManageContradiction contradictionMgr;
+    private I_ConfigAceFrame config = null;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+            throws TaskFailedException {
         try {
-            logger = getLog();
-            logger.info("\r\n::: [CheckCyclesMojo] execute() -- begin");
-
-            Bdb.setup(berkeleyDir.getAbsolutePath());
+            logger.info("\r\n::: [TestDbForIsaCycle] execute() -- begin");
             tf = Terms.get();
             setupCoreNids();
-            config = getMojoDbConfig();
-            tf.setActiveAceFrameConfig(config);
-            precedence = config.getPrecedence();
-            contradictionMgr = config.getConflictResolutionStrategy();
+            config = tf.getActiveAceFrameConfig();
 
             // GET INPUT & OUTPUT PATHS FROM CLASSIFIER PREFERRENCES
             setupPaths();
@@ -169,92 +120,68 @@ public class CheckCyclesMojo extends AbstractMojo {
                     config.getPrecedence(),
                     config.getConflictResolutionStrategy());
             tf.iterateConcepts(pcEdit);
-            logger.info("\r\n::: [CheckCyclesMojo] STATED (Edit) PATH DATA : "
-                    + pcEdit.getStats(startTime));
+            logger.log(Level.INFO, "\r\n::: [TestDbForIsaCycle] STATED (Edit) PATH DATA : {0}",
+                    pcEdit.getStats(startTime));
 
             if (cycleSnoCons.size() > 0) {
+//                if (reportCycles != null) {
+//                    SnoCon. dumpToFile(cycleSnoCons,
+//                            "target" + File.separator + reportCycles + "_FAIL.txt", 5);
+//                }
                 StringBuilder sb = new StringBuilder();
                 sb.append("CYCLES DETECTED ... ");
                 sb.append(cycleSnoCons.size());
-                sb.append("\r\n");
-                for (int i = 0; i < cycleSnoCons.size(); i++) {
+                for (int i = 0; i < cycleSnoCons.size() && i < 6; i++) {
                     SnoCon sc = cycleSnoCons.get(i);
                     I_GetConceptData c1 = tf.getConcept(sc.id);
+                    sb.append("\r\n");
                     sb.append(c1.getPrimUuid());
                     sb.append("\t");
                     sb.append(c1.getInitialText());
-                    sb.append("\r\n");
                 }
-                logger.info("\r\n::: [CheckCyclesMojo] CYCLES DETECTED = " + cycleSnoCons.size());
-
-//                if (reportCycles != null) {
-//                    SnoRel.dumpToFile(cycleSnoCons,
-//                            "target" + File.separator + reportCycles + "_FAIL.txt", 5);
-//                }
+                logger.log(Level.INFO, sb.toString());
+                showCycleDialog(sb.toString());
             } else {
-                logger.info("\r\n::: [CheckCyclesMojo] NO CYCLES DETECTED");
-//                if (reportCycles != null) {
-//                    SnoRel.dumpToFile(cycleSnoCons,
-//                            "target" + File.separator + reportCycles + "_PASS.txt", 5);
-//                }
+                logger.info("\r\n::: [TestDbForIsaCycle] NO CYCLES DETECTED");
+                showCycleDialog("NO CYCLES DETECTED");
             }
 
         } catch (TerminologyException ex) {
-            Logger.getLogger(CheckCyclesMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestDbForIsaCycle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(CheckCyclesMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestDbForIsaCycle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
-            Logger.getLogger(CheckCyclesMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestDbForIsaCycle.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(CheckCyclesMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestDbForIsaCycle.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        return Condition.CONTINUE;
     }
 
-    private I_ConfigAceFrame getMojoDbConfig()
-            throws TerminologyException, IOException, ParseException {
-        I_ConfigAceFrame tmpConfig = null;
-        tmpConfig = tf.newAceFrameConfig();
-        DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)}),
-                df.parse(dateTimeStr).getTime()));
-        // Addes inferred promotion template to catch the context relationships [ testing
-        //tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
-        //tmpConfig.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
-        PathBI editPath = tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)});
-        tmpConfig.addEditingPath(editPath);
-        tmpConfig.getDescTypes().add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
-        tmpConfig.getDescTypes().add(SnomedMetadataRfx.getDES_SYNONYM_PREFERRED_NAME_NID());
-        tmpConfig.getDestRelTypes().add(
-                ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-        tmpConfig.getDestRelTypes().add(
-                ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.localize().getNid());
-        tmpConfig.getDestRelTypes().add(
-                Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-        tmpConfig.setDefaultStatus(tf.getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()));
-        tmpConfig.getAllowedStatus().add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+    private void showCycleDialog(String message) {
+        JFrame parentFrame = null;
+        for (JFrame frame : OpenFrames.getFrames()) {
+            if (frame.isActive()) {
+                parentFrame = frame;
+                break;
+            }
+        }
+        JOptionPane.showMessageDialog(parentFrame, message);
 
-        tmpConfig.setClassifierIsaType(tf.getConcept(SNOMED.Concept.IS_A.getPrimoridalUid()));
-
-        tmpConfig.setClassificationRoot(tf.getConcept(SNOMED.Concept.ROOT.getPrimoridalUid()));
-        tmpConfig.setClassificationRoleRoot(tf.getConcept(UUID.fromString(uuidRoleRoot)));
-        // :!!!: config.setClassifierInputPath(null);
-        // :!!!: config.setClassifierOutputPath(null);
-
-        // I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
-        // newDbProfile.setUsername("username");
-        // newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-        // newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-        // newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-        // newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-        // tmpConfig.setDbConfig(newDbProfile);
-
-        tmpConfig.setPrecedence(Precedence.TIME);
-
-        return tmpConfig;
     }
 
-    private void setupCoreNids() throws MojoFailureException {
+    @Override
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        // nothing to do.
+    }
+
+    @Override
+    public Collection<Condition> getConditions() {
+        return CONTINUE_CONDITION;
+    }
+
+    private void setupCoreNids() throws TaskFailedException {
         tf = Terms.get();
 
         // SETUP CORE NATIVES IDs
@@ -280,10 +207,10 @@ public class CheckCyclesMojo extends AbstractMojo {
 
         } catch (TerminologyException e) {
             logger.info(e.toString());
-            throw new MojoFailureException("setupCoreNids", e);
+            throw new TaskFailedException("setupCoreNids", e);
         } catch (IOException e) {
             logger.info(e.toString());
-            throw new MojoFailureException("setupCoreNids", e);
+            throw new TaskFailedException("setupCoreNids", e);
         }
         statusSet = tf.newIntSet();
         statusSet.add(isCURRENT);

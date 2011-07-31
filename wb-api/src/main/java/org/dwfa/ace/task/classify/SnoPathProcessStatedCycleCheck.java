@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.mojo.maven.classifier;
+package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,7 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.maven.plugin.logging.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -34,10 +35,6 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.classify.SnoGrp;
-import org.dwfa.ace.task.classify.SnoGrpList;
-import org.dwfa.ace.task.classify.SnoRel;
-import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
@@ -46,7 +43,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
-    private List<SnoRel> snorels;
+    private List<SnoCon> snocons;
     // STATISTICS COUNTERS
     private int countConSeen;
     private int countConRoot;
@@ -68,7 +65,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
     private PositionSetReadOnly fromPathPos;
     private PositionSetReadOnly fromPathPosPriority;
     // WORKBENCH
-    private Log logger;
+    private static final Logger logger = Logger.getLogger(SnoPathProcessStatedCycleCheck.class.getName());
     private Precedence precedence;
     private I_ManageContradiction contradictionMgr;
     private ConcurrentHashMap<Integer, UUID> watchList = null;
@@ -83,16 +80,14 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
     }
 
     public SnoPathProcessStatedCycleCheck(
-            Log logger,
-            List<SnoRel> snorels,
+            List<SnoCon> snocons,
             I_IntSet roleSet,
             I_IntSet statSet,
             PositionSetReadOnly pathPos,
             Precedence precedence,
             I_ManageContradiction contradictionMgr)
             throws Exception {
-        this.logger = logger;
-        this.snorels = snorels;
+        this.snocons = snocons;
         this.fromPathPosPriority = null;
 
         this.fromPathPos = pathPos;
@@ -137,9 +132,14 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
 
+        if (cNid == -2147327456) { // Organism (organism) 0bab48ac-3030-3568-93d8-aee0f63bf072
+            System.out.println(":!!!:DEBUG:");
+        }
+
         if (++countConSeen % 25000 == 0) {
             if (logger != null) {
-                logger.info("::: [SnoPathProcessStatedCycleCheck] Concepts viewed:\t" + countConSeen);
+                logger.log(Level.INFO,
+                        "::: [SnoPathProcessStatedCycleCheck] Concepts viewed:\t{0}", countConSeen);
             }
         }
         if (cNid == rootNid) {
@@ -187,16 +187,14 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
                 countConAdded++;
                 countRelAdded += snorelListA.size();
 
-                for (int i = 0; i < snorelListA.size(); i++) {
-                    if (snorelListA.get(i).typeId == isaNid) {
-                        if (SnoTable.findIsaCycle(cNid, isaNid, snorelListA.get(i).c2Id, true)) {
-                            snorels.add(snorelListA.get(i));
-                        }
-                    }
+                if (SnoTable.findIsaCycle(cNid, true)) {
+                    snocons.add(new SnoCon(cNid, false));
                 }
 
             } // isaFound
         } // pass to compare
+
+        // System.out.println(":!!!:DEBUG: MAXDEPTH=" + SnoTable.MAXDEPTH);
     }
 
     private List<SnoRel> tupleToSnoRel(List<? extends I_RelTuple> relTupList) throws Exception {

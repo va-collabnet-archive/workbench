@@ -1,6 +1,8 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +43,20 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 @BeanList(specs = { @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN) })
 public class TestSnoPathProcessStated extends AbstractTask {
     private static final long serialVersionUID = 1L;
+    private static final int dataVersion = 1;
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(dataVersion);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        final int objDataVersion = in.readInt();
+
+        if (objDataVersion <= dataVersion) {
+        } else {
+            throw new IOException("Can't handle dataversion: " + objDataVersion);
+        }
+    }
 
     // USER INTERFACE
     private Logger logger;

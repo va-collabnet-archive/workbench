@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.management.MBeanConstructorInfo;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -535,13 +536,12 @@ public class SnoTable {
      * Does starting at C2 ever end up at C1?<br>
      * If yes, then adding C1-ISA-C2 to C1 will create a cycle.<br>
      */
+    static final int MAX_DEPTH_CYCLE_THRESHOLD = 10000;
     public static boolean findIsaCycle(int c1, int type, int c2, boolean isStatedUser) throws Exception {
+        int countIterations = 0;
 
         if (cEditPath == null) {
             updatePrefs(true);
-        }
-        if (cEditPath == null) {
-            return false;
         }
         if (type != isaNid) {
             return false;
@@ -585,7 +585,63 @@ public class SnoTable {
 
             // RESET NEXT LEVEL SEARCH LIST
             isaCBNext = new ArrayList<I_GetConceptData>(); // new "next" list
+            countIterations++;
+            if (countIterations > MAX_DEPTH_CYCLE_THRESHOLD) {
+                    return true; // cycle must exist ... maximum depth exceeded.
+            }
         }
+//        if (countIterations > MAX_DEPTH_CYCLE_THRESHOLD) {
+//            MAX_DEPTH_CYCLE_THRESHOLD = countIterations;
+//        }
+        return false;
+    }
+
+    // if maximum depth is exceeded, then cycle must exist
+    public static boolean findIsaCycle(int c1, boolean isStatedUser) throws Exception {
+        int countIterations = 0;
+
+        if (cEditPath == null) {
+            updatePrefs(true);
+        }
+        int startNid = c1;
+
+        I_GetConceptData cBean = tf.getConcept(startNid);
+        List<PositionBI> posList = cEditPath;
+
+        List<I_GetConceptData> isaCBNext = new ArrayList<I_GetConceptData>();
+
+        List<SnoRel> isaSnoRelProx = findIsaProximal(cBean, posList, isStatedUser);
+        while (isaSnoRelProx.size() > 0) {
+            // TEST LIST FOR PRIMITIVE OR NOT
+            for (SnoRel isaSnoRel : isaSnoRelProx) {
+                int theNid = isaSnoRel.c2Id;
+                I_GetConceptData isaCB = tf.getConcept(theNid);
+                if (theNid == rootNid) { // i.e. not primitive
+                    // search no more on this branch
+                } else {
+                    isaCBNext.add(isaCB); // add to next level search
+                }
+            }
+
+            // GET ALL NEXT LEVEL RELS FOR NON_PRIMITIVE CONCEPTS
+            isaSnoRelProx = new ArrayList<SnoRel>();
+            for (I_GetConceptData cbNext : isaCBNext) {
+                List<SnoRel> nextSnoRelList = findIsaProximal(cbNext, posList, isStatedUser);
+                if (nextSnoRelList.size() > 0) {
+                    isaSnoRelProx.addAll(nextSnoRelList);
+                }
+            }
+
+            // RESET NEXT LEVEL SEARCH LIST
+            isaCBNext = new ArrayList<I_GetConceptData>(); // new "next" list
+            countIterations++;
+            if (countIterations > MAX_DEPTH_CYCLE_THRESHOLD) {
+                    return true; // cycle must exist ... maximum depth exceeded.
+            }
+        }
+//        if (countIterations > MAX_DEPTH_CYCLE_THRESHOLD) {
+//            MAX_DEPTH_CYCLE_THRESHOLD = countIterations;
+//        }
         return false;
     }
 
