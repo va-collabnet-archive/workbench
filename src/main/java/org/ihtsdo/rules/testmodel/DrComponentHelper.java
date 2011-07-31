@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -51,8 +52,12 @@ public class DrComponentHelper {
 			I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-			ConAttrVersionBI attributeTuple = conceptBi.getConAttrsActive();
-			if (attributeTuple != null) {
+			List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					config.getConflictResolutionStrategy());
+			
+			if (attributeTuples != null && !attributeTuples.isEmpty()) {
+				I_ConceptAttributeTuple attributeTuple = attributeTuples.iterator().next();
 				concept.setDefined(attributeTuple.isDefined());
 				concept.setPathUuid(tf.nidToUuid(attributeTuple.getPathNid()).toString());
 				concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
