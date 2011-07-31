@@ -24,32 +24,33 @@ import java.beans.SimpleBeanInfo;
 import org.dwfa.ace.prop.editor.ConceptLabelPropEditor;
 import org.dwfa.bpa.tasks.editor.PropertyNameLabelEditor;
 
-public class ChangeRolesToStatusBeanInfo extends SimpleBeanInfo {
+public class CheckForTargetBeanInfo extends SimpleBeanInfo {
 
     /**
      * 
      */
-    public ChangeRolesToStatusBeanInfo() {
+    public CheckForTargetBeanInfo() {
         super();
     }
 
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
-         
-            PropertyDescriptor newStatus = new PropertyDescriptor("newStatus", ChangeRolesToStatus.class);
-            newStatus.setBound(true);
-            newStatus.setPropertyEditorClass(ConceptLabelPropEditor.class);
-            newStatus.setDisplayName("New status:");
-            newStatus.setShortDescription("The new status value for the concept.");
 
             PropertyDescriptor activeConceptPropName = new PropertyDescriptor("activeConceptPropName",
-                ChangeRolesToStatus.class);
+                    ChangeRolesToStatus.class);
             activeConceptPropName.setBound(true);
             activeConceptPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
             activeConceptPropName.setDisplayName("<html><font color='green'>Concept property:");
             activeConceptPropName.setShortDescription("Name of the property containing the concept to change the status of. ");
 
-            PropertyDescriptor rv[] = {newStatus, activeConceptPropName};
+            PropertyDescriptor uuidListListPropName = new PropertyDescriptor("uuidListListPropName",
+                    getBeanDescriptor().getBeanClass());
+            uuidListListPropName.setBound(true);
+            uuidListListPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
+            uuidListListPropName.setDisplayName("<html><font color='green'>Uuid List:");
+            uuidListListPropName.setShortDescription("Uuid list.");
+
+            PropertyDescriptor rv[] = {activeConceptPropName, uuidListListPropName};
             return rv;
         } catch (IntrospectionException e) {
             throw new Error(e.toString());
@@ -60,8 +61,8 @@ public class ChangeRolesToStatusBeanInfo extends SimpleBeanInfo {
      * @see java.beans.BeanInfo#getBeanDescriptor()
      */
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(ChangeRolesToStatus.class);
-        bd.setDisplayName("<html><font color='green'><center>Change Roles to Status");
+        BeanDescriptor bd = new BeanDescriptor(CheckForTarget.class);
+        bd.setDisplayName("<html><font color='green'><center>Check For Target of Roles");
         return bd;
     }
 }
