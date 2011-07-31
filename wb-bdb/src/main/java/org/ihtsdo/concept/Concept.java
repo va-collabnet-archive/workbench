@@ -148,6 +148,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return false;
     }
 
+    public void modified(long sequence) {
+        data.modified(sequence);
+    }
+
     public static class ConceptLowMemoryListener implements LowMemoryListener {
 
         @Override
@@ -2104,6 +2108,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     @Override
     public boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException {
+        this.modified();
         return BdbCommitManager.commit(this, ChangeSetPolicy.get(changeSetPolicy),
                 ChangeSetWriterThreading.get(changeSetWriterThreading));
     }

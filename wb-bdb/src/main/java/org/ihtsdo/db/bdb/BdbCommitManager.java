@@ -696,7 +696,10 @@ public class BdbCommitManager {
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                             while (uncommittedCNidItr.next()) {
                                 if (getActiveFrame() != null) {
-                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItr.nid());
+                                    int cnid = uncommittedCNidItr.nid();
+                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), cnid);
+                                    Concept c = Concept.get(cnid);
+                                    c.modified(lastCommit);
                                 }
                             }
                             NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();

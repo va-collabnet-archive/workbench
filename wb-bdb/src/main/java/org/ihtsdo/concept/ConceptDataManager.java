@@ -252,6 +252,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
         lastChange = Bdb.gVersion.incrementAndGet();
     }
 
+    @Override
+    public void modified(long sequence) {
+        lastChange = sequence;
+    }
+
     /*
      * (non-Javadoc)
      * 

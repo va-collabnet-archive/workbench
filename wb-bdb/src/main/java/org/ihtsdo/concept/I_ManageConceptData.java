@@ -150,4 +150,6 @@ public interface I_ManageConceptData {
 
     public void setAnnotationIndex(boolean annotationIndex) throws IOException;;
 
+    public void modified(long sequence);
+
 }
