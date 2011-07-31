@@ -101,7 +101,11 @@ public abstract class LuceneManager {
 	    	}
     	} else {
 	    	if (wfHxLuceneDir == null) {
-	    		wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
+	    		if (WfHxLuceneManager.runningLuceneDirFile.exists()) {
+	    			wfHxLuceneDir = initDirectory(WfHxLuceneManager.runningLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
+	    		} else {
+	    			wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
+	    		}
 	    	}
     	}
     }

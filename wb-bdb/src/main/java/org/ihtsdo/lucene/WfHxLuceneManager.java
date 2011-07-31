@@ -23,6 +23,7 @@ public class WfHxLuceneManager extends LuceneManager {
 
     static final String wfLuceneFileSuffix = "lucene";
 	protected static File wfHxLuceneDirFile = new File("target/workflow/lucene");
+        protected static File runningLuceneDirFile = new File("workflow/lucene");
 	private static boolean recalculateMatchLimit = true;
 	private static int matchLimit = 0;
 	private static UUID workflowIdToUpdate = null;
