@@ -310,6 +310,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      */
     @Override
     public List<Relationship> getDestRels() throws IOException {
+        // Need to make sure there are no pending db writes prior calling this method. 
+        BdbCommitManager.waitTillWritesFinished();
 
         List<Relationship> destRels = new ArrayList<Relationship>();
         for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {
@@ -333,6 +335,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
      */
     @Override
     public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+        // Need to make sure there are no pending db writes prior calling this method. 
+        BdbCommitManager.waitTillWritesFinished();
 
         List<Relationship> destRels = new ArrayList<Relationship>();
         for (NidPairForRel pair : Bdb.getDestRelPairs(enclosingConcept.getNid())) {

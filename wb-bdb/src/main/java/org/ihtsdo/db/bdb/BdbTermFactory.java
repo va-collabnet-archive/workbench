@@ -333,20 +333,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public List<? extends I_ExtendByRef> getAllExtensionsForComponent(int nid) throws IOException {
-        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
-        if (pairs == null || pairs.isEmpty()) {
-            return new ArrayList<I_ExtendByRef>(0);
-        }
-        List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>(pairs.size());
+        List<I_ExtendByRef> returnValues = new ArrayList<I_ExtendByRef>();
         HashSet<Integer> addedMembers = new HashSet<Integer>();
-        for (NidPairForRefset pair : pairs) {
-            I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
-            if (ext != null && !addedMembers.contains(ext.getNid())) {
-                addedMembers.add(ext.getNid());
-                returnValues.add(ext);
-            }
-        }
-
         ComponentBI component =
                 Bdb.getComponent(nid);
         if (component instanceof Concept) {
@@ -360,6 +348,21 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     addedMembers.add(annotation.getNid());
                 }
             }
+        }
+
+        // Need to make sure there are no pending db writes prior calling this method. 
+        BdbCommitManager.waitTillWritesFinished();
+        
+        List<NidPairForRefset> pairs = Bdb.getRefsetPairs(nid);
+        if (pairs != null) {
+            for (NidPairForRefset pair : pairs) {
+                I_ExtendByRef ext = (I_ExtendByRef) Bdb.getComponent(pair.getMemberNid());
+                if (ext != null && !addedMembers.contains(ext.getNid())) {
+                    addedMembers.add(ext.getNid());
+                    returnValues.add(ext);
+                }
+            }
+
         }
         return returnValues;
     }

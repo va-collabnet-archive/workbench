@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -86,10 +87,22 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class BdbCommitManager {
 
-    private static Semaphore dbWriterPermit = new Semaphore(50);
-    private static Semaphore luceneWriterPermit = new Semaphore(50);
+    private static final int PERMIT_COUNT = 50;
+    private static final AtomicInteger writerCount = new AtomicInteger(0);
+    private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
+    private static Semaphore luceneWriterPermit = new Semaphore(PERMIT_COUNT);
     private static ThreadGroup commitManagerThreadGroup =
             new ThreadGroup("commit manager threads");
+
+    public static void waitTillWritesFinished() {
+        if (writerCount.get() > 0) {
+            try {
+                dbWriterPermit.acquireUninterruptibly(PERMIT_COUNT);
+            } finally {
+                dbWriterPermit.release(PERMIT_COUNT);
+            }
+        }
+    }
 
     private static class ConceptWriter implements Runnable {
 
@@ -99,6 +112,7 @@ public class BdbCommitManager {
             super();
             assert c.readyToWrite();
             this.c = c;
+            writerCount.incrementAndGet();
         }
 
         @Override
@@ -114,6 +128,7 @@ public class BdbCommitManager {
                 AceLog.getAppLog().alertAndLogException(newEx);
             } finally {
                 dbWriterPermit.release();
+                writerCount.decrementAndGet();
             }
         }
     }
@@ -405,7 +420,7 @@ public class BdbCommitManager {
                     if (f instanceof ContradictionEditorFrame) {
                         frameConfig = ((ContradictionEditorFrame) f).getActiveFrameConfig();
                     } else if (f instanceof AceFrame) {
-                       frameConfig = ((AceFrame) f).getCdePanel().getAceFrameConfig();
+                        frameConfig = ((AceFrame) f).getCdePanel().getAceFrameConfig();
                     }
                     if (frameConfig != null) {
                         frameConfig.setCommitEnabled(true);
