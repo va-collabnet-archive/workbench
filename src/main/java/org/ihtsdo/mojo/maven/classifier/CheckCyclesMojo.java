@@ -15,6 +15,8 @@
  */
 package org.ihtsdo.mojo.maven.classifier;
 
+import org.apache.maven.plugin.logging.Log;
+import org.dwfa.ace.task.classify.SnoPathProcessStatedCycleCheck;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -28,7 +30,6 @@ import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -36,7 +37,7 @@ import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.classify.SnoRel;
+import org.dwfa.ace.task.classify.SnoCon;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
@@ -126,7 +127,7 @@ public class CheckCyclesMojo extends AbstractMojo {
     PathBI cViewPathBI; // Used for write back value
     List<PositionBI> cViewPathListPositionBI; // Classifier (Inferred) Path I_Positions
     // MASTER DATA SETS
-    List<SnoRel> cycleSnoRels; // "Edit Path" Concepts
+    List<SnoCon> cycleSnoCons; // "Edit Path" Concepts
     // USER INTERFACE
     private Log logger;
     private I_TermFactory tf = null;
@@ -158,10 +159,10 @@ public class CheckCyclesMojo extends AbstractMojo {
             long startTime = System.currentTimeMillis();
 
             // PROCESS EDIT_PATH
-            cycleSnoRels = new ArrayList<SnoRel>(); // List of relationships with cycles
+            cycleSnoCons = new ArrayList<SnoCon>(); // List of relationships with cycles
             SnoPathProcessStatedCycleCheck pcEdit = null;
-            pcEdit = new SnoPathProcessStatedCycleCheck(logger,
-                    cycleSnoRels,
+            pcEdit = new SnoPathProcessStatedCycleCheck(
+                    cycleSnoCons,
                     allowedRoleTypes,
                     statusSet,
                     cEditPosSet,
@@ -171,18 +172,31 @@ public class CheckCyclesMojo extends AbstractMojo {
             logger.info("\r\n::: [CheckCyclesMojo] STATED (Edit) PATH DATA : "
                     + pcEdit.getStats(startTime));
 
-            if (cycleSnoRels.size() > 0) {
-                logger.info("\r\n::: [CheckCyclesMojo] CYCLES DETECTED = " + cycleSnoRels.size());
-                if (reportCycles != null) {
-                    SnoRel.dumpToFile(cycleSnoRels,
-                            "target" + File.separator + reportCycles + "_FAIL.txt", 5);
+            if (cycleSnoCons.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("CYCLES DETECTED ... ");
+                sb.append(cycleSnoCons.size());
+                sb.append("\r\n");
+                for (int i = 0; i < cycleSnoCons.size(); i++) {
+                    SnoCon sc = cycleSnoCons.get(i);
+                    I_GetConceptData c1 = tf.getConcept(sc.id);
+                    sb.append(c1.getPrimUuid());
+                    sb.append("\t");
+                    sb.append(c1.getInitialText());
+                    sb.append("\r\n");
                 }
+                logger.info("\r\n::: [CheckCyclesMojo] CYCLES DETECTED = " + cycleSnoCons.size());
+
+//                if (reportCycles != null) {
+//                    SnoRel.dumpToFile(cycleSnoCons,
+//                            "target" + File.separator + reportCycles + "_FAIL.txt", 5);
+//                }
             } else {
                 logger.info("\r\n::: [CheckCyclesMojo] NO CYCLES DETECTED");
-                if (reportCycles != null) {
-                    SnoRel.dumpToFile(cycleSnoRels,
-                            "target" + File.separator + reportCycles + "_PASS.txt", 5);
-                }
+//                if (reportCycles != null) {
+//                    SnoRel.dumpToFile(cycleSnoCons,
+//                            "target" + File.separator + reportCycles + "_PASS.txt", 5);
+//                }
             }
 
         } catch (TerminologyException ex) {
@@ -202,29 +216,23 @@ public class CheckCyclesMojo extends AbstractMojo {
         I_ConfigAceFrame tmpConfig = null;
         tmpConfig = tf.newAceFrameConfig();
         DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)}), df.parse(dateTimeStr).getTime()));
+        tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)}),
+                df.parse(dateTimeStr).getTime()));
         // Addes inferred promotion template to catch the context relationships [ testing
         //tmpConfig.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
         //tmpConfig.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
         PathBI editPath = tf.getPath(new UUID[]{UUID.fromString(uuidEditPath)});
         tmpConfig.addEditingPath(editPath);
-        tmpConfig.getDescTypes().add(
-                ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-        tmpConfig.getDescTypes().add(
-                ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
-        tmpConfig.getDescTypes().add(
-                ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
+        tmpConfig.getDescTypes().add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
+        tmpConfig.getDescTypes().add(SnomedMetadataRfx.getDES_SYNONYM_PREFERRED_NAME_NID());
         tmpConfig.getDestRelTypes().add(
                 ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
         tmpConfig.getDestRelTypes().add(
                 ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.localize().getNid());
         tmpConfig.getDestRelTypes().add(
                 Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-        tmpConfig.setDefaultStatus(tf.getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid())));
-        tmpConfig.getAllowedStatus().add(
-                ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-        tmpConfig.getAllowedStatus().add(
-                ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+        tmpConfig.setDefaultStatus(tf.getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()));
+        tmpConfig.getAllowedStatus().add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
 
         tmpConfig.setClassifierIsaType(tf.getConcept(SNOMED.Concept.IS_A.getPrimoridalUid()));
 
