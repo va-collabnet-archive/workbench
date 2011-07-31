@@ -422,6 +422,9 @@ public class ConceptView extends JPanel {
     }
     
     long lastLayoutSequence = Long.MIN_VALUE;
+    public void resetLastLayoutSequence() {
+        lastLayoutSequence = Long.MIN_VALUE;
+    }
     
     public void layoutConcept(I_GetConceptData concept) throws IOException {
         if (concept != null) {
@@ -451,6 +454,7 @@ public class ConceptView extends JPanel {
         
     }
     
+
     public JLabel getJLabel(String text) {
         JLabel l = new JLabel(text);
         l.setFont(l.getFont().deriveFont(settings.getFontSize()));

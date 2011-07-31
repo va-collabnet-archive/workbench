@@ -256,6 +256,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                view.resetLastLayoutSequence();
                 JButton button = (JButton) e.getSource();
                 if (relAssertionType == null) {
                     relAssertionType = RelAssertionType.STATED;
