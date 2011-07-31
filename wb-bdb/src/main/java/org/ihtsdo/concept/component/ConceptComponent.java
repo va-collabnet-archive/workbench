@@ -2020,17 +2020,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         if (annotations != null) {
             List<Object> toRemove = new ArrayList<Object>();
-            for (Object a : annotations) {
-                RefsetMember<? extends RefsetRevision<?, ?>, ? extends RefsetMember<?, ?>> rm = (RefsetMember<?, ?>) a;
-                if (rm.getTime() == Long.MAX_VALUE) {
+            for (RefsetMember<?, ?> a : annotations) {
+                 a.clearVersions();
+                if (a.getTime() == Long.MAX_VALUE) {
                     toRemove.add(a);
-                } else if (rm.revisions != null) {
-                    for (RefsetRevision rv : rm.revisions) {
+                } else if (a.revisions != null) {
+                    for (RefsetRevision rv : a.revisions) {
                         List<RefsetRevision> revToRemove = new ArrayList<RefsetRevision>();
                         if (rv.getTime() == Long.MAX_VALUE) {
                             revToRemove.add(rv);
                         }
-                        rm.revisions.removeAll(revToRemove);
+                        a.revisions.removeAll(revToRemove);
                     }
                 }
             }
