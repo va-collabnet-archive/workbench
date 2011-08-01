@@ -42,8 +42,8 @@ public class UIAuthenticator {
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		if (OpenFrames.getNumOfFrames() > 0) {
 			parentFrame = OpenFrames.getFrames().iterator().next();
-			AceLog.getAppLog().info("### Adding an existing frame");
-		} else {
+			//AceLog.getAppLog().info("### Adding an existing frame");
+		}/* else {
 			try {
 						parentFrame.setContentPane(new JLabel(
 								"Bobbin the bob is starting..."));
@@ -59,7 +59,7 @@ public class UIAuthenticator {
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} 
-		}
+		} */
 		}
 		return parentFrame;
 		
