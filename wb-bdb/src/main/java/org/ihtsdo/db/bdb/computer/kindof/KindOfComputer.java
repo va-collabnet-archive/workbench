@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
@@ -84,6 +85,12 @@ public class KindOfComputer {
             isac.updateCache(c);
         }
     }
+    
+    public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
+    	for (IsaCache isac: isaCache.values()) {
+    		isac.updateCacheUsingStatedView(c);
+    	}
+    }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
         if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
@@ -130,8 +137,14 @@ public class KindOfComputer {
 
     public static void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
         if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
-            isaCache.get(isaCoordinate).updateConcept(cNid);
+            isaCache.get(isaCoordinate).updateCache(Terms.get().getConcept(cNid));
         }
+    }
+    
+    public static void updateIsaCacheUsingStatedView(IsaCoordinate isaCoordinate, int cNid) throws Exception {
+    	if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
+    		isaCache.get(isaCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
+    	}
     }
 
     public static void persistIsaCache() throws Exception {

@@ -256,7 +256,7 @@ public class BdbCommitManager {
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
         ((Concept) concept).modified();
         try {
-            KindOfComputer.updateIsaCaches((Concept) concept);
+            KindOfComputer.updateIsaCachesUsingStatedView((Concept) concept);
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -354,7 +354,7 @@ public class BdbCommitManager {
             return;
         }
         try {
-            KindOfComputer.updateIsaCaches(igcd);
+            KindOfComputer.updateIsaCachesUsingStatedView(igcd);
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -539,7 +539,7 @@ public class BdbCommitManager {
                 Bdb.annotationConcepts.clear();
 
                 KindOfComputer.reset();
-                KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
+                KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
                 long commitTime = System.currentTimeMillis();
                 NidSetBI sapNidsFromCommit = c.setCommitTime(commitTime);
                 c.modified();
@@ -697,7 +697,7 @@ public class BdbCommitManager {
                             while (uncommittedCNidItr.next()) {
                                 if (getActiveFrame() != null) {
                                     int cnid = uncommittedCNidItr.nid();
-                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), cnid);
+                                    KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), cnid);
                                     Concept c = Concept.get(cnid);
                                     c.modified(lastCommit);
                                 }
@@ -705,7 +705,7 @@ public class BdbCommitManager {
                             NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
                             while (uncommittedCNidItrNoChecks.next()) {
                                 if (getActiveFrame() != null) {
-                                    KindOfComputer.updateIsaCache(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItrNoChecks.nid());
+                                    KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItrNoChecks.nid());
                                 }
                             }
                             long commitTime = System.currentTimeMillis();

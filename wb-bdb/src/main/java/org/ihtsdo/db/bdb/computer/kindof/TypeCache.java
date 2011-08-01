@@ -22,6 +22,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -31,6 +32,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	protected ConcurrentHashMap<Integer, int[]> typeMap;
 	private List<ParallelConceptIterator> pcis;
 	protected ViewCoordinate coordinate;
+	protected ViewCoordinate statedViewCoordinate;
 	private boolean ready = false;
 	private boolean cancelled = false;
 	private CountDownLatch latch = new CountDownLatch(1);
@@ -64,6 +66,8 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	@Override
 	public void setup(ViewCoordinate coordinate) throws Exception {
 		this.coordinate = coordinate;
+		this.statedViewCoordinate = new ViewCoordinate(coordinate);
+		this.statedViewCoordinate.setRelAssertionType(RelAssertionType.STATED);
 		this.types = coordinate.getIsaTypeNids();
 		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
 		KindOfComputer.kindOfComputerService.execute(this);
@@ -106,6 +110,19 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	public void updateCache(ConceptChronicleBI c) throws IOException, ContraditionException {
 		if (c.isUncommitted()) {
 			ConceptVersion cv = new ConceptVersion((Concept) c, coordinate);
+			NidSet parentSet = new NidSet();
+			for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+				if (types.contains(relv.getTypeNid())) {
+					parentSet.add(relv.getDestinationNid());
+				}
+			}
+			typeMap.put(c.getNid(), parentSet.getSetValues());
+		}
+	}
+	
+	public void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
+		if (c.isUncommitted()) {
+			ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
 			NidSet parentSet = new NidSet();
 			for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
 				if (types.contains(relv.getTypeNid())) {
