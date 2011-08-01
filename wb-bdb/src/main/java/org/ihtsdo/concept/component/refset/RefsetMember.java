@@ -42,6 +42,8 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
@@ -461,10 +463,48 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public void setRefsetId(int refsetNid) throws IOException {
         if (getTime() == Long.MAX_VALUE) {
             if (this.refsetNid != refsetNid) {
+                int oldRefsetNid = this.refsetNid;
+                Concept oldRefset = Concept.get(oldRefsetNid);
+                Concept newRefset = Concept.get(refsetNid);
                 this.refsetNid = refsetNid;
+                moveRefset(oldRefset, newRefset);
             }
         } else {
             throw new UnsupportedOperationException("Cannot change refset unless member is uncommitted...");
+        }
+    }
+    
+    private void moveRefset(Concept from, Concept to) throws IOException {
+        if (from.isAnnotationStyleRefex()) {
+            if (from.isAnnotationIndex()) {
+                from.getData().getMemberNids().remove(this.nid);
+                from.modified();
+                BdbCommitManager.addUncommittedNoChecks(from);
+            }
+        } else {
+            from.getRefsetMembers().remove(this);
+            from.getData().getMemberNids().remove(this.nid);
+            from.modified();
+            BdbCommitManager.addUncommittedNoChecks(from);
+        }
+        
+        if (to.isAnnotationStyleRefex()) {
+            if (from.isAnnotationStyleRefex()) {
+                // nothing to move. 
+            } else {
+                Bdb.getComponent(this.referencedComponentNid).addAnnotation(this);
+                Bdb.getNidCNidMap().resetCidForNid(
+                        Bdb.getNidCNidMap().getCNid(this.referencedComponentNid), nid);
+                this.enclosingConceptNid = Bdb.getNidCNidMap().getCNid(this.referencedComponentNid);
+                to.modified();
+                BdbCommitManager.addUncommitted(to);
+            }
+        } else {
+            to.getRefsetMembers().add(this);
+            Bdb.getNidCNidMap().resetCidForNid(to.getNid(), nid);
+            this.enclosingConceptNid = to.getNid();
+            to.modified();
+            BdbCommitManager.addUncommitted(to);
         }
     }
 

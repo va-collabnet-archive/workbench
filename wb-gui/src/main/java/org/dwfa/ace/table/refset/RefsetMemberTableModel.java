@@ -999,10 +999,14 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 switch (columns[col]) {
                     case REFSET_ID:
                         Integer refsetId = (Integer) value;
-                        if (refsetId != extTuple.getCore().getRefsetId()) {
+                        int oldId = extTuple.getCore().getRefsetId();
+                        if (refsetId != oldId) {
+                            
                             extTuple.getCore().setRefsetId(refsetId);
                             referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
                             changed = true;
+                            AceLog.getAppLog().info("Changing refset from: " + 
+                                    Terms.get().getConcept(oldId) + " to: " + Terms.get().getConcept(refsetId));
                         }
                         break;
                     case MEMBER_ID:

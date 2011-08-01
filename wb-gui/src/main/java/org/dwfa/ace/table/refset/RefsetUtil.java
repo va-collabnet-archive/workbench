@@ -322,7 +322,7 @@ public class RefsetUtil {
                 return true;
             }
         } else {
-            if (visibleExtensions.size() != 0) {
+            if (!visibleExtensions.isEmpty()) {
                 return true;
             }
         }
