@@ -279,7 +279,7 @@ end
 				hasHistoricalRels == false);
 	then
 		templates.put(new RelSpec(Taxonomies.SNOMED, HistoricalRelType.MOVED_TO,
-									ConceptInactivationType.MOVED_ELSEWHERE),
+									SnomedMetadataRf2.COMPONENT_MOVED_ELSEWHERE_RF2),
 									$c.getNid());
 end */
 
