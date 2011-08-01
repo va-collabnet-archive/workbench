@@ -8,6 +8,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 
 
@@ -357,7 +358,9 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
     	setWorkflowUid(update.getWorkflowId());
     	setActionUid(update.getAction());
     	setFSN(update.getFSN());
-    	setModelerUid(update.getModeler());
+    	
+    	// Always update on current modeler regardless of bean's request
+    	setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
     	setPathUid(update.getPath());
     	setStateUid(update.getState());
     	setAutoApproved(update.getAutoApproved());

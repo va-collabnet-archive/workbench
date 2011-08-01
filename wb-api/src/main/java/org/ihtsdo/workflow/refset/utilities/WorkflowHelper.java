@@ -143,7 +143,10 @@ public class WorkflowHelper {
 		writer = new WorkflowHistoryRefsetWriter();
 
 		writer.setPathUid(bean.getPath());
-		writer.setModelerUid(bean.getModeler());
+
+		// Always retire on current modeler regardless of bean's request 
+		writer.setModelerUid(getCurrentModeler().getPrimUuid());
+
 		writer.setConceptUid(bean.getConcept());
 		writer.setFSN(bean.getFSN());
 		writer.setActionUid(bean.getAction());
