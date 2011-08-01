@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb.computer.version;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -16,6 +17,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -25,6 +27,10 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
 
@@ -181,10 +187,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         } else {
                  addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
                         positions, matchingTuples, versions, precedencePolicy,
-                        contradictionManager, new AuthorFilter(ReferenceConcepts.SNOROCKET.getNid()));
+                        contradictionManager, new InferredFilter(ReferenceConcepts.SNOROCKET.getNid()));
                 addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
                         positions, matchingTuples, versions, precedencePolicy,
-                        contradictionManager, new AuthorAntiFilter(ReferenceConcepts.SNOROCKET.getNid()));
+                        contradictionManager, new StatedFilter(ReferenceConcepts.SNOROCKET.getNid()));
         }
     }
 
@@ -197,20 +203,20 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             if (c.getRelAssertionType() == RelAssertionType.INFERRED) {
                 addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
                         c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
-                        c.getContradictionManager(), new AuthorFilter(c.getClassifierNid()));
+                        c.getContradictionManager(), new InferredFilter(c.getClassifierNid()));
             } else if (c.getRelAssertionType() == RelAssertionType.STATED) {
                 addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
                         c.getPositionSet(), matchingVersions, versions, c.getPrecedence(),
-                        c.getContradictionManager(), new AuthorAntiFilter(c.getClassifierNid()));
+                        c.getContradictionManager(), new StatedFilter(c.getClassifierNid()));
             } else if (c.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
                 List<V> possibleValues = new ArrayList<V>();
                 addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
                         c.getPositionSet(), possibleValues, versions, c.getPrecedence(),
-                        c.getContradictionManager(), new AuthorFilter(c.getClassifierNid()));
+                        c.getContradictionManager(), new InferredFilter(c.getClassifierNid()));
                 if (possibleValues.isEmpty()) {
                     addSpecifiedVersionsWithPositions(c.getAllowedStatusNids(), null,
                             c.getPositionSet(), possibleValues, versions, c.getPrecedence(),
-                            c.getContradictionManager(), new AuthorAntiFilter(c.getClassifierNid()));
+                            c.getContradictionManager(), new StatedFilter(c.getClassifierNid()));
                 }
                 matchingVersions.addAll(possibleValues);
             } else {
@@ -249,9 +255,9 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         }
     }
 
-    private static class AuthorAntiFilter extends AuthorFilter {
+    private static class StatedFilter extends InferredFilter {
 
-        private AuthorAntiFilter(int... nids) {
+        private StatedFilter(int... nids) {
             super(nids);
         }
 
@@ -261,20 +267,45 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         }
     }
 
-    private static class AuthorFilter {
+    private static class InferredFilter {
 
-        NidSetBI authorNids = new NidSet();
+        NidSetBI classifierNid = new NidSet();
 
-        private AuthorFilter(int... nids) {
+        private InferredFilter(int... nids) {
+            if (inferredNidSet == null) {
+                try {
+                    NidSetBI tempInferred = new NidSet();
+                    tempInferred.add(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid());
+                    if (Ts.get().usesRf2Metadata()) {
+                        tempInferred.add(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
+                    }
+                    inferredNidSet = tempInferred;
+                } catch (ValidationException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
             for (int nid : nids) {
-                authorNids.add(nid);
+                classifierNid.add(nid);
             }
         }
 
         public boolean pass(ConceptComponent<?, ?>.Version part) {
-            return authorNids.contains(part.getAuthorNid());
+            if (classifierNid.contains(part.getAuthorNid())) {
+                return true;
+            }
+            if (part instanceof RelationshipVersionBI) {
+                RelationshipVersionBI relPart = (RelationshipVersionBI) part;
+                if (inferredNidSet.contains(relPart.getCharacteristicNid())) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
+    
+    private static NidSetBI inferredNidSet;
 
     private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus,
             NidSetBI allowedTypes,
@@ -282,7 +313,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> specifiedVersions,
             List<? extends V> versions,
             Precedence precedencePolicy,
-            ContradictionManagerBI contradictionManager, AuthorFilter filter) {
+            ContradictionManagerBI contradictionManager, InferredFilter filter) {
         HashSet<V> partsToAdd = new HashSet<V>();
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
@@ -348,7 +379,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> specifiedVersions,
             List<? extends V> versions,
             Precedence precedencePolicy,
-            ContradictionManagerBI contradictionManager, AuthorFilter filter) {
+            ContradictionManagerBI contradictionManager, InferredFilter filter) {
         if (versions == null) {
             return;
         }
