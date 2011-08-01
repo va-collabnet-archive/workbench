@@ -44,6 +44,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
@@ -500,6 +501,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 BdbCommitManager.addUncommitted(to);
             }
         } else {
+            if (from.isAnnotationStyleRefex()) {
+                ComponentBI component = Bdb.getComponent(this.referencedComponentNid);
+                if (component instanceof ConceptComponent) {
+                    ((ConceptComponent) component).getAnnotationsMod().remove(this);
+                } else if (component instanceof Concept) {
+                   ((ConceptComponent) ((Concept) component).getConAttrs()).getAnnotationsMod().remove(this);
+                }
+            }
             to.getRefsetMembers().add(this);
             Bdb.getNidCNidMap().resetCidForNid(to.getNid(), nid);
             this.enclosingConceptNid = to.getNid();
