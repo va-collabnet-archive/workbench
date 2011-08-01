@@ -62,7 +62,7 @@ public class DrDescription extends DrComponent {
 				ConceptChronicleBI languageRefset = Ts.get().getConcept(UUID.fromString(languageRefsetUuid));
 				descriptionSb.append(" languageRefset: " + languageRefset + " (" + languageRefsetUuid + "),");
 			}
-
+			descriptionSb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 			descriptionSb.append("Extensions: [");
 			if (extensions != null) {
 				int i = 0;

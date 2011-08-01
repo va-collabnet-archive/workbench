@@ -36,6 +36,7 @@ public class DrIdentifier extends DrComponent {
 			}
 
 			sb.append(" Denotation: " + denotation + ",");
+			sb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -53,7 +53,7 @@ public class DrRelationship extends DrComponent {
 			} catch (IllegalArgumentException ex) {}
 
 			relSb.append(" Relationship group: " + relGroup + ",");
-			
+			relSb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 			relSb.append("\nIdentifiers: [");
 			if (identifiers != null) {
 				for (DrIdentifier identifier : identifiers) {
