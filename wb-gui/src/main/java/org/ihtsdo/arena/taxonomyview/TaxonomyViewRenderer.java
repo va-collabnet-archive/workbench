@@ -71,6 +71,7 @@ public class TaxonomyViewRenderer extends JComponent {
         setLayout(new BorderLayout());
 
         title = new TaxonomyViewTitle(graph, cell, settings);
+        title.setCursor(Cursor.getDefaultCursor());
 
         add(title, BorderLayout.NORTH);
 
@@ -105,6 +106,7 @@ public class TaxonomyViewRenderer extends JComponent {
 
 
         JPanel footerPanel = new JPanel();
+        footerPanel.setCursor(Cursor.getDefaultCursor());
         footerPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

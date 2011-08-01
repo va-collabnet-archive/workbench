@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.conceptview;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -205,6 +206,7 @@ public class ConceptNavigator extends JPanel {
 
     private JPanel setupTopPanel() {
         JPanel thePanel = new JPanel(new GridBagLayout());
+        thePanel.setCursor(Cursor.getDefaultCursor());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.weightx = 0;
         gbc.weighty = 0;

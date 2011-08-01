@@ -276,6 +276,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         setLayout(new BorderLayout());
 
         title = new ConceptViewTitle(graph, cell, settings);
+        title.setCursor(Cursor.getDefaultCursor());
 
         add(title, BorderLayout.NORTH);
 
@@ -630,6 +631,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 
         workflowToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         footerPanel.add(workflowToggleButton, gbc);
+        workflowToggleButton.setCursor(Cursor.getDefaultCursor());
+
 
 
 
@@ -644,6 +647,8 @@ public class ConceptViewRenderer extends JLayeredPane {
         wfHxDetailsToggleButton.setSelected(false);
 //        wfHxDetailsToggleButton.setSelected(false);
         wfHxDetailsToggleButton.setVisible(true);
+        wfHxDetailsToggleButton.setCursor(Cursor.getDefaultCursor());
+
 
         wfHxDetailsToggleButton.addActionListener(new ActionListener() {
 
@@ -685,6 +690,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         cancelButton.addActionListener(new CancelActionListener(settings));
         cancelButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         cancelButton.setVisible(false);
+        cancelButton.setCursor(Cursor.getDefaultCursor());
         footerPanel.add(cancelButton, gbc);
 
         gbc.gridx++;
@@ -694,12 +700,14 @@ public class ConceptViewRenderer extends JLayeredPane {
         commitButton.addActionListener(new CommitActionListener(settings));
         commitButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
         commitButton.setVisible(false);
+        commitButton.setCursor(Cursor.getDefaultCursor());
         footerPanel.add(commitButton, gbc);
 
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.SOUTHEAST;
         footerPanel.add(settings.getResizeLabel(), gbc);
         footerPanel.setBorder(BorderFactory.createMatteBorder(0, 1, 1, 1, Color.gray));
+        footerPanel.setCursor(Cursor.getDefaultCursor());
         add(footerPanel, BorderLayout.SOUTH);
 
         setMinimumSize(new Dimension(40, 20));
