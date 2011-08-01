@@ -52,6 +52,9 @@ public class DrConcept extends DrComponent {
 			conceptSb.append(" variantEvaluationCandidate: " + variantEvaluationCandidate + ",");
 			conceptSb.append(" specialConceptCategory: " + specialConceptCategory + ",");
 			conceptSb.append(" effectiveDomain: " + effectiveDomain + ",");
+			//DR COMPONENT
+			conceptSb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
+			
 			conceptSb.append("tdomainUuids: [");
 			if (listOfDomainsUuids != null) {
 				for (String domainUuid : listOfDomainsUuids) {

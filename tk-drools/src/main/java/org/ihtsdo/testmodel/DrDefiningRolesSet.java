@@ -21,6 +21,7 @@ public class DrDefiningRolesSet {
 		try {
 			sb.append("RolesSetType: " + rolesSetType + ",");
 			sb.append("NumberOfIsas: " + numberOfIsas + ",");
+			sb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 
 			sb.append("\nRelationships: " + relationships);
 		} catch (Exception e) {

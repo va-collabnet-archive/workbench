@@ -32,6 +32,7 @@ public class DrLanguageDesignationSet {
 			sb.append(" PreferredTermOccurrence: " + preferredTermOccurrence + ",");
 			sb.append(" PreferredFsnOccurrence: " + preferredFsnOccurrence + ",");
 			sb.append(" HasDuplicates: " + hasDuplicates);
+			sb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

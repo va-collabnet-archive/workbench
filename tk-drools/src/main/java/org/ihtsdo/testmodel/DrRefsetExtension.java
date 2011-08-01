@@ -68,7 +68,7 @@ public class DrRefsetExtension extends DrComponent{
 				sb.append(" C1: " + c1 + " (" + c1Uuid + "),");
 			} catch (IllegalArgumentException ex) {
 			}
-			
+			sb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 			sb.append("\nIdentifiers: [");
 			if (identifiers != null) {
 				for (DrIdentifier identifier : identifiers) {
