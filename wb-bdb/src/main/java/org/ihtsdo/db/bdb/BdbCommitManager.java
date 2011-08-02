@@ -1006,6 +1006,9 @@ public class BdbCommitManager {
         RefsetMember m = (RefsetMember) extension;
         Concept c = Bdb.getConcept(m.getRefsetId());
         ComponentBI component = Bdb.getComponent(m.getComponentNid());
+        if (component instanceof Concept) {
+            component = ((Concept) component).getConAttrs();
+        }
         ConceptComponent comp = (ConceptComponent) component;
         if (m.getTime() != Long.MAX_VALUE) {
             // Only need to forget additional versions;
