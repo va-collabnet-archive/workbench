@@ -284,6 +284,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                     eIdv.setStatusUuid(Bdb.getPrimUuidForConcept(idv.getStatusNid()));
                     eIdv.setAuthorUuid(Bdb.getPrimUuidForConcept(idv.getAuthorNid()));
                     eIdv.setTime(idv.getTime());
+                    ec.getAdditionalIdComponents().add(eIdv);
                 }
             }
         }
