@@ -509,6 +509,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         RULES_CONTEXT_METADATA_REFSET(new String[]{"rules context metadata refset",
     "rules context metadata refset"}, RULES_AUXILIARY),
         REALTIME_QA_CONTEXT(new String[]{"realtime qa context", "realtime qa context"}, RULES_CONTEXT),
+        REALTIME_PRECOMMIT_QA_CONTEXT(new String[]{"realtime precommit qa context", "realtime precommit qa context"}, RULES_CONTEXT),
         BATCH_QA_CONTEXT(new String[]{"batch qa context", "batch qa context"}, RULES_CONTEXT),
         TEMPLATE_CONTEXT(new String[]{"template context", "template context"}, RULES_CONTEXT),
         LANG_GUIDELINES_CONTEXT(new String[]{"linguistic guidelines context", "linguistic guidelines context"}, RULES_CONTEXT),
