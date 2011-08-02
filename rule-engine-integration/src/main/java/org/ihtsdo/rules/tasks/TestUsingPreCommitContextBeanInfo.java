@@ -23,15 +23,15 @@ import org.dwfa.ace.task.commit.TestForUneditedDefaultsBeanInfo;
 /**
  * The Class TestUsingLibraryBeanInfo.
  */
-public class TestUsingLibraryBeanInfo extends TestForUneditedDefaultsBeanInfo {
+public class TestUsingPreCommitContextBeanInfo extends TestForUneditedDefaultsBeanInfo {
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.ace.task.commit.TestForUneditedDefaultsBeanInfo#getBeanDescriptor()
 	 */
 
 	public BeanDescriptor getBeanDescriptor() {
-		BeanDescriptor bd = new BeanDescriptor(TestUsingLibrary.class);
-		bd.setDisplayName("<html><font color='green'><center>Test Concept using Library");
+		BeanDescriptor bd = new BeanDescriptor(TestUsingPreCommitContext.class);
+		bd.setDisplayName("<html><font color='green'><center>Test Concept using<br>PreCommit context");
 		return bd;
 	}
 }
