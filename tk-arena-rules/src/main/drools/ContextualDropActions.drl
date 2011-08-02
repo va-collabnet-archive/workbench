@@ -45,6 +45,7 @@ import org.ihtsdo.arena.context.action.SetSynonymyAction;
 import org.ihtsdo.arena.context.action.SetDefinedAction;
 import org.ihtsdo.arena.context.action.SetICSignificantAction;
 import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
+import org.ihtsdo.arena.context.action.CancelAction;
 //import org.ihtsdo.arena.context.action.ChangeRefexAction;
 
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -123,14 +124,26 @@ rule "rule 4" #concept onto same concept
       actions.add(new CloneAndRetireAction("clone & retire", $dropObject));
 end
 
+
 /* rule "rule 4.1" #refex onto refex
 
    when
          $dropTarget: RefexFact(context == Context.DROP_TARGET)
          $dropObject: RefexFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+         not $refex: RefexFact(context == Context.DROP_TARGET)
    then
       actions.add(new ChangeRefexAction("change", $dropObject));
 end */
+
+rule "rule 4.2" #CANCEL concept onto same concept
+
+   when
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
+         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
+            component.time == Long.MAX_VALUE)
+   then
+      actions.add(new CancelAction("cancel", $dropObject, vc));
+end
 
 rule "rule 5" #template onto concept
 
