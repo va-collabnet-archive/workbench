@@ -266,12 +266,12 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	// get the username
     	String un = getUserValue();
-    	AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
+    	//AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
     	//if the password field is enabled get the password
     	String pw = null;
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
-    		AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
+    		//AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
     		boolean ok  = checkSVN(getSvnUrl(),un,pw);	
     		if(ok){
     			this.prompt.setUsername(un);
@@ -292,7 +292,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	boolean ok = true;
     	SVNRepository repo= null;
     	 try { 
-    		 AceLog.getAppLog().info("checkSVN url = "+url +" pw = "+pw);  
+    		 //AceLog.getAppLog().info("checkSVN url = "+url +" pw = "+pw);  
     		 DAVRepositoryFactory.setup();
     	     SVNRepositoryFactoryImpl.setup();
     	     FSRepositoryFactory.setup();
