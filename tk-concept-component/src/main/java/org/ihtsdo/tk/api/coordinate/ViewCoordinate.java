@@ -5,7 +5,9 @@ import java.util.Arrays;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -66,28 +68,44 @@ public class ViewCoordinate {
         assert precedence != null;
         assert contradictionManager != null;
         this.precedence = precedence;
-        this.positionSet = positionSet;
-        this.allowedStatusNids = allowedStatusNids;
-        this.isaTypeNids = isaTypeNids;
+        if (positionSet != null) {
+            this.positionSet = new PositionSet(positionSet);
+        }
+        if (allowedStatusNids != null) {
+            this.allowedStatusNids = new NidSet(allowedStatusNids.getSetValues());
+        }
+        if (isaTypeNids != null) {
+            this.isaTypeNids = new NidSet(isaTypeNids.getSetValues());        
+        }
         this.contradictionManager = contradictionManager;
         this.languageNid = languageNid;
         this.classifierNid = classifierNid;
         this.relAssertionType = relAssertionType;
-        this.langPrefList = langPrefList;
+        if (langPrefList != null) {
+            this.langPrefList = new NidList(langPrefList.getListArray());
+        }
         this.langSort = langSort;
     }
 
     public ViewCoordinate(ViewCoordinate another) {
         super();
         this.precedence = another.precedence;
-        this.positionSet = another.positionSet;
-        this.allowedStatusNids = another.allowedStatusNids;
-        this.isaTypeNids = another.isaTypeNids;
+        if (another.positionSet != null) {
+            this.positionSet = new PositionSet(another.positionSet);
+        }
+        if (another.allowedStatusNids != null) {
+            this.allowedStatusNids = new NidSet(another.allowedStatusNids.getSetValues());
+        }
+        if (another.isaTypeNids != null) {
+            this.isaTypeNids = new NidSet(another.isaTypeNids.getSetValues());        
+        }
         this.contradictionManager = another.contradictionManager;
         this.languageNid = another.languageNid;
         this.classifierNid = another.classifierNid;
         this.relAssertionType = another.relAssertionType;
-        this.langPrefList = another.langPrefList;
+        if (another.langPrefList != null) {
+            this.langPrefList = new NidList(another.langPrefList.getListArray());
+        }
         this.langSort = another.langSort;
     }
 

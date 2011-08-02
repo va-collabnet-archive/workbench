@@ -9,6 +9,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -43,6 +45,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -132,6 +135,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                 newFrameConfig.getConceptViewer(1).setTermComponent(null);
             }
         });
+        addWindowListener(new AceWindowActionListener());
     }
     
     private void createLeftComponent() {
@@ -378,6 +382,44 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         } else if (evt.getPropertyName().equals("uncommitted")) {
             // Nothing to do...
         } 
+    }
+
+    private void doWindowActivation() {
+        try {
+            Terms.get().setActiveAceFrameConfig(newFrameConfig);
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
+
+    private class AceWindowActionListener implements WindowListener {
+
+        public void windowActivated(WindowEvent e) {
+            doWindowActivation();
+        }
+
+        public void windowClosed(WindowEvent e) {
+        }
+
+        public void windowClosing(WindowEvent e) {
+
+        }
+
+        public void windowDeactivated(WindowEvent e) {
+        }
+
+        public void windowDeiconified(WindowEvent e) {
+        }
+
+        public void windowIconified(WindowEvent e) {
+        }
+
+        public void windowOpened(WindowEvent e) {
+            doWindowActivation();
+        }
+
     }
 
 }

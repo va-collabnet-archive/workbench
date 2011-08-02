@@ -1021,7 +1021,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public EditCoordinate getEditCoordinate() {
-      NidSet editPaths = new NidSet(getEditingPathSet());
+      NidSet editPaths = new NidSet(getPromotionPathSet());
       return new EditCoordinate(Terms.get().getAuthorNid(),
               editPaths);
     }

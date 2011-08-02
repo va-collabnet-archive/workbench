@@ -109,6 +109,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
         return forAjudciation;
     }
 
+    public void setForAjudciation(boolean forAjudciation) {
+        this.forAjudciation = forAjudciation;
+    }
+
     private class ConceptChangedListener implements PropertyChangeListener {
 
         @Override

@@ -10,6 +10,9 @@ public class NidSet implements NidSetBI {
 
     private int[] setValues = new int[0];
 
+    public NidSet(NidSet another) {
+        this(another.setValues);
+    }
     public NidSet(int[] values) {
         super();
         this.setValues = new int[values.length];
