@@ -67,10 +67,14 @@ public class UIAuthenticator {
 
 	//public String authenticate(SvnHelper svnH){
 		public String authenticate(SvnPrompter prompt, String testURL){	
+		String retVal = null;	
 		baseURL = testURL;
 		this.prompt = prompt;
 		try {
 			apm.processProfiles();
+			if(!apm.isProfileFolderFound()){
+				retVal = "No Profiles folder found";
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -85,7 +89,7 @@ public class UIAuthenticator {
 		setProfile(apm.getProfile());
 		//AceLog.getAppLog().info("authenticate this profile = "+getProfile().getAbsoluteFile());
 		
-		return "";
+		return retVal;
 	}
 	
 	private void initPrompter(){

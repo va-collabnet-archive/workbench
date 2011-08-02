@@ -9,13 +9,15 @@ import org.dwfa.ace.log.AceLog;
 
 public class AceProfileManager {
 	
-    public String profileDirName = "profiles";
-    public String profileFileEnding= ".ace";
+    private String profileDirName = "profiles";
+    private String profileFileEnding= ".ace";
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
-    public File profile;
-    public File profileDir;
+    private File profile;
+    private File profileDir;
     
-    public String userName;
+    private String userName;
+    
+    private boolean profileFolderFound = false;
     
     
     public void processProfiles() throws Exception {
@@ -102,6 +104,7 @@ public class AceProfileManager {
 					+ profileDir.getAbsolutePath());
 		}
 
+		profileFolderFound = true;
 		return profileDir;
 	}
 	public void setProfileDir(File profileDir) {
@@ -114,6 +117,14 @@ public class AceProfileManager {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public boolean isProfileFolderFound() {
+		return profileFolderFound;
+	}
+
+	public void setProfileFolderFound(boolean profileFolderFound) {
+		this.profileFolderFound = profileFolderFound;
 	}
     
 
