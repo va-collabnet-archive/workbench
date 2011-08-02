@@ -100,14 +100,14 @@ public class WorkbenchRunner {
 		//String result = auth.authenticate(svnH);
 		//SvnPrompter prompt = new SvnPrompter();
 		String result = auth.authenticate(prompt, baseURL);
+		if(result != null){
+			AceLog.getAppLog().info("Problem Authenticating . Problem was "+result);
+		}
 		userProfile = auth.getProfile();
 		if(userProfile == null){
 			//AceLog.getAppLog().info("up is null "+auth.getApm().getProfile().getAbsolutePath());
 			AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
-			
-		
-		
-		
+			//here
 		}
 		
 		/*if(result != null && result.length() > 0){
@@ -213,11 +213,11 @@ public class WorkbenchRunner {
 			//AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
 			//TODO throw some sort of error if url is empty or null
 			
-			authenticate(Svn.getPrompter(),testSVNURL);
+			String auth_e_msg = authenticate(Svn.getPrompter(),testSVNURL);
 			/*AceLog.getAppLog().info("prompt userName = "+prompt.getUsername());
 			AceLog.getAppLog().info("prompt password = "+prompt.getPassword());
 			AceLog.getAppLog().info("prompt DEBUG HERE = "+prompt.getPassword());*/
-			if (acePropertiesFileExists == false || initialized == false) {
+			if (acePropertiesFileExists == false || initialized == false || auth_e_msg != null) {
 				try {
 					boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, Svn.getPrompter());
 				} catch (Exception ex) {
