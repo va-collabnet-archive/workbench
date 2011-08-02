@@ -38,14 +38,13 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 
 
 /**
- * The Class TestUsingLibrary.
+ * The Class TestUsingPreCommitContext.
  */
 @BeanList(specs = {
 	 @Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN),
-     @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-     @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+     @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN) })
 		
-public class TestUsingLibrary extends AbstractConceptTest {
+public class TestUsingPreCommitContext extends AbstractConceptTest {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
@@ -100,7 +99,7 @@ public class TestUsingLibrary extends AbstractConceptTest {
 				return alertList;
 			} else {
 			alertList =  RulesLibrary.checkConcept(concept, 
-					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids()), true, 
+					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
 					getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
 			}
 			
