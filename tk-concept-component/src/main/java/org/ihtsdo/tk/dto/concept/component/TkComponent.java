@@ -201,6 +201,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     }
 
     public List<TkIdentifier> getAdditionalIdComponents() {
+    	if(additionalIds == null){
+    		additionalIds = new ArrayList<TkIdentifier>();
+    	}
         return additionalIds;
     }
 
