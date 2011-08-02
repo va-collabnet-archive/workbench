@@ -199,7 +199,6 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			doc = createDoc(bean, vals);
 		} catch (Exception e) {
 		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues on bean: " + bean.toString() + " with error: " + e.getMessage());
-		    e.printStackTrace();
 		}
 
 		return doc;
