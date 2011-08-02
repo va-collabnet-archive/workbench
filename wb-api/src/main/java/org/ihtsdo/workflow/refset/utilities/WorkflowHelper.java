@@ -773,6 +773,10 @@ public class WorkflowHelper {
 			I_GetConceptData modeler = Terms.get().getConcept(modelerUid);
 			ConceptVersionBI category = categorySearcher.searchForCategoryForConceptByModeler(modeler.getVersion(vc), concept.getVersion(vc), vc);
 		
+			if (category == null) {
+	        	AceLog.getAppLog().log(Level.WARNING, "The user does not have a valid Editor Category.  Therefore, workflow will not be advanced.  Solution: Update Workflow Editor Category file.");
+	        }
+			
 			StateTransitionRefsetSearcher nextStateSearcher = new StateTransitionRefsetSearcher();
 			Map<UUID, UUID> possibleActions = nextStateSearcher.searchForPossibleActionsAndFinalStates(category.getConceptNid(), initialState.getConceptNid(), vc);
 		
