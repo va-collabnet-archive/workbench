@@ -130,7 +130,6 @@ end
    when
          $dropTarget: RefexFact(context == Context.DROP_TARGET)
          $dropObject: RefexFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-         not $refex: RefexFact(context == Context.DROP_TARGET)
    then
       actions.add(new ChangeRefexAction("change", $dropObject));
 end */
@@ -139,8 +138,9 @@ rule "rule 4.2" #CANCEL concept onto same concept
 
    when
          $dropTarget: ComponentFact(context == Context.DROP_TARGET)
-         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
-            component.time == Long.MAX_VALUE)
+         $dropObject: ComponentFact(component.chronicle.isUncommitted == true,
+                context == Context.DROP_OBJECT, component == $dropTarget.component)
+         not $refex: RefexFact(context == Context.DROP_TARGET)
    then
       actions.add(new CancelAction("cancel", $dropObject, vc));
 end
