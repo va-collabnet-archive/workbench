@@ -1,6 +1,7 @@
 package org.ihtsdo.db.runner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -156,6 +157,10 @@ public class SvnHelper {
 
 		boolean ok = false;
 		Properties wbProperties = new Properties();
+		if (acePropertiesFile.exists()) {
+			wbProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+		}
+			
 		wbProperties.setProperty("initial-svn-checkout", "true");
 		
 		String pw = prompter.getPassword();
