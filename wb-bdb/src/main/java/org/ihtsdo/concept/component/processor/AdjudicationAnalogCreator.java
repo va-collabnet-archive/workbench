@@ -39,7 +39,9 @@ public class AdjudicationAnalogCreator implements ProcessComponentChronicleBI {
     
     @Override
     public void process(ComponentChroncileBI cc) throws Exception {
-        componentChanged = componentChanged || cc.makeAdjudicationAnalogs(ec, vc);
+        if (cc.makeAdjudicationAnalogs(ec, vc)) {
+            componentChanged = true;
+        }
     }
     
     public boolean isComponentChanged() {
