@@ -22,7 +22,6 @@ import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 
@@ -45,9 +44,16 @@ public class CancelAction extends AbstractAction {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
-                I_GetConceptData c = Terms.get().getConcept(component.getConceptNid());
+                I_GetConceptData c = Terms.get().getConcept(component.getNid());
                 I_ConceptAttributeVersioned ca = c.getConceptAttributes();
-                ConAttrVersionBI attr = (ConAttrVersionBI) ca;
+                ConAttrVersionBI attr = (ConAttrVersionBI) component;
+                Collection<? extends RefexChronicleBI<?>> refexes = attr.getRefexes();
+                for (RefexChronicleBI refex : refexes) {
+                    if (refex.isUncommitted()) {
+                        I_ExtendByRef ext = Terms.get().getExtension(refex.getNid());
+                        Terms.get().forget(ext);
+                    }
+                }
                 if (attr.isUncommitted()) {
                     Terms.get().forget(ca);
                 }
@@ -72,6 +78,13 @@ public class CancelAction extends AbstractAction {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
                 if (rel.isUncommitted()) {
                     I_RelVersioned rv = Terms.get().getRelationship(rel.getNid());
+                    Collection<? extends RefexChronicleBI<?>> refexes = rel.getRefexes();
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.isUncommitted()) {
+                            I_ExtendByRef ext = Terms.get().getExtension(refex.getNid());
+                            Terms.get().forget(ext);
+                        }
+                    }
                     Terms.get().forget(rv);
                 }
             }
