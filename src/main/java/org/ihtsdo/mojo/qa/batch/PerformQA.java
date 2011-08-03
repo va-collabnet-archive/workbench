@@ -15,6 +15,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
@@ -42,9 +44,10 @@ public class PerformQA implements I_ProcessConcepts {
 	int fsnNid;
 	private String databaseUuid;
 	private String testPathUuid;
+	private IsaCache isaCache;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
-			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid) {
+			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid) throws Exception {
 		super();
 		this.config = config;
 		this.context = context;
@@ -71,14 +74,15 @@ public class PerformQA implements I_ProcessConcepts {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		isaCache = KindOfComputer.getIsaCacheMap().get(config.getViewCoordinate());
+		if (isaCache == null) {
+			throw new Exception("Error: No isa cache for ViewCoordinate.");
+		}
 	}
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
-		//testing cut-off, skip all after 2000 -- count < 2001 && 
-		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), snomedRoot.getNid());
-		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), loopConcept.getNid());
-		if (subtypeConcept.isKindOf(parentConcept)) {
+		if (isaCache.isKindOf(loopConcept.getNid(), snomedRoot.getNid())) {
 		//if (myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
 			//snomedRoot.isParentOfOrEqualTo(loopConcept)
 			//, config.getAllowedStatus(), 
