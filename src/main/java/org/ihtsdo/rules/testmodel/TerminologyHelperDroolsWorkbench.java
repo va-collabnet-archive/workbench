@@ -260,11 +260,13 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 			int sourceConceptNid = tf.uuidToNative(UUID.fromString(conceptUuid));
-			String filteredDescription = "+" + QueryParser.escape(fsn);
+			String workingSearchString = new String();
+			workingSearchString = fsn.trim();
 			Pattern p = Pattern.compile("[\\s\\(]");
-			Matcher m = p.matcher(filteredDescription);
-			filteredDescription = m.replaceAll(" +");
-			System.out.println(fsn + "  ---->  " + filteredDescription);
+			Matcher m = p.matcher(workingSearchString);
+			workingSearchString = m.replaceAll(" +");
+			String filteredDescription = "+" + QueryParser.escape(fsn);
+			//System.out.println(fsn + "  ---->  " + filteredDescription);
 			SearchResult results = tf.doLuceneSearch(filteredDescription);
 			TopDocs topDocs = results.topDocs;
 			ScoreDoc[] docs = topDocs.scoreDocs;
