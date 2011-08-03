@@ -338,6 +338,7 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void performQA(UUID executionUUID, RulesContextHelper contextHelper) throws Exception {
+		System.out.println("Starting concept iteration...");
 		I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
 
 		// Add results to output file
@@ -371,6 +372,7 @@ public class BatchQACheck extends AbstractMojo {
 
 		executionPw.flush();
 		executionPw.close();
+		System.out.println("Concept iteration finished...");
 	}
 
 	private void validateParamenters() throws Exception {
