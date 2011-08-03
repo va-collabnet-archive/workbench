@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -9,14 +8,13 @@
 	<artifactId>rule-engine-integration</artifactId>
 	<name>${branch}: Rules engine integration</name>
 	<url>http://maven.apache.org</url>
-	<!-- <repositories> <repository> <id>drools jboss repository</id> <url>http://repository.jboss.com/maven2/</url> 
-		</repository> </repositories> -->
+	<!-- <repositories> <repository> <id>drools jboss repository</id> <url>http://repository.jboss.com/maven2/</url> </repository> </repositories> -->
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>
 			<version>2.5.16</version>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -98,6 +96,16 @@
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
 			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.7</version>
 		</dependency>
 	</dependencies>
 	<build>

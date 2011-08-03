@@ -204,7 +204,8 @@ public class RulesLibrary {
 					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-
+					System.out.println(testConcept);
+					
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Testing concept...");
 						config.setStatusMessage("Testing concept...");
