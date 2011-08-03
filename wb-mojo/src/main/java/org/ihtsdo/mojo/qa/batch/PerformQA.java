@@ -143,7 +143,7 @@ public class PerformQA implements I_ProcessConcepts {
 
 			// END TRACERS
 
-			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
+			System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
 			count++;
 			if (count % 1000 == 0) {
 				System.out.println("Checked " + count + " effective concepts in " + (Calendar.getInstance().getTimeInMillis()-start) + " ms.");
