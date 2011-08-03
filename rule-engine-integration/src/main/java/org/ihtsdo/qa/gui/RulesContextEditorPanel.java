@@ -5,6 +5,7 @@
 package org.ihtsdo.qa.gui;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,7 +73,7 @@ public class RulesContextEditorPanel extends JPanel {
 
 		try {
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
-				comboBox2.addItem(context);
+				contextComboBox.addItem(context);
 			}
 			updateCheckBox1();
 		} catch (Exception e) {
@@ -80,7 +82,7 @@ public class RulesContextEditorPanel extends JPanel {
 	}
 
 	private void updateCheckBox1() throws Exception {
-		I_GetConceptData selectedContext = (I_GetConceptData) comboBox2.getSelectedItem();
+		I_GetConceptData selectedContext = (I_GetConceptData) contextComboBox.getSelectedItem();
 		if (selectedContext != null) {
 			List<RulesDeploymentPackageReference> pkgs = contextHelper.getPackagesForContext(selectedContext);
 			comboBox1.removeAllItems();
@@ -107,10 +109,10 @@ public class RulesContextEditorPanel extends JPanel {
 			label4.repaint();
 			tableModel.data = new Object[0][0];
 			tableModel.dataList = new ArrayList<Object[]>();
-			if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null) {
+			if (comboBox1.getSelectedItem() != null && contextComboBox.getSelectedItem() != null) {
 				I_GetConceptData agendaMetadataRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
 				RulesDeploymentPackageReference selectedPackage = (RulesDeploymentPackageReference) comboBox1.getSelectedItem();
-				I_GetConceptData selectedContext = (I_GetConceptData) comboBox2.getSelectedItem();
+				I_GetConceptData selectedContext = (I_GetConceptData) contextComboBox.getSelectedItem();
 
 				// Fiddle with the Sport column's cell editors/renderers.
 				setUpSportColumn(table1, table1.getColumnModel().getColumn(3));
@@ -129,7 +131,6 @@ public class RulesContextEditorPanel extends JPanel {
 						String ruleUid = null;
 						String description = null;
 						String ditaUid = null;
-
 						try {
 							ruleUid = (String) rule.getMetaData().get("UUID");
 							// ruleUid = rule.getMetaAttribute("UID");
@@ -288,9 +289,9 @@ public class RulesContextEditorPanel extends JPanel {
 				Object originalStContext = row[ORIGINAL_STATUS_IN_CONTEXT];
 
 				if (statusInContext instanceof I_GetConceptData && !statusInContext.toString().equals(originalStContext.toString())) {
-					contextHelper.setRoleInContext(row[RULE_UID].toString(), (I_GetConceptData) comboBox2.getSelectedItem(), (I_GetConceptData) statusInContext);
+					contextHelper.setRoleInContext(row[RULE_UID].toString(), (I_GetConceptData) contextComboBox.getSelectedItem(), (I_GetConceptData) statusInContext);
 				} else if (originalStContext instanceof I_GetConceptData && !(statusInContext instanceof I_GetConceptData)) {
-					contextHelper.setRoleInContext(row[RULE_UID].toString(), (I_GetConceptData) comboBox2.getSelectedItem(), null);
+					contextHelper.setRoleInContext(row[RULE_UID].toString(), (I_GetConceptData) contextComboBox.getSelectedItem(), null);
 				}
 			}
 		}
@@ -339,9 +340,9 @@ public class RulesContextEditorPanel extends JPanel {
 			// comboBox1.removeItemListener(comboBox1.getItemListeners()[0]);
 			// comboBox2.removeItemListener(comboBox2.getItemListeners()[0]);
 
-			comboBox2.removeAllItems();
+			contextComboBox.removeAllItems();
 			for (I_GetConceptData context : contextHelper.getAllContexts()) {
-				comboBox2.addItem(context);
+				contextComboBox.addItem(context);
 			}
 			comboBox1.removeAllItems();
 			for (RulesDeploymentPackageReference repo : rulesRepoHelper.getAllRulesDeploymentPackages()) {
@@ -377,6 +378,29 @@ public class RulesContextEditorPanel extends JPanel {
 		updateTable1();
 	}
 
+	private void exportToExcelButtonActionPerformed(ActionEvent e) {
+		if (comboBox1.getSelectedItem() != null && contextComboBox.getSelectedItem() != null) {
+			updateTable1();
+			try {
+				RulesDeploymentPackageReference selectedPackage = (RulesDeploymentPackageReference) comboBox1.getSelectedItem();
+				I_GetConceptData selectedContext = (I_GetConceptData) contextComboBox.getSelectedItem();
+
+				File excelFile = new ExcelExportUtil().exortRulesContext(tableModel.data, tableModel.columnNames, selectedPackage, selectedContext);
+				if (excelFile != null) {
+					Desktop desktop = null;
+					if (Desktop.isDesktopSupported()) {
+						desktop = Desktop.getDesktop();
+						desktop.open(excelFile);
+					}
+				} else {
+					// showError(NO_DATA);
+				}
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -384,10 +408,11 @@ public class RulesContextEditorPanel extends JPanel {
 		label1 = new JLabel();
 		panel2 = new JPanel();
 		label3 = new JLabel();
-		comboBox2 = new JComboBox();
+		contextComboBox = new JComboBox();
 		label2 = new JLabel();
 		comboBox1 = new JComboBox();
 		button1 = new JButton();
+		exportToExcelButton = new JButton();
 		label4 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
@@ -427,14 +452,14 @@ public class RulesContextEditorPanel extends JPanel {
 			label3.setText("Context:");
 			panel2.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			// ---- comboBox2 ----
-			comboBox2.addItemListener(new ItemListener() {
+			// ---- contextComboBox ----
+			contextComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					comboBox2ItemStateChanged(e);
 				}
 			});
-			panel2.add(comboBox2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel2.add(contextComboBox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label2 ----
 			label2.setText("Repository:");
@@ -451,6 +476,16 @@ public class RulesContextEditorPanel extends JPanel {
 				}
 			});
 			panel2.add(button1, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+
+			// ---- exportToExcelButton ----
+			exportToExcelButton.setText("Export to Excel");
+			exportToExcelButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportToExcelButtonActionPerformed(e);
+				}
+			});
+			panel2.add(exportToExcelButton, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 			// ---- label4 ----
 			label4.setText("Notification");
@@ -485,7 +520,6 @@ public class RulesContextEditorPanel extends JPanel {
 			panel3.add(saveButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
 
@@ -495,10 +529,11 @@ public class RulesContextEditorPanel extends JPanel {
 	private JLabel label1;
 	private JPanel panel2;
 	private JLabel label3;
-	private JComboBox comboBox2;
+	private JComboBox contextComboBox;
 	private JLabel label2;
 	private JComboBox comboBox1;
 	private JButton button1;
+	private JButton exportToExcelButton;
 	private JLabel label4;
 	private JScrollPane scrollPane1;
 	private JTable table1;
