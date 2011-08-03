@@ -287,10 +287,12 @@ public class RulesLibrary {
 		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
 				" for " + context.toString());
 		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
-		try {
-			activity.complete();
-		} catch (ComputationCanceled e) {
-			e.printStackTrace();
+		if (!DwfaEnv.isHeadless()) {
+			try {
+				activity.complete();
+			} catch (ComputationCanceled e) {
+				e.printStackTrace();
+			}
 		}
 		config.setStatusMessage("");
 
@@ -504,15 +506,15 @@ public class RulesLibrary {
 				KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
 				kagent.applyChangeSet( ResourceFactory.newFileResource( url ) );
 				kbase = kagent.getKnowledgeBase();
-//				try {
-//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-//					out.writeObject( kbase.getKnowledgePackages() );
-//					out.close();
-//				} catch (FileNotFoundException e) {
-//					e.printStackTrace();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
+				//				try {
+				//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+				//					out.writeObject( kbase.getKnowledgePackages() );
+				//					out.close();
+				//				} catch (FileNotFoundException e) {
+				//					e.printStackTrace();
+				//				} catch (IOException e) {
+				//					e.printStackTrace();
+				//				}
 			}
 		}
 		return kbase;
@@ -650,15 +652,15 @@ public class RulesLibrary {
 		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
 		kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
 		kbase = kagent.getKnowledgeBase();
-//		try {
-//			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-//			out.writeObject( kbase );
-//			out.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		//		try {
+		//			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+		//			out.writeObject( kbase );
+		//			out.close();
+		//		} catch (FileNotFoundException e) {
+		//			e.printStackTrace();
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
@@ -775,15 +777,15 @@ public class RulesLibrary {
 			}
 			kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 
-//			try {
-//				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-//				out.writeObject( kbuilder.getKnowledgePackages() );
-//				out.close();
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			//			try {
+			//				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+			//				out.writeObject( kbuilder.getKnowledgePackages() );
+			//				out.close();
+			//			} catch (FileNotFoundException e) {
+			//				e.printStackTrace();
+			//			} catch (IOException e) {
+			//				e.printStackTrace();
+			//			}
 
 		}
 		//		}
