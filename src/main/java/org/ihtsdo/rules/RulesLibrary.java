@@ -163,8 +163,9 @@ public class RulesLibrary {
 			INFERRED_VIEW_ORIGIN inferredOrigin) 
 	throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
-		I_ShowActivity activity =
-			Terms.get().newActivityPanel(true, config, 
+		I_ShowActivity activity = null;
+		if (!DwfaEnv.isHeadless()) {
+			activity = Terms.get().newActivityPanel(true, config, 
 					"<html>Performing QA check on concept: " + concept.toString() + 
 					" for " + context.toString(), true);
 		activities.add(activity);
@@ -172,6 +173,7 @@ public class RulesLibrary {
 		activity.setIndeterminate(true);
 		activity.setProgressInfoLower("Getting KnowledgeBase...");
 		Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
+		}
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
@@ -182,8 +184,10 @@ public class RulesLibrary {
 				if (!(kbase.getKnowledgePackages().size() == 0) && 
 						!(kbase.getKnowledgePackages().size() == 1 &&
 								kbase.getKnowledgePackages().iterator().next().getRules().size() == 0)) { 
-					activity.setProgressInfoLower("Creating session...");
-					config.setStatusMessage("Creating session...");
+					if (!DwfaEnv.isHeadless()) {
+						activity.setProgressInfoLower("Creating session...");
+						config.setStatusMessage("Creating session...");
+					}
 
 					StatefulKnowledgeSession ksession = kbase.newStatefulKnowledgeSession();
 
@@ -194,13 +198,17 @@ public class RulesLibrary {
 
 					ConceptVersionBI conceptBi = Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getNid());
 
-					activity.setProgressInfoLower("Converting concept...");
-					config.setStatusMessage("Converting concept...");
+					if (!DwfaEnv.isHeadless()) {
+						activity.setProgressInfoLower("Converting concept...");
+						config.setStatusMessage("Converting concept...");
+					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
 
-					activity.setProgressInfoLower("Testing concept...");
-					config.setStatusMessage("Testing concept...");
+					if (!DwfaEnv.isHeadless()) {
+						activity.setProgressInfoLower("Testing concept...");
+						config.setStatusMessage("Testing concept...");
+					}
 
 					ksession.insert(testConcept);
 
@@ -270,31 +278,34 @@ public class RulesLibrary {
 			long elapsed = endTime - startTime;
 			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			String result = "Error";
-			activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
-					" for " + context.toString());
-			activity.setProgressInfoLower("Error: elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
-			try {
-				activity.complete();
-			} catch (ComputationCanceled e1) {
-				e1.printStackTrace();
+			if (!DwfaEnv.isHeadless()) {
+				activity.setProgressInfoUpper("<html>Error in QA check on concept: " + concept.toString() + 
+						" for " + context.toString());
+				activity.setProgressInfoLower("Error: elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+				try {
+					activity.complete();
+				} catch (ComputationCanceled e1) {
+					e1.printStackTrace();
+				}
+				e.printStackTrace();
 			}
-			e.printStackTrace();
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 		String result = "Done";
-		activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
-				" for " + context.toString());
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
 		if (!DwfaEnv.isHeadless()) {
+			activity.setProgressInfoUpper("<html>Performed QA check on concept: " + concept.toString() + 
+					" for " + context.toString());
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result + " -  Rules fired:" + results.getResultsItems().size());
+
 			try {
 				activity.complete();
 			} catch (ComputationCanceled e) {
 				e.printStackTrace();
 			}
+			config.setStatusMessage("");
 		}
-		config.setStatusMessage("");
 
 		return results;
 	}
