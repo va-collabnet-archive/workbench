@@ -2,15 +2,12 @@ package org.ihtsdo.mojo.qa.batch;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -22,7 +19,9 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 public class PerformQA implements I_ProcessConcepts {
@@ -79,7 +78,10 @@ public class PerformQA implements I_ProcessConcepts {
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
 		//testing cut-off, skip all after 2000 -- count < 2001 && 
-		if (myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
+		ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), snomedRoot.getNid());
+		ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), loopConcept.getNid());
+		if (subtypeConcept.isKindOf(parentConcept)) {
+		//if (myStaticIsACache.isKindOf(loopConcept.getConceptNid(), snomedRoot.getConceptNid())) {
 			//snomedRoot.isParentOfOrEqualTo(loopConcept)
 			//, config.getAllowedStatus(), 
 			//destRels, config.getViewPositionSetReadOnly(), 
