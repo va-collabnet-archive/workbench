@@ -228,9 +228,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 										if (potentialMatchSemtag != null &&
 												originalSemTag.equals(potentialMatchSemtag)) {
 											result = true;
-											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
-													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
-													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
+//											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
+//													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
+//													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
 											break;
 										}
 									}
