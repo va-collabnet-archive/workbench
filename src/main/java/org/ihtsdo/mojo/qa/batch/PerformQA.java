@@ -156,9 +156,9 @@ public class PerformQA implements I_ProcessConcepts {
 				writeOutputFile(results, loopConcept);
 			}
 		} else {
-			count++;
-			if (count % 1000 == 0) {
-			 System.out.println("Skipped concepts: " + count);
+			skippedCount++;
+			if (skippedCount % 1000 == 0) {
+			 System.out.println("Skipped concepts: " + skippedCount);
 			}
 		}
 	}
