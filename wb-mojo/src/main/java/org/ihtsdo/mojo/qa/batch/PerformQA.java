@@ -74,6 +74,9 @@ public class PerformQA implements I_ProcessConcepts {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("Setting up Is-a cache...");
+		KindOfComputer.setupIsaCacheAndWait(config.getViewCoordinate().getIsaCoordinate());
+		System.out.println("Is-a created OK...");
 		isaCache = KindOfComputer.getIsaCacheMap().get(config.getViewCoordinate());
 		if (isaCache == null) {
 			throw new Exception("Error: No isa cache for ViewCoordinate.");

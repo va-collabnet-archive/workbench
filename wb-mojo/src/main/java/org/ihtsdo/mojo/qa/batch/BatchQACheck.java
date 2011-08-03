@@ -339,9 +339,6 @@ public class BatchQACheck extends AbstractMojo {
 
 	private void performQA(UUID executionUUID, RulesContextHelper contextHelper) throws Exception {
 		I_TermFactory tf = Terms.get();
-		System.out.println("Setting up Is-a cache...");
-		tf.setupIsaCache(config.getViewCoordinate().getIsaCoordinate()).getLatch().await();
-		System.out.println("Is-a created OK...");
 		System.out.println("Starting concept iteration...");
 		I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
 
