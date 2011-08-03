@@ -32,9 +32,9 @@ public class PerformQA implements I_ProcessConcepts {
 	PrintWriter findingPw;
 	I_GetConceptData snomedRoot;
 	I_IntSet destRels;
-	KindOfCacheBI myStaticIsACache;
 	TerminologyHelperDroolsWorkbench terminologyHelperCache;
 	int count;
+	int skippedCount;
 	long start;
 
 	HashMap<String,Long> traceElapsedTimes;
@@ -54,6 +54,7 @@ public class PerformQA implements I_ProcessConcepts {
 		this.databaseUuid=databaseUuid;
 		this.testPathUuid=testPathUuid;
 		this.count = 0;
+		this.skippedCount = 0;
 		this.start = Calendar.getInstance().getTimeInMillis();
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
@@ -62,13 +63,10 @@ public class PerformQA implements I_ProcessConcepts {
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 			fsnNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			myStaticIsACache = RulesLibrary.setupIsACache(); // pointer to avoid garbage collection during qa
 			terminologyHelperCache = RulesLibrary.getTerminologyHelper(); // pointer to avoid garbage collection during qa
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,7 +156,10 @@ public class PerformQA implements I_ProcessConcepts {
 				writeOutputFile(results, loopConcept);
 			}
 		} else {
-			//System.out.println("Skipping concept: " + loopConcept);
+			count++;
+			if (count % 1000 == 0) {
+			 System.out.println("Skipped concepts: " + count);
+			}
 		}
 	}
 
