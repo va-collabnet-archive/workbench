@@ -27,19 +27,19 @@ public abstract class DrComponent {
 			try {
 				ConceptChronicleBI status = Ts.get().getConcept(UUID.fromString(statusUuid));
 				sb.append(" Status: " + status + " (" + statusUuid + "),");
-			} catch (IllegalArgumentException ex) {
+			} catch (Exception ex) {
 			}
 
 			try {
 				ConceptChronicleBI path = Ts.get().getConcept(UUID.fromString(pathUuid));
 				sb.append(" Path: " + path + " (" + pathUuid + "),");
-			} catch (IllegalArgumentException ex) {
+			} catch (Exception ex) {
 			}
 
 			try {
 				ConceptChronicleBI author = Ts.get().getConcept(UUID.fromString(authorUuid));
 				sb.append(" Author: " + author + " (" + authorUuid + "),");
-			} catch (IllegalArgumentException ex) {
+			} catch (Exception ex) {
 			}
 
 			sb.append(" Time: " + time + ",");
