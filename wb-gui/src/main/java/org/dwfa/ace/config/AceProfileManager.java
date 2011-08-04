@@ -28,8 +28,9 @@ public class AceProfileManager {
     	try {
     	getProfiles(getProfileDir());
     	} catch (FileNotFoundException e) {
-			AceLog.getAppLog().alertAndLog(Level.SEVERE, e.getMessage(),e);	
-			throw e;
+    		//AceLog.getAppLog().alertAndLog(Level.INFO,
+			//AceLog.getAppLog().alertAndLog(Level.SEVERE, e.getMessage(),e);	
+			//throw e;
 		}
     }
     

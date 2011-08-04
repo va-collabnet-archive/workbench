@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.log.AceLog;
@@ -28,7 +29,7 @@ public class UIAuthenticator {
 	
 	public String baseURL;
 	
-	private final static String ERR_NO_PROFILE_S = "No Profiles folder found";
+	public final static String ERR_NO_PROFILE_S = "No Profiles folder found";
 
 	
 	private JFrame parentFrame = null;
@@ -77,6 +78,8 @@ public class UIAuthenticator {
 			apm.processProfiles();
 			if(!apm.isProfileFolderFound()){
 				retVal = ERR_NO_PROFILE_S;
+				String msg = "No Profiles folder found. The application will try and check one out from the repository";
+				JOptionPane.showMessageDialog(getParentFrame(),msg , ERR_NO_PROFILE_S, JOptionPane.INFORMATION_MESSAGE);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
