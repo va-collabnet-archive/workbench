@@ -13,9 +13,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.log.AceLog;
@@ -133,12 +135,7 @@ public class PositionMapper {
         if (version.getSapNid() < 0) {
             return false;
         }
-        // Forms a barrier to ensure that the setup is complete prior to use
-        try {
-            completeLatch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        waitTillSetup();
         lastRequestTime = System.currentTimeMillis();
         if (version.getTime() == Long.MAX_VALUE) {
             return true;
@@ -157,6 +154,43 @@ public class PositionMapper {
         return false;
     }
 
+    public void waitTillSetup() {
+        // Forms a barrier to ensure that the setup is complete prior to use
+        try {
+            if (completeLatch.getCount() == 0) {
+                return;
+            }
+            try {
+                if (mappersToSetup.contains(this)) {
+                    if (!completeLatch.await(10, TimeUnit.SECONDS)) {
+
+                        if (mappersToSetup.remove(this)) {
+                            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                                AceLog.getAppLog().fine("Removed mapper from queue.");
+                            }
+                        } else {
+                            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                                AceLog.getAppLog().fine("Mapper was not in queue.");
+                            }
+                        }
+                        setup();
+
+                    }
+                } else {
+                    setup();
+                }
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (PathNotExistsException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (TerminologyException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean idsOnRoute(I_IdPart idVersion) {
         queryCount++;
         if (Bdb.getSapNid(idVersion.getStatusNid(), idVersion.getAuthorNid(),
@@ -164,11 +198,7 @@ public class PositionMapper {
             return false;
         }
         // Forms a barrier to ensure that the setup is complete prior to use
-        try {
-            completeLatch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        waitTillSetup();
         lastRequestTime = System.currentTimeMillis();
         if (idVersion.getTime() == Long.MAX_VALUE) {
             return true;
@@ -218,11 +248,7 @@ public class PositionMapper {
         }
 
         // Forms a barrier to ensure that the setup is complete prior to use
-        try {
-            completeLatch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        waitTillSetup();
         lastRequestTime = System.currentTimeMillis();
         if (v1.getTime() == Long.MAX_VALUE) {
             if (v2.getTime() == Long.MAX_VALUE) {
@@ -266,7 +292,7 @@ public class PositionMapper {
         lastRequestTime = System.currentTimeMillis();
         // Forms a barrier to ensure that the setup is complete prior to use
         try {
-            completeLatch.await();
+            waitTillSetup();
             assert part1.getSapNid() < conflictMatrix.length :
                     "SapNid: " + part1.getSapNid() + " out of range; "
                     + " rows: " + conflictMatrix.length
@@ -286,8 +312,6 @@ public class PositionMapper {
                     + " destination: " + destination + " latch: " + completeLatch.getCount()
                     + " positionCount: " + positionCount;
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         switch (precedencePolicy) {
@@ -329,7 +353,7 @@ public class PositionMapper {
         lastRequestTime = System.currentTimeMillis();
         // Forms a barrier to ensure that the setup is complete prior to use
         try {
-            completeLatch.await();
+            waitTillSetup();
             assert Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) < conflictMatrix.length :
                     "SapNid: " + Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()) + " out of range; "
                     + " rows: " + conflictMatrix.length
@@ -349,8 +373,6 @@ public class PositionMapper {
                     + " destination: " + destination + " latch: " + completeLatch.getCount()
                     + " positionCount: " + positionCount;
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         switch (precedencePolicy) {
@@ -409,12 +431,12 @@ public class PositionMapper {
     private static LinkedBlockingQueue<PositionMapper> mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
     @SuppressWarnings("unused")
     private static PositionMapperSetupManager setupManager = new PositionMapperSetupManager();
-    
+
     public static void reset() {
         mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
         closed = false;
         setupManager = new PositionMapperSetupManager();
-        
+
     }
     /**
      * Only need an approximate query count, so no need to incur
