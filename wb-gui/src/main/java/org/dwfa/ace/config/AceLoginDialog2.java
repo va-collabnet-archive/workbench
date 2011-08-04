@@ -143,7 +143,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     		title = "Please login";
     		JTextField jtf = new JTextField();
     		jtf.setText(nameProf.keys().nextElement());
-    		//jtf.setEditable(false);
+    		jtf.setEditable(false);
     		userControl = jtf;
     		return userControl;
     	}
