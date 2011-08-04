@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -21,9 +22,6 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.KindOfCacheBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 public class PerformQA implements I_ProcessConcepts {
@@ -45,6 +43,8 @@ public class PerformQA implements I_ProcessConcepts {
 	private String databaseUuid;
 	private String testPathUuid;
 	private IsaCache isaCache;
+	private long elapsedTotal;
+	private int estimatedNumberOfConcepts;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
 			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid) throws Exception {
@@ -81,6 +81,8 @@ public class PerformQA implements I_ProcessConcepts {
 		if (isaCache == null) {
 			throw new Exception("Error: No isa cache for ViewCoordinate.");
 		}
+		elapsedTotal = 0;
+		estimatedNumberOfConcepts = 400000;
 	}
 
 	@Override
@@ -143,10 +145,37 @@ public class PerformQA implements I_ProcessConcepts {
 
 			// END TRACERS
 
-			System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
+			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
+			if (individualElapsed > 6000) {
+				System.out.println("Specially long check: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
+			}
+			
+//			if (count > 600 && count < 700) {
+//				System.out.println(count + "- Tracing: " + loopConcept.toString() + " took " + individualElapsed + " ms.");
+//			}
+//			
+//			if (count == 337) {
+//				System.out.println("Found it...");
+//			}
+			
 			count++;
-			if (count % 1000 == 0) {
-				System.out.println("Checked " + count + " effective concepts in " + (Calendar.getInstance().getTimeInMillis()-start) + " ms.");
+			if (count % 100 == 0) {
+				long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
+				elapsedTotal = elapsedTotal + elapsedInterval;
+				System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
+				String elpasedString = String.format("%d hours, %d min, %d sec",
+						TimeUnit.MILLISECONDS.toHours(elapsedTotal),
+					    TimeUnit.MILLISECONDS.toMinutes(elapsedTotal) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(elapsedTotal)),
+					    TimeUnit.MILLISECONDS.toSeconds(elapsedTotal) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsedTotal))
+					);
+				long predictedTime = (estimatedNumberOfConcepts * elapsedTotal)/count;
+				String predictedString = String.format("%d hours, %d min, %d sec",
+						TimeUnit.MILLISECONDS.toHours(predictedTime),
+					    TimeUnit.MILLISECONDS.toMinutes(predictedTime) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(predictedTime)),
+					    TimeUnit.MILLISECONDS.toSeconds(predictedTime) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(predictedTime))
+					);
+				System.out.println("Elapsed until now: " + elpasedString + ", predicted time: " + predictedString + " (average: " + elapsedTotal/count + ")");
+				System.out.println("");
 				start = Calendar.getInstance().getTimeInMillis();
 
 				//Tracers output
@@ -166,6 +195,7 @@ public class PerformQA implements I_ProcessConcepts {
 			skippedCount++;
 			if (skippedCount % 1000 == 0) {
 			 System.out.println("Skipped concepts: " + skippedCount);
+			 System.out.println("");
 			}
 		}
 	}
