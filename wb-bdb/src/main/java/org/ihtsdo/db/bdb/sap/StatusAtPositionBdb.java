@@ -34,6 +34,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import java.util.logging.Level;
 
 /**
  * @author kec
@@ -70,11 +71,11 @@ public class StatusAtPositionBdb extends ComponentBdb {
             for (int sapNid : commitSapNids.getSetValues()) {
                 min = Math.min(min, sapNid);
             }
-            
+
             for (int sapNid : uncomittedStatusPathEntries.values()) {
                 min = Math.min(min, sapNid);
             }
-            
+
             for (int i = min; i < sequence.get(); i++) {
                 changedSinceSync = true;
                 mutableArray.commitTimes[getReadWriteIndex(i)] = Long.MIN_VALUE;

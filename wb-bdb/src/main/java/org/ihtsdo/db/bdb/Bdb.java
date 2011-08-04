@@ -254,6 +254,7 @@ public class Bdb {
                     new NamedThreadFactory(dbdThreadGroup, "Sync service"));
 
             BdbCommitManager.reset();
+            PositionMapper.reset();
             NidDataFromBdb.resetExecutorPool();
             for (@SuppressWarnings("unused") OFFSETS o : OFFSETS.values()) {
                 // ensure all OFFSETS are initialized prior to multi-threading. 

@@ -1058,6 +1058,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return primordialSapNid == -1;
     }
 
+    private static boolean fixAlert = true;
+    
     protected ConceptComponent(int enclosingConceptNid, TupleInput input) throws IOException {
         super();
         this.enclosingConceptNid = enclosingConceptNid;
@@ -1067,7 +1069,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
         } else if (cNid != this.enclosingConceptNid) {
             Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
-            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            if (fixAlert) {
+                AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+                fixAlert = false;
+            }
+            
             AceLog.getAppLog().warning("Datafix warning. cNid "
                     + cNid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(cNid)
                     + "\nincorrect for: " + this.nid + " "

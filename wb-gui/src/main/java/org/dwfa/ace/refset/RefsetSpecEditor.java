@@ -250,6 +250,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
                 spec.modifyOverallSpecStatus(status);
 
+                Terms.get().addUncommittedNoChecks(memberRefset);
                 Terms.get().addUncommittedNoChecks(refsetSpec);
                 Terms.get().addUncommittedNoChecks(markedParent);
                 Terms.get().addUncommittedNoChecks(promotionRefset);
@@ -257,6 +258,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 Terms.get().addUncommittedNoChecks(editTimeRefset);
                 Terms.get().addUncommittedNoChecks(computeTimeRefset);
                 
+                Ts.get().commit(memberRefset);
                 Ts.get().commit(refsetSpec);
                 Ts.get().commit(markedParent);
                 Ts.get().commit(promotionRefset);

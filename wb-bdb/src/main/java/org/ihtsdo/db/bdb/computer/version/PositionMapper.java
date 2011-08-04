@@ -143,8 +143,12 @@ public class PositionMapper {
         if (version.getTime() == Long.MAX_VALUE) {
             return true;
         }
-        assert version.getSapNid() < positionDistance.length : "sapNid: " + version.getSapNid()
-                + " length: " + positionDistance.length + " version: " + version;
+        if (version.getSapNid() >= positionDistance.length) {
+            AceLog.getAppLog().severe("sapNid: " + version.getSapNid()
+                    + " length: " + positionDistance.length
+                    + " version: " + version);
+            return false;
+        }
         if (version.getTime() < Long.MAX_VALUE) {
             return positionDistance[version.getSapNid()] >= 0;
         } else if (destination.getTime() > System.currentTimeMillis()) {
@@ -405,6 +409,13 @@ public class PositionMapper {
     private static LinkedBlockingQueue<PositionMapper> mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
     @SuppressWarnings("unused")
     private static PositionMapperSetupManager setupManager = new PositionMapperSetupManager();
+    
+    public static void reset() {
+        mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
+        closed = false;
+        setupManager = new PositionMapperSetupManager();
+        
+    }
     /**
      * Only need an approximate query count, so no need to incur
      * AtomicInt overhead.
@@ -430,368 +441,163 @@ public class PositionMapper {
             pathDesc = pathConcept.getDescriptions().iterator().next().getText();
         }
         writeLock.lock();
-        if (completeLatch.getCount() == 1) {
-            try {
-                if (pathManager == null) {
-                    pathManager = BdbPathManager.get();
-                }
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine(
-                            "Creating new PositionMapper for: "
-                            + pathConcept.getNid() + ": "
-                            + pathDesc + " time: "
-                            + TimeHelper.formatDate(destination.getTime())
-                            + " thread: " + Thread.currentThread().getName());
-                }
-                Collection<PositionBI> origins =
-                        pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
-                origins.add(this.destination);
+        try {
+            if (completeLatch.getCount() == 1) {
+                try {
+                    if (pathManager == null) {
+                        pathManager = BdbPathManager.get();
+                    }
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine(
+                                "Creating new PositionMapper for: "
+                                + pathConcept.getNid() + ": "
+                                + pathDesc + " time: "
+                                + TimeHelper.formatDate(destination.getTime())
+                                + " thread: " + Thread.currentThread().getName());
+                    }
+                    Collection<PositionBI> origins =
+                            pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
+                    origins.add(this.destination);
 
-                // Map of the origin position's path id, to the origin position... See
-                // assumption 1.
-                Map<Integer, PositionBI> originMap = new TreeMap<Integer, PositionBI>();
+                    // Map of the origin position's path id, to the origin position... See
+                    // assumption 1.
+                    Map<Integer, PositionBI> originMap = new TreeMap<Integer, PositionBI>();
 
-                // Map of the origin position's path to it's 'depth' (how many origins
-                // below the destination it is)
-                TreeMap<Integer, BigInteger> depthMap = new TreeMap<Integer, BigInteger>();
+                    // Map of the origin position's path to it's 'depth' (how many origins
+                    // below the destination it is)
+                    TreeMap<Integer, BigInteger> depthMap = new TreeMap<Integer, BigInteger>();
 
-                // Map of the origin's position path to the set of paths that precede it
-                // (including itself).
-                TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
-                for (PositionBI o : origins) {
-                    originMap.put(o.getPath().getConceptNid(), o);
-                    depthMap.put(o.getPath().getConceptNid(),
-                            getDepth(o, destination, 1));
-                    precedingPathIdMap.put(o.getPath().getConceptNid(),
-                            getPreceedingPathSet(o));
-                }
+                    // Map of the origin's position path to the set of paths that precede it
+                    // (including itself).
+                    TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
+                    for (PositionBI o : origins) {
+                        originMap.put(o.getPath().getConceptNid(), o);
+                        depthMap.put(o.getPath().getConceptNid(),
+                                getDepth(o, destination, 1));
+                        precedingPathIdMap.put(o.getPath().getConceptNid(),
+                                getPreceedingPathSet(o));
+                    }
 
-                BigInteger timeUpperBound = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.TEN);
+                    BigInteger timeUpperBound = BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.TEN);
 
-                positionCount = Bdb.getSapDb().getPositionCount();
-                positionDistance = new int[positionCount];
-                Arrays.fill(positionDistance, Integer.MIN_VALUE);
-                BigInteger[] positionComputedDistance = new BigInteger[positionCount];
-                Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
-                conflictMatrix = new BitSet[positionCount];
-                for (int p1index = initialIndex; p1index < positionCount; p1index++) {
-                    try {
-                        PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
-                        Integer p1pathId = p1.getPath().getConceptNid();
-                        Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
-                        // see if position may be in route to the destination
-                        if (originMap.containsKey(p1pathId)) {
-                            // compute the distance to the destination
-                            BigInteger pathDepth = depthMap.get(p1.getPath().getConceptNid());
-
-                            if (destination.getPath().getConceptNid() == p1.getPath().getConceptNid()) {
-                                // On the same path as the destination...
-                                if (p1.getTime() <= destination.getTime()) {
-                                    positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(p1.getTime()));
-                                } else {
-                                    conflictMatrix[p1index] = null;
-                                }
-                                conflictMatrix[p1index] = null;
-                            } else {
-                                // On a different path than the destination
+                    positionCount = Bdb.getSapDb().getPositionCount();
+                    positionDistance = new int[positionCount];
+                    Arrays.fill(positionDistance, Integer.MIN_VALUE);
+                    BigInteger[] positionComputedDistance = new BigInteger[positionCount];
+                    Arrays.fill(positionComputedDistance, BIG_MINUS_ONE);
+                    conflictMatrix = new BitSet[positionCount];
+                    for (int p1index = initialIndex; p1index < positionCount; p1index++) {
+                        try {
+                            PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
+                            Integer p1pathId = p1.getPath().getConceptNid();
+                            Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
+                            // see if position may be in route to the destination
+                            if (originMap.containsKey(p1pathId)) {
                                 // compute the distance to the destination
-                                positionComputedDistance[p1index] = timeUpperBound.multiply(pathDepth).subtract(
-                                        BigInteger.valueOf(p1.getTime()));
+                                BigInteger pathDepth = depthMap.get(p1.getPath().getConceptNid());
 
-                                // iterate to compute conflicts...
-                                for (int p2index = initialIndex; p2index < positionCount; p2index++) {
-                                    PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
-                                    Integer p2pathId = p2.getPath().getConceptNid();
-                                    if (originMap.containsKey(p2pathId)
-                                            && p2.getTime() <= originMap.get(p2pathId).getTime()) {
-                                        Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
-                                        if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
-                                            if (conflictMatrix[p1index] != null) {
-                                                // technically not required as default is to false.
-                                                conflictMatrix[p1index].set(p2index, false);
-                                            }
-                                            if (conflictMatrix[p2index] != null) {
-                                                // technically not required as default is to false.
-                                                conflictMatrix[p2index].set(p1index, false);
-                                            }
-                                        } else {
-                                            if (p1index < p2index) {
-                                                if (conflictMatrix[p1index] == null) {
-                                                    conflictMatrix[p1index] = new BitSet(positionCount);
-                                                }
-                                                conflictMatrix[p1index].set(p2index, true);
-                                            } else {
-                                                if (conflictMatrix[p2index] == null) {
-                                                    conflictMatrix[p2index] = new BitSet(positionCount);
-                                                }
-                                                conflictMatrix[p2index].set(p1index, true);
-                                            }
-                                        }
+                                if (destination.getPath().getConceptNid() == p1.getPath().getConceptNid()) {
+                                    // On the same path as the destination...
+                                    if (p1.getTime() <= destination.getTime()) {
+                                        positionComputedDistance[p1index] = timeUpperBound.subtract(BigInteger.valueOf(p1.getTime()));
                                     } else {
                                         conflictMatrix[p1index] = null;
                                     }
-                                }
-                            }
-                        } else {
-                            conflictMatrix[p1index] = null;
-                        }
-                    } catch (Exception e) {
-                        AceLog.getAppLog().alertAndLogException(e);
-                    }
-
-                }
-
-                // Copy positionComputedDistance to positionDistance.
-                // Step 1: sort
-
-                TreeSet<BigInteger> sortedPositionComputedDistanceTreeSet = new TreeSet<BigInteger>(
-                        Arrays.asList(positionComputedDistance));
-                BigInteger[] sortedPositionComputedDistance = sortedPositionComputedDistanceTreeSet.toArray(new BigInteger[sortedPositionComputedDistanceTreeSet.size()]);
-
-                // Step 2: copy: if neg, distance = -1 if positive, distance = sort
-                // sequence.
-                for (int pid = initialIndex; pid < positionCount; pid++) {
-                    if (positionComputedDistance[pid].compareTo(BigInteger.ZERO) < 0) {
-                        positionDistance[pid] = -1;
-                    } else {
-                        positionDistance[pid] = Arrays.binarySearch(
-                                sortedPositionComputedDistance,
-                                positionComputedDistance[pid]);
-                    }
-                }
-                completeLatch.countDown();
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine(
-                            "Finished setup for new PositionMapper for: "
-                            + pathConcept.getNid() + ": "
-                            + pathDesc + " time: "
-                            + TimeHelper.formatDate(destination.getTime())
-                            + " thread: " + Thread.currentThread().getName());
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        } else {
-            if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                AceLog.getAppLog().info(
-                        "Suppressed reinitilization of PositionMapper for: "
-                        + pathConcept.getNid() + ": "
-                        + pathDesc + " time: "
-                        + destination.getTime()
-                        + " thread: " + Thread.currentThread().getName());
-            }
-
-        }
-        writeLock.unlock();
-    }
-
-    private void setup__int() throws IOException, PathNotExistsException, TerminologyException {
-        if (Bdb.getConceptDb() == null) {
-            return;
-        }
-        Concept pathConcept = Bdb.getConceptDb().getConcept(destination.getPath().getConceptNid());
-        String pathDesc = pathConcept.getPrimUuid().toString();
-        if (pathConcept.getDescriptions() != null && pathConcept.getDescriptions().size() > 0) {
-            pathDesc = pathConcept.getDescriptions().iterator().next().getText();
-        }
-        writeLock.lock();
-        if (completeLatch.getCount() == 1) {
-            try {
-                if (pathManager == null) {
-                    pathManager = BdbPathManager.get();
-                }
-                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-                    AceLog.getAppLog().fine(
-                            "Creating new PositionMapper for: " + pathConcept.getNid() + ": "
-                            + pathDesc + " time: "
-                            + TimeHelper.formatDate(destination.getTime()) + " thread: "
-                            + Thread.currentThread().getName());
-                }
-                Collection<PositionBI> origins = pathManager.getAllPathOrigins(destination.getPath().getConceptNid());
-                origins.add(this.destination);
-
-                // Map of the origin position's path id, to the origin position... See
-                // assumption 1.
-                Map<Integer, PositionBI> originMap = new TreeMap<Integer, PositionBI>();
-
-                // Map of the origin position's path to it's 'depth' (how many origins
-                // below the destination it is)
-                TreeMap<Integer, Integer> depthMap = new TreeMap<Integer, Integer>();
-
-                // Map of the origin's position path to the set of paths that precede it
-                // (including itself).
-                TreeMap<Integer, Set<Integer>> precedingPathIdMap = new TreeMap<Integer, Set<Integer>>();
-                for (PositionBI o : origins) {
-                    originMap.put(o.getPath().getConceptNid(), o);
-                    if (depthMap.containsKey(o.getPath().getConceptNid()) == false) {
-                        depthMap.put(o.getPath().getConceptNid(), getDepth__int(o, destination, 1));
-                    }
-                    precedingPathIdMap.put(o.getPath().getConceptNid(), getPreceedingPathSet(o));
-                }
-
-                positionCount = Bdb.getSapDb().getPositionCount();
-
-                // COMPUTE timeMax, timeMin, timeDelta
-                long[] unscaledTimeData = new long[positionCount];
-                for (int pIdx = initialIndex; pIdx < positionCount; pIdx++) {
-                    unscaledTimeData[pIdx] = Bdb.getSapDb().getPosition(pIdx).getTime();
-                }
-                Arrays.sort(unscaledTimeData);
-
-                long timeMax = unscaledTimeData[positionCount - 1];
-                long timeMin = unscaledTimeData[1];
-                long timeDelta = Long.MAX_VALUE;
-
-                for (int i = initialIndex; i < positionCount - 1; i++) {
-                    long delta = unscaledTimeData[i + 1] - unscaledTimeData[i];
-                    if (delta < timeDelta) {
-                        timeDelta = delta;
-                    }
-                }
-
-                if (timeDelta >= 4) {
-                    timeDelta = timeDelta / 2; // over sample to insure unique "time slot" after scaling
-                } else if (timeDelta == 0) {
-                    timeDelta = 1;
-                }
-                unscaledTimeData = null;
-
-                // COMPUTE DISTANCES
-                long timeUpperBound = ((timeMax - timeMin) * 4) / timeDelta;
-
-                AceLog.getAppLog().info(
-                        "::: PositionMapper " + "\ttimeMax=" + timeMax + "\ttimeMin=" + timeMin
-                        + "\ttimeDelta=" + timeDelta + "\ttimeUpperBound="
-                        + timeUpperBound);
-
-                positionDistance = new int[positionCount];
-                Arrays.fill(positionDistance, Integer.MIN_VALUE);
-                long[] positionComputedDistance__long = new long[positionCount];
-                Arrays.fill(positionComputedDistance__long, INT_MINUS_ONE);
-                conflictMatrix = new BitSet[positionCount];
-                for (int p1index = initialIndex; p1index < positionCount; p1index++) {
-                    try {
-                        PositionBI p1 = Bdb.getSapDb().getPosition(p1index);
-                        Integer p1pathId = p1.getPath().getConceptNid();
-                        Set<Integer> precedingPathIdSet = precedingPathIdMap.get(p1pathId);
-                        // see if position may be in route to the destination
-                        if (originMap.containsKey(p1pathId)) {
-                            // compute the distance to the destination
-                            int pathDepth = depthMap.get(p1.getPath().getConceptNid());
-
-                            if (destination.getPath().getConceptNid() == p1.getPath().getConceptNid()) {
-                                // On the same path as the destination...
-                                if (p1.getTime() <= destination.getTime()) {
-                                    long scaledTime = (p1.getTime() - timeMin) / timeDelta;
-                                    positionComputedDistance__long[p1index] = timeUpperBound - scaledTime;
-                                } else {
                                     conflictMatrix[p1index] = null;
-                                }
-                                conflictMatrix[p1index] = null;
-                            } else {
-                                // On a different path than the destination
-                                // compute the distance to the destination
-                                long scaledTime = (p1.getTime() - timeMin) / timeDelta;
-                                positionComputedDistance__long[p1index] = (timeUpperBound * pathDepth)
-                                        - scaledTime;
+                                } else {
+                                    // On a different path than the destination
+                                    // compute the distance to the destination
+                                    positionComputedDistance[p1index] = timeUpperBound.multiply(pathDepth).subtract(
+                                            BigInteger.valueOf(p1.getTime()));
 
-                                // iterate to compute conflicts...
-                                for (int p2index = initialIndex; p2index < positionCount; p2index++) {
-                                    PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
-                                    Integer p2pathId = p2.getPath().getConceptNid();
-                                    if (originMap.containsKey(p2pathId)
-                                            && p2.getTime() <= originMap.get(p2pathId).getTime()) {
-                                        Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
-                                        if (precedingPathIdSet.contains(p2pathId)
-                                                || p2PrecedingPathIdSet.contains(p1pathId)) {
-                                            if (conflictMatrix[p1index] != null) {
-                                                // technically not required as default is to false.
-                                                conflictMatrix[p1index].set(p2index, false);
-                                            }
-                                            if (conflictMatrix[p2index] != null) {
-                                                // technically not required as default is to false.
-                                                conflictMatrix[p2index].set(p1index, false);
+                                    // iterate to compute conflicts...
+                                    for (int p2index = initialIndex; p2index < positionCount; p2index++) {
+                                        PositionBI p2 = Bdb.getSapDb().getPosition(p2index);
+                                        Integer p2pathId = p2.getPath().getConceptNid();
+                                        if (originMap.containsKey(p2pathId)
+                                                && p2.getTime() <= originMap.get(p2pathId).getTime()) {
+                                            Set<Integer> p2PrecedingPathIdSet = precedingPathIdMap.get(p2pathId);
+                                            if (precedingPathIdSet.contains(p2pathId) || p2PrecedingPathIdSet.contains(p1pathId)) {
+                                                if (conflictMatrix[p1index] != null) {
+                                                    // technically not required as default is to false.
+                                                    conflictMatrix[p1index].set(p2index, false);
+                                                }
+                                                if (conflictMatrix[p2index] != null) {
+                                                    // technically not required as default is to false.
+                                                    conflictMatrix[p2index].set(p1index, false);
+                                                }
+                                            } else {
+                                                if (p1index < p2index) {
+                                                    if (conflictMatrix[p1index] == null) {
+                                                        conflictMatrix[p1index] = new BitSet(positionCount);
+                                                    }
+                                                    conflictMatrix[p1index].set(p2index, true);
+                                                } else {
+                                                    if (conflictMatrix[p2index] == null) {
+                                                        conflictMatrix[p2index] = new BitSet(positionCount);
+                                                    }
+                                                    conflictMatrix[p2index].set(p1index, true);
+                                                }
                                             }
                                         } else {
-                                            if (p1index < p2index) {
-                                                if (conflictMatrix[p1index] == null) {
-                                                    conflictMatrix[p1index] = new BitSet(
-                                                            positionCount);
-                                                }
-                                                conflictMatrix[p1index].set(p2index, true);
-                                            } else {
-                                                if (conflictMatrix[p2index] == null) {
-                                                    conflictMatrix[p2index] = new BitSet(
-                                                            positionCount);
-                                                }
-                                                conflictMatrix[p2index].set(p1index, true);
-                                            }
+                                            conflictMatrix[p1index] = null;
                                         }
-                                    } else {
-                                        conflictMatrix[p1index] = null;
                                     }
                                 }
+                            } else {
+                                conflictMatrix[p1index] = null;
                             }
-                        } else {
-                            conflictMatrix[p1index] = null;
+                        } catch (Exception e) {
+                            AceLog.getAppLog().alertAndLogException(e);
                         }
-                    } catch (Exception e) {
-                        AceLog.getAppLog().alertAndLogException(e);
+
                     }
 
-                }
+                    // Copy positionComputedDistance to positionDistance.
+                    // Step 1: sort
 
-                /*
-                // STEP 1: SORT DISTANCES
-                SortableDistance[] distSortArray = new SortableDistance[positionCount];
-                for (int p1index = 0; p1index < positionCount; p1index++)
-                distSortArray[p1index] = new SortableDistance(p1index,
-                positionComputedDistance__long[p1index]);
-                Arrays.sort(distSortArray);
-                
-                // STEP 2:ASSIGN RELATIVE DISTANCES
-                for (int pid = 0; pid < positionCount; pid++) {
-                SortableDistance sd = distSortArray[pid];
-                if (sd.distance < 0)
-                positionDistance[sd.idx] = -1;
-                else
-                positionDistance[sd.idx] = pid;
-                }
-                 */
+                    TreeSet<BigInteger> sortedPositionComputedDistanceTreeSet = new TreeSet<BigInteger>(
+                            Arrays.asList(positionComputedDistance));
+                    BigInteger[] sortedPositionComputedDistance = sortedPositionComputedDistanceTreeSet.toArray(new BigInteger[sortedPositionComputedDistanceTreeSet.size()]);
 
-                // STEP 1: SORT DISTANCES
-                long[] positionComputedDistanceSorted__long = new long[positionCount];
-                System.arraycopy(positionComputedDistance__long, 0, positionComputedDistanceSorted__long, 0, positionCount);
-                Arrays.sort(positionComputedDistanceSorted__long);
-
-                // STEP 2:ASSIGN RELATIVE DISTANCES
-                for (int pid = initialIndex; pid < positionCount; pid++) {
-                    if (positionComputedDistance__long[pid] < 0) {
-                        positionDistance[pid] = -1;
-                    } else {
-                        positionDistance[pid] = Arrays.binarySearch(positionComputedDistanceSorted__long,
-                                positionComputedDistance__long[pid]);
+                    // Step 2: copy: if neg, distance = -1 if positive, distance = sort
+                    // sequence.
+                    for (int pid = initialIndex; pid < positionCount; pid++) {
+                        if (positionComputedDistance[pid].compareTo(BigInteger.ZERO) < 0) {
+                            positionDistance[pid] = -1;
+                        } else {
+                            positionDistance[pid] = Arrays.binarySearch(
+                                    sortedPositionComputedDistance,
+                                    positionComputedDistance[pid]);
+                        }
                     }
+                    completeLatch.countDown();
+                    if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine(
+                                "Finished setup for new PositionMapper for: "
+                                + pathConcept.getNid() + ": "
+                                + pathDesc + " time: "
+                                + TimeHelper.formatDate(destination.getTime())
+                                + " thread: " + Thread.currentThread().getName());
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            } else {
+                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    AceLog.getAppLog().fine(
+                            "Suppressed reinitilization of PositionMapper for: "
+                            + pathConcept.getNid() + ": "
+                            + pathDesc + " time: "
+                            + destination.getTime()
+                            + " thread: " + Thread.currentThread().getName());
                 }
 
-                completeLatch.countDown();
-                AceLog.getAppLog().info(
-                        "Finished setup for new PositionMapper for: " + pathConcept.getNid() + ": "
-                        + pathDesc + " time: " + TimeHelper.formatDate(destination.getTime())
-                        + " thread: " + Thread.currentThread().getName());
-            } catch (Throwable e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
             }
-        } else {
-            AceLog.getAppLog().info(
-                    "Suppressed reinitilization of PositionMapper for: " + pathConcept.getNid()
-                    + ": " + pathDesc + " time: " + destination.getTime() + " thread: "
-                    + Thread.currentThread().getName());
-
+        } finally {
+            writeLock.unlock();
         }
-        writeLock.unlock();
     }
 
     /**

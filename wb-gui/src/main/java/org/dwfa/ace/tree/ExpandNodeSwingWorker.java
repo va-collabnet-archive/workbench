@@ -368,7 +368,8 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (ExecutionException ex) {
             stopWorkAndRemove("worker threw exception");
-            AceLog.getAppLog().alertAndLogException(ex);
+            AceLog.getAppLog().severe(ex.getMessage(), ex);
+            AceLog.getAppLog().alertAndLogException(ex.getCause());
         }
         if (elapsedTime == Long.MIN_VALUE) {
             elapsedTime = System.currentTimeMillis() - expansionStart;
