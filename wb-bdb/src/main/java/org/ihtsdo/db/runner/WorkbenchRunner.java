@@ -533,14 +533,14 @@ public class WorkbenchRunner {
 							
 							ace.getSubversionMap().clear();
 							ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
-							AceLog.getAppLog().info("Workbench runner 534 ace.getSubversionMap().size() = "+ace.getSubversionMap().size()); 
+							/*AceLog.getAppLog().info("Workbench runner 534 ace.getSubversionMap().size() = "+ace.getSubversionMap().size()); 
 							for (String key : ace.getSubversionMap().keySet()) {
 				                SubversionData svd = ace.getSubversionMap().get(key);
 				                AceLog.getAppLog().info(" Printing ace svnMap info key = " + key+" SubversionData = "+svd);
-				                }
+				                } */
 							
 						}
-						AceLog.getAppLog().info("About to handleNormalFrame"); 
+						//AceLog.getAppLog().info("About to handleNormalFrame"); 
 						handleNormalFrame(ace);
 					}	
 					
