@@ -35,6 +35,10 @@ public class DrConcept extends DrComponent {
 
 	@Override
 	public String toString() {
+		return super.toString();
+	}
+	
+	public String toUserString() {
 		StringBuffer conceptSb = new StringBuffer("");
 		ConceptChronicleBI concept = null;
 		try {
