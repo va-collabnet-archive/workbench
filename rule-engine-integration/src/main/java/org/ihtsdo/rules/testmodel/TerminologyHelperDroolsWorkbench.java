@@ -33,6 +33,7 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -228,9 +229,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 										if (potentialMatchSemtag != null &&
 												originalSemTag.equals(potentialMatchSemtag)) {
 											result = true;
-//											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
-//													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
-//													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
+											//											System.out.println("Hierarchy match found: " + originalFsn + " (" + 
+											//													originalConcept.getUids().iterator().next() + ") & " + potentialMatchFsn.getText() 
+											//													+ " (" + potentialMatchConcept.getUUIDs().iterator().next() + ")");
 											break;
 										}
 									}
@@ -369,7 +370,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					}
 				}
 			}
-			
+
 			if (parentSemtags.size() == 1 &&
 					parentSemtags.iterator().next().equals(semtag)) {
 				return true;
@@ -418,13 +419,13 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 				int isaType = Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+				I_IntSet allowedrels = Terms.get().newIntSet();
+				allowedrels.add(isaType);
 				for (I_RelTuple loopTuple : concept.getDestRelTuples(config.getAllowedStatus(), 
-						config.getDestRelTypes(), config.getViewPositionSetReadOnly(), 
-						config.getPrecedence(), config.getConflictResolutionStrategy())) {
-					if (loopTuple.getTypeNid() == isaType &&
-							loopTuple.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
-						result = true;
-					}
+						allowedrels, config.getViewPositionSetReadOnly(), 
+						config.getPrecedence(), config.getConflictResolutionStrategy(),
+						config.getClassifierConcept().getConceptNid(), RelAssertionType.STATED)) {
+					result = true;
 				}
 			} catch (TerminologyException e) {
 				e.printStackTrace();
