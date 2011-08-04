@@ -31,7 +31,7 @@ public class ObjectCacheClassHandler {
 	private static Object instantiateClass(String className)
 			throws ClassNotFoundException, IllegalAccessException,
 			InstantiationException {
-		AceLog.getAppLog().info("instantiateClass called className = " + className);
+		//AceLog.getAppLog().info("instantiateClass called className = " + className);
 		if (className == null)
 			return null;
 		return Class.forName(className).newInstance();
