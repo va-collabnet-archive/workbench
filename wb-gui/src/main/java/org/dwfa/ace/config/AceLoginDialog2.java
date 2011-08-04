@@ -23,7 +23,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Hashtable;
 import java.util.logging.Level;
 
@@ -34,6 +38,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -42,9 +47,13 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.svn.Svn;
+import org.tigris.subversion.javahl.ClientException;
+import org.tigris.subversion.javahl.Revision;
+import org.tigris.subversion.javahl.SVNClient;
 import org.tmatesoft.svn.core.SVNAuthenticationException;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
@@ -79,6 +88,11 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private Hashtable<String,File> nameProf = new Hashtable<String,File>();
     private String title = "";
     
+	private final static String ERR_PASSWORD_S = "Authorization failed please check Username and Password";
+	private final static String ERR_NETWORK_S = "Failed to connect to to repository. \n Please check network and URL. Currently trying to use: \n ";
+    
+	private static String err_msg = null;
+	
     public String svnUrl;
 
     public AceLoginDialog2(JFrame topFrame,Hashtable<String,File> np) {
@@ -129,7 +143,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     		title = "Please login";
     		JTextField jtf = new JTextField();
     		jtf.setText(nameProf.keys().nextElement());
-    		jtf.setEditable(false);
+    		//jtf.setEditable(false);
     		userControl = jtf;
     		return userControl;
     	}
@@ -200,7 +214,7 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
         gbc.gridx = 0;
         gbc.gridy++;
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("Exit");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -266,17 +280,23 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {
     	// get the username
     	String un = getUserValue();
-    	//AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
+    	AceLog.getAppLog().info("loginButtonActionPerformed UN = "+un);
     	//if the password field is enabled get the password
     	String pw = null;
     	if(passwordField.isEnabled()){
     		pw = new String(passwordField.getPassword());
     		//AceLog.getAppLog().info("loginButtonActionPerformed pw = "+pw);
-    		boolean ok  = checkSVN(getSvnUrl(),un,pw);	
-    		if(ok){
+    		checkSVN(getSvnUrl(),un,pw);	
+    		AceLog.getAppLog().info("loginButtonActionPerforme err_msg = "+err_msg);
+    		if(err_msg == null){
     			this.prompt.setUsername(un);
     			this.prompt.setPassword(pw);
     			this.dispose();
+    		}
+    		else{
+    			AceLog.getAppLog().info("loginButtonActionPerformed not OK");
+    			//JOptionPane jop = new JOptionPane(this);
+    			JOptionPane.showMessageDialog(this, err_msg, "Login Error", JOptionPane.ERROR_MESSAGE);
     		}
     	}
     	if(!passwordField.isEnabled()){
@@ -288,32 +308,54 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     }
     
     
-    private boolean checkSVN(String url, String uname, String pw){
-    	boolean ok = true;
+    private String checkSVN(String url, String uname, String pw){
+    	
+    	String d_uname="npfit\\"+uname;
+    	err_msg = null;
     	SVNRepository repo= null;
     	 try { 
-    		 //AceLog.getAppLog().info("checkSVN url = "+url +" pw = "+pw);  
+    		 AceLog.getAppLog().info("checkSVN url = "+url+ " d_uname = "+d_uname);  
     		 DAVRepositoryFactory.setup();
     	     SVNRepositoryFactoryImpl.setup();
     	     FSRepositoryFactory.setup();
     	     repo = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(url));
     	     //AceLog.getAppLog().info("checkSVN OK1");
-    	     ISVNAuthenticationManager authManager = 
-    	                  SVNWCUtil.createDefaultAuthenticationManager(uname, pw);
+    	     //ISVNAuthenticationManager 
+    	     BasicAuthenticationManager authManager = new BasicAuthenticationManager(uname, pw);
+    	                  //SVNWCUtil.createDefaultAuthenticationManager(d_uname, pw);
+    	     
     	     //AceLog.getAppLog().info("checkSVN OK2");
+    	     authManager.setAuthenticationForced(true);
     	     repo.setAuthenticationManager(authManager);
     	     repo.testConnection();
     	     
     	 }catch (SVNAuthenticationException svnAEx){
-    		 ok = false;
-    		 AceLog.getAppLog().alertAndLog(Level.SEVERE, "Authorization failed please check Username and Password", svnAEx);	 
+    		 AceLog.getAppLog().info("checkSVN SVNAuthenticationException");
+    		 //ok = false;
+    		 //AceLog.getAppLog().alertAndLog(Level.SEVERE, ERR_PASSWORD_S, svnAEx);	
+    		 err_msg = ERR_PASSWORD_S;
     	 }
     	 catch (SVNException e){
-    		 ok = false;
-    	     AceLog.getAppLog().alertAndLog(Level.SEVERE, "Failed to connect to to repository. \n Please check network and URL. Currently trying to use: \n "+url+" \n Error = "+e.getMessage(), e);
+    		 AceLog.getAppLog().info("checkSVN SVNException");
+    		 //ok = false;
+    	    // AceLog.getAppLog().alertAndLog(Level.SEVERE, ERR_NETWORK_S+url+" \n Error = "+e.getMessage(), e);
+    	     err_msg = ERR_NETWORK_S+url+" \n Error = "+e.getMessage();
     	 }
-
-    	return ok;
+    	 
+    	
+		/*final SVNClient client = new SVNClient();
+		client.username(d_uname);
+		client.password(pw);
+		try {
+			byte[] fileContent = client.fileContent(url, Revision.HEAD);
+			Reader r = new InputStreamReader(new ByteArrayInputStream(fileContent));
+		} catch (ClientException e) {
+			AceLog.getAppLog().alertAndLog(Level.SEVERE, "checkSVN", e);
+			err_msg = e.getMessage();
+		}*/
+    	 
+    	 AceLog.getAppLog().info("checkSVN err_msg = "+err_msg);
+    	return err_msg;
     	
     }
 

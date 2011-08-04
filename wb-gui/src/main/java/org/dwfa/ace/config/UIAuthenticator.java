@@ -28,6 +28,9 @@ public class UIAuthenticator {
 	
 	public String baseURL;
 	
+	private final static String ERR_NO_PROFILE_S = "No Profiles folder found";
+
+	
 	private JFrame parentFrame = null;
 	private AceProfileManager apm = new AceProfileManager();
 	
@@ -73,7 +76,7 @@ public class UIAuthenticator {
 		try {
 			apm.processProfiles();
 			if(!apm.isProfileFolderFound()){
-				retVal = "No Profiles folder found";
+				retVal = ERR_NO_PROFILE_S;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
