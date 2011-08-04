@@ -101,7 +101,9 @@ public class WorkbenchRunner {
 		//SvnPrompter prompt = new SvnPrompter();
 		String result = auth.authenticate(prompt, baseURL);
 		if(result != null){
+			if(result.equals(UIAuthenticator.ERR_NO_PROFILE_S)){
 			AceLog.getAppLog().info("Problem Authenticating . Problem was "+result);
+			}
 		}
 		userProfile = auth.getProfile();
 		if(userProfile == null){
