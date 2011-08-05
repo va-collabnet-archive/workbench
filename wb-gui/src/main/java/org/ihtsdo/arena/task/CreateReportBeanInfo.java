@@ -35,29 +35,29 @@ public class CreateReportBeanInfo extends SimpleBeanInfo {
         super();
     }
 
-    public PropertyDescriptor[] getPropertyDescriptors() {
-        try {
-            PropertyDescriptor begDateProp = new PropertyDescriptor("begDateProp",
-                CreateReport.class);
-            PropertyDescriptor endDateProp = new PropertyDescriptor("endDateProp",
-                CreateReport.class);
-            
-            begDateProp.setBound(true);
-            begDateProp.setDisplayName("<html><font color='green'>Start Date:");
-            begDateProp.setShortDescription("html file");
-            begDateProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            
-            endDateProp.setBound(true);
-            endDateProp.setDisplayName("<html><font color='green'>End Date:");
-            endDateProp.setShortDescription("html file");
-            endDateProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
-
-            PropertyDescriptor rv[] = { begDateProp, endDateProp };
-            return rv;
-        } catch (IntrospectionException e) {
-            throw new Error(e.toString());
-        }
-    }
+//    public PropertyDescriptor[] getPropertyDescriptors() {
+//        try {
+//            PropertyDescriptor begDateProp = new PropertyDescriptor("begDateProp",
+//                CreateReport.class);
+//            PropertyDescriptor endDateProp = new PropertyDescriptor("endDateProp",
+//                CreateReport.class);
+//            
+//            begDateProp.setBound(true);
+//            begDateProp.setDisplayName("<html><font color='green'>Start Date:");
+//            begDateProp.setShortDescription("html file");
+//            begDateProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
+//            
+//            endDateProp.setBound(true);
+//            endDateProp.setDisplayName("<html><font color='green'>End Date:");
+//            endDateProp.setShortDescription("html file");
+//            endDateProp.setPropertyEditorClass(PropertyNameLabelEditor.class);
+//
+//            PropertyDescriptor rv[] = { begDateProp, endDateProp };
+//            return rv;
+//        } catch (IntrospectionException e) {
+//            throw new Error(e.toString());
+//        }
+//    }
 
     /**
      * @see java.beans.BeanInfo#getBeanDescriptor()
