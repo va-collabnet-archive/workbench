@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -38,6 +39,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.spec.ConceptSpec;
+import org.ihtsdo.tk.Ts;
 
 /**
  * 
@@ -55,9 +57,29 @@ public abstract class ChangeReportBase extends DiffBase {
     protected String changes;
     protected String changes_xml;
     String cur_page;
+    protected int parentConceptNid;
     
-    public ChangeReportBase(String v1, String v2){
-        super(v1, v2);
+    public ChangeReportBase(String v1, String v2, String path1_uuid, String path2_uuid,
+                boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex,boolean deleted_concepts_refex,
+                boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
+                boolean changed_rel_author, boolean changed_refex_author, String author1, String author2, boolean changed_defined,
+                boolean added_descriptions, boolean deleted_descriptions, boolean changed_description_status,
+                boolean changed_description_term, boolean changed_description_type, boolean changed_description_language,
+                boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
+                boolean changed_relationship_status, boolean changed_relationship_characteristic,
+                boolean changed_relationship_refinability,boolean changed_relationship_type,
+                boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid ){
+        super(v1, v2, path1_uuid, path2_uuid,
+                added_concepts, deleted_concepts, added_concepts_refex, deleted_concepts_refex,
+                changed_concept_status, changed_concept_author, changed_description_author,
+                changed_rel_author, changed_refex_author, author1, author2, changed_defined,
+                added_descriptions, deleted_descriptions, changed_description_status,
+                changed_description_term, changed_description_type, changed_description_language,
+                changed_description_case, added_relationships, deleted_relationships,
+                changed_relationship_status, changed_relationship_characteristic,
+                changed_relationship_refinability,changed_relationship_type,
+                changed_relationship_group, config);
+        this.parentConceptNid = parentConceptNid;
         String curDir = System.getProperty("user.dir");
         report_dir = new File (curDir + "/reports");
         
@@ -409,6 +431,29 @@ public abstract class ChangeReportBase extends DiffBase {
         super.changedRelationshipGroup(c, d1, d2);
         listChangedRelationship(c, d1, d2);
     }
+    
+    
+    @Override
+    protected void addedConceptToRefex(I_GetConceptData c, I_GetConceptData m)
+            throws Exception {
+        super.addedConceptToRefex(c, m);
+        startChange(c);
+        changes += "<tr><td>" + "Added member concept" + "</td><td>" + " "
+                + "</td><td>" + getConceptName(m.getConceptNid()) + "</td></tr>";
+        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
+                + endElement("added_concept") + "\n";
+    }
+
+    @Override
+    protected void deletedConceptFromRefex(I_GetConceptData c, I_GetConceptData m)
+            throws Exception {
+        super.deletedConceptFromRefex(c, m);
+        startChange(c);
+        changes += "<tr><td>" + "Deleted member concept" + "</td><td>" 
+                + getConceptName(m.getConceptNid()) + "</td><td>" + " " + "</td></tr>";
+        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
+                + endElement("added_concept") + "\n";
+    }
     String config_html = "";
 
     protected void logConfig(String... str) throws Exception {
@@ -502,6 +547,7 @@ public abstract class ChangeReportBase extends DiffBase {
         out.println("<br>Version 1: " + pos1.toString());
         out.println("<br>Version 2: " + pos2.toString());
         out.println("<br>Generated: " + new Date());
+        out.println("<br>Parent: " + Ts.get().getConcept(parentConceptNid).toString());
         out.println("<h3>Config</h3>");
         out.println("<table border=\"1\" width=\"700\">");
         out.println(config_html);
@@ -579,12 +625,12 @@ public abstract class ChangeReportBase extends DiffBase {
         return all_concepts;
     }
     
-    protected ArrayList<Integer> getAllConceptsForParent(ConceptSpec parentConcept) throws Exception {
+    protected ArrayList<Integer> getAllConceptsForParent(int parentConceptNid) throws Exception {
         ArrayList<Integer> all_concepts;
         I_TermFactory tf = Terms.get();
         if (!test_p) {
             all_concepts = getDescendants(
-                    tf.getConcept(parentConcept.getUuids()).getNid(),
+                    parentConceptNid,
                     this.allowed_position2);
             AceLog.getAppLog().info("Retrieved hierarchical: " + all_concepts.size());
             return all_concepts;
@@ -681,6 +727,7 @@ public abstract class ChangeReportBase extends DiffBase {
         compareAttributes(c);
         compareDescriptions(c);
         compareRelationships(c);
+        compareRefexes(c);
         if (i % 10000 == 0) {
             System.out.println("Processed: " + i + " "
                     + ((System.currentTimeMillis() - beg) / 1000));
