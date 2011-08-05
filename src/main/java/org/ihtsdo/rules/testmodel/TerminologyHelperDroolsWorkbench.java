@@ -30,12 +30,14 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
@@ -465,6 +467,29 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isTargetOfReferToLink(String conceptUuid) {
 		//TODO implement when refer to import is defined
 		return false;
+	}
+	
+	@Override
+	public boolean isTargetOfHistoricalRelationships(String conceptUuid) {
+		boolean result = false;
+		try {
+			I_GetConceptData oldStyleConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			int historical = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
+			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
+					null, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					config.getConflictResolutionStrategy())) {
+				if (relTuple.getCharacteristicNid() == historical) {
+					result = true;
+				}
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	@Override
