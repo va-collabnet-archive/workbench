@@ -183,9 +183,12 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         DIFFERENCE_QUERY(new String[]{
     "Difference Query", "difference query"}, SPEC_QUERY_TOKEN), DIFFERENCE_CONFIGURATION(new String[]{
     "DIFFERENCE CONFIGURATION", "difference configuration"}, DIFFERENCE_QUERY), DIFFERENCE_STATISTICS(new String[]{
-    "DIFFERENCE STATISTICS", "difference statistics"}, DIFFERENCE_QUERY), ADDED_CONCEPT(new String[]{
-    "ADDED CONCEPT", "added concept"}, DIFFERENCE_QUERY), DELETED_CONCEPT(new String[]{"DELETED CONCEPT",
-    "deleted concept"}, DIFFERENCE_QUERY), CHANGED_CONCEPT_STATUS(new String[]{"CHANGED CONCEPT STATUS",
+    "DIFFERENCE STATISTICS", "difference statistics"}, DIFFERENCE_QUERY),
+    ADDED_CONCEPT(new String[]{"ADDED CONCEPT", "added concept"}, DIFFERENCE_QUERY),
+    DELETED_CONCEPT(new String[]{"DELETED CONCEPT","deleted concept"},DIFFERENCE_QUERY),
+    ADDED_CONCEPT_REFEX(new String[]{"ADDED CONCEPT", "added member concept"}, DIFFERENCE_QUERY), 
+    DELETED_CONCEPT_REFEX(new String[]{"DELETED CONCEPT","deleted member concept"},DIFFERENCE_QUERY),
+    CHANGED_CONCEPT_STATUS(new String[]{"CHANGED CONCEPT STATUS",
     "changed concept status"}, DIFFERENCE_QUERY), CHANGED_DEFINED(new String[]{"CHANGED DEFINED",
     "changed defined"}, DIFFERENCE_QUERY), ADDED_DESCRIPTION(new String[]{"ADDED DESCRIPTION",
     "added description"}, DIFFERENCE_QUERY), DELETED_DESCRIPTION(new String[]{"DELETED DESCRIPTION",
