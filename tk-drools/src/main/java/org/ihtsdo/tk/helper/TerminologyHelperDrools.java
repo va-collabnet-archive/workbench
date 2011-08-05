@@ -487,6 +487,10 @@ public class TerminologyHelperDrools {
 		return true;
 	}
 	
+	public boolean isTargetOfHistoricalRelationships(String conceptUuid) {
+		return true;
+	}
+	
 	public boolean isExtensionConcept(String conceptUuid) {
 		return true;
 	}
