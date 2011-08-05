@@ -700,6 +700,26 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
                         }
                     }
+                    if (activeInferredRelPanels != null) {
+                        for (DragPanelRel rel : activeInferredRelPanels) {
+                            if (stop) {
+                                return;
+                            }
+                            if (rel.getThingToDrag().isUncommitted()) {
+                                rel.setVisible(true);
+                            }
+                        }
+                    }
+                    if (activeStatedRelPanels != null) {
+                        for (DragPanelRel rel : activeStatedRelPanels) {
+                            if (stop) {
+                                return;
+                            }
+                            if (rel.getThingToDrag().isUncommitted()) {
+                                rel.setVisible(true);
+                            }
+                        }
+                    }
                 }
             });
         }
