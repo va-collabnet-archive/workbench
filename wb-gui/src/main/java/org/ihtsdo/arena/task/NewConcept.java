@@ -275,13 +275,31 @@ public class NewConcept extends PreviousNextOrCancel {
                 }
 
                 //create blueprints
+                if (lang.equals("en")) {
+                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+                }
+                if (lang.equals("en-us")) {
+                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+//                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                }
+                if (lang.equals("en-gb")) {
+//                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid()); //only using one fsn
+                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
+//                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                }
                 if (addUsDescFsn) {
-                    createBlueprintUsFsnDesc();
-                    createBlueprintUsFsnRefex(descSpecUsFsn.getComponentNid());
+//                    createBlueprintUsFsnDesc();
+                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
                 }
                 if (addGbDescFsn) {
-                    createBlueprintGbFsnDesc();
-                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
+//                    createBlueprintGbFsnDesc();
+//                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
+                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid()); //only using one fsn (US)
                 }
                 if (addUsDescPref) {
                     createBlueprintUsPrefDesc();
@@ -292,22 +310,6 @@ public class NewConcept extends PreviousNextOrCancel {
                     createBlueprintGbPrefDesc();
                     createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
 //                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
-                }
-                if (lang.equals("en")) {
-                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                }
-                if (lang.equals("en-us")) {
-                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                    //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
-                }
-                if (lang.equals("en-gb")) {
-                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                    //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                 }
                 
             }
@@ -730,9 +732,9 @@ public class NewConcept extends PreviousNextOrCancel {
                 varient = th.getSpellingTerm(prefText, us);
                 this.gbFsn.setText(varient + " " + extra);
                 this.gbBoxFsn.setSelected(true);
-                this.gbBoxFsn.setVisible(true);
-                this.gbFsn.setVisible(true);
-                this.gbLabelFsn.setVisible(true);
+                this.gbBoxFsn.setVisible(false);
+                this.gbFsn.setVisible(false);
+                this.gbLabelFsn.setVisible(false);
                 this.usBoxFsn.setVisible(false);
                 this.usBoxFsn.setSelected(false);
                 this.usFsn.setVisible(false);
@@ -742,9 +744,9 @@ public class NewConcept extends PreviousNextOrCancel {
                 varient = th.getSpellingTerm(prefText, us);
                 this.gbPref.setText(varient);
                 this.gbBoxPref.setSelected(true);
-                this.gbBoxPref.setVisible(true);
-                this.gbPref.setVisible(true);
-                this.gbLabelPref.setVisible(true);
+                this.gbBoxPref.setVisible(false);
+                this.gbPref.setVisible(false);
+                this.gbLabelPref.setVisible(false);
                 this.usBoxPref.setVisible(false);
                 this.usBoxPref.setSelected(false);
                 this.usPref.setVisible(false);
@@ -761,9 +763,9 @@ public class NewConcept extends PreviousNextOrCancel {
                 varient = th.getSpellingTerm(prefText, gb);
                 this.usFsn.setText(varient + " " + extra);
                 this.usBoxFsn.setSelected(true);
-                this.usBoxFsn.setVisible(true);
-                this.usFsn.setVisible(true);
-                this.usLabelFsn.setVisible(true);
+                this.usBoxFsn.setVisible(false);
+                this.usFsn.setVisible(false);
+                this.usLabelFsn.setVisible(false);
                 this.gbBoxFsn.setVisible(false);
                 this.gbBoxFsn.setSelected(false);
                 this.gbFsn.setVisible(false);
@@ -773,9 +775,9 @@ public class NewConcept extends PreviousNextOrCancel {
                 varient = th.getSpellingTerm(prefText, gb);
                 this.usPref.setText(varient);
                 this.usBoxPref.setSelected(true);
-                this.usBoxPref.setVisible(true);
-                this.usPref.setVisible(true);
-                this.usLabelPref.setVisible(true);
+                this.usBoxPref.setVisible(false);
+                this.usPref.setVisible(false);
+                this.usLabelPref.setVisible(false);
                 this.gbBoxPref.setVisible(false);
                 this.gbBoxPref.setSelected(false);
                 this.gbPref.setVisible(false);
@@ -799,7 +801,11 @@ public class NewConcept extends PreviousNextOrCancel {
 
 
             //create concept blue print
-            conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+            if(lang == "en-us"){
+                conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+            }else{
+                conceptSpec = new ConceptCB(usFsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+            }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
