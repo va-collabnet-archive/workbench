@@ -309,22 +309,17 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     
     
     private String checkSVN(String url, String uname, String pw){
-    	
-    	String d_uname="npfit\\"+uname;
     	err_msg = null;
     	SVNRepository repo= null;
     	 try { 
-    		 AceLog.getAppLog().info("checkSVN url = "+url+ " d_uname = "+d_uname);  
+    		// AceLog.getAppLog().info("checkSVN url = "+url+);  
     		 DAVRepositoryFactory.setup();
     	     SVNRepositoryFactoryImpl.setup();
     	     FSRepositoryFactory.setup();
     	     repo = SVNRepositoryFactory.create(SVNURL.parseURIDecoded(url));
-    	     //AceLog.getAppLog().info("checkSVN OK1");
-    	     //ISVNAuthenticationManager 
+    	     //AuthenticationManager 
     	     BasicAuthenticationManager authManager = new BasicAuthenticationManager(uname, pw);
-    	                  //SVNWCUtil.createDefaultAuthenticationManager(d_uname, pw);
-    	     
-    	     //AceLog.getAppLog().info("checkSVN OK2");
+    	                  //SVNWCUtil.createDefaultAuthenticationManager(uname, pw);
     	     authManager.setAuthenticationForced(true);
     	     repo.setAuthenticationManager(authManager);
     	     repo.testConnection();
