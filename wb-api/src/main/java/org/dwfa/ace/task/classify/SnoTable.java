@@ -238,7 +238,9 @@ public class SnoTable {
     }
 
     private static void addPathOrigins(List<PositionBI> origins, PathBI p) {
-        origins.addAll(p.getOrigins());
+        synchronized (p) {
+            origins.addAll(p.getOrigins());
+        }
         for (PositionBI o : p.getOrigins()) {
             addPathOrigins(origins, o.getPath());
         }
