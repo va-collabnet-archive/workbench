@@ -54,6 +54,8 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -189,6 +191,12 @@ public class TerminologyTransferHandler extends TransferHandler {
 						case CONCEPT_ID:
 	                        return new ConceptTransferable(Terms.get().getConcept(
 	                        		((I_ExtendByRefPartCid) extVersion.getMutablePart()).getC1id()));
+                                                case CONCEPT_ID2:
+	                        return new ConceptTransferable(Terms.get().getConcept(
+	                        		((I_ExtendByRefPartCidCid) extVersion.getMutablePart()).getC2id()));
+                                                case CONCEPT_ID3:
+	                        return new ConceptTransferable(Terms.get().getConcept(
+	                        		((I_ExtendByRefPartCidCidCid) extVersion.getMutablePart()).getC3id()));
 						case INTEGER_VALUE:
 	                        return new StringSelection(Integer.toString(
 	                        		((I_ExtendByRefPartInt) extVersion.getMutablePart()).getIntValue()));
