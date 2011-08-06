@@ -272,6 +272,7 @@ public class BatchQACheck extends AbstractMojo {
 						System.out.println("*+*+ " + ruleUid + " - " + description + " - " + roleInContext.toUserString());
 					} else {
 						//rulePw.print("default" + "\t");// Status
+						System.out.println("*+*+ " + ruleUid + " - " + description + " - Default");
 					}
 					rulePw.print(severityUid + "\t");
 					rulePw.print(loopPackage.getName() + "\t");
