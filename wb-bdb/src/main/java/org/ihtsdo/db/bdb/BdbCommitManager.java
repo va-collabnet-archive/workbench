@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -871,17 +872,22 @@ public class BdbCommitManager {
             throws IOException {
         NidBitSetItrBI idItr = uncommittedCNids2.iterator();
         while (idItr.next()) {
-            Concept c = Concept.get(idItr.nid());
-            if (c.isCanceled()) {
-                Terms.get().forget(c);
-            }
-            c.modified();
-            c.setLastWrite(Bdb.gVersion.incrementAndGet());
             try {
-                KindOfComputer.updateIsaCaches((Concept) c);
-            } catch (Exception e) {
-                AceLog.getAppLog().alertAndLog(Level.SEVERE,
-                        "Canceling cache for: " + c.toString(), e);
+                Concept c = Concept.get(idItr.nid());
+                if (c.isCanceled()) {
+                    Terms.get().forget(c);
+                }
+                c.flushVersions();
+                c.modified();
+                c.setLastWrite(Bdb.gVersion.incrementAndGet());
+                try {
+                    KindOfComputer.updateIsaCaches((Concept) c);
+                } catch (Exception e) {
+                    AceLog.getAppLog().alertAndLog(Level.SEVERE,
+                            "Canceling cache for: " + c.toString(), e);
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
             }
         }
     }

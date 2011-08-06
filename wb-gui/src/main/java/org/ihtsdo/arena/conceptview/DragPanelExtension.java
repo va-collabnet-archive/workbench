@@ -22,6 +22,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
@@ -198,6 +199,17 @@ public class DragPanelExtension
             valueLabel.setBackground(getBackground());
             valueLabel.setFont(valueLabel.getFont().deriveFont(getSettings().getFontSize()));
             valueLabel.setText(Integer.toString(value));
+            add(valueLabel, gbc);
+            gbc.gridx++;
+            classFound = true;
+        }
+        if (RefexBooleanVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+            Boolean value = ((RefexBooleanVersionBI) getRefexV()).getBoolean1();
+            JLabel valueLabel = new JLabel(value.toString());
+            valueLabel.setOpaque(false);
+            valueLabel.setBackground(getBackground());
+            valueLabel.setFont(valueLabel.getFont().deriveFont(getSettings().getFontSize()));
+            valueLabel.setText(value.toString());
             add(valueLabel, gbc);
             gbc.gridx++;
             classFound = true;

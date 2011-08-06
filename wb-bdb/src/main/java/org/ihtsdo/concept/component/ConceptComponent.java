@@ -73,7 +73,6 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import java.util.Arrays;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -1253,6 +1252,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public abstract void clearVersions();
+    
+    protected void clearAnnotationVersions() {
+        if (annotations != null) {
+            for (RefsetMember<?,?> rm: annotations) {
+                rm.clearVersions();
+            }
+        }
+    }
 
     public Concept getEnclosingConcept() {
         try {

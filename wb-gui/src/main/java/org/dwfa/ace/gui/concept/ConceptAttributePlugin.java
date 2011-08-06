@@ -237,8 +237,8 @@ public class ConceptAttributePlugin extends AbstractPlugin implements TableModel
                 super.setSelectedItem(value);
             }
         };
-        comboBox.addItem(new Boolean(true));
-        comboBox.addItem(new Boolean(false));
+        comboBox.addItem(true);
+        comboBox.addItem(false);
         conceptTable.getColumn(CONCEPT_FIELD.DEFINED).setCellEditor(new DefaultCellEditor(comboBox));
 
         conceptTable.getColumn(CONCEPT_FIELD.STATUS).setCellEditor(

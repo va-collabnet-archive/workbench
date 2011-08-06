@@ -695,6 +695,7 @@ public class Description
     @Override
     public void clearVersions() {
         versions = null;
+        clearAnnotationVersions();
     }
 
     @Override

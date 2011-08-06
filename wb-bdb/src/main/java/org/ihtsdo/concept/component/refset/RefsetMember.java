@@ -673,6 +673,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     @Override
     public void clearVersions() {
         versions = null;
+        clearAnnotationVersions();
     }
 
     @Override

@@ -561,6 +561,7 @@ public class ConceptAttributes
     @Override
     public void clearVersions() {
         versions = null;
+        clearAnnotationVersions();
     }
 
     @Override

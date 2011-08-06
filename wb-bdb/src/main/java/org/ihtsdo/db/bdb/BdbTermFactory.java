@@ -1117,7 +1117,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         member.enclosingConceptNid = refsetConcept.getNid();
         member.nid = Bdb.uuidToNid(primordialUuid);
         member.refsetNid = refsetConcept.getNid();
-        Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
+        if (refsetConcept.isAnnotationStyleRefex()) {
+            ComponentBI component = Bdb.getComponent(referencedComponentNid);
+            Bdb.getNidCNidMap().setCNidForNid(Bdb.getConceptNid(component.getNid()), member.nid);
+        } else {
+            Bdb.getNidCNidMap().setCNidForNid(refsetConcept.getNid(), member.nid);
+        }
         member.referencedComponentNid = referencedComponentNid;
         member.primordialUNid = Bdb.getUuidsToNidMap().getUNid(primordialUuid);
         member.primordialSapNid = Integer.MIN_VALUE;

@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jsr166y.ConcurrentReferenceHashMap;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -54,6 +56,7 @@ import org.ihtsdo.concept.component.description.Description.Version;
 import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.processor.AdjudicationAnalogCreator;
+import org.ihtsdo.concept.component.processor.VersionFlusher;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.relationship.Relationship;
@@ -2150,6 +2153,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         } catch (Exception e) {
             return null;
         }
+    }
+    public void flushVersions() throws Exception {
+        processComponentChronicles(new VersionFlusher());
     }
 
     @Override

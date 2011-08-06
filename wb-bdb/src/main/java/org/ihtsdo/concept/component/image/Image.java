@@ -633,6 +633,7 @@ public class Image
     @Override
     public void clearVersions() {
         versions = null;
+        clearAnnotationVersions();
     }
 
     @Override
