@@ -58,6 +58,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,
@@ -221,8 +223,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
                                     writeHeader(exportFileWriter);
                                 }
                                 // write to file
-                                String description =
-                                        getDescription(descriptionTypeTermEntry, latestTuple.getComponentId());
+                                ConceptVersionBI cv = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), latestTuple.getComponentId());
+                                String description = cv.getFullySpecifiedDescription().getText();
                                 if (description == null) {
                                     description = "UNKNOWN";
                                 }
@@ -259,8 +261,9 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
     private void writeRefsetName(BufferedWriter exportFileWriter, I_GetConceptData memberRefset)
             throws TerminologyException, Exception {
         exportFileWriter.write("Refset Name: ");
-        exportFileWriter.write(getDescription(Terms.get().getConcept(
-            ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), memberRefset.getConceptNid()));
+        ConceptVersionBI cv = memberRefset.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+        Ts.get().getConcept(memberRefset.getConceptNid());
+        exportFileWriter.write(cv.getPreferredDescription().getText());
         exportFileWriter.newLine();
     }
 
@@ -285,25 +288,6 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         } else {
             return null;
         }
-    }
-
-    private String getDescription(I_GetConceptData descType, int componentId) throws Exception {
-        I_TermFactory termFactory = Terms.get();
-        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-
-        I_IntSet allowedTypes = termFactory.newIntSet();
-        allowedTypes.add(descType.getConceptNid());
-
-        String latestDescription =
-                getLatestDescription(componentId, helper.getCurrentStatusIntSet(), allowedTypes, termFactory
-                    .getActiveAceFrameConfig().getViewPositionSetReadOnly());
-
-        if (latestDescription == null) {
-            // try relaxing the rules for searching - check all statuses & positions
-            latestDescription = getLatestDescription(componentId, null, allowedTypes, null);
-        }
-
-        return latestDescription;
     }
 
     private String getLatestDescription(int componentId, I_IntSet statuses, I_IntSet allowedTypes,
@@ -336,12 +320,6 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         }
 
         return latestDescription;
-    }
-
-    private String getDescription(TermEntry descriptionTypeTermEntry, int conceptId) throws Exception {
-        I_TermFactory termFactory = Terms.get();
-        I_GetConceptData descType = termFactory.getConcept(descriptionTypeTermEntry.getIds());
-        return getDescription(descType, conceptId);
     }
 
     public int[] getDataContainerIds() {
