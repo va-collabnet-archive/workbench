@@ -75,7 +75,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             }
         }
         short annotationCount = in.readShort();
-        assert annotationCount < 500: "annotation count is: " + annotationCount;
+        assert annotationCount < 5000: "annotation count is: " + annotationCount;
         if (annotationCount > 0) {
             annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotationCount);
             for (int i = 0; i < annotationCount; i++) {
