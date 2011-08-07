@@ -30,6 +30,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.ArenaComponentSettings;
 
+import org.ihtsdo.arena.conceptview.ConceptViewSettings.DescType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
@@ -254,10 +255,14 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
         return l;
     }
 
-    protected TermComponentLabel getLabel(int nid, boolean canDrop)
+    protected TermComponentLabel getLabel(int nid, boolean canDrop, DescType textType) throws IOException {
+        return getLabel(nid, canDrop, textType.getLabelText());
+    }
+
+    protected TermComponentLabel getLabel(int nid, boolean canDrop, LabelText textType)
             throws IOException {
         try {
-            TermComponentLabel termLabel = new TermComponentLabel(LabelText.PREFERRED);
+            TermComponentLabel termLabel = new TermComponentLabel(textType);
             termLabel.setLineWrapEnabled(true);
             termLabel.getDropTarget().setActive(canDrop);
             termLabel.setFixedWidth(150);
@@ -475,7 +480,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
                 gbc.gridy++;
             }
         }
-        
+
         for (RefexVersionBI<?> rx : tempRefexList) {
             if (!refexIdsWithDups.contains(rx.getCollectionNid())) {
                 DragPanelExtension dpe =

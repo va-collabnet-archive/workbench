@@ -111,7 +111,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
 
         gbc.weightx = 1;
         gbc.gridx++;
-        TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop);
+        TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType());
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>(
                 (RelationshipAnalogBI) getRel()) {
@@ -139,7 +139,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
         add(new JSeparator(SwingConstants.VERTICAL), gbc);
         gbc.weightx = 1;
         gbc.gridx++;
-        TermComponentLabel destLabel = getLabel(getRel().getDestinationNid(), canDrop);
+        TermComponentLabel destLabel = getLabel(getRel().getDestinationNid(), canDrop, getSettings().getRelTarget());
         destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>(
                 (RelationshipAnalogBI) getRel()) {

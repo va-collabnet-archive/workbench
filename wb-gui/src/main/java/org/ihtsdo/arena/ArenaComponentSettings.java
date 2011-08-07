@@ -51,6 +51,7 @@ import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
+import javax.swing.JComboBox;
 
 public abstract class ArenaComponentSettings implements Serializable,
         ComponentListener, HierarchyBoundsListener {
@@ -135,6 +136,13 @@ public abstract class ArenaComponentSettings implements Serializable,
         this.graph = graph;
         this.renderer = renderer;
         this.prefRoot = new DefaultMutableTreeNode("PrefRoot");
+        JPanel fontSizePanel = newFontSizePanel();
+
+        this.prefRoot.add(new PreferencesNode("font size", fontSizePanel));
+        
+        setupSubtypes();
+    }
+    private JPanel newFontSizePanel() {
         SpinnerModel fontSizeModel =
                 new SpinnerNumberModel(fontSize, //initial value
                 9, //min
@@ -143,9 +151,7 @@ public abstract class ArenaComponentSettings implements Serializable,
         JSpinner fontSizeSpinner = new JSpinner(fontSizeModel);
         JPanel fontSizePanel = new JPanel(new GridLayout(1, 1));
         fontSizePanel.add(fontSizeSpinner);
-
-        this.prefRoot.add(new PreferencesNode("Font Size", fontSizePanel));
-        //setupSubtypes();
+        return fontSizePanel;
     }
 
     protected abstract void setupSubtypes();
@@ -253,7 +259,7 @@ public abstract class ArenaComponentSettings implements Serializable,
             preferences = new ArenaPreferencesPanel(this);
             preferences.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
             preferences.setOpaque(true);
-            preferences.setBounds(0, 0, 450, 20);
+            preferences.setBounds(0, 0, 350, 20);
         }
         return preferences;
     }

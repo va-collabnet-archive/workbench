@@ -1,5 +1,7 @@
 package org.ihtsdo.arena;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
 import javax.swing.JLabel;
@@ -43,9 +45,22 @@ public class ArenaPreferencesPanel extends JPanel {
 			PreferencesNode node = (PreferencesNode)
              		settingsTree.getLastSelectedPathComponent();			
 			if (node != null) {
-				splitPanel.setRightComponent(new JScrollPane(node.getPrefPanel()));
+                            JPanel prefPanel = new JPanel(new GridBagLayout());
+                            GridBagConstraints gbc = new GridBagConstraints();
+                            gbc.gridx = 0;
+                            gbc.gridy = 0;
+                            gbc.weightx = 1;
+                            gbc.weighty = 0;
+                            gbc.anchor = GridBagConstraints.NORTHWEST;
+                            gbc.fill = GridBagConstraints.HORIZONTAL;
+                            prefPanel.add(node.getPrefPanel(), gbc);
+                            gbc.gridy++;
+                            gbc.fill = GridBagConstraints.BOTH;
+                            gbc.weighty = 1;
+                            prefPanel.add(new JPanel(), gbc);
+                            splitPanel.setRightComponent(prefPanel);
 			} else {
-				splitPanel.setRightComponent(new JPanel());
+			    splitPanel.setRightComponent(new JPanel());
 			}
 		}
 		

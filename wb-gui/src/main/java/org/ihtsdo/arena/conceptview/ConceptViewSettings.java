@@ -3,8 +3,10 @@ package org.ihtsdo.arena.conceptview;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -13,19 +15,23 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.TermComponentLabel.LabelText;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -45,31 +51,136 @@ public class ConceptViewSettings extends ArenaComponentSettings {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 2;
-        
-    
-    private transient ConceptChangedListener conceptChangedListener;
+    private static final int dataVersion = 3;
+
+    private class DescTypeActionListener implements ActionListener {
+
+        DescPreference descPreference;
+
+        public DescTypeActionListener(DescPreference descPreference) {
+            this.descPreference = descPreference;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                JComboBox descTypeCombo = (JComboBox) e.getSource();
+                switch (descPreference) {
+                    case C1_REFEX:
+                        c1Refex = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case C2_REFEX:
+                        c2Refex = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case C3_REFEX:
+                        c3Refex = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case DESC_TYPE:
+                        descType = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case REL_TARGET:
+                        relTarget = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case REL_TYPE:
+                        relType = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    case REFEX_NAME:
+                        refexName = (DescType) descTypeCombo.getSelectedItem();
+                        break;
+                    default:
+                        throw new RuntimeException("Can't handle type: " + descPreference);
+               }
+               getView().resetLastLayoutSequence();
+               getView().layoutConcept(getConcept());
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
 
     public enum SIDE {
 
         RIGHT, LEFT
     };
+
+    public enum DescType {
+
+        PREFERRED("preferred"),
+        FULLY_SPECIFIED("fully specified");
+        private String displayName;
+
+        private DescType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+
+        public LabelText getLabelText() {
+            switch (this) {
+                case FULLY_SPECIFIED:
+                    return LabelText.FULLYSPECIFIED;
+                case PREFERRED:
+                    return LabelText.PREFERRED;
+                default:
+                    throw new RuntimeException("Can't handle type: " + this);
+            }
+        }
+    }
+
+    public enum DescPreference {
+
+        DESC_TYPE("desc type"),
+        REL_TYPE("rel type"),
+        REL_TARGET("rel target"),
+        C1_REFEX("c1 refex"),
+        C2_REFEX("c2 refex"),
+        C3_REFEX("c3 refex"),
+        REFEX_NAME("refex name");
+
+        String displayName;
+        private DescPreference(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
     // dataVersion = 1;
     private Integer linkedTab = null;
     // dataVersion = 2;
     private boolean forAjudciation = false;
-
+    // dataVersion = 3
+    private DescType descType = DescType.PREFERRED;
+    private DescType relType = DescType.PREFERRED;
+    private DescType relTarget = DescType.FULLY_SPECIFIED;
+    private DescType c1Refex = DescType.PREFERRED;
+    private DescType c2Refex = DescType.PREFERRED;
+    private DescType c3Refex = DescType.PREFERRED;
+    private DescType refexName = DescType.PREFERRED;
     // transient
     private transient ConceptView view;
     private transient ConceptNavigator navigator;
     private transient JTreeWithDragImage navigatorTree;
     private transient JToggleButton navButton;
     private transient JButton statedInferredButton;
+    private transient ConceptChangedListener conceptChangedListener;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeObject(linkedTab);
         out.writeBoolean(forAjudciation);
+        out.writeObject(descType);
+        out.writeObject(relType);
+        out.writeObject(relTarget);
+        out.writeObject(c1Refex);
+        out.writeObject(c2Refex);
+        out.writeObject(c3Refex);
+        out.writeObject(refexName);
     }
 
     private void readObject(ObjectInputStream in) throws IOException,
@@ -81,6 +192,23 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                 forAjudciation = in.readBoolean();
             } else {
                 forAjudciation = false;
+            }
+            if (dataVersion >= 3) {
+                descType = (DescType) in.readObject();
+                relType = (DescType) in.readObject();
+                relTarget = (DescType) in.readObject();
+                c1Refex = (DescType) in.readObject();
+                c2Refex = (DescType) in.readObject();
+                c3Refex = (DescType) in.readObject();
+                refexName = (DescType) in.readObject();
+            } else {
+                descType = DescType.PREFERRED;
+                relType = DescType.PREFERRED;
+                relTarget = DescType.FULLY_SPECIFIED;
+                c1Refex = DescType.PREFERRED;
+                c2Refex = DescType.PREFERRED;
+                c3Refex = DescType.PREFERRED;
+                refexName = DescType.PREFERRED;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -221,15 +349,15 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     }
 
     public boolean hideNavigator() {
-		if (preferences != null) {
-			JLayeredPane layers = renderer.getRootPane().getLayeredPane();
-	
-	        preferences.setVisible(false);
-	        preferences.invalidate();
-	        layers.remove(preferences);
-   		}
+        if (preferences != null) {
+            JLayeredPane layers = renderer.getRootPane().getLayeredPane();
 
-    	if (navButton.isSelected()) {
+            preferences.setVisible(false);
+            preferences.invalidate();
+            layers.remove(preferences);
+        }
+
+        if (navButton.isSelected()) {
             navButton.doClick();
             return true;
         }
@@ -413,37 +541,48 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
     @Override
     protected void setupSubtypes() {
-        this.getPrefRoot().add(addComponentPrefs("attributes"));
-        this.getPrefRoot().add(addComponentPrefs("descriptions"));
-        this.getPrefRoot().add(addComponentPrefs("relationships"));
-        this.getPrefRoot().add(addComponentPrefs("images"));
-        this.getPrefRoot().add(addComponentPrefs("refset members"));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.DESC_TYPE));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.REL_TYPE));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.REL_TARGET));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.REFEX_NAME));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.C1_REFEX));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.C2_REFEX));
+        this.getPrefRoot().add(newDescTypeNode(DescPreference.C3_REFEX));
     }
 
-    private PreferencesNode addComponentPrefs(String componentStr) {
-        PreferencesNode componentNode = new PreferencesNode(componentStr, new JCheckBox("show " + componentStr + ": "));
-        componentNode.add(new PreferencesNode("identifiers", new JCheckBox("show identifiers: ")));
-        componentNode.add(new PreferencesNode("extensions", new JCheckBox("show extensions: ")));
-        PreferencesNode templateNode = new PreferencesNode("templates", new JCheckBox("show templates: "));
-        componentNode.add(templateNode);
-        templateNode.add(new PreferencesNode("drools template", new JCheckBox("drools templates: ")));
+    private PreferencesNode newDescTypeNode(DescPreference descPreference) {
+        JComboBox descTypeCombo = new JComboBox(DescType.values());
+        switch (descPreference) {
+            case C1_REFEX:
+                descTypeCombo.setSelectedItem(c1Refex);
+                break;
+            case C2_REFEX:
+                descTypeCombo.setSelectedItem(c2Refex);
+                break;
+            case C3_REFEX:
+                descTypeCombo.setSelectedItem(c3Refex);
+                break;
+            case DESC_TYPE:
+                descTypeCombo.setSelectedItem(descType);
+                break;
+            case REL_TARGET:
+                descTypeCombo.setSelectedItem(relTarget);
+                break;
+            case REL_TYPE:
+                descTypeCombo.setSelectedItem(relType);
+                break;
+            case REFEX_NAME:
+               descTypeCombo.setSelectedItem(refexName);
+                break;
+            default:
+                throw new RuntimeException("Can't handle type: " + descPreference);
 
-        PreferencesNode filterNode = new PreferencesNode("filters", new JCheckBox("show filters: "));
-        filterNode.add(new PreferencesNode("drools filter", new JCheckBox("drools filters: ")));
-        componentNode.add(filterNode);
-        if (componentStr.equals("descriptions")) {
-            componentNode.add(new PreferencesNode("language", new JCheckBox("show language: ")));
-            componentNode.add(new PreferencesNode("case sensitivity", new JCheckBox("case sensitive: ")));
-            templateNode.add(new PreferencesNode("fully specified", new JCheckBox("fully specified: ")));
-        } else if (componentStr.equals("relationships")) {
-            componentNode.add(new PreferencesNode("refinability", new JCheckBox("show refinability: ")));
-            componentNode.add(new PreferencesNode("characteristic", new JCheckBox("show characteristic: ")));
-            templateNode.add(new PreferencesNode("procedures", new JCheckBox("procedures: ")));
-            templateNode.add(new PreferencesNode("medicine", new JCheckBox("medicine: ")));
-            templateNode.add(new PreferencesNode("finding", new JCheckBox("finding: ")));
-            templateNode.add(new PreferencesNode("lab test", new JCheckBox("lab test: ")));
         }
-        return componentNode;
+        descTypeCombo.addActionListener(new DescTypeActionListener(descPreference));
+
+        JPanel descTypePanel = new JPanel(new GridLayout(1, 1));
+        descTypePanel.add(descTypeCombo);
+        return new PreferencesNode(descPreference.toString(), descTypePanel);
     }
 
     @Override
@@ -463,5 +602,33 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     }
 
     public void regenerateWfPanel(I_GetConceptData con) {
+    }
+
+    public DescType getC1Refex() {
+        return c1Refex;
+    }
+
+    public DescType getC2Refex() {
+        return c2Refex;
+    }
+
+    public DescType getC3Refex() {
+        return c3Refex;
+    }
+
+    public DescType getDescType() {
+        return descType;
+    }
+
+    public DescType getRelTarget() {
+        return relTarget;
+    }
+
+    public DescType getRelType() {
+        return relType;
+    }
+
+    public DescType getRefexName() {
+        return refexName;
     }
 }

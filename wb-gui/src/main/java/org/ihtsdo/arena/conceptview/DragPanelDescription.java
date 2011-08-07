@@ -124,7 +124,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
-        TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop);
+        TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
         add(typeLabel, gbc);
         if (getDesc().isUncommitted()) {
             typeLabel.addPropertyChangeListener("termComponent",
