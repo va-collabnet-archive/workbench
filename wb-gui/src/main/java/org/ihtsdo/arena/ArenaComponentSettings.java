@@ -51,7 +51,6 @@ import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
-import javax.swing.JComboBox;
 
 public abstract class ArenaComponentSettings implements Serializable,
         ComponentListener, HierarchyBoundsListener {
@@ -341,7 +340,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 	            loc.x = loc.x - getPreferences().getWidth();
 	            getPreferences().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
 	        }
-	        getPreferences().setBounds(loc.x, loc.y, getPreferences().getWidth(), renderer.getHeight());
+	        getPreferences().setBounds(loc.x, loc.y, getPreferences().getWidth(), 250);
 	        layers.add(getPreferences(), JLayeredPane.PALETTE_LAYER);
 	    }
     }
@@ -356,6 +355,7 @@ public abstract class ArenaComponentSettings implements Serializable,
             private static final long serialVersionUID = 1L;
             boolean collapsed = false;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 collapsed = !collapsed;
                 resizeLabel.setVisible(!collapsed);
@@ -404,18 +404,22 @@ public abstract class ArenaComponentSettings implements Serializable,
             this.index = index;
         }
 
+        @Override
         public void mouseClicked(MouseEvent e) {
             // ignore
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
             // ignore
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             // ignore
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             // Selects to create a handler for resizing
             if (!graph.isCellSelected(cell)) {
@@ -433,18 +437,21 @@ public abstract class ArenaComponentSettings implements Serializable,
             }
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             graphContainer.getGraphControl().dispatchEvent(
                     SwingUtilities.convertMouseEvent((Component) e.getSource(),
                     e, graphContainer.getGraphControl()));
         }
 
+        @Override
         public void mouseDragged(MouseEvent e) {
             graphContainer.getGraphControl().dispatchEvent(
                     SwingUtilities.convertMouseEvent((Component) e.getSource(),
                     e, graphContainer.getGraphControl()));
         }
 
+        @Override
         public void mouseMoved(MouseEvent e) {
             // ignore
         }
