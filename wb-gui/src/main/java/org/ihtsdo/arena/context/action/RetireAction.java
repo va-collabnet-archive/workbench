@@ -1,6 +1,7 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -18,6 +19,8 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -55,12 +58,18 @@ public class RetireAction extends AbstractAction {
                 if(DescriptionVersionBI.class.isAssignableFrom(component.getClass())){
                 	retireFromRefexes(component);
                 }
+                if(RelationshipVersionBI.class.isAssignableFrom(component.getClass())){
+                	RelationshipAnalogBI ra = (RelationshipAnalogBI) analog;
+                        ra.setGroup(0);
+                }
                 I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
                 Terms.get().addUncommitted(concept);
             }
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }catch (PropertyVetoException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }
