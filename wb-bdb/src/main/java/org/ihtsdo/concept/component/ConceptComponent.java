@@ -863,7 +863,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public int nid;
     public int enclosingConceptNid;
     /**
-     * primordial: first created or developed Sap = Status At Position
+     * primordial: first created or developed Sap = status, author, position 
      */
     public int primordialSapNid;
     /**
@@ -975,7 +975,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         } else {
             buf.append(primordialSapNid);
         }
-        if (primordialSapNid >= 0) {
+        if (primordialSapNid > 0) {
             try {
                 buf.append(" status:");
                 ConceptComponent.addNidToBuffer(buf, getStatusNid());
@@ -1029,6 +1029,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             size = size + additionalIdVersions.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
+        assert primordialSapNid != 0;
         sapNids.add(primordialSapNid);
         if (additionalIdVersions != null) {
             for (IdentifierVersion id : additionalIdVersions) {
@@ -1109,6 +1110,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     + "\nprocessing: " + this.toString());
         }
         this.primordialSapNid = Bdb.getSapNid(eComponent);
+        assert primordialSapNid > 0: " Processing nid: " + enclosingConceptNid;
         this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
         convertId(eComponent.additionalIds);
         assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
@@ -1315,6 +1317,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     @Override
     public void setStatusAtPositionNid(int sapNid) {
         this.primordialSapNid = sapNid;
+        assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         modified();
     }
 
@@ -1363,6 +1366,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     private void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
         assert primordialSapNid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
+        assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;;
         assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
         output.writeInt(primordialUNid);
         List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
@@ -1504,6 +1508,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final void readComponentFromBdb(TupleInput input) {
         nid = input.readInt();
         primordialSapNid = input.readInt();
+        assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;;
         readIdentifierFromBdb(input);
         readAnnotationsFromBdb(input);
         readFromBdb(input);
@@ -1511,7 +1516,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     public final void writeComponentToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
         assert nid != 0;
-        assert primordialSapNid >= 0;
+        assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;;
         assert primordialSapNid != Integer.MAX_VALUE;
         output.writeInt(nid);
         output.writeInt(primordialSapNid);
@@ -1628,8 +1633,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             throw new UnsupportedOperationException(
                     "Cannot change status if time != Long.MAX_VALUE; Use makeAnalog instead.");
         }
-        if (authorNid != getPathNid()) {
+        if (authorNid != getAuthorNid()) {
             this.primordialSapNid = Bdb.getSapNid(getStatusNid(), authorNid, getPathNid(), Long.MAX_VALUE);
+            assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;;
             modified();
         }
     }
@@ -1688,6 +1694,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.primordialSapNid = Bdb.getSapNid(getStatusId(),
                     Terms.get().getAuthorNid(),
                     pathId, Long.MAX_VALUE);
+            assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;
             modified();
         }
     }
@@ -1702,6 +1709,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.primordialSapNid = Bdb.getSapNid(getStatusNid(),
                     Terms.get().getAuthorNid(),
                     pathId, Long.MAX_VALUE);
+            assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;
             modified();
         }
     }
@@ -1716,6 +1724,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.primordialSapNid = Bdb.getSapNid(getStatusNid(),
                     Terms.get().getAuthorNid(),
                     getPathNid(), time);
+            assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;
         }
     }
 
@@ -1727,6 +1736,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         this.primordialSapNid = Bdb.getSapNid(statusNid,
                 authorNid,
                 pathNid, Long.MAX_VALUE);
+        assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;
         this.getEnclosingConcept().setIsCanceled(false);
         this.clearVersions();
     }
@@ -1742,6 +1752,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.primordialSapNid = Bdb.getSapNid(statusId,
                     Terms.get().getAuthorNid(),
                     getPathId(), Long.MAX_VALUE);
+        assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
         }
     }
 
@@ -1755,6 +1766,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             this.primordialSapNid = Bdb.getSapNid(statusId,
                     Terms.get().getAuthorNid(),
                     getPathNid(), Long.MAX_VALUE);
+            assert primordialSapNid != 0: "Processing nid: " + enclosingConceptNid;
         }
     }
 
@@ -2104,6 +2116,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             size = size + revisions.size();
         }
         HashSet<Integer> sapNids = new HashSet<Integer>(size);
+        assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;
 
         sapNids.add(primordialSapNid);
         if (revisions != null) {

@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.PathNotExistsException;
@@ -49,7 +49,11 @@ public class PositionMapper {
 
     public static final BigInteger BIG_MINUS_ONE = BigInteger.valueOf(-1);
     public static final int INT_MINUS_ONE = -1;
-    private static final int initialIndex = StatusAtPositionBdb.getInitialPosition();
+    private static int initialIndex = -1;
+    
+    private static void setupInitialIndex() {
+       initialIndex = StatusAtPositionBdb.getInitialPosition();
+    }
 
     /**
      * Possible results when comparing two positions with respect to a
@@ -86,8 +90,10 @@ public class PositionMapper {
                     if (closed) {
                         return;
                     }
+                    if (initialIndex == -1) {
+                        setupInitialIndex();
+                    }
                     m.setup();
-                    //m.setup__int();
                 } catch (Throwable e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
@@ -433,6 +439,7 @@ public class PositionMapper {
     private static PositionMapperSetupManager setupManager = new PositionMapperSetupManager();
 
     public static void reset() {
+        initialIndex = -1;
         mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
         closed = false;
         setupManager = new PositionMapperSetupManager();

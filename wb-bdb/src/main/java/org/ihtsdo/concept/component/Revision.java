@@ -66,6 +66,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public Revision(int statusAtPositionNid, C primordialComponent) {
         super();
         assert primordialComponent != null;
+        assert statusAtPositionNid != 0;
         this.sapNid = statusAtPositionNid;
         this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
@@ -78,6 +79,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
             long time, C primordialComponent) {
         this.sapNid = Bdb.getSapDb().getSapNid(statusNid, authorNid,
                 pathNid, time);
+        assert sapNid != 0;
         this.primordialComponent = primordialComponent;
         primordialComponent.clearVersions();
         assert primordialComponent != null;
@@ -88,6 +90,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public Revision(TupleInput input, C conceptComponent) {
         this(input.readInt(), conceptComponent);
         conceptComponent.clearVersions();
+        assert sapNid != 0;
     }
 
     public Revision() {
@@ -121,6 +124,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
 
     @Override
     public void setStatusAtPositionNid(int sapNid) {
+        assert sapNid != 0;
         this.sapNid = sapNid;
         modified();
     }
