@@ -12,6 +12,7 @@ public class ModuleIDDAO {
 
 	public String conceptid;
 	public String effectiveTime;
+	public String active;
 	public java.util.Date effectiveDate;
 
 
@@ -33,6 +34,13 @@ public class ModuleIDDAO {
 		this.effectiveTime = effectiveTime;		
 	}
 
+	public ModuleIDDAO(String conceptid,  String effectiveTime , String active) {
+		this.conceptid = conceptid;
+		this.effectiveTime = effectiveTime;	
+		this.active = active;
+	}
+
+	
 	public ModuleIDDAO() {
 		// TODO Auto-generated constructor stub
 	}
@@ -59,6 +67,14 @@ public class ModuleIDDAO {
 		this.effectiveTime = effectiveTime;
 	}
 
+	public String getActive() {
+		return active;
+	}
+
+
+	public void setActive(String active) {
+		this.active = active;
+	}
 	
 	public void setEffectiveDate(java.util.Date effectiveDate) {
 		this.effectiveDate = effectiveDate;

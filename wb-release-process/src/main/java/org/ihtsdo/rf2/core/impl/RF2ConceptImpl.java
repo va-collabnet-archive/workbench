@@ -48,7 +48,7 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		Date et = null;
 		String conceptStatus = "";
 		String active = "";
-		String moduleId = "";
+		String moduleId = I_Constants.CORE_MODULE_ID;
 		String definitionStatusId = "";
 
 		try {
@@ -78,11 +78,14 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 				} else {
 					active = "0";
 				}
-				moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
-				if(moduleId.equals(I_Constants.META_MOULE_ID)){
-					incrementMetaDataCount();
+				if(active.equals("1")){
+					moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());					
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){
+						incrementMetaDataCount();
+					}
 				}
-				if (conceptid==null || conceptid.equals("")){
+				
+				if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 					conceptid=concept.getUids().iterator().next().toString();
 				}
 				

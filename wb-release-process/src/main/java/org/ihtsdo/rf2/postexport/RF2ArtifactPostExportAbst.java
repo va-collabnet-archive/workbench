@@ -21,18 +21,18 @@ public abstract class RF2ArtifactPostExportAbst {
 	
 	public static enum FILE_TYPE{
 
-		RF2_CONCEPT(new int[]{0,1},0,new Integer[]{2,3,4},"xsct2_Concept_SUFFIX_INT"),
-		RF2_DESCRIPTION(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8},"xsct2_Description_SUFFIX-en_INT"),
-		RF2_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"xsct2_Relationship_SUFFIX_INT"), 
-		RF2_STATED_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"xsct2_StatedRelationship_SUFFIX_INT"), 
-		RF2_QUALIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"xsct2_Qualifier_SUFFIX_INT"), 
-		RF2_LANGUAGE_REFSET(new int[]{0,1},0,new Integer[]{2,4,5,6},"xder2_cRefset_LanguageSUFFIX-en_INT"), 
-		RF2_ATTRIBUTE_VALUE(new int[]{0,1},0,new Integer[]{2,4,5,6},"xder2_cRefset_AttributeValueSUFFIX_INT"),
-		RF2_ASSOCIATION(new int[]{0,1},0,new Integer[]{2,4,5,6},"xder2_cRefset_AssociationReferenceSUFFIX_INT"),
-		RF2_SIMPLE_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6},"xder2_Refset_SimpleMapSUFFIX_INT"),
-		RF2_SIMPLE(new int[]{0,1},0,new Integer[]{2,4,5},"xder2_Refset_SimpleSUFFIX_INT"),
-		RF2_TEXTDEFINITION(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8},"xsct2_TextDefinition_SUFFIX-en_INT"),
-		RF2_ICD9_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9,10,11},"xder2_iissscRefset_ICD9CMEquivalenceMapSUFFIX_INT");
+		RF2_CONCEPT(new int[]{0,1},0,new Integer[]{2,3,4},"sct2_Concept_SUFFIX_INT"),
+		RF2_DESCRIPTION(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8},"sct2_Description_SUFFIX-en_INT"),
+		RF2_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_Relationship_SUFFIX_INT"), 
+		RF2_STATED_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_StatedRelationship_SUFFIX_INT"), 
+		RF2_QUALIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"sct2_Qualifier_SUFFIX_INT"), 
+		RF2_LANGUAGE_REFSET(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_LanguageSUFFIX-en_INT"), 
+		RF2_ATTRIBUTE_VALUE(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AttributeValueSUFFIX_INT"),
+		RF2_ASSOCIATION(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AssociationReferenceSUFFIX_INT"),
+		RF2_SIMPLE_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_Refset_SimpleMapSUFFIX_INT"),
+		RF2_SIMPLE(new int[]{0,1},0,new Integer[]{2,4,5},"der2_Refset_SimpleSUFFIX_INT"),
+		RF2_TEXTDEFINITION(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8},"sct2_TextDefinition_SUFFIX-en_INT"),
+		RF2_ICD9_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9,10,11},"der2_iissscRefset_ICD9CMEquivalenceMapSUFFIX_INT");
 		 
 
 		private int[] columnIndexes;

@@ -104,7 +104,7 @@ public class ExportUtil {
 					str = str.trim();
 					String[] part= str.split("\t");
 					//System.out.println(part[0] + " & " + part[1]);
-					ModuleIDDAO ModuleIDDAO = new ModuleIDDAO(part[0] , part[1]);
+					ModuleIDDAO ModuleIDDAO = new ModuleIDDAO(part[0] , part[1], part[2]);
 					metaHierDAO.add(ModuleIDDAO);
 				}
 			} catch (FileNotFoundException e1) {
@@ -132,6 +132,7 @@ public class ExportUtil {
 
 	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
 		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		moduleId = I_Constants.CORE_MODULE_ID; 
 		if (metaHierDAO.isEmpty()) { 
 			logger.error("Meta Hierarchy DAO Set is empty"); 
 		} else {  
@@ -140,14 +141,13 @@ public class ExportUtil {
 				ModuleIDDAO  moduleIdDAO = ( ModuleIDDAO ) iter.next();
 				String conceptid = moduleIdDAO.getConceptid();
 				String effectivetime = moduleIdDAO.getEffectiveTime();
-				//need to sort effectivetime issue
-				if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0
-				){
-					moduleId = I_Constants.META_MOULE_ID;
+				String active = moduleIdDAO.getActive();
+				if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("0")){
+					System.out.println("==special case==" + snomedIntegerId);
+					moduleId = I_Constants.CORE_MODULE_ID;
 					break;
-				}
-				else {
-					moduleId = I_Constants.CORE_MODULE_ID; 
+				}else if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("1")){
+					moduleId = I_Constants.META_MOULE_ID;					
 				}
 			} 
 		}
@@ -207,7 +207,7 @@ public class ExportUtil {
 			inactiveConceptSet.add(outdatedConcept);
 			inactiveConceptSet.add(reasonnotstatedConcept);
 			
-			System.out.println("=====================================" + inactiveConceptSet.size());
+			//System.out.println("=====================================" + inactiveConceptSet.size());
 			
 			Iterator iter = inactiveConceptSet.iterator();		
 			
@@ -1164,7 +1164,7 @@ public class ExportUtil {
 	}
 
 	public static String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
-		Long conceptId = null; // ConceptId
+		Long conceptId = 0L; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
 		List<? extends I_IdVersion> i_IdentifyList = i_Identify.getIdVersions();
 		if (i_IdentifyList.size() > 0) {
@@ -1185,6 +1185,12 @@ public class ExportUtil {
 				}
 			}
 		}
+		
+	   /*	
+	   if(conceptId.toString().equals("0")){
+			System.out.println("==conceptId==" + conceptId.toString());
+		}*/
+		
 		return conceptId.toString();
 	}
 
@@ -1246,6 +1252,9 @@ public class ExportUtil {
 				}
 			}
 		}
+		/*if(descriptionId.toString().equals("0")){
+			System.out.println("==descriptionId==" + descriptionId.toString());
+		}*/
 		return descriptionId.toString();
 	}
 
