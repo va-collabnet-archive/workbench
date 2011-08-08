@@ -515,11 +515,11 @@ public abstract class RF2AbstractImpl {
 					if (c != null)  conceptid = c.toString();
 				}
 			}
-			int len= conceptid.length();
+			/*int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
-			if(partition.equals("00")){			
+			if(partition.equals("00")){		*/	
 				export(concept, conceptid);				
-			}
+			//}	
 		}
 	}
 

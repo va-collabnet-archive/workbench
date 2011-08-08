@@ -57,7 +57,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
-			moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
+			
 			for (I_DescriptionTuple description: descriptions) {
 				String sDescType = getSnomedDescriptionType(description.getTypeNid());
 				typeId = getTypeId(sDescType);
@@ -81,16 +81,16 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						caseSignificanceId = I_Constants.INITIAL_INSENSITIVE;
 					}
 					
-					if(moduleId.equals(I_Constants.META_MOULE_ID)){
-						//System.out.println(moduleId);
+					moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){				
 						incrementMetaDataCount();
 					}
 
-					if (conceptid==null || conceptid.equals("")){
+					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 						conceptid=concept.getUids().iterator().next().toString();
 					}
-					
-					if (descriptionid==null || descriptionid.equals("")){
+				
+					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
 
