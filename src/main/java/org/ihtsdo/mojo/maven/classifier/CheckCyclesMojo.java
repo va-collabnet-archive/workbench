@@ -15,8 +15,6 @@
  */
 package org.ihtsdo.mojo.maven.classifier;
 
-import org.apache.maven.plugin.logging.Log;
-import org.dwfa.ace.task.classify.SnoPathProcessStatedCycleCheck;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -27,9 +25,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
@@ -38,6 +38,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.classify.SnoCon;
+import org.dwfa.ace.task.classify.SnoPathProcessStatedCycleCheck;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
@@ -99,6 +101,15 @@ public class CheckCyclesMojo extends AbstractMojo {
      * @parameter
      */
     private String reportCycles;
+    
+    /**
+    * Throw Exception if a cycle is detected<br>
+    * Values= true or false
+    *
+    * @parameter
+    */
+    private String throwExceptionIfCycleDetected;
+    
     // CORE CONSTANTS
     private static int isaNid = Integer.MAX_VALUE;
     private static int rootNid = Integer.MAX_VALUE;
@@ -191,6 +202,12 @@ public class CheckCyclesMojo extends AbstractMojo {
 //                    SnoRel.dumpToFile(cycleSnoCons,
 //                            "target" + File.separator + reportCycles + "_FAIL.txt", 5);
 //                }
+                
+                if (throwExceptionIfCycleDetected != null && 
+                		throwExceptionIfCycleDetected.toLowerCase().equals("true")) {
+                	throw new TaskFailedException("Cycle detected!");
+                }
+                
             } else {
                 logger.info("\r\n::: [CheckCyclesMojo] NO CYCLES DETECTED");
 //                if (reportCycles != null) {
