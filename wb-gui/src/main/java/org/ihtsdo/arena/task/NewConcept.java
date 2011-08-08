@@ -801,10 +801,10 @@ public class NewConcept extends PreviousNextOrCancel {
 
 
             //create concept blue print
-            if(lang == "en-us"){
-                conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
-            }else{
+            if(lang.equals("en-gb")){
                 conceptSpec = new ConceptCB(usFsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+            }else{
+                conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
             }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
