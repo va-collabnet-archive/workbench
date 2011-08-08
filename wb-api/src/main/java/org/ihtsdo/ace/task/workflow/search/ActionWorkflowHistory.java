@@ -44,7 +44,9 @@ public class ActionWorkflowHistory extends AbstractWorkflowHistorySearchTest {
             	this.testAction = (WorkflowConceptVersion) obj;
             } else {
                 try {
+                    if (!Terms.get().getActiveAceFrameConfig().getWorkflowActions().isEmpty()) {
             		this.testAction = new WorkflowConceptVersion(Terms.get().getActiveAceFrameConfig().getWorkflowActions().first());
+                    }
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
