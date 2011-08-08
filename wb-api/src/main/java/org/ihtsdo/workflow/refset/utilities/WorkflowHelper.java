@@ -82,6 +82,7 @@ public class WorkflowHelper {
 
 	private static Set<UUID> beginWorkflowActions = null;
 	private static Set<UUID> commitWorkflowActions = null;
+	private static Set<UUID> beginWorkflowStateUids = null;
 	private static UUID endWorkflowActionUid = null;
 	private static UUID endWorkflowStateUid = null;
 
@@ -599,7 +600,7 @@ public class WorkflowHelper {
     	}
     }
     
-    private static boolean isEndWorkflowAction(ConceptVersionBI actionConcept) {
+    public static boolean isEndWorkflowAction(ConceptVersionBI actionConcept) {
 		
     	if (endWorkflowActionUid  == null && actionConcept != null)
 		{
@@ -847,7 +848,7 @@ public class WorkflowHelper {
 		return endWorkflowStateUid;
     }
 
-	private static boolean isEndWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+	public static boolean isEndWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
     	if (endWorkflowStateUid  == null)
 		{
     		// TODO: Remove hardcode and add to metadata
@@ -856,6 +857,35 @@ public class WorkflowHelper {
 
     	if (endWorkflowStateUid != null && stateConcept != null) {
     		return (endWorkflowStateUid.equals(stateConcept.getPrimUuid()));
+    	} else {
+    		return false;
+    	}
+    }
+    	
+	public static boolean isBeginWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+    	if (beginWorkflowStateUids  == null)
+		{
+    		beginWorkflowStateUids = new HashSet<UUID>();
+    		
+    		beginWorkflowStateUids.add(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_STATE.getPrimoridalUid());
+    		beginWorkflowStateUids.add(ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_STATE.getPrimoridalUid());
+			beginWorkflowStateUids.add(ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_IN_BATCH_STATE.getPrimoridalUid());
+    				
+			for (ConceptVersionBI state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
+			{
+				List<RelationshipVersionBI> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+	
+	    		for (RelationshipVersionBI rel : relList)
+	    		{
+	    			if (rel != null) {
+	    				beginWorkflowStateUids.add(state.getPrimUuid());
+	    			}
+	    		}
+			}
+		}
+
+    	if (beginWorkflowStateUids != null && stateConcept != null) {
+    		return (beginWorkflowStateUids.contains(stateConcept.getPrimUuid()));
     	} else {
     		return false;
     	}
