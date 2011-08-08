@@ -17,8 +17,6 @@
 package org.dwfa.ace.task.status;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.IntrospectionException;
@@ -43,7 +41,6 @@ import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -53,8 +50,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.jini.TermEntry;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -64,21 +59,17 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.WizardBI;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.spec.ConceptSpec;
 
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN)})
-public class CheckForTarget extends AbstractTask /*implements ActionListener */ {
+public class CheckForTarget extends AbstractTask {
 
     /**
      * 
@@ -278,12 +269,10 @@ public class CheckForTarget extends AbstractTask /*implements ActionListener */ 
             //find if concept is member of Refers To refset
             Collection<? extends RefexCnidVersionBI<?>> refexMembers =
                     (Collection<? extends RefexCnidVersionBI<?>>) refexConcept.getCurrentRefsetMembers(tempVc);
-            int count = 0;
             for (RefexCnidVersionBI member : refexMembers) {
                 if (member.getCnid1() == concept.getNid()) {
                     List<UUID> uuids = Ts.get().getUuidsForNid(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
                     uuidList.add(uuids);
-                    count++;
                 }
             }
         } catch (IOException e) {
