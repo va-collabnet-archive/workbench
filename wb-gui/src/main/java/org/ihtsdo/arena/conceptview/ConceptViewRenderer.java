@@ -21,14 +21,13 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -63,7 +62,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.arena.WizardPanel;
 import org.ihtsdo.arena.context.action.BpAction;
 import org.ihtsdo.arena.context.action.BpActionFactory;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -416,37 +414,22 @@ public class ConceptViewRenderer extends JLayeredPane {
                             JButton selectedOverrideButton = ((JButton) e.getSource());
                             
                             try {
+                            	int totalStatesCount = 0;
                                 TreeSet<? extends ConceptVersionBI> wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
-                                Iterator<? extends ConceptVersionBI> wfStatesItr = wfStates.iterator();
+                                SortedSet<String> possibilities = new TreeSet<String>();
 
-                                int totalStatesCount = 0;
+                                for (ConceptVersionBI con : wfStates) {
+                                	if (!WorkflowHelper.isBeginWorkflowState(con) && 
+                                		!WorkflowHelper.isEndWorkflowState(con)) { 
+                    					possibilities.add(con.getPreferredDescription().getText());
+                                	}
+                                } 
 
-                                String[] possibilities = new String[wfStates.size()];
-
-                                while (wfStatesItr.hasNext()) {
-                                    String currCon = wfStatesItr.next().toString();
-                                    if (!currCon.equalsIgnoreCase(CHANGED_WORKFLOW_STATE)
-                                            && !currCon.equalsIgnoreCase(CHANGED_IN_BATCH_WORKFLOW_STATE)
-                                            && !currCon.equalsIgnoreCase(CONCEPT_HAVING_NO_PRIOR_WORKFLOW_STATE)
-                                            && !currCon.equalsIgnoreCase(CONCEPT_NOT_PREVIOUSLY_EXISTING_WORKFLOW_STATE)
-                                            && !currCon.equalsIgnoreCase(NEW_WORKFLOW_STATE)) {
-                                        possibilities[totalStatesCount++] = currCon;
-                                    }
+                                String[] actualPossibilities = new String[possibilities.size()];
+                                int counter = 0;
+                                for (String s : possibilities) {
+                                	actualPossibilities[counter++] = s;
                                 }
-
-                                String[] actualPossibilities = new String[totalStatesCount];
-                                int overrideStatesCount = 0;
-                                for (; overrideStatesCount < totalStatesCount; overrideStatesCount++) {
-                                    String s = possibilities[overrideStatesCount];
-
-                                    if (s == null || s.length() == 0) {
-                                        break;
-                                    }
-
-                                    actualPossibilities[overrideStatesCount] = s;
-                                }
-                                actualPossibilities = Arrays.copyOf(actualPossibilities, overrideStatesCount);
-
 
                                 String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:",
                                         "Override",
@@ -496,7 +479,7 @@ public class ConceptViewRenderer extends JLayeredPane {
                                         bean.setWorkflowTime(today.getTime());
 
                                         WorkflowHistoryJavaBean latestBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(selectedConcept);
-                                        if (latestBean == null || !WorkflowHelper.getAcceptAction().equals(latestBean.getAction())) {
+                                        if (latestBean == null || WorkflowHelper.getAcceptAction().equals(latestBean.getAction())) {
                                             bean.setWorkflowId(UUID.randomUUID());
                                         } else {
                                             bean.setWorkflowId(latestBean.getWorkflowId());

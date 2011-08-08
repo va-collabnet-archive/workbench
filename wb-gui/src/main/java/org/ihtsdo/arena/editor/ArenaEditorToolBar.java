@@ -235,9 +235,6 @@ public class ArenaEditorToolBar extends JToolBar
 	private boolean isAutoApprovalAvailable(int index, ViewCoordinate viewCoord) throws Exception {
 		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
 		
-		// Get Modeler
-		String modelerStr = Terms.get().getActiveAceFrameConfig().getUsername();
-		
-		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.lookupModeler(modelerStr), viewCoord);
+		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.getCurrentModeler(), viewCoord);
 	}
 }
