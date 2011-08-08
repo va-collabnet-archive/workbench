@@ -110,90 +110,106 @@ public class RulesContextHelper {
 		I_ShowActivity activity =
 			Terms.get().newActivityPanel(true, config, 
 					"<html>Generating KnowledgeBase for context...", true);
-		activities.add(activity);
-		activity.setValue(0);
-		activity.setIndeterminate(true);
-		activity.setProgressInfoLower("Generating KnowledgeBase for context...");
-		long startTime = System.currentTimeMillis();
-		File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
-		if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
-			returnBase = kbCache.get(context.getConceptNid());
-		} 
-
-		if (returnBase == null && serializedKbFile.exists() && !recreate){
-			KnowledgeBase kbase = null;
-			try {
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-				kbase = (KnowledgeBase) in.readObject();
-				in.close();
-				kbCache.put(context.getConceptNid(), kbase);
-				Terms.get().setKnowledgeBaseCache(kbCache);
-			} catch (StreamCorruptedException e0) {
-				serializedKbFile.delete();
-			} catch (FileNotFoundException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} catch (Exception e) {
-				serializedKbFile.delete();
-				//AceLog.getAppLog().alertAndLogException(e);
-			}
-			returnBase = kbase;
-		}
-		
-		if (returnBase == null) {
-			//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
-
-			KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-
-			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-			File flow = new File("rules/qa-execution2.rf");
-			if (flow.exists()) {
-				kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution2.rf"), ResourceType.DRF);
-				kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-
-				for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
-					KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(recreate);
-					if (loopKBase != null) {
-						loopKBase = filterForContext(loopKBase, context, config);
-						kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
-					}
-				}
-				
-				if (kbase.getKnowledgePackages().size() == 0 && !noRulesAlertShown && 
-						RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids().containsAll(context.getUids())) {
-					noRulesAlertShown = true;
-					JOptionPane.showMessageDialog(null,
-						    "Rules base is empty, you might need to update from Guvnor.",
-						    "Rules base empty",
-						    JOptionPane.WARNING_MESSAGE);
-				}
-				
-//				try {
-//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-//					out.writeObject( kbase );
-//					out.writeObject( kbase.getKnowledgePackages() );
-//					out.close();
-//				} catch (FileNotFoundException e) {
-//					AceLog.getAppLog().alertAndLogException(e);
-//				} catch (IOException e) {
-//					AceLog.getAppLog().alertAndLogException(e);
-//				}
-				
-				kbCache.put(context.getConceptNid(), kbase);
-				Terms.get().setKnowledgeBaseCache(kbCache);
-				lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
-			}
-			returnBase = kbase;
-		}
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-		String result = "Done";
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+		long startTime= System.currentTimeMillis();
 		try {
-			activity.complete();
-			activity.removeActivityFromViewer();
-		} catch (ComputationCanceled e) {
-			AceLog.getAppLog().alertAndLogException(e);
+			activities.add(activity);
+			activity.setValue(0);
+			activity.setIndeterminate(true);
+			activity.setProgressInfoLower("Generating KnowledgeBase for context...");
+			File serializedKbFile = new File("rules/" + context.getConceptNid() + ".bkb");
+			if (kbCache.containsKey(context.getConceptNid()) && !recreate) {
+				returnBase = kbCache.get(context.getConceptNid());
+			} 
+
+			if (returnBase == null && serializedKbFile.exists() && !recreate){
+				KnowledgeBase kbase = null;
+				try {
+					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+					kbase = (KnowledgeBase) in.readObject();
+					in.close();
+					kbCache.put(context.getConceptNid(), kbase);
+					Terms.get().setKnowledgeBaseCache(kbCache);
+				} catch (StreamCorruptedException e0) {
+					serializedKbFile.delete();
+				} catch (FileNotFoundException e) {
+					AceLog.getAppLog().alertAndLogException(e);
+				} catch (Exception e) {
+					serializedKbFile.delete();
+					//AceLog.getAppLog().alertAndLogException(e);
+				}
+				returnBase = kbase;
+			}
+
+			if (returnBase == null) {
+				//RulesDeploymentPackageReferenceHelper rulesPackageHelper = new RulesDeploymentPackageReferenceHelper(config);
+
+				KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+
+				KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+				File flow = new File("rules/qa-execution2.rf");
+				if (flow.exists()) {
+					kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution2.rf"), ResourceType.DRF);
+					kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+
+					for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
+						KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(recreate);
+						if (loopKBase != null) {
+							loopKBase = filterForContext(loopKBase, context, config);
+							kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+						}
+					}
+
+					if (kbase.getKnowledgePackages().size() == 0 && !noRulesAlertShown && 
+							RefsetAuxiliary.Concept.REALTIME_QA_CONTEXT.getUids().containsAll(context.getUids())) {
+						noRulesAlertShown = true;
+						JOptionPane.showMessageDialog(null,
+								"Rules base is empty, you might need to update from Guvnor.",
+								"Rules base empty",
+								JOptionPane.WARNING_MESSAGE);
+					}
+
+					//				try {
+					//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+					//					out.writeObject( kbase );
+					//					out.writeObject( kbase.getKnowledgePackages() );
+					//					out.close();
+					//				} catch (FileNotFoundException e) {
+					//					AceLog.getAppLog().alertAndLogException(e);
+					//				} catch (IOException e) {
+					//					AceLog.getAppLog().alertAndLogException(e);
+					//				}
+
+					kbCache.put(context.getConceptNid(), kbase);
+					Terms.get().setKnowledgeBaseCache(kbCache);
+					lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
+				}
+				returnBase = kbase;
+			}
+
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String result = "Done";
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+		} catch (Exception e1) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String result = "Done";
+			activity.setProgressInfoLower("Error - Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
+				AceLog.getAppLog().alertAndLogException(e);
+			}
+			e1.printStackTrace();
 		}
 		return returnBase;
 	}
@@ -556,8 +572,10 @@ public class RulesContextHelper {
 			if (pkgRelTuples != null) {
 				for (I_RelTuple loopTuple : pkgRelTuples) {
 					if (isActive(loopTuple.getStatusNid())) {
-						returnData.add(refHelper.getRulesDeploymentPackageReference(
-								termFactory.getConcept(loopTuple.getC2Id())));
+						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
+						if (!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
+							returnData.add(refHelper.getRulesDeploymentPackageReference(targetPackage));
+						}
 					}
 				}
 			}
