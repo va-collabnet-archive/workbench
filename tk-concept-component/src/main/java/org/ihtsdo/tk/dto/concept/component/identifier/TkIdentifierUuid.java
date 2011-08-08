@@ -6,22 +6,19 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-
-
 public class TkIdentifierUuid extends TkIdentifier {
 
     public static final long serialVersionUID = 1;
-
     public static UUID generatedUuid = UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66");
     public UUID denotation;
 
     public TkIdentifierUuid(UUID denotation) {
-		super();
-		this.denotation = denotation;
-		this.authorityUuid = generatedUuid;
-	}
+        super();
+        this.denotation = denotation;
+        this.authorityUuid = generatedUuid;
+    }
 
-	public TkIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+    public TkIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
         super(in, dataVersion);
         denotation = new UUID(in.readLong(), in.readLong());
     }
@@ -49,23 +46,25 @@ public class TkIdentifierUuid extends TkIdentifier {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
+        StringBuilder buff = new StringBuilder();
+        buff.append(this.getClass().getSimpleName()).append(": ");
         buff.append(" denotation:");
         buff.append(this.denotation);
         buff.append("; ");
         buff.append(super.toString());
         return buff.toString();
     }
-    
+
     /**
      * Returns a hash code for this <code>EIdentifierVersionUuid</code>.
      * 
      * @return a hash code value for this <tt>EIdentifierVersionUuid</tt>.
      */
+    @Override
     public int hashCode() {
-        return Arrays.hashCode(new int[] { denotation.hashCode(), statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
+        return Arrays.hashCode(new int[]{denotation.hashCode(), statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32)});
     }
 
     /**
@@ -78,9 +77,11 @@ public class TkIdentifierUuid extends TkIdentifier {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
         if (TkIdentifierUuid.class.isAssignableFrom(obj.getClass())) {
             TkIdentifierUuid another = (TkIdentifierUuid) obj;
 
@@ -98,9 +99,8 @@ public class TkIdentifierUuid extends TkIdentifier {
         return false;
     }
 
-	@Override
-	public void setDenotation(Object denotation) {
-		this.denotation = (UUID) denotation;
-	}
-
+    @Override
+    public void setDenotation(Object denotation) {
+        this.denotation = (UUID) denotation;
+    }
 }

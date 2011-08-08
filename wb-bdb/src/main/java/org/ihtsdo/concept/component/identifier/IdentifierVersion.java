@@ -221,7 +221,13 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion,
         buf.append(" path:");
         ConceptComponent.addNidToBuffer(buf, getPathId());
         buf.append(" tm:");
-        buf.append(Revision.fileDateFormat.format(new Date(getTime())));
+        if (getTime() == Long.MAX_VALUE) {
+            buf.append(" uncommitted");
+        } else if (getTime() == Long.MIN_VALUE) {
+            buf.append(" uncommitted");
+        } else {
+            buf.append(Revision.fileDateFormat.format(new Date(getTime())));
+        }
         buf.append(" status:");
         ConceptComponent.addNidToBuffer(buf, getStatusId());
         return buf.toString();
@@ -241,6 +247,10 @@ public abstract class IdentifierVersion implements I_IdPart, I_IdVersion,
     @Override
     public int hashCode() {
         return HashFunction.hashCode(new int[] { statusAtPositionNid, authorityNid });
+    }
+
+    public boolean sapIsInRange(int min, int max) {
+        return statusAtPositionNid >= min && statusAtPositionNid <= max;
     }
 
 }

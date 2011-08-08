@@ -2315,6 +2315,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 }
             }
         }
+        if (additionalIdVersions != null) {
+            for (IdentifierVersion id : additionalIdVersions) {
+                    if (id.sapIsInRange(min, max)) {
+                        return true;
+                    }
+            }
+        }
 
         return false;
     }

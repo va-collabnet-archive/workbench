@@ -31,19 +31,23 @@ import javax.swing.JPopupMenu;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.helper.dto.DtoToText;
 
 public class ProgrammersPopupListener extends MouseAdapter implements ActionListener, ClipboardOwner {
+
 
     private enum MENU_OPTIONS {
 
         WRITE_LONG_FORM_TO_CLIPBOARD("Write long form to clipboard"),
         SET_FROM_NID("Set from nid"),
         ADD_TO_WATCH_LIST("Add to watch list"),
+        ADD_TEST_ID("Add test id"),
         REMOVE_FROM_WATCH_LIST("Remove from watch list"),
         GET_CONCEPT_ATTRIBUTES("Get concept attributes"),
         SET_CACHE_SIZE("Set cache size"),
@@ -135,6 +139,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             case IMPORT_CHANGE_SET:
                 importEccs();
                 break;
+            case ADD_TEST_ID:
+                addTestId();
 
         }
     }
@@ -236,6 +242,25 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         StringSelection contents = new StringSelection(igcd.toLongString());
         clip.setContents(contents, this);
     }
+    
+    private void addTestId() {
+        try {
+            I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+                    
+            
+            
+            ((I_Identify) igcd.getConceptAttributes()).addLongId(111L, 
+                    ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+                    ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+                    ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid(), 
+                    Long.MAX_VALUE);
+            Terms.get().addUncommitted(igcd);
+            Terms.get().commit();
+        } catch (Exception exception) {
+            AceLog.getAppLog().alertAndLogException(exception);
+        }
+    }
+
 
     private void setFromNid() {
         String nidString = askQuestion("Set panel to new concept:", "Enter nid:", "-2142075612");

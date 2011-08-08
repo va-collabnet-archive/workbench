@@ -65,10 +65,10 @@ public class IdentifierVersionLong extends IdentifierVersion {
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        buf.append(this.getClass().getSimpleName() + ": ");
-        buf.append("denotation:" + this.longDenotation);
+        buf.append(this.getClass().getSimpleName()).append(": ");
+        buf.append("denotation:").append(this.longDenotation);
         buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
@@ -83,6 +83,11 @@ public class IdentifierVersionLong extends IdentifierVersion {
             return this.getSapNid() == another.getSapNid();
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override

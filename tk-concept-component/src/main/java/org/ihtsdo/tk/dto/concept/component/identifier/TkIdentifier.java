@@ -53,8 +53,9 @@ public abstract class TkIdentifier extends TkRevision {
     /**
      * Returns a string representation of the object.
      */
+    @Override
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(" authorityUuid:");
         buff.append(this.authorityUuid);
         buff.append("; ");
@@ -67,6 +68,7 @@ public abstract class TkIdentifier extends TkRevision {
      * 
      * @return a hash code value for this <tt>EIdentifierVersion</tt>.
      */
+    @Override
     public int hashCode() {
         return Arrays.hashCode(new int[] { statusUuid.hashCode(), pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
     }
@@ -81,6 +83,7 @@ public abstract class TkIdentifier extends TkRevision {
      * @return <code>true</code> if the objects are the same; 
      *         <code>false</code> otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
