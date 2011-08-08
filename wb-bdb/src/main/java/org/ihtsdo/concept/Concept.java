@@ -660,7 +660,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return UUID.fromString("00000000-0000-0000-C000-000000000046");
     }
 
     public List<UUID> getUidsForComponent(int componentNid) throws IOException {

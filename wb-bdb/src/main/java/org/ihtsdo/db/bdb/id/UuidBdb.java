@@ -173,7 +173,7 @@ public class UuidBdb extends ComponentBdb {
 
     public UUID getUuid(int nid) {
         if (nid < 0) {
-            return new UUID(0, 0);
+            return UUID.fromString("00000000-0000-0000-C000-000000000046");
         }
         int mapIndex = nid / UUID_MAP_SIZE;
         int indexInMap = nid % UUID_MAP_SIZE;

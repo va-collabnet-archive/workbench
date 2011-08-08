@@ -87,6 +87,9 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
 
     @Override
     public UUID getPrimUuid() {
+        if (uuid == null) {
+            return UUID.fromString("00000000-0000-0000-C000-000000000046");
+        }
         return uuid;
     }
 
