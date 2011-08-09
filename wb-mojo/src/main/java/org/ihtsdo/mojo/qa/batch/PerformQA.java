@@ -159,7 +159,7 @@ public class PerformQA implements I_ProcessConcepts {
 //			}
 			
 			count++;
-			if (count % 100 == 0) {
+			if (count % 10000 == 0 || count == 100 || count == 1000) {
 				long elapsedInterval = Calendar.getInstance().getTimeInMillis()-start;
 				elapsedTotal = elapsedTotal + elapsedInterval;
 				System.out.println("Checked " + count + " effective concepts in " + elapsedInterval + " ms.");
