@@ -68,7 +68,7 @@ public class DescriptionIndexGenerator extends IndexGenerator {
         if (did != null) {
             for (I_IdPart p : did.getMutableIdParts()) {
                 doc.add(new Field("desc", p.getDenotation().toString(), Field.Store.NO,
-                        Field.Index.NOT_ANALYZED));
+                        Field.Index.ANALYZED));
             }
         } else {
             AceLog.getAppLog().alertAndLogException(new Exception("Identifier is null"));
