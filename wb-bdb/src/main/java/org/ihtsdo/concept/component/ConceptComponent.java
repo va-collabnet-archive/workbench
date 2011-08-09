@@ -430,6 +430,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         @Override
         public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
             if (Version.class.isAssignableFrom(obj.getClass())) {
                 Version another = (Version) obj;
                 if (this.getNid() == another.getNid() && this.index == another.index) {
