@@ -143,7 +143,6 @@ public class ExportUtil {
 				String effectivetime = moduleIdDAO.getEffectiveTime();
 				String active = moduleIdDAO.getActive();
 				if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("0")){
-					System.out.println("==special case==" + snomedIntegerId);
 					moduleId = I_Constants.CORE_MODULE_ID;
 					break;
 				}else if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("1")){
