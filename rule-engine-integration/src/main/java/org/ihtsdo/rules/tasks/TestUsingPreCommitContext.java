@@ -90,19 +90,9 @@ public class TestUsingPreCommitContext extends AbstractConceptTest {
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
 			I_TermFactory tf = Terms.get();
-			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
-			if (snomedRoot == null)
-				return alertList;
-			if (!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy())) {
-				return alertList;
-			} else {
 			alertList =  RulesLibrary.checkConcept(concept, 
 					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
 					getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
-			}
-			
 			return alertList;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
