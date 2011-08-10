@@ -85,12 +85,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="countRuleCases" resultMap="qaCaseResultMap"
-		parameterType="RuleFilterCoords">
+		parameterType="Integer">
 		select count(*)
-		from qa_db.qa_case c inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
-		where r.rule_uid = #{ruleUuid}
+		from qa_db.qa_case c
+		inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
+		inner join qa_db.qa_component comp on c.QA_component = comp.component_uid
+		and r.rule_uid = #{ruleUuid}
 		and c.database_uid = #{databaseUuid}
 		and c.path_uid = #{pathUuid}
+		<if test="assignedToFilter != null">
+			and c.assigned_to = #{assignedToFilter}
+		</if>
+		<if test="dispStatusUuidFilter != null">
+			and c.disposition_status_uid = #{dispStatusUuidFilter}
+		</if>
+		<if test="statusFilter != null">
+			and c.status = #{statusFilter}
+		</if>
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 	</select>
 	

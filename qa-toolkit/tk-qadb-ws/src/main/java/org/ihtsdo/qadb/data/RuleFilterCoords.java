@@ -1,9 +1,9 @@
 package org.ihtsdo.qadb.data;
 
-
 public class RuleFilterCoords {
 	private String ruleUuid;
 	private String status;
+	private Integer statusFilter;
 	private String name;
 	private String ruleCode;
 	private String ruleCategory;
@@ -16,8 +16,34 @@ public class RuleFilterCoords {
 	private Boolean dispositionOrder;
 	private Integer startLine;
 	private Integer pageLenght;
+	private String dispStatusUuidFilter;
+	private String assignedToFilter;
 	private DispositionStatus dispStatusFilter;
-	
+
+	public Integer getStatusFilter() {
+		return statusFilter;
+	}
+
+	public void setStatusFilter(Integer statusFilter) {
+		this.statusFilter = statusFilter;
+	}
+
+	public String getAssignedToFilter() {
+		return assignedToFilter;
+	}
+
+	public void setAssignedToFilter(String assignedToFilter) {
+		this.assignedToFilter = assignedToFilter;
+	}
+
+	public String getDispStatusUuidFilter() {
+		return dispStatusUuidFilter;
+	}
+
+	public void setDispStatusUuidFilter(String dispStatusUuidFilter) {
+		this.dispStatusUuidFilter = dispStatusUuidFilter;
+	}
+
 	public DispositionStatus getDispStatusFilter() {
 		return dispStatusFilter;
 	}

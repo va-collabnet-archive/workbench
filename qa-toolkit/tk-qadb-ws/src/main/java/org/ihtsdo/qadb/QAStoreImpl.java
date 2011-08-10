@@ -651,6 +651,45 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.info("Returning " + lines.size() + " Lines");
 		return lines;
 	}
+	public int countQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
+		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
+		
+		RuleFilterCoords coords = new RuleFilterCoords();
+		coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid());
+		coords.setPathUuid(qaCoordinate.getPathUuid());
+		coords.setRuleUuid(ruleUuid);
+		coords.setViewPointTime(qaCoordinate.getViewPointTime());
+		coords.setStartLine(startLine);
+		coords.setPageLenght(pageLenght);
+		
+		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
+			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
+		}
+		
+		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
+			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
+			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
+			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
+			if (dispoFilterValue != null) {
+				coords.setDispStatusUuidFilter(dispoFilterValue.toString());
+			}
+			if (statusFilterValue != null) {
+				coords.setStatusFilter(Integer.valueOf(statusFilterValue.toString()));
+			}
+			if(assignedToFilter != null){
+				coords.setAssignedToFilter(assignedToFilter.toString());
+			}
+		}
+		
+		long queryStartTime = System.currentTimeMillis();
+		Integer count = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.QACaseMapper.countRuleCases", coords);
+		long queryEndTime = System.currentTimeMillis();
+		logger.info("Rule cases counted in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
+		
+		return count;
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -685,7 +724,7 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.info("Getting qa cases report lines by page...");
 		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
 		List<QACasesReportLine> reduced = null;
-		int totalLines = lines.size();
+		int totalLines = countQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
 		logger.debug("############################## QA CASE REPORT PAGE");
 		logger.debug("Total Lines: " + totalLines);
 		logger.debug("Start Line: " + startLine);
