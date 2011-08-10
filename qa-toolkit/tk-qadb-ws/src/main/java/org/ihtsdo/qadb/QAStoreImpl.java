@@ -723,7 +723,6 @@ public class QAStoreImpl implements QAStoreBI {
 		long startTime = System.currentTimeMillis();
 		logger.info("Getting qa cases report lines by page...");
 		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
-		List<QACasesReportLine> reduced = null;
 		Integer totalLines = countQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
 		logger.debug("############################## QA CASE REPORT PAGE");
 		logger.debug("Total Lines: " + totalLines);
@@ -740,14 +739,9 @@ public class QAStoreImpl implements QAStoreBI {
 			long sortEndTime = System.currentTimeMillis();
 			logger.info("Sorting lines finished in: " + ((sortEndTime - sortStartTime) / 1000) + " Seconds");
 		}
-		if (startLine + pageLenght - 1 > totalLines) {
-			reduced = lines.subList(startLine - 1, totalLines);
-		} else {
-			reduced = lines.subList(startLine - 1, startLine + pageLenght - 1);
-		}
-		logger.debug("Reduced Lines: " + reduced.size());
+		logger.debug("Reduced Lines: " + lines.size());
 
-		QACasesReportPage result = new QACasesReportPage(reduced, sortBy, filter, startLine, startLine + reduced.size() - 1, totalLines);
+		QACasesReportPage result = new QACasesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
 		long endTime = System.currentTimeMillis();
 		logger.info("QA cases page found in: " + ((endTime - startTime) / 1000) + " Seconds");
 		return result;
