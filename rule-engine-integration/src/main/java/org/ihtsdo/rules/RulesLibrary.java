@@ -70,6 +70,7 @@ import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -113,6 +114,7 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACache;
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
+	public static boolean noRealtimeRulesAlertShown = false;
 
 	public enum INFERRED_VIEW_ORIGIN {STATED, CONSTRAINT_NORMAL_FORM, INFERRED};
 
@@ -175,6 +177,13 @@ public class RulesLibrary {
 		}
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
+		if (!noRealtimeRulesAlertShown &&
+				context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) &&
+				kbase.getKnowledgePackages().size() < 2) {
+			noRealtimeRulesAlertShown = true;
+			AceLog.getAppLog().alertAndLogException(
+                    new IOException("Warning! No rules in realtime context. QA is disabled."));
+		}
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
 			if (kbase != null) {
