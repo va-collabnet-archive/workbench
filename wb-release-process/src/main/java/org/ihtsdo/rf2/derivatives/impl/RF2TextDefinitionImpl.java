@@ -81,13 +81,15 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						active = "0";
 					
 					moduleId = getConceptMetaModuleID(concept , effectiveTime);
-					
-					if (conceptid==null || conceptid.equals("")){
+				
+					if (conceptid==null || conceptid.equals("") || conceptid.equals("0") ){
 						conceptid=concept.getUids().iterator().next().toString();
 					}
-					if (descriptionid==null || descriptionid.equals("")){
+					
+					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
+					
 					getConfig().getBw().write(
 							descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
 							+ caseSignificanceId);
