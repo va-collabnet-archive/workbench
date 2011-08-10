@@ -84,8 +84,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by effective_time desc
 	</select>
 
-	<select id="countRuleCases" resultMap="qaCaseResultMap"
-		parameterType="Integer">
+	<select id="countRuleCases" resultType="Integer"
+		parameterType="RuleFilterCoords">
 		select count(*)
 		from qa_db.qa_case c
 		inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
