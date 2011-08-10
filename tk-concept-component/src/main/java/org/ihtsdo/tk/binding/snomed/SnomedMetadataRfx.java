@@ -31,6 +31,9 @@ public class SnomedMetadataRfx {
     // DESCRIPTION NIDs
     private static int DES_FULL_SPECIFIED_NAME_NID;
     private static int DES_SYNONYM_PREFERRED_NAME_NID;
+    private static int DES_SYNONYM_NID;
+    private static int ACCEPTABLE_NID;
+    private static int PREFERRED_NID;
     // RELATIONSHIP NIDs
     private static int REL_CH_DEFINING_CHARACTERISTIC_NID;
     private static int REL_CH_INFERRED_RELATIONSHIP_NID;
@@ -45,6 +48,9 @@ public class SnomedMetadataRfx {
     private static int STATUS_CURRENT_NID;
     private static int STATUS_LIMITED_NID;
     private static int STATUS_RETIRED_NID;
+    //REFEX NIDs
+    private static int US_DIALECT_REFEX_NID;
+    private static int GB_DIALECT_REFEX_NID;
 
     public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -58,6 +64,27 @@ public class SnomedMetadataRfx {
             setupSnoRf1Rf2();
         }
         return DES_SYNONYM_PREFERRED_NAME_NID;
+    }
+    
+    public static int getDES_SYNONYM_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return DES_SYNONYM_NID;
+    }
+    
+    public static int getDESC_ACCEPTABLE_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return ACCEPTABLE_NID;
+    }
+    
+    public static int getDESC_PREFERRED_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return PREFERRED_NID;
     }
 
     public static int getREL_CH_DEFINING_CHARACTERISTIC_NID() throws IOException {
@@ -150,6 +177,20 @@ public class SnomedMetadataRfx {
         }
         return STATUS_RETIRED_NID;
     }
+    
+    public static int getUS_DIALECT_REFEX_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return US_DIALECT_REFEX_NID;
+    }
+    
+    public static int getGB_DIALECT_REFEX_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return GB_DIALECT_REFEX_NID;
+    }
 
     private static void setupSnoRf1Rf2() throws IOException {
         TerminologyStoreDI tf = Ts.get();
@@ -167,6 +208,12 @@ public class SnomedMetadataRfx {
             DES_FULL_SPECIFIED_NAME_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUuids());
             DES_SYNONYM_PREFERRED_NAME_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getUuids());
+            DES_SYNONYM_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getUuids());
+            ACCEPTABLE_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getUuids());
+            PREFERRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getUuids());
             // RELATIONSHIPS
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
@@ -194,6 +241,11 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getUuids());
             STATUS_RETIRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
+            //REFEX
+            US_DIALECT_REFEX_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getUuids());
+            GB_DIALECT_REFEX_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getUuids());
 
         } else if (releaseFormat == 2) {
             // DESCRIPTIONS
@@ -201,6 +253,12 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids());
             DES_SYNONYM_PREFERRED_NAME_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.SYNONYM_RF2.getUuids());
+            DES_SYNONYM_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.SYNONYM_RF2.getUuids());
+            ACCEPTABLE_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.ACCEPTABLE_RF2.getUuids());
+            PREFERRED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.PREFERRED_RF2.getUuids());
             // RELATIONSHIPS
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
@@ -226,6 +284,11 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
             STATUS_RETIRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
+            //REFEX
+            US_DIALECT_REFEX_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getUuids());
+            GB_DIALECT_REFEX_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getUuids());
 
         } else {
             throw new IOException("SnomedMetadataRfx releaseFormat must equal 1 or 2.");
