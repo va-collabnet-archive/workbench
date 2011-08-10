@@ -676,7 +676,7 @@ public class QAStoreImpl implements QAStoreBI {
 				coords.setDispStatusUuidFilter(dispoFilterValue.toString());
 			}
 			if (statusFilterValue != null) {
-				coords.setStatusFilter(Integer.valueOf(statusFilterValue.toString()));
+				coords.setStatusFilter(statusFilterValue.toString().equals("Open") ? 1 : 0);
 			}
 			if(assignedToFilter != null){
 				coords.setAssignedToFilter(assignedToFilter.toString());
