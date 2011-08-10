@@ -127,7 +127,7 @@ public abstract class RF2ArtifactPostExportAbst {
 			return null;
 		}
 		retFile=retFile.replace("SUFFIX",deltaSuffix);
-		retFile+="_" + previuosReleaseDate + "_" + date + endFile;
+		retFile+="_" + date + endFile;
 		return new File(parentFolder,retFile);
 		
 	}
