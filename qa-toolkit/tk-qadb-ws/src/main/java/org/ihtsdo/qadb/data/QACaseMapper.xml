@@ -93,6 +93,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and c.path_uid = #{pathUuid}
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 	</select>
+	
+	<sql id="pagingSql">
+		LIMIT #{startLine}, #{pageLenght}
+	</sql>
 
 	<select id="selectRuleCases" resultMap="qaCaseResultMap"
 		parameterType="RuleFilterCoords">
@@ -106,6 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="name != null">
 			and comp.name like #{name}
 		</if>
+		<include refid="pagingSql"/>
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 	</select>
 
