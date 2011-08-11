@@ -1098,6 +1098,7 @@ public class ExportUtil {
 	public static String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
 		Long sctId = null;
 		I_Identify identify = getTermFactory().getId(nid);
+		if (identify==null) return null;
 		List<? extends I_IdVersion> i_IdentifyList = identify.getIdVersions();
 		if (i_IdentifyList.size() > 0) {
 			for (int i = 0; i < i_IdentifyList.size(); i++) {
@@ -1116,7 +1117,7 @@ public class ExportUtil {
 			}
 		}
 		if (sctId == null)
-			sctId = 0L; // This is temporary fix so needs to remove later on
+			return null;
 		return sctId.toString();
 	}
 

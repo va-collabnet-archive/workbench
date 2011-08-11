@@ -1,6 +1,7 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -88,7 +89,14 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 						referencedComponentId=concept.getUids().iterator().next().toString();
 					}
 					if (targetComponent==null || targetComponent.equals("")){
-						targetComponent=Terms.get().getUids(rel.getC2Id()).iterator().next().toString();
+						Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+						if (Uids==null  ){
+							continue;
+						}
+						targetComponent=Uids.iterator().next().toString();
+						if (targetComponent.equals(nullUuid)){
+							continue;
+						}
 					}
 
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
