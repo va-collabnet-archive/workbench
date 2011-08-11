@@ -27,6 +27,8 @@ import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.task.cs.ImportAllChangeSets;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import net.nhs.cfh.ace.config.WorkbenchConfiguration
+import net.nhs.cfh.ace.gui.service.ConceptService;
 
 /**
  * Read all binary change set under a specified directory hierarchy, and apply
@@ -95,6 +97,12 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
+        conceptService  conceptService=  WorkbenchConfiguration.setResourceName("workbench-config.xml");
+        (ConceptService) WorkbenchConfiguration
+		.getDefaultInstance().getBeanFactory()
+		.getBean("conceptService");
+        
+        BdbCommitManager.addCommitListener(new LuceneCommitListener(conceptService));
         try {
             importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
         } catch (TaskFailedException e) {
