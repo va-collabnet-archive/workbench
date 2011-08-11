@@ -39,6 +39,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.agent.KnowledgeAgent;
+import org.drools.agent.KnowledgeAgentConfiguration;
 import org.drools.agent.KnowledgeAgentFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
@@ -559,21 +560,21 @@ public class RulesLibrary {
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 			} catch (Exception e) {
 				// agent base not available
-				System.out.println("WARNING: Agent based connection with guvnor not available, using trying to load from cache...");
+				System.out.println("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
 				kbase = getKnowledgeBaseFromFileCache(referenceUuid);
 				if (kbase != null) {
-					System.out.println("WARNING: Cache load OK.");
+					System.out.println("INFO: Cache load OK.");
 				} else {
-					System.out.println("WARNING: Cache loading failed, No knowledgebase.");
+					System.out.println("WARNING: Cache loading failed.");
 				}
 			}
 		} else  {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
 			if (kbase == null) {
-				System.out.println("WARNING: Cache loading failed, terying Guvnor...");
+				System.out.println("INFO: Trying Guvnor...");
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 				if (kbase != null) {
-					System.out.println("WARNING: Guvnor load OK.");
+					System.out.println("INFO: Guvnor load OK.");
 				} else {
 					System.out.println("WARNING: Guvnor loading failed, No knowledgebase.");
 				}
@@ -669,7 +670,9 @@ public class RulesLibrary {
 			rulesDirectory.mkdir();
 		}
 		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
-		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent" );
+		KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
+//		kaconf.setProperty( "drools.resource.urlcache","rules" );
+		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
 		kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
 		kbase = kagent.getKnowledgeBase();
 		//		try {
