@@ -28,6 +28,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.AbstractConceptTest;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
@@ -41,14 +42,14 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
  * The Class TestUsingPreCommitContext.
  */
 @BeanList(specs = {
-	 @Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN),
-     @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN) })
-		
-public class TestUsingPreCommitContext extends AbstractConceptTest {
+		@Spec(directory = "tasks/rules tasks", type = BeanType.TASK_BEAN),
+		@Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN) })
+
+		public class TestUsingPreCommitContext extends AbstractConceptTest {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
-	
+
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
@@ -90,10 +91,31 @@ public class TestUsingPreCommitContext extends AbstractConceptTest {
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
 			I_TermFactory tf = Terms.get();
-			alertList =  RulesLibrary.checkConcept(concept, 
-					tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
-					getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
-			return alertList;
+			I_GetConceptData snomedRoot = getConceptSafe(Terms.get(), SNOMED.Concept.ROOT.getUids());
+			I_GetConceptData auxRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getUids());
+			I_GetConceptData refsetRoot = getConceptSafe(Terms.get(), RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
+			I_GetConceptData projectRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getUids());
+			if (snomedRoot == null)
+				return alertList;
+			if (auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+					getFrameConfig().getConflictResolutionStrategy()) ||
+					refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+							.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+							getFrameConfig().getConflictResolutionStrategy()) ||
+							projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+									.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+									getFrameConfig().getConflictResolutionStrategy()) ||
+									!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+											.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+											getFrameConfig().getConflictResolutionStrategy())) {
+				return alertList;
+			} else {
+				alertList =  RulesLibrary.checkConcept(concept, 
+						tf.getConcept(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()), true, 
+						getFrameConfig(), INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM).getAlertList();
+				return alertList;
+			}
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
