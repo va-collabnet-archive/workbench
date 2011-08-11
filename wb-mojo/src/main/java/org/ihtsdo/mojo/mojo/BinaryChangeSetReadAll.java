@@ -19,6 +19,7 @@ package org.ihtsdo.mojo.mojo;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,6 +32,9 @@ import net.nhs.cfh.ace.config.WorkbenchConfiguration;
 import net.nhs.cfh.ace.gui.service.ConceptService;
 import net.nhs.cfh.ace.service.extensions.LuceneCommitListener;
 import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.objectCache.ObjectCache;
+import org.ihtsdo.custom.statics.CustomStatics;
+
 
 /**
  * Read all binary change set under a specified directory hierarchy, and apply
@@ -99,6 +103,15 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
+        
+        Properties custProps = new Properties();
+        custProps.put("conceptService", "net.nhs.cfh.ace.gui.service.NHSAceConceptServiceImpl");
+        custProps.put("conceptServiceName", "nhs-ace");
+        custProps.put("nhs-ace.readv2.c6af074b-1992-3e70-8586-856538d53d56", "net.nhs.cfh.ace.gui.service.handlers.read.v2.ReadV2Handler");
+        custProps.put("nhs-ace.readv3.98aee43f-9d13-35af-b2a0-bb2bab1e50b3", "net.nhs.cfh.ace.gui.service.handlers.read.v3.ReadV3Handler");
+        custProps.put("nhs-ace.snomed.0418a591-f75b-39ad-be2c-3ab849326da9", "net.nhs.cfh.ace.gui.service.handlers.snomed.SnomedHandler");
+        ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
+
           WorkbenchConfiguration.setResourceName("ci-config.xml");
           ConceptService conceptService = (ConceptService) WorkbenchConfiguration
 		.getDefaultInstance().getBeanFactory()
