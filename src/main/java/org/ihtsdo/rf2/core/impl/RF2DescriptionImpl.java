@@ -52,7 +52,9 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		String typeId = "";
 		String languageCode = "en";
 		try {
-
+			if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
+				boolean bstop=true;
+			}
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
