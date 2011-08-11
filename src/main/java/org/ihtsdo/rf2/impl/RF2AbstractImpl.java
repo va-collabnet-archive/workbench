@@ -100,6 +100,8 @@ public abstract class RF2AbstractImpl {
 	protected int activeNid ; //Active value	900000000000545005	
 	
 	protected int inactiveNid; //Inactive value	900000000000546006	
+	
+	protected String nullUuid; // null string to match with UUID.fromString("00000000-0000-0000-C000-000000000046")
 
 	private int activeStatus;
 
@@ -155,7 +157,7 @@ public abstract class RF2AbstractImpl {
 			this.retiredNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 			this.activeNid = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); //Active value	900000000000545005	
 			this.inactiveNid = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006	
-		
+			this.nullUuid="00000000-0000-0000-c000-000000000046";
 			allStatuses = getAllStatuses();
 			this.allStatusSet=tf.newIntSet();
 			this.allStatusSet.addAll(allStatuses.getSetValues());
