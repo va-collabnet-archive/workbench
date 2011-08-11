@@ -16,9 +16,7 @@
  */
 package org.dwfa.ace.refset;
 
-public interface I_RefsetDefaultsConInt extends I_RefsetDefaultsConcept {
+public interface I_RefsetDefaultsConInt extends I_RefsetDefaultsConcept, I_RefsetDefaultsInteger {
     public int getDefaultForIntegerValue();
-
-    public Integer[] getIntegerPopupItems();
 
 }
