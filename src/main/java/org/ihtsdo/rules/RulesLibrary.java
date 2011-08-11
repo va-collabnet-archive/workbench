@@ -115,6 +115,7 @@ public class RulesLibrary {
 	public static KindOfCacheBI myStaticIsACacheRefsetSpec;
 	public static TerminologyHelperDroolsWorkbench terminologyHelperCache;
 	public static boolean noRealtimeRulesAlertShown = false;
+	public static boolean rulesDisabled = false;
 
 	public enum INFERRED_VIEW_ORIGIN {STATED, CONSTRAINT_NORMAL_FORM, INFERRED};
 
