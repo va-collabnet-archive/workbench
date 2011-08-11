@@ -314,12 +314,13 @@ rule "missing Dialect description EN_US"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
-                $dv : DescriptionVersionBI(this.isUncommitted == true, 
+                $dv : DescriptionVersionBI(this.isUncommitted == true && 
                             this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
 	then 
 		for (DescriptionVersionBI $d : $c.getDescsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
-              Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+              Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())&&
+                    $d.getTypeNid() != SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
    		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
                Language.EN_US, $c.getViewCoordinate()), $c.getNid());
          }
@@ -330,12 +331,13 @@ rule "missing Dialect description EN_UK"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
-                $dv : DescriptionVersionBI(this.isUncommitted == true, 
+                $dv : DescriptionVersionBI(this.isUncommitted == true && 
                             this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
 	then 
 		for (DescriptionVersionBI $d : $c.getDescsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
-              Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+              Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate()) &&
+                    $d.getTypeNid() != SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
    		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
                Language.EN_UK, $c.getViewCoordinate()), $c.getNid());
          }
