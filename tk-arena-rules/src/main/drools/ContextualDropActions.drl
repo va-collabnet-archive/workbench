@@ -553,7 +553,7 @@ rule "rule 28" #proceedure onto physical object
       	actions.add(new CreateRelAction("Proceedure Device - Direct", $dropTarget, Snomed.PROCEDURE_DEVICE_DIRECT, $dropObject));
       	actions.add(new CreateRelAction("Proceedure Device - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject));
       	actions.add(new CreateRelAction("Proceedure Device - using access device", $dropTarget, Snomed.PROCCEDURE_ACCESS_DEVICE, $dropObject));
-      	actions.add(new CreateRelAction("Proceedure Device - using device", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject));
+      	actions.add(new CreateRelAction("Proceedure Device - using device", $dropTarget, Snomed.PROCEDURE_USING_DEVICE, $dropObject));
 end
 
 rule "rule 29" #proceedure onto substance
@@ -723,7 +723,7 @@ rule "rule 39" #clinical finding onto observable entity
          ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.OBSERVABLE_ENTITY, $dropObject));
+		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject));
 end
 
 rule "rule 40" #clinical finding onto substance
@@ -931,8 +931,8 @@ end
 rule "rule 53" #Body structure onto qualifier value
 	when
 	(and
-         ($dropTarget: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject));
