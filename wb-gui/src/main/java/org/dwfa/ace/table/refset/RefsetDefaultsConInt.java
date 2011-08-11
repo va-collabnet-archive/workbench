@@ -74,4 +74,9 @@ public class RefsetDefaultsConInt extends RefsetDefaultsConcept implements I_Ref
         this.integerPopupItems = integerPopupItems;
     }
 
+    @Override
+    public int getDefaultForIntegerRefset() {
+        return defaultForIntegerValue;
+    }
+
 }
