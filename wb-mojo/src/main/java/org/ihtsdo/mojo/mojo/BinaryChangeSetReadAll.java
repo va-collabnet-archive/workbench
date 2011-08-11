@@ -97,8 +97,8 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
-        conceptService  conceptService=  WorkbenchConfiguration.setResourceName("workbench-config.xml");
-        (ConceptService) WorkbenchConfiguration
+          WorkbenchConfiguration.setResourceName("workbench-config.xml");
+          ConceptService conceptService = (ConceptService) WorkbenchConfiguration
 		.getDefaultInstance().getBeanFactory()
 		.getBean("conceptService");
         
