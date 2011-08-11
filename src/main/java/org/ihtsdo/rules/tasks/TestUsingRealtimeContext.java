@@ -97,18 +97,19 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 			I_GetConceptData projectRoot = getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getUids());
 			if (snomedRoot == null)
 				return alertList;
-			if (auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
-					.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-					getFrameConfig().getConflictResolutionStrategy()) ||
-					refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+			if (RulesLibrary.rulesDisabled ||
+					auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 							.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
 							getFrameConfig().getConflictResolutionStrategy()) ||
-							projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+							refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 									.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
 									getFrameConfig().getConflictResolutionStrategy()) ||
-									!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+									projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 											.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-											getFrameConfig().getConflictResolutionStrategy())) {
+											getFrameConfig().getConflictResolutionStrategy()) ||
+											!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+													.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
+													getFrameConfig().getConflictResolutionStrategy())) {
 				return alertList;
 			} else {
 				alertList =  RulesLibrary.checkConcept(concept, 

@@ -1,5 +1,7 @@
 package org.ihtsdo.rules.context;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,6 +68,28 @@ public class RulesDeploymentPackageReference {
 		return buff.toString().getBytes();
 	}
 
+	public byte[] getChangeSetXmlBytesForFile() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("<change-set xmlns='http://drools.org/drools-5.0/change-set'");
+		buff.append("		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance'");
+		buff.append("		xs:schemaLocation='http://drools.org/drools-5.0/change-set drools-change-set-5.0.xsd' >");
+		buff.append("		<add>");
+		buff.append("			<resource source='");
+		String[] parts = url.split("/");
+		File file = new File("rules/" + parts[parts.length-2] + "_" + parts[parts.length-1] + ".pkg");
+		try {
+			buff.append(file.toURI().toURL().toString());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		//TODO: implement full authentication
+		buff.append("' type='PKG' basicAuthentication='enabled' username='empty' password='empty'/>");
+		buff.append("		</add>");
+		buff.append("</change-set>");
+
+		return buff.toString().getBytes();
+	}
+
 	public String toString() {
 		return name;
 	}
@@ -73,12 +97,37 @@ public class RulesDeploymentPackageReference {
 	public KnowledgeBase updateKnowledgeBase() throws Exception {
 		return getKnowledgeBase(true);
 	}
-	
+
 	public KnowledgeBase getKnowledgeBase(boolean recreate) throws Exception {
-		return RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-				getChangeSetXmlBytes(), recreate);
+		if (!recreate) {
+			KnowledgeBase fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+					getChangeSetXmlBytesForFile(), recreate);
+			if (fileBased != null) {
+				return fileBased;
+			} else {
+				KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+						getChangeSetXmlBytes(), recreate);
+				if (guvnorBased != null) {
+					return guvnorBased;
+				}
+			}
+		} else {
+			KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+					getChangeSetXmlBytes(), recreate);
+			if (guvnorBased != null) {
+				return guvnorBased;
+			} else {
+				System.out.println("WARNING: KB Recreation failed.");
+				KnowledgeBase fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+						getChangeSetXmlBytesForFile(), recreate);
+				if (fileBased != null) return fileBased;
+			}
+		}
+
+		return null;
+
 	}
-	
+
 	public Collection<Rule> getRules() throws Exception {
 		Collection<Rule> rules = new ArrayList<Rule>();
 		KnowledgeBase kbase = getKnowledgeBase(false);
@@ -92,7 +141,7 @@ public class RulesDeploymentPackageReference {
 		}
 		return rules;
 	}
-	
+
 	public boolean validate() {
 		return RulesLibrary.validateDeploymentPackage(uuids.iterator().next(), getChangeSetXmlBytes());
 	}
