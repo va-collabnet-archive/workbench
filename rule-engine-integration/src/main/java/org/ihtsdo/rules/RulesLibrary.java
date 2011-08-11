@@ -48,7 +48,6 @@ import org.drools.definition.KnowledgePackage;
 import org.drools.definition.rule.Rule;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -585,7 +584,7 @@ public class RulesLibrary {
 		return kbase;
 	}
 
-	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) {
+	private static KnowledgeBase getKnowledgeBaseFromFileCache(UUID referenceUuid) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ConfigAceFrame config = null;
 		try {
@@ -646,7 +645,7 @@ public class RulesLibrary {
 		}
 		return kbase;
 	}
-	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) {
+	private static KnowledgeBase getKnowledgeBaseWithAgent(UUID referenceUuid, byte[] bytes) throws Exception {
 		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
 		I_ConfigAceFrame config = null;
 		try {

@@ -1,6 +1,7 @@
 package org.ihtsdo.rules.context;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,7 +69,7 @@ public class RulesDeploymentPackageReference {
 		return buff.toString().getBytes();
 	}
 
-	public byte[] getChangeSetXmlBytesForFile() {
+	public byte[] getChangeSetXmlBytesForFile() throws FileNotFoundException {
 		StringBuffer buff = new StringBuffer();
 		buff.append("<change-set xmlns='http://drools.org/drools-5.0/change-set'");
 		buff.append("		xmlns:xs='http://www.w3.org/2001/XMLSchema-instance'");
@@ -76,7 +77,10 @@ public class RulesDeploymentPackageReference {
 		buff.append("		<add>");
 		buff.append("			<resource source='");
 		String[] parts = url.split("/");
-		File file = new File("rules/" + parts[parts.length-2] + "_" + parts[parts.length-1] + ".pkg");
+		File file = new File("rules/" + parts[parts.length-2] + "_" + parts[parts.length-1] + ".guvnor");
+		if (!file.exists()) {
+			throw new FileNotFoundException();
+		}
 		try {
 			buff.append(file.toURI().toURL().toString());
 		} catch (MalformedURLException e) {
@@ -100,8 +104,13 @@ public class RulesDeploymentPackageReference {
 
 	public KnowledgeBase getKnowledgeBase(boolean recreate) throws Exception {
 		if (!recreate) {
-			KnowledgeBase fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-					getChangeSetXmlBytesForFile(), recreate);
+			KnowledgeBase fileBased = null;
+			try {
+				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+						getChangeSetXmlBytesForFile(), recreate);
+			} catch (Exception e) {
+				// not found
+			}
 			if (fileBased != null) {
 				return fileBased;
 			} else {
@@ -118,8 +127,13 @@ public class RulesDeploymentPackageReference {
 				return guvnorBased;
 			} else {
 				System.out.println("WARNING: KB Recreation failed.");
-				KnowledgeBase fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-						getChangeSetXmlBytesForFile(), recreate);
+				KnowledgeBase fileBased = null;
+				try {
+					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+							getChangeSetXmlBytesForFile(), recreate);
+				} catch (Exception e) {
+					// not found
+				}
 				if (fileBased != null) return fileBased;
 			}
 		}
