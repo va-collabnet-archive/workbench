@@ -29,6 +29,8 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import net.nhs.cfh.ace.config.WorkbenchConfiguration;
 import net.nhs.cfh.ace.gui.service.ConceptService;
+import net.nhs.cfh.ace.service.extensions.LuceneCommitListener;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 
 /**
  * Read all binary change set under a specified directory hierarchy, and apply
