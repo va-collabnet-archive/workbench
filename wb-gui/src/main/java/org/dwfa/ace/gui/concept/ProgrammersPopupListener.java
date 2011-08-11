@@ -38,9 +38,9 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.helper.dto.DtoToText;
+import org.ihtsdo.rules.RulesLibrary;
 
 public class ProgrammersPopupListener extends MouseAdapter implements ActionListener, ClipboardOwner {
-
 
     private enum MENU_OPTIONS {
 
@@ -54,12 +54,21 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         SET_CACHE_PERCENT("Set cache percent"),
         CHANGE_SET_TO_TEXT("Change set to text"),
         DTO_TO_TEXT("DTO to text"),
-        IMPORT_CHANGE_SET("Import change set");
+        IMPORT_CHANGE_SET("Import change set"),
+        TOGGLE_QA("Toggle QA");
         
         String menuText;
 
         private MENU_OPTIONS(String menuText) {
             this.menuText = menuText;
+        }
+        
+        public void setText(String menuText) {
+        	 this.menuText = menuText;
+        }
+        
+        public String getText() {
+        	return this.menuText;
         }
 
         public void addToMenu(JPopupMenu popup, ActionListener l) {
@@ -141,6 +150,9 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                 break;
             case ADD_TEST_ID:
                 addTestId();
+                break;
+            case TOGGLE_QA:
+            	toggleQa();
 
         }
     }
@@ -281,6 +293,22 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
     private void addToWatch() {
         I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
         Terms.get().addToWatchList(igcd);
+    }
+    
+    private void toggleQa() {
+    	if (RulesLibrary.rulesDisabled == false) {
+    		RulesLibrary.rulesDisabled = true;
+    		JOptionPane.showMessageDialog(null,
+    			    "QA is Disabled!.",
+    			    "Warning",
+    			    JOptionPane.WARNING_MESSAGE);
+    	} else {
+    		RulesLibrary.rulesDisabled = false;
+    		JOptionPane.showMessageDialog(null,
+    			    "QA is Enabled!.",
+    			    "Warning",
+    			    JOptionPane.WARNING_MESSAGE);
+    	}
     }
 
     public String askQuestion(String realm, String question, String defaultAnswer) {
