@@ -65,7 +65,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			//TODO empty folder needed?
 		}
 		if (!rf2OutputFolder.exists()){
-			rf2OutputFolder.mkdir();
+			rf2OutputFolder.mkdirs();
 		}else{
 			//TODO empty folder needed?
 		}
