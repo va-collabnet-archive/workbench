@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -149,6 +150,7 @@ public class QACaseDetailsPanel extends JPanel {
 		ruleDescription.append("Example: " + rule.getExample());
 		ruleDescriptionTextArea.setText(ruleDescription.toString());
 		componentNameTextArea.setText(component.getComponentName());
+		conceptUUID.setText(component.getComponentUuid().toString());
 		caseDetails.setText(selectedCase.getDetail());
 		annotation.setText(selectedCase.getDispositionAnnotation() == null ? ""
 				: selectedCase.getDispositionAnnotation());
@@ -313,6 +315,8 @@ public class QACaseDetailsPanel extends JPanel {
 		separator1 = new JSeparator();
 		label3 = new JLabel();
 		componentNameTextArea = new JTextArea();
+		label16 = new JLabel();
+		conceptUUID = new JTextField();
 		label4 = new JLabel();
 		scrollPane3 = new JScrollPane();
 		caseDetails = new JTextArea();
@@ -378,9 +382,9 @@ public class QACaseDetailsPanel extends JPanel {
 						panel3.setBorder(new EmptyBorder(5, 5, 0, 0));
 						panel3.setLayout(new GridBagLayout());
 						((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 127, 0, 0, 0, 114, 60, 0, 0};
-						((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {25, 66, 12, 25, 30, 0, 28, 26, 0, 0, 0, 0};
+						((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {25, 66, 12, 25, 0, 30, 0, 28, 26, 0, 0, 0, 0};
 						((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
-						((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 						//---- label1 ----
 						label1.setText("Rule name");
@@ -428,10 +432,22 @@ public class QACaseDetailsPanel extends JPanel {
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
+						//---- label16 ----
+						label16.setText("Component UUID");
+						panel3.add(label16, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
+
+						//---- conceptUUID ----
+						conceptUUID.setEditable(false);
+						panel3.add(conceptUUID, new GridBagConstraints(1, 4, 7, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 0), 0, 0));
+
 						//---- label4 ----
 						label4.setText("Detail");
 						label4.setVerticalAlignment(SwingConstants.TOP);
-						panel3.add(label4, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+						panel3.add(label4, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
@@ -443,16 +459,16 @@ public class QACaseDetailsPanel extends JPanel {
 							caseDetails.setEditable(false);
 							scrollPane3.setViewportView(caseDetails);
 						}
-						panel3.add(scrollPane3, new GridBagConstraints(1, 4, 7, 1, 0.0, 0.0,
+						panel3.add(scrollPane3, new GridBagConstraints(1, 5, 7, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
-						panel3.add(separator2, new GridBagConstraints(0, 5, 8, 1, 0.0, 0.0,
+						panel3.add(separator2, new GridBagConstraints(0, 6, 8, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
 						//---- label5 ----
 						label5.setText("Disposition status");
-						panel3.add(label5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
+						panel3.add(label5, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
@@ -463,13 +479,13 @@ public class QACaseDetailsPanel extends JPanel {
 								dispositionStatusComboItemStateChanged(e);
 							}
 						});
-						panel3.add(dispositionStatusCombo, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
+						panel3.add(dispositionStatusCombo, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
 						//---- label6 ----
 						label6.setText("Annotation");
-						panel3.add(label6, new GridBagConstraints(2, 6, 2, 1, 0.0, 0.0,
+						panel3.add(label6, new GridBagConstraints(2, 7, 2, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
@@ -480,34 +496,34 @@ public class QACaseDetailsPanel extends JPanel {
 								annotationKeyPressed(e);
 							}
 						});
-						panel3.add(annotation, new GridBagConstraints(4, 6, 4, 1, 0.0, 0.0,
+						panel3.add(annotation, new GridBagConstraints(4, 7, 4, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
 						//---- label14 ----
 						label14.setText("Edited by");
-						panel3.add(label14, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
+						panel3.add(label14, new GridBagConstraints(0, 8, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(dispositionStatusEditorLabel, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
+						panel3.add(dispositionStatusEditorLabel, new GridBagConstraints(1, 8, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
 						//---- label15 ----
 						label15.setText("Date");
-						panel3.add(label15, new GridBagConstraints(2, 7, 2, 1, 0.0, 0.0,
+						panel3.add(label15, new GridBagConstraints(2, 8, 2, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(dispositionStatusEditionDate, new GridBagConstraints(4, 7, 3, 1, 0.0, 0.0,
+						panel3.add(dispositionStatusEditionDate, new GridBagConstraints(4, 8, 3, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(separator3, new GridBagConstraints(0, 8, 8, 1, 0.0, 0.0,
+						panel3.add(separator3, new GridBagConstraints(0, 9, 8, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
 						//---- label7 ----
 						label7.setText("Assigned to");
-						panel3.add(label7, new GridBagConstraints(0, 9, 1, 1, 0.0, 0.0,
+						panel3.add(label7, new GridBagConstraints(0, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
@@ -518,31 +534,31 @@ public class QACaseDetailsPanel extends JPanel {
 								assignedToItemStateChanged(e);
 							}
 						});
-						panel3.add(assignedTo, new GridBagConstraints(1, 9, 1, 1, 0.0, 0.0,
+						panel3.add(assignedTo, new GridBagConstraints(1, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
 						//---- label8 ----
 						label8.setText("By");
-						panel3.add(label8, new GridBagConstraints(3, 9, 1, 1, 0.0, 0.0,
+						panel3.add(label8, new GridBagConstraints(3, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(by, new GridBagConstraints(4, 9, 2, 1, 0.0, 0.0,
+						panel3.add(by, new GridBagConstraints(4, 10, 2, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
 
 						//---- label9 ----
 						label9.setText("Date");
-						panel3.add(label9, new GridBagConstraints(6, 9, 1, 1, 0.0, 0.0,
+						panel3.add(label9, new GridBagConstraints(6, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 5), 0, 0));
-						panel3.add(assignedDate, new GridBagConstraints(7, 9, 1, 1, 0.0, 0.0,
+						panel3.add(assignedDate, new GridBagConstraints(7, 10, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
 						//---- caseDetailsError ----
 						caseDetailsError.setForeground(Color.red);
-						panel3.add(caseDetailsError, new GridBagConstraints(0, 10, 6, 1, 0.0, 0.0,
+						panel3.add(caseDetailsError, new GridBagConstraints(0, 11, 6, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 5), 0, 0));
 					}
@@ -719,6 +735,8 @@ public class QACaseDetailsPanel extends JPanel {
 	private JSeparator separator1;
 	private JLabel label3;
 	private JTextArea componentNameTextArea;
+	private JLabel label16;
+	private JTextField conceptUUID;
 	private JLabel label4;
 	private JScrollPane scrollPane3;
 	private JTextArea caseDetails;
