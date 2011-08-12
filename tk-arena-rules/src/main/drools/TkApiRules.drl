@@ -314,8 +314,8 @@ rule "missing Dialect description EN_US"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
-                $dv : DescriptionVersionBI(this.isUncommitted == true, 
-                            this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
+                $dv : DescriptionVersionBI(isUncommitted() == true, 
+                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
 	then 
 		for (DescriptionVersionBI $d : $c.getDescsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
@@ -330,8 +330,8 @@ rule "missing Dialect description EN_UK"
 	
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
-                $dv : DescriptionVersionBI(this.isUncommitted == true, 
-                            this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
+                $dv : DescriptionVersionBI(isUncommitted() == true, 
+                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
 	then 
 		for (DescriptionVersionBI $d : $c.getDescsActive()) {
          if (DialectHelper.isMissingDescForDialect($d,
