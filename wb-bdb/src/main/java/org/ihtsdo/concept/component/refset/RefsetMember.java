@@ -554,8 +554,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
       if ((this.refsetNid == Integer.MAX_VALUE) || (this.refsetNid == collectionNid)
               || (getTime() == Long.MAX_VALUE)) {
          if (this.refsetNid != collectionNid) {
-            NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
-            Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+            if ((this.refsetNid != 0) && (this.nid != 0)) {
+               NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+
+               Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+            }
+
             // new xref is added on the dbWrite.
             this.refsetNid = collectionNid;
             modified();
@@ -568,9 +572,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
    @Override
    public void setReferencedComponentNid(int referencedComponentNid) {
       if (this.referencedComponentNid != referencedComponentNid) {
-         NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+         if ((this.refsetNid != 0) && (this.nid != 0)) {
+            NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
 
-         Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+            Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+         }
 
          // new xref is added on the dbWrite.
          this.referencedComponentNid = referencedComponentNid;
@@ -582,9 +588,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
    public void setRefsetId(int refsetNid) throws IOException {
       if (getTime() == Long.MAX_VALUE) {
          if (this.refsetNid != refsetNid) {
-            NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
-            Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
-            
+            if ((this.refsetNid != 0) && (this.nid != 0)) {
+               NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+
+               Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+            }
+
             int     oldRefsetNid = this.refsetNid;
             Concept oldRefset    = Concept.get(oldRefsetNid);
             Concept newRefset    = Concept.get(refsetNid);
