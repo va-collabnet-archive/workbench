@@ -28,6 +28,7 @@ import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class DragPanelExtension
         extends DragPanelComponentVersion<RefexVersionBI<?>> {
@@ -113,12 +114,15 @@ public class DragPanelExtension
         setLayout(new GridBagLayout());
         boolean canDrop = false;
         TerminologyStoreDI ts = Ts.get();
-        if (getRefexV().getTime() == Long.MAX_VALUE) {
+        RefexVersionBI<?> refexV = getRefexV();
+        if (getRefexV().isUncommitted()) {
             setOpaque(true);
             setBackground(Color.YELLOW);
+        }
+        if (getRefexV().isUncommitted() && 
+                getRefexV().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
             canDrop = true;
         }
-
         setBorder(BorderFactory.createRaisedBevelBorder());
         extensionLabel = getJLabel(" ");
         extensionLabel.setBackground(Color.RED);
@@ -139,10 +143,11 @@ public class DragPanelExtension
             gbc.gridx++;
         }
         gbc.weightx = 1;
-       
+
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(getRefexV().getCollectionNid(), canDrop, getSettings().getRefexName());
+        typeLabel.setFrozen(canDrop);
         add(typeLabel, gbc);
         gbc.gridx++;
         gbc.weightx = 0;
@@ -154,6 +159,7 @@ public class DragPanelExtension
         if (RefexCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop, getSettings().getC1Refex());
+            ext.setFrozen(canDrop);
             ext.setOpaque(false);
             ext.setBackground(getBackground());
             add(ext, gbc);
@@ -163,6 +169,7 @@ public class DragPanelExtension
         if (RefexCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop, getSettings().getC2Refex());
+            ext.setFrozen(canDrop);
             ext.setOpaque(false);
             ext.setBackground(getBackground());
             add(ext, gbc);
@@ -172,6 +179,7 @@ public class DragPanelExtension
         if (RefexCnidCnidCnidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
             int cnid = ((RefexCnidCnidCnidVersionBI) getRefexV()).getCnid1();
             TermComponentLabel ext = getLabel(cnid, canDrop, getSettings().getC3Refex());
+            ext.setFrozen(canDrop);
             ext.setOpaque(false);
             ext.setBackground(getBackground());
             add(ext, gbc);
@@ -225,7 +233,8 @@ public class DragPanelExtension
             gbc.gridx++;
             classFound = true;
         }
-        
+
+
         gbc.weightx = 0;
         gbc.gridx++;
 

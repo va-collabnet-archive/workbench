@@ -25,6 +25,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionBI> {
 
@@ -111,7 +112,12 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
 
         gbc.weightx = 1;
         gbc.gridx++;
+        
         TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType());
+        if (getRel().isUncommitted() 
+                && getRel().getStatusNid()== SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+            typeLabel.setFrozen(true);
+        }
         typeLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>(
                 (RelationshipAnalogBI) getRel()) {
@@ -140,6 +146,10 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
         gbc.weightx = 1;
         gbc.gridx++;
         TermComponentLabel destLabel = getLabel(getRel().getDestinationNid(), canDrop, getSettings().getRelTarget());
+        if (getRel().isUncommitted() 
+                && getRel().getStatusNid()== SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+            destLabel.setFrozen(true);
+        }
         destLabel.addPropertyChangeListener("termComponent",
                 new PropertyChangeManager<RelationshipAnalogBI>(
                 (RelationshipAnalogBI) getRel()) {

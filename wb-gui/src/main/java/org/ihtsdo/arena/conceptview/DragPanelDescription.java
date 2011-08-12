@@ -26,6 +26,7 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class DragPanelDescription extends DragPanelComponentVersion<DescriptionAnalogBI> {
 
@@ -126,7 +127,13 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         gbc.gridx++;
         TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
         add(typeLabel, gbc);
-        if (getDesc().isUncommitted()) {
+        
+        if (getDesc().isUncommitted() 
+                && getDesc().getStatusNid()== SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+            typeLabel.setFrozen(true);
+        }
+        if (getDesc().isUncommitted() && 
+                getDesc().getStatusNid()!= SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
             typeLabel.addPropertyChangeListener("termComponent",
                     new PropertyChangeManager<DescriptionAnalogBI>(getDesc()) {
 
@@ -196,8 +203,14 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
 
         JButton collapseExpandButton = getCollapseExpandButton();
         add(collapseExpandButton, gbc);
+        
+        if (getDesc().isUncommitted() 
+                && getDesc().getStatusNid()== SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+            textPane.setEditable(false);
+        }
 
-        if (getDesc().isUncommitted()) {
+        if (getDesc().isUncommitted() 
+                && getDesc().getStatusNid()!= SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
             textPane.getDocument().addDocumentListener(
                     new UpdateTextDocumentListener(textPane, getDesc()));
         }
