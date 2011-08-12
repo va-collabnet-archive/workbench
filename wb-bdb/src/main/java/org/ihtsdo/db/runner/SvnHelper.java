@@ -243,10 +243,6 @@ public class SvnHelper {
 	}
 
 	void handleSvnProfileCheckout(Properties aceProperties,SvnPrompter prompter) throws ClientException, TaskFailedException {
-		if (new File("profiles").exists()) {
-			// A checkout has previously completed. 
-			return;
-		}
 		SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
 		Svn.setPrompter(prompter);
 		List<String> listing = Svn.list(svd);
@@ -256,8 +252,6 @@ public class SvnHelper {
 				profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
 			}
 		}
-		
-		
 		String selectedPath = null;
 		String selectedProfile = prompter.getUsername();
 		AceLog.getAppLog().info("prompter UN = "+prompter.getUsername());
@@ -307,18 +301,19 @@ public class SvnHelper {
 		SubversionData svnCheckoutData = new SubversionData(svnProfilePath, "profiles/" + selectedProfile);
 		subversionMap.put(svnCheckoutData.getWorkingCopyStr(), svnCheckoutData);
 		aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
-		
-		
-		String moduleName = svnCheckoutData.getRepositoryUrlStr();
-		String destPath = svnCheckoutData.getWorkingCopyStr();
-		Revision revision = Revision.HEAD;
-		Revision pegRevision = Revision.HEAD;
-		int depth = Depth.infinity;
-		boolean ignoreExternals = false;
-		boolean allowUnverObstructions = false;
-		Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
-				allowUnverObstructions);
-		changeLocations.add(new File(destPath));
+		if (!new File("profiles").exists()) {
+			String moduleName = svnCheckoutData.getRepositoryUrlStr();
+			String destPath = svnCheckoutData.getWorkingCopyStr();
+			Revision revision = Revision.HEAD;
+			Revision pegRevision = Revision.HEAD;
+			int depth = Depth.infinity;
+			boolean ignoreExternals = false;
+			boolean allowUnverObstructions = false;
+			
+			changeLocations.add(new File(destPath));
+			Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
+					allowUnverObstructions);
+		}
 	}
 
 	private void handleSvnCheckout(List<File> changeLocations, String svnSpec,SvnPrompter prompter) throws TaskFailedException,
