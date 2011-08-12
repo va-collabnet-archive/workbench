@@ -712,9 +712,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
    @Override
    public void setDestinationNid(int dNid) throws PropertyVetoException {
       if (this.c2Nid != dNid) {
-         NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(typeNid, this.nid);
+         if ((this.typeNid != 0) && (this.nid != 0)) {
+            NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
 
-         Bdb.forgetXrefPair(this.c2Nid, oldNpr);
+            Bdb.forgetXrefPair(this.c2Nid, oldNpr);
+         }
 
          // new xref is added on the dbWrite.
          this.c2Nid = dNid;
@@ -749,9 +751,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
    @Override
    public void setTypeNid(int typeNid) {
       if (this.typeNid != typeNid) {
-         NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
+         if ((this.typeNid != 0) && (this.nid != 0)) {
+            NidPairForRel oldNpr = NidPair.getTypeNidRelNidPair(this.typeNid, this.nid);
 
-         Bdb.forgetXrefPair(this.c2Nid, oldNpr);
+            Bdb.forgetXrefPair(this.c2Nid, oldNpr);
+         }
 
          // new xref is added on the dbWrite.
          this.typeNid = typeNid;
