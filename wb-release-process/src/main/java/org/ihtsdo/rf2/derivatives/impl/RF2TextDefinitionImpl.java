@@ -66,6 +66,17 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					typeId = I_Constants.DEFINITION;
 					String languageCode = description.getLang(); // This should be always "en"
 					String term = description.getText();
+					if (term!=null ){
+						if (term.indexOf("\t")>-1){
+							term=term.replaceAll("\t", "");
+						}
+						if (term.indexOf("\r")>-1){
+							term=term.replaceAll("\r", "");
+						}
+						if (term.indexOf("\n")>-1){
+							term=term.replaceAll("\n", "");
+						}
+					}
 					String textDefstatus = getStatusType(description.getStatusNid());
 					if (description.isInitialCaseSignificant()) {
 						caseSignificanceId = I_Constants.SENSITIVE_CASE;

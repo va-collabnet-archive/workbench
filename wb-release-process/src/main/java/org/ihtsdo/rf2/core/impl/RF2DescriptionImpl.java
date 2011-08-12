@@ -70,6 +70,17 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 					String term = description.getText();
+					if (term!=null ){
+						if (term.indexOf("\t")>-1){
+							term=term.replaceAll("\t", "");
+						}
+						if (term.indexOf("\r")>-1){
+							term=term.replaceAll("\r", "");
+						}
+						if (term.indexOf("\n")>-1){
+							term=term.replaceAll("\n", "");
+						}
+					}
 					String descriptionstatus = getStatusType(description.getStatusNid());
 
 					if (descriptionstatus.equals("0") || descriptionstatus.equals("6") || descriptionstatus.equals("8"))
