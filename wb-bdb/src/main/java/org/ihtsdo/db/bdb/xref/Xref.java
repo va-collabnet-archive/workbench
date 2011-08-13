@@ -339,10 +339,10 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
                     System.arraycopy(currentPairs, 1, newPairs, 0,
                             currentPairs.length - 1);
                 } else {
-                    System.arraycopy(currentPairs, 0, newPairs, 0, index - 1);
+                    System.arraycopy(currentPairs, 0, newPairs, 0, index);
                     if (index < currentPairs.length) {
                         System.arraycopy(currentPairs, index + 1, newPairs,
-                                index, currentPairs.length - index);
+                                index, currentPairs.length - index - 1);
                     }
                 }
                 if (mutableXref.get().replace(nid, currentPairs, newPairs)) {
@@ -350,6 +350,10 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
                 }
                 currentPairs = mutableXref.get().get(nid);
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+
         } finally {
             locks[word].unlock();
             rwl.readLock().unlock();
