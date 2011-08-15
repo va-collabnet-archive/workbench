@@ -98,7 +98,7 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 			if (snomedRoot == null)
 				return alertList;
 			if (RulesLibrary.rulesDisabled ||
-					auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
+					((auxRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 							.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
 							getFrameConfig().getConflictResolutionStrategy()) ||
 							refsetRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
@@ -106,10 +106,10 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 									getFrameConfig().getConflictResolutionStrategy()) ||
 									projectRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 											.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-											getFrameConfig().getConflictResolutionStrategy()) ||
+											getFrameConfig().getConflictResolutionStrategy()) ) &&
 											!snomedRoot.isParentOfOrEqualTo(concept, getFrameConfig().getAllowedStatus(), getFrameConfig()
 													.getDestRelTypes(), getFrameConfig().getViewPositionSetReadOnly(), getFrameConfig().getPrecedence(),
-													getFrameConfig().getConflictResolutionStrategy())) {
+													getFrameConfig().getConflictResolutionStrategy()))) {
 				return alertList;
 			} else {
 				alertList =  RulesLibrary.checkConcept(concept, 
