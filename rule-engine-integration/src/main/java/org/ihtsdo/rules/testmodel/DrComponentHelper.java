@@ -27,6 +27,7 @@ import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -66,11 +67,13 @@ public class DrComponentHelper {
 				concept.setFactContextName(factContextName);
 			}
 
-			Collection<? extends DescriptionVersionBI> descsActive = conceptBi.getDescsActive();
+			Collection<? extends DescriptionVersionBI> descriptionsList = oldStyleConcept.getDescriptionTuples(null, 
+					null, config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), config.getConflictResolutionStrategy());
 
 			HashMap<Integer,DrLanguageDesignationSet> languageDesignationSetsMap = new HashMap<Integer,DrLanguageDesignationSet>();
 			
-			for (DescriptionVersionBI descriptionVersion : descsActive) {
+			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
 				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
 					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
@@ -83,7 +86,7 @@ public class DrComponentHelper {
 				}
 			}
 
-			for (DescriptionVersionBI descriptionVersion : descsActive) {
+			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
 				DrDescription loopDescription = new DrDescription();
 				loopDescription.setAuthorUuid(tf.nidToUuid(descriptionVersion.getAuthorNid()).toString());
 				loopDescription.setConceptUuid(tf.nidToUuid(descriptionVersion.getConceptNid()).toString());
@@ -336,8 +339,6 @@ public class DrComponentHelper {
 //			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ContraditionException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
