@@ -754,21 +754,15 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private void addRelGroups(Collection<RelGroupVersionBI> relGroups,
             boolean cprAdded, CollapsePanel cpr,
             GridBagConstraints gbc) throws IOException, TerminologyException, ContraditionException {
-        int retiredRgRels = 0;
+        int currentRgRels = 0;
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
         for (RelGroupVersionBI rg : relGroups) {
             if (stop) {
                 return;
             }
             Collection<? extends RelationshipChronicleBI> rgRels =
-                    rg.getRels(); //TODO getCurrentRels
-            for (RelationshipChronicleBI rel : rgRels) {
-                RelationshipVersionBI rv = (RelationshipVersionBI) rel;
-                if (rv.getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {//TODO returning active when inactive
-                    retiredRgRels++;
-                }
-            }
-            if (rgRels.size() != retiredRgRels) {
+                    rg.getRels();
+            if (rgRels.size() == rg.getCurrentRels().size()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         cView.add(cpr, gbc);
@@ -785,24 +779,39 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
                     cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
                 }
+            } else if (rg.getCurrentRels().isEmpty()) {
+                if (!rgRels.isEmpty()) {
+                    if (!cprAdded) {
+                        cView.add(cpr, gbc);
+                        gbc.gridy++;
+                        cprAdded = true;
+                    }
+                    DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
+                    cpr.getInactiveComponentPanels().add(rgc);
+                    rgc.setVisible(relHistoryIsShown);
+                    seperatorComponents.add(rgc);
+                    cView.add(rgc, gbc);
+                    gbc.gridy++;
+                    cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
+                    cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
+                    cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
+                    cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
+                }
             } else {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         cView.add(cpr, gbc);
-                        cpr.setVisible(relHistoryIsShown);
                         gbc.gridy++;
                         cprAdded = true;
                     }
-                    if (relHistoryIsShown) {
-                        DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
-                        seperatorComponents.add(rgc);
-                        cView.add(rgc, gbc);
-                        gbc.gridy++;
-                        cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
-                        cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
-                        cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
-                        cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
-                    }
+                    DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
+                    seperatorComponents.add(rgc);
+                    cView.add(rgc, gbc);
+                    gbc.gridy++;
+                    cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
+                    cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
+                    cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
+                    cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
                 }
             }
         }
