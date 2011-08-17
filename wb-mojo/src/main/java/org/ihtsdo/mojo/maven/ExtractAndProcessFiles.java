@@ -135,7 +135,11 @@ public class ExtractAndProcessFiles extends AbstractMojo {
                     l.error( "DEPRECATED: runtime-directory scope should be converted to ZIP artifact for " + d );
                     continue;
                 }
-
+                if (d.getType().equals("pom")) {
+               	 l.error( "INFO processing a POM dependency skipping " + d );
+                   continue;
+                   
+               }
                 File dependencyFile = d.getFile();
                 if (dependencyFile.exists()) {
                     try {

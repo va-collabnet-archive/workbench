@@ -8,6 +8,7 @@
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
 	<name>${branch}: Workbench Mojo</name>
+	<version>2.6.2-trek-rsrb-6-UKTC-SNAPSHOT</version>
 	<description>Workbench Maven Java Objects (mojo)</description>
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
@@ -22,7 +23,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -39,7 +40,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-wf</artifactId>
-			<version>${project.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.doxia</groupId>

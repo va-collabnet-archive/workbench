@@ -206,13 +206,13 @@ public class UuidSnomedMap implements Map<UUID, Long>, I_MapUuidsToSnomed {
      * java.lang.Long)
      */
     public Long put(UUID key, Long sctId) {
-        /*
-         * try {
-         * maxSequence = Math.max(maxSequence, getSequence(sctId)); TODO
-         * } catch (StringIndexOutOfBoundsException e) {
-         * System.out.println("Inserted sctid which is not NEHTA owned: " + sctId);
-         * }
-         */
+        
+          try {
+        	  maxSequence = Math.max(maxSequence, getSequence(sctId)); // TODO
+          } catch (StringIndexOutOfBoundsException e) {
+          System.out.println("Inserted sctid which is not NEHTA owned: " + sctId);
+          }
+         
         return uuidSnomedMap.put(key, sctId);
     }
 
