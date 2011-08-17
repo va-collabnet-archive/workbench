@@ -148,7 +148,7 @@ public class PositionMapper {
         }
         if (version.getSapNid() >= positionDistance.length) {
             AceLog.getAppLog().severe("sapNid: " + version.getSapNid()
-                    + " length: " + positionDistance.length
+                    + " out of range calling onRoute. sapNid array length: " + positionDistance.length
                     + " version: " + version);
             return false;
         }
