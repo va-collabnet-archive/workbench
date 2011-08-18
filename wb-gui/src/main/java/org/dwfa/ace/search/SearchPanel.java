@@ -430,7 +430,7 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
     public SearchPanel(I_ConfigAceFrame config, ACE ace) throws TerminologyException, IOException {
         super(new GridBagLayout());
         this.config = config;
-        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
+        this.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getActionMap().put("search", new AbstractAction("Search on enter") {
             /**
