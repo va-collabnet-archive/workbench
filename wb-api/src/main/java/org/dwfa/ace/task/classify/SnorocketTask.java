@@ -1427,9 +1427,20 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         StringBuilder sb = new StringBuilder();
         try {
             I_GetConceptData c = tf.getConcept(cNid);
-            sb.append(c.getUids().iterator().next()).append("\t");
-            sb.append(cNid).append("\t");
-            sb.append(c.getInitialText());
+            if (!c.isCanceled()) {
+                if (c.getUids().iterator().hasNext()) {
+                    sb.append(c.getUids().iterator().next());
+                    sb.append("\t");
+                } else {
+                    sb.append("NO_UUID\t");
+                }
+                sb.append(cNid).append("\t");
+                sb.append(c.getInitialText());
+            } else {
+                sb.append("CANCELED\t");
+                sb.append(cNid).append("\t");
+                sb.append(c.getInitialText());
+            }
         } catch (IOException e) {
             logger.log(Level.INFO, e.toString());
         } catch (TerminologyException e) {
@@ -1903,7 +1914,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             sb.append("\tc2 status: ** ");
             I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
             for (I_ConceptAttributePart mp : ca.getMutableParts()) {
-                sb.append(toStringCNid(mp.getStatusId())).append(" ** ");
+                sb.append(toStringCNid(mp.getStatusNid())).append(" ** ");
             }
 
             return sb.toString();
