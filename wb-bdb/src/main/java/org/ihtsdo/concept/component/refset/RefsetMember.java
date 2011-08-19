@@ -1,7 +1,6 @@
 package org.ihtsdo.concept.component.refset;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
@@ -58,766 +57,762 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
         extends ConceptComponent<R, C> implements I_ExtendByRef, RefexChronicleBI<R>, RefexAnalogBI<R> {
-   public int                        referencedComponentNid;
-   public int                        refsetNid;
-   protected List<? extends Version> versions;
 
-   //~--- constructors --------------------------------------------------------
+    public int referencedComponentNid;
+    public int refsetNid;
+    protected List<? extends Version> versions;
 
-   public RefsetMember() {
-      super();
-      referencedComponentNid = Integer.MAX_VALUE;
-      refsetNid              = Integer.MAX_VALUE;
-   }
+    //~--- constructors --------------------------------------------------------
+    public RefsetMember() {
+        super();
+        referencedComponentNid = Integer.MAX_VALUE;
+        refsetNid = Integer.MAX_VALUE;
+    }
 
-   public RefsetMember(int enclosingConceptNid, TupleInput input) throws IOException {
-      super(enclosingConceptNid, input);
-   }
+    public RefsetMember(int enclosingConceptNid, TupleInput input) throws IOException {
+        super(enclosingConceptNid, input);
+    }
 
-   public RefsetMember(TkRefsetAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
-      super(refsetMember, enclosingConceptNid);
-      refsetNid              = Bdb.uuidToNid(refsetMember.refsetUuid);
-      referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
-      primordialSapNid       = Bdb.getSapNid(refsetMember);
-      assert primordialSapNid != Integer.MAX_VALUE;
-      assert referencedComponentNid != Integer.MAX_VALUE;
-      assert refsetNid != Integer.MAX_VALUE;
-   }
+    public RefsetMember(TkRefsetAbstractMember<?> refsetMember, int enclosingConceptNid) throws IOException {
+        super(refsetMember, enclosingConceptNid);
+        refsetNid = Bdb.uuidToNid(refsetMember.refsetUuid);
+        referencedComponentNid = Bdb.uuidToNid(refsetMember.getComponentUuid());
+        primordialSapNid = Bdb.getSapNid(refsetMember);
+        assert primordialSapNid != Integer.MAX_VALUE;
+        assert referencedComponentNid != Integer.MAX_VALUE;
+        assert refsetNid != Integer.MAX_VALUE;
+    }
 
-   //~--- methods -------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    protected abstract void addSpecProperties(RefexCAB rcs);
 
-   protected abstract void addSpecProperties(RefexCAB rcs);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public void addTuples(List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
+            I_ManageContradiction contradictionManager)
+            throws TerminologyException, IOException {
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
-   @SuppressWarnings({ "unchecked", "rawtypes" })
-   @Override
-   public void addTuples(List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
-                         I_ManageContradiction contradictionManager)
-           throws TerminologyException, IOException {
-      List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
+                Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), versionsToAdd,
+                (List<Version>) getVersions(), precedencePolicy, contradictionManager);
+        returnTuples.addAll((Collection<? extends I_ExtendByRefVersion<R>>) versionsToAdd);
+    }
 
-      getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
-              Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), versionsToAdd,
-              (List<Version>) getVersions(), precedencePolicy, contradictionManager);
-      returnTuples.addAll((Collection<? extends I_ExtendByRefVersion<R>>) versionsToAdd);
-   }
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
+            List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
+            I_ManageContradiction contradictionManager)
+            throws TerminologyException, IOException {
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
-   @SuppressWarnings({ "rawtypes", "unchecked" })
-   @Override
-   public void addTuples(I_IntSet allowedStatus, PositionSetReadOnly positions,
-                         List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
-                         I_ManageContradiction contradictionManager)
-           throws TerminologyException, IOException {
-      List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
+                (List<Version>) getVersions(), precedencePolicy, contradictionManager);
+        returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
+    }
 
-      getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
-              (List<Version>) getVersions(), precedencePolicy, contradictionManager);
-      returnTuples.addAll((Collection<? extends I_ExtendByRefVersion>) versionsToAdd);
-   }
+    @SuppressWarnings("unchecked")
+    @Override
+    public void addVersion(@SuppressWarnings("rawtypes") I_ExtendByRefPart part) {
+        versions = null;
+        super.addRevision((R) part);
+    }
 
-   @SuppressWarnings("unchecked")
-   @Override
-   public void addVersion(@SuppressWarnings("rawtypes") I_ExtendByRefPart part) {
-      versions = null;
-      super.addRevision((R) part);
-   }
+    @Override
+    public void clearVersions() {
+        versions = null;
+        clearAnnotationVersions();
+    }
 
-   @Override
-   public void clearVersions() {
-      versions = null;
-      clearAnnotationVersions();
-   }
+    public final int compareTo(I_ExtendByRefPart<R> o) {
+        if (getNid() != o.getNid()) {
+            return getNid() - o.getNid();
+        }
 
-   public final int compareTo(I_ExtendByRefPart<R> o) {
-      if (getNid() != o.getNid()) {
-         return getNid() - o.getNid();
-      }
+        return this.getSapNid() - o.getSapNid();
+    }
 
-      return this.getSapNid() - o.getSapNid();
-   }
-
-   @Override
-   public boolean equals(Object obj) {
-      if (obj == null) {
-         return false;
-      }
-
-      if (RefsetMember.class.isAssignableFrom(obj.getClass())) {
-         RefsetMember<?, ?> another = (RefsetMember<?, ?>) obj;
-
-         return this.referencedComponentNid == another.referencedComponentNid;
-      }
-
-      return false;
-   }
-
-   @Override
-   public boolean fieldsEqual(ConceptComponent<R, C> obj) {
-      if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
-         RefsetMember<R, C> another = (RefsetMember<R, C>) obj;
-
-         if (this.getTypeNid() != another.getTypeNid()) {
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
-         }
+        }
 
-         if (membersEqual(obj)) {
-            return conceptComponentFieldsEqual(another);
-         }
-      }
+        if (RefsetMember.class.isAssignableFrom(obj.getClass())) {
+            RefsetMember<?, ?> another = (RefsetMember<?, ?>) obj;
 
-      return false;
-   }
+            return this.referencedComponentNid == another.referencedComponentNid;
+        }
 
-   @Override
-   public int hashCode() {
-      return HashFunction.hashCode(new int[] { referencedComponentNid });
-   }
+        return false;
+    }
 
-   public abstract R makeAnalog();
+    @Override
+    public boolean fieldsEqual(ConceptComponent<R, C> obj) {
+        if (ConceptAttributes.class.isAssignableFrom(obj.getClass())) {
+            RefsetMember<R, C> another = (RefsetMember<R, C>) obj;
 
-   @SuppressWarnings("unchecked")
-   public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
-      return (I_ExtendByRefPart<R>) makeAnalog(getStatusNid(), promotionPath.getConceptNid(), Long.MAX_VALUE);
-   }
+            if (this.getTypeNid() != another.getTypeNid()) {
+                return false;
+            }
 
-   protected abstract boolean membersEqual(ConceptComponent<R, C> obj);
+            if (membersEqual(obj)) {
+                return conceptComponentFieldsEqual(another);
+            }
+        }
 
-   @SuppressWarnings("unchecked")
-   public RefsetMember<R, C> merge(RefsetMember<R, C> component) throws IOException {
-      return (RefsetMember<R, C>) super.merge((C) component);
-   }
+        return false;
+    }
 
-   private void moveRefset(Concept from, Concept to) throws IOException {
-      if (from.isAnnotationStyleRefex()) {
-         if (from.isAnnotationIndex()) {
+    @Override
+    public int hashCode() {
+        return HashFunction.hashCode(new int[]{referencedComponentNid});
+    }
+
+    public abstract R makeAnalog();
+
+    @SuppressWarnings("unchecked")
+    public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
+        return (I_ExtendByRefPart<R>) makeAnalog(getStatusNid(), promotionPath.getConceptNid(), Long.MAX_VALUE);
+    }
+
+    protected abstract boolean membersEqual(ConceptComponent<R, C> obj);
+
+    @SuppressWarnings("unchecked")
+    public RefsetMember<R, C> merge(RefsetMember<R, C> component) throws IOException {
+        return (RefsetMember<R, C>) super.merge((C) component);
+    }
+
+    private void moveRefset(Concept from, Concept to) throws IOException {
+        if (from.isAnnotationStyleRefex()) {
+            if (from.isAnnotationIndex()) {
+                from.getData().getMemberNids().remove(this.nid);
+                from.modified();
+                BdbCommitManager.addUncommittedNoChecks(from);
+            }
+        } else {
+            from.getRefsetMembers().remove(this);
             from.getData().getMemberNids().remove(this.nid);
             from.modified();
             BdbCommitManager.addUncommittedNoChecks(from);
-         }
-      } else {
-         from.getRefsetMembers().remove(this);
-         from.getData().getMemberNids().remove(this.nid);
-         from.modified();
-         BdbCommitManager.addUncommittedNoChecks(from);
-      }
+        }
 
-      if (to.isAnnotationStyleRefex()) {
-         if (from.isAnnotationStyleRefex()) {
+        if (to.isAnnotationStyleRefex()) {
+            if (from.isAnnotationStyleRefex()) {
+                // nothing to move.
+            } else {
+                Bdb.getComponent(this.referencedComponentNid).addAnnotation(this);
+                Bdb.getNidCNidMap().resetCidForNid(Bdb.getNidCNidMap().getCNid(this.referencedComponentNid), nid);
+                this.enclosingConceptNid = Bdb.getNidCNidMap().getCNid(this.referencedComponentNid);
+                to.modified();
+                BdbCommitManager.addUncommitted(to);
+            }
+        } else {
+            if (from.isAnnotationStyleRefex()) {
+                ComponentBI component = Bdb.getComponent(this.referencedComponentNid);
 
-            // nothing to move.
-         } else {
-            Bdb.getComponent(this.referencedComponentNid).addAnnotation(this);
-            Bdb.getNidCNidMap().resetCidForNid(Bdb.getNidCNidMap().getCNid(this.referencedComponentNid), nid);
-            this.enclosingConceptNid = Bdb.getNidCNidMap().getCNid(this.referencedComponentNid);
+                if (component instanceof ConceptComponent) {
+                    ((ConceptComponent) component).getAnnotationsMod().remove(this);
+                } else if (component instanceof Concept) {
+                    ((ConceptComponent) ((Concept) component).getConAttrs()).getAnnotationsMod().remove(this);
+                }
+            }
+
+            to.getRefsetMembers().add(this);
+            Bdb.getNidCNidMap().resetCidForNid(to.getNid(), nid);
+            this.enclosingConceptNid = to.getNid();
             to.modified();
             BdbCommitManager.addUncommitted(to);
-         }
-      } else {
-         if (from.isAnnotationStyleRefex()) {
-            ComponentBI component = Bdb.getComponent(this.referencedComponentNid);
+        }
+    }
 
-            if (component instanceof ConceptComponent) {
-               ((ConceptComponent) component).getAnnotationsMod().remove(this);
-            } else if (component instanceof Concept) {
-               ((ConceptComponent) ((Concept) component).getConAttrs()).getAnnotationsMod().remove(this);
+    @Override
+    public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
+            Precedence precedence)
+            throws IOException, TerminologyException {
+        int viewPathId = viewPosition.getPath().getConceptNid();
+        Collection<Version> matchingTuples = getVersionComputer().getSpecifiedVersions(allowedStatus,
+                viewPosition, getVersions(), precedence, null);
+        boolean promotedAnything = false;
+
+        for (PathBI promotionPath : pomotionPaths) {
+            for (Version v : matchingTuples) {
+                if (v.getPathNid() == viewPathId) {
+                    RefsetRevision<?, ?> revision = v.makeAnalog(v.getStatusNid(), promotionPath.getConceptNid(),
+                            Long.MAX_VALUE);
+
+                    addVersion(revision);
+                    promotedAnything = true;
+                }
             }
-         }
+        }
 
-         to.getRefsetMembers().add(this);
-         Bdb.getNidCNidMap().resetCidForNid(to.getNid(), nid);
-         this.enclosingConceptNid = to.getNid();
-         to.modified();
-         BdbCommitManager.addUncommitted(to);
-      }
-   }
+        return promotedAnything;
+    }
 
-   @Override
-   public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
-                          Precedence precedence)
-           throws IOException, TerminologyException {
-      int                 viewPathId     = viewPosition.getPath().getConceptNid();
-      Collection<Version> matchingTuples = getVersionComputer().getSpecifiedVersions(allowedStatus,
-                                              viewPosition, getVersions(), precedence, null);
-      boolean promotedAnything = false;
+    @Override
+    public void readFromBdb(TupleInput input) {
+        refsetNid = input.readInt();
+        referencedComponentNid = input.readInt();
+        assert refsetNid != Integer.MAX_VALUE;
+        assert referencedComponentNid != Integer.MAX_VALUE;
+        readMemberFields(input);
 
-      for (PathBI promotionPath : pomotionPaths) {
-         for (Version v : matchingTuples) {
-            if (v.getPathNid() == viewPathId) {
-               RefsetRevision<?, ?> revision = v.makeAnalog(v.getStatusNid(), promotionPath.getConceptNid(),
-                                                  Long.MAX_VALUE);
+        int additionalVersionCount = input.readShort();
 
-               addVersion(revision);
-               promotedAnything = true;
+        if (additionalVersionCount > 0) {
+            if (revisions == null) {
+                revisions = new CopyOnWriteArrayList<R>();
             }
-         }
-      }
 
-      return promotedAnything;
-   }
+            for (int i = 0; i < additionalVersionCount; i++) {
+                R r = readMemberRevision(input);
 
-   @Override
-   public void readFromBdb(TupleInput input) {
-      refsetNid              = input.readInt();
-      referencedComponentNid = input.readInt();
-      assert refsetNid != Integer.MAX_VALUE;
-      assert referencedComponentNid != Integer.MAX_VALUE;
-      readMemberFields(input);
-
-      int additionalVersionCount = input.readShort();
-
-      if (additionalVersionCount > 0) {
-         if (revisions == null) {
-            revisions = new CopyOnWriteArrayList<R>();
-         }
-
-         for (int i = 0; i < additionalVersionCount; i++) {
-            R r = readMemberRevision(input);
-
-            if ((r.sapNid != -1) && (r.getTime() != Long.MIN_VALUE)) {
-               revisions.add(r);
+                if ((r.sapNid != -1) && (r.getTime() != Long.MIN_VALUE)) {
+                    revisions.add(r);
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   protected abstract void readMemberFields(TupleInput input);
+    protected abstract void readMemberFields(TupleInput input);
 
-   protected abstract R readMemberRevision(TupleInput input);
+    protected abstract R readMemberRevision(TupleInput input);
 
-   @Override
-   public final boolean readyToWriteComponent() {
-      assert referencedComponentNid != Integer.MAX_VALUE : assertionString();
-      assert referencedComponentNid != 0 : assertionString();
-      assert refsetNid != Integer.MAX_VALUE : assertionString();
-      assert refsetNid != 0 : assertionString();
-      assert readyToWriteRefsetMember() : assertionString();
+    @Override
+    public final boolean readyToWriteComponent() {
+        assert referencedComponentNid != Integer.MAX_VALUE : assertionString();
+        assert referencedComponentNid != 0 : assertionString();
+        assert refsetNid != Integer.MAX_VALUE : assertionString();
+        assert refsetNid != 0 : assertionString();
+        assert readyToWriteRefsetMember() : assertionString();
 
-      return true;
-   }
+        return true;
+    }
 
-   public abstract boolean readyToWriteRefsetMember();
+    public abstract boolean readyToWriteRefsetMember();
 
-   /*
-    *  (non-Javadoc)
-    * @see java.lang.Object#toString()
-    */
-   @Override
-   public String toString() {
-      StringBuffer buf = new StringBuffer();
+    /*
+     *  (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
 
-      buf.append(" refset:");
-      addNidToBuffer(buf, refsetNid);
-      buf.append(" type:");
+        buf.append(" refset:");
+        addNidToBuffer(buf, refsetNid);
+        buf.append(" type:");
 
-      try {
-         buf.append(REFSET_TYPES.nidToType(getTypeNid()));
-      } catch (IOException e) {
-         buf.append(e.getLocalizedMessage());
-      }
+        try {
+            buf.append(REFSET_TYPES.nidToType(getTypeNid()));
+        } catch (IOException e) {
+            buf.append(e.getLocalizedMessage());
+        }
 
-      buf.append(" rcNid:");
-      addNidToBuffer(buf, referencedComponentNid);
-      buf.append(" ");
-      buf.append(super.toString());
+        buf.append(" rcNid:");
+        addNidToBuffer(buf, referencedComponentNid);
+        buf.append(" ");
+        buf.append(super.toString());
 
-      return buf.toString();
-   }
+        return buf.toString();
+    }
 
-   @Override
-   public String toUserString() {
-      return toString();
-   }
+    @Override
+    public String toUserString() {
+        return toString();
+    }
 
-   @Override
-   public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
-      ComponentVersionBI c1Component = snapshot.getConceptVersion(refsetNid);
+    @Override
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+        ComponentVersionBI c1Component = snapshot.getConceptVersion(refsetNid);
 
-      return "refex: " + c1Component.toUserString(snapshot);
-   }
+        return "refex: " + c1Component.toUserString(snapshot);
+    }
 
-   /**
-    * Test method to check to see if two objects are equal in all respects.
-    * @param another
-    * @return either a zero length String, or a String containing a description of the
-    * validation failures.
-    * @throws IOException
-    */
-   public String validate(RefsetMember<?, ?> another) throws IOException {
-      assert another != null;
+    /**
+     * Test method to check to see if two objects are equal in all respects.
+     * @param another
+     * @return either a zero length String, or a String containing a description of the
+     * validation failures.
+     * @throws IOException
+     */
+    public String validate(RefsetMember<?, ?> another) throws IOException {
+        assert another != null;
 
-      StringBuilder buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder();
 
-      if (this.referencedComponentNid != another.referencedComponentNid) {
-         buf.append(
-             "\tRefsetMember.referencedComponentNid not equal: \n"
-             + "\t\tthis.referencedComponentNid = ").append(this.referencedComponentNid).append(
-                 "\n" + "\t\tanother.referencedComponentNid = ").append(
-                 another.referencedComponentNid).append("\n");
-      }
+        if (this.referencedComponentNid != another.referencedComponentNid) {
+            buf.append(
+                    "\tRefsetMember.referencedComponentNid not equal: \n"
+                    + "\t\tthis.referencedComponentNid = ").append(this.referencedComponentNid).append(
+                    "\n" + "\t\tanother.referencedComponentNid = ").append(
+                    another.referencedComponentNid).append("\n");
+        }
 
-      // Compare the parents
-      buf.append(super.validate(another));
+        // Compare the parents
+        buf.append(super.validate(another));
 
-      return buf.toString();
-   }
+        return buf.toString();
+    }
 
-   protected abstract void writeMember(TupleOutput output);
+    protected abstract void writeMember(TupleOutput output);
 
-   @Override
-   public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-      List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<R, C>>();
+    @Override
+    public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
+        List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<R, C>>();
 
-      if (revisions != null) {
-         for (RefsetRevision<R, C> p : revisions) {
-            if ((p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid)
-                    && (p.getTime() != Long.MIN_VALUE)) {
-               additionalVersionsToWrite.add(p);
+        if (revisions != null) {
+            for (RefsetRevision<R, C> p : revisions) {
+                if ((p.getStatusAtPositionNid() > maxReadOnlyStatusAtPositionNid)
+                        && (p.getTime() != Long.MIN_VALUE)) {
+                    additionalVersionsToWrite.add(p);
+                }
             }
-         }
-      }
+        }
 
-      assert refsetNid != Integer.MAX_VALUE;
-      assert referencedComponentNid != Integer.MAX_VALUE;
-      output.writeInt(refsetNid);
-      output.writeInt(referencedComponentNid);
-      writeMember(output);
-      output.writeShort(additionalVersionsToWrite.size());
+        assert refsetNid != Integer.MAX_VALUE;
+        assert referencedComponentNid != Integer.MAX_VALUE;
+        output.writeInt(refsetNid);
+        output.writeInt(referencedComponentNid);
+        writeMember(output);
+        output.writeShort(additionalVersionsToWrite.size());
 
-      NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(refsetNid, nid);
+        NidPairForRefset npr = NidPair.getRefsetNidMemberNidPair(refsetNid, nid);
 
-      Bdb.addXrefPair(referencedComponentNid, npr);
+        Bdb.addXrefPair(referencedComponentNid, npr);
 
-      for (RefsetRevision<R, C> p : additionalVersionsToWrite) {
-         p.writePartToBdb(output);
-      }
-   }
+        for (RefsetRevision<R, C> p : additionalVersionsToWrite) {
+            p.writePartToBdb(output);
+        }
+    }
 
-   //~--- get methods ---------------------------------------------------------
+    //~--- get methods ---------------------------------------------------------
+    @Override
+    public int getCollectionNid() {
+        return refsetNid;
+    }
 
-   @Override
-   public int getCollectionNid() {
-      return refsetNid;
-   }
+    @Override
+    public int getComponentId() {
+        return referencedComponentNid;
+    }
 
-   @Override
-   public int getComponentId() {
-      return referencedComponentNid;
-   }
+    @Override
+    public int getComponentNid() {
+        return referencedComponentNid;
+    }
 
-   @Override
-   public int getComponentNid() {
-      return referencedComponentNid;
-   }
+    @Override
+    public int getMemberId() {
+        return nid;
+    }
 
-   @Override
-   public int getMemberId() {
-      return nid;
-   }
+    @Override
+    public RefsetMember<R, C> getMutablePart() {
+        return this;
+    }
 
-   @Override
-   public RefsetMember<R, C> getMutablePart() {
-      return this;
-   }
+    @Override
+    public List<? extends I_ExtendByRefPart<R>> getMutableParts() {
+        return getVersions();
+    }
 
-   @Override
-   public List<? extends I_ExtendByRefPart<R>> getMutableParts() {
-      return getVersions();
-   }
+    @Override
+    public RefsetMember getPrimordialVersion() {
+        return RefsetMember.this;
+    }
 
-   @Override
-   public RefsetMember getPrimordialVersion() {
-      return RefsetMember.this;
-   }
+    @Override
+    public int getReferencedComponentNid() {
+        return referencedComponentNid;
+    }
 
-   @Override
-   public int getReferencedComponentNid() {
-      return referencedComponentNid;
-   }
+    @Override
+    public RefexCAB getRefexEditSpec() throws IOException {
+        RefexCAB rcs = new RefexCAB(getTkRefsetType(), getReferencedComponentNid(), getRefsetId(),
+                getPrimUuid());
 
-   @Override
-   public RefexCAB getRefexEditSpec() throws IOException {
-      RefexCAB rcs = new RefexCAB(getTkRefsetType(), getReferencedComponentNid(), getRefsetId(),
-                                  getPrimUuid());
+        addSpecProperties(rcs);
 
-      addSpecProperties(rcs);
+        return rcs;
+    }
 
-      return rcs;
-   }
+    @Override
+    public int getRefsetId() {
+        return refsetNid;
+    }
 
-   @Override
-   public int getRefsetId() {
-      return refsetNid;
-   }
+    protected abstract TK_REFSET_TYPE getTkRefsetType();
 
-   protected abstract TK_REFSET_TYPE getTkRefsetType();
+    @Override
+    public List<Version> getTuples() {
+        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+    }
 
-   @Override
-   public List<Version> getTuples() {
-      return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
-   }
+    @SuppressWarnings("rawtypes")
+    @Override
+    public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
+            throws TerminologyException, IOException {
 
-   @SuppressWarnings("rawtypes")
-   @Override
-   public List<? extends I_ExtendByRefVersion> getTuples(I_ManageContradiction contradictionMgr)
-           throws TerminologyException, IOException {
+        // TODO Implement contradictionMgr part...
+        return getVersions();
+    }
 
-      // TODO Implement contradictionMgr part...
-      return getVersions();
-   }
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
+            PositionSetReadOnly positions, Precedence precedencePolicy,
+            I_ManageContradiction contradictionManager)
+            throws TerminologyException, IOException {
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
 
-   @SuppressWarnings({ "unchecked", "rawtypes" })
-   @Override
-   public List<? extends I_ExtendByRefVersion> getTuples(I_IntSet allowedStatus,
-           PositionSetReadOnly positions, Precedence precedencePolicy,
-           I_ManageContradiction contradictionManager)
-           throws TerminologyException, IOException {
-      List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
+                (List<Version>) getVersions(), precedencePolicy, contradictionManager);
 
-      getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
-              (List<Version>) getVersions(), precedencePolicy, contradictionManager);
+        return versionsToAdd;
+    }
 
-      return versionsToAdd;
-   }
+    @SuppressWarnings("deprecation")
+    @Override
+    public int getTypeNid() {
+        return getTypeId();
+    }
 
-   @SuppressWarnings("deprecation")
-   @Override
-   public int getTypeNid() {
-      return getTypeId();
-   }
+    public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+        throw new UnsupportedOperationException();
+    }
 
-   public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
-      throw new UnsupportedOperationException();
-   }
+    @Override
+    public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
+        List<RefsetMember<R, C>.Version> vForC = getVersions(c);
 
-   @Override
-   public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
-      List<RefsetMember<R, C>.Version> vForC = getVersions(c);
+        if (vForC.isEmpty()) {
+            return null;
+        }
 
-      if (vForC.isEmpty()) {
-         return null;
-      }
+        if (vForC.size() > 1) {
+            vForC = c.getContradictionManager().resolveVersions(vForC);
+        }
+        if (vForC.size() > 1) {
+            throw new ContraditionException(vForC.toString());
+        }
 
-      if (vForC.size() > 1) {
-         throw new ContraditionException(vForC.toString());
-      }
+        return vForC.get(0);
+    }
 
-      return vForC.get(0);
-   }
+    protected abstract VersionComputer<RefsetMember<R, C>.Version> getVersionComputer();
 
-   protected abstract VersionComputer<RefsetMember<R, C>.Version> getVersionComputer();
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<? extends Version> getVersions() {
+        if (versions == null) {
+            int count = 1;
 
-   @SuppressWarnings("unchecked")
-   @Override
-   public List<? extends Version> getVersions() {
-      if (versions == null) {
-         int count = 1;
-
-         if (revisions != null) {
-            count = count + revisions.size();
-         }
-
-         ArrayList<Version> list = new ArrayList<Version>(count);
-
-         list.add(new Version());
-
-         if (revisions != null) {
-            for (int i = 0; i < revisions.size(); i++) {
-               list.add(new Version(i));
+            if (revisions != null) {
+                count = count + revisions.size();
             }
-         }
 
-         versions = list;
-      }
+            ArrayList<Version> list = new ArrayList<Version>(count);
 
-      return (List<Version>) versions;
-   }
+            list.add(new Version());
 
-   @Override
-   public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c) {
-      List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
+            if (revisions != null) {
+                for (int i = 0; i < revisions.size(); i++) {
+                    list.add(new Version(i));
+                }
+            }
 
-      getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null,
-              c.getPositionSet(), returnTuples, getVersions(), c.getPrecedence(),
-              c.getContradictionManager());
+            versions = list;
+        }
 
-      return returnTuples;
-   }
+        return (List<Version>) versions;
+    }
 
-   @Override
-   public boolean hasExtensions() throws IOException {
-      return getEnclosingConcept().hasExtensionsForComponent(nid);
-   }
+    @Override
+    public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c) {
+        List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
 
-   //~--- set methods ---------------------------------------------------------
+        getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null,
+                c.getPositionSet(), returnTuples, getVersions(), c.getPrecedence(),
+                c.getContradictionManager());
 
-   @Override
-   public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-      if ((this.refsetNid == Integer.MAX_VALUE) || (this.refsetNid == collectionNid)
-              || (getTime() == Long.MAX_VALUE)) {
-         if (this.refsetNid != collectionNid) {
+        return returnTuples;
+    }
+
+    @Override
+    public boolean hasExtensions() throws IOException {
+        return getEnclosingConcept().hasExtensionsForComponent(nid);
+    }
+
+    //~--- set methods ---------------------------------------------------------
+    @Override
+    public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+        if ((this.refsetNid == Integer.MAX_VALUE) || (this.refsetNid == collectionNid)
+                || (getTime() == Long.MAX_VALUE)) {
+            if (this.refsetNid != collectionNid) {
+                if ((this.refsetNid != 0) && (this.nid != 0)) {
+                    NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+
+                    Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+                }
+
+                // new xref is added on the dbWrite.
+                this.refsetNid = collectionNid;
+                modified();
+            }
+        } else {
+            throw new PropertyVetoException("Cannot change refset unless member is uncommitted...", null);
+        }
+    }
+
+    @Override
+    public void setReferencedComponentNid(int referencedComponentNid) {
+        if (this.referencedComponentNid != referencedComponentNid) {
             if ((this.refsetNid != 0) && (this.nid != 0)) {
-               NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+                NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
 
-               Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+                Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
             }
 
             // new xref is added on the dbWrite.
-            this.refsetNid = collectionNid;
+            this.referencedComponentNid = referencedComponentNid;
             modified();
-         }
-      } else {
-         throw new PropertyVetoException("Cannot change refset unless member is uncommitted...", null);
-      }
-   }
+        }
+    }
 
-   @Override
-   public void setReferencedComponentNid(int referencedComponentNid) {
-      if (this.referencedComponentNid != referencedComponentNid) {
-         if ((this.refsetNid != 0) && (this.nid != 0)) {
-            NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+    @Override
+    public void setRefsetId(int refsetNid) throws IOException {
+        if (getTime() == Long.MAX_VALUE) {
+            if (this.refsetNid != refsetNid) {
+                if ((this.refsetNid != 0) && (this.nid != 0)) {
+                    NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
 
-            Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
-         }
+                    Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+                }
 
-         // new xref is added on the dbWrite.
-         this.referencedComponentNid = referencedComponentNid;
-         modified();
-      }
-   }
+                int oldRefsetNid = this.refsetNid;
+                Concept oldRefset = Concept.get(oldRefsetNid);
+                Concept newRefset = Concept.get(refsetNid);
 
-   @Override
-   public void setRefsetId(int refsetNid) throws IOException {
-      if (getTime() == Long.MAX_VALUE) {
-         if (this.refsetNid != refsetNid) {
-            if ((this.refsetNid != 0) && (this.nid != 0)) {
-               NidPairForRefset oldNpr = NidPair.getRefsetNidMemberNidPair(this.refsetNid, this.nid);
+                this.refsetNid = refsetNid;
+                moveRefset(oldRefset, newRefset);
+                modified();
+            }
+        } else {
+            throw new UnsupportedOperationException("Cannot change refset unless member is uncommitted...");
+        }
+    }
 
-               Bdb.forgetXrefPair(this.referencedComponentNid, oldNpr);
+    @Override
+    public void setTypeId(int typeId) {
+        if (typeId != getTypeNid()) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    //~--- inner classes -------------------------------------------------------
+    public class Version extends ConceptComponent<R, C>.Version
+            implements I_ExtendByRefVersion<R>, I_ExtendByRefPart<R>, RefexAnalogBI<R> {
+
+        public Version() {
+            super();
+        }
+
+        public Version(int index) {
+            super(index);
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @SuppressWarnings("unchecked")
+        @Override
+        public void addVersion(I_ExtendByRefPart<R> part) {
+            versions = null;
+            RefsetMember.this.addRevision((R) part);
+        }
+
+        @Override
+        public int compareTo(I_ExtendByRefPart<R> o) {
+            if (Version.class.isAssignableFrom(o.getClass())) {
+                Version another = (Version) o;
+
+                if (getSapNid() != another.getSapNid()) {
+                    return this.getSapNid() - another.getSapNid();
+                }
+
+                return this.index - another.index;
             }
 
-            int     oldRefsetNid = this.refsetNid;
-            Concept oldRefset    = Concept.get(oldRefsetNid);
-            Concept newRefset    = Concept.get(refsetNid);
+            return this.toString().compareTo(o.toString());
+        }
 
-            this.refsetNid = refsetNid;
-            moveRefset(oldRefset, newRefset);
-            modified();
-         }
-      } else {
-         throw new UnsupportedOperationException("Cannot change refset unless member is uncommitted...");
-      }
-   }
+        @Override
+        public I_ExtendByRefPart<R> duplicate() {
+            throw new UnsupportedOperationException();
+        }
 
-   @Override
-   public void setTypeId(int typeId) {
-      if (typeId != getTypeNid()) {
-         throw new UnsupportedOperationException();
-      }
-   }
+        @Override
+        public int hashCodeOfParts() {
+            return 0;
+        }
 
-   //~--- inner classes -------------------------------------------------------
-
-   public class Version extends ConceptComponent<R, C>.Version
-           implements I_ExtendByRefVersion<R>, I_ExtendByRefPart<R>, RefexAnalogBI<R> {
-      public Version() {
-         super();
-      }
-
-      public Version(int index) {
-         super(index);
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public void addVersion(I_ExtendByRefPart<R> part) {
-         versions = null;
-         RefsetMember.this.addRevision((R) part);
-      }
-
-      @Override
-      public int compareTo(I_ExtendByRefPart<R> o) {
-         if (Version.class.isAssignableFrom(o.getClass())) {
-            Version another = (Version) o;
-
-            if (getSapNid() != another.getSapNid()) {
-               return this.getSapNid() - another.getSapNid();
+        public R makeAnalog() {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog();
             }
 
-            return this.index - another.index;
-         }
+            return (R) RefsetMember.this.makeAnalog();
+        }
 
-         return this.toString().compareTo(o.toString());
-      }
+        @Override
+        public RefsetRevision<?, ?> makeAnalog(int statusNid, int pathNid, long time) {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog(statusNid, pathNid, time);
+            }
 
-      @Override
-      public I_ExtendByRefPart<R> duplicate() {
-         throw new UnsupportedOperationException();
-      }
+            return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, pathNid, time);
+        }
 
-      @Override
-      public int hashCodeOfParts() {
-         return 0;
-      }
+        @Override
+        public R makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+            if (index >= 0) {
+                return revisions.get(index).makeAnalog(statusNid, authorNid, pathNid, time);
+            }
 
-      public R makeAnalog() {
-         if (index >= 0) {
-            return revisions.get(index).makeAnalog();
-         }
+            return (R) RefsetMember.this.makeAnalog(statusNid, authorNid, pathNid, time);
+        }
 
-         return (R) RefsetMember.this.makeAnalog();
-      }
+        @Override
+        public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
+            throw new UnsupportedOperationException();
+        }
 
-      @Override
-      public RefsetRevision<?, ?> makeAnalog(int statusNid, int pathNid, long time) {
-         if (index >= 0) {
-            return revisions.get(index).makeAnalog(statusNid, pathNid, time);
-         }
+        //~--- get methods ------------------------------------------------------
+        @Override
+        public int getCollectionNid() {
+            return refsetNid;
+        }
 
-         return (RefsetRevision<?, ?>) RefsetMember.this.makeAnalog(statusNid, pathNid, time);
-      }
+        @Override
+        public int getComponentId() {
+            return referencedComponentNid;
+        }
 
-      @Override
-      public R makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-         if (index >= 0) {
-            return revisions.get(index).makeAnalog(statusNid, authorNid, pathNid, time);
-         }
+        @Override
+        public I_ExtendByRef getCore() {
+            return RefsetMember.this;
+        }
 
-         return (R) RefsetMember.this.makeAnalog(statusNid, authorNid, pathNid, time);
-      }
+        public TkRefsetAbstractMember<?> getERefsetMember() throws TerminologyException, IOException {
+            throw new UnsupportedOperationException("subclass must override");
+        }
 
-      @Override
-      public I_ExtendByRefPart<R> makePromotionPart(PathBI promotionPath) {
-         throw new UnsupportedOperationException();
-      }
+        public TkRevision getERefsetRevision() throws TerminologyException, IOException {
+            throw new UnsupportedOperationException("subclass must override");
+        }
 
-      //~--- get methods ------------------------------------------------------
+        @Override
+        public int getMemberId() {
+            return nid;
+        }
 
-      @Override
-      public int getCollectionNid() {
-         return refsetNid;
-      }
+        @SuppressWarnings("unchecked")
+        @Override
+        public I_ExtendByRefPart<R> getMutablePart() {
+            return (I_ExtendByRefPart<R>) super.getMutablePart();
+        }
 
-      @Override
-      public int getComponentId() {
-         return referencedComponentNid;
-      }
+        @Override
+        public RefsetMember getPrimordialVersion() {
+            return RefsetMember.this;
+        }
 
-      @Override
-      public I_ExtendByRef getCore() {
-         return RefsetMember.this;
-      }
+        @Override
+        public int getReferencedComponentNid() {
+            return RefsetMember.this.getReferencedComponentNid();
+        }
 
-      public TkRefsetAbstractMember<?> getERefsetMember() throws TerminologyException, IOException {
-         throw new UnsupportedOperationException("subclass must override");
-      }
+        public RefexCAB getRefexEditSpec() throws IOException {
+            if ((index >= 0) && (revisions != null)) {
+                return revisions.get(index).getRefexEditSpec();
+            } else {
+                return RefsetMember.this.getRefexEditSpec();
+            }
+        }
 
-      public TkRevision getERefsetRevision() throws TerminologyException, IOException {
-         throw new UnsupportedOperationException("subclass must override");
-      }
+        @Override
+        public int getRefsetId() {
+            return refsetNid;
+        }
 
-      @Override
-      public int getMemberId() {
-         return nid;
-      }
+        @Override
+        @Deprecated
+        public int getStatus() {
+            if (index >= 0) {
+                return revisions.get(index).getStatus();
+            }
 
-      @SuppressWarnings("unchecked")
-      @Override
-      public I_ExtendByRefPart<R> getMutablePart() {
-         return (I_ExtendByRefPart<R>) super.getMutablePart();
-      }
+            return RefsetMember.this.getStatusId();
+        }
 
-      @Override
-      public RefsetMember getPrimordialVersion() {
-         return RefsetMember.this;
-      }
+        @Override
+        public int getTypeId() {
+            return RefsetMember.this.getTypeNid();
+        }
 
-      @Override
-      public int getReferencedComponentNid() {
-         return RefsetMember.this.getReferencedComponentNid();
-      }
+        public int getTypeNid() {
+            return RefsetMember.this.getTypeNid();
+        }
 
-      public RefexCAB getRefexEditSpec() throws IOException {
-         if ((index >= 0) && (revisions != null)) {
-            return revisions.get(index).getRefexEditSpec();
-         } else {
-            return RefsetMember.this.getRefexEditSpec();
-         }
-      }
+        @Override
+        public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+            throw new UnsupportedOperationException();
+        }
 
-      @Override
-      public int getRefsetId() {
-         return refsetNid;
-      }
+        @Override
+        public ArrayIntList getVariableVersionNids() {
+            if (index >= 0) {
+                return revisions.get(index).getVariableVersionNids();
+            } else {
+                return RefsetMember.this.getVariableVersionNids();
+            }
+        }
 
-      @Override
-      @Deprecated
-      public int getStatus() {
-         if (index >= 0) {
-            return revisions.get(index).getStatus();
-         }
+        @Override
+        public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
+            return RefsetMember.this.getVersion(c);
+        }
 
-         return RefsetMember.this.getStatusId();
-      }
+        @Override
+        public List<? extends I_ExtendByRefPart<R>> getVersions() {
+            return RefsetMember.this.getVersions();
+        }
 
-      @Override
-      public int getTypeId() {
-         return RefsetMember.this.getTypeNid();
-      }
+        @Override
+        public Collection<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c) {
+            return RefsetMember.this.getVersions(c);
+        }
 
-      public int getTypeNid() {
-         return RefsetMember.this.getTypeNid();
-      }
+        //~--- set methods ------------------------------------------------------
+        @Override
+        public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+            RefsetMember.this.setCollectionNid(collectionNid);
+        }
 
-      @Override
-      public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
-         throw new UnsupportedOperationException();
-      }
+        @Override
+        public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
+            RefsetMember.this.setReferencedComponentNid(componentNid);
+        }
 
-      @Override
-      public ArrayIntList getVariableVersionNids() {
-         if (index >= 0) {
-            return revisions.get(index).getVariableVersionNids();
-         } else {
-            return RefsetMember.this.getVariableVersionNids();
-         }
-      }
-
-      @Override
-      public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
-         return RefsetMember.this.getVersion(c);
-      }
-
-      @Override
-      public List<? extends I_ExtendByRefPart<R>> getVersions() {
-         return RefsetMember.this.getVersions();
-      }
-
-      @Override
-      public Collection<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c) {
-         return RefsetMember.this.getVersions(c);
-      }
-
-      //~--- set methods ------------------------------------------------------
-
-      @Override
-      public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-         RefsetMember.this.setCollectionNid(collectionNid);
-      }
-
-      @Override
-      public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
-         RefsetMember.this.setReferencedComponentNid(componentNid);
-      }
-
-      @Override
-      @Deprecated
-      public void setStatus(int idStatus) {
-         if (index >= 0) {
-            revisions.get(index).setStatus(idStatus);
-         } else {
-            RefsetMember.this.setStatusId(idStatus);
-         }
-      }
-   }
+        @Override
+        @Deprecated
+        public void setStatus(int idStatus) {
+            if (index >= 0) {
+                revisions.get(index).setStatus(idStatus);
+            } else {
+                RefsetMember.this.setStatusId(idStatus);
+            }
+        }
+    }
 }
