@@ -22,8 +22,7 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
     @Override
     public String getDescription() {
         return "<html>This resolution strategy implements resolution that"
-        + "<ul><li>checks if conflicting members are present on the users edit path(s),</li>"
-        + "<li>and if so, suppresses the members that are NOT on the edit path(s) from </li>"
+        + "<li>suppresses the members that are NOT on the edit path(s) from </li>"
         + "<li>participating in the potential contradiction.</ul>"
         + "</html>";
     }
@@ -55,10 +54,6 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
         if (config.getEditingPathSetReadOnly().getPathNidSet().contains(part2.getPathNid())) {
             returnValues.add(part2);
         }
-        if (returnValues.isEmpty()) {
-            returnValues.add(part1);
-            returnValues.add(part2);
-        }
         return returnValues;
     }
 
@@ -70,9 +65,6 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
                 returnValues.add(v);
             }
         }
-        if (returnValues.isEmpty()) {
-            returnValues.addAll(versions);
-        }
         return returnValues;
     }
 
@@ -83,9 +75,6 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
             if (config.getEditingPathSetReadOnly().getPathNidSet().contains(v.getPathNid())) {
                 returnValues.add(v);
             }
-        }
-        if (returnValues.isEmpty()) {
-            returnValues.addAll(tuples);
         }
         return returnValues;
     }

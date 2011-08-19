@@ -608,6 +608,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       }
 
       if (vForC.size() > 1) {
+          vForC = c.getContradictionManager().resolveVersions(vForC);
+      }
+      if (vForC.size() > 1) {
          throw new ContraditionException(vForC.toString());
       }
 
