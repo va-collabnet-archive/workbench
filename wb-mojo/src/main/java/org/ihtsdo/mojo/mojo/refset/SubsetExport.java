@@ -134,7 +134,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * 
      * @parameter
      */
-    String languageCode = "en";
+    String languageCode = "en-GB";
 
     /**
      * File delimiter.
@@ -348,7 +348,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             File subsetFile = getExportFile(refsetId);
             if (subsetFile == null) {
                 subsetFile =
-                        new File(subsetOutputDirectory, "der1_SubsetMembers_" + refsetName + "_" + languageCode+"_"+ countryCode
+                        new File(subsetOutputDirectory, "der1_SubsetMembers_" + refsetName + "_"+ countryCode+namespace
                            + "_" + releaseVersion + ".txt");
             } else {
                 subsetFile = new File(subsetOutputDirectory, subsetFile.getName());
