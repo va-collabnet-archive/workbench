@@ -136,8 +136,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
 
         activity.setProgressInfoLower("Setting up is-a cache...");
         if (possibleIds.cardinality() > SETUP_ISA_CACHE_THRESHOLD) {
+            if (frameConfig.getViewCoordinate().getIsaCoordinates().size() != 1) {
+               throw new Exception("Only one is-a coordinate allowed. Found: " + frameConfig.getViewCoordinate().getIsaCoordinates());
+            }
             isaCache = KindOfComputer.setupIsaCacheAndWait(
-                    frameConfig.getViewCoordinate().getIsaCoordinate());
+                    frameConfig.getViewCoordinate().getIsaCoordinates().iterator().next());
         }
 
         activity.setProgressInfoLower("Starting computation...");

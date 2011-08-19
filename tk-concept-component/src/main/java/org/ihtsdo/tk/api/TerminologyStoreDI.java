@@ -82,4 +82,6 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
     boolean hasUncommittedChanges();
 
     Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
+
+    public long getSequence();
 }

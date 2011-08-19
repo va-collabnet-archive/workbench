@@ -1,140 +1,164 @@
 package org.ihtsdo.tk.dto.concept.component.relationship;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.UUID;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import java.util.UUID;
+
 public class TkRelationshipRevision extends TkRevision {
+   public static final long serialVersionUID = 1;
 
-    public static final long serialVersionUID = 1;
+   //~--- fields --------------------------------------------------------------
 
-    public UUID characteristicUuid;
-    public UUID refinabilityUuid;
-    public int group;
-    public UUID typeUuid;
+   public UUID characteristicUuid;
+   public int  group;
+   public UUID refinabilityUuid;
+   public UUID typeUuid;
 
-    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-        super();
-        readExternal(in, dataVersion);
-    }
+   //~--- constructors --------------------------------------------------------
 
-    public TkRelationshipRevision() {
-        super();
-    }
+   public TkRelationshipRevision() {
+      super();
+   }
 
-    @Override
-    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-        super.readExternal(in, dataVersion);
-        characteristicUuid = new UUID(in.readLong(), in.readLong());
-        refinabilityUuid = new UUID(in.readLong(), in.readLong());
-        group = in.readInt();
-        typeUuid = new UUID(in.readLong(), in.readLong());
-    }
+   public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+      super();
+      readExternal(in, dataVersion);
+   }
 
-    @Override
-    public void writeExternal(DataOutput out) throws IOException {
-        super.writeExternal(out);
-        out.writeLong(characteristicUuid.getMostSignificantBits());
-        out.writeLong(characteristicUuid.getLeastSignificantBits());
-        out.writeLong(refinabilityUuid.getMostSignificantBits());
-        out.writeLong(refinabilityUuid.getLeastSignificantBits());
-        out.writeInt(group);
-        out.writeLong(typeUuid.getMostSignificantBits());
-        out.writeLong(typeUuid.getLeastSignificantBits());
-    }
+   //~--- methods -------------------------------------------------------------
 
-    public UUID getCharacteristicUuid() {
-        return characteristicUuid;
-    }
+   /**
+    * Compares this object to the specified object. The result is <tt>true</tt>
+    * if and only if the argument is not <tt>null</tt>, is a
+    * <tt>ERelationshipVersion</tt> object, and contains the same values,
+    * field by field, as this <tt>ERelationshipVersion</tt>.
+    *
+    * @param obj the object to compare with.
+    * @return <code>true</code> if the objects are the same;
+    *         <code>false</code> otherwise.
+    */
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    public void setCharacteristicUuid(UUID characteristicUuid) {
-        this.characteristicUuid = characteristicUuid;
-    }
+      if (TkRelationshipRevision.class.isAssignableFrom(obj.getClass())) {
+         TkRelationshipRevision another = (TkRelationshipRevision) obj;
 
-    public UUID getRefinabilityUuid() {
-        return refinabilityUuid;
-    }
-
-    public void setRefinabilityUuid(UUID refinabilityUuid) {
-        this.refinabilityUuid = refinabilityUuid;
-    }
-
-    public int getGroup() {
-        return group;
-    }
-
-    public void setRelGroup(int relGroup) {
-        this.group = relGroup;
-    }
-
-    public UUID getTypeUuid() {
-        return typeUuid;
-    }
-
-    public void setTypeUuid(UUID typeUuid) {
-        this.typeUuid = typeUuid;
-    }
-
-    /**
-     * Returns a string representation of the object.
-     */
-    public String toString() {
-        StringBuffer buff = new StringBuffer();
-        buff.append(this.getClass().getSimpleName() + ": ");
-        buff.append(" characteristicUuid:");
-        buff.append(this.characteristicUuid);
-        buff.append(" refinabilityUuid:");
-        buff.append(this.refinabilityUuid);
-        buff.append(" group:");
-        buff.append(this.group);
-        buff.append(" typeUuid:");
-        buff.append(this.typeUuid);
-        buff.append("; ");
-        buff.append(super.toString());
-        return buff.toString();
-    }
-
-    /**
-     * Compares this object to the specified object. The result is <tt>true</tt>
-     * if and only if the argument is not <tt>null</tt>, is a
-     * <tt>ERelationshipVersion</tt> object, and contains the same values, 
-     * field by field, as this <tt>ERelationshipVersion</tt>.
-     * 
-     * @param obj the object to compare with.
-     * @return <code>true</code> if the objects are the same; 
-     *         <code>false</code> otherwise.
-     */
-    public boolean equals(Object obj) {
-        if (obj == null)
+         // =========================================================
+         // Compare properties of 'this' class to the 'another' class
+         // =========================================================
+         // Compare characteristicUuid
+         if (!this.characteristicUuid.equals(another.characteristicUuid)) {
             return false;
-        if (TkRelationshipRevision.class.isAssignableFrom(obj.getClass())) {
-            TkRelationshipRevision another = (TkRelationshipRevision) obj;
+         }
 
-            // =========================================================
-            // Compare properties of 'this' class to the 'another' class
-            // =========================================================
-            // Compare characteristicUuid
-            if (!this.characteristicUuid.equals(another.characteristicUuid)) {
-                return false;
-            }
-            // Compare refinabilityUuid
-            if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
-                return false;
-            }
-            // Compare group
-            if (this.group != another.group) {
-                return false;
-            }
-            // Compare typeUuid
-            if (!this.typeUuid.equals(another.typeUuid)) {
-                return false;
-            }
-            // Compare their parents
-            return super.equals(obj);
-        }
-        return false;
-    }
+         // Compare refinabilityUuid
+         if (!this.refinabilityUuid.equals(another.refinabilityUuid)) {
+            return false;
+         }
+
+         // Compare group
+         if (this.group != another.group) {
+            return false;
+         }
+
+         // Compare typeUuid
+         if (!this.typeUuid.equals(another.typeUuid)) {
+            return false;
+         }
+
+         // Compare their parents
+         return super.equals(obj);
+      }
+
+      return false;
+   }
+
+   @Override
+   public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+      super.readExternal(in, dataVersion);
+      characteristicUuid = new UUID(in.readLong(), in.readLong());
+      refinabilityUuid   = new UUID(in.readLong(), in.readLong());
+      group              = in.readInt();
+      typeUuid           = new UUID(in.readLong(), in.readLong());
+   }
+
+   /**
+    * Returns a string representation of the object.
+    */
+   @Override
+   public String toString() {
+      StringBuilder buff = new StringBuilder();
+
+      buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(" type:");
+      buff.append(informAboutUuid(this.typeUuid));
+      buff.append(" grp:");
+      buff.append(this.group);
+      buff.append(" char:");
+      buff.append(this.characteristicUuid);
+      buff.append(" ref:");
+      buff.append(this.refinabilityUuid);
+      buff.append(" ");
+      buff.append(super.toString());
+
+      return buff.toString();
+   }
+
+   @Override
+   public void writeExternal(DataOutput out) throws IOException {
+      super.writeExternal(out);
+      out.writeLong(characteristicUuid.getMostSignificantBits());
+      out.writeLong(characteristicUuid.getLeastSignificantBits());
+      out.writeLong(refinabilityUuid.getMostSignificantBits());
+      out.writeLong(refinabilityUuid.getLeastSignificantBits());
+      out.writeInt(group);
+      out.writeLong(typeUuid.getMostSignificantBits());
+      out.writeLong(typeUuid.getLeastSignificantBits());
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   public UUID getCharacteristicUuid() {
+      return characteristicUuid;
+   }
+
+   public int getGroup() {
+      return group;
+   }
+
+   public UUID getRefinabilityUuid() {
+      return refinabilityUuid;
+   }
+
+   public UUID getTypeUuid() {
+      return typeUuid;
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   public void setCharacteristicUuid(UUID characteristicUuid) {
+      this.characteristicUuid = characteristicUuid;
+   }
+
+   public void setRefinabilityUuid(UUID refinabilityUuid) {
+      this.refinabilityUuid = refinabilityUuid;
+   }
+
+   public void setRelGroup(int relGroup) {
+      this.group = relGroup;
+   }
+
+   public void setTypeUuid(UUID typeUuid) {
+      this.typeUuid = typeUuid;
+   }
 }

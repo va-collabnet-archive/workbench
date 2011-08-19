@@ -1568,7 +1568,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             returnValue = revisions.add(r);
         } else if (revisions.get(revisions.size() - 1) != r && getVersionSapMap().containsKey(r.sapNid) == false) {
             assert revisions.get(revisions.size() - 1).equals(r) == false :
-                    "last revision: " + revisions.get(revisions.size() - 1) + " new revision: " + r;
+                    "last revision: " + revisions.get(revisions.size() - 1) + "\n\nnew revision: " + r;
             returnValue = revisions.add(r); //maybe here...
         }
         r.primordialComponent = (C) this; // maybe here

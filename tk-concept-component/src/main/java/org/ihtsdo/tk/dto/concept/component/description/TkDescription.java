@@ -126,17 +126,16 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
     public String toString() {
         StringBuilder buff = new StringBuilder();
         buff.append(this.getClass().getSimpleName()).append(": ");
-        buff.append(" text:");
         buff.append("'").append(this.text).append("'");
-        buff.append(" conceptUuid:");
-        buff.append(this.conceptUuid);
-        buff.append(" initialCaseSignificant:");
+        buff.append(" concept:");
+        buff.append(informAboutUuid(this.conceptUuid));
+        buff.append(" ics:");
         buff.append(this.initialCaseSignificant);
         buff.append(" lang:");
         buff.append("'").append(this.lang).append("'");
-        buff.append(" typeUuid:");
-        buff.append(this.typeUuid);
-        buff.append("; ");
+        buff.append(" type:");
+        buff.append(informAboutUuid(this.typeUuid));
+        buff.append(" ");
         buff.append(super.toString());
         return buff.toString();
     }

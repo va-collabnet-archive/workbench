@@ -94,6 +94,7 @@ import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
@@ -2129,7 +2130,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             canceled = true;
         }
         try {
-            KindOfComputer.updateIsaCache(Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinate(), this.getNid());
+            for (IsaCoordinate isac: Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates()) {
+                KindOfComputer.updateIsaCache(isac, this.getNid());
+            }
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (Exception e) {

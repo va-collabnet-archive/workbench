@@ -22,9 +22,10 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.helper.ResultsItem;
 
-public class PerformQA implements I_ProcessConcepts {
+public class PerformQA implements I_ProcessConcepts { 
 	I_ConfigAceFrame config;
 	I_GetConceptData context;
 	UUID executionUUID;
@@ -75,9 +76,14 @@ public class PerformQA implements I_ProcessConcepts {
 			e.printStackTrace();
 		}
 		System.out.println("Setting up Is-a cache...");
-		KindOfComputer.setupIsaCacheAndWait(config.getViewCoordinate().getIsaCoordinate());
+                if (config.getViewCoordinate().getIsaCoordinates().size() != 1) {
+                    throw new Exception("wrong number of view coordinates: " + config.getViewCoordinate().getIsaCoordinates());
+                }
+                for (IsaCoordinate isac: config.getViewCoordinate().getIsaCoordinates()) {
+                    KindOfComputer.setupIsaCacheAndWait(isac);
+                }
 		System.out.println("Is-a created OK...");
-		isaCache = KindOfComputer.getIsaCacheMap().get(config.getViewCoordinate().getIsaCoordinate());
+		isaCache = KindOfComputer.getIsaCacheMap().get(config.getViewCoordinate().getIsaCoordinates().iterator().next());
 		if (isaCache == null) {
 			throw new Exception("Error: No isa cache for ViewCoordinate.");
 		}

@@ -76,7 +76,8 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                         AceLog.getAppLog().warning(
                                 RELATIVE_POSITION.EQUAL
                                 + " should never happen. "
-                                + "Data is malformed. Part:\n"
+                                + "Data is malformed. sap: " + part.getSapNid()
+                                + " Part:\n"
                                 + part
                                 + " \n  Part to test: \n"
                                 + prevPartToTest);

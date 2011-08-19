@@ -350,6 +350,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         Bdb.getConceptDb().iterateConceptDataInSequence(processor);
     }
 
+    @Override
+    public long getSequence() {
+        return Bdb.gVersion.incrementAndGet();
+    }
+
     private class ConceptGetter implements I_ProcessUnfetchedConceptData {
 
         NidBitSetBI cNids;

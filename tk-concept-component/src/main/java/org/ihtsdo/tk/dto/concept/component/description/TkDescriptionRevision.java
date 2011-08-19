@@ -125,15 +125,15 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
     public String toString() {
         StringBuilder buff = new StringBuilder();
         buff.append(this.getClass().getSimpleName()).append(": ");
-        buff.append(" initialCaseSignificant:");
+        buff.append(" ics:");
         buff.append(this.initialCaseSignificant);
         buff.append(" lang:");
         buff.append("'").append(this.lang).append("'");
         buff.append(" text:");
         buff.append("'").append(this.text).append("'");
-        buff.append(" typeUuid:");
-        buff.append(this.typeUuid);
-        buff.append("; ");
+        buff.append(" type:");
+        buff.append(informAboutUuid(this.typeUuid));
+        buff.append(" ");
         buff.append(super.toString());
         return buff.toString();
     }

@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -81,6 +80,7 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
@@ -104,6 +104,7 @@ public class BdbCommitManager {
             }
         }
     }
+
 
     private static class ConceptWriter implements Runnable {
 
@@ -540,7 +541,9 @@ public class BdbCommitManager {
                 Bdb.annotationConcepts.clear();
 
                 KindOfComputer.reset();
-                KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), c.getNid());
+                for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
+                    KindOfComputer.updateIsaCacheUsingStatedView(isac, c.getNid());
+                }
                 long commitTime = System.currentTimeMillis();
                 NidSetBI sapNidsFromCommit = c.setCommitTime(commitTime);
                 c.modified();
@@ -698,7 +701,9 @@ public class BdbCommitManager {
                             while (uncommittedCNidItr.next()) {
                                 if (getActiveFrame() != null) {
                                     int cnid = uncommittedCNidItr.nid();
-                                    KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), cnid);
+                                    for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
+                                        KindOfComputer.updateIsaCacheUsingStatedView(isac, cnid);
+                                    }
                                     Concept c = Concept.get(cnid);
                                     c.modified(lastCommit);
                                 }
@@ -706,7 +711,9 @@ public class BdbCommitManager {
                             NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
                             while (uncommittedCNidItrNoChecks.next()) {
                                 if (getActiveFrame() != null) {
-                                    KindOfComputer.updateIsaCacheUsingStatedView(getActiveFrame().getViewCoordinate().getIsaCoordinate(), uncommittedCNidItrNoChecks.nid());
+                                    for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
+                                        KindOfComputer.updateIsaCacheUsingStatedView(isac, uncommittedCNidItrNoChecks.nid());
+                                    }
                                 }
                             }
                             long commitTime = System.currentTimeMillis();

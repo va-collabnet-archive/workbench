@@ -9,13 +9,12 @@ package org.dwfa.ace.gui.concept;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
+import org.ihtsdo.helper.dto.DtoExtract;
 import org.ihtsdo.helper.dto.DtoToText;
 import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.rules.RulesLibrary;
@@ -41,6 +40,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,13 +85,21 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
    //~--- enums ---------------------------------------------------------------
 
    private enum MENU_OPTIONS {
-      WRITE_LONG_FORM_TO_CLIPBOARD("Write long form to clipboard"), SET_FROM_NID("Set from nid"),
-      ADD_TO_WATCH_LIST("Add to watch list"), ADD_TEST_ID("Add test id"),
-      REMOVE_FROM_WATCH_LIST("Remove from watch list"), GET_CONCEPT_ATTRIBUTES("Get concept attributes"),
-      SET_CACHE_SIZE("Set cache size"), SET_CACHE_PERCENT("Set cache percent"),
-      CHANGE_SET_TO_TEXT("Change set to text"),
-      ALL_CHANGE_SET_TO_TEXT("All Change sets in profiles to text"), DTO_TO_TEXT("DTO to text"),
-      IMPORT_CHANGE_SET("Import change set"), TOGGLE_QA("Toggle QA");
+      //J-
+      WRITE_LONG_FORM_TO_CLIPBOARD("Write long form to clipboard"), 
+      SET_FROM_NID("Set from nid"),
+      ADD_TO_WATCH_LIST("Add to watch list"), 
+      REMOVE_FROM_WATCH_LIST("Remove from watch list"), 
+      GET_CONCEPT_ATTRIBUTES("Get concept attributes..."),
+      SET_CACHE_SIZE("Set cache size"), 
+      SET_CACHE_PERCENT("Set cache percent"),
+      CHANGE_SET_TO_TEXT("Change set to text..."),
+      ALL_CHANGE_SET_TO_TEXT("All Change sets in profiles to text"), 
+      EXTRACT_CHANGE_SETS_FOR_CONCEPT("Extract change sets for concept..."),
+      DTO_TO_TEXT("DTO to text..."),
+      IMPORT_CHANGE_SET("Import change set..."), 
+      TOGGLE_QA("Toggle QA");
+      //J+
 
       String menuText;
 
@@ -120,8 +130,6 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
          this.menuText = menuText;
       }
    }
-
-   ;
 
    //~--- methods -------------------------------------------------------------
 
@@ -175,28 +183,19 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
          break;
 
-      case ADD_TEST_ID :
-         addTestId();
+      case TOGGLE_QA :
+         toggleQa();
 
          break;
 
-      case TOGGLE_QA :
-         toggleQa();
-      }
-   }
+      case EXTRACT_CHANGE_SETS_FOR_CONCEPT :
+         extractChangeSets();
 
-   private void addTestId() {
-      try {
-         I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+         break;
 
-         ((I_Identify) igcd.getConceptAttributes()).addLongId(111L,
-                 ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
-                 ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid(), Long.MAX_VALUE);
-         Terms.get().addUncommitted(igcd);
-         Terms.get().commit();
-      } catch (Exception exception) {
-         AceLog.getAppLog().alertAndLogException(exception);
+      default :
+         AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
+                 + optionMap.get(e.getActionCommand())));
       }
    }
 
@@ -209,6 +208,43 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
    public String askQuestion(String realm, String question, String defaultAnswer) {
       return (String) JOptionPane.showInputDialog(this.conceptPanel, question, realm,
               JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
+   }
+
+   private void extractChangeSets() {
+      File             rootFile       = new File("profiles");
+      String           prefix         = null;
+      String           suffix         = ".eccs";
+      List<File>       changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+      I_GetConceptData igcd           = (I_GetConceptData) this.conceptPanel.getTermComponent();
+      FileDialog       dialog         = new FileDialog(new Frame(),
+                                           "Select name and location for new directory...");
+
+      dialog.setMode(FileDialog.SAVE);
+      dialog.setDirectory(System.getProperty("user.dir"));
+      dialog.setFile(igcd.toUserString() + " cs extract");
+
+      Set<UUID> concepts = new TreeSet<UUID>();
+
+      concepts.add(igcd.getPrimUuid());
+      dialog.setVisible(true);
+
+      if (dialog.getFile() != null) {
+         File csfd = new File(dialog.getDirectory(), dialog.getFile());
+
+         csfd.mkdir();
+
+         for (File csf : changeSetFiles) {
+            try {
+               File extractFile = new File(csfd, "ex-" + csf.getName());
+
+               DtoExtract.extract(csf, concepts, extractFile);
+            } catch (IOException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            } catch (ClassNotFoundException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            }
+         }
+      }
    }
 
    private void importEccs() {
