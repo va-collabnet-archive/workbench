@@ -107,18 +107,15 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
    //
    private Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap =
       new ConcurrentHashMap<PositionBI, Collection<DragPanelComponentVersion<?>>>();
-   private TreeSet<PositionBI>                                             positionOrderedSet        =
+   private TreeSet<PositionBI>               positionOrderedSet        =
       new TreeSet(new PositionComparator());
-   private Map<PathBI, Integer>                                            pathRowMap                =
-      new ConcurrentHashMap<PathBI, Integer>();
-   private CountDownLatch                                                  latch                     =
-      new CountDownLatch(6);
-   private JPanel                                                          historyPanel              =
-      new JPanel(new GridBagLayout());
-   private Lock                                                            dramsLock                 =
-      new ReentrantLock();
-   private Map<Integer, Integer>                                           componentCountForConflict =
-      new TreeMap<Integer, Integer>();
+   private Map<PathBI, Integer>              pathRowMap                = new ConcurrentHashMap<PathBI,
+                                                                            Integer>();
+   private CountDownLatch                    latch                     = new CountDownLatch(6);
+   private JPanel                            historyPanel              = new JPanel(new GridBagLayout());
+   private Lock                              dramsLock                 = new ReentrantLock();
+   private Map<Integer, Collection<Integer>> componentCountForConflict = new TreeMap<Integer,
+                                                                            Collection<Integer>>();
    private List<DragPanelDescription>                                      activeDescriptionPanels;
    private List<DragPanelRel>                                              activeInferredRelPanels;
    private List<DragPanelRel>                                              activeStatedRelPanels;
@@ -405,7 +402,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
          }
 
          tempDescList.removeAll(descriptions);
-         inactiveDescriptions      = new ArrayList<I_DescriptionTuple>(tempDescList);
+         inactiveDescriptions = new ArrayList<I_DescriptionTuple>(tempDescList);
          removeContradictions(inactiveDescriptions);
          inactiveDescriptionPanels = new ArrayList<DragPanelDescription>(inactiveDescriptions.size());
          setupDescriptions(latch, inactiveDescriptions, inactiveDescriptionPanels, cpd);
@@ -486,6 +483,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                DragPanelConceptAttributes cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
 
+               setShowConflicts(cav, cac);
                seperatorComponents.add(cac);
                cpe.addToggleComponent(cac);
                cpe.setAlertCount(0);
@@ -566,6 +564,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                      return;
                   }
 
+                  setShowConflicts(dc.getComponentVersion(), dc);
                   seperatorComponents.add(dc);
                   dc.setVisible(descHistoryIsShown);
                   cpd.getInactiveComponentPanels().add(dc);
@@ -610,6 +609,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cprAdded = true;
                      }
 
+                     setShowConflicts(rc.getComponentVersion(), rc);
                      seperatorComponents.add(rc);
                      cpr.addToggleComponent(rc);
                      cView.add(rc, gbc);
@@ -631,6 +631,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cprAdded = true;
                      }
 
+                     setShowConflicts(rc.getComponentVersion(), rc);
                      rc.setVisible(relHistoryIsShown);
                      seperatorComponents.add(rc);
                      cpr.addToggleComponent(rc);
@@ -657,6 +658,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cprAdded = true;
                      }
 
+                     setShowConflicts(rc.getComponentVersion(), rc);
                      seperatorComponents.add(rc);
                      cpr.addToggleComponent(rc);
                      cView.add(rc, gbc);
@@ -678,6 +680,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cprAdded = true;
                      }
 
+                     setShowConflicts(rc.getComponentVersion(), rc);
                      rc.setVisible(relHistoryIsShown);
                      seperatorComponents.add(rc);
                      cpr.addToggleComponent(rc);
@@ -903,10 +906,13 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
       for (ComponentVersionBI cv : componentVersions) {
          if (componentCountForConflict.containsKey(cv.getNid())) {
-            componentCountForConflict.put(cv.getNid(), componentCountForConflict.get(cv.getNid()) + 1);
+            componentCountForConflict.get(cv.getNid()).add(cv.getSapNid());
             extraVersions.add(cv);
          } else {
-            componentCountForConflict.put(cv.getNid(), 1);
+            List<Integer> saptList = new ArrayList<Integer>();
+
+            saptList.add(cv.getSapNid());
+            componentCountForConflict.put(cv.getNid(), saptList);
          }
       }
 
@@ -1332,6 +1338,18 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
    public ConceptViewSettings getSettings() {
       return settings;
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   private void setShowConflicts(ComponentVersionBI cv, DragPanelComponentVersion cvp) {
+      if ((cv == null) || (cvp == null) || (componentCountForConflict.get(cv.getNid()) == null)) {
+         return;
+      }
+
+      if (componentCountForConflict.get(cv.getNid()).size() > 1) {
+         cvp.showConflicts(componentCountForConflict.get(cv.getNid()));
+      }
    }
 
    //~--- inner classes -------------------------------------------------------
