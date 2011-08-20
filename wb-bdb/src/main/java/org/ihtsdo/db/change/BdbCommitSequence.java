@@ -13,28 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.db.change;
 
-import java.util.concurrent.atomic.AtomicInteger;
+
+
+package org.ihtsdo.db.change;
 
 /**
  *
  * @author kec
  */
 public class BdbCommitSequence {
-    
-    private static final BdbCommitSequence singleton = new BdbCommitSequence();
-    
-    private short commitSequence = Short.MIN_VALUE;
-    
-    private synchronized short nextSequence() {
-        if (commitSequence >= Short.MAX_VALUE) {
-            commitSequence = Short.MIN_VALUE;
-        }
-        return commitSequence++; 
-    }
-    
-    private static short getCommitSequence() {
-        return singleton.nextSequence();
-    }
+   private static short commitSequence = Short.MIN_VALUE;
+
+   //~--- methods -------------------------------------------------------------
+
+   public static synchronized short nextSequence() {
+      if (commitSequence >= Short.MAX_VALUE) {
+         commitSequence = Short.MIN_VALUE;
+      }
+
+      return commitSequence++;
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   public static short getCommitSequence() {
+      return commitSequence;
+   }
 }
