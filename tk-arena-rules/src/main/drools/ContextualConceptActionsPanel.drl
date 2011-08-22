@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.ConAttrFact;
 
 import org.ihtsdo.arena.context.action.BpActionFactory;
 import org.ihtsdo.arena.context.action.CopyDescAction;
@@ -45,6 +46,13 @@ rule "retire or move"
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+end
+
+rule "abandon concept and restart"
+	when
+		$c: ConceptFact(component.conAttrsActive.versions.iterator.next.isUncommitted == true); 
+	then
+		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end
 
 
