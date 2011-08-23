@@ -171,7 +171,8 @@ public abstract class MemberRefsetHandler {
         StringBuffer formattedLine = new StringBuffer();
 
         Collection<UUID> statusUuids = tf.getUids(part.getStatusId());
-        String id = getMemberId(part, memberId, useSctId, componentId, refsetNid, namespace, project);
+        // Looking at latest RF2 spec id should always be UUID not sctid
+        String id = getMemberId(part, memberId, false, componentId, refsetNid, namespace, project);
         String effectiveDate = getDate(tf, part.getVersion());
         boolean active = isActiveStatus(statusUuids);
         String moduleId = toId(tf, getModule().getConceptNid(), useSctId, namespace, project);
@@ -258,6 +259,7 @@ public abstract class MemberRefsetHandler {
     public String getRF2HeaderLine() {
         return "Id" + FILE_DELIMITER + "effectiveTime" + FILE_DELIMITER + "active" + FILE_DELIMITER + "moduleId"
             + FILE_DELIMITER + "refSetId" + FILE_DELIMITER + "referencedComponentId" + FILE_DELIMITER + "conceptId";
+    // do we need concept_id current RF2 specs do not show this as a mandatory field
     }
 
     /**

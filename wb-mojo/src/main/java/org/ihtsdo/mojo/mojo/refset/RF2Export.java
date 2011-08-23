@@ -350,7 +350,13 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
              */
             String sctIdFilePrefix = "der2_SCTID.";
             String uuidFilePrefix = "der2_UUID.";
-
+            
+            String filePrefix="der2_Refset_";
+            String refsetStatus=""; 
+            	
+           // TODO  create  function on rf2Descriptor.status(); ?
+            //TODO if refset draft prepend x to der2_Refset
+            
             String fileName = null;
             File exportFile = getExportFile(tf.getConcept(refsetId));
             if (exportFile != null) {
@@ -360,14 +366,17 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             }
             if (fileName == null) {
                 fileName =
-                        refsetName + refsetType.getFileExtension() + "_" + rf2Descriptor.getContentSubType() + "_"
-                            + rf2Descriptor.getCountryCode() + namespace + "_" + releaseVersion + ".txt";
+                	//TODO change this don't need refsetType.getFileExtension()
+                        refsetName +  "_" + rf2Descriptor.getCountryCode() + namespace + "_" + releaseVersion + ".txt";
             }
+            
+            
             uuidRefsetWriter =
-                    new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, uuidFilePrefix + fileName)));
+                    new BufferedWriter(new FileWriter(new File(uuidRefsetOutputDirectory, refsetStatus +filePrefix + fileName)));
+           
             sctIdRefsetWriter =
-                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory, sctIdFilePrefix + fileName)));
-
+                    new BufferedWriter(new FileWriter(new File(sctidRefsetOutputDirectory,refsetStatus + filePrefix + fileName)));
+            // do we need the UUID maps at all ?
             writerMap.put(refsetId + "UUID", uuidRefsetWriter);
             writerMap.put(refsetId + "SCTID", sctIdRefsetWriter);
 
