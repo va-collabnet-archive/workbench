@@ -337,9 +337,10 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
-            // TODO strip out spaces e.g. "my refset" becomes "myrefset"
-            // TODO do we prepend x_ for draft refsets?
             
+            // TODO strip out spaces e.g. "my refset" becomes "myrefset"
+            
+            String refsetStatus=""; 
             
             if (releaseVersion == null) {
                 releaseVersion = referenceSetExport.getReleaseVersion(refsetConcept);
@@ -348,7 +349,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             File subsetFile = getExportFile(refsetId);
             if (subsetFile == null) {
                 subsetFile =
-                        new File(subsetOutputDirectory, "der1_SubsetMembers_" + refsetName + "_"+ countryCode+namespace
+                        new File(subsetOutputDirectory, refsetStatus + "der1_SubsetMembers_" + refsetName + "_"+ countryCode+namespace
                            + "_" + releaseVersion + ".txt");
             } else {
                 subsetFile = new File(subsetOutputDirectory, subsetFile.getName());
