@@ -50,7 +50,8 @@ end
 
 rule "abandon concept and restart"
 	when
-		$c: ConceptFact(component.conAttrsActive.versions.iterator.next.isUncommitted == true); 
+		$c: ConceptFact(component != null, component.conAttrsActive != null,
+                    component.conAttrsActive.versions.iterator.next.isUncommitted == true); 
 	then
 		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end
