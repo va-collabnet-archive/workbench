@@ -15,6 +15,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
@@ -74,7 +75,7 @@ public class AddFromSpecAction extends AbstractAction {
                     originConcept,
                     relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(),
                     relSpec.getDestinationSpec().get(concept.getViewCoordinate()).getNid(),
-                    SnomedMetadataRfx.getREL_HISTORY_HISTORIC_NID(),
+                    SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getLenient().getNid(),
                     SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
                     0,
                     SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
