@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.Boolean;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -13,6 +14,8 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBooleanRevision> {
    public static final long serialVersionUID = 1;
@@ -32,6 +35,12 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
       readExternal(in, dataVersion);
    }
 
+   public TkRefsetBooleanMember(TkRefsetBooleanMember another, Map<UUID, UUID> conversionMap, long offset,
+                                boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.booleanValue = another.booleanValue;
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -44,7 +53,7 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-    @Override
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -73,9 +82,14 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
     *
     * @return a hash code value for this <tt>ERefsetBooleanMember</tt>.
     */
-    @Override
+   @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRefsetBooleanMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetBooleanMember(this, conversionMap, offset, mapAll);
    }
 
    @Override
@@ -97,11 +111,11 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
    /**
     * Returns a string representation of the object.
     */
-    @Override
+   @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(this.booleanValue);
       buff.append(" ");
       buff.append(super.toString());

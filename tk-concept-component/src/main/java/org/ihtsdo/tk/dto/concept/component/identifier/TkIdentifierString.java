@@ -7,6 +7,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.UUID;
 
 public class TkIdentifierString extends TkIdentifier {
    public static final long serialVersionUID = 1;
@@ -24,6 +26,12 @@ public class TkIdentifierString extends TkIdentifier {
    public TkIdentifierString(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super(in, dataVersion);
       denotation = in.readUTF();
+   }
+
+   public TkIdentifierString(TkIdentifierString another, Map<UUID, UUID> conversionMap, long offset,
+                             boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.denotation = another.denotation;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -71,6 +79,11 @@ public class TkIdentifierString extends TkIdentifier {
    public int hashCode() {
       return Arrays.hashCode(new int[] { denotation.hashCode(), statusUuid.hashCode(), pathUuid.hashCode(),
                                          (int) time, (int) (time >>> 32) });
+   }
+
+   @Override
+   public TkIdentifierString makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkIdentifierString(this, conversionMap, offset, mapAll);
    }
 
    /**

@@ -238,6 +238,7 @@
         <module>tk-spelling-variants</module>
         <module>tk-junit-ext</module>
         <module>tk-case-sensitive-words</module>
+        <module>tk-cern-prim</module>
  <!--     <module>bdb-properties</module> -->
     </modules>
 </project>

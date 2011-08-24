@@ -1,34 +1,36 @@
 package org.ihtsdo.tk.api;
 
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
 public interface PathBI {
+   public String toHtmlString() throws IOException;
 
-    public int getConceptNid();
+   //~--- get methods ---------------------------------------------------------
 
-    public Collection<? extends PositionBI> getOrigins();
+   public int getConceptNid();
 
-    /**
-     * Get all origins and origin of origins, etc., for this path.
-     */
-    public Set<? extends PositionBI> getInheritedOrigins();
+   /**
+    * Get all origins and origin of origins, etc., for this path.
+    */
+   public Set<? extends PositionBI> getInheritedOrigins();
 
-    /**
-     * Similar to {@link #getInheritedOrigins()} however superseded origins
-     * (where there is more than one origin for the same path but with an 
-     * earlier version) will be excluded.
-     */
-    public Set<? extends PositionBI> getNormalisedOrigins();
+   public PathBI getMatchingPath(int pathNid);
 
-    public PathBI getMatchingPath(int pathNid);
+   /**
+    * Similar to {@link #getInheritedOrigins()} however superseded origins
+    * (where there is more than one origin for the same path but with an
+    * earlier version) will be excluded.
+    */
+   public Set<? extends PositionBI> getNormalisedOrigins();
 
-	public String toHtmlString() throws IOException;
-	
-	public List<UUID> getUUIDs();
+   public Collection<? extends PositionBI> getOrigins();
 
+   public List<UUID> getUUIDs();
 }

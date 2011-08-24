@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.cid;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevision> {
@@ -31,6 +33,17 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
    public TkRefsetCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetCidMember(TkRefsetCidMember another, Map<UUID, UUID> conversionMap, long offset,
+                            boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(another.c1Uuid);
+      } else {
+         this.c1Uuid = another.c1Uuid;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -77,6 +90,11 @@ public class TkRefsetCidMember extends TkRefsetAbstractMember<TkRefsetCidRevisio
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRefsetCidMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetCidMember(this, conversionMap, offset, mapAll);
    }
 
    @Override

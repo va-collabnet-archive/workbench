@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkConcept {
@@ -57,6 +58,47 @@ public class TkConcept {
    public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
       super();
       readExternal(in);
+   }
+
+   public TkConcept(TkConcept another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super();
+      this.annotationStyleRefex = another.annotationStyleRefex;
+
+      if (another.conceptAttributes != null) {
+         this.conceptAttributes = another.conceptAttributes.makeConversion(conversionMap, offset,
+                 mapAll);
+      }
+      if (another.descriptions != null) {
+          this.descriptions = new ArrayList<TkDescription>(another.descriptions.size());
+          for (TkDescription d: another.descriptions) {
+              this.descriptions.add(d.makeConversion(conversionMap, offset, mapAll));
+          }
+      }
+
+      if (another.media != null) {
+          this.media = new ArrayList<TkMedia>(another.media.size());
+          for (TkMedia d: another.media) {
+              this.media.add(d.makeConversion(conversionMap, offset, mapAll));
+          }
+      }
+
+      this.primordialUuid = conversionMap.get(another.primordialUuid);
+
+      if (another.refsetMembers != null) {
+          this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(another.refsetMembers.size());
+          for (TkRefsetAbstractMember<?> d: another.refsetMembers) {
+              this.refsetMembers.add((TkRefsetAbstractMember<?>) d.makeConversion(conversionMap, offset, mapAll));
+          }
+      }
+
+      if (another.relationships != null) {
+          this.relationships = new ArrayList<TkRelationship>(another.relationships.size());
+          for (TkRelationship d: another.relationships) {
+              this.relationships.add(d.makeConversion(conversionMap, offset, mapAll));
+          }
+      }
+
+   
    }
 
    //~--- methods -------------------------------------------------------------

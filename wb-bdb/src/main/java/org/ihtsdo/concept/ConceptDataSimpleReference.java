@@ -31,6 +31,8 @@ import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.util.NidPairForRel;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.NidList;
+import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -130,6 +132,57 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
          }
       } finally {
          memberMapLock.unlock();
+      }
+   }
+
+   private void addUncommittedNids(Collection<? extends ConceptComponent<?, ?>> componentList,
+                                   NidListBI uncommittedNids) {
+      if (componentList != null) {
+         for (ConceptComponent<?, ?> cc : componentList) {
+            addUncommittedNids(cc, uncommittedNids);
+         }
+      }
+   }
+
+   private void addUncommittedNids(ConceptComponent<?, ?> cc, NidListBI uncommittedNids) {
+      if (cc != null) {
+         if (cc.getTime() == Long.MAX_VALUE) {
+            uncommittedNids.add(cc.nid);
+         } else {
+            if (cc.revisions != null) {
+               for (Revision<?, ?> r : cc.revisions) {
+                  if (r.getTime() == Long.MAX_VALUE) {
+                     uncommittedNids.add(cc.nid);
+
+                     break;
+                  }
+               }
+            }
+         }
+
+         if (cc.annotations != null) {
+            for (ConceptComponent<?, ?> annotation : cc.annotations) {
+               if (annotation.annotations != null) {
+                  for (ConceptComponent<?, ?> aa : annotation.annotations) {
+                     addUncommittedNids(aa, uncommittedNids);
+                  }
+               }
+
+               if (annotation.getTime() == Long.MAX_VALUE) {
+                  uncommittedNids.add(annotation.nid);
+
+                  break;
+               } else if (annotation.revisions != null) {
+                  for (Revision<?, ?> r : annotation.revisions) {
+                     if (r.getTime() == Long.MAX_VALUE) {
+                        uncommittedNids.add(annotation.nid);
+
+                        break;
+                     }
+                  }
+               }
+            }
+         }
       }
    }
 
@@ -876,6 +929,19 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public Set<Integer> getSrcRelNidsReadOnly() throws IOException {
       return getReadOnlyIntSet(OFFSETS.SRC_REL_NIDS);
+   }
+
+   @Override
+   public NidListBI getUncommittedNids() {
+      NidListBI uncommittedNids = new NidList();
+
+      addUncommittedNids(attributes.get(), uncommittedNids);
+      addUncommittedNids(srcRels.get(), uncommittedNids);
+      addUncommittedNids(descriptions.get(), uncommittedNids);
+      addUncommittedNids(images.get(), uncommittedNids);
+      addUncommittedNids(refsetMembers.get(), uncommittedNids);
+
+      return uncommittedNids;
    }
 
    @Override

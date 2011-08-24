@@ -72,6 +72,8 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
+import org.ihtsdo.db.change.BdbCommitSequence;
+import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
@@ -256,9 +258,11 @@ public class BdbCommitManager {
     private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
 
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
-        ((Concept) concept).modified();
+        Concept c = (Concept) concept;
+        c.modified();
+        LastChange.touch(c);
         try {
-            KindOfComputer.updateIsaCachesUsingStatedView((Concept) concept);
+            KindOfComputer.updateIsaCachesUsingStatedView(c);
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -267,7 +271,7 @@ public class BdbCommitManager {
                     "---@@@ Adding uncommitted NO checks: "
                     + concept.getNid() + " ---@@@ ");
         }
-        Concept c = null;
+        c = null;
         if (concept.isUncommitted()) {
             uncommittedCNidsNoChecks.setMember(concept.getNid());
             c = lastUncommitted.getAndSet((Concept) concept);
@@ -362,6 +366,8 @@ public class BdbCommitManager {
         }
 
         Concept concept = (Concept) igcd;
+        LastChange.touch(concept);
+
         dataCheckMap.remove(concept);
         if (concept.isUncommitted() == false) {
             if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -534,7 +540,7 @@ public class BdbCommitManager {
             }
 
             if (performCommit) {
-
+                BdbCommitSequence.nextSequence();
                 for (Concept annotationConcept : Bdb.annotationConcepts) {
                     dbWriterService.execute(new ConceptWriter(annotationConcept));
                 }
@@ -771,6 +777,7 @@ public class BdbCommitManager {
             }
             if (performCommit) {
                 Bdb.sync();
+                BdbCommitSequence.nextSequence();
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);

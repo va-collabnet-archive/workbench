@@ -1,5 +1,9 @@
 package org.ihtsdo.tk.dto.concept.component.identifier;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
@@ -7,6 +11,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkIdentifierUuid extends TkIdentifier {
@@ -32,6 +37,12 @@ public class TkIdentifierUuid extends TkIdentifier {
    public TkIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super(in, dataVersion);
       denotation = new UUID(in.readLong(), in.readLong());
+   }
+
+   public TkIdentifierUuid(TkIdentifierUuid another, Map<UUID, UUID> conversionMap, long offset,
+                           boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.denotation = conversionMap.get(another.denotation);
    }
 
    //~--- methods -------------------------------------------------------------
@@ -79,6 +90,11 @@ public class TkIdentifierUuid extends TkIdentifier {
    public int hashCode() {
       return Arrays.hashCode(new int[] { denotation.hashCode(), statusUuid.hashCode(), pathUuid.hashCode(),
                                          (int) time, (int) (time >>> 32) });
+   }
+
+   @Override
+   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkIdentifierUuid(this, conversionMap, offset, mapAll);
    }
 
    /**

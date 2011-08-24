@@ -3,8 +3,8 @@ package org.ihtsdo.tk.dto.concept.component;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.ext.I_VersionExternally;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -15,13 +15,12 @@ import java.io.IOException;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
-public class TkRevision implements I_VersionExternally {
+public abstract class TkRevision implements I_VersionExternally {
    private static final long serialVersionUID    = 1;
    public static UUID        unspecifiedUserUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
 
@@ -41,6 +40,22 @@ public class TkRevision implements I_VersionExternally {
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRevision(TkRevision another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super();
+
+      if (mapAll) {
+         this.statusUuid = conversionMap.get(another.statusUuid);
+         this.authorUuid = conversionMap.get(another.authorUuid);
+         this.pathUuid   = conversionMap.get(another.pathUuid);
+      } else {
+         this.statusUuid = another.statusUuid;
+         this.authorUuid = another.authorUuid;
+         this.pathUuid   = another.pathUuid;
+      }
+
+      this.time = another.time + offset;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -127,11 +142,12 @@ public class TkRevision implements I_VersionExternally {
                sb.append(" ");
             } else {
                ComponentBI component = Ts.get().getComponent(nid);
-                  sb.append("comp: '");
-                  sb.append(component.toUserString());
-                  sb.append("' ");
-                  sb.append(nid);
-                  sb.append(" ");
+
+               sb.append("comp: '");
+               sb.append(component.toUserString());
+               sb.append("' ");
+               sb.append(nid);
+               sb.append(" ");
             }
          } catch (IOException ex) {
             Logger.getLogger(TkRevision.class.getName()).log(Level.SEVERE, null, ex);
@@ -142,6 +158,8 @@ public class TkRevision implements I_VersionExternally {
 
       return sb;
    }
+
+   public abstract TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll);
 
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       pathUuid   = new UUID(in.readLong(), in.readLong());

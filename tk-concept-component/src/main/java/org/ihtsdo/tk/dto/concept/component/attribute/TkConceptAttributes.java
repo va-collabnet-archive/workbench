@@ -13,6 +13,8 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision>
         implements I_ConceptualizeExternally {
@@ -31,6 +33,11 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
    public TkConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkConceptAttributes(TkConceptAttributes another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.defined = another.defined;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -77,6 +84,11 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkConceptAttributes makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkConceptAttributes(this, conversionMap, offset, mapAll);
    }
 
    @Override
@@ -132,12 +144,12 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
 
    //~--- get methods ---------------------------------------------------------
 
-    @Override
+   @Override
    public List<TkConceptAttributesRevision> getRevisionList() {
       return revisions;
    }
 
-    @Override
+   @Override
    public boolean isDefined() {
       return defined;
    }

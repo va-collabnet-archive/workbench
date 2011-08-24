@@ -11,6 +11,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
+import java.util.UUID;
+
 public class TkRefsetStrRevision extends TkRevision {
    public static final long serialVersionUID = 1;
 
@@ -29,6 +32,12 @@ public class TkRefsetStrRevision extends TkRevision {
       readExternal(in, dataVersion);
    }
 
+   public TkRefsetStrRevision(TkRefsetStrRevision another, Map<UUID, UUID> conversionMap, long offset,
+                              boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.stringValue = another.stringValue;
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -41,7 +50,7 @@ public class TkRefsetStrRevision extends TkRevision {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-    @Override
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -63,6 +72,11 @@ public class TkRefsetStrRevision extends TkRevision {
       }
 
       return false;
+   }
+
+   @Override
+   public TkRefsetStrRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetStrRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

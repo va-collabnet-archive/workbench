@@ -10,6 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidRevision extends TkRevision {
@@ -28,6 +29,17 @@ public class TkRefsetCidRevision extends TkRevision {
    public TkRefsetCidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetCidRevision(TkRefsetCidRevision another, Map<UUID, UUID> conversionMap, long offset,
+                              boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(another.c1Uuid);
+      } else {
+         this.c1Uuid = another.c1Uuid;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -66,6 +78,11 @@ public class TkRefsetCidRevision extends TkRevision {
    }
 
    @Override
+   public TkRefsetCidRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetCidRevision(this, conversionMap, offset, mapAll);
+   }
+
+   @Override
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
       c1Uuid = new UUID(in.readLong(), in.readLong());
@@ -74,11 +91,11 @@ public class TkRefsetCidRevision extends TkRevision {
    /**
     * Returns a string representation of the object.
     */
-    @Override
+   @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(" c1:");
       buff.append(informAboutUuid(this.c1Uuid));
       buff.append(" ");

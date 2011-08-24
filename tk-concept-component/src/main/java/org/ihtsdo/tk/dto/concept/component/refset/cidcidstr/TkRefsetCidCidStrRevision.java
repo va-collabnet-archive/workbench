@@ -11,6 +11,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidCidStrRevision extends TkRevision {
@@ -32,6 +33,21 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
            throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetCidCidStrRevision(TkRefsetCidCidStrRevision another, Map<UUID, UUID> conversionMap,
+                                    long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid      = conversionMap.get(another.c1Uuid);
+         this.c2Uuid      = conversionMap.get(another.c2Uuid);
+         this.stringValue = another.stringValue;
+      } else {
+         this.c1Uuid      = another.c1Uuid;
+         this.c2Uuid      = another.c2Uuid;
+         this.stringValue = another.stringValue;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -78,6 +94,12 @@ public class TkRefsetCidCidStrRevision extends TkRevision {
       }
 
       return false;
+   }
+
+   @Override
+   public TkRefsetCidCidStrRevision makeConversion(Map<UUID, UUID> conversionMap, long offset,
+           boolean mapAll) {
+      return new TkRefsetCidCidStrRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

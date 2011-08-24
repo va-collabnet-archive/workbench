@@ -94,8 +94,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
       SET_CACHE_SIZE("Set cache size"), 
       SET_CACHE_PERCENT("Set cache percent"),
       CHANGE_SET_TO_TEXT("Change set to text..."),
-      ALL_CHANGE_SET_TO_TEXT("All Change sets in profiles to text"), 
+      ALL_CHANGE_SET_TO_TEXT("All change sets in profiles to text"), 
       EXTRACT_CHANGE_SETS_FOR_CONCEPT("Extract change sets for concept..."),
+      EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS(
+              "Extract change sets for concept and assign new nids..."),
       DTO_TO_TEXT("DTO to text..."),
       IMPORT_CHANGE_SET("Import change set..."), 
       TOGGLE_QA("Toggle QA");
@@ -193,6 +195,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
          break;
 
+      case EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS :
+         extractChangeSetsAndAssignNewNids();
+
+         break;
+
       default :
          AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
                  + optionMap.get(e.getActionCommand())));
@@ -238,6 +245,44 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                File extractFile = new File(csfd, "ex-" + csf.getName());
 
                DtoExtract.extract(csf, concepts, extractFile);
+            } catch (IOException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            } catch (ClassNotFoundException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            }
+         }
+      }
+   }
+
+   private void extractChangeSetsAndAssignNewNids() {
+      File             rootFile       = new File("profiles");
+      String           prefix         = null;
+      String           suffix         = ".eccs";
+      List<File>       changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+      I_GetConceptData igcd           = (I_GetConceptData) this.conceptPanel.getTermComponent();
+      FileDialog       dialog         = new FileDialog(new Frame(),
+                                           "Select name and location for new cs extract and map directory...");
+
+      dialog.setMode(FileDialog.SAVE);
+      dialog.setDirectory(System.getProperty("user.dir"));
+      dialog.setFile(igcd.toUserString() + " cs extract and map");
+
+      Set<UUID> concepts = new TreeSet<UUID>();
+
+      concepts.add(igcd.getPrimUuid());
+      dialog.setVisible(true);
+
+      if (dialog.getFile() != null) {
+         File csfd = new File(dialog.getDirectory(), dialog.getFile());
+
+         csfd.mkdir();
+         DtoExtract.DynamicMap map = new DtoExtract.DynamicMap();
+
+         for (File csf : changeSetFiles) {
+            try {
+               File extractFile = new File(csfd, "ex-newnid-" + csf.getName());
+
+               DtoExtract.extractChangeSetsAndAssignNewNids(csf, concepts, extractFile, map);
             } catch (IOException ex) {
                AceLog.getAppLog().alertAndLogException(ex);
             } catch (ClassNotFoundException ex) {

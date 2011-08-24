@@ -10,6 +10,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
+import java.util.UUID;
+
 public class TkRefsetIntRevision extends TkRevision {
    public static final long serialVersionUID = 1;
 
@@ -26,6 +29,12 @@ public class TkRefsetIntRevision extends TkRevision {
    public TkRefsetIntRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetIntRevision(TkRefsetIntRevision another, Map<UUID, UUID> conversionMap, long offset,
+                              boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.intValue = another.intValue;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -62,6 +71,11 @@ public class TkRefsetIntRevision extends TkRevision {
       }
 
       return false;
+   }
+
+   @Override
+   public TkRefsetIntRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetIntRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

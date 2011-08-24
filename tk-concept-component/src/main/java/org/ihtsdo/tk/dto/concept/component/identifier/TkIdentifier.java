@@ -11,6 +11,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class TkIdentifier extends TkRevision {
@@ -29,6 +30,16 @@ public abstract class TkIdentifier extends TkRevision {
    public TkIdentifier(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkIdentifier(TkIdentifier another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.authorityUuid = conversionMap.get(another.authorityUuid);
+      } else {
+         this.authorUuid = another.authorUuid;
+      }
    }
 
    //~--- methods -------------------------------------------------------------

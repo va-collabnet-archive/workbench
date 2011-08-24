@@ -10,6 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TkMediaRevision extends TkRevision {
@@ -29,6 +30,18 @@ public class TkMediaRevision extends TkRevision {
    public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkMediaRevision(TkMediaRevision another, Map<UUID, UUID> conversionMap, long offset,
+                          boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.textDescription = another.textDescription;
+
+      if (mapAll) {
+         this.typeUuid = conversionMap.get(another.typeUuid);
+      } else {
+         this.typeUuid = another.typeUuid;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -70,6 +83,11 @@ public class TkMediaRevision extends TkRevision {
       }
 
       return false;
+   }
+
+   @Override
+   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkMediaRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

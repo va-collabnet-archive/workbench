@@ -1,23 +1,9 @@
-/**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+
+/*
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
-
-
-
-package org.dwfa.ace.tree;
+package org.ihtsdo.tree;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -27,12 +13,17 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.FrameConfigSnapshot;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.tree.ConceptBeanForTree;
+import org.dwfa.ace.tree.TreeIdPath;
 import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
-import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
+import org.ihtsdo.helper.thread.NamedThreadFactory;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -72,9 +63,12 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.tk.Ts;
 
-public class TermTreeHelper extends TermChangeListener implements PropertyChangeListener {
+/**
+ *
+ * @author kec
+ */
+public class TaxonomyHelper extends TermChangeListener implements PropertyChangeListener {
    private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
    private static ImageIcon   statedView         =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
@@ -85,21 +79,22 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
 
    //~--- fields --------------------------------------------------------------
 
-   private final Map<TreeIdPath, ExpandNodeSwingWorker> expansionWorkers = new ConcurrentHashMap<TreeIdPath,
-                                                                              ExpandNodeSwingWorker>();
+   private final Map<TreeIdPath, ExpandTaxonomyNodeWorker> expansionWorkers =
+      new ConcurrentHashMap<TreeIdPath, ExpandTaxonomyNodeWorker>();
    private ExecutorService treeExpandThread = Executors.newFixedThreadPool(1,
                                                  new NamedThreadFactory(treeExpansionGroup,
                                                     "tree expansion "));
+   private OpenIntIntHashMap    expandedNodes = new OpenIntIntHashMap();
    private I_ConfigAceFrame     aceFrameConfig;
    private ActivityPanel        activity;
    private RelAssertionType     assertionType;
-   private TermTreeCellRenderer renderer;
+   private TaxonomyNodeRenderer renderer;
    private JButton              statedInferredButton;
-   private JTreeWithDragImage   tree;
+   private TaxonomyTree         tree;
 
    //~--- constructors --------------------------------------------------------
 
-   public TermTreeHelper(I_ConfigAceFrame config) {
+   public TaxonomyHelper(I_ConfigAceFrame config) {
       super();
       this.aceFrameConfig = config;
       this.assertionType  = config.getRelAssertionType();
@@ -122,17 +117,16 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
                               + " changedComponents: " + changedComponents);
    }
 
-   private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
+   private TaxonomyNode handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
       TreeIdPath idPath = new TreeIdPath(evt.getPath());
 
       stopWorkersOnPath(idPath, "stopping for collapse");
 
-      DefaultMutableTreeNode node = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
+      TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
 
       node.removeAllChildren();
 
-      I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
-      DefaultTreeModel        model      = (DefaultTreeModel) tree.getModel();
+      DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
       /*
        * To avoid having JTree re-expand the root node, we disable
@@ -143,7 +137,7 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
       model.nodeStructureChanged(node);
       model.setAsksAllowsChildren(true);
 
-      return userObject;
+      return node;
    }
 
    @Override
@@ -158,27 +152,27 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
    }
 
    private void removeAnyMatchingExpansionWorker(TreeIdPath key, String message) {
-      ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+      ExpandTaxonomyNodeWorker foundWorker = expansionWorkers.get(key);
 
       if (foundWorker != null) {
-         foundWorker.stopWork(message);
+         foundWorker.cancel(false);
          expansionWorkers.remove(key);
       }
    }
 
-   protected void removeExpansionWorker(TreeIdPath key, ExpandNodeSwingWorker worker, String message) {
-      ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+   protected void removeExpansionWorker(TreeIdPath key, ExpandTaxonomyNodeWorker worker, String message) {
+      ExpandTaxonomyNodeWorker foundWorker = expansionWorkers.get(key);
 
       if ((worker != null) && (foundWorker == worker)) {
-         worker.stopWork(message);
+         worker.cancel(false);
          expansionWorkers.remove(key);
       }
    }
 
    protected void removeStaleExpansionWorker(TreeIdPath key) {
-      ExpandNodeSwingWorker foundWorker = expansionWorkers.get(key);
+      ExpandTaxonomyNodeWorker foundWorker = expansionWorkers.get(key);
 
-      if (foundWorker.getContinueWork() == false) {
+      if (foundWorker.isCancelled()) {
          expansionWorkers.remove(key);
       }
    }
@@ -210,30 +204,27 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
    }
 
    protected void treeTreeCollapsed(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
-      I_GetConceptDataForTree userObject = handleCollapse(evt, aceFrameConfig);
+      TaxonomyNode node = handleCollapse(evt, aceFrameConfig);
 
-      aceFrameConfig.getChildrenExpandedNodes().remove(userObject.getConceptNid());
+      expandedNodes.removeKey(node.getCnid());
    }
 
    protected void treeTreeExpanded(TreeExpansionEvent evt) {
-      DefaultMutableTreeNode node   = (DefaultMutableTreeNode) evt.getPath().getLastPathComponent();
-      TreeIdPath             idPath = new TreeIdPath(evt.getPath());
+      TaxonomyNode node   = (TaxonomyNode) evt.getPath().getLastPathComponent();
+      TreeIdPath   idPath = new TreeIdPath(evt.getPath());
 
       stopWorkersOnPath(idPath, "stopping before expansion");
+      expandedNodes.removeKey(node.getCnid());
 
-      I_GetConceptDataForTree userObject = (I_GetConceptDataForTree) node.getUserObject();
+      FrameConfigSnapshot      configSnap   = new FrameConfigSnapshot(aceFrameConfig);
+      ConceptVersionBI         cv           = null;
+      ExpandTaxonomyNodeWorker parentWorker = null;
+      ExpandTaxonomyNodeWorker worker       = new ExpandTaxonomyNodeWorker(cv,
+                                                 (DefaultTreeModel) tree.getModel(), node, parentWorker,
+                                                 renderer);
 
-      if (userObject != null) {
-         aceFrameConfig.getChildrenExpandedNodes().add(userObject.getConceptNid());
-
-         FrameConfigSnapshot   configSnap = new FrameConfigSnapshot(aceFrameConfig);
-         ExpandNodeSwingWorker worker     = new ExpandNodeSwingWorker((DefaultTreeModel) tree.getModel(),
-                                               tree, node, new CompareConceptBeansForTree(configSnap), this,
-                                               configSnap, assertionType);
-
-         treeExpandThread.execute(worker);
-         expansionWorkers.put(idPath, worker);
-      }
+      treeExpandThread.execute(worker);
+      expansionWorkers.put(idPath, worker);
    }
 
    protected void treeValueChanged(TreeSelectionEvent evt) {
@@ -276,7 +267,7 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
       return assertionType;
    }
 
-   public Map<TreeIdPath, ExpandNodeSwingWorker> getExpansionWorkers() {
+   public Map<TreeIdPath, ExpandTaxonomyNodeWorker> getExpansionWorkers() {
       return expansionWorkers;
    }
 
@@ -295,7 +286,7 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
          }
       }
 
-      tree = new JTreeWithDragImage(aceFrameConfig, this);
+      tree = new TaxonomyTree(aceFrameConfig, this);
       tree.putClientProperty("JTree.lineStyle", "None");
       tree.setLargeModel(true);
 
@@ -304,7 +295,7 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
 
       // tree.setDragEnabled(true);
       ToolTipManager.sharedInstance().registerComponent(tree);
-      renderer = new TermTreeCellRenderer(aceFrameConfig, this);
+      renderer = new TaxonomyNodeRenderer(aceFrameConfig, this);
       tree.setCellRenderer(renderer);
       tree.setRootVisible(false);
       tree.setShowsRootHandles(true);
@@ -322,7 +313,6 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
        * root pre-expanded, we set askAllowsChildrenafter assigning the new
        * root.
        */
-
       model.setAsksAllowsChildren(true);
       tree.addTreeExpansionListener(new TreeExpansionListener() {
          @Override
@@ -435,11 +425,11 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
       return treeView;
    }
 
-   public TermTreeCellRenderer getRenderer() {
+   public TaxonomyNodeRenderer getRenderer() {
       return renderer;
    }
 
-   public JTreeWithDragImage getTree() {
+   public TaxonomyTree getTree() {
       return tree;
    }
 

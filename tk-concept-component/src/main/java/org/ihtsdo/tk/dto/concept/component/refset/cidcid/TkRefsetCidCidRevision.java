@@ -10,6 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidCidRevision extends TkRevision {
@@ -31,6 +32,19 @@ public class TkRefsetCidCidRevision extends TkRevision {
       readExternal(in, dataVersion);
    }
 
+   public TkRefsetCidCidRevision(TkRefsetCidCidRevision another, Map<UUID, UUID> conversionMap, long offset,
+                               boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(another.c1Uuid);
+         this.c2Uuid = conversionMap.get(another.c2Uuid);
+      } else {
+         this.c1Uuid = another.c1Uuid;
+         this.c2Uuid = another.c2Uuid;
+      }
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -43,7 +57,7 @@ public class TkRefsetCidCidRevision extends TkRevision {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-    @Override
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -73,6 +87,11 @@ public class TkRefsetCidCidRevision extends TkRevision {
    }
 
    @Override
+   public TkRefsetCidCidRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetCidCidRevision(this, conversionMap, offset, mapAll);
+   }
+
+   @Override
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
       c1Uuid = new UUID(in.readLong(), in.readLong());
@@ -82,11 +101,11 @@ public class TkRefsetCidCidRevision extends TkRevision {
    /**
     * Returns a string representation of the object.
     */
-    @Override
+   @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(" c1:");
       buff.append(informAboutUuid(this.c1Uuid));
       buff.append(" c2:");
