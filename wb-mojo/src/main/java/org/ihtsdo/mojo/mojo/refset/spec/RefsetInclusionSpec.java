@@ -24,6 +24,7 @@ import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 public class RefsetInclusionSpec {
 
     public File exportFile;
+    //TODO create a status member = e.g. x for draft use enum?
     public ConceptDescriptor refsetConcept;
     public boolean specContainsSnomedId = false;
     public int subsetVersion = 1;

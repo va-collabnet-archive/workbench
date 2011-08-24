@@ -124,6 +124,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      */
     String releaseVersion;
+    
 
     private I_TermFactory tf = Terms.get();
 
@@ -338,7 +339,8 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
 
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
-
+            refsetName = refsetName.replace("'", "");	
+            
             if (releaseVersion == null) {
                 releaseVersion = referenceSetExport.getReleaseVersion(refsetConcept);
             }

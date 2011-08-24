@@ -142,6 +142,17 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
      * @parameter
      */
     String FILE_DELIMITER = "\t";
+    
+    /**
+     * Used to group released subset member files into catalogues e.g. Pathology.
+     * 
+     * @required
+     * @parameter
+     */
+    
+    String subsetCatalogue ="";
+    
+    
 
     private I_TermFactory tf = Terms.get();
 
@@ -318,9 +329,11 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
         }
 
         BufferedWriter subsetIndexFileWriter = writerMap.get("INDEX");
+        //TODO create a refset grouping catalogue e.g. all pathology refsets ?
+       // would requier a new parameter called refsetCatalogue 
         if (subsetIndexFileWriter == null) {
             subsetIndexFileWriter =
-                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "sct_subsets_" + countryCode
+                    new BufferedWriter(new FileWriter(new File(subsetOutputDirectory, "der1_Subsets_"+ subsetCatalogue + countryCode
                         + "_" + releaseVersion + ".txt")));
             subsetIndexFileWriter.write("SUBSETID" + FILE_DELIMITER + "SUBSETORIGINALID" + FILE_DELIMITER
                 + "SUBSETVERSION" + FILE_DELIMITER + "SUBSETNAME" + FILE_DELIMITER + "SUBSETTYPE" + FILE_DELIMITER
@@ -337,7 +350,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
-            
+            refsetName = refsetName.replace("'", "");
             // TODO strip out spaces e.g. "my refset" becomes "myrefset"
             
             String refsetStatus=""; 
@@ -439,10 +452,14 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                     currentLine = storedSubsetMemberFileReader.readLine();
                 }
                 storedSubsetMemberFileReader.close();
-                if (previousMemberUuids.equals(memberUuids)) {
-                    setSubsetId(storedSubsetId);
-                    return "" + storedSubsetVersion;
-                } else {
+                
+                //according to Chris Morris we should always increment when exporting
+                // regardless of whether the content has changed. 
+                
+//                if (previousMemberUuids.equals(memberUuids)) {
+//                    setSubsetId(storedSubsetId);
+//                    return "" + storedSubsetVersion;
+//                } else {
                     int subsetVersion = storedSubsetVersion + 1;
                     long subsetId =
                             Long.parseLong(refsetType.getRefsetHandler().generateNewSctId(refsetId, subsetVersion,
@@ -450,7 +467,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
                     setSubsetId(subsetId);
                     updateStoredSubsetMemberFile(storedSubsetMemberFile, subsetId, subsetVersion);
                     return "" + subsetVersion;
-                }
+             //   }
             } else {
                 // the subset hasn't be released before. Use the SNOMED ID
                 // attached to the refset concept as the subset
