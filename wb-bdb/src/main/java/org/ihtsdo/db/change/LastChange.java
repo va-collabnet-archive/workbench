@@ -159,7 +159,10 @@ public class LastChange {
    }
 
    public static void touch(int nid, Change changeType) {
-      assert nid != Integer.MAX_VALUE;
+      if (nid == Integer.MAX_VALUE) {
+         return;
+      }
+
       ensureCapacity(nid);
 
       int word = (nid >>> segmentShift) & segmentMask;
