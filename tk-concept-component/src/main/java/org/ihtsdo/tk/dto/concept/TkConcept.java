@@ -60,6 +60,7 @@ public class TkConcept {
             }
         }
         int descCount = in.readInt();
+        checkListInt(descCount);
         if (descCount > 0) {
             descriptions = new ArrayList<TkDescription>(descCount);
             for (int i = 0; i < descCount; i++) {
@@ -67,6 +68,7 @@ public class TkConcept {
             }
         }
         int relCount = in.readInt();
+        checkListInt(relCount);
         if (relCount > 0) {
             relationships = new ArrayList<TkRelationship>(relCount);
             for (int i = 0; i < relCount; i++) {
@@ -74,16 +76,15 @@ public class TkConcept {
             }
         }
         int imgCount = in.readInt();
-        if(imgCount == 1587136848){
+        checkListInt(imgCount);
+       /* if(imgCount == 1587136848){
         	System.out.println("imgCount = "+imgCount);
         	while(imgCount != 0){
         		imgCount = in.readInt();
         		System.out.println("imgCount = "+imgCount);
-        	}
-        	
-        	
-        	
-        }
+        	} 	
+        }*/
+        
         if (imgCount > 0) {
             media = new ArrayList<TkMedia>(imgCount);
             for (int i = 0; i < imgCount; i++) {
@@ -91,6 +92,7 @@ public class TkConcept {
             }
         }
         int refsetMemberCount = in.readInt();
+        checkListInt(refsetMemberCount);
         if (refsetMemberCount > 0) {
             refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(refsetMemberCount);
             for (int i = 0; i < refsetMemberCount; i++) {
@@ -376,7 +378,7 @@ public class TkConcept {
     public void setAnnotationStyleRefex(boolean annotationStyleRefex) {
         this.annotationStyleRefex = annotationStyleRefex;
     }
-
+ 
     public static void checkListInt(int int2Check) throws IOException{
     	if(int2Check < 0){
     		IOException ioe = new IOException(" checkListInt int was less than 0 and = "+int2Check);
@@ -384,7 +386,7 @@ public class TkConcept {
     		throw ioe;
     	}
     	if(int2Check > 1000000){
-    		IOException ioe = new IOException(" checkListInt int was less than 1000000 and = "+int2Check);
+    		IOException ioe = new IOException(" checkListInt int was greater than 1000000 and = "+int2Check);
     		ioe.printStackTrace();
     		throw ioe;
     	}
