@@ -362,7 +362,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
             File subsetFile = getExportFile(refsetId);
             if (subsetFile == null) {
                 subsetFile =
-                        new File(subsetOutputDirectory, refsetStatus + "der1_SubsetMembers_" + refsetName + "_"+ countryCode+namespace
+                        new File(subsetOutputDirectory, currentSpec.status + "der1_SubsetMembers_" + refsetName + "_"+ countryCode+namespace
                            + "_" + releaseVersion + ".txt");
             } else {
                 subsetFile = new File(subsetOutputDirectory, subsetFile.getName());
