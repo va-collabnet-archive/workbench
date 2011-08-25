@@ -155,9 +155,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					if (sourceId==null || sourceId.equals("")){
 						sourceId=sourceConcept.getUids().iterator().next().toString();
 					}
-					if (relationshipId==null || relationshipId.equals("")){
-						relationshipId=rel.getUUIDs().iterator().next().toString();
-					}
+				
 					if (relTypeId==null || relTypeId.equals("")){
 						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 					}
@@ -172,9 +170,17 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							continue;
 						}
 					}
-
-					writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+		
+					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+						relationshipId=rel.getUUIDs().iterator().next().toString();
+					}
+					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.error("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else{
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
+					}
 				}
 			}
 

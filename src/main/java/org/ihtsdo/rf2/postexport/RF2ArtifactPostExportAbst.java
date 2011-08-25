@@ -25,15 +25,16 @@ public abstract class RF2ArtifactPostExportAbst {
 		RF2_DESCRIPTION(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8},"sct2_Description_SUFFIX-en_INT"),
 		RF2_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_Relationship_SUFFIX_INT"), 
 		RF2_STATED_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_StatedRelationship_SUFFIX_INT"), 
-		RF2_QUALIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"sct2_Qualifier_SUFFIX_INT"), 
+		RF2_IDENTIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"sct2_Identifier_SUFFIX_INT"),
+		RF2_TEXTDEFINITION(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8},"sct2_TextDefinition_SUFFIX-en_INT"),
 		RF2_LANGUAGE_REFSET(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_LanguageSUFFIX-en_INT"), 
 		RF2_ATTRIBUTE_VALUE(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AttributeValueSUFFIX_INT"),
-		RF2_ASSOCIATION(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AssociationReferenceSUFFIX_INT"),
-		RF2_SIMPLE_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_Refset_SimpleMapSUFFIX_INT"),
+		RF2_SIMPLE_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_sRefset_SimpleMapSUFFIX_INT"),
 		RF2_SIMPLE(new int[]{0,1},0,new Integer[]{2,4,5},"der2_Refset_SimpleSUFFIX_INT"),
-		RF2_TEXTDEFINITION(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8},"sct2_TextDefinition_SUFFIX-en_INT"),
+		RF2_ASSOCIATION(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AssociationReferenceSUFFIX_INT"),
+		RF2_QUALIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"sct2_Qualifier_SUFFIX_INT"),
 		RF2_ICD9_MAP(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9,10,11},"der2_iissscRefset_ICD9CMEquivalenceMapSUFFIX_INT");
-		 
+		
 
 		private int[] columnIndexes;
 		private Integer[] columnsToCompare;
@@ -78,33 +79,37 @@ public abstract class RF2ArtifactPostExportAbst {
 		case RF2_RELATIONSHIP:
 			retFile=RF2fRetrieve.getRelationshipFile();
 			break; 
+		case RF2_STATED_RELATIONSHIP:
+			retFile=RF2fRetrieve.getStatedRelationshipFile();
+			break; 
+		case RF2_IDENTIFIER:
+			retFile=RF2fRetrieve.getIdentifierFile();
+			break; 
+		case RF2_TEXTDEFINITION:
+			retFile=RF2fRetrieve.getTextDefinitionFile();
+			break;
 		case RF2_LANGUAGE_REFSET:
 			retFile=RF2fRetrieve.getLanguageFile();
 			break; 
 		case RF2_ATTRIBUTE_VALUE:
 			retFile=RF2fRetrieve.getAttributeValueFile();
 			break;
-		case RF2_ASSOCIATION:
-			retFile=RF2fRetrieve.getAssociationFile();
-			break;
 		case RF2_SIMPLE_MAP:
 			retFile=RF2fRetrieve.getSimpleMapFile();
-			break;
-		case RF2_STATED_RELATIONSHIP:
-			retFile=RF2fRetrieve.getStatedRelationshipFile();
-			break; 
-		case RF2_QUALIFIER:
-			retFile=RF2fRetrieve.getQualifierFile();
-			break; 
-		case RF2_TEXTDEFINITION:
-			retFile=RF2fRetrieve.getTextDefinitionFile();
-			break;
-		case RF2_ICD9_MAP:
-			retFile=RF2fRetrieve.getICD9CrossMapFile();
 			break;
 		case RF2_SIMPLE:
 			retFile=RF2fRetrieve.getRefsetSimpleFile();
 			break;
+		case RF2_ASSOCIATION:
+			retFile=RF2fRetrieve.getAssociationFile();
+			break;
+		case RF2_QUALIFIER:
+			retFile=RF2fRetrieve.getQualifierFile();
+			break; 
+		case RF2_ICD9_MAP:
+			retFile=RF2fRetrieve.getICD9CrossMapFile();
+			break;
+	
 		}
 		if (retFile==null){
 			return null;
