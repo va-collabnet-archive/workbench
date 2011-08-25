@@ -86,7 +86,8 @@ public abstract class RF2AbstractImpl {
 	protected NidSetBI textDefinTypes;
 
 	private I_GetConceptData snomedRoot;
-
+	private I_GetConceptData snomedMetaRoot;
+	
 	protected I_IntSet allStatusSet;
 
 	protected int preferredNid;
@@ -151,6 +152,7 @@ public abstract class RF2AbstractImpl {
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			snomedMetaRoot = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			this.preferredNid=tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
 			this.acceptableNid=tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
 			this.currentNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -524,7 +526,21 @@ public abstract class RF2AbstractImpl {
 			//}	
 		}
 	}
-
+	
+	public boolean isMetaConcept(I_GetConceptData concept) throws IOException, TerminologyException {
+	boolean isMetaConcept = false;
+		if (snomedMetaRoot.isParentOf(concept, 
+				currenAceConfig.getAllowedStatus(),
+				currenAceConfig.getDestRelTypes(), 
+				currenAceConfig.getViewPositionSetReadOnly(), 
+				currenAceConfig.getPrecedence(), 
+				currenAceConfig.getConflictResolutionStrategy())) {
+			isMetaConcept=true;
+		}
+		System.out.println("==is meta concept===" + isMetaConcept);
+		return isMetaConcept;
+	}
+	
 	public NidSetBI getAllStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
