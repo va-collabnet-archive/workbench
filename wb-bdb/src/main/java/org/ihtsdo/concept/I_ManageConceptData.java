@@ -19,7 +19,6 @@ import org.ihtsdo.concept.ConceptDataManager.AddDescriptionSet;
 import org.ihtsdo.concept.ConceptDataManager.AddImageSet;
 import org.ihtsdo.concept.ConceptDataManager.AddMemberSet;
 import org.ihtsdo.concept.ConceptDataManager.AddSrcRelSet;
-import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
 public interface I_ManageConceptData {
@@ -152,7 +151,5 @@ public interface I_ManageConceptData {
     public void setAnnotationIndex(boolean annotationIndex) throws IOException;;
 
     public void modified(long sequence);
-
-    public NidListBI getUncommittedNids();
 
 }

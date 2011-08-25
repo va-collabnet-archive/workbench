@@ -2,7 +2,6 @@ package org.ihtsdo.tk.dto.concept.component.refset.member;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -14,8 +13,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public static final long serialVersionUID = 1;
@@ -29,10 +26,6 @@ public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public TkRefsetMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
-   }
-
-   public TkRefsetMember(TkRefsetMember another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
    }
 
    //~--- methods -------------------------------------------------------------
@@ -73,11 +66,6 @@ public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
-   }
-
-   @Override
-   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkRefsetMember(this, conversionMap, offset, mapAll);
    }
 
    @Override

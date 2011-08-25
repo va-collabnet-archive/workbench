@@ -3,7 +3,6 @@ package org.ihtsdo.tk.dto.concept.component.media;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -13,7 +12,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class TkMedia extends TkComponent<TkMediaRevision> {
@@ -36,24 +34,6 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
    public TkMedia(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
-   }
-
-   public TkMedia(TkMedia another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-
-      if (mapAll) {
-         this.conceptUuid     = conversionMap.get(another.conceptUuid);
-         this.dataBytes       = another.dataBytes;
-         this.format          = another.format;
-         this.textDescription = another.textDescription;
-         this.typeUuid        = conversionMap.get(another.typeUuid);
-      } else {
-         this.conceptUuid     = another.conceptUuid;
-         this.dataBytes       = another.dataBytes;
-         this.format          = another.format;
-         this.textDescription = another.textDescription;
-         this.typeUuid        = another.typeUuid;
-      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -122,11 +102,6 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
-   }
-
-   @Override
-   public TkMedia makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkMedia(this, conversionMap, offset, mapAll);
    }
 
    @Override

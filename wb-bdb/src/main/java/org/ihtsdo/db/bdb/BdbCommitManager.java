@@ -72,13 +72,10 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.db.change.BdbCommitSequence;
-import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -107,6 +104,7 @@ public class BdbCommitManager {
             }
         }
     }
+
 
     private static class ConceptWriter implements Runnable {
 
@@ -258,11 +256,9 @@ public class BdbCommitManager {
     private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
 
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
-        Concept c = (Concept) concept;
-        c.modified();
-        LastChange.touch(c);
+        ((Concept) concept).modified();
         try {
-            KindOfComputer.updateIsaCachesUsingStatedView(c);
+            KindOfComputer.updateIsaCachesUsingStatedView((Concept) concept);
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -271,7 +267,7 @@ public class BdbCommitManager {
                     "---@@@ Adding uncommitted NO checks: "
                     + concept.getNid() + " ---@@@ ");
         }
-        c = null;
+        Concept c = null;
         if (concept.isUncommitted()) {
             uncommittedCNidsNoChecks.setMember(concept.getNid());
             c = lastUncommitted.getAndSet((Concept) concept);
@@ -366,8 +362,6 @@ public class BdbCommitManager {
         }
 
         Concept concept = (Concept) igcd;
-        LastChange.touch(concept);
-
         dataCheckMap.remove(concept);
         if (concept.isUncommitted() == false) {
             if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -540,19 +534,7 @@ public class BdbCommitManager {
             }
 
             if (performCommit) {
-                NidBitSetItrBI uncommittedCNidsItr = uncommittedCNids.iterator();
-                NidBitSetItrBI uncommittedCNidsNoChecksItr = uncommittedCNidsNoChecks.iterator();
-                while (uncommittedCNidsItr.next()) {
-                    AceLog.getAppLog().info("Committing on concept: "
-                            + Ts.get().getComponent(uncommittedCNidsItr.nid()).toUserString()
-                            + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsItr.nid()).toString());
-                }
-                while (uncommittedCNidsNoChecks.iterator().next()) {
-                    AceLog.getAppLog().info("Committing on concept: "
-                            + Ts.get().getComponent(uncommittedCNidsNoChecksItr.nid()).toUserString()
-                            + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
-                }
-                BdbCommitSequence.nextSequence();
+
                 for (Concept annotationConcept : Bdb.annotationConcepts) {
                     dbWriterService.execute(new ConceptWriter(annotationConcept));
                 }
@@ -718,9 +700,6 @@ public class BdbCommitManager {
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
                             while (uncommittedCNidItr.next()) {
                                 if (getActiveFrame() != null) {
-                                    AceLog.getAppLog().info("Committing on concept: "
-                                            + Ts.get().getComponent(uncommittedCNidItr.nid()).toUserString()
-                                            + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidItr.nid()).toString());
                                     int cnid = uncommittedCNidItr.nid();
                                     for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
                                         KindOfComputer.updateIsaCacheUsingStatedView(isac, cnid);
@@ -732,9 +711,6 @@ public class BdbCommitManager {
                             NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
                             while (uncommittedCNidItrNoChecks.next()) {
                                 if (getActiveFrame() != null) {
-                                    AceLog.getAppLog().info("Committing on concept: "
-                                            + Ts.get().getComponent(uncommittedCNidItrNoChecks.nid()).toUserString()
-                                            + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidItrNoChecks.nid()).toString());
                                     for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
                                         KindOfComputer.updateIsaCacheUsingStatedView(isac, uncommittedCNidItrNoChecks.nid());
                                     }
@@ -795,7 +771,6 @@ public class BdbCommitManager {
             }
             if (performCommit) {
                 Bdb.sync();
-                BdbCommitSequence.nextSequence();
             }
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
@@ -882,18 +857,6 @@ public class BdbCommitManager {
             synchronized (uncommittedCNidsNoChecks) {
                 synchronized (uncommittedWfMemberIds) {
                     try {
-                        NidBitSetItrBI uncommittedCNidsItr = uncommittedCNids.iterator();
-                        NidBitSetItrBI uncommittedCNidsNoChecksItr = uncommittedCNidsNoChecks.iterator();
-                        while (uncommittedCNidsItr.next()) {
-                            AceLog.getAppLog().info("Canceling on concept: "
-                                    + Ts.get().getComponent(uncommittedCNidsItr.nid()).toUserString()
-                                    + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsItr.nid()).toString());
-                        }
-                        while (uncommittedCNidsNoChecksItr.next()) {
-                            AceLog.getAppLog().info("Canceling on concept: "
-                                    + Ts.get().getComponent(uncommittedCNidsNoChecksItr.nid()).toUserString()
-                                    + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
-                        }
                         KindOfComputer.reset();
                         handleCanceledConcepts(uncommittedCNids);
                         handleCanceledConcepts(uncommittedCNidsNoChecks);

@@ -18,22 +18,9 @@
 
 package org.ihtsdo.db.change;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.ihtsdo.concept.Concept;
-import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.TermChangeListener;
-
 //~--- JDK imports ------------------------------------------------------------
 
-import java.lang.ref.WeakReference;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -43,26 +30,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author kec
  */
 public class LastChange {
-   private static final int                                       MAP_SIZE         = 50000;
-   private static int                                             concurrencyLevel = 128;
-   private static int                                             sshift           = 0;
-   private static int                                             ssize            = 1;
-   private static int                                             segmentShift     = 32 - sshift;
-   private static int                                             segmentMask      = ssize - 1;
-   private static ReentrantLock[]                                 locks            =
-      new ReentrantLock[concurrencyLevel];
-   private static Timer                                           timer            = new Timer("LastChange",
-                                                                                        true);
-   private static ReentrantReadWriteLock                          rwl              =
-      new ReentrantReadWriteLock();
-   private static AtomicReference<int[][]>                        lastChangeMap    =
-      new AtomicReference<int[][]>(new int[0][]);
-   private static AtomicReference<ConcurrentSkipListSet<Integer>> changedXrefs     =
-      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
-   private static AtomicReference<ConcurrentSkipListSet<Integer>> changedComponents =
-      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
-   private static ConcurrentSkipListSet<WeakReference<TermChangeListener>> changeListenerRefs =
-      new ConcurrentSkipListSet<WeakReference<TermChangeListener>>();
+   private static final int MAP_SIZE = 50000;
+
+   // Find power-of-two sizes best matching arguments
+   private static int                      concurrencyLevel = 128;
+   private static ReentrantReadWriteLock   rwl              = new ReentrantReadWriteLock();
+   private static AtomicReference<int[][]> lastChangeMap    = new AtomicReference<int[][]>(new int[0][]);
+
+   // TODO Consider using an implementation that uses
+   // AtomicLongArray rather than simply a long[]...
+   private static int             sshift       = 0;
+   private static int             ssize        = 1;
+   private static int             segmentShift = 32 - sshift;
+   private static int             segmentMask  = ssize - 1;
+   private static ReentrantLock[] locks        = new ReentrantLock[concurrencyLevel];
 
    //~--- static initializers -------------------------------------------------
 
@@ -71,12 +52,12 @@ public class LastChange {
          ++sshift;
          ssize <<= 1;
       }
+   }
 
+   static {
       for (int i = 0; i < concurrencyLevel; i++) {
          locks[i] = new ReentrantLock();
       }
-
-      timer.schedule(new Notifier(), 5000, 2000);
    }
 
    //~--- constant enums ------------------------------------------------------
@@ -84,10 +65,6 @@ public class LastChange {
    public enum Change { COMPONENT, XREF }
 
    //~--- methods -------------------------------------------------------------
-
-   public static void addTermChangeListener(TermChangeListener cl) {
-      changeListenerRefs.add(new ComparableWeakRef(cl));
-   }
 
    private static int asInt(short componentSequence, short xrefSequence) {
       int returnValue = xrefSequence;
@@ -146,23 +123,8 @@ public class LastChange {
       lastChangeMap.set(newNidCidMaps);
    }
 
-   public static void removeTermChangeListener(TermChangeListener cl) {
-      changeListenerRefs.remove(new ComparableWeakRef(cl));
-   }
-
-   public static void touch(Concept c) {
-      for (int nid : c.getUncommittedNids().getListArray()) {
-         touch(nid, Change.COMPONENT);
-      }
-
-      touch(c.getNid(), Change.COMPONENT);
-   }
-
    public static void touch(int nid, Change changeType) {
-      if (nid == Integer.MAX_VALUE) {
-         return;
-      }
-
+      assert nid != Integer.MAX_VALUE;
       ensureCapacity(nid);
 
       int word = (nid >>> segmentShift) & segmentMask;
@@ -182,7 +144,6 @@ public class LastChange {
 
             lastChangeMap.get()[mapIndex][indexInMap] = asInt(BdbCommitSequence.getCommitSequence(),
                     xrefSequence);
-            changedComponents.get().add(nid);
 
             break;
 
@@ -191,20 +152,11 @@ public class LastChange {
 
             lastChangeMap.get()[mapIndex][indexInMap] = asInt(componentSequence,
                     BdbCommitSequence.getCommitSequence());
-            changedXrefs.get().add(nid);
 
             break;
          }
       } finally {
          locks[word].unlock();
-      }
-
-      if (changeType == Change.XREF) {
-         int cNid = Bdb.getConceptNid(nid);
-
-         if ((cNid != nid) && (cNid != Integer.MAX_VALUE)) {
-            LastChange.touch(cNid, changeType);
-         }
       }
    }
 
@@ -246,55 +198,5 @@ public class LastChange {
 
    public static short getLastTouchForXref(int nid) {
       return getLastTouch(nid, Change.XREF);
-   }
-
-   //~--- inner classes -------------------------------------------------------
-
-   public static class ComparableWeakRef extends WeakReference<TermChangeListener>
-           implements Comparable<ComparableWeakRef> {
-      int id;
-
-      //~--- constructors -----------------------------------------------------
-
-      public ComparableWeakRef(TermChangeListener cl) {
-         super(cl);
-         this.id = cl.getListenerId();
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      public int compareTo(ComparableWeakRef o) {
-         return this.id - o.id;
-      }
-   }
-
-
-   private static class Notifier extends TimerTask {
-      @Override
-      public void run() {
-         ConcurrentSkipListSet<Integer> changedXrefs =
-            LastChange.changedXrefs.getAndSet(new ConcurrentSkipListSet<Integer>());
-         ConcurrentSkipListSet<Integer> changedComponents =
-            LastChange.changedComponents.getAndSet(new ConcurrentSkipListSet<Integer>());
-         long sequence = BdbCommitSequence.nextSequence();
-
-         if (!changedXrefs.isEmpty() ||!changedComponents.isEmpty()) {
-            List<WeakReference<TermChangeListener>> toRemove =
-               new ArrayList<WeakReference<TermChangeListener>>();
-
-            for (WeakReference<TermChangeListener> clr : changeListenerRefs) {
-               TermChangeListener cl = clr.get();
-
-               if (cl == null) {
-                  toRemove.add(clr);
-               } else {
-                  cl.changeNotify(sequence, changedXrefs, changedComponents);
-               }
-            }
-
-            changeListenerRefs.removeAll(toRemove);
-         }
-      }
    }
 }

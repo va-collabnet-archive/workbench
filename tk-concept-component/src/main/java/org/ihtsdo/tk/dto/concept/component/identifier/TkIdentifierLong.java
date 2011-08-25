@@ -1,9 +1,5 @@
 package org.ihtsdo.tk.dto.concept.component.identifier;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
-
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
@@ -11,8 +7,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
 
 public class TkIdentifierLong extends TkIdentifier {
    public static final long serialVersionUID = 1;
@@ -32,12 +26,6 @@ public class TkIdentifierLong extends TkIdentifier {
       denotation = in.readLong();
    }
 
-   public TkIdentifierLong(TkIdentifierLong another, Map<UUID, UUID> conversionMap, long offset,
-                           boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.denotation = another.denotation;
-   }
-
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -50,7 +38,7 @@ public class TkIdentifierLong extends TkIdentifier {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-   @Override
+    @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -79,7 +67,7 @@ public class TkIdentifierLong extends TkIdentifier {
     *
     * @return a hash code value for this <tt>EIdentifierVersionLong</tt>.
     */
-   @Override
+    @Override
    public int hashCode() {
       return Arrays.hashCode(new int[] {
          (int) denotation, (int) (denotation >>> 32), statusUuid.hashCode(), pathUuid.hashCode(), (int) time,
@@ -87,19 +75,14 @@ public class TkIdentifierLong extends TkIdentifier {
       });
    }
 
-   @Override
-   public TkRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkIdentifierLong(this, conversionMap, offset, mapAll);
-   }
-
    /**
     * Returns a string representation of the object.
     */
-   @Override
+    @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-      buff.append(this.getClass().getSimpleName()).append(": ");
+        buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(" denotation:");
       buff.append(this.denotation);
       buff.append(" ");

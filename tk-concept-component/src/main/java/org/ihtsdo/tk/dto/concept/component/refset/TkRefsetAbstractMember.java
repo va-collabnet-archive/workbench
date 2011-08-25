@@ -11,7 +11,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.Map;
 import java.util.UUID;
 
 public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkComponent<V> {
@@ -31,19 +30,6 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
    public TkRefsetAbstractMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
-   }
-
-   public TkRefsetAbstractMember(TkRefsetAbstractMember another, Map<UUID, UUID> conversionMap, long offset,
-                                 boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-
-      if (mapAll) {
-         this.componentUuid = conversionMap.get(another.componentUuid);
-         this.refsetUuid    = conversionMap.get(another.refsetUuid);
-      } else {
-         this.componentUuid = another.componentUuid;
-         this.refsetUuid    = another.refsetUuid;
-      }
    }
 
    //~--- methods -------------------------------------------------------------

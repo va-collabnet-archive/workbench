@@ -31,7 +31,6 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
@@ -250,7 +249,6 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
         int word = (nid >>> segmentShift) & segmentMask;
         locks[word].lock();
         try {
-            LastChange.touchXref(nid);
             long pairAsLong = pair.asLong();
             assert pairAsLong != 0;
             long[] currentPairs = mutableXref.get().get(nid);
@@ -311,7 +309,6 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
         int word = (nid >>> segmentShift) & segmentMask;
         locks[word].lock();
         try {
-            LastChange.touchXref(nid);
             long pairAsLong = pair.asLong();
             long[] currentPairs = mutableXref.get().get(nid);
             if (currentPairs == null) {

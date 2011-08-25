@@ -429,9 +429,6 @@ public class Bdb {
     }
 
     public static int getConceptNid(int componentNid) {
-        if (nidCidMapDb == null) {
-            return Integer.MAX_VALUE;
-        }
         return nidCidMapDb.getCNid(componentNid);
     }
 

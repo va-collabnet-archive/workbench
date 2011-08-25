@@ -10,7 +10,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidFloatRevision extends TkRevision {
@@ -30,19 +29,6 @@ public class TkRefsetCidFloatRevision extends TkRevision {
    public TkRefsetCidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
-   }
-
-   public TkRefsetCidFloatRevision(TkRefsetCidFloatRevision another, Map<UUID, UUID> conversionMap,
-                                   long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-
-      if (mapAll) {
-         this.c1Uuid     = conversionMap.get(another.c1Uuid);
-         this.floatValue = another.floatValue;
-      } else {
-         this.c1Uuid     = another.c1Uuid;
-         this.floatValue = another.floatValue;
-      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -84,12 +70,6 @@ public class TkRefsetCidFloatRevision extends TkRevision {
       }
 
       return false;
-   }
-
-   @Override
-   public TkRefsetCidFloatRevision makeConversion(Map<UUID, UUID> conversionMap, long offset,
-           boolean mapAll) {
-      return new TkRefsetCidFloatRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

@@ -1,6 +1,10 @@
 package org.ihtsdo.tk.api;
 
-//~--- non-JDK imports --------------------------------------------------------
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -9,94 +13,75 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.IOException;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
-   void addTermChangeListener(TermChangeListener cl);
 
-   void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
+    ViewCoordinate getMetadataVC() throws IOException;
 
-   void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception;
+    TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
 
-   void removeTermChangeListener(TermChangeListener cl);
+    ComponentChroncileBI<?> getComponent(int nid) throws IOException;
 
-   boolean satisfiesDependencies(Collection<DbDependency> dependencies);
+    ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
 
-   boolean usesRf2Metadata() throws IOException;
+    ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException;
 
-   //~--- get methods ---------------------------------------------------------
+    ConceptChronicleBI getConcept(int cNid) throws IOException;
 
-   NidBitSetBI getAllConceptNids() throws IOException;
+    ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
 
-   KindOfCacheBI getCache(ViewCoordinate vc) throws Exception;
+    ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException;
+    Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException;
 
-   ComponentChroncileBI<?> getComponent(int nid) throws IOException;
+    ComponentVersionBI getComponentVersion(ViewCoordinate vc, int nid) throws IOException, ContraditionException;
 
-   ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
+    ComponentVersionBI getComponentVersion(ViewCoordinate vc, UUID... uuids) throws IOException, ContraditionException;
 
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, Collection<UUID> uuids)
-           throws IOException, ContraditionException;
+    ComponentVersionBI getComponentVersion(ViewCoordinate vc, Collection<UUID> uuids) throws IOException, ContraditionException;
 
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, int nid)
-           throws IOException, ContraditionException;
+    ConceptVersionBI getConceptVersion(ViewCoordinate vc, int cNid) throws IOException;
 
-   ComponentVersionBI getComponentVersion(ViewCoordinate vc, UUID... uuids)
-           throws IOException, ContraditionException;
+    ConceptVersionBI getConceptVersion(ViewCoordinate vc, UUID... uuids) throws IOException;
 
-   ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
+    ConceptVersionBI getConceptVersion(ViewCoordinate vc, Collection<UUID> uuids) throws IOException;
 
-   ConceptChronicleBI getConcept(int cNid) throws IOException;
+    Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate vc, NidBitSetBI cNids) throws IOException;
 
-   ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
+    int getConceptNidForNid(int nid) throws IOException;
 
-   int getConceptNidForNid(int nid) throws IOException;
+    List<UUID> getUuidsForNid(int nid);
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, Collection<UUID> uuids) throws IOException;
+    int getNidForUuids(UUID... uuids) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, int cNid) throws IOException;
+    int getNidForUuids(Collection<UUID> uuids) throws IOException;
 
-   ConceptVersionBI getConceptVersion(ViewCoordinate vc, UUID... uuids) throws IOException;
+    KindOfCacheBI getCache(ViewCoordinate vc) throws Exception;
 
-   Map<Integer, ConceptVersionBI> getConceptVersions(ViewCoordinate vc, NidBitSetBI cNids) throws IOException;
+    Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
 
-   Map<Integer, ConceptChronicleBI> getConcepts(NidBitSetBI cNids) throws IOException;
+    boolean satisfiesDependencies(Collection<DbDependency> dependencies);
 
-   ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoord, boolean useCase);
+    TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc);
 
-   NidBitSetBI getEmptyNidSet() throws IOException;
+    boolean hasUuid(UUID memberUUID);
 
-   Collection<DbDependency> getLatestChangeSetDependencies() throws IOException;
+    boolean usesRf2Metadata() throws IOException ;
 
-   ViewCoordinate getMetadataVC() throws IOException;
+    void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor)
+            throws Exception;
 
-   int getNidForUuids(Collection<UUID> uuids) throws IOException;
+    void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor)
+            throws Exception;
 
-   int getNidForUuids(UUID... uuids) throws IOException;
+    NidBitSetBI getAllConceptNids() throws IOException;
 
-   List<? extends PathBI> getPathChildren(int nid);
+    NidBitSetBI getEmptyNidSet() throws IOException;
+    
+    ContradictionIdentifierBI getConflictIdentifier(ViewCoordinate viewCoord, boolean useCase);
+    
+    boolean hasUncommittedChanges();
 
-   long getSequence();
+    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
 
-   TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
-
-   TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc);
-
-   Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
-
-   List<UUID> getUuidsForNid(int nid);
-
-   boolean hasPath(int nid) throws IOException;
-
-   boolean hasUncommittedChanges();
-
-   boolean hasUuid(UUID memberUUID);
+    public long getSequence();
 }

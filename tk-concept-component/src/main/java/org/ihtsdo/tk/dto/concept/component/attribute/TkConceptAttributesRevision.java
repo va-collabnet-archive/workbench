@@ -11,9 +11,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.Map;
-import java.util.UUID;
-
 public class TkConceptAttributesRevision extends TkRevision implements I_ConceptualizeExternally {
    public static final long serialVersionUID = 1;
 
@@ -31,12 +28,6 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
            throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
-   }
-
-   public TkConceptAttributesRevision(TkConceptAttributesRevision another, Map<UUID, UUID> conversionMap,
-                                      long offset, boolean mapAll) {
-      super(another, conversionMap, offset, mapAll);
-      this.defined = another.defined;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -73,11 +64,6 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
       }
 
       return false;
-   }
-
-   @Override
-   public TkConceptAttributesRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
-      return new TkConceptAttributesRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override
