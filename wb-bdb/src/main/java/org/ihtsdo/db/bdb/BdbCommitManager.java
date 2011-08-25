@@ -73,7 +73,6 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.change.BdbCommitSequence;
-import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
@@ -260,7 +259,6 @@ public class BdbCommitManager {
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
         Concept c = (Concept) concept;
         c.modified();
-        LastChange.touch(c);
         try {
             KindOfComputer.updateIsaCachesUsingStatedView(c);
         } catch (Exception ex) {
@@ -366,7 +364,6 @@ public class BdbCommitManager {
         }
 
         Concept concept = (Concept) igcd;
-        LastChange.touch(concept);
 
         dataCheckMap.remove(concept);
         if (concept.isUncommitted() == false) {
