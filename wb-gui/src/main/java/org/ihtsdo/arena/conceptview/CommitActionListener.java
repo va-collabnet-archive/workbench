@@ -19,6 +19,9 @@ public class CommitActionListener implements ActionListener {
         try {
             if (settings != null) {
                 I_GetConceptData c = settings.getConcept();
+                AceLog.getAppLog().info("Committing on concept: "
+                    + c.toUserString()
+                    + " UUID: " + c.getPrimUuid().toString());
                 if (c != null) {
                     if (c.commit(
                             settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
