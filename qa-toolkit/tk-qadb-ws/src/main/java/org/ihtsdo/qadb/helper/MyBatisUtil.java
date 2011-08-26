@@ -26,12 +26,14 @@ public class MyBatisUtil {
 			try {
 				session = sessionFactory.openSession();
 			} catch (Exception e) {
+				logger.debug("first try: -> Could not open session");
 				//Try again.
 			}
 			for (int i = 1; i < 4; i++) {
 				if (session == null) {
 					try{
-					session = sessionFactory.openSession();
+						logger.debug("trying to open session...");
+						session = sessionFactory.openSession();
 					}catch (Exception e) {
 						logger.debug("try: " + i + " -> Could not open session");
 						etoThrow = e;
