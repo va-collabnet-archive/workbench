@@ -1,14 +1,8 @@
 package org.ihtsdo.qadb.helper;
 
 import java.io.Reader;
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ResultHandler;
-import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -67,8 +61,6 @@ public class MyBatisUtil {
 
 	public static SqlSessionFactory getSessionFactory() {
 		logger.debug("Getting session Factory ");
-		SqlSession session = null;
-		openSession(session);
 		return sessionFactory;
 	}
 
