@@ -25,7 +25,7 @@ public class RF2DescriptionFactory extends RF2AbstractFactory {
 
 	public void export() throws IOException, Exception {
 
-		logger.info("Started Description Export ...");
+		logger.info("Started Description Snapshot Export...");
 
 		try {
 
@@ -39,7 +39,7 @@ public class RF2DescriptionFactory extends RF2AbstractFactory {
 
 			closeExportFileWriter();
 
-			logger.info("Finished Description Export.");
+			logger.info("Finished Description Snapshot Export...");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());

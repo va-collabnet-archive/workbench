@@ -23,12 +23,12 @@ public class RF2IdentifierFactory extends RF2AbstractFactory {
 
 	public void export() {
 
-		logger.info("Started Identifier Export ...");
+		logger.info("Started Identifier Snapshot Export ...");
 
 		try {
 			closeExportFileWriter();
 
-			logger.info("Finished Identifier Export.");
+			logger.info("Finished Identifier Snapshot Export...");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());

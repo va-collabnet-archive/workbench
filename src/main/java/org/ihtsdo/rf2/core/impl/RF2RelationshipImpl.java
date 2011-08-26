@@ -176,7 +176,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					}
 					
 					if (relationshipId==null || relationshipId.equals("")){
-						logger.error("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
 					}else{
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
@@ -185,13 +185,10 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			}
 
 		} catch (IOException e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
+			logger.error("======failing for the IOException & sourceId=====" + sourceId);
 			logger.error("IOExceptions: " + e.getMessage());
-			e.printStackTrace();
 		} catch (Exception e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("======failing for the Exception & sourceId=====" + sourceId);
 		}
 
 	}

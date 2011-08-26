@@ -103,7 +103,7 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					}
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
-						logger.error("Unplublished Retired Text-definition: " + description.getUUIDs().iterator().next().toString());
+						logger.info("Unplublished Retired Text-definition: " + description.getUUIDs().iterator().next().toString());
 					}else{
 						/*getConfig().getBw().write(
 							descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
