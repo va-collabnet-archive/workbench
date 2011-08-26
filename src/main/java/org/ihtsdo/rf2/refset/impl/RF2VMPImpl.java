@@ -76,27 +76,27 @@ public class RF2VMPImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 								if (logger.isDebugEnabled()) {
 									logger.debug("Refset extension part not found!");
 								}
-							}else{
-								
+							}else{								
 								extensionStatusId = extensionPart.getStatusNid();
 								if (extensionStatusId == activeNid) { 														
 									active = "1";
 								} else if (extensionStatusId == inactiveNid) { 														
 									active = "0";
 								} else {
-									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
 									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									System.exit(0);
 								}
 
-								if (conceptid==null || conceptid.equals("")){
+								if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
 									conceptid=concept.getUids().iterator().next().toString();
 								}
-								refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
-								Date effectiveDate = new Date(extensionPart.getTime());
-								effectiveTime = getDateFormat().format(effectiveDate);
 								
-								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
+								if (conceptid==null || conceptid.equals("")){
+									logger.error("Unplublished Retired Concept of VMP : " + concept.getUUIDs().iterator().next().toString());
+								}else {
+									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
+									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
+								}
 							}							
 						}
 					}

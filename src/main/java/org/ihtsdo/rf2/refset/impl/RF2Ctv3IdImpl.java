@@ -45,11 +45,10 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 
 		try{
 			String refsetId = I_Constants.CTV3_REFSET_ID;
-			//String moduleId = getMetaModuleID(concept);
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			
 			String mapTarget_Core = getCtv3Id(concept, getSnomedCorePathNid());
-// TODO confirm requeriment 			
+		
 			String mapTarget_Aux = getCtv3Id(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
 			
