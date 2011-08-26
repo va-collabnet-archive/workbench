@@ -87,15 +87,12 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 					}
 				}
 		
-				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1")){
+				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0"))){
 					conceptid=concept.getUUIDs().iterator().next().toString();
 				}
 				
-				if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-					logger.error("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
-				}else{
-					writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
-				}
+				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
+				
 			}
 		} catch (IOException e) {
 			logger.error("conceptid : " + conceptid);

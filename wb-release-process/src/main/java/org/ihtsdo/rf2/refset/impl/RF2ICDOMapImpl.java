@@ -76,7 +76,7 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 							}
 							if (extensionPart == null) {
 								if (logger.isDebugEnabled()) {
-									logger.debug("Language refset extension part not found!");
+									logger.debug("ICDO refset extension part not found!");
 								}
 							}else{
 
@@ -90,17 +90,19 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 								} else if (extensionStatusId == inactiveNid) { // inactive													
 									active = "0";								
 								} else {
-									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
 									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									System.exit(0);
 								}
 								
-								Date effectiveDate = new Date(extensionPart.getTime());
-								effectiveTime = getDateFormat().format(effectiveDate);
-
-								if (referencedComponentId==null || referencedComponentId.equals("")){
+								
+								if ((referencedComponentId==null || referencedComponentId.equals("")) && active.equals("1")){
 									referencedComponentId=concept.getUids().iterator().next().toString();
 								}
+								if (referencedComponentId==null || referencedComponentId.equals("")){
+									logger.error("Unplublished Retired Concept of ICDO Map : " + concept.getUUIDs().iterator().next().toString());
+								}else{
+										
+								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+
 								mapTarget = extensionPart.getStringValue();
 								if(mapTarget.contains(" ") || mapTarget.contains("[") || mapTarget.contains("]") ){
 									String test[] = mapTarget.split(" ");
@@ -109,7 +111,7 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 								refsetuuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
 								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, mapTarget);
 
-								
+								}
 							}
 						}
 					}

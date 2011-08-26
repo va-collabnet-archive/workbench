@@ -88,13 +88,18 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 									System.exit(0);
 								}
 								
-								if (conceptid==null || conceptid.equals("")){
+								if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
 									conceptid=concept.getUids().iterator().next().toString();
 								}
-								refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
-								Date effectiveDate = new Date(extensionPart.getTime());
-								effectiveTime = getDateFormat().format(effectiveDate);
-								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
+								
+								if (conceptid==null || conceptid.equals("")){
+									logger.error("Unplublished Retired Concept of Non-Human : " + concept.getUUIDs().iterator().next().toString());
+								}else {
+									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
+									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
+								}
+								
 							}							
 						}
 					}
