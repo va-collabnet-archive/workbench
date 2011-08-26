@@ -26,7 +26,7 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 	public void export() {
 
-		logger.info("Started Concept Export (new process)...");
+		logger.info("Started Concept Snapshot Export...");
 
 		try {
 
@@ -40,14 +40,12 @@ public class RF2ConceptFactory extends RF2AbstractFactory {
 
 			logger.info("==========Total number of duplicated records======" + iterator.getDupRecord());
 
-			logger.info("Finished Concept Export.");
+			logger.info("Finished Concept Snapshot Export...");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());
-			e.printStackTrace();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage());			
 		}
 	}
 }

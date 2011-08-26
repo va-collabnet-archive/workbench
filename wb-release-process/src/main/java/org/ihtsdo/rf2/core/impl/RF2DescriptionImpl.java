@@ -108,7 +108,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					}
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
-						logger.error("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
+						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
 					}else{
 						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
 					}

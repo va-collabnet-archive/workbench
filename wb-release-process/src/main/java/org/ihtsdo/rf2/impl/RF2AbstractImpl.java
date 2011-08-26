@@ -535,8 +535,6 @@ public abstract class RF2AbstractImpl {
 				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
 				
 				String conceptStatus = getStatusType(attributes.getStatusNid());
-			
-				String effectiveTime = getDateFormat().format(new Date(attributes.getTime()));
 				if (conceptStatus.equals("0")) {
 					active = "1";
 				} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
@@ -551,8 +549,9 @@ public abstract class RF2AbstractImpl {
 			}
 			
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-				logger.error("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
+				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
+				System.out.println("=====" + concept.getInitialText());
 				export(concept, conceptid);	
 			}
 		}

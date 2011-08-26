@@ -172,7 +172,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					}
 					
 					if (relationshipId==null || relationshipId.equals("")){
-						logger.error("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
+						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
 					}else{
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
