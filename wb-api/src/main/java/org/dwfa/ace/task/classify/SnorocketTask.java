@@ -1466,7 +1466,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         s.append("\r\n:::\t").append(isMANDATORY_REFINABILITY).append("\t : isMANDATORY_REFINABILITY");
 
         s.append("\r\n:::\t").append(isCh_STATED_RELATIONSHIP).append("\t : isCh_STATED_RELATIONSHIP");
-        s.append("\r\n:::\t").append(isCh_INFERRED_CHARACTERISTIC).append("\t : isCh_DEFINING_CHARACTERISTIC");
+        s.append("\r\n:::\t").append(isCh_INFERRED_CHARACTERISTIC).append("\t : defining/inferred");
         // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_INFERRED_RELATIONSHIP);
         // :!!!:???: s.append("\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
         // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_SUBSUMED_RELATIONSHIP);
