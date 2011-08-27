@@ -11,6 +11,9 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
+import org.ihtsdo.tk.drools.facts.ViewFact;
+import org.ihtsdo.tk.drools.facts.View;
+
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
@@ -136,6 +139,7 @@ end */
 
 rule "isKindOf duplicate"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.DUPLICATE_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -148,6 +152,7 @@ end
 
 rule "isKindOf ambiguous"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.AMBIGUOUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -159,6 +164,7 @@ end
 
 rule "isKindOf erroneous"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.ERRONEOUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -173,6 +179,7 @@ end
 
 rule "isKindOf outdated"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.OUTDATED_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -187,6 +194,7 @@ end
 
 rule "isKindOf reason not stated"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.REASON_NOT_STATED_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -201,6 +209,7 @@ end
 
 rule "isKindOf moved elswhere"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.MOVED_ELSEWHERE,
 				hasHistoricalRels == false);
 	then
@@ -211,6 +220,7 @@ end
 
 rule "isKindOf limited status"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf ConceptInactivationType.LIMITED_STATUS_CONCEPT,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -225,6 +235,7 @@ end
 
 rule "isKindOf duplicate (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -237,6 +248,7 @@ end
 
 rule "isKindOf ambiguous (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -248,6 +260,7 @@ end
 
 rule "isKindOf erroneous (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -262,6 +275,7 @@ end
 
 rule "isKindOf outdated (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.OUTDATED_COMPONENT_RF2,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -286,6 +300,7 @@ end */
 
 rule "isKindOf limited status (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf SnomedMetadataRf2.LIMITED_COMPONENT_RF2,
 				this not isKindOf TermAux.MOVED_TO,
 				hasHistoricalRels == false);
@@ -301,6 +316,7 @@ end
 rule "double spaces"
 	
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isKindOf Taxonomies.SNOMED);
 		$d : DescriptionVersionBI(text matches ".*garbage to disable this rule match \\s\\s.*") from $c.descsActive
 	then 
@@ -313,6 +329,7 @@ end
 rule "missing Dialect description EN_US"
 	
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
                 $dv : DescriptionVersionBI(this.isUncommitted == true && 
                             this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
@@ -330,6 +347,7 @@ end
 rule "missing Dialect description EN_UK"
 	
 	when
+                ViewFact(view == View.STATED)
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
                 $dv : DescriptionVersionBI(this.isUncommitted == true && 
                             this.getTypeNid != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
@@ -343,3 +361,14 @@ rule "missing Dialect description EN_UK"
          }
 		} 	
 end
+
+/*rule "fsn missing preferred term"
+	when
+                ViewFact(view == View.STATED)
+		$c : ConceptVersionBI();
+                $pref : DescriptionVersionBI($textPref : text) from $c.preferredDescription
+                $fsn : DescriptionVersionBI($textFsn : text) from $c.fullySpecifiedDescription
+                eval($textFsn.lastIndexOf($pref) != -1)
+        then
+            System.out.println("### IT WORKED ###");
+end */

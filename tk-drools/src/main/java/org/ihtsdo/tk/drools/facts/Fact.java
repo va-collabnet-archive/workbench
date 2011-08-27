@@ -10,6 +10,10 @@ public class Fact <T extends Object> {
 		this.context = context;
 		this.component = component;
 	}
+        
+        protected Fact() {
+		super();
+	}
 	
 	public Context getContext() {
 		return context;
