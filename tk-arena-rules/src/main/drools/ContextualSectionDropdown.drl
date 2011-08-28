@@ -47,6 +47,8 @@ import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelSpecFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
+import org.ihtsdo.tk.drools.facts.ViewFact;
+import org.ihtsdo.tk.drools.facts.View;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.spec.ValidationException;
 import java.io.IOException;
@@ -77,6 +79,7 @@ global ViewCoordinate vc;
 
 rule "add if not in refset: Non-Human refset (RF1)"
 	when
+                        ViewFact(view == View.STATED)
  			$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
  							this not isParentMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
  							context == Context.FOCUS_CONCEPT)
@@ -97,6 +100,7 @@ end
 
 rule "remove if in refset: Non-Human refset (RF1)"
 	when
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this isMemberOf SnomedMetadataRf1.NON_HUMAN_RF1,
  						context == Context.FOCUS_CONCEPT)
 	then 
@@ -114,6 +118,7 @@ end
 
 rule "add if not in refset: Non-Human refset (RF2)"
 	when
+                        ViewFact(view == View.STATED)
  			$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
  							this not isParentMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
  							context == Context.FOCUS_CONCEPT)
@@ -134,6 +139,7 @@ end
 
 rule "remove if in refset: Non-Human refset (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this isMemberOf SnomedMetadataRf2.NON_HUMAN_RF2,
  						context == Context.FOCUS_CONCEPT)
 	then 
@@ -151,6 +157,7 @@ end
 
 rule "add if not in refset: VMP refset (RF1)"
 	when 
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.VMP_RF1, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
@@ -169,6 +176,7 @@ end
 
 rule "remove if in refset: VMP refset (RF1)"
 	when
+                ViewFact(view == View.STATED)
 		$c:ConceptFact(this isMemberOf SnomedMetadataRf1.VMP_RF1, this isKindOf Snomed.PRODUCT,
 						context == Context.FOCUS_CONCEPT)
 	then 
@@ -186,6 +194,7 @@ end
 
 rule "add if not in refset: VMP refset (RF2)"
 	when 
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.VMP_RF2, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
@@ -204,6 +213,7 @@ end
 
 rule "remove if in refset: VMP refset (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c:ConceptFact(this isMemberOf SnomedMetadataRf2.VMP_RF2, this isKindOf Snomed.PRODUCT,
 						context == Context.FOCUS_CONCEPT)
 	then 
@@ -221,6 +231,7 @@ end
 
 rule "add if not in refset: VTM refset (RF1)"
 	when 
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this not isMemberOf SnomedMetadataRf1.VTM_RF1, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
@@ -239,6 +250,7 @@ end
 
 rule "remove if in refset: VTM refset (RF1)"
 	when
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this isMemberOf SnomedMetadataRf1.VTM_RF1, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
@@ -256,6 +268,7 @@ end
 
 rule "add if not in refset: VTM refset (RF2)"
 	when 
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this not isMemberOf SnomedMetadataRf2.VTM_RF2, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 
@@ -274,6 +287,7 @@ end
 
 rule "remove if in refset: VTM refset (RF2)"
 	when
+                ViewFact(view == View.STATED)
 		$c: ConceptFact(this isMemberOf SnomedMetadataRf2.VTM_RF2, this isKindOf Snomed.PRODUCT,
 						 context == Context.FOCUS_CONCEPT)
 	then 

@@ -43,4 +43,8 @@ public class FactFactory {
         throw new UnsupportedOperationException("Can't handle component: "
                 + component);
     }
+    
+    public static Fact<?> get(View view) {
+        return new ViewFact(view);
+    }
 }
