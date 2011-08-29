@@ -133,6 +133,7 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.translation.FSNGenerationException;
 import org.ihtsdo.translation.LanguageUtil;
+import org.ihtsdo.translation.LanguageUtil.Language;
 import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
@@ -1339,6 +1340,7 @@ public class TranslationConceptEditor6 extends JPanel {
 			termZoomDialog.setVisible(true);
 			termZoomDialog.pack();
 			zoomTextArea.setText(targetTextField.getText());
+			zoomTextArea.setEnabled(targetTextField.isEnabled());
 			zoomTextArea.revalidate();
 			zoomTextArea.repaint();
 		}
@@ -3315,6 +3317,15 @@ public class TranslationConceptEditor6 extends JPanel {
 			} else {
 				editingRow = rowModel;
 				if (descrpt.getLanguageRefsetId() == targetId) {
+					String langCode = "";
+					try {
+						langCode = targetLangRefset.getLangCode(Terms.get().getActiveAceFrameConfig());
+					} catch (TerminologyException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
 					if (descrpt.getTypeId() == fsn.getConceptNid() || descrpt.getTypeId() == preferred.getConceptNid() || descrpt.getTypeId() == synonym.getConceptNid()) {
 						try {
 							if (fsn.getConceptNid() == descrpt.getTypeId()) {
@@ -3341,6 +3352,9 @@ public class TranslationConceptEditor6 extends JPanel {
 						panel2.revalidate();
 						saveDesc = true;
 						mSpellChk.setEnabled(true);
+						if(!ArchitectonicAuxiliary.LANG_CODE.valueOf(langCode).getFormatedLanguageCode().equals(descrpt.getLang())){
+							targetTextField.setEnabled(false);
+						}
 						// mAddPref.setEnabled(false);
 						// mAddDesc.setEnabled(false);
 						// button5.setEnabled(true);
