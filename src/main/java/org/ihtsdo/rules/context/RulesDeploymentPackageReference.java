@@ -109,20 +109,31 @@ public class RulesDeploymentPackageReference {
 				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytesForFile(), recreate);
 			} catch (Exception e) {
-				// not found
+				// probably not found
 			}
 			if (fileBased != null) {
 				return fileBased;
 			} else {
-				KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-						getChangeSetXmlBytes(), recreate);
+				KnowledgeBase guvnorBased = null;
+				try {
+					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+							getChangeSetXmlBytes(), recreate);
+				} catch (RuntimeException e1) {
+					// probably deserializing problem
+				}
 				if (guvnorBased != null) {
 					return guvnorBased;
 				}
 			}
 		} else {
-			KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-					getChangeSetXmlBytes(), recreate);
+			KnowledgeBase guvnorBased = null;
+
+			try {
+				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+						getChangeSetXmlBytes(), recreate);
+			} catch (RuntimeException e1) {
+				// probably deserializing problem
+			}
 			if (guvnorBased != null) {
 				return guvnorBased;
 			} else {
@@ -132,7 +143,7 @@ public class RulesDeploymentPackageReference {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					// not found
+					// probably not found
 				}
 				if (fileBased != null) return fileBased;
 			}
