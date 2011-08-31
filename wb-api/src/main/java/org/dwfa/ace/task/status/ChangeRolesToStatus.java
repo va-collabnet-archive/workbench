@@ -130,25 +130,6 @@ public class ChangeRolesToStatus extends AbstractTask {
                 }
             }
             
-            //remove roles which concept is target of
-            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelsIncoming();
-            
-            for (RelationshipChronicleBI rel : relsIn) {
-                for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
-                    	//change status
-                    	for (PathBI editPath : config.getEditingPathSet()) {
-                    		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-	                    	I_RelPart newPart = (I_RelPart) relv.makeAnalog(
-	                    			newStatusConcept.getConceptNid(), 
-	                    			config.getDbConfig().getUserConcept().getNid(),
-	                    			editPath.getConceptNid(), 
-	                    			Long.MAX_VALUE);
-                    	}
-
-                    }
-                }
-            }
             Terms.get().addUncommitted(concept);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {
