@@ -175,16 +175,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 && System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
             debugDump = true;
         }
-    }
-
-    static {
-        if (System.getProperties().get("SnorocketDebug") != null
-                && System.getProperties().get("SnorocketDebug").toString().toLowerCase().startsWith("t")) {
-            debug = true;
-        }
-        if (System.getProperties().get("SnorocketDebugDump") != null
-                && System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
-            debugDump = true;
+        if (System.getProperties().get("SnorocketDebugCore") != null
+                && System.getProperties().get("SnorocketDebugCore").toString().toLowerCase().startsWith("t")) {
             au.csiro.snorocket.core.Snorocket.DEBUG_DUMP = true;
         }
     }
