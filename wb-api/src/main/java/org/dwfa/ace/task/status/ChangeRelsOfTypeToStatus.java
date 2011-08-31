@@ -50,16 +50,15 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN)})
 public class ChangeRelsOfTypeToStatus extends AbstractTask {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
-
     private String activeConceptPropName = ProcessAttachmentKeys.ACTIVE_CONCEPT.getAttachmentKey();
     private TermEntry relType = new TermEntry(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
     private TermEntry newStatus = new TermEntry(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
@@ -85,7 +84,6 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
-
     }
 
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
@@ -108,20 +106,22 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
             typeSet.add(relTypeConcept.getConceptNid());
 
             for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
-                config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                for (PathBI editPath : config.getEditingPathSet()) {
-                    List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
-                        positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
-                    Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-                    for (I_RelTuple t : editTuples) {
-                        if (t.getStatusNid() != newStatusConcept.getConceptNid() &&
-                                t.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                            I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
-                            partsToAdd.add(newPart);
+                    config.getPrecedence(), config.getConflictResolutionStrategy())) {
+                if (relTuple.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                    for (PathBI editPath : config.getEditingPathSet()) {
+                        List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
+                                positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
+                        Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
+                        for (I_RelTuple t : editTuples) {
+                            if (t.getStatusNid() != newStatusConcept.getConceptNid() &&
+                                   t.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() ) {
+                                I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+                                partsToAdd.add(newPart);
+                            }
                         }
-                    }
-                    for (I_RelPart p : partsToAdd) {
-                        relTuple.getFixedPart().addVersion(p);
+                        for (I_RelPart p : partsToAdd) {
+                            relTuple.getFixedPart().addVersion(p);
+                        }
                     }
                 }
             }
@@ -147,7 +147,7 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
 
     public String getActiveConceptPropName() {
@@ -173,5 +173,4 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
     public void setRelType(TermEntry relType) {
         this.relType = relType;
     }
-
 }
