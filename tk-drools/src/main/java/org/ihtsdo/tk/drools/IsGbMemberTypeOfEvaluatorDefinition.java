@@ -157,7 +157,7 @@ public class IsGbMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition 
                 }
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+               return false;
             }
 
             return this.getOperator().isNegated() ^ (isMemberType);

@@ -31,6 +31,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
@@ -249,6 +250,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
         int word = (nid >>> segmentShift) & segmentMask;
         locks[word].lock();
         try {
+            LastChange.touchXref(nid);
             long pairAsLong = pair.asLong();
             assert pairAsLong != 0;
             long[] currentPairs = mutableXref.get().get(nid);
@@ -309,6 +311,7 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
         int word = (nid >>> segmentShift) & segmentMask;
         locks[word].lock();
         try {
+            LastChange.touchXref(nid);
             long pairAsLong = pair.asLong();
             long[] currentPairs = mutableXref.get().get(nid);
             if (currentPairs == null) {
@@ -339,10 +342,10 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
                     System.arraycopy(currentPairs, 1, newPairs, 0,
                             currentPairs.length - 1);
                 } else {
-                    System.arraycopy(currentPairs, 0, newPairs, 0, index - 1);
+                    System.arraycopy(currentPairs, 0, newPairs, 0, index);
                     if (index < currentPairs.length) {
                         System.arraycopy(currentPairs, index + 1, newPairs,
-                                index, currentPairs.length - index);
+                                index, currentPairs.length - index - 1);
                     }
                 }
                 if (mutableXref.get().replace(nid, currentPairs, newPairs)) {
@@ -350,6 +353,10 @@ public class Xref extends ComponentBdb implements I_ProcessUnfetchedConceptData 
                 }
                 currentPairs = mutableXref.get().get(nid);
             }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+
         } finally {
             locks[word].unlock();
             rwl.readLock().unlock();

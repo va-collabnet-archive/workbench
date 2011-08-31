@@ -1,8 +1,10 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -139,9 +141,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
 					} else if (relationshipStatusId == inactiveNid) { 														
 						active = "0";
-
 						moduleId = getConceptMetaModuleID(sourceConcept,
-								getDateFormat().format(new Date(rel.getFixedPart().getTime())));
+						getDateFormat().format(new Date(rel.getFixedPart().getTime())));
 					}
 
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
@@ -151,18 +152,31 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					if (sourceId==null || sourceId.equals("")){
 						sourceId=sourceConcept.getUids().iterator().next().toString();
 					}
-					if (relationshipId==null || relationshipId.equals("")){
-						relationshipId=rel.getUUIDs().iterator().next().toString();
-					}
+			
 					if (relTypeId==null || relTypeId.equals("")){
 						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 					}
 					if (destinationId==null || destinationId.equals("")){
-						destinationId=tf.getUids(rel.getC2Id()).iterator().next().toString();
+						Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+						if (Uids==null  ){
+							continue;
+						}
+						destinationId=Uids.iterator().next().toString();
+						if (destinationId.equals(nullUuid)){
+							continue;
+						}
 					}
-
-					writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+					
+					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+						relationshipId=rel.getUUIDs().iterator().next().toString();
+					}
+					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else{
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
+					}
 				}
 			}
 		} catch (IOException e) {

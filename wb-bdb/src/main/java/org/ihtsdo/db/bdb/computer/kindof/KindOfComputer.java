@@ -230,9 +230,9 @@ public class KindOfComputer {
                 return true;
             }
         }
-        Set<I_GetConceptData> parents = c.getSourceRelTargets(spec.allowedStatusNids,
-                spec.relTypeNids, spec.getViewPositionSet(),
-                spec.precedence, spec.contradictionMgr);
+        Set<I_GetConceptData> parents = c.getSourceRelTargets(spec.getAllowedStatusNids(),
+                spec.getRelTypeNids(), spec.getViewPositionSet(),
+                spec.getPrecedence(), spec.getContradictionMgr());
         if (parents.isEmpty()) {
             cache.setKindOf(c.getNid(), false);
             return false;

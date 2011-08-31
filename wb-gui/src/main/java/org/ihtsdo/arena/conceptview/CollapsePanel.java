@@ -41,9 +41,12 @@ import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
 import org.ihtsdo.arena.conceptview.ConceptView.PanelSection;
 import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.FactFactory;
+import org.ihtsdo.tk.drools.facts.View;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 public class CollapsePanel extends JPanel {
@@ -138,10 +141,11 @@ public class CollapsePanel extends JPanel {
     }
     Set<PanelSection> noMenuSections =
             EnumSet.of(PanelSection.EXTRAS, PanelSection.REL_GRP);
+
     public CollapsePanel(String labelStr, ConceptViewSettings settings,
             CollapsePanelPrefs prefs, PanelSection sectionType) {
         this(labelStr, settings,
-            prefs, sectionType, null);
+                prefs, sectionType, null);
     }
 
     public CollapsePanel(String labelStr, ConceptViewSettings settings,
@@ -269,7 +273,17 @@ public class CollapsePanel extends JPanel {
                         settings.getConfig(),
                         settings.getHost()));
 
+
                 Collection<Object> facts = new ArrayList<Object>();
+                View viewType;
+                if (settings.getRelAssertionType() == RelAssertionType.STATED) {
+                    viewType = View.STATED;
+                } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED) {
+                    viewType = View.INFERRED;
+                } else {
+                    viewType = View.STATED_AND_INFERRED;
+                }
+                facts.add(FactFactory.get(viewType));
                 ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
                         Ts.get().getConceptVersion(coordinate,
                         settings.getConcept().getNid()),
@@ -277,7 +291,7 @@ public class CollapsePanel extends JPanel {
                 facts.add(cFact);
 
                 DroolsExecutionManager.fireAllRules(
-                		CollapsePanel.class.getCanonicalName(),
+                        CollapsePanel.class.getCanonicalName(),
                         kbFiles,
                         globals,
                         facts,
@@ -289,8 +303,9 @@ public class CollapsePanel extends JPanel {
         }
     }
     private static ImageIcon dynamicPopupImage = new ImageIcon(
-                ConceptViewRenderer.class.getResource(
-                "/16x16/plain/dynamic_popup.png"));
+            ConceptViewRenderer.class.getResource(
+            "/16x16/plain/dynamic_popup.png"));
+
     private JButton getDynamicPopupMenuButton() {
         dynamicPopupMenuButton = new JButton(dynamicPopupImage);
         dynamicPopupMenuButton.setPreferredSize(new Dimension(21, 16));
@@ -403,7 +418,7 @@ public class CollapsePanel extends JPanel {
                 for (JComponent retiredPanel : retiredPanels) {
                     retiredPanel.setVisible(!shown);
                 }
-                for (JComponent inactiveComponentPanel: inactiveComponentPanels) {
+                for (JComponent inactiveComponentPanel : inactiveComponentPanels) {
                     inactiveComponentPanel.setVisible(!shown);
                 }
                 handleToggleAction(subpanelType, e, icon);
@@ -542,7 +557,6 @@ public class CollapsePanel extends JPanel {
     public void addToggleComponent(I_ToggleSubPanels component) {
         components.add(component);
     }
-    
     private static int emptyWidth = 21;
     private static int emptyHeight = 16;
     private Dimension emptyDimension = new Dimension(emptyWidth, emptyHeight);
@@ -639,10 +653,8 @@ public class CollapsePanel extends JPanel {
     public List<JComponent> getHistoryPanels() {
         return historyPanels;
     }
-    
+
     public List<JComponent> getInactiveComponentPanels() {
         return inactiveComponentPanels;
     }
-
-
 }

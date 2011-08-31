@@ -60,7 +60,8 @@ public class RetireAction extends AbstractAction {
                 }
                 if(RelationshipVersionBI.class.isAssignableFrom(component.getClass())){
                 	RelationshipAnalogBI ra = (RelationshipAnalogBI) analog;
-                        ra.setGroup(0);
+                        RelationshipVersionBI rv = (RelationshipVersionBI) analog;
+                        ra.setGroup(rv.getGroup());
                 }
                 I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
                 Terms.get().addUncommitted(concept);

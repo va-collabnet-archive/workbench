@@ -1,77 +1,95 @@
 package org.ihtsdo.arena.conceptview;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
+import org.ihtsdo.tk.spec.DescriptionSpec;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+
+import java.util.Collection;
 import java.util.EnumSet;
 
 import javax.swing.TransferHandler;
-import org.ihtsdo.arena.conceptview.DragPanelComponentVersion.SubPanelTypes;
-
-import org.ihtsdo.tk.spec.DescriptionSpec;
 
 public class DragPanelDescTemplate extends DragPanel<DescriptionSpec> implements I_ToggleSubPanels {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
+   /**
+    *
+    */
+   private static final long serialVersionUID = 1L;
 
-    public DragPanelDescTemplate(ConceptViewLayout viewLayout,
-            DescriptionSpec ds) {
-        super(viewLayout, ds);
-    }
+   //~--- constructors --------------------------------------------------------
 
-    public DragPanelDescTemplate(LayoutManager layout,
-            ConceptViewLayout viewLayout, DescriptionSpec ds) {
-        super(layout, viewLayout, ds);
-    }
+   public DragPanelDescTemplate(ConceptViewLayout viewLayout, DescriptionSpec ds) {
+      super(viewLayout, ds);
+   }
 
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[]{DragPanelDataFlavors.descVersionFlavor};
-    }
+   public DragPanelDescTemplate(LayoutManager layout, ConceptViewLayout viewLayout, DescriptionSpec ds) {
+      super(layout, viewLayout, ds);
+   }
 
-    @Override
-    public DataFlavor getNativeDataFlavor() {
-        return DragPanelDataFlavors.descVersionFlavor;
-    }
+   //~--- methods -------------------------------------------------------------
 
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return false;
-    }
+   @Override
+   public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
 
-    @Override
-    protected int getTransferMode() {
-        return TransferHandler.COPY;
-    }
+      // nothing to do...;
+   }
 
-    @Override
-    public DescriptionSpec getThingToDrag() {
-        return thingToDrag;
-    }
+   @Override
+   public void showConflicts(Collection<Integer> saptCol) {
 
-    public DescriptionSpec getDraggedThing() {
-        return thingToDrag;
-    }
+      // nothing to do.
+   }
 
-    @Override
-    public String getUserString(DescriptionSpec obj) {
-        return obj.getDescText();
-    }
+   @Override
+   public void showSubPanels(EnumSet<SubPanelTypes> panels) {
 
-    @Override
-    public void showSubPanels(EnumSet<SubPanelTypes> panels) {
-        // nothing to do...;
-    }
+      // nothing to do...;
+   }
 
-    @Override
-    public void hideSubPanels(EnumSet<SubPanelTypes> panels) {
-        // nothing to do...;
-    }
+   //~--- get methods ---------------------------------------------------------
 
-    @Override
-    public boolean isExpanded() {
-        return false;
-    }
+   public DescriptionSpec getDraggedThing() {
+      return thingToDrag;
+   }
+
+   @Override
+   public DataFlavor getNativeDataFlavor() {
+      return DragPanelDataFlavors.descVersionFlavor;
+   }
+
+   @Override
+   public DescriptionSpec getThingToDrag() {
+      return thingToDrag;
+   }
+
+   @Override
+   public DataFlavor[] getTransferDataFlavors() {
+      return new DataFlavor[] { DragPanelDataFlavors.descVersionFlavor };
+   }
+
+   @Override
+   protected int getTransferMode() {
+      return TransferHandler.COPY;
+   }
+
+   @Override
+   public String getUserString(DescriptionSpec obj) {
+      return obj.getDescText();
+   }
+
+   @Override
+   public boolean isDataFlavorSupported(DataFlavor flavor) {
+      return false;
+   }
+
+   @Override
+   public boolean isExpanded() {
+      return false;
+   }
 }

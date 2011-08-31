@@ -1,31 +1,38 @@
 package org.ihtsdo.db.bdb.sap;
 
-import org.dwfa.util.HashFunction;
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.tk.hash.Hashcode;
 
 public class UncommittedStatusForPath {
-	public int statusNid;
-	public int pathNid;
-	
-	public UncommittedStatusForPath(int statusNid, int pathNid) {
-		super();
-		this.statusNid = statusNid;
-		this.pathNid = pathNid;
-	}
+   public int pathNid;
+   public int statusNid;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof UncommittedStatusForPath) {
-			UncommittedStatusForPath other = (UncommittedStatusForPath) obj;
-			if ((statusNid == other.statusNid) && (pathNid == other.pathNid)) {
-				return true;
-			}
-		}
-		return false;
-	}
+   //~--- constructors --------------------------------------------------------
 
-	@Override
-	public int hashCode() {
-		return HashFunction.hashCode(new int[] { statusNid, pathNid });
-	}
+   public UncommittedStatusForPath(int statusNid, int pathNid) {
+      super();
+      this.statusNid = statusNid;
+      this.pathNid   = pathNid;
+   }
 
+   //~--- methods -------------------------------------------------------------
+
+   @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof UncommittedStatusForPath) {
+         UncommittedStatusForPath other = (UncommittedStatusForPath) obj;
+
+         if ((statusNid == other.statusNid) && (pathNid == other.pathNid)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public int hashCode() {
+      return Hashcode.compute(new int[] { statusNid, pathNid });
+   }
 }

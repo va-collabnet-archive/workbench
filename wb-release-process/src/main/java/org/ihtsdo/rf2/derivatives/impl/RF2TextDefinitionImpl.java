@@ -12,6 +12,7 @@ import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
@@ -66,6 +67,17 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					typeId = I_Constants.DEFINITION;
 					String languageCode = description.getLang(); // This should be always "en"
 					String term = description.getText();
+					if (term!=null ){
+						if (term.indexOf("\t")>-1){
+							term=term.replaceAll("\t", "");
+						}
+						if (term.indexOf("\r")>-1){
+							term=term.replaceAll("\r", "");
+						}
+						if (term.indexOf("\n")>-1){
+							term=term.replaceAll("\n", "");
+						}
+					}
 					String textDefstatus = getStatusType(description.getStatusNid());
 					if (description.isInitialCaseSignificant()) {
 						caseSignificanceId = I_Constants.SENSITIVE_CASE;
@@ -86,15 +98,20 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						conceptid=concept.getUids().iterator().next().toString();
 					}
 					
-					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
 					
-					getConfig().getBw().write(
+					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+						logger.info("Unplublished Retired Text-definition: " + description.getUUIDs().iterator().next().toString());
+					}else{
+						/*getConfig().getBw().write(
 							descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
 							+ caseSignificanceId);
-					getConfig().getBw().write("\r\n");
-
+						getConfig().getBw().write("\r\n");
+						*/
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -104,5 +121,12 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 			logger.error("Exceptions in exporttextDef: " + e.getMessage());
 		}
 	}
-
+	
+	
+	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
+			String caseSignificanceId) throws IOException {
+		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
+				+ caseSignificanceId);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
 }

@@ -576,9 +576,12 @@ public class ConceptAttributes
         if (vForC.isEmpty()) {
             return null;
         }
-        if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
-        }
+      if (vForC.size() > 1) {
+          vForC = c.getContradictionManager().resolveVersions(vForC);
+      }
+      if (vForC.size() > 1) {
+         throw new ContraditionException(vForC.toString());
+      }
         return vForC.get(0);
     }
 

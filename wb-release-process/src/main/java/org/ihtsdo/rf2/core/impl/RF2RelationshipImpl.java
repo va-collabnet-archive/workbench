@@ -1,8 +1,10 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -153,29 +155,40 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					if (sourceId==null || sourceId.equals("")){
 						sourceId=sourceConcept.getUids().iterator().next().toString();
 					}
-					if (relationshipId==null || relationshipId.equals("")){
-						relationshipId=rel.getUUIDs().iterator().next().toString();
-					}
+				
 					if (relTypeId==null || relTypeId.equals("")){
 						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 					}
 					if (destinationId==null || destinationId.equals("")){
-						destinationId=tf.getUids(rel.getC2Id()).iterator().next().toString();
-					}
 
-					writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+						Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+						if (Uids==null  ){
+							continue;
+						}
+						destinationId=Uids.iterator().next().toString();
+						if (destinationId.equals(nullUuid)){
+							continue;
+						}
+					}
+		
+					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+						relationshipId=rel.getUUIDs().iterator().next().toString();
+					}
+					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else{
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
+					}
 				}
 			}
 
 		} catch (IOException e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
+			logger.error("======failing for the IOException & sourceId=====" + sourceId);
 			logger.error("IOExceptions: " + e.getMessage());
-			e.printStackTrace();
 		} catch (Exception e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("======failing for the Exception & sourceId=====" + sourceId);
 		}
 
 	}

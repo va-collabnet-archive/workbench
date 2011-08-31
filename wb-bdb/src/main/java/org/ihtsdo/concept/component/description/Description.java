@@ -707,12 +707,15 @@ public class Description
     public Description.Version getVersion(ViewCoordinate c)
             throws ContraditionException {
         List<Description.Version> vForC = getVersions(c);
-        if (vForC.size() == 0) {
+        if (vForC.isEmpty()) {
             return null;
         }
-        if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
-        }
+       if (vForC.size() > 1) {
+          vForC = c.getContradictionManager().resolveVersions(vForC);
+      }
+      if (vForC.size() > 1) {
+         throw new ContraditionException(vForC.toString());
+      }
         return vForC.get(0);
     }
 

@@ -39,10 +39,9 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 	public void export(I_GetConceptData concept, String referencedComponentId) {
 		try{
 			String refsetId = I_Constants.SNOMED_REFSET_ID;
-			//String moduleId = getMetaModuleID(concept);
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			String mapTarget_Core = getSnomedId(concept, getSnomedCorePathNid());
-// TODO confirm requeriment
+
 			String mapTarget_Aux = getSnomedId(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
 			
@@ -65,7 +64,6 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 		} catch (Exception e) {
 			logger.error("Exceptions in exportIncremental SnomedIdRefset: " + e.getMessage());
 			e.printStackTrace();
-			System.exit(0);
 		}
 	}
 

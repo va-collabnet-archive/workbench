@@ -1,12 +1,15 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
@@ -16,6 +19,7 @@ import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
  * Title: RF2RelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Relationship File Copyright: Copyright (c) 2010 Company: IHTSDO
@@ -78,22 +82,53 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 					} else if (relationshipStatusId == inactiveNid) { 														
 						active = "0";
 					}
+						
+					String relationshipId = "";
+
+					I_Identify id = tf.getId(rel.getNid());
+					if (id != null) {
+						List<? extends I_IdPart> idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+								snomedIntId);
+						if (idParts != null) {
+							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+									RelAssertionType.INFERRED_THEN_STATED);
+							if (denotation instanceof Long) {
+								Long c = (Long) denotation;
+								if (c != null)  relationshipId = c.toString();
+							}
+						}
+					}
 					
-
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-
-					String refsetId = getRefsetId(relTypeId);
-
-					if (referencedComponentId==null || referencedComponentId.equals("")){
-						referencedComponentId=concept.getUids().iterator().next().toString();
+					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+						relationshipId=rel.getUUIDs().iterator().next().toString();
 					}
-					if (targetComponent==null || targetComponent.equals("")){
-						targetComponent=Terms.get().getUids(rel.getC2Id()).iterator().next().toString();
-					}
+					
+					if (relationshipId==null || relationshipId.equals("")){
+						logger.error("Unplublished Retired Historical Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else{
 
-					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
-										
-					writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
+						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+	
+						String refsetId = getRefsetId(relTypeId);
+	
+						if (referencedComponentId==null || referencedComponentId.equals("")){
+							referencedComponentId=concept.getUids().iterator().next().toString();
+						}
+						if (targetComponent==null || targetComponent.equals("")){
+							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+							if (Uids==null  ){
+								continue;
+							}
+							targetComponent=Uids.iterator().next().toString();
+							if (targetComponent.equals(nullUuid)){
+								continue;
+							}
+						}
+	
+						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
+											
+						writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
+					}
 				}
 			}
 		} catch (IOException e) {

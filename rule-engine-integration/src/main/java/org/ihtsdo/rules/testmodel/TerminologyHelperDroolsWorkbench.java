@@ -30,7 +30,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Precedence;
@@ -423,10 +422,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				int isaType = Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
 				I_IntSet allowedrels = Terms.get().newIntSet();
 				allowedrels.add(isaType);
-				for (I_RelTuple loopTuple : concept.getDestRelTuples(config.getAllowedStatus(), 
+				
+				if (concept.getDestRelTuples(config.getAllowedStatus(), 
 						allowedrels, config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), config.getConflictResolutionStrategy(),
-						config.getClassifierConcept().getConceptNid(), RelAssertionType.STATED)) {
+						config.getClassifierConcept().getConceptNid(), RelAssertionType.STATED).size() > 0) {
 					result = true;
 				}
 			} catch (TerminologyException e) {

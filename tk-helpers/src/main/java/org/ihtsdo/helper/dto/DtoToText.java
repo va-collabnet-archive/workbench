@@ -33,20 +33,20 @@ import org.ihtsdo.tk.dto.concept.TkConcept;
 public class DtoToText {
 
     public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
-        convert(changeSetFile, true);
+        convert(changeSetFile, true, false);
     }
 
     public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
-        convert(changeSetFile, false);
+        convert(changeSetFile, false, false);
     }
 
-    private static void convert(File changeSetFile, boolean changeSet) throws IOException, FileNotFoundException, ClassNotFoundException {
+    private static void convert(File changeSetFile, boolean changeSet, boolean append) throws IOException, FileNotFoundException, ClassNotFoundException {
         FileInputStream fis = new FileInputStream(changeSetFile);
         BufferedInputStream bis = new BufferedInputStream(fis);
         DataInputStream dataStream = new DataInputStream(bis);
         File textFile = new File(changeSetFile.getParentFile(),
                 changeSetFile.getName() + ".txt");
-        FileWriter textOut = new FileWriter(textFile, true);
+        FileWriter textOut = new FileWriter(textFile, append);
         try {
             int count = 0;
             while (dataStream.available() > 0) {

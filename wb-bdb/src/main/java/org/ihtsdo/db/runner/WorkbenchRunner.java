@@ -75,6 +75,7 @@ import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
 import java.io.IOException;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 
 public class WorkbenchRunner {
 
@@ -499,7 +500,9 @@ public class WorkbenchRunner {
             List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
             if (isaCacheCreateOnStartUp) {
                 for (final I_ConfigAceFrame ace : AceConfig.config.aceFrames) {
-                    latches.add(Terms.get().setupIsaCache(ace.getViewCoordinate().getIsaCoordinate()).getLatch());
+                    for (IsaCoordinate isac: ace.getViewCoordinate().getIsaCoordinates()) {
+                        latches.add(Terms.get().setupIsaCache(isac).getLatch());
+                    }
                 }
             }
 

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import javax.swing.SwingWorker;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.ComputationCanceled;
@@ -33,9 +34,8 @@ public class UpdateAllPackagesTask extends SwingWorker<Object, Object> {
 		RulesContextHelper ctxHelper = new RulesContextHelper(config);
 		ctxHelper.clearCache();
 		
-		RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
-		for ( RulesDeploymentPackageReference loopPkg : pkgHelper.getAllRulesDeploymentPackages()) {
-			loopPkg.updateKnowledgeBase();
+		for (I_GetConceptData loopContext : ctxHelper.getAllContexts()) {
+			ctxHelper.getKnowledgeBaseForContext(loopContext, config, true);
 		}
 		
 		long endTime = System.currentTimeMillis();

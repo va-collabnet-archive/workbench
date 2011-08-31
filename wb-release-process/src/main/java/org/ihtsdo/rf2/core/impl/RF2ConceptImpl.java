@@ -52,9 +52,9 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		String definitionStatusId = "";
 
 		try {
-			if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
+			/*if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
 				boolean bstop=true;
-			}
+			}*/
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
@@ -86,12 +86,13 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 						incrementMetaDataCount();
 					}
 				}
-				
-				if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-					conceptid=concept.getUids().iterator().next().toString();
+		
+				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0"))){
+					conceptid=concept.getUUIDs().iterator().next().toString();
 				}
 				
 				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
+				
 			}
 		} catch (IOException e) {
 			logger.error("conceptid : " + conceptid);

@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.6.0-trek-24-SNAPSHOT</version>
+    <version>2.6.0-trek-29-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -238,6 +238,7 @@
         <module>tk-spelling-variants</module>
         <module>tk-junit-ext</module>
         <module>tk-case-sensitive-words</module>
+        <module>tk-cern-prim</module>
  <!--     <module>bdb-properties</module> -->
     </modules>
 </project>

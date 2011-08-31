@@ -132,7 +132,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     private static int isNOT_REFINABLE = Integer.MIN_VALUE;
     private static int isMANDATORY_REFINABILITY = Integer.MIN_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MIN_VALUE;
-    private static int isCh_DEFINING_CHARACTERISTIC = Integer.MIN_VALUE;
+    private static int isCh_INFERRED_CHARACTERISTIC = Integer.MIN_VALUE;
     private static int workbenchAuxPath = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     // NID SETS
@@ -1230,7 +1230,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId, rel_B.c2Id,
-                isCh_DEFINING_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
+                isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
         // :!!!:TODO: [SnorocketTask] move addUncommittedNoChecks() to more efficient location.
@@ -1309,7 +1309,11 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             isNOT_REFINABLE = SnomedMetadataRfx.getREL_NOT_REFINABLE_NID();
             isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
             isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
-            isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
+            if (SnomedMetadataRfx.getReleaseFormat() == 1) {
+                isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
+            } else {
+                isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+            }
 
             snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
 
@@ -1427,9 +1431,20 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         StringBuilder sb = new StringBuilder();
         try {
             I_GetConceptData c = tf.getConcept(cNid);
-            sb.append(c.getUids().iterator().next()).append("\t");
-            sb.append(cNid).append("\t");
-            sb.append(c.getInitialText());
+            if (!c.isCanceled()) {
+                if (c.getUids().iterator().hasNext()) {
+                    sb.append(c.getUids().iterator().next());
+                    sb.append("\t");
+                } else {
+                    sb.append("NO_UUID\t");
+                }
+                sb.append(cNid).append("\t");
+                sb.append(c.getInitialText());
+            } else {
+                sb.append("CANCELED\t");
+                sb.append(cNid).append("\t");
+                sb.append(c.getInitialText());
+            }
         } catch (IOException e) {
             logger.log(Level.INFO, e.toString());
         } catch (TerminologyException e) {
@@ -1451,7 +1466,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         s.append("\r\n:::\t").append(isMANDATORY_REFINABILITY).append("\t : isMANDATORY_REFINABILITY");
 
         s.append("\r\n:::\t").append(isCh_STATED_RELATIONSHIP).append("\t : isCh_STATED_RELATIONSHIP");
-        s.append("\r\n:::\t").append(isCh_DEFINING_CHARACTERISTIC).append("\t : isCh_DEFINING_CHARACTERISTIC");
+        s.append("\r\n:::\t").append(isCh_INFERRED_CHARACTERISTIC).append("\t : defining/inferred");
         // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_INFERRED_RELATIONSHIP);
         // :!!!:???: s.append("\t : isCh_STATED_AND_INFERRED_RELATIONSHIP");
         // :!!!:???: s.append("\r\n:::\t").append(isCh_STATED_AND_SUBSUMED_RELATIONSHIP);
@@ -1486,12 +1501,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     List<? extends I_RelPart> parts = rv.getMutableParts();
                     for (I_RelPart p : parts) {
                         x++;
-                        Integer i1 = p.getTypeId();
+                        Integer i1 = p.getTypeNid();
                         Integer i2 = p.getGroup();
-                        Integer i3 = p.getStatusId();
+                        Integer i3 = p.getStatusNid();
                         Integer i4 = p.getRefinabilityId();
                         Integer i5 = p.getCharacteristicId();
-                        Integer i6 = p.getPathId();
+                        Integer i6 = p.getPathNid();
                         Integer i7 = p.getVersion();
                         s.append("\r\n::: ... \t").append(iR.toString()).append("\t");
                         s.append(iA.toString()).append("\t");
@@ -1572,14 +1587,14 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathListPositionBI) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
-                        if (pos.getPath().getConceptNid() == rPart.getPathId()) {
+                        if (pos.getPath().getConceptNid() == rPart.getPathNid()) {
                             if (rPart1 == null) {
                                 rPart1 = rPart; // ... KEEP FIRST_INSTANCE
                             } else if (rPart1.getVersion() < rPart.getVersion()) {
                                 rPart1 = rPart; // ... KEEP MORE_RECENT PART
                             } else if (rPart1.getVersion() == rPart.getVersion()) {
                                 countRelDuplVersion++;
-                                if (rPart.getStatusId() == isCURRENT) {
+                                if (rPart.getStatusNid() == isCURRENT) {
                                     rPart1 = rPart; // KEEP CURRENT PART
                                 }
                             }
@@ -1590,8 +1605,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     }
                 }
 
-                if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
-                        && (rPart1.getTypeId() == isaNid)) {
+                if ((rPart1 != null) && (rPart1.getStatusNid() == isCURRENT)
+                        && (rPart1.getTypeNid() == isaNid)) {
                     // KEEP C1 AS RESULT
                     resultSet.add(rv.getC1Id());
 
@@ -1903,7 +1918,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             sb.append("\tc2 status: ** ");
             I_ConceptAttributeVersioned<?> ca = c2.getConceptAttributes();
             for (I_ConceptAttributePart mp : ca.getMutableParts()) {
-                sb.append(toStringCNid(mp.getStatusId())).append(" ** ");
+                sb.append(toStringCNid(mp.getStatusNid())).append(" ** ");
             }
 
             return sb.toString();

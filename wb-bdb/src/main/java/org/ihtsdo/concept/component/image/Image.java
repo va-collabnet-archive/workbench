@@ -233,10 +233,10 @@ public class Image
 
     @Override
     public boolean readyToWriteComponent() {
-        assert textDescription != null: assertionString();
-        assert format != null: assertionString();
-        assert typeNid != Integer.MAX_VALUE: assertionString();
-        assert image != null: assertionString();
+        assert textDescription != null : assertionString();
+        assert format != null : assertionString();
+        assert typeNid != Integer.MAX_VALUE : assertionString();
+        assert image != null : assertionString();
         return true;
     }
 
@@ -671,6 +671,9 @@ public class Image
         List<Image.Version> vForC = getVersions(c);
         if (vForC.isEmpty()) {
             return null;
+        }
+        if (vForC.size() > 1) {
+            vForC = c.getContradictionManager().resolveVersions(vForC);
         }
         if (vForC.size() > 1) {
             throw new ContraditionException(vForC.toString());
