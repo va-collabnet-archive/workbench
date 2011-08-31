@@ -48,6 +48,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeRelsOfTypeToStatus extends AbstractTask {
@@ -113,7 +114,8 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
                         positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
                     Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                     for (I_RelTuple t : editTuples) {
-                        if (t.getStatusNid() != newStatusConcept.getConceptNid()) {
+                        if (t.getStatusNid() != newStatusConcept.getConceptNid() &&
+                                t.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
                             I_RelPart newPart = (I_RelPart) t.makeAnalog(newStatusConcept.getConceptNid(), editPath.getConceptNid(), Long.MAX_VALUE);
                             partsToAdd.add(newPart);
                         }

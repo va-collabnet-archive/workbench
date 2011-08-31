@@ -54,6 +54,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeRolesToStatus extends AbstractTask {
@@ -113,7 +114,8 @@ public class ChangeRolesToStatus extends AbstractTask {
             //get rels that are NOT isa
             for (RelationshipChronicleBI rel : relsOut) {
                 for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
+                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid())) && 
+                            relv.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
                     	//change status
                     	for (PathBI editPath : config.getEditingPathSet()) {
                     		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
