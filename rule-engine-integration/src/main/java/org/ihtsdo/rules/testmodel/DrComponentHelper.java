@@ -186,91 +186,10 @@ public class DrComponentHelper {
 					}
 				}
 			}else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
-				// TODO implement CONSTRAINT_NORMAL_FORM calculation
 				RelationshipsDAO rDao=new RelationshipsDAO();
-				InheritedRelationships inhRel = rDao.getInheritedRelationships(oldStyleConcept);
-				//Inherited single roles
-				for (I_RelTuple relTuple:inhRel.getSingleRoles()){
-					DrRelationship loopRel = new DrRelationship();
-					loopRel.setModifierUuid("someUuid");
-					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-					loopRel.setRelGroup(0);
-					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-					loopRel.setTime(relTuple.getTime());
-					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-					loopRel.setFactContextName(factContextName);
-					concept.getOutgoingRelationships().add(loopRel);
-				}
-				//Inherited grouped roles
-				int groupNr=0;
-				for (I_RelTuple[] relTuples:inhRel.getRoleGroups()){
-					groupNr++;
-					for (I_RelTuple relTuple:relTuples){
-						DrRelationship loopRel = new DrRelationship();
-						loopRel.setModifierUuid("someUuid");
-						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-						loopRel.setRelGroup(groupNr);
-						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-						loopRel.setTime(relTuple.getTime());
-						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-						loopRel.setFactContextName(factContextName);
-						concept.getOutgoingRelationships().add(loopRel);
-					}
-				}
-				//Is A's Stated
-				List<I_RelTuple> relTuples=(List<I_RelTuple>) rDao.getStatedIsARels(oldStyleConcept);
-
-				for (I_RelTuple relTuple:relTuples){
-					DrRelationship loopRel = new DrRelationship();
-					loopRel.setModifierUuid("someUuid");
-					loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-					loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-					loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-					loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-					loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-					loopRel.setRelGroup(0);
-					loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-					loopRel.setTime(relTuple.getTime());
-					loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-					loopRel.setFactContextName(factContextName);
-					concept.getOutgoingRelationships().add(loopRel);
-				}
-				//Not defining rels
-				if (CptModelRels==null){
-					CptModelRels=RulesLibrary.getConceptModelRels();
-				}
-				for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
-						CptModelRels, 
-						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
-						config.getConflictResolutionStrategy())) {
-					if (!rDao.isDefiningChar(relTuple.getCharacteristicNid())){
-						DrRelationship loopRel = new DrRelationship();
-						loopRel.setModifierUuid("someUuid");
-						loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
-						loopRel.setSourceUuid(tf.nidToUuid(relTuple.getOriginNid()).toString());
-						loopRel.setTargetUuid(tf.nidToUuid(relTuple.getDestinationNid()).toString());
-						loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
-						loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
-						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
-						loopRel.setRelGroup(relTuple.getGroup());
-						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
-						loopRel.setTime(relTuple.getTime());
-						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
-						loopRel.setFactContextName(factContextName);
-						concept.getOutgoingRelationships().add(loopRel);
-					}
-				}
+				concept=rDao.getConstraintNormalForm(oldStyleConcept, factContextName);
+				rDao=null;
+				System.gc();
 			}
 
 			DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();
@@ -282,7 +201,7 @@ public class DrComponentHelper {
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
 			modelersRolesSet.setRolesSetType("Modelers");
 
-			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
 					null, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 					config.getConflictResolutionStrategy())) {

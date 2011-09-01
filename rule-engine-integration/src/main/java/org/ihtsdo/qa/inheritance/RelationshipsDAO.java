@@ -15,6 +15,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.testmodel.DrConcept;
+import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -26,8 +28,10 @@ public class RelationshipsDAO {
 	private I_ConfigAceFrame config;
 	private I_TermFactory termFactory;
 	private I_GetConceptData stated;
+	private I_IntSet modelRel;
 
 	private Set<Integer> setDefChar;
+
 	public enum TEST_RESULTS {CONCEPT1_ANCESTOROF_CONCEPT2,CONCEPT2_ANCESTOROF_CONCEPT1,CONCEPTS_DIFF_HIERARCHY,
 		CONCEPT1_SUBSUM_CONCEPT2,CONCEPT1_EQUAL_CONCEPT2,CONCEPT2_SUBSUM_CONCEPT1,THERE_IS_NO_SUBSUM,
 		ROLE1_SUBSUM_ROLE2, ROLE2_SUBSUM_ROLE1,ROLE1_EQUAL_ROLE2,ROLES_CROSSOVER,
@@ -39,23 +43,16 @@ public class RelationshipsDAO {
 			allowedDestRelTypes =  termFactory.newIntSet();
 			allowedStatus =  termFactory.newIntSet(); 
 			config=Terms.get().getActiveAceFrameConfig();
-			//			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedIsATypes=config.getDestRelTypes();
-			I_IntSet modelRel = RulesLibrary.getConceptModelRels();
+			modelRel = RulesLibrary.getConceptModelRels();
 			allowedDestRelTypes.addAll(allowedIsATypes.getSetValues());
 			allowedDestRelTypes.addAll(modelRel.getSetValues());
 
-			//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			allowedStatus=config.getAllowedStatus();
 			stated=termFactory.getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid());
-			//inferred=ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
-			
+
 			setDefChar=new HashSet<Integer>();
 			setDefChar.add(stated.getConceptNid());
-			
-			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			////			config.setAllowedStatus(allowedStatus);
 
 		}
 
@@ -68,14 +65,14 @@ public class RelationshipsDAO {
 		}
 
 		public List<? extends I_RelTuple> getStatedIsARels(I_GetConceptData concept) throws IOException, TerminologyException {
-		
+
 			return concept.getSourceRelTuples(allowedStatus, 
 					allowedIsATypes, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 					RelAssertionType.STATED);
 		}
-		
+
 		public Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> children = new HashSet<I_GetConceptData>();
 
@@ -340,7 +337,7 @@ public class RelationshipsDAO {
 					}
 				}
 			}
-			
+
 			for (int i=allSingleRoles.size()-1;i>-1;i--){
 				I_RelTuple[] singleRole1=new I_RelTuple[]{allSingleRoles.get(i)};
 				for (I_RelTuple[] roleGroup2:allRoleGroups){
@@ -420,7 +417,7 @@ public class RelationshipsDAO {
 
 
 		public boolean isDefiningChar(int characteristicId) throws IOException, TerminologyException {
-			
+
 			if (setDefChar.contains(characteristicId)){
 				return true;
 			}
@@ -430,5 +427,76 @@ public class RelationshipsDAO {
 				return true;
 			}				
 			return false;
+		}
+
+		public DrConcept getConstraintNormalForm(I_GetConceptData conceptData, String factContextName){
+
+			DrConcept concept = new DrConcept();
+			try {
+				InheritedRelationships inhRel = getInheritedRelationships(conceptData);
+				//Inherited single roles
+				for (I_RelTuple relTuple:inhRel.getSingleRoles()){
+					DrRelationship loopRel = new DrRelationship();
+					loopRel.setModifierUuid("someUuid");
+					loopRel.setAuthorUuid(termFactory.nidToUuid(relTuple.getAuthorNid()).toString());
+					loopRel.setSourceUuid(termFactory.nidToUuid(relTuple.getOriginNid()).toString());
+					loopRel.setTargetUuid(termFactory.nidToUuid(relTuple.getDestinationNid()).toString());
+					loopRel.setCharacteristicUuid(termFactory.nidToUuid(relTuple.getCharacteristicNid()).toString());
+					loopRel.setPathUuid(termFactory.nidToUuid(relTuple.getPathNid()).toString());
+					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+					loopRel.setRelGroup(0);
+					loopRel.setStatusUuid(termFactory.nidToUuid(relTuple.getStatusNid()).toString());
+					loopRel.setTime(relTuple.getTime());
+					loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
+					loopRel.setFactContextName(factContextName);
+					concept.getOutgoingRelationships().add(loopRel);
+				}
+				//Inherited grouped roles
+				int groupNr=0;
+				for (I_RelTuple[] relTuples:inhRel.getRoleGroups()){
+					groupNr++;
+					for (I_RelTuple relTuple:relTuples){
+						DrRelationship loopRel = new DrRelationship();
+						loopRel.setModifierUuid("someUuid");
+						loopRel.setAuthorUuid(termFactory.nidToUuid(relTuple.getAuthorNid()).toString());
+						loopRel.setSourceUuid(termFactory.nidToUuid(relTuple.getOriginNid()).toString());
+						loopRel.setTargetUuid(termFactory.nidToUuid(relTuple.getDestinationNid()).toString());
+						loopRel.setCharacteristicUuid(termFactory.nidToUuid(relTuple.getCharacteristicNid()).toString());
+						loopRel.setPathUuid(termFactory.nidToUuid(relTuple.getPathNid()).toString());
+						loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+						loopRel.setRelGroup(groupNr);
+						loopRel.setStatusUuid(termFactory.nidToUuid(relTuple.getStatusNid()).toString());
+						loopRel.setTime(relTuple.getTime());
+						loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
+						loopRel.setFactContextName(factContextName);
+						concept.getOutgoingRelationships().add(loopRel);
+					}
+				}
+				//Is A's Stated
+				List<I_RelTuple> relTuples=(List<I_RelTuple>) getStatedIsARels(conceptData);
+
+				for (I_RelTuple relTuple:relTuples){
+					DrRelationship loopRel = new DrRelationship();
+					loopRel.setModifierUuid("someUuid");
+					loopRel.setAuthorUuid(termFactory.nidToUuid(relTuple.getAuthorNid()).toString());
+					loopRel.setSourceUuid(termFactory.nidToUuid(relTuple.getOriginNid()).toString());
+					loopRel.setTargetUuid(termFactory.nidToUuid(relTuple.getDestinationNid()).toString());
+					loopRel.setCharacteristicUuid(termFactory.nidToUuid(relTuple.getCharacteristicNid()).toString());
+					loopRel.setPathUuid(termFactory.nidToUuid(relTuple.getPathNid()).toString());
+					loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());
+					loopRel.setRelGroup(0);
+					loopRel.setStatusUuid(termFactory.nidToUuid(relTuple.getStatusNid()).toString());
+					loopRel.setTime(relTuple.getTime());
+					loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
+					loopRel.setFactContextName(factContextName);
+					concept.getOutgoingRelationships().add(loopRel);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			}
+			return null;
+
 		}
 }
