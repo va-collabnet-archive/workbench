@@ -459,6 +459,8 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             }
             a.nid = cNid;
             a.enclosingConceptNid = cNid;
+        } else {
+            throw new InvalidCAB("Concept already exists:\n" + blueprint + "\n\n" + newC);
         }
 
         a.setDefined(blueprint.isDefined());

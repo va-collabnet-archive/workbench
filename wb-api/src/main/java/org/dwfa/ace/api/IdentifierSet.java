@@ -1,285 +1,364 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+
 package org.dwfa.ace.api;
 
-import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.OpenBitSet;
+
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+
 import org.ihtsdo.tk.api.NidBitSetBI;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.IOException;
+
+import java.util.concurrent.locks.ReentrantLock;
+
 public class IdentifierSet implements I_RepresentIdSet {
-	
-	// TODO Consider using an implementation that uses
-	// AtomicLongArray rather than simply a long[]...
 
-	// Find power-of-two sizes best matching arguments
-	private static int concurrencyLevel = 128;
-	private static int sshift = 0;
-	private static int ssize = 1;
-	static {
-		while (ssize < concurrencyLevel) {
-			++sshift;
-			ssize <<= 1;
-		}
-	}
-	private static int segmentShift = 32 - sshift;
-	private static int segmentMask = ssize - 1;
-	private static ReentrantLock[] locks = new ReentrantLock[concurrencyLevel];
-	static {
-		for (int i = 0; i < concurrencyLevel; i++) {
-			locks[i] = new ReentrantLock();
-		}
-	}
+   // TODO Consider using an implementation that uses
+   // AtomicLongArray rather than simply a long[]...
+   // Find power-of-two sizes best matching arguments
+   private static int             concurrencyLevel = 128;
+   private static int             sshift           = 0;
+   private static int             ssize            = 1;
+   private static int             segmentShift     = 32 - sshift;
+   private static int             segmentMask      = ssize - 1;
+   private static ReentrantLock[] locks            = new ReentrantLock[concurrencyLevel];
 
-	protected OpenBitSet bitSet;
-	
-	@Override
-	public void andNot(NidBitSetBI other) {
-		bitSet.andNot(((IdentifierSet)other).bitSet);
-	}
+   //~--- static initializers -------------------------------------------------
 
-	@Override
-	public void union(NidBitSetBI other) {
-		bitSet.union(((IdentifierSet)other).bitSet);
-	}
+   static {
+      while (ssize < concurrencyLevel) {
+         ++sshift;
+         ssize <<= 1;
+      }
+   }
 
-	@Override
-	public void xor(NidBitSetBI other) {
-		bitSet.xor(((IdentifierSet)other).bitSet);
-	}
+   static {
+      for (int i = 0; i < concurrencyLevel; i++) {
+         locks[i] = new ReentrantLock();
+      }
+   }
 
-	private int offset = Integer.MIN_VALUE;
-	private int toStringMax = 10;
+   //~--- fields --------------------------------------------------------------
 
-	public IdentifierSet(OpenBitSet bitSet) {
-		super();
-		this.bitSet = bitSet;
-	}
+   private int          offset      = Integer.MIN_VALUE;
+   private int          toStringMax = 10;
+   protected OpenBitSet bitSet;
 
-	public IdentifierSet(IdentifierSet anotherSet) {
-		super();
-		this.bitSet = (OpenBitSet) anotherSet.bitSet.clone();
-	}
+   //~--- constructors --------------------------------------------------------
 
-	public IdentifierSet() {
-		bitSet = new OpenBitSet();
-	}
+   public IdentifierSet() {
+      bitSet = new OpenBitSet();
+   }
 
-	public IdentifierSet(int numBits) {
-		bitSet = new OpenBitSet(numBits);
-	}
+   public IdentifierSet(IdentifierSet anotherSet) {
+      super();
+      this.bitSet = (OpenBitSet) anotherSet.bitSet.clone();
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.ace.api.I_RepresentIdSet#isMember(int)
-	 */
-	public boolean isMember(int nid) {
-		int index = nid + offset;
-		bitSet.ensureCapacity(index);
-		return bitSet.get(index);
-	}
+   public IdentifierSet(int numBits) {
+      bitSet = new OpenBitSet(numBits);
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.ace.api.I_RepresentIdSet#setMember(int)
-	 */
-	public void setMember(int nid) {
-		int word = (nid >>> segmentShift) & segmentMask;
-		locks[word].lock();
-		try {
-			int index = nid + offset;
-			bitSet.ensureCapacity(index);
-			bitSet.set(index);
-		} finally {
-			locks[word].unlock();
-		}
-	}
+   public IdentifierSet(OpenBitSet bitSet) {
+      super();
+      this.bitSet = bitSet;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.ace.api.I_RepresentIdSet#setNotMember(int)
-	 */
-	public void setNotMember(int nid) {
-		int word = (nid >>> segmentShift) & segmentMask;
-		locks[word].lock();
-		try {
-			int index = nid + offset;
-			bitSet.ensureCapacity(index);
-			bitSet.clear(index);
-		} finally {
-			locks[word].unlock();
-		}
-	}
+   //~--- methods -------------------------------------------------------------
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.dwfa.ace.api.I_RepresentIdSet#and(org.dwfa.ace.api.IdentifierSet)
-	 */
-	public void and(NidBitSetBI other) {
-		bitSet.and(((IdentifierSet) other).bitSet);
-	}
+   /*
+    * (non-Javadoc)
+    *
+    * @see
+    * org.dwfa.ace.api.I_RepresentIdSet#and(org.dwfa.ace.api.IdentifierSet)
+    */
+   @Override
+   public void and(NidBitSetBI other) {
+      bitSet.and(((IdentifierSet) other).bitSet);
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.dwfa.ace.api.I_RepresentIdSet#or(org.dwfa.ace.api.IdentifierSet)
-	 */
-	public void or(NidBitSetBI other) {
-		bitSet.or(((IdentifierSet) other).bitSet);
-	}
+   @Override
+   public void andNot(NidBitSetBI other) {
+      bitSet.andNot(((IdentifierSet) other).bitSet);
+   }
 
-	public I_RepresentIdSet duplicate() {
-		return new IdentifierSet((OpenBitSet) bitSet.clone());
-	}
+   @Override
+   public int cardinality() {
+      return (int) bitSet.cardinality();
+   }
 
-	public I_IterateIds iterator() {
-		return new NidIterator(bitSet.iterator());
-	}
+   @Override
+   public void clear() {
+      bitSet.clear(0, bitSet.capacity());
+   }
 
-	private class NidIterator implements I_IterateIds {
-		private DocIdSetIterator docIterator;
+   public I_RepresentIdSet duplicate() {
+      return new IdentifierSet((OpenBitSet) bitSet.clone());
+   }
 
-		private NidIterator(DocIdSetIterator docIterator) {
-			super();
-			this.docIterator = docIterator;
-		}
+   @Override
+   public boolean equals(Object obj) {
+      if (IdentifierSet.class.isAssignableFrom(obj.getClass())) {
+         IdentifierSet another = (IdentifierSet) obj;
 
-		public boolean next() throws IOException {
-			return docIterator.nextDoc() != DocIdSetIterator.NO_MORE_DOCS;
-		}
+         return this.bitSet.equals(another.bitSet);
+      }
 
-		public int nid() {
-			return docIterator.docID() + offset;
-		}
+      return super.equals(obj);
+   }
 
-		public boolean skipTo(int target) throws IOException {
-			return docIterator.advance(target + offset) != DocIdSetIterator.NO_MORE_DOCS;
-		}
+   @Override
+   public I_IterateIds iterator() {
+      return new NidIterator(bitSet.iterator());
+   }
 
-		public String toString() {
-			StringBuffer buff = new StringBuffer();
-			buff.append("NidIterator: nid: ");
-			buff.append(nid());
-			buff.append(" component: ");
-			try {
-				buff.append(Terms.get().getComponent(nid()).toString());
-			} catch (TerminologyException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			} catch (IOException e) {
-				AceLog.getAppLog().alertAndLogException(e);
-			}
-			return buff.toString();
-		}
-	}
+   /*
+    * (non-Javadoc)
+    *
+    * @see org.dwfa.ace.api.I_RepresentIdSet#or(org.dwfa.ace.api.IdentifierSet)
+    */
+   @Override
+   public void or(NidBitSetBI other) {
+      bitSet.or(((IdentifierSet) other).bitSet);
+   }
 
-	public int size() {
-		return (int) bitSet.cardinality();
-	}
+   @Override
+   public int size() {
+      return (int) bitSet.cardinality();
+   }
 
-	public int cardinality() {
-		return (int) bitSet.cardinality();
-	}
+   @Override
+   public String toString() {
+      StringBuilder buff = new StringBuilder();
 
-	public int totalBits() {
-		return bitSet.getNumWords() * 64;
-	}
+      buff.append("IdentifierSet: cardinality: ");
+      buff.append(bitSet.cardinality());
+      buff.append(" ");
 
-	public String toString() {
-		StringBuffer buff = new StringBuffer();
-		buff.append("IdentifierSet: cardinality: ");
-		buff.append(bitSet.cardinality());
-		buff.append(" ");
-		I_IterateIds idIterator = iterator();
-		int count = 0;
-		int cardinality = (int) bitSet.cardinality();
-		try {
-			buff.append("[");
-			while (count < toStringMax && idIterator.next()) {
-				try {
-					buff.append(Terms.get().getComponent(idIterator.nid())
-							.toString());
-				} catch (TerminologyException e) {
-					buff.append(e.toString());
-				}
-				count++;
-				if (count == 10 && count < cardinality) {
-					buff.append(", ...");
-				} else if (count < cardinality) {
-					buff.append(", ");
-				}
-			}
-			buff.append("]");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return buff.toString();
-	}
+      I_IterateIds idIterator  = iterator();
+      int          count       = 0;
+      int          cardinality = (int) bitSet.cardinality();
 
-	public int getToStringMax() {
-		return toStringMax;
-	}
+      try {
+         buff.append("[");
 
-	public void setToStringMax(int toStringMax) {
-		this.toStringMax = toStringMax;
-	}
+         while ((count < toStringMax) && idIterator.next()) {
+            try {
+               buff.append(Terms.get().getComponent(idIterator.nid()).toString());
+            } catch (TerminologyException e) {
+               buff.append(e.toString());
+            }
 
-	public void clear() {
-		bitSet.clear(0, bitSet.capacity());
-	}
+            count++;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (IdentifierSet.class.isAssignableFrom(obj.getClass())) {
-			IdentifierSet another = (IdentifierSet) obj;
-			return this.bitSet.equals(another.bitSet);
-		}
-		return super.equals(obj);
-	}
+            if ((count == 10) && (count < cardinality)) {
+               buff.append(", ...");
+            } else if (count < cardinality) {
+               buff.append(", ");
+            }
+         }
 
-	public String getDifferences(IdentifierSet that) throws IOException {
-		StringBuffer buff = new StringBuffer();
-		buff.append("this->that differences: \n");
-		I_IterateIds thisItr = this.iterator();
-		while (thisItr.next()) {
-			if (!that.isMember(thisItr.nid())) {
-				buff.append("   that missing: ");
-				buff.append(thisItr.nid());
-				buff.append("\n");
-			}
-		}
+         buff.append("]");
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
 
-		buff.append("\n\nthat->this differences: \n");
-		I_IterateIds thatItr = this.iterator();
-		while (thatItr.next()) {
-			if (!this.isMember(thatItr.nid())) {
-				buff.append("   this missing: ");
-				buff.append(thatItr.nid());
-				buff.append("\n");
-			}
-		}
-		return buff.toString();
-	}
+      return buff.toString();
+   }
+
+   @Override
+   public int totalBits() {
+      return bitSet.getNumWords() * 64;
+   }
+
+   @Override
+   public void union(NidBitSetBI other) {
+      bitSet.union(((IdentifierSet) other).bitSet);
+   }
+
+   @Override
+   public void xor(NidBitSetBI other) {
+      bitSet.xor(((IdentifierSet) other).bitSet);
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   public String getDifferences(IdentifierSet that) throws IOException {
+      StringBuilder buff = new StringBuilder();
+
+      buff.append("this->that differences: \n");
+
+      I_IterateIds thisItr = this.iterator();
+
+      while (thisItr.next()) {
+         if (!that.isMember(thisItr.nid())) {
+            buff.append("   that missing: ");
+            buff.append(thisItr.nid());
+            buff.append("\n");
+         }
+      }
+
+      buff.append("\n\nthat->this differences: \n");
+
+      I_IterateIds thatItr = this.iterator();
+
+      while (thatItr.next()) {
+         if (!this.isMember(thatItr.nid())) {
+            buff.append("   this missing: ");
+            buff.append(thatItr.nid());
+            buff.append("\n");
+         }
+      }
+
+      return buff.toString();
+   }
+
+   public int getToStringMax() {
+      return toStringMax;
+   }
+
+   /*
+    * (non-Javadoc)
+    *
+    * @see org.dwfa.ace.api.I_RepresentIdSet#isMember(int)
+    */
+   @Override
+   public boolean isMember(int nid) {
+      int index = nid + offset;
+
+      bitSet.ensureCapacity(index);
+
+      return bitSet.get(index);
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   /*
+    * (non-Javadoc)
+    *
+    * @see org.dwfa.ace.api.I_RepresentIdSet#setMember(int)
+    */
+   @Override
+   public void setMember(int nid) {
+      int word = (nid >>> segmentShift) & segmentMask;
+
+      locks[word].lock();
+
+      try {
+         int index = nid + offset;
+
+         bitSet.ensureCapacity(index);
+         bitSet.set(index);
+      } finally {
+         locks[word].unlock();
+      }
+   }
+
+   /*
+    * (non-Javadoc)
+    *
+    * @see org.dwfa.ace.api.I_RepresentIdSet#setNotMember(int)
+    */
+   @Override
+   public void setNotMember(int nid) {
+      int word = (nid >>> segmentShift) & segmentMask;
+
+      locks[word].lock();
+
+      try {
+         int index = nid + offset;
+
+         bitSet.ensureCapacity(index);
+         bitSet.clear(index);
+      } finally {
+         locks[word].unlock();
+      }
+   }
+
+   public void setToStringMax(int toStringMax) {
+      this.toStringMax = toStringMax;
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   private class NidIterator implements I_IterateIds {
+      private DocIdSetIterator docIterator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private NidIterator(DocIdSetIterator docIterator) {
+         super();
+         this.docIterator = docIterator;
+      }
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      public boolean next() throws IOException {
+         return docIterator.nextDoc() != DocIdSetIterator.NO_MORE_DOCS;
+      }
+
+      @Override
+      public int nid() {
+         return docIterator.docID() + offset;
+      }
+
+      @Override
+      public boolean skipTo(int target) throws IOException {
+         return docIterator.advance(target + offset) != DocIdSetIterator.NO_MORE_DOCS;
+      }
+
+      @Override
+      public String toString() {
+         StringBuilder buff = new StringBuilder();
+
+         buff.append("NidIterator: nid: ");
+         buff.append(nid());
+         buff.append(" component: ");
+
+         try {
+            if (nid() != Integer.MAX_VALUE) {
+               Object component = Terms.get().getComponent(nid());
+
+               if (component != null) {
+                  buff.append(component.toString());
+               } else {
+                  buff.append(nid());
+               }
+            } else {
+               buff.append(nid());
+            }
+         } catch (TerminologyException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+         } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+         }
+
+         return buff.toString();
+      }
+   }
 }

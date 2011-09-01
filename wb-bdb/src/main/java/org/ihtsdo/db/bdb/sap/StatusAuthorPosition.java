@@ -9,6 +9,7 @@ package org.ihtsdo.db.bdb.sap;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
+   public int   hashCode = Integer.MAX_VALUE;
    private int  authorNid;
    private int  pathNid;
    private int  statusNid;
@@ -61,7 +62,11 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
 
    @Override
    public int hashCode() {
-      return Hashcode.compute(new int[] { authorNid, statusNid, pathNid, (int) time });
+      if (hashCode == Integer.MAX_VALUE) {
+         hashCode = Hashcode.compute(new int[] { authorNid, statusNid, pathNid, (int) time });
+      }
+
+      return hashCode;
    }
 
    //~--- get methods ---------------------------------------------------------
@@ -80,11 +85,5 @@ public class StatusAuthorPosition implements Comparable<StatusAuthorPosition> {
 
    public long getTime() {
       return time;
-   }
-
-   //~--- set methods ---------------------------------------------------------
-
-   public void setAuthorNid(int authorNid) {
-      this.authorNid = authorNid;
    }
 }
