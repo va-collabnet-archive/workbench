@@ -15,7 +15,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -72,6 +71,49 @@ public class RelationshipsDAO {
 					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 					RelAssertionType.STATED);
 		}
+		
+		public List<? extends I_RelTuple> getStatedAllRels(I_GetConceptData concept) throws IOException, TerminologyException {
+			
+			return concept.getSourceRelTuples(allowedStatus, 
+					null, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
+					RelAssertionType.STATED);
+		}
+
+		public List<? extends I_RelTuple> getInferredRels(I_GetConceptData concept) throws IOException, TerminologyException {
+			
+			return concept.getSourceRelTuples(allowedStatus, 
+					null, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
+					RelAssertionType.INFERRED);
+		}
+		
+		public List<I_RelTuple> getRelTuples(I_GetConceptData concept) throws IOException, TerminologyException{
+			List<I_RelTuple> result = new ArrayList<I_RelTuple>();
+ 			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
+			
+ 			List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
+ 			int relGroup = 1;
+			for (I_RelTuple[] i_RelTuples : roleGroups) {
+				for (I_RelTuple i_RelTuple : i_RelTuples) {
+					i_RelTuple.setGroup(relGroup);
+					result.add(i_RelTuple);
+				}
+				relGroup++;
+			}
+ 			
+			List<I_RelTuple> singles = inheritedRels.getSingleRoles();
+			for (I_RelTuple i_RelTuple : singles) {
+				i_RelTuple.setGroup(0);
+				result.add(i_RelTuple);
+			}
+			
+			return result;
+			
+		}
+		
 
 		public Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> children = new HashSet<I_GetConceptData>();
