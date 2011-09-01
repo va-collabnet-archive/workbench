@@ -187,7 +187,7 @@ public class DrComponentHelper {
 				}
 			}else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
 				RelationshipsDAO rDao=new RelationshipsDAO();
-				concept=rDao.getConstraintNormalForm(oldStyleConcept, factContextName);
+				concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName));
 				rDao=null;
 				System.gc();
 			}
@@ -230,9 +230,14 @@ public class DrComponentHelper {
 				if (relTuple.getCharacteristicNid() != inferred) {
 					modelersRolesSet.getRelationships().add(loopRel);
 				}
+				
+				if (relTuple.getCharacteristicNid() == inferred) {
+					inferredRolesSet.getRelationships().add(loopRel);
+				}
 			}
 			concept.getDefiningRoleSets().add(statedRolesSet);
 			concept.getDefiningRoleSets().add(modelersRolesSet);
+			concept.getDefiningRoleSets().add(inferredRolesSet);
 
 			//TODO: incoming rels is heavy on performance moved to helper method
 //			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 

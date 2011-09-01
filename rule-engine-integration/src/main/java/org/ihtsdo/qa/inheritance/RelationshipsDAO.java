@@ -429,9 +429,9 @@ public class RelationshipsDAO {
 			return false;
 		}
 
-		public DrConcept getConstraintNormalForm(I_GetConceptData conceptData, String factContextName){
+		public List<DrRelationship> getConstraintNormalForm(I_GetConceptData conceptData, String factContextName){
 
-			DrConcept concept = new DrConcept();
+			List<DrRelationship> rels = new ArrayList<DrRelationship>();
 			try {
 				InheritedRelationships inhRel = getInheritedRelationships(conceptData);
 				//Inherited single roles
@@ -449,7 +449,7 @@ public class RelationshipsDAO {
 					loopRel.setTime(relTuple.getTime());
 					loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
 					loopRel.setFactContextName(factContextName);
-					concept.getOutgoingRelationships().add(loopRel);
+					rels.add(loopRel);
 				}
 				//Inherited grouped roles
 				int groupNr=0;
@@ -469,7 +469,7 @@ public class RelationshipsDAO {
 						loopRel.setTime(relTuple.getTime());
 						loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
 						loopRel.setFactContextName(factContextName);
-						concept.getOutgoingRelationships().add(loopRel);
+						rels.add(loopRel);
 					}
 				}
 				//Is A's Stated
@@ -489,14 +489,14 @@ public class RelationshipsDAO {
 					loopRel.setTime(relTuple.getTime());
 					loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
 					loopRel.setFactContextName(factContextName);
-					concept.getOutgoingRelationships().add(loopRel);
+					rels.add(loopRel);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			}
-			return null;
+			return rels;
 
 		}
 }
