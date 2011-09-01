@@ -24,6 +24,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
@@ -66,7 +67,7 @@ public class CopyToRelGroupAction extends AbstractAction {
 				I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
 						rel.getTypeNid(), 
 						rel.getDestinationNid(), 
-						rel.getCharacteristicNid(), 
+						SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
 						rel.getRefinabilityNid(), 
 						relGroup.getRelGroup(), 
 						rel.getStatusNid(), 
@@ -74,10 +75,10 @@ public class CopyToRelGroupAction extends AbstractAction {
 						pathItr.next().getConceptNid(), 
 						Long.MAX_VALUE);
 				
-				while (pathItr.hasNext()) {
-					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
-							pathItr.next().getConceptNid(), Long.MAX_VALUE);
-				}
+//				while (pathItr.hasNext()) {
+//					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
+//							pathItr.next().getConceptNid(), Long.MAX_VALUE);
+//				}
 			}
 			
 			Terms.get().addUncommitted(concept);
