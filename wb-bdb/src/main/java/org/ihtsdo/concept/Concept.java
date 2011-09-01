@@ -444,7 +444,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         return getNativeSourceRels();
     }
 
-    private Collection<Relationship> getNativeSourceRels() throws IOException {
+    public Collection<Relationship> getNativeSourceRels() throws IOException {
         if (isCanceled()) {
             return new ConcurrentSkipListSet<Relationship>(new ComponentComparator());
         }
