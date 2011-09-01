@@ -308,8 +308,10 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 
 		try {
-			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), UUID.fromString(conceptUUID));
-			int status = concept.getConAttrs().getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate()).getStatusNid();
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUUID));
+			int status = concept.getConceptAttributeTuples(null, config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
 					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid() ||
 					status == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
@@ -319,8 +321,6 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ContraditionException e) {
 			e.printStackTrace();
 		}
 
