@@ -1524,11 +1524,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    public Collection<Relationship> getNativeSourceRels() throws IOException {
-      if (isCanceled()) {
-         return new ConcurrentSkipListSet<Relationship>();
-      }
-
-      return data.getSourceRels();
+       if (isCanceled()) {
+       	 return new ConcurrentSkipListSet<Relationship>(new ComponentComparator());
+       }
+       return data.getSourceRels();
    }
 
    @Override
