@@ -855,7 +855,7 @@ public class WorkbenchRunner {
     						ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
     						ObjectCache.INSTANCE.put(CustomStatics.CUSTOM_UI_CLASS, custCN);	
     						ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
-    					
+                        }
                     }
                 }
             }
