@@ -583,7 +583,7 @@ public class QAStoreImpl implements QAStoreBI {
 		return lines;
 	}
 
-	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
+	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght, LinkedHashMap<Integer, Boolean> sortBy) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 
 		RuleFilterCoords coords = new RuleFilterCoords();
@@ -593,6 +593,7 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setViewPointTime(qaCoordinate.getViewPointTime());
 		coords.setStartLine(startLine);
 		coords.setPageLenght(pageLenght);
+		
 		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
 			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
 		}
@@ -722,7 +723,7 @@ public class QAStoreImpl implements QAStoreBI {
 			int pageLenght) {
 		long startTime = System.currentTimeMillis();
 		logger.info("Getting qa cases report lines by page...");
-		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
+		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght,sortBy);
 		Integer totalLines = countQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
 		logger.debug("############################## QA CASE REPORT PAGE");
 		logger.debug("Total Lines: " + totalLines);

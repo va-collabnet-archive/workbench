@@ -1,5 +1,7 @@
 package org.ihtsdo.qadb.data;
 
+import java.util.LinkedHashMap;
+
 public class RuleFilterCoords {
 	private String ruleUuid;
 	private String status;
@@ -19,6 +21,7 @@ public class RuleFilterCoords {
 	private String dispStatusUuidFilter;
 	private String assignedToFilter;
 	private DispositionStatus dispStatusFilter;
+	private LinkedHashMap<Integer, Boolean> sortBy;
 
 	public Integer getStatusFilter() {
 		return statusFilter;
@@ -162,5 +165,13 @@ public class RuleFilterCoords {
 
 	public void setViewPointTime(String viewPointTime) {
 		this.viewPointTime = viewPointTime;
+	}
+
+	public void setSortBy(LinkedHashMap<Integer, Boolean> sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	public LinkedHashMap<Integer, Boolean> getSortBy() {
+		return sortBy;
 	}
 }

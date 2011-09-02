@@ -121,6 +121,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="name != null">
 			and comp.name like #{name}
 		</if>
+		oreder by 	<!-- CONCEPT_NAME(1), STATUS(2), DISPOSITION(3), ASSIGNED_TO(4), TIME(5); -->
+		<choose>
+			<when test="sortBy.keySet().iterator().next() == 1">
+				comp.name, c.status, c.disposition_status_uid
+			</when>
+			<when test="sortBy.keySet().iterator().next() == 2">
+				c.status, c.disposition_status_uid, comp.name
+			</when>
+			<when test="sortBy.keySet().iterator().next() == 3">
+				c.disposition_status_uid, comp.name, c.status
+			</when>
+			<otherwise>
+				comp.name, c.status, c.disposition_status_uid
+			</otherwise>
+		</choose>
 		<include refid="pagingSql"/>
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 	</select>
