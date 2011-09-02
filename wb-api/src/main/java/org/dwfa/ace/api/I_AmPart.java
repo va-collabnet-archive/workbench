@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.apache.commons.collections.primitives.ArrayIntList;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.AnalogGeneratorBI;
@@ -24,17 +25,21 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
         AnalogGeneratorBI<T> {
 	
+    @Override
 	public int getStatusNid();
-	public void setStatusNid(int statusNid);
+	public void setStatusNid(int statusNid) throws PropertyVetoException;
 
+    @Override
 	public int getAuthorNid();
-	public void setAuthorNid(int authorNid);
+	public void setAuthorNid(int authorNid) throws PropertyVetoException;
 
+    @Override
 	public int getPathNid();
-	public void setPathNid(int pathNid);
+	public void setPathNid(int pathNid) throws PropertyVetoException;
 
+    @Override
 	public long getTime();
-	public void setTime(long time);
+	public void setTime(long time) throws PropertyVetoException;
 	
 	public ArrayIntList getPartComponentNids();
 	
@@ -46,8 +51,10 @@ public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
 	 * @param time
 	 * @return
 	 */
+      @Deprecated
 	public Object makeAnalog(int statusNid, int pathNid, long time);
 
+    @Override
 	public T makeAnalog(int statusNid, int authorNid, int pathNid, long time);
 	
 	@Deprecated
@@ -57,8 +64,8 @@ public interface I_AmPart<T extends AnalogBI> extends ComponentVersionBI,
 	@Deprecated
 	public int getVersion();
 	@Deprecated
-	public void setPathId(int pathId);
+	public void setPathId(int pathId) throws PropertyVetoException;
 	@Deprecated
-	public void setStatusId(int statusId);
+	public void setStatusId(int statusId) throws PropertyVetoException;
 
 }

@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 
 public interface I_ConceptAttributePart<A extends ConAttrAnalogBI>
@@ -23,7 +24,7 @@ public interface I_ConceptAttributePart<A extends ConAttrAnalogBI>
 
     public boolean isDefined();
 
-    public void setDefined(boolean defined);
+    public void setDefined(boolean defined) throws PropertyVetoException;
 
     @Deprecated
     public I_ConceptAttributePart duplicate();

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.ihtsdo.concept.component.RevisionSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,7 +112,7 @@ public class BooleanMemberTest {
         
         // Create an object to test... 
         BooleanMember obj = new BooleanMember();
-        obj.revisions = new CopyOnWriteArrayList<BooleanRevision>();
+        obj.revisions = new RevisionSet(1);
         BooleanRevision rev = new BooleanRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 1;
@@ -129,7 +130,7 @@ public class BooleanMemberTest {
         
         // Create an object to test... 
         BooleanMember obj = new BooleanMember();
-        obj.revisions = new CopyOnWriteArrayList<BooleanRevision>();
+        obj.revisions = new RevisionSet(1);
         BooleanRevision rev = new BooleanRevision(); 
         rev.primordialComponent = obj; 
         rev.sapNid = 2;

@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -12,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
@@ -113,9 +113,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
-import org.ihtsdo.concept.component.description.DescriptionRevision;
 import org.ihtsdo.concept.component.image.Image;
-import org.ihtsdo.concept.component.image.ImageRevision;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember;
@@ -170,6 +168,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.concept.ConceptVersion;
+import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -893,7 +892,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                         Bdb.getSapDb().getSapNid(statusNid, getUserNid(aceFrameConfig), p.getConceptNid(), time);
             } else {
                 if (a.revisions == null) {
-                    a.revisions = new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                    a.revisions = new RevisionSet(a.primordialSapNid);
                 }
                 a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, p.getConceptNid(), time));
             }
@@ -961,7 +960,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                         effectiveDate);
             } else {
                 if (d.revisions == null) {
-                    d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
+                    d.revisions = new RevisionSet(d.primordialSapNid);
                 }
                 d.revisions.add(d.makeAnalog(status.getNid(), p.getConceptNid(), effectiveDate));
             }
@@ -1137,13 +1136,21 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         assert config.getEditingPathSet().size() > 0 : "Empty editing path set. Must have at least one editing path.";
         for (PathBI p : config.getEditingPathSet()) {
             if (member.primordialSapNid == Integer.MIN_VALUE) {
-                member.primordialSapNid =
-                        Bdb.getSapDb().getSapNid(statusNid, getUserNid(config), p.getConceptNid(), time);
-                propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
+                try {
+                    member.primordialSapNid =
+                            Bdb.getSapDb().getSapNid(statusNid, getUserNid(config), p.getConceptNid(), time);
+                    propMap.setPropertiesExceptSap((I_ExtendByRefPart) member);
+                } catch (PropertyVetoException ex) {
+                    throw new IOException(ex);
+                }
             } else {
-                I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
-                propMap.setProperties(revision);
-                member.addVersion(revision);
+                try {
+                    I_ExtendByRefPart revision = (I_ExtendByRefPart) member.makeAnalog(statusNid, p.getConceptNid(), time);
+                    propMap.setProperties(revision);
+                    member.addVersion(revision);
+                } catch (PropertyVetoException ex) {
+                    throw new IOException(ex);
+                }
             }
         }
         if (refsetConcept.isAnnotationStyleRefex()) {
@@ -1286,7 +1293,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                         effectiveDate);
             } else {
                 if (r.revisions == null) {
-                    r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
+                    r.revisions = new RevisionSet(r.primordialSapNid);
                 }
                 r.revisions.add((RelationshipRevision) r.makeAnalog(statusNid, p.getConceptNid(), effectiveDate));
             }
@@ -2045,7 +2052,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                         p.getConceptNid(), Long.MAX_VALUE);
             } else {
                 if (img.revisions == null) {
-                    img.revisions = new CopyOnWriteArrayList<ImageRevision>();
+                    img.revisions = new RevisionSet(img.primordialSapNid);
                 }
                 img.revisions.add(img.makeAnalog(statusNid, p.getConceptNid(), Long.MAX_VALUE));
             }

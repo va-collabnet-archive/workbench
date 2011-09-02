@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 
@@ -37,13 +38,13 @@ public interface I_DescriptionTuple<A extends DescriptionAnalogBI>
     public int getDescId();
 
     @Override
-    public void setInitialCaseSignificant(boolean capStatus);
+    public void setInitialCaseSignificant(boolean capStatus) throws PropertyVetoException;
 
     @Override
-    public void setLang(String lang);
+    public void setLang(String lang) throws PropertyVetoException;
 
     @Override
-    public void setText(String text);
+    public void setText(String text) throws PropertyVetoException;
 
     /**
      * @deprecated

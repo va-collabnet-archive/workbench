@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.path;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -140,7 +141,7 @@ public class NewEditPathForUserFromProperty extends AbstractTask {
 
     protected static I_GetConceptData createComponents(String username, I_TermFactory tf,
             I_ConfigAceFrame activeProfile, TermEntry parentPathTermEntry) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException, TerminologyException, IOException {
+            UnsupportedEncodingException, TerminologyException, IOException, PropertyVetoException {
         String fsDescription = username + " development editing path";
 
         UUID type5ConceptId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, fsDescription);

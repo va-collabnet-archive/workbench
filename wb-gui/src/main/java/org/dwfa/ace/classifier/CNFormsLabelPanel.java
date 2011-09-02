@@ -164,12 +164,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setPathNid(int pathNid) {
+        public void setPathNid(int pathNid) throws PropertyVetoException {
             part.setPathNid(pathNid);
         }
 
         @Override
-        public void setStatusNid(int statusNid) {
+        public void setStatusNid(int statusNid) throws PropertyVetoException {
             part.setStatusNid(statusNid);
         }
 
@@ -178,7 +178,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             return part.getPartComponentNids();
         }
 
-        public void setConceptStatus(int conceptStatus) {
+        public void setConceptStatus(int conceptStatus) throws PropertyVetoException {
             part.setStatusNid(conceptStatus);
         }
         transient Integer hash;
@@ -222,7 +222,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          */
         @Deprecated
         @Override
-        public void setStatusId(int statusId) {
+        public void setStatusId(int statusId)  throws PropertyVetoException{
             part.setStatusId(statusId);
         }
 
@@ -266,7 +266,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * )
          */
         @Deprecated
-        public void setStatusId(Integer statusId) {
+        public void setStatusId(Integer statusId) throws PropertyVetoException {
             part.setStatusId(statusId);
 
         }
@@ -277,7 +277,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_ConceptAttributeTuple#setDefined(boolean)
          */
         @Override
-        public void setDefined(boolean defined) {
+        public void setDefined(boolean defined) throws PropertyVetoException {
             part.setDefined(defined);
 
         }
@@ -325,7 +325,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Deprecated
         @Override
-        public void setPathId(int pathId) {
+        public void setPathId(int pathId) throws PropertyVetoException {
             part.setPathId(pathId);
         }
 
@@ -365,7 +365,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setTime(long value) {
+        public void setTime(long value) throws PropertyVetoException {
             part.setTime(value);
         }
 
@@ -375,7 +375,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setAuthorNid(int authorNid) {
+        public void setAuthorNid(int authorNid) throws PropertyVetoException {
             part.setAuthorNid(authorNid);
         }
 
@@ -537,7 +537,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setCharacteristicNid(int nid) {
+        public void setCharacteristicNid(int nid) throws PropertyVetoException {
             fixedPart.setCharacteristicNid(nid);
         }
 
@@ -547,7 +547,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setRefinabilityNid(int nid) {
+        public void setRefinabilityNid(int nid) throws PropertyVetoException {
             fixedPart.setRefinabilityNid(nid);
         }
 
@@ -574,12 +574,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setPathNid(int pathNid) {
+        public void setPathNid(int pathNid) throws PropertyVetoException {
             part.setPathNid(pathNid);
         }
 
         @Override
-        public void setStatusNid(int statusNid) {
+        public void setStatusNid(int statusNid) throws PropertyVetoException {
             part.setStatusNid(statusNid);
         }
 
@@ -589,7 +589,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setAuthorNid(int authorNid) {
+        public void setAuthorNid(int authorNid) throws PropertyVetoException {
             part.setAuthorNid(authorNid);
         }
 
@@ -720,13 +720,13 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          */
         @Deprecated
         @Override
-        public void setTypeId(int typeId) {
+        public void setTypeId(int typeId) throws PropertyVetoException {
             part.setTypeId(typeId);
 
         }
 
         @Override
-        public void setTypeNid(int typeNid) {
+        public void setTypeNid(int typeNid) throws PropertyVetoException {
             part.setTypeNid(typeNid);
 
         }
@@ -738,7 +738,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          */
         @Deprecated
         @Override
-        public void setStatusId(int statusId) {
+        public void setStatusId(int statusId) throws PropertyVetoException {
             part.setStatusId(statusId);
 
         }
@@ -750,7 +750,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * org.dwfa.vodb.types.I_RelTuple#setCharacteristicId(java.lang.Integer)
          */
         @Override
-        public void setCharacteristicId(int characteristicId) {
+        public void setCharacteristicId(int characteristicId) throws PropertyVetoException {
             part.setCharacteristicId(characteristicId);
 
         }
@@ -761,7 +761,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#setRefinabilityId(java.lang.Integer)
          */
         @Override
-        public void setRefinabilityId(int refinabilityId) {
+        public void setRefinabilityId(int refinabilityId) throws PropertyVetoException {
             part.setRefinabilityId(refinabilityId);
 
         }
@@ -772,7 +772,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
          * @see org.dwfa.vodb.types.I_RelTuple#setGroup(java.lang.Integer)
          */
         @Override
-        public void setGroup(int group) {
+        public void setGroup(int group) throws PropertyVetoException {
             part.setGroup(group);
 
         }
@@ -843,7 +843,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Deprecated
         @Override
-        public void setPathId(int pathId) {
+        public void setPathId(int pathId) throws PropertyVetoException {
             part.setPathId(pathId);
         }
 
@@ -868,7 +868,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public void setTime(long value) {
+        public void setTime(long value) throws PropertyVetoException {
             part.setTime(value);
         }
 

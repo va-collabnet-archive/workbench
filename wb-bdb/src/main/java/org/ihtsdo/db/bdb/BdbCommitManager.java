@@ -1005,7 +1005,7 @@ public class BdbCommitManager {
       } else {
 
          // have to forget "all" references to component...
-         c.getSourceRels().remove(rel);
+         c.getSourceRels().remove((Relationship) rel);
          c.getData().getSrcRelNids().remove(rel.getNid());
          r.primordialSapNid = -1;
       }

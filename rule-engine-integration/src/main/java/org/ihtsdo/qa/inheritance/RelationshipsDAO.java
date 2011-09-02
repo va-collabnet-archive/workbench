@@ -1,5 +1,6 @@
 package org.ihtsdo.qa.inheritance;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,21 +95,25 @@ public class RelationshipsDAO {
 			List<I_RelTuple> result = new ArrayList<I_RelTuple>();
  			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
 			
- 			List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
- 			int relGroup = 1;
-			for (I_RelTuple[] i_RelTuples : roleGroups) {
-				for (I_RelTuple i_RelTuple : i_RelTuples) {
-					i_RelTuple.setGroup(relGroup);
-					result.add(i_RelTuple);
-				}
-				relGroup++;
-			}
- 			
-			List<I_RelTuple> singles = inheritedRels.getSingleRoles();
-			for (I_RelTuple i_RelTuple : singles) {
-				i_RelTuple.setGroup(0);
-				result.add(i_RelTuple);
-			}
+                    try {
+                        List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
+                        int relGroup = 1;
+                        for (I_RelTuple[] i_RelTuples : roleGroups) {
+                            for (I_RelTuple i_RelTuple : i_RelTuples) {
+                                i_RelTuple.setGroup(relGroup);
+                                result.add(i_RelTuple);
+                            }
+                            relGroup++;
+                        }
+                        
+                        List<I_RelTuple> singles = inheritedRels.getSingleRoles();
+                        for (I_RelTuple i_RelTuple : singles) {
+                            i_RelTuple.setGroup(0);
+                            result.add(i_RelTuple);
+                        }
+                    } catch (PropertyVetoException e) {
+                        throw new TerminologyException(e);
+                    }
 			
 			return result;
 			

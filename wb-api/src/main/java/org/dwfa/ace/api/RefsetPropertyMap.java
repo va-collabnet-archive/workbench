@@ -1,5 +1,6 @@
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -96,11 +97,11 @@ public class RefsetPropertyMap {
         return properties.containsKey(key);
     }
 
-    public void writeTo(I_ExtendByRefPart part) {
+    public void writeTo(I_ExtendByRefPart part) throws PropertyVetoException {
         setProperties(part);
     }
 
-    public void setProperties(I_ExtendByRefPart part) {
+    public void setProperties(I_ExtendByRefPart part) throws PropertyVetoException {
         for (Entry<REFSET_PROPERTY, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
             case BOOLEAN_VALUE:
@@ -150,7 +151,7 @@ public class RefsetPropertyMap {
         }
     }
 
-    public void setPropertiesExceptSap(I_ExtendByRefPart part) {
+    public void setPropertiesExceptSap(I_ExtendByRefPart part) throws PropertyVetoException {
         for (Entry<REFSET_PROPERTY, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
             case BOOLEAN_VALUE:

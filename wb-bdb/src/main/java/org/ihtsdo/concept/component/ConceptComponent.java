@@ -38,11 +38,10 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPairForRefset;
-import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -76,14 +75,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.helper.time.TimeHelper;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, I_IdPart, I_IdVersion,
@@ -108,8 +108,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     * primordial: first created or developed
     *
     */
-   public int                     primordialUNid;
-   public CopyOnWriteArrayList<R> revisions;
+   public int               primordialUNid;
+   public RevisionSet<R, C> revisions;
 
    //~--- constructors --------------------------------------------------------
 
@@ -335,20 +335,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       assert c != null : "Can't find concept for: " + r;
 
       if (revisions == null) {
-         revisions   = new CopyOnWriteArrayList<R>();
+         revisions   = new RevisionSet(primordialSapNid);
          returnValue = revisions.add(r);
-      } else if (revisions.isEmpty()) {
+      } else {
          returnValue = revisions.add(r);
-      } else if ((revisions.get(revisions.size() - 1) != r) && (containsSapt(r.sapNid) == false)) {
-         if (revisions.get(revisions.size() - 1).equals(r) == false) {
-            returnValue = revisions.add(r);    // maybe here...
-         } else {
-            AceLog.getAppLog().warning("Adding equal versions! last revision:\n\n"
-                                       + revisions.get(revisions.size() - 1) + "\n\nnew revision: " + r);
-         }
       }
 
-      r.primordialComponent = (C) this;    // maybe here
+      r.primordialComponent = (C) this;
       c.modified();
       clearVersions();
 
@@ -847,58 +840,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    public abstract boolean readyToWriteComponent();
 
-   public Version removeDuplicates(Version dup1, Version dup2) {
-      synchronized (revisions) {
-         if (dup1.dup) {
-            return dup1;
-         }
-
-         if (dup2.dup) {
-            return dup2;
-         }
-
-         if (dup1.index != dup2.index) {
-            Version smaller = dup1;
-            Version larger  = dup2;
-
-            if (dup1.index > dup2.index) {
-               smaller = dup2;
-               larger  = dup1;
-            }
-
-            larger.dup = true;
-
-            int indexToRemove = larger.index;
-
-            larger.index = smaller.index;
-
-            if (revisions.size() < indexToRemove) {
-               revisions.remove(indexToRemove);
-            } else {
-               indexToRemove = revisions.indexOf(larger);
-
-               if ((indexToRemove != dup1.index) && (indexToRemove >= 0)) {
-                  revisions.remove(indexToRemove);
-               }
-            }
-
-            if (revisions.isEmpty()) {
-               revisions = null;
-            }
-
-            Concept c = getEnclosingConcept();
-
-            clearVersions();
-            c.modified();
-            BdbCommitManager.writeImmediate(c);
-
-            return larger;
-         }
-
-         return dup2;
-      }
-   }
-
    public boolean removeRevision(R r) {
       boolean changed = false;
 
@@ -975,7 +916,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             buf.append(" path:");
             ConceptComponent.addNidToBuffer(buf, getPathNid());
             buf.append(" tm: ");
-            buf.append(TimeUtil.formatDate(getTime()));
+            buf.append(TimeHelper.formatDate(getTime()));
             buf.append(" ");
             buf.append(getTime());
          } catch (Throwable e) {
@@ -1049,22 +990,23 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       if (this.revisions != null) {
          if (this.revisions.equals(another.revisions) == false) {
-            for (int i = 0; i < this.revisions.size(); i++) {
+            if (this.revisions.size() != another.revisions.size()) {
+               buf.append("\trevision.size() not equal");
+            } else {
+               Iterator<R> thisRevItr    = this.revisions.iterator();
+               Iterator<R> anotherRevItr = (Iterator<R>) another.revisions.iterator();
 
-               // make sure there are elements in both arrays to compare
-               if (another.revisions.size() > i) {
-                  Revision<R, C> thisRevision    = (Revision<R, C>) this.revisions.get(i);
-                  Revision<R, C> anotherRevision = (Revision<R, C>) another.revisions.get(i);
+               while (thisRevItr.hasNext()) {
+                  R thisRevision    = thisRevItr.next();
+                  R anotherRevision = anotherRevItr.next();
 
                   validationResults = thisRevision.validate(anotherRevision);
 
                   if (validationResults.length() != 0) {
-                     buf.append("\tRevision[").append(i).append("] not equal: \n");
+                     buf.append("\tRevision[").append(thisRevision).append(", ").append(
+                         anotherRevision).append("] not equal: \n");
                      buf.append(validationResults);
                   }
-               } else {
-                  buf.append("\tConceptComponent.revision[").append(i).append("] not equal: \n");
-                  buf.append("\t\tThere is no corresponding Revision in another to compare it to.\n");
                }
             }
          }
@@ -1119,7 +1061,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       // Start writing
-
       output.writeShort(partsToWrite.size());
 
       for (IdentifierVersion p : partsToWrite) {
@@ -1925,110 +1866,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    //~--- inner classes -------------------------------------------------------
 
-   protected class EditableVersionList<V extends Version> extends ArrayList<V> {
-
-      /**
-       *
-       */
-      private static final long serialVersionUID = 1L;
-
-      //~--- constructors -----------------------------------------------------
-
-      public EditableVersionList(Collection<V> c) {
-         super(c);
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      public boolean add(V e) {
-         if (Revision.class.isAssignableFrom(e.getClass())) {
-            if (revisions == null) {
-               throw new RuntimeException(
-                   "Use makeAnalog to generate revisions. They will be automatically added.");
-            }
-
-            if (revisions.contains(e.getRevision())) {
-               return false;
-            }
-
-            throw new RuntimeException(
-                "Use makeAnalog to generate revisions. They will be automatically added.");
-         }
-
-         if (e.index == -1) {
-            return false;
-         }
-
-         if (revisions == null) {
-            throw new RuntimeException(
-                "Use makeAnalog to generate revisions. They will be automatically added.");
-         }
-
-         if (e.index < revisions.size()) {
-            return false;
-         }
-
-         throw new RuntimeException(
-             "Use makeAnalog to generate revisions. They will be automatically added.");
-      }
-
-      @Override
-      public void add(int index, V element) {
-         throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public boolean addAll(Collection<? extends V> c) {
-         boolean addedAnything = false;
-
-         for (V v : c) {
-            if (add(v)) {
-               addedAnything = true;
-            }
-         }
-
-         return addedAnything;
-      }
-
-      @Override
-      public boolean addAll(int index, Collection<? extends V> c) {
-         throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public void clear() {
-         throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public Object clone() {
-         throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public V remove(int index) {
-         throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public boolean remove(Object o) {
-         return super.remove(o);
-      }
-
-      //~--- set methods ------------------------------------------------------
-
-      @Override
-      public V set(int index, V element) {
-         throw new UnsupportedOperationException();
-      }
-   }
-
-
-   ;
-
-   //~--- inner classes -------------------------------------------------------
-
    public class IdVersion implements I_IdVersion, I_IdPart {
       protected int index = -1;
 
@@ -2126,7 +1963,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Deprecated
       public int getPathId() {
          if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
-            return getMutableIdPart().getPathId();
+            return getMutableIdPart().getPathNid();
          }
 
          return Bdb.getSapDb().getPathNid(primordialSapNid);
@@ -2153,7 +1990,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Deprecated
       public int getStatusId() {
          if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
-            return getMutableIdPart().getStatusId();
+            return getMutableIdPart().getStatusNid();
          }
 
          return Bdb.getSapDb().getStatusNid(primordialSapNid);
@@ -2238,18 +2075,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
 
    public abstract class Version implements I_AmTuple<R>, I_Identify, ComponentVersionBI {
-      protected int   index = -1;
-      private boolean dup   = false;
+      protected ComponentVersionBI cv;
 
       //~--- constructors -----------------------------------------------------
-
-      public Version() {
+      public Version(ComponentVersionBI cv) {
          super();
-      }
-
-      public Version(int index) {
-         super();
-         this.index = index;
+         this.cv = cv;
       }
 
       //~--- methods ----------------------------------------------------------
@@ -2289,7 +2120,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          if (Version.class.isAssignableFrom(obj.getClass())) {
             Version another = (Version) obj;
 
-            if ((this.getNid() == another.getNid()) && (this.index == another.index)) {
+            if ((this.getNid() == another.getNid()) && (this.getSapNid() == another.getSapNid())) {
                return true;
             }
          }
@@ -2299,7 +2130,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public int hashCode() {
-         return Hashcode.compute(new int[] { index, nid });
+         return Hashcode.compute(new int[] { this.getSapNid(), nid });
       }
 
       public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
@@ -2324,50 +2155,24 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          return false;
       }
 
-      public Version removeDuplicates(Version dup1, Version dup2) {
-         return ConceptComponent.this.removeDuplicates(dup1, dup2);
-      }
-
       @Override
       public boolean sapIsInRange(int min, int max) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            CopyOnWriteArrayList<R> localRevisions = revisions;
-
-            if ((localRevisions != null) && (index < localRevisions.size())) {
-               return (revisions.get(index).sapNid >= min) && (revisions.get(index).sapNid <= max);
-            }
-
-            return false;
-         }
-
-         return ConceptComponent.this.sapIsInRange(min, max);
+         return cv.sapIsInRange(min, max);
       }
 
       @Override
       public String toString() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return "Version: " + revisions.get(index).toString();
-         }
-
-         return "Version: " + ConceptComponent.this.toString();
+         return "Version: " + cv.toString();
       }
 
       @Override
       public String toUserString() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).toUserString();
-         }
-
-         return ConceptComponent.this.toUserString();
+         return cv.toUserString();
       }
 
       @Override
       public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).toUserString(snapshot);
-         }
-
-         return ConceptComponent.this.toUserString(snapshot);
+         return cv.toUserString(snapshot);
       }
 
       //~--- get methods ------------------------------------------------------
@@ -2391,11 +2196,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public int getAuthorNid() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getAuthorNid();
-         }
-
-         return Bdb.getSapDb().getAuthorNid(primordialSapNid);
+         return cv.getAuthorNid();
       }
 
       @Override
@@ -2449,11 +2250,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public I_AmPart getMutablePart() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index);
-         }
-
-         return this;
+         return (I_AmPart) cv;
       }
 
       @Override
@@ -2474,29 +2271,17 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Override
       @Deprecated
       public int getPathId() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getPathNid();
-         }
-
-         return Bdb.getSapDb().getPathNid(primordialSapNid);
+         return cv.getPathNid();
       }
 
       @Override
       public int getPathNid() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getPathNid();
-         }
-
-         return Bdb.getSapDb().getPathNid(primordialSapNid);
+         return cv.getPathNid();
       }
 
       @Override
       public PositionBI getPosition() throws IOException {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).getPosition();
-         } else {
-            return ConceptComponent.this.getPosition();
-         }
+         return cv.getPosition();
       }
 
       public Set<PositionBI> getPositions() throws IOException {
@@ -2519,48 +2304,32 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       public R getRevision() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index);
+         if (cv == ConceptComponent.this) {
+            return makeAnalog(getStatusNid(), getAuthorNid(), getPathNid(), getTime());
          }
 
-         return makeAnalog(getStatusNid(), getAuthorNid(), getPathNid(), getTime());
+         return (R) cv;
       }
 
       @Override
       public int getSapNid() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).sapNid;
-         }
-
-         return primordialSapNid;
+         return cv.getSapNid();
       }
 
       @Override
       @Deprecated
       public int getStatusId() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getStatusNid();
-         }
-
-         return Bdb.getSapDb().getStatusNid(primordialSapNid);
+         return cv.getStatusNid();
       }
 
       @Override
       public int getStatusNid() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getStatusNid();
-         }
-
-         return Bdb.getSapDb().getStatusNid(primordialSapNid);
+         return cv.getStatusNid();
       }
 
       @Override
       public long getTime() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getTime();
-         }
-
-         return Bdb.getSapDb().getTime(primordialSapNid);
+         return cv.getTime();
       }
 
       @Override
@@ -2584,11 +2353,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Override
       @Deprecated
       public int getVersion() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return getMutablePart().getVersion();
-         }
-
-         return Bdb.getSapDb().getVersion(primordialSapNid);
+         return Bdb.getSapDb().getVersion(cv.getSapNid());
       }
 
       @Override
@@ -2613,20 +2378,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public boolean isActive(NidSetBI allowedStatusNids) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).isActive(allowedStatusNids);
-         }
-
-         return ConceptComponent.this.isActive(allowedStatusNids);
+         return cv.isActive(allowedStatusNids);
       }
 
       @Override
       public boolean isBaselineGeneration() {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            return revisions.get(index).isBaselineGeneration();
-         }
-
-         return ConceptComponent.this.isBaselineGeneration();
+         return cv.isBaselineGeneration();
       }
 
       public boolean isUncommitted() {
@@ -2636,63 +2393,39 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       //~--- set methods ------------------------------------------------------
 
       @Override
-      public void setAuthorNid(int authorNid) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            revisions.get(index).setAuthorNid(authorNid);
-         } else {
-            ConceptComponent.this.setAuthorNid(authorNid);
-         }
+      public void setAuthorNid(int authorNid) throws PropertyVetoException {
+         ((AnalogBI) cv).setAuthorNid(authorNid);
       }
 
       public final void setNid(int nid) throws PropertyVetoException {
-         if (index == -1) {
-            ConceptComponent.this.setNid(nid);
-         }
-
-         throw new PropertyVetoException(null, null);
+         ((AnalogBI) cv).setNid(nid);
       }
 
       @Override
       @Deprecated
-      public void setPathId(int pathId) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            revisions.get(index).setPathNid(pathId);
-         } else {
-            ConceptComponent.this.setPathNid(pathId);
-         }
+      public void setPathId(int pathId) throws PropertyVetoException {
+         ((AnalogBI) cv).setPathNid(pathId);
       }
 
       @Override
-      public void setPathNid(int pathId) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            revisions.get(index).setPathNid(pathId);
-         } else {
-            ConceptComponent.this.setPathNid(pathId);
-         }
+      public void setPathNid(int pathId) throws PropertyVetoException {
+         ((AnalogBI) cv).setPathNid(pathId);
       }
 
       @Override
       @Deprecated
-      public void setStatusId(int statusNid) {
+      public void setStatusId(int statusNid) throws PropertyVetoException {
          setStatusNid(statusNid);
       }
 
       @Override
-      public void setStatusNid(int statusNid) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            revisions.get(index).setStatusNid(statusNid);
-         } else {
-            ConceptComponent.this.setStatusNid(statusNid);
-         }
+      public void setStatusNid(int statusNid) throws PropertyVetoException {
+         ((AnalogBI) cv).setStatusNid(statusNid);
       }
 
       @Override
-      public void setTime(long time) {
-         if ((index >= 0) && (revisions != null) && (index < revisions.size())) {
-            getMutablePart().setTime(time);
-         }
-
-         ConceptComponent.this.setTime(time);
+      public void setTime(long time) throws PropertyVetoException {
+         ((AnalogBI) cv).setTime(time);
       }
    }
 }

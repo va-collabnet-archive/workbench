@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.path;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_AmTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -191,8 +194,11 @@ public class NewPath extends AbstractTask {
         UUID relId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, parent.ids[0] + description + "relid");
         tf.newRelationship(relId, newPathConcept, relType, relDestination, relCharacteristic, relRefinability,
             statusConcept, 0, activeProfile);
-
-        TupleListUtil.setStatus(statusConcept, newTuples);
+        try {
+            TupleListUtil.setStatus(statusConcept, newTuples);
+        } catch (PropertyVetoException ex) {
+            throw new IOException(ex);
+        }
 
         return newPathConcept;
     }
