@@ -54,6 +54,7 @@ public class MyBatisUtil {
 		if (session != null) {
 			session.close();
 		}else{
+			logger.debug("One more try to open session");
 			sessionFactory.openSession();
 		}
 	}
