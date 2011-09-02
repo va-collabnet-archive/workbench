@@ -22,8 +22,6 @@ public class MyBatisUtil {
 			reader = Resources.getResourceAsReader(resource);
 			SqlSession session = null; 
 			sessionFactory = new SqlSessionFactoryBuilder().build(reader);
-			openSession(session);
-
 		} catch (Throwable ex) {
 			// Make sure you log the exception, as it might be swallowed
 			System.err.println("Initial SessionFactory creation failed." + ex);
@@ -31,10 +29,11 @@ public class MyBatisUtil {
 		}
 	}
 
-	private static void openSession(SqlSession session) {
+	private static void openSession() {
 		Exception etoThrow = null;
+		SqlSession session = null;
 		try {
-			session = sessionFactory.openSession();
+			session  = sessionFactory.openSession();
 		} catch (Exception e) {
 			logger.debug("first try: -> Could not open session");
 			//Try again.
@@ -61,6 +60,7 @@ public class MyBatisUtil {
 
 	public static SqlSessionFactory getSessionFactory() {
 		logger.debug("Getting session Factory ");
+		openSession();
 		return sessionFactory;
 	}
 
