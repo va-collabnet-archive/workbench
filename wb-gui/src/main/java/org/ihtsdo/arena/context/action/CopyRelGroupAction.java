@@ -24,8 +24,6 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 
-//test
-//
 public class CopyRelGroupAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
@@ -81,11 +79,7 @@ public class CopyRelGroupAction extends AbstractAction {
                         config.getDbConfig().getUserConcept().getNid(),
                         pathItr.next().getConceptNid(),
                         Long.MAX_VALUE);
-//
-//                while (pathItr.hasNext()) {
-//                    newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(),
-//                            pathItr.next().getConceptNid(), Long.MAX_VALUE);
-//                }
+                
                 Terms.get().addUncommitted(concept);
 
             }

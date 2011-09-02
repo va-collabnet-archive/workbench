@@ -66,11 +66,6 @@ public class CopyRelAction extends AbstractAction {
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 
 						Long.MAX_VALUE);
-				
-//				while (pathItr.hasNext()) {
-//					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
-//							pathItr.next().getConceptNid(), Long.MAX_VALUE);
-//				}
 			}
 			Terms.get().addUncommitted(concept);
 			

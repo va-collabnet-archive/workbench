@@ -7,17 +7,13 @@ import java.util.UUID;
 
 import javax.swing.AbstractAction;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -25,10 +21,8 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
 
 public class CopyToRelGroupAction extends AbstractAction {
 
@@ -74,11 +68,6 @@ public class CopyToRelGroupAction extends AbstractAction {
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 
 						Long.MAX_VALUE);
-				
-//				while (pathItr.hasNext()) {
-//					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
-//							pathItr.next().getConceptNid(), Long.MAX_VALUE);
-//				}
 			}
 			
 			Terms.get().addUncommitted(concept);
