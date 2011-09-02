@@ -103,15 +103,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     // 8
     private I_GetConceptData userConcept;
-    
-    private List<UUID> userConcept_UUIDs;
 
     // 9
     private I_GetConceptData userPath;
-    
-    private List<UUID> userpath_UUIDs;
-    
- 
     private String fullName;
     
     //10
@@ -122,7 +116,10 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
  
     // transient
     private transient File profileFile;
-    
+    //The List of User concept UUIDs
+    private List<UUID> userConcept_UUIDs;
+    //The list of user path UUIDs
+    private List<UUID> userpath_UUIDs;
     // Max CS File Size 
     private int maxCSFileSize = 512000;
 
@@ -207,7 +204,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             if (username == null || username.equals("null")) {
                 username = aceFrames.get(0).getUsername();
             }
-
             if (objDataVersion >= 2) {
                 loggerRiverConfigFile = (String) in.readObject();
             } else {
@@ -547,6 +543,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         for (I_ConfigAceFrame f : aceFrames) {
             if (f.isActive()) {
                 return ((AceFrameConfig) f).getAceFrame();
+            }
+        }
+        return null;
+    }
+
+    public I_ConfigAceFrame getActiveConfig() {
+        for (I_ConfigAceFrame f : aceFrames) {
+            if (f.isActive()) {
+                return f;
             }
         }
         return null;
