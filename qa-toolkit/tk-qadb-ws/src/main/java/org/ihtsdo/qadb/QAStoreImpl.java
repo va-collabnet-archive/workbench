@@ -730,17 +730,17 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.debug("Total Lines: " + totalLines);
 		logger.debug("Start Line: " + startLine);
 		logger.debug("Page Lenght: " + pageLenght);
-		if (sortBy != null && !sortBy.isEmpty()) {
-			logger.debug("************SORT BY**************");
-			Set<Integer> keyset = sortBy.keySet();
-			for (Integer integer : keyset) {
-				logger.debug(integer + " " + sortBy.get(integer));
-			}
-			long sortStartTime = System.currentTimeMillis();
-			Collections.sort(lines, new CaseReportLineComparator(sortBy));
-			long sortEndTime = System.currentTimeMillis();
-			logger.info("Sorting lines finished in: " + ((sortEndTime - sortStartTime) / 1000) + " Seconds");
-		}
+//		if (sortBy != null && !sortBy.isEmpty()) {
+//			logger.debug("************SORT BY**************");
+//			Set<Integer> keyset = sortBy.keySet();
+//			for (Integer integer : keyset) {
+//				logger.debug(integer + " " + sortBy.get(integer));
+//			}
+//			long sortStartTime = System.currentTimeMillis();
+//			Collections.sort(lines, new CaseReportLineComparator(sortBy));
+//			long sortEndTime = System.currentTimeMillis();
+//			logger.info("Sorting lines finished in: " + ((sortEndTime - sortStartTime) / 1000) + " Seconds");
+//		}
 		logger.debug("Reduced Lines: " + lines.size());
 
 		QACasesReportPage result = new QACasesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
