@@ -591,7 +591,7 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setPathUuid(qaCoordinate.getPathUuid());
 		coords.setRuleUuid(ruleUuid);
 		coords.setViewPointTime(qaCoordinate.getViewPointTime());
-		coords.setStartLine(startLine);
+		coords.setStartLine(startLine-1);
 		coords.setPageLenght(pageLenght);
 		coords.setSortBy(sortBy);
 		
