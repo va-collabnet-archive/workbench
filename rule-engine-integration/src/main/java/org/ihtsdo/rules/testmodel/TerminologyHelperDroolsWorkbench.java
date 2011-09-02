@@ -2,6 +2,7 @@ package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,15 +31,20 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
+import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
@@ -465,8 +471,31 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	@Override
 	public boolean isTargetOfReferToLink(String conceptUuid) {
-		//TODO implement when refer to import is defined
-		return false;
+		boolean result = false;
+		try {
+			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+			I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			List<? extends DescriptionVersionBI> descriptionsList = concept.getDescriptionTuples(config.getAllowedStatus(), 
+					null, config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), config.getConflictResolutionStrategy());
+			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
+			for (DescriptionVersionBI loopDescription : descriptionsList) {
+				Collection<? extends RefexVersionBI<?>> currentAnnotations = loopDescription.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
+				for (RefexVersionBI<?> annotation : currentAnnotations) {
+					RefexCnidVersionBI annotationCnid = (RefexCnidVersionBI) annotation;
+					int languageNid = annotationCnid.getCollectionNid();
+					if (annotationCnid.getCollectionNid() != referToRefset.getLenient().getNid()) {
+						result = true;
+						break;
+					}
+				}
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
 	@Override
