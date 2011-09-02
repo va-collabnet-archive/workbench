@@ -65,16 +65,16 @@ import org.ihtsdo.qadb.ws.data.WsCategory;
 import org.ihtsdo.qadb.ws.data.WsQACasesReportLine;
 
 public class QAStoreBIImpl implements QAStoreBI {
-	
+
 	private String url = "http://mgr.servers.aceworkspace.net:50008/axis2/services/qadb-service";
-	
+
 	public QAStoreBIImpl(String url) {
 		System.out.println("#######################################################");
 		System.out.println();
 		System.out.println(url);
 		System.out.println();
 		System.out.println("#######################################################");
-		if(url != null){
+		if (url != null) {
 			this.url = url;
 		}
 	}
@@ -123,7 +123,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public Finding getFinding(UUID findingUuid) {
 		// TODO Auto-generated method stub
@@ -153,7 +153,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		QADatabase result = null;
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
+
 			QADatabaseRequest request = new QADatabaseRequest();
 			request.setDatabaseUuid(databaseUuid.toString());
 			QADatabaseResponse response = service.getQADatabase(request);
@@ -176,9 +176,11 @@ public class QAStoreBIImpl implements QAStoreBI {
 			AllDatabasesResponse response = service.getAllDatabases();
 			Database[] wsDatabases = response.getDatabase();
 			result = new ArrayList<QADatabase>();
-			for (Database wsDatabase : wsDatabases) {
-				QADatabase dataase = new QADatabase(UUID.fromString(wsDatabase.getDatabaseUuid()), wsDatabase.getName());
-				result.add(dataase);
+			if (wsDatabases != null) {
+				for (Database wsDatabase : wsDatabases) {
+					QADatabase dataase = new QADatabase(UUID.fromString(wsDatabase.getDatabaseUuid()), wsDatabase.getName());
+					result.add(dataase);
+				}
 			}
 		} catch (AxisFault e) {
 			e.printStackTrace();
@@ -199,13 +201,15 @@ public class QAStoreBIImpl implements QAStoreBI {
 		List<TerminologyComponent> result = null;
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
+
 			AllPathsResponse response = service.getAllPaths();
 			Component[] paths = response.getPaths();
 			result = new ArrayList<TerminologyComponent>();
-			for (Component component : paths) {
-				TerminologyComponent termComp = WsClientDataConverter.wsComponentToTerminologyComponent(component);
-				result.add(termComp);
+			if (paths != null) {
+				for (Component component : paths) {
+					TerminologyComponent termComp = WsClientDataConverter.wsComponentToTerminologyComponent(component);
+					result.add(termComp);
+				}
 			}
 		} catch (AxisFault e) {
 			e.printStackTrace();
@@ -220,15 +224,17 @@ public class QAStoreBIImpl implements QAStoreBI {
 		List<TerminologyComponent> result = null;
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
+
 			AllPathsForDatabaseRequest request = new AllPathsForDatabaseRequest();
 			request.setDatabaseUuid(databaseUuid.toString());
 			AllPathsForDatabaseResponse response = service.getAllPathsForDatabase(request);
 			Component[] paths = response.getPaths();
 			result = new ArrayList<TerminologyComponent>();
-			for (Component component : paths) {
-				TerminologyComponent termComp = WsClientDataConverter.wsComponentToTerminologyComponent(component);
-				result.add(termComp);
+			if (paths != null) {
+				for (Component component : paths) {
+					TerminologyComponent termComp = WsClientDataConverter.wsComponentToTerminologyComponent(component);
+					result.add(termComp);
+				}
 			}
 		} catch (AxisFault e) {
 			e.printStackTrace();
@@ -268,7 +274,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		List<Severity> result = null;
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
+
 			AllSeveritiesResponse response = service.getAllSeverities();
 			org.ihtsdo.qadb.ws.data.Severity[] severities = response.getSeverity();
 			result = new ArrayList<Severity>();
@@ -370,10 +376,12 @@ public class QAStoreBIImpl implements QAStoreBI {
 			AllRulesResponse reponse = service.getAllRules();
 			org.ihtsdo.qadb.ws.data.Rule[] rules = reponse.getRule();
 			result = new ArrayList<Rule>();
-			for (org.ihtsdo.qadb.ws.data.Rule wsRule : rules) {
-				Rule rule = new Rule();
-				rule = WsClientDataConverter.wsRuleToRule(wsRule);
-				result.add(rule);
+			if (rules != null) {
+				for (org.ihtsdo.qadb.ws.data.Rule wsRule : rules) {
+					Rule rule = new Rule();
+					rule = WsClientDataConverter.wsRuleToRule(wsRule);
+					result.add(rule);
+				}
 			}
 		} catch (AxisFault e) {
 			e.printStackTrace();
@@ -425,7 +433,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setSortedBy(wsSorteBy);
 
 			IntStrKeyValue[] wsFilter = null;
-			if(filter != null && !filter.isEmpty()){
+			if (filter != null && !filter.isEmpty()) {
 				wsFilter = WsClientDataConverter.filterToWsFilter(filter);
 			}
 			request.setFilter(wsFilter);
@@ -445,30 +453,30 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 			List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 			org.ihtsdo.qadb.ws.data.RulesReportLine[] wsReportLines = response.getRulesReportLine();
-			if(wsReportLines != null){
-				
+			if (wsReportLines != null) {
+
 				for (org.ihtsdo.qadb.ws.data.RulesReportLine wsRulesReportLine : wsReportLines) {
 					RulesReportLine ruleReportLine = new RulesReportLine();
-	
+
 					HashMap<UUID, Integer> dispositionStatusCounts = new HashMap<UUID, Integer>();
 					DispositionStatusCount_type0[] wsDispositionStatusCounts = wsRulesReportLine.getDispositionStatusCount();
 					for (DispositionStatusCount_type0 wsDispositionStatusCount : wsDispositionStatusCounts) {
 						dispositionStatusCounts.put(UUID.fromString(wsDispositionStatusCount.getDispositionStatusUuid()), wsDispositionStatusCount.getDispositionStatusCount());
 					}
 					ruleReportLine.setDispositionStatusCount(dispositionStatusCounts);
-	
+
 					HashMap<Boolean, Integer> statusCounts = new HashMap<Boolean, Integer>();
 					StatusCount_type0[] wsStatusCounts = wsRulesReportLine.getStatusCount();
 					for (StatusCount_type0 wsStatusCount : wsStatusCounts) {
 						statusCounts.put(wsStatusCount.getStatus(), wsStatusCount.getCount());
 					}
 					ruleReportLine.setStatusCount(statusCounts);
-	
+
 					Rule rule = null;
 					org.ihtsdo.qadb.ws.data.Rule wsRule = wsRulesReportLine.getRule();
-	
+
 					rule = WsClientDataConverter.wsRuleToRule(wsRule);
-	
+
 					ruleReportLine.setRule(rule);
 					lines.add(ruleReportLine);
 				}
@@ -495,19 +503,19 @@ public class QAStoreBIImpl implements QAStoreBI {
 	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn, Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter,
 			int startLine, int pageLenght) {
 		QACasesReportPage reportPage = null;
-		try{
+		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
+
 			QACasesReportLinesByPageRequest request = new QACasesReportLinesByPageRequest();
 			IntStrKeyValue[] wsFilter = null;
-			if(filter != null && !filter.isEmpty()){
+			if (filter != null && !filter.isEmpty()) {
 				wsFilter = WsClientDataConverter.qaCaseFilterToWsQaCaseFilter(filter);
 			}
 			IntBoolKeyValue[] wsSorteBy = null;
-			
+
 			wsSorteBy = WsClientDataConverter.qaCaseSortToWsQaCaseSort(sortBy);
-			
-			org.ihtsdo.qadb.ws.data.QACoordinate wsQaCoord = new org.ihtsdo.qadb.ws.data.QACoordinate(); 
+
+			org.ihtsdo.qadb.ws.data.QACoordinate wsQaCoord = new org.ihtsdo.qadb.ws.data.QACoordinate();
 			WsClientDataConverter.qaCoordinateToWsQaCoordinate(qaCoordinate, wsQaCoord);
 
 			request.setFilter(wsFilter);
@@ -517,7 +525,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 			request.setPageLenght(pageLenght);
 			request.setRuleUuid(ruleUuid.toString());
 			QACasesReportLinesByPageResponse wsResponse = service.getQACasesReportLinesByPage(request);
-			
+
 			reportPage = new QACasesReportPage();
 			reportPage.setFilter(filter);
 			reportPage.setSortBy(sortBy);
@@ -526,7 +534,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 			reportPage.setInitialLine(wsResponse.getInitialLine());
 			WsQACasesReportLine[] wslines = wsResponse.getLines();
 			List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
-			if(wslines != null){
+			if (wslines != null) {
 				for (WsQACasesReportLine wsQACasesReportLine : wslines) {
 					QACase qaCase = WsClientDataConverter.wsCaseToCase(wsQACasesReportLine.getQaCase());
 					TerminologyComponent component = WsClientDataConverter.wsComponentToTerminologyComponent(wsQACasesReportLine.getComponent());
@@ -536,8 +544,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 				}
 			}
 			reportPage.setLines(lines);
-			
-		}catch (Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return reportPage;
@@ -616,7 +624,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
 			PersistQACaseRequest request = new PersistQACaseRequest();
-			
+
 			Case wsQaCase = WsClientDataConverter.caseToWsCase(qaCase);
 			request.setQaCase(wsQaCase);
 			service.persistQACase(request);
@@ -638,8 +646,8 @@ public class QAStoreBIImpl implements QAStoreBI {
 		List<Category> result = null;
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
-			
-		AllCategoriesResponse response = service.getAllCategories();
+
+			AllCategoriesResponse response = service.getAllCategories();
 			WsCategory[] categories = response.getCategories();
 			result = new ArrayList<Category>();
 			for (WsCategory wsCategory : categories) {
@@ -664,7 +672,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		try {
 			QadbServiceStub service = new QadbServiceStub(url);
 			PersistQACaseList qaListRequest = new PersistQACaseList();
-			
+
 			Case[] wsCaseList = new Case[qaCaseList.size()];
 			int i = 0;
 			for (QACase qaCase2 : qaCaseList) {
@@ -672,7 +680,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 				wsCaseList[i] = wsQaCase;
 				i++;
 			}
-			qaListRequest.setQaCaseList(wsCaseList );
+			qaListRequest.setQaCaseList(wsCaseList);
 			service.persistQACaseList(qaListRequest);
 		} catch (AxisFault e) {
 			e.printStackTrace();
@@ -692,9 +700,9 @@ public class QAStoreBIImpl implements QAStoreBI {
 		QadbServiceStub service = new QadbServiceStub(url);
 		PersistQACommentRequest persistRequest = new PersistQACommentRequest();
 		persistRequest.setQaComment(wsComment);
-		try{
+		try {
 			service.persistQAComment(persistRequest);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw e;
 		}
 	}
