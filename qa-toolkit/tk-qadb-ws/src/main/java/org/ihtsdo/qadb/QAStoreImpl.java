@@ -593,6 +593,7 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setViewPointTime(qaCoordinate.getViewPointTime());
 		coords.setStartLine(startLine);
 		coords.setPageLenght(pageLenght);
+		coords.setSortBy(sortBy);
 		
 		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
 			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
