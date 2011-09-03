@@ -135,6 +135,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
         c.weighty = 1.0;
         c.weightx = 1.0;
         tl = new TerminologyList(config);
+        tl.setVisibleRowCount(1);
         wizardPanel.add(tl, c);
         c.weighty = 0.0;
 
@@ -180,12 +181,9 @@ public class RetireAsInappropriateAction extends AbstractAction {
             wizard.setWizardPanelVisible(false);
             if (tl != null) {
                 TerminologyListModel model = (TerminologyListModel) tl.getModel();
-                List<Integer> nidList = model.getNidsInList();
-                for (int nid : nidList) {
                     retireFromRefexes(component);
                     retireSynonym();
-                    addToRefersToRefset(nid);
-                }
+                    addToRefersToRefset(model.getElementAt(0).getNid());
             }
         }
     }
