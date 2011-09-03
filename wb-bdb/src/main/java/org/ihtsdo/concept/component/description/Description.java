@@ -385,6 +385,17 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
       output.writeString(text);
       output.writeInt(typeNid);
       output.writeShort(partsToWrite.size());
+    
+    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions,
+            List<I_DescriptionTuple<DescriptionRevision>> matchingTuples,
+            Precedence precedence, ContradictionManagerBI contradictionManager,
+            Long time) {
+        List<Version> returnTuples = new ArrayList<Version>();
+        computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
+                returnTuples, getVersions(), precedence, contradictionManager, time);
+        matchingTuples.addAll(returnTuples);
+    }
 
       // conceptNid is the enclosing concept, does not need to be written.
       for (DescriptionRevision p : partsToWrite) {

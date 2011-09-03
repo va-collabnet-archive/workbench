@@ -24,14 +24,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +39,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
@@ -110,18 +106,22 @@ public class CreateReport extends AbstractTask {
     protected boolean added_relationships = false;
     protected boolean deleted_relationships = false;
     protected boolean changed_relationship_status = false;
+    protected List<Integer> v1_relationship_characteristic_filter_int;
+    protected List<Integer> v2_relationship_characteristic_filter_int;
     protected boolean changed_relationship_characteristic = false;
     protected boolean changed_relationship_refinability = false;
     protected boolean changed_relationship_type = false;
     protected boolean changed_relationship_group = false;
-    protected String author1;
-    protected String author2;
+    protected List<Integer> author1;
+    protected List<Integer> author2;
     protected int parentConceptNid;
     protected TerminologyList taxonomyList;
     protected TerminologyList v1PathList;
     protected TerminologyList v2PathList;
     protected TerminologyList v1AuthList;
     protected TerminologyList v2AuthList;
+    protected TerminologyList v1RelCharList;
+    protected TerminologyList v2RelCharList;
     protected FixedWidthJEditorPane dateV1;
     protected FixedWidthJEditorPane dateV2;
     protected JPanel panel;
@@ -175,7 +175,6 @@ public class CreateReport extends AbstractTask {
     }
 
     public void doRun(final I_EncodeBusinessProcess process, I_Work worker) {
-
         if (returnCondition == Condition.CONTINUE) {
             try {
                 //get taxonomy parent
@@ -188,26 +187,45 @@ public class CreateReport extends AbstractTask {
                 I_GetConceptData pathV1 = modelPathV1.getElementAt(0);
                 path1_uuid = pathV1.getPrimUuid().toString();
 
-                //get v1 path
+                //get v2 path
                 TerminologyListModel modelPathV2 = (TerminologyListModel) v2PathList.getModel();
                 I_GetConceptData pathV2 = modelPathV2.getElementAt(0);
                 path2_uuid = pathV2.getPrimUuid().toString();
 
-                //get v1 path
+                //get v1 author
                 TerminologyListModel modelAuthV1 = (TerminologyListModel) v1AuthList.getModel();
-                I_GetConceptData authV1 = modelAuthV1.getElementAt(0);
-                if (authV1 != null) {
-                    author1 = authV1.getPrimUuid().toString();
+                if (modelAuthV1.getNidsInList() != null) {
+                    author1 = modelAuthV1.getNidsInList();
+                }else {
+                    author1 = null;
                 }
 
-                //get v1 path
+                //get v2 author
                 TerminologyListModel modelAuthV2 = (TerminologyListModel) v2AuthList.getModel();
-                I_GetConceptData authV2 = modelAuthV2.getElementAt(0);
-                if (authV2 != null) {
-                    author2 = authV2.getPrimUuid().toString();
+                if (modelAuthV2.getNidsInList() != null) {
+                    author2 = modelAuthV2.getNidsInList();
+                }else {
+                    author2 = null;
+                }
+                
+                //get v1 rel char
+                TerminologyListModel modelCharV1 = (TerminologyListModel) v1RelCharList.getModel();
+                if(modelCharV1.getNidsInList() != null){
+                    v1_relationship_characteristic_filter_int = modelCharV1.getNidsInList();
+                }else{
+                    v1_relationship_characteristic_filter_int = null;
+                }
+
+                //get v2 rel char
+                TerminologyListModel modelCharV2 = (TerminologyListModel) v2RelCharList.getModel();
+                if(modelCharV2.getNidsInList() != null){
+                    v2_relationship_characteristic_filter_int = modelCharV2.getNidsInList();
+                }else{
+                    v2_relationship_characteristic_filter_int = null;
                 }
 
                 ChangeReport reporter = new ChangeReport(v1, v2, path1_uuid, path2_uuid,
+                        v1_relationship_characteristic_filter_int, v2_relationship_characteristic_filter_int,
                         added_concepts, deleted_concepts, added_concepts_refex, deleted_concepts_refex,
                         changed_concept_status, changed_concept_author, changed_description_author,
                         changed_rel_author, changed_refex_author, author1, author2, changed_defined,
@@ -370,6 +388,26 @@ public class CreateReport extends AbstractTask {
             c.gridwidth = 2;
             v2AuthList = new TerminologyList(config);
             workflowPanel.add(v2AuthList, c);
+            
+            c.gridy++;
+            c.weightx = 0.0;
+            workflowPanel.add(new JLabel("Relationship Characteristic v1"), c);
+            c.gridy++;
+            c.ipady = 20;
+            c.gridwidth = 2;
+            v1RelCharList = new TerminologyList(config);
+            workflowPanel.add(v1RelCharList, c);
+
+            c.gridy++;
+            c.weightx = 0.0;
+            c.gridwidth = 0;
+            c.ipady = 0;
+            workflowPanel.add(new JLabel("Relationship Characteristic v2"), c);
+            c.gridy++;
+            c.ipady = 20;
+            c.gridwidth = 2;
+            v2RelCharList = new TerminologyList(config);
+            workflowPanel.add(v2RelCharList, c);
 
             c.gridy++;
             c.ipady = 0;

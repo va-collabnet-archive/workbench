@@ -967,6 +967,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                                        precedencePolicy, contradictionManager);
    }
+   
+   @Override
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
+           PositionSetBI positionSet, Precedence precedencePolicy,
+           ContradictionManagerBI contradictionManager, long time)
+           throws IOException, TerminologyException {
+      List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
+      ConceptAttributes attr = getConceptAttributes();
+
+      if (attr != null) {
+         attr.addTuples(allowedStatus, positionSet, returnTuples,
+                 precedencePolicy, contradictionManager, time);
+      }
+
+      return returnTuples;
+   }
 
    @Override
    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
@@ -1164,6 +1180,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       return getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(),
                                   config.getViewPositionSetReadOnly(), config.getPrecedence(),
                                   config.getConflictResolutionStrategy());
+   }
+   
+   @Override
+   public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(NidSetBI allowedStatus,
+           NidSetBI allowedTypes, PositionSetBI positions, Precedence precedencePolicy,
+           ContradictionManagerBI contradictionManager, long time)
+           throws IOException {
+      List<I_DescriptionTuple<DescriptionRevision>> returnDescriptions =
+         new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
+
+      for (Description desc : getDescriptions()) {
+         desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions, precedencePolicy,
+                        contradictionManager, time);
+      }
+
+      return returnDescriptions;
    }
 
    @Override

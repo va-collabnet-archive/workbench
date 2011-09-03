@@ -64,6 +64,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
@@ -492,18 +493,23 @@ public class DiffBase {
     protected boolean test_p = false;
     protected boolean debug_p = false;
     protected I_ConfigAceFrame config;
+    protected long v1_id;
+    protected long v2_id;
+    
 
     public DiffBase(String v1, String v2, String path1_uuid, String path2_uuid,
-                boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex,boolean deleted_concepts_refex,
-                boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
-                boolean changed_rel_author, boolean changed_refex_author, String author1, String author2, boolean changed_defined,
-                boolean added_descriptions, boolean deleted_descriptions, boolean changed_description_status,
-                boolean changed_description_term, boolean changed_description_type, boolean changed_description_language,
-                boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
-                boolean changed_relationship_status, boolean changed_relationship_characteristic,
-                boolean changed_relationship_refinability,
-                boolean changed_relationship_type, boolean changed_relationship_group,
-                I_ConfigAceFrame config) {
+            List<Integer> v1_relationship_characteristic_filter_int, List<Integer> v2_relationship_characteristic_filter_int,
+            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
+            boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
+            boolean changed_rel_author, boolean changed_refex_author,
+            List<Integer> author1, List<Integer> author2, boolean changed_defined,
+            boolean added_descriptions, boolean deleted_descriptions, boolean changed_description_status,
+            boolean changed_description_term, boolean changed_description_type, boolean changed_description_language,
+            boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
+            boolean changed_relationship_status, boolean changed_relationship_characteristic,
+            boolean changed_relationship_refinability,
+            boolean changed_relationship_type, boolean changed_relationship_group,
+            I_ConfigAceFrame config) {
         this.config = config;
         this.v1 = v1;
         this.v2 = v2;
@@ -541,11 +547,11 @@ public class DiffBase {
         this.changed_rel_author = changed_rel_author;
         this.changed_refex_author = changed_refex_author;
 //        author1 = "923e9866-2d12-4dd8-b5c2-5799092454dc"; //<- user: 'user'
-        v1_concept_author.add(author1);
+        v1_concept_author_int = author1;
 //        author2 = "923e9866-2d12-4dd8-b5c2-5799092454dc";
-        v2_concept_author.add(author2);
-        this.changed_defined = changed_defined = true;
-        this.added_descriptions = added_descriptions = true;
+        v2_concept_author_int = author2;
+        this.changed_defined = changed_defined;
+        this.added_descriptions = added_descriptions;
         this.deleted_descriptions = deleted_descriptions;
         this.changed_description_status = changed_description_status;
         this.changed_description_term = changed_description_term;
@@ -555,6 +561,8 @@ public class DiffBase {
         this.added_relationships = added_relationships;
         this.deleted_relationships = deleted_relationships;
         this.changed_relationship_status = changed_relationship_status;
+        this.v1_relationship_characteristic_filter_int = v1_relationship_characteristic_filter_int;
+        this.v2_relationship_characteristic_filter_int = v2_relationship_characteristic_filter_int;
         this.changed_relationship_characteristic = changed_relationship_characteristic;
         this.changed_relationship_refinability = changed_relationship_refinability;
         this.changed_relationship_type = changed_relationship_type;
@@ -579,8 +587,8 @@ public class DiffBase {
         I_TermFactory tf = Terms.get();
         PathBI path1 = tf.getPath(Arrays.asList(UUID.fromString(path1_uuid)));
         PathBI path2 = tf.getPath(Arrays.asList(UUID.fromString(path2_uuid)));
-        long v1_id = ThinVersionHelper.convert(this.v1);
-        long v2_id = ThinVersionHelper.convert(this.v2);
+        v1_id = ThinVersionHelper.convert(this.v1);
+        v2_id = ThinVersionHelper.convert(this.v2);
         pos1 = tf.newPosition(path1, v1_id);
         pos2 = tf.newPosition(path2, v2_id);
         allowed_position1 = new PositionSetReadOnly(pos1);
@@ -631,6 +639,22 @@ public class DiffBase {
         return ret;
     }
 
+    protected void logConfigList(List<Integer> conceptNids, String tag)
+            throws Exception {
+        I_TermFactory tf = Terms.get();
+        if (conceptNids.isEmpty()) {
+                logConfig(tag, "null");
+            }
+        for (Integer conceptNid : conceptNids) {
+            I_GetConceptData con = tf.getConcept(conceptNid);
+            if (con == null) {
+                logConfig(tag, "null");
+                continue;
+            }
+            logConfig(tag, con.getInitialText());
+        }
+    }
+
     protected void processConfigFilters() throws Exception {
         logConfig("added_concepts", "" + this.added_concepts);
         this.diff_count.put(this.added_concept_change, 0);
@@ -649,10 +673,14 @@ public class DiffBase {
         logConfig("changed_description_author", "" + this.changed_description_author);
         logConfig("changed_rel_author", "" + this.changed_rel_author);
         logConfig("changed_refex_author", "" + this.changed_refex_author);
-        this.v1_concept_author_int = buildConceptEnum(this.v1_concept_author,
-                "v1_concept_author");
-        this.v2_concept_author_int = buildConceptEnum(this.v2_concept_author,
-                "v2_concept_author");
+        logConfigList(v1_concept_author_int, "v1_concept_author");
+        logConfigList(v2_concept_author_int, "v2_concept_author");
+//        if (v1_concept_author != null && v2_concept_author != null) {
+//            this.v1_concept_author_int = buildConceptEnum(this.v1_concept_author,
+//                    "v1_concept_author");
+//            this.v2_concept_author_int = buildConceptEnum(this.v2_concept_author,
+//                    "v2_concept_author");
+//        }
         logConfig("changed_defined", "" + this.changed_defined);
         this.diff_count.put(this.defined_change, 0);
         this.v1_isa_filter_int = buildConceptEnum(this.v1_isa_filter,
@@ -737,12 +765,14 @@ public class DiffBase {
         this.v2_relationship_status_filter_int = buildConceptEnum(
                 this.v2_relationship_status_filter,
                 "v2_relationship_status_filter");
-        this.v1_relationship_characteristic_filter_int = buildConceptEnum(
-                this.v1_relationship_characteristic_filter,
-                "v1_relationship_characteristic_filter");
-        this.v2_relationship_characteristic_filter_int = buildConceptEnum(
-                this.v2_relationship_characteristic_filter,
-                "v2_relationship_characteristic_filter");
+        logConfigList(v1_relationship_characteristic_filter_int, "v1_relationship_characteristic_filter");
+        logConfigList(v2_relationship_characteristic_filter_int, "v2_relationship_characteristic_filter");
+//        this.v1_relationship_characteristic_filter_int = buildConceptEnum(
+//                this.v1_relationship_characteristic_filter,
+//                "v1_relationship_characteristic_filter");
+//        this.v2_relationship_characteristic_filter_int = buildConceptEnum(
+//                this.v2_relationship_characteristic_filter,
+//                "v2_relationship_characteristic_filter");
         this.v1_relationship_refinability_filter_int = buildConceptEnum(
                 this.v1_relationship_refinability_filter,
                 "v1_relationship_refinability_filter");
@@ -870,8 +900,7 @@ public class DiffBase {
         I_TermFactory tf = Terms.get();
         if (current_status == null) {
             current_status = new NidSet();
-            current_status.add(tf.getConcept(
-                    ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getNid());
+            current_status.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
         }
         if (isa_type == null) {
             isa_type = new NidSet();
@@ -880,13 +909,11 @@ public class DiffBase {
         }
         if (pref_type == null) {
             pref_type = new NidSet();
-            pref_type.add(tf.getConcept(
-                    ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getNid());
+            pref_type.add(SnomedMetadataRfx.getDESC_PREFERRED_NID());
         }
         if (fsn_type == null) {
             fsn_type = new NidSet();
-            fsn_type.add(tf.getConcept(
-                    ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getNid());
+            fsn_type.add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
         }
         classifier_type = tf.getConcept(
                 ArchitectonicAuxiliary.Concept.SNOROCKET.getUids()).getNid();
@@ -1192,7 +1219,8 @@ public class DiffBase {
 
     protected boolean testDescriptionFilter(I_DescriptionTuple d,
             List<Integer> status_filter, List<Integer> type_filter,
-            String term_filter, String lang_filter, Boolean case_filter) {
+            String term_filter, String lang_filter,
+            Boolean case_filter, List<Integer> author_filter) {
         if (status_filter.size() > 0
                 && !status_filter.contains(d.getStatusNid())) {
             return false;
@@ -1211,20 +1239,27 @@ public class DiffBase {
         if (case_filter != null && !d.isInitialCaseSignificant() == case_filter) {
             return false;
         }
+        if (author_filter.size() > 0 && !author_filter.contains(d.getAuthorNid())) {
+            return false;
+        }
         return true;
     }
 
     protected void compareDescriptions(I_GetConceptData c) throws Exception {
         List<? extends I_DescriptionTuple> d1s = c.getDescriptionTuples(null,
-                null, allowed_position1, precedence, contradiction_mgr);
+                null, allowed_position1, precedence, contradiction_mgr, v1_id);
         List<? extends I_DescriptionTuple> d2s = c.getDescriptionTuples(null,
-                null, allowed_position2, precedence, contradiction_mgr);
+                null, allowed_position2, precedence, contradiction_mgr, v2_id);
         for (I_DescriptionTuple d2 : d2s) {
 
             descriptions++;
-            if (!testDescriptionFilter(d2, v2_description_status_filter_int,
-                    v2_description_type_filter_int, v2_description_term_filter,
-                    v2_description_lang_filter, v2_description_case_filter)) {
+            if (!testDescriptionFilter(d2,
+                    v2_description_status_filter_int,
+                    v2_description_type_filter_int,
+                    v2_description_term_filter,
+                    v2_description_lang_filter,
+                    v2_description_case_filter,
+                    v2_concept_author_int)) {
                 continue;
             }
             boolean found = false;
@@ -1235,20 +1270,21 @@ public class DiffBase {
                             v1_description_type_filter_int,
                             v1_description_term_filter,
                             v1_description_lang_filter,
-                            v1_description_case_filter)) {
+                            v1_description_case_filter,
+                            v1_concept_author_int)) {
                         continue;
                     }
                     found = true;
-                    if (changed_description_author) {
-                        if (v1_concept_author_int.size() > 0 && d1 != null
-                                && !v1_concept_author_int.contains(d1.getAuthorNid())) {
-                            return;
-                        }
-                        if (v2_concept_author_int.size() > 0 && d2 != null
-                                && !v2_concept_author_int.contains(d2.getAuthorNid())) {
-                            return;
-                        }
-                    }
+//                    if (changed_description_author) {
+//                        if (v1_concept_author_int.size() > 0 && d1 != null
+//                                && !v1_concept_author_int.contains(d1.getAuthorNid())) {
+//                            return;
+//                        }
+//                        if (v2_concept_author_int.size() > 0 && d2 != null
+//                                && !v2_concept_author_int.contains(d2.getAuthorNid())) {
+//                            return;
+//                        }
+//                    }
                     descriptions_filtered++;
                     if (d1.getStatusNid() != d2.getStatusNid()
                             && this.changed_description_status
@@ -1286,7 +1322,8 @@ public class DiffBase {
     protected boolean testRelationshipFilter(I_RelTuple r,
             List<Integer> status_filter, List<Integer> type_filter,
             List<Integer> characteristic_filter,
-            List<Integer> refinability_filter) {
+            List<Integer> refinability_filter,
+            List<Integer> author_filter) {
         if (status_filter.size() > 0
                 && !status_filter.contains(r.getStatusNid())) {
             return false;
@@ -1300,6 +1337,10 @@ public class DiffBase {
         }
         if (refinability_filter.size() > 0
                 && !refinability_filter.contains(r.getRefinabilityNid())) {
+            return false;
+        }
+        if (author_filter.size() > 0
+                && !author_filter.contains(r.getAuthorNid())) {
             return false;
         }
         return true;
@@ -1333,7 +1374,8 @@ public class DiffBase {
             if (!testRelationshipFilter(d2, v2_relationship_status_filter_int,
                     v2_relationship_type_filter_int,
                     v2_relationship_characteristic_filter_int,
-                    v2_relationship_refinability_filter_int)) {
+                    v2_relationship_refinability_filter_int,
+                    v2_concept_author_int)) {
                 continue;
             }
             boolean found = false;
@@ -1344,19 +1386,20 @@ public class DiffBase {
                             v1_relationship_status_filter_int,
                             v1_relationship_type_filter_int,
                             v1_relationship_characteristic_filter_int,
-                            v1_relationship_refinability_filter_int)) {
+                            v1_relationship_refinability_filter_int,
+                            v1_concept_author_int)) {
                         continue;
                     }
-                    if (changed_rel_author) {
-                        if (v1_concept_author_int.size() > 0 && d1 != null
-                                && !v1_concept_author_int.contains(d1.getAuthorNid())) {
-                            return;
-                        }
-                        if (v2_concept_author_int.size() > 0 && d2 != null
-                                && !v2_concept_author_int.contains(d2.getAuthorNid())) {
-                            return;
-                        }
-                    }
+//                    if (changed_rel_author) {
+//                        if (v1_concept_author_int.size() > 0 && d1 != null
+//                                && !v1_concept_author_int.contains(d1.getAuthorNid())) {
+//                            return;
+//                        }
+//                        if (v2_concept_author_int.size() > 0 && d2 != null
+//                                && !v2_concept_author_int.contains(d2.getAuthorNid())) {
+//                            return;
+//                        }
+//                    }
                     relationships_filtered++;
                     if (d1.getStatusNid() != d2.getStatusNid()
                             && this.changed_relationship_status
@@ -1393,7 +1436,8 @@ public class DiffBase {
             if (!testRelationshipFilter(d1, v1_relationship_status_filter_int,
                     v1_relationship_type_filter_int,
                     v1_relationship_characteristic_filter_int,
-                    v1_relationship_refinability_filter_int)) {
+                    v1_relationship_refinability_filter_int,
+                    v1_concept_author_int)) {
                 continue;
             }
             boolean found = false;
@@ -1404,7 +1448,8 @@ public class DiffBase {
                             v2_relationship_status_filter_int,
                             v2_relationship_type_filter_int,
                             v2_relationship_characteristic_filter_int,
-                            v2_relationship_refinability_filter_int)) {
+                            v2_relationship_refinability_filter_int,
+                            v2_concept_author_int)) {
                         continue;
                     }
                     // relationships_filtered++;

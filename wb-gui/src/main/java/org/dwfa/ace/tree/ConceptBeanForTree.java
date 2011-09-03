@@ -250,6 +250,17 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getConceptAttributeTuples(allowedStatus, positions,
 				precedencePolicy, contradictionManager);
 	}
+    
+    @Override
+	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
+			NidSetBI allowedStatus, PositionSetBI positions,
+			Precedence precedencePolicy,
+			ContradictionManagerBI contradictionManager,
+                        long time) throws IOException,
+			TerminologyException {
+		return bean.getConceptAttributeTuples(allowedStatus, positions,
+				precedencePolicy, contradictionManager, time);
+	}
 
     @Override
 	public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(
@@ -259,6 +270,13 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 		return bean.getConceptAttributeTuples(precedencePolicy,
 				contradictionManager);
 	}
+    @Override
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positionSet, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+            long time) throws IOException{
+        return bean.getDescriptionTuples(allowedStatus, allowedTypes,
+				positionSet, precedencePolicy, contradictionManager, time);
+    }
 
     @Override
 	public List<? extends I_DescriptionTuple> getDescriptionTuples(

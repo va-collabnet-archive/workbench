@@ -260,6 +260,15 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
    @Override
    public String toUserString() {
       StringBuilder buf = new StringBuilder();
+    
+    public void addTuples(NidSetBI allowedStatus, PositionSetBI positionSet,
+            List<I_ConceptAttributeTuple> returnTuples, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager, long time) throws TerminologyException, IOException {
+        List<Version> returnList = new ArrayList<Version>();
+        computer.addSpecifiedVersions(allowedStatus, null, positionSet, returnList,
+                getVersions(), precedencePolicy, contradictionManager, time);
+        returnTuples.addAll(returnList);
+    }
 
       buf.append("concept ");
 
