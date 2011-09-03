@@ -119,6 +119,16 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
       matchingTuples.addAll(returnTuples);
    }
 
+   public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+                         List<I_DescriptionTuple<DescriptionRevision>> matchingTuples, Precedence precedence,
+                         ContradictionManagerBI contradictionManager, Long time) {
+      List<Version> returnTuples = new ArrayList<Version>();
+
+      computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, returnTuples, getVersions(),
+                                    precedence, contradictionManager, time);
+      matchingTuples.addAll(returnTuples);
+   }
+
    @Override
    public boolean addVersion(I_DescriptionPart newPart) {
       this.versions = null;
@@ -385,17 +395,6 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
       output.writeString(text);
       output.writeInt(typeNid);
       output.writeShort(partsToWrite.size());
-    
-    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions,
-            List<I_DescriptionTuple<DescriptionRevision>> matchingTuples,
-            Precedence precedence, ContradictionManagerBI contradictionManager,
-            Long time) {
-        List<Version> returnTuples = new ArrayList<Version>();
-        computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions,
-                returnTuples, getVersions(), precedence, contradictionManager, time);
-        matchingTuples.addAll(returnTuples);
-    }
 
       // conceptNid is the enclosing concept, does not need to be written.
       for (DescriptionRevision p : partsToWrite) {
