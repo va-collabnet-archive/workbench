@@ -341,14 +341,14 @@ public class TestSnoPathProcessStated extends AbstractTask {
                 I_RelPart rPart1 = null;
                 for (PositionBI pos : cEditPathListPositionBI) { // PATHS_IN_PRIORITY_ORDER
                     for (I_RelPart rPart : rv.getMutableParts()) {
-                        if (pos.getPath().getConceptNid() == rPart.getPathId()) {
+                        if (pos.getPath().getConceptNid() == rPart.getPathNid()) {
                             if (rPart1 == null) {
                                 rPart1 = rPart; // ... KEEP FIRST_INSTANCE
                             } else if (rPart1.getVersion() < rPart.getVersion()) {
                                 rPart1 = rPart; // ... KEEP MORE_RECENT PART
                             } else if (rPart1.getVersion() == rPart.getVersion()) {
                                 countRelDuplVersion++;
-                                if (rPart.getStatusId() == isCURRENT)
+                                if (rPart.getStatusNid() == isCURRENT)
                                     rPart1 = rPart; // KEEP CURRENT PART
                             }
                         }
@@ -357,8 +357,8 @@ public class TestSnoPathProcessStated extends AbstractTask {
                         break; // IF FOUND ON THIS PATH, STOP SEARCHING
                 }
 
-                if ((rPart1 != null) && (rPart1.getStatusId() == isCURRENT)
-                        && (rPart1.getTypeId() == isaNid)) {
+                if ((rPart1 != null) && (rPart1.getStatusNid() == isCURRENT)
+                        && (rPart1.getTypeNid() == isaNid)) {
                     // KEEP C1 AS RESULT
                     resultSet.add(rv.getC1Id());
 
