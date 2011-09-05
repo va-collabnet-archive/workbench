@@ -411,7 +411,7 @@ public class SnorocketMojo extends AbstractMojo {
             cClassSnoRels = new ArrayList<SnoRel>();
             SnoPathProcessInferred pcClass = null;
             pcClass = new SnoPathProcessInferred(null, cClassSnoRels, allowedRoleTypes,
-                    statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
+                    statusSet, cViewPosSet, null, precedence, contradictionMgr);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [SnorocketMojo] GET INFERRED (View) PATH DATA : "
                     + pcClass.getStats(startTime));
