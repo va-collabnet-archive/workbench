@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -125,6 +126,17 @@ public class BdbCommitManager {
    private static ExecutorService             changeSetWriterService;
    private static ExecutorService             dbWriterService;
    private static ExecutorService             luceneWriterService;
+   
+   
+   /**
+    * <p>
+    * listeners
+    * </p>
+    */
+   private static ICommitListener[] listeners = new ICommitListener[0];
+
+   
+   
    //J-
      private static ConcurrentHashMap<I_GetConceptData, 
                                       Collection<AlertToDataConstraintFailure>> dataCheckMap =
@@ -488,7 +500,7 @@ public class BdbCommitManager {
                            throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
                         }
                      }
-
+                     notifyCommit();
                      uncommittedCNids.clear();
                      uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
                      WorkflowHistoryRefsetWriter.unLockMutex();
@@ -1139,6 +1151,7 @@ public class BdbCommitManager {
       AceLog.getAppLog().info("Awaiting termination of changeSetWriterService.");
       changeSetWriterService.awaitTermination(90, TimeUnit.MINUTES);
       AceLog.getAppLog().info("BdbCommitManager is shutdown.");
+      notifyShutdown();
    }
 
    public static void suspendChangeSetWriters() {
@@ -1637,5 +1650,74 @@ public class BdbCommitManager {
 
          luceneWriterPermit.release();
       }
+   }
+   
+   /**
+    * <p>
+    * Register a commit listener
+    * </p>
+    * @param listener
+    */
+   public static void addCommitListener(final ICommitListener listener) {
+       if (listener != null) {
+           listeners = (ICommitListener[]) ArrayUtils.add(listeners, listener);
+       }
+   }
+
+   /**
+    * <p>
+    * Remove the commit listener
+    * </p>
+    * @param listener
+    */
+   public static void removeCommitListener(final ICommitListener listener) {
+       if (listener != null) {
+           listeners = (ICommitListener[]) ArrayUtils.removeElement(listeners, listener);
+       }
+   }
+
+   /**
+    * <p>
+    * Remove all registered commit listener
+    * </p>
+    */
+   public static void removeAllCommitListeners() {
+       if (listeners != null && listeners.length > 0) {
+           listeners = new ICommitListener[0];
+       }
+   }
+
+   /**
+    * <p>
+    * notify the commit event
+    * </p>
+    */
+   private static void notifyShutdown() {
+       if (listeners != null && listeners.length > 0) {
+           for (final ICommitListener listener : listeners) {
+               try {
+                   listener.shutdown();
+               } catch (final Exception exception) {
+                   // @todo handle exception
+                   exception.printStackTrace();
+               }
+           }
+       }
+   }
+
+   private static void notifyCommit() {
+       if (listeners != null && listeners.length > 0) {
+           final CommitEvent event;
+           event = new CommitEvent(uncommittedCNidsNoChecks);
+           for (final ICommitListener listener : listeners) {
+               try {
+                   listener.afterCommit(event);
+               } catch (final Exception exception) {
+                   // @todo handle exception
+                   exception.printStackTrace();
+               }
+           }
+       }
+
    }
 }
