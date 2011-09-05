@@ -350,7 +350,7 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
 
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
-            refsetName = refsetName.replace("'", "");
+            refsetName = refsetName.replace(" ", "");
             // TODO strip out spaces e.g. "my refset" becomes "myrefset"
             
             String refsetStatus=""; 

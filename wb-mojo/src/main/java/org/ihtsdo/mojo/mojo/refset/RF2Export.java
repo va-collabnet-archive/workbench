@@ -339,7 +339,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
 
             refsetName = refsetName.replace("/", "-");
             refsetName = refsetName.replace("'", "_");
-            refsetName = refsetName.replace("'", "");	
+            refsetName = refsetName.replace(" ", "");	
             
             if (releaseVersion == null) {
                 releaseVersion = referenceSetExport.getReleaseVersion(refsetConcept);
@@ -357,7 +357,7 @@ public class RF2Export extends AbstractMojo implements I_ProcessConcepts {
             String refsetStatus=""; 
             	
            // TODO  create  function on rf2Descriptor.status(); ?
-            //TODO if refset draft prepend x to der2_Refset
+           // TODO if refset draft prepend x to der2_Refset
             
             String fileName = null;
             File exportFile = getExportFile(tf.getConcept(refsetId));
