@@ -21,8 +21,16 @@ public class RF2IdGeneratorFactory extends RF2AbstractFactory {
 
 	private static Logger logger = Logger.getLogger(RF2IdGeneratorFactory.class);
 
-	public RF2IdGeneratorFactory(Config config) {
+	public RF2IdGeneratorFactory(Config config) {		
 		super(config);
+		System.out.println("==================");
+	}
+	
+	public static void main(String[] args) {
+		System.out.println("==============statrted======");
+		RF2IdGeneratorFactory idFactory = new RF2IdGeneratorFactory(getConfig());
+		idFactory.export();
+		System.out.println("==============Finished======");
 	}
 
 	public void export() {
@@ -30,13 +38,10 @@ public class RF2IdGeneratorFactory extends RF2AbstractFactory {
 		logger.info("Started Id Generation Export...");
 
 		try {
-
 			RF2IdGeneratorImpl iterator = new RF2IdGeneratorImpl(getConfig());
 			iterator.generateIdentifier();
 			//Terms.get().iterateConcepts(iterator);
-
-			closeExportFileWriter();
-			
+			closeExportFileWriter();			
 			logger.info("Finished Id Generation Snapshot Export...");
 
 		} catch (IOException e) {
