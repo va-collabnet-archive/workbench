@@ -11,6 +11,8 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdVersion;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -97,6 +99,7 @@ public class DrComponentHelper {
 				loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
 				loopDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
 				loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
+				loopDescription.setPublished(!getSnomedIntId(descriptionVersion.getNid()).equals("0"));
 				loopDescription.setFactContextName(factContextName);
 
 				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
@@ -296,4 +299,23 @@ public class DrComponentHelper {
 		}
 		return descendants;
 	}
+	
+	public static String getSnomedIntId(int nid) throws IOException, TerminologyException {
+		Long descriptionId = 0L; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
+		I_Identify desc_Identify = Terms.get().getId(nid);
+		List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
+		if (i_IdentifyList.size() > 0) {
+			for (int i = 0; i < i_IdentifyList.size(); i++) {
+				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
+				Object denotation = (Object) i_IdVersion.getDenotation();
+				int authorityNid = i_IdVersion.getAuthorityNid();
+				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+				if (authorityNid == arcAuxSnomedIntegerNid) {
+					descriptionId = (Long) denotation;
+				}
+			}
+		}
+		return descriptionId.toString();
+	}
+
 }
