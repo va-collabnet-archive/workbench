@@ -45,6 +45,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-bdb</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
 			<artifactId>tk-concept-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>

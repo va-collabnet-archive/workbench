@@ -31,9 +31,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
-import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -44,7 +42,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.ihtsdo.tk.spec.ConceptSpec;
-import org.ihtsdo.tk.spec.ValidationException;
 
 public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 

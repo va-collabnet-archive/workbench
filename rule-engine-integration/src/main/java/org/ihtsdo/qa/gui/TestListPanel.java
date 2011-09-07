@@ -2,19 +2,6 @@ package org.ihtsdo.qa.gui;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ModelTerminologyList;
-import org.dwfa.ace.api.Terms;
-
-import org.ihtsdo.rules.CheckConceptTask;
-import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
-import org.ihtsdo.rules.context.RulesContextHelper;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
-import org.ihtsdo.tk.helper.ResultsItem;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -22,10 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
@@ -39,6 +24,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.table.DefaultTableModel;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.Terms;
+import org.ihtsdo.rules.CheckConceptTask;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
+import org.ihtsdo.rules.context.RulesContextHelper;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+import org.ihtsdo.tk.helper.ResultsItem;
 
 /**
  * @author Guillermo Reynoso

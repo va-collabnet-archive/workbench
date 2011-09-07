@@ -4,7 +4,6 @@
 
 package org.ihtsdo.qa.store.gui;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,7 +16,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,7 +37,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
-import org.eclipse.jdt.core.dom.ThisExpression;
 import org.ihtsdo.qa.store.QAStoreBI;
 import org.ihtsdo.qa.store.model.Category;
 import org.ihtsdo.qa.store.model.DispositionStatus;
