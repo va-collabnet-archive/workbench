@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.ihtsdo.rf2.identifier.dao.RF2IdentifierFile;
+
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Config {
@@ -47,6 +49,14 @@ public class Config {
 	private String username;
 	@XmlTransient
 	private String password;
+	
+	// for idgenerator
+	private String releaseFolder;
+	private String destinationFolder;
+	private ArrayList<RF2IdentifierFile> rf2Files;
+	private boolean updateWbSctId;
+	
+	
 	
 
 	@XmlTransient
@@ -176,13 +186,11 @@ public class Config {
 	}
 
 	public void setDefaults() {
-
 		this.setRf2Format("true");
 		this.setInvokeDroolRules("false");
 		this.setIncrementalRelease("false");
 		this.setFileExtension("txt");
 		this.setFlushCount(100000);
-
 	}
 
 	public String getEndPoint() {
@@ -207,6 +215,38 @@ public class Config {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	public String getReleaseFolder() {
+		return releaseFolder;
+	}
+
+	public void setReleaseFolder(String releaseFolder) {
+		this.releaseFolder = releaseFolder;
+	}
+
+	public String getDestinationFolder() {
+		return destinationFolder;
+	}
+
+	public void setDestinationFolder(String destinationFolder) {
+		this.destinationFolder = destinationFolder;
+	}
+
+	public ArrayList<RF2IdentifierFile> getRf2Files() {
+		return rf2Files;
+	}
+
+	public void setRf2Files(ArrayList<RF2IdentifierFile> rf2Files) {
+		this.rf2Files = rf2Files;
+	}
+	
+	public boolean isUpdateWbSctId() {
+		return updateWbSctId;
+	}
+
+	public void setUpdateWbSctId(boolean updateWbSctId) {
+		this.updateWbSctId = updateWbSctId;
 	}
 
 }
