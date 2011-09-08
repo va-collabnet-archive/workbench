@@ -14,9 +14,7 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -42,7 +40,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,7 +48,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
-import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
@@ -72,11 +68,10 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
-import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.concept.Concept;
+import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.gui.viewers.gui.TreeObj;
 import org.ihtsdo.qa.gui.viewers.utils.IconUtilities;
 import org.ihtsdo.tk.api.RelAssertionType;
@@ -97,7 +92,7 @@ public class HierarchyNavigator extends JPanel {
 	public HierarchyNavigator() {
 		initComponents();
 
-		comboBox1.setTransferHandler(new ObjectTransferHandler());
+		comboBox1.setTransferHandler(new ObjectTransferHandler(config, null));
 		tree1.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
 		tree2.setModel(new DefaultTreeModel(new DefaultMutableTreeNode()));
 		tree1.setCellRenderer(new HierarchyIconRenderer());
@@ -122,7 +117,7 @@ public class HierarchyNavigator extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		tree1.setTransferHandler(new ObjectTransferHandler());
+		tree1.setTransferHandler(new ObjectTransferHandler(config, null));
 		tree1.setRootVisible(false);
 		tree1.setShowsRootHandles(true);
 		tree1.setDragEnabled(true);
@@ -131,7 +126,7 @@ public class HierarchyNavigator extends JPanel {
 		ToolTipManager.sharedInstance().registerComponent(tree1);
 
 		// applyDNDHack(tree1);
-		tree2.setTransferHandler(new ObjectTransferHandler());
+		tree2.setTransferHandler(new ObjectTransferHandler(config,null));
 		tree2.setRootVisible(false);
 		tree2.setShowsRootHandles(true);
 		tree2.setDragEnabled(true);
@@ -259,85 +254,6 @@ public class HierarchyNavigator extends JPanel {
 		}
 	}
 
-	class ObjectTransferHandler extends TransferHandler {
-		public boolean importData(JComponent c, Transferable t) {
-			if (canImport(c, t.getTransferDataFlavors())) {
-				try {
-
-					DataFlavor conceptBeanFlavor = null;
-					if (hasConceptBeanFlavor(t.getTransferDataFlavors(), conceptBeanFlavor)) {
-
-						DataFlavor[] dataFlavors = t.getTransferDataFlavors();
-						for (DataFlavor dataFlavor : dataFlavors) {
-							if (dataFlavor.getRepresentationClass().equals(I_GetConceptData.class)) {
-								conceptBeanFlavor = dataFlavor;
-								break;
-							}
-						}
-
-						I_GetConceptData concept = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
-						comboBox1.addItem(concept);
-						comboBox1.setSelectedItem(concept);
-					}
-					return true;
-				} catch (UnsupportedFlavorException ufe) {
-					System.out.println("importData: unsupported data flavor");
-					ufe.printStackTrace();
-				} catch (IOException ioe) {
-					System.out.println("importData: I/O exception");
-					ioe.printStackTrace();
-				}
-			}
-			return false;
-		}
-
-		protected Transferable createTransferable(JComponent c) {
-			if (c instanceof JTree) {
-				JTree tree = (JTree) c;
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-				I_GetConceptData concept = null;
-				if (node.getUserObject() instanceof TreeObj) {
-					TreeObj usrObj = (TreeObj) node.getUserObject();
-					System.out.println(usrObj.getAtrValue().getClass());
-					concept = (Concept) usrObj.getAtrValue();
-					return new ConceptTransferable(concept);
-				}
-			}
-			return null;
-		}
-
-		public int getSourceActions(JComponent c) {
-			return COPY_OR_MOVE;
-		}
-
-		protected void exportDone(JComponent c, Transferable data, int action) {
-			if (action == MOVE) {
-				// not used
-			}
-		}
-
-		public boolean canImport(JComponent c, DataFlavor[] flavors) {
-			if (c.isEnabled() && c instanceof JComboBox) {
-				DataFlavor conceptBeanFlavor;
-				conceptBeanFlavor = TerminologyTransferHandler.conceptBeanFlavor;
-
-				if (hasConceptBeanFlavor(flavors, conceptBeanFlavor)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		private boolean hasConceptBeanFlavor(DataFlavor[] flavors, DataFlavor conceptBeanFlavor) {
-			for (int i = 0; i < flavors.length; i++) {
-				if (flavors[i].getRepresentationClass().equals(I_GetConceptData.class)) {
-					return true;
-				}
-			}
-
-			return false;
-		}
-	}
 
 	private List<? extends I_RelTuple> getChildren(I_GetConceptData concept) {
 		List<? extends I_RelTuple> children = new ArrayList<I_RelTuple>();
