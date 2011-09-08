@@ -806,6 +806,7 @@ public class NewConcept extends PreviousNextOrCancel {
             }else{
                 conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
             }
+            conceptSpec.setComponentUuid(UUID.randomUUID());
             newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
