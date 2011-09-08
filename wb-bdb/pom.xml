@@ -32,6 +32,11 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-api</artifactId>
+            <version>$3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
