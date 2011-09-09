@@ -1,4 +1,4 @@
-package org.ihtsdo.rf2.identifier.dao;
+package org.ihtsdo.rf2.identifier.mojo;
 
 import java.util.ArrayList;
 

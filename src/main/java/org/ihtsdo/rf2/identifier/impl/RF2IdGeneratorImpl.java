@@ -23,8 +23,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
+import org.ihtsdo.rf2.impl.RF2IDImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.IdUtil;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -35,12 +37,12 @@ import org.ihtsdo.tk.api.Precedence;
  * @version 1.0
  */
 
-public class RF2IdGeneratorImpl extends RF2AbstractImpl implements I_ProcessConcepts {
+public class RF2IdGeneratorImpl extends RF2IDImpl {
 
 	private static Logger logger = Logger.getLogger(RF2IdGeneratorImpl.class);
 
 	public RF2IdGeneratorImpl(Config config) {
-		super(config);
+		super(config);	
 	}
 
 	/*
@@ -49,26 +51,8 @@ public class RF2IdGeneratorImpl extends RF2AbstractImpl implements I_ProcessConc
 	 * @seeorg.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api. I_GetConceptData)
 	 */
 
-	@Override
-	public void processConcept(I_GetConceptData concept) throws Exception {
-
-		process(concept);
-
-	}
-
-	@Override
-	public void export(I_GetConceptData concept, String conceptid) {
-		
-	}
-
-
-	public static void writeRF2TypeLine(String conceptid, String effectiveTime, String active, String moduleId, String definitionStatusId) throws IOException {
-		WriteUtil.write(getConfig(), conceptid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + definitionStatusId);
-		WriteUtil.write(getConfig(), "\r\n");
-	}
-
 	
-
+	
 	private static int writeCount = 0;
 
 	public static void init() {
@@ -133,6 +117,7 @@ public class RF2IdGeneratorImpl extends RF2AbstractImpl implements I_ProcessConc
 		
 	public void generateIdentifier(){
 		
+	
 		// check if the release folder exists
 		File rFile = new File(getConfig().getReleaseFolder());
 		if (!rFile.exists())
@@ -149,44 +134,22 @@ public class RF2IdGeneratorImpl extends RF2AbstractImpl implements I_ProcessConc
 			logger.info("Destination folder : " + getConfig().getDestinationFolder() + " doesn't exist, creating ..");
 			dFile.mkdirs();
 		}
-		boolean updateWbSctId = getConfig().isUpdateWbSctId();
-		logger.info("updateWbSctId flag value : " + updateWbSctId );
+		
+		String updateWbSctId = getConfig().isUpdateWbSctId();
 		
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 			
 			File file = new File(getConfig().getReleaseFolder() + File.separator + getConfig().getRf2Files().get(f).fileName);
 			File sctIdFile = new File(getConfig().getDestinationFolder() + File.separator + getConfig().getRf2Files().get(f).sctIdFileName);
 			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
-			
 			ArrayList<String> Key = getConfig().getRf2Files().get(f).key.keyOrdinals;
 		
 			// Creating SctIds			
 			logger.info("Creating SCTIds.....................");
 			
-			// open rf2 file and  removed line with effective date  characteristictypeId wherever applicable...
-			try {
-				//BufferedReader rf2FileReader = new BufferedReader(new FileReader(file));
-				BufferedWriter rf2FileWriter = new BufferedWriter(new FileWriter(sctIdFile));
-				//BufferedWriter rf2FileWriter = createWriter(destinationFolder + File.separator + rf2Files.get(f).sctIdFileName);
-			
-				/*	
-			    FileOutputStream fos = new FileOutputStream(sctIdFile);
-				OutputStreamWriter osw = new OutputStreamWriter(fos);
-				BufferedWriter rf2FileWriter = new BufferedWriter(osw);
-				
-				FileInputStream fis = new FileInputStream(file);
-				InputStreamReader isr = new InputStreamReader(fis);				
-				LineNumberReader rf2FileReader = new LineNumberReader(isr);
-			
-				FileOutputStream fos = new FileOutputStream(sctIdFile);
-				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-				BufferedWriter rf2FileWriter = new BufferedWriter(osw);
-				
-				FileInputStream fis = new FileInputStream(file);
-				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");				
-				LineNumberReader rf2FileReader = new LineNumberReader(isr);
-				*/	
-				
+			// open rf2 file and  check for uuid line then get sctid from webservice and update wherever applicable...
+			try {			
+				BufferedWriter rf2FileWriter = new BufferedWriter(new FileWriter(sctIdFile));			
 				FileInputStream fis = new FileInputStream(file);
 				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");				
 				BufferedReader rf2FileReader = new BufferedReader(isr);
@@ -194,21 +157,20 @@ public class RF2IdGeneratorImpl extends RF2AbstractImpl implements I_ProcessConc
 				String lineRead = "";
 				String sctid="sctid";
 				while ((lineRead = rf2FileReader.readLine()) != null) {		
-					logger.info("==Reading line===" + lineRead);
-			 		String[] part= lineRead.split("\t");
+					String[] part= lineRead.split("\t");
 		 			for (int s = 0; s < Key.size(); s++) {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){					    			
 				    		String uuid = part[Integer.parseInt(Key.get(s))];
-				    		sctid = ExportUtil.getSCTId(getConfig(), UUID.fromString(uuid)); 
+				    		sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid)); 
 			    			if(sctid.equals("0")){
-								sctid = ExportUtil.getSCTId(getConfig(), UUID.fromString(uuid));
+								sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
 							}
-							if(updateWbSctId){
-								///insert sctid in the workbench using uuid
-							}
-							logger.info("===New UUID===" + part[Integer.parseInt(Key.get(s))] + "===replaced with ===" + sctid);
-				    		lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);
-				    		logger.info("==Reading line 2===" + lineRead);
+			    			
+			    			if(updateWbSctId.equals("true")){
+								//insert sctid in the workbench using uuid
+								
+							}							
+							lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);				    	
 						 }
 					}
 					rf2FileWriter.append(lineRead);
