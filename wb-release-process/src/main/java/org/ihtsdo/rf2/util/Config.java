@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.ihtsdo.rf2.identifier.dao.RF2IdentifierFile;
+import org.ihtsdo.rf2.identifier.mojo.RF2IdentifierFile;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -54,7 +54,7 @@ public class Config {
 	private String releaseFolder;
 	private String destinationFolder;
 	private ArrayList<RF2IdentifierFile> rf2Files;
-	private boolean updateWbSctId;
+	private String updateWbSctId;
 	
 	
 	
@@ -241,11 +241,11 @@ public class Config {
 		this.rf2Files = rf2Files;
 	}
 	
-	public boolean isUpdateWbSctId() {
+	public String isUpdateWbSctId() {
 		return updateWbSctId;
 	}
 
-	public void setUpdateWbSctId(boolean updateWbSctId) {
+	public void setUpdateWbSctId(String updateWbSctId) {
 		this.updateWbSctId = updateWbSctId;
 	}
 
