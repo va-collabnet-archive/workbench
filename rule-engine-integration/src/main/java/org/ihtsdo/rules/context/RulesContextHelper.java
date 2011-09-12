@@ -3,8 +3,10 @@ package org.ihtsdo.rules.context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -166,16 +168,16 @@ public class RulesContextHelper {
 								JOptionPane.WARNING_MESSAGE);
 					}
 
-					//				try {
-					//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					//					out.writeObject( kbase );
-					//					out.writeObject( kbase.getKnowledgePackages() );
-					//					out.close();
-					//				} catch (FileNotFoundException e) {
-					//					AceLog.getAppLog().alertAndLogException(e);
-					//				} catch (IOException e) {
-					//					AceLog.getAppLog().alertAndLogException(e);
-					//				}
+//					try {
+//						ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+//						out.writeObject( kbase );
+//						out.writeObject( kbase.getKnowledgePackages() );
+//						out.close();
+//					} catch (FileNotFoundException e) {
+//						AceLog.getAppLog().alertAndLogException(e);
+//					} catch (IOException e) {
+//						AceLog.getAppLog().alertAndLogException(e);
+//					}
 
 					kbCache.put(context.getConceptNid(), kbase);
 					Terms.get().setKnowledgeBaseCache(kbCache);
