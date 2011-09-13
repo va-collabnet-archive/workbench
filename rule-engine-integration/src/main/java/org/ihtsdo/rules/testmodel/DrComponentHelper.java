@@ -150,7 +150,7 @@ public class DrComponentHelper {
 			int historical = tf.uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
 
 			if (inferredOrigin == INFERRED_VIEW_ORIGIN.STATED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
 						null, 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 						config.getConflictResolutionStrategy())) {
@@ -168,11 +168,12 @@ public class DrComponentHelper {
 						loopRel.setTime(relTuple.getTime());
 						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 						loopRel.setFactContextName(factContextName);
+						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
 						concept.getOutgoingRelationships().add(loopRel);
 					}
 				}
 			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.INFERRED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
 						null, 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 						config.getConflictResolutionStrategy())) {
@@ -190,6 +191,7 @@ public class DrComponentHelper {
 						loopRel.setTime(relTuple.getTime());
 						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 						loopRel.setFactContextName(factContextName);
+						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
 						concept.getOutgoingRelationships().add(loopRel);
 					}
 				}
@@ -226,6 +228,7 @@ public class DrComponentHelper {
 				loopRel.setTime(relTuple.getTime());
 				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 				loopRel.setFactContextName(factContextName);
+				loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
 
 				if (relTuple.getCharacteristicNid() == historical) {
 					concept.getOutgoingRelationships().add(loopRel);
