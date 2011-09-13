@@ -675,14 +675,15 @@ public class RedoConcept extends PreviousNextOrCancel {
     }
 
     public class CopyTextDocumentListener implements DocumentListener {
-
-        String fsnText = "";
         int paren;
-        String prefText = "";
 
         @Override
         public void changedUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -698,7 +699,11 @@ public class RedoConcept extends PreviousNextOrCancel {
 
         @Override
         public void insertUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -714,7 +719,11 @@ public class RedoConcept extends PreviousNextOrCancel {
 
         @Override
         public void removeUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -846,9 +855,9 @@ public class RedoConcept extends PreviousNextOrCancel {
 
             //create concept blue print
             if (lang.equals("en-gb")) {
-                conceptSpec = new ConceptCB(usFsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
             } else {
-                conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
             }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
@@ -859,12 +868,15 @@ public class RedoConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintGbFsnDesc() {
+        String text = gbFsn.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecGbFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     "en-gb",
-                    gbFsn.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecGbFsn);
@@ -894,12 +906,15 @@ public class RedoConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintGbPrefDesc() {
+        String text = gbPref.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecGbPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     "en-gb",
-                    gbPref.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecGbPref);
@@ -949,12 +964,15 @@ public class RedoConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintUsFsnDesc() {
+        String text = usFsn.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecUsFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     "en-us",
-                    usFsn.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecUsFsn);
@@ -986,12 +1004,15 @@ public class RedoConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintUsPrefDesc() {
+        String text = usPref.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecUsPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     "en-us",
-                    usPref.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecUsPref);

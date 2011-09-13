@@ -57,6 +57,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     int prefNid;
     int acceptNid;
     TerminologyConstructorBI tc;
+    String text;
 
     public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
             DescriptionAnalogBI desc) throws TerminologyException, IOException {
@@ -69,8 +70,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void insertUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -84,8 +88,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void removeUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -99,8 +106,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -154,7 +164,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 }
 
                 //set initial word case sensitivity
-                String descText = editorPane.extractText();
+                String descText = text;
                 String initialWord = null;
                 if (descText.indexOf(" ") != -1) {
                     initialWord = descText.substring(0, descText.indexOf(" "));
@@ -215,11 +225,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB {
         TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
+        desc.setText(text);
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+            if (th.checkTermSpelling(text, "en-gb")
+                    && th.checkTermSpelling(text, "en-us")) {//acceptable in both
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -238,7 +248,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (th.checkTermSpelling(text, "en-us")) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -247,7 +257,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 RefexChronicleBI<?> newRefex = tc.construct(refexSpecUs);
                 I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
                 Ts.get().addUncommitted(refex);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (th.checkTermSpelling(text, "en-gb")) { //acceptable in GB
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -263,11 +273,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB {
         TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
+        desc.setText(text);
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in both 
+            if (th.checkTermSpelling(text, "en-gb")
+                    && th.checkTermSpelling(text, "en-us")) { //acceptable in both 
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -286,7 +296,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (th.checkTermSpelling(text, "en-us")) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -307,7 +317,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (th.checkTermSpelling(text, "en-gb")) { //acceptable in GB
                 /* REMOVED FOR RF2
                 RefexCAB refexSpecUs = new RefexCAB(
                 TK_REFSET_TYPE.CID,
@@ -338,16 +348,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 config.getViewCoordinate());
         TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
+        desc.setText(text);
 
 
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+            if (th.checkTermSpelling(text, "en-gb")
+                    && th.checkTermSpelling(text, "en-us")) {//acceptable in both
                 usRefex.setCnid1(prefNid);
                 gbRefex.setCnid1(prefNid);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (th.checkTermSpelling(text, "en-us")) { //acceptable in US
                 if (usRefex == null) {
                     doFsnUpdate();
                 } else {
@@ -360,7 +370,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (th.checkTermSpelling(text, "en-gb")) { //acceptable in GB
                 if (gbRefex == null) {
                     doFsnUpdate();
                 } else {
@@ -382,11 +392,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 config.getViewCoordinate());
         TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
+        desc.setText(text);
 
         if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+            if (th.checkTermSpelling(text, "en-gb")
+                    && th.checkTermSpelling(text, "en-us")) {//acceptable in both
                 if (usRefex == null) {
                     //forget GB
                     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
@@ -412,7 +422,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     gbRefex.setCnid1(acceptNid);
                 }
 
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (th.checkTermSpelling(text, "en-us")) { //acceptable in US
                 if (usRefex == null) {
                     doSynUpdate();
                 } else {
@@ -425,7 +435,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (th.checkTermSpelling(text, "en-gb")) { //acceptable in GB
                 if (gbRefex == null) {
                     doSynUpdate();
                 } else {
