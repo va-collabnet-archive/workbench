@@ -318,12 +318,12 @@ public class BdbCommitManager {
                          + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
                   }
 
+                  Bdb.getSapDb().commit(Long.MIN_VALUE);
                   KindOfComputer.reset();
                   handleCanceledConcepts(uncommittedCNids);
                   handleCanceledConcepts(uncommittedCNidsNoChecks);
                   uncommittedCNidsNoChecks.clear();
                   uncommittedCNids.clear();
-                  Bdb.getSapDb().commit(Long.MIN_VALUE);
                   DataCheckRunner.cancelAll();
                   dataCheckMap.clear();
                } catch (IOException e1) {

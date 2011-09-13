@@ -108,29 +108,25 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 
 	@Override
 	public void updateCache(ConceptChronicleBI c) throws IOException, ContraditionException {
-		if (c.isUncommitted()) {
-			ConceptVersion cv = new ConceptVersion((Concept) c, coordinate);
-			NidSet parentSet = new NidSet();
-			for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
-				if (types.contains(relv.getTypeNid())) {
-					parentSet.add(relv.getDestinationNid());
-				}
+		ConceptVersion cv = new ConceptVersion((Concept) c, coordinate);
+		NidSet parentSet = new NidSet();
+		for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+			if (types.contains(relv.getTypeNid())) {
+				parentSet.add(relv.getDestinationNid());
 			}
-			typeMap.put(c.getNid(), parentSet.getSetValues());
 		}
+		typeMap.put(c.getNid(), parentSet.getSetValues());
 	}
-	
+
 	public void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
-		if (c.isUncommitted()) {
-			ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
-			NidSet parentSet = new NidSet();
-			for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
-				if (types.contains(relv.getTypeNid())) {
-					parentSet.add(relv.getDestinationNid());
-				}
+		ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
+		NidSet parentSet = new NidSet();
+		for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+			if (types.contains(relv.getTypeNid())) {
+				parentSet.add(relv.getDestinationNid());
 			}
-			typeMap.put(c.getNid(), parentSet.getSetValues());
 		}
+		typeMap.put(c.getNid(), parentSet.getSetValues());
 	}
 
 	public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
