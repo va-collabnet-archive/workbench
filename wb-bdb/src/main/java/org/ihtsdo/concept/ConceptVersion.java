@@ -27,6 +27,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
@@ -51,9 +52,12 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class ConceptVersion implements ConceptVersionBI {
 
@@ -224,11 +228,54 @@ public class ConceptVersion implements ConceptVersionBI {
         return conceptSet;
     }
 
+    private static IntSet classifierCharacteristics;
+    private static void setupClassifierCharacteristics() {
+    	if (classifierCharacteristics == null) {
+    		IntSet temp = new IntSet();
+    		try {
+				temp.add(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
+				temp.add(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid());
+			} catch (ValidationException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+    		classifierCharacteristics = temp;
+    	}
+    }
     @Override
     public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
             throws IOException {
-        return concept.getRelsOutgoing();
-    }
+    	setupClassifierCharacteristics();
+    	Collection<? extends RelationshipChronicleBI> allRels = concept.getRelsOutgoing();
+    	Collection<RelationshipChronicleBI> results = new ArrayList<RelationshipChronicleBI>(allRels.size());
+    	switch (vc.getRelAssertionType()) {
+    	case INFERRED:
+    		for (RelationshipChronicleBI rc: allRels) {
+    			for (RelationshipVersionBI<?> rv: rc.getVersions()) {
+    				if (classifierCharacteristics.contains(rv.getCharacteristicNid())) {
+    					results.add(rc);
+    					break;
+    				}
+    			}
+    		}
+    		return results;
+    	case INFERRED_THEN_STATED:
+    		return allRels;
+    	case STATED:
+    		for (RelationshipChronicleBI rc: allRels) {
+    			for (RelationshipVersionBI<?> rv: rc.getVersions()) {
+    				if (!classifierCharacteristics.contains(rv.getCharacteristicNid())) {
+    					results.add(rc);
+    					break;
+    				}
+    			}
+    		}
+    		return results;
+    		default: 
+    			throw new RuntimeException("Can't handle: " + vc.getRelAssertionType());
+    	}
+     }
 
     @Override
     public Collection<? extends RelationshipVersionBI> getRelsOutgoingActive()
