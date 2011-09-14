@@ -2,9 +2,7 @@ package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -25,6 +23,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
@@ -33,6 +32,8 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	private List<ParallelConceptIterator> pcis;
 	protected ViewCoordinate coordinate;
 	protected ViewCoordinate statedViewCoordinate;
+	protected ViewCoordinate inferredViewCoordinate;
+	protected ViewCoordinate inferredThenStatedViewCoordinate;
 	private boolean ready = false;
 	private boolean cancelled = false;
 	private CountDownLatch latch = new CountDownLatch(1);
@@ -67,7 +68,11 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	public void setup(ViewCoordinate coordinate) throws Exception {
 		this.coordinate = coordinate;
 		this.statedViewCoordinate = new ViewCoordinate(coordinate);
+		this.inferredViewCoordinate = new ViewCoordinate(coordinate);
+		this.inferredThenStatedViewCoordinate = new ViewCoordinate(coordinate);
 		this.statedViewCoordinate.setRelAssertionType(RelAssertionType.STATED);
+		this.inferredViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED);
+		this.inferredThenStatedViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
 		this.types = coordinate.getIsaTypeNids();
 		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
 		KindOfComputer.kindOfComputerService.execute(this);
@@ -108,9 +113,28 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 
 	@Override
 	public void updateCache(ConceptChronicleBI c) throws IOException, ContraditionException {
-		ConceptVersion cv = new ConceptVersion((Concept) c, coordinate);
+		boolean inferredChanges = false;
+		
+		ConceptVersion civ = new ConceptVersion((Concept) c, inferredViewCoordinate);
+		for (RelationshipChronicleBI loopRel : civ.getRelsOutgoing()) {
+			if (loopRel.isUncommitted()) {
+				inferredChanges = true;
+				break;
+			}
+		}
+		
+		if (inferredChanges) {
+			updateCacheUsingInferredThenStatedView(c);
+		} else {
+			updateCacheUsingStatedView(c);
+		}
+		
+	}
+	
+	protected void updateCacheUsingInferredThenStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
+		ConceptVersion cv = new ConceptVersion((Concept) c, inferredThenStatedViewCoordinate);
 		NidSet parentSet = new NidSet();
-		for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+		for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {
 			if (types.contains(relv.getTypeNid())) {
 				parentSet.add(relv.getDestinationNid());
 			}
@@ -118,10 +142,10 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		typeMap.put(c.getNid(), parentSet.getSetValues());
 	}
 
-	public void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
+	protected void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
 		ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
 		NidSet parentSet = new NidSet();
-		for (RelationshipVersionBI relv : cv.getRelsOutgoingActive()) {
+		for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {
 			if (types.contains(relv.getTypeNid())) {
 				parentSet.add(relv.getDestinationNid());
 			}

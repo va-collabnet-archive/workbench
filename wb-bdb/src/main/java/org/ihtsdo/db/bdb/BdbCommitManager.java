@@ -441,7 +441,7 @@ public class BdbCommitManager {
 
                            for (IsaCoordinate isac :
                                    getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-                              KindOfComputer.updateIsaCacheUsingStatedView(isac, cnid);
+                              KindOfComputer.updateIsaCache(isac, cnid);
                            }
 
                            Concept c = Concept.get(cnid);
@@ -457,7 +457,7 @@ public class BdbCommitManager {
 
                            for (IsaCoordinate isac :
                                    getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-                              KindOfComputer.updateIsaCacheUsingStatedView(isac,
+                              KindOfComputer.updateIsaCache(isac,
                                       uncommittedCNidItrNoChecks.nid());
                            }
                         }
@@ -641,7 +641,7 @@ public class BdbCommitManager {
             KindOfComputer.reset();
 
             for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-               KindOfComputer.updateIsaCacheUsingStatedView(isac, c.getNid());
+               KindOfComputer.updateIsaCache(isac, c.getNid());
             }
 
             long          commitTime        = System.currentTimeMillis();
