@@ -211,7 +211,7 @@ public class DrComponentHelper {
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
 			modelersRolesSet.setRolesSetType("Modelers");
 
-			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
+			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
 					null, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 					config.getConflictResolutionStrategy())) {
