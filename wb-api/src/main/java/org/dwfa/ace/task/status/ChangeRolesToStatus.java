@@ -100,11 +100,6 @@ public class ChangeRolesToStatus extends AbstractTask {
                 throw new TaskFailedException("You must select at least one editing path. ");
             }
 
-            Set<PositionBI> positionSet = new HashSet<PositionBI>();
-            for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
-            }
-            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
            
             ViewCoordinate vc = config.getViewCoordinate();

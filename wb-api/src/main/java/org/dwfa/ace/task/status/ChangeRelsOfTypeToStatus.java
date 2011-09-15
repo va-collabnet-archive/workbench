@@ -96,21 +96,21 @@ public class ChangeRelsOfTypeToStatus extends AbstractTask {
             }
 
             Set<PositionBI> positionSet = new HashSet<PositionBI>();
-            for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Long.MAX_VALUE));
+            for (PositionBI viewPosition : config.getViewPositionSet()) {
+                positionSet.add(viewPosition);
             }
-            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
+            PositionSetReadOnly positionsForView = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
             I_GetConceptData relTypeConcept = Terms.get().getConcept(relType.ids);
             I_IntSet typeSet = Terms.get().newIntSet();
             typeSet.add(relTypeConcept.getConceptNid());
 
-            for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForEdit,
+            for (I_RelTuple relTuple : concept.getSourceRelTuples(config.getAllowedStatus(), typeSet, positionsForView,
                     config.getPrecedence(), config.getConflictResolutionStrategy())) {
                 if (relTuple.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
                     for (PathBI editPath : config.getEditingPathSet()) {
                         List<? extends I_RelTuple> editTuples = concept.getSourceRelTuples(config.getAllowedStatus(), typeSet,
-                                positionsForEdit, config.getPrecedence(), config.getConflictResolutionStrategy());
+                                positionsForView, config.getPrecedence(), config.getConflictResolutionStrategy());
                         Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
                         for (I_RelTuple t : editTuples) {
                             if (t.getStatusNid() != newStatusConcept.getConceptNid() &&
