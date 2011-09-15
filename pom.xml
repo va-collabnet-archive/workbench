@@ -49,11 +49,6 @@
 			<version>3.1.3</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ihtsdo</groupId>
-			<artifactId>id-generation-ws-client</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<artifactId>xercesImpl</artifactId>
 			<groupId>xerces</groupId>
 			<version>2.9.1</version>
