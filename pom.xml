@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
@@ -6,26 +7,26 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>wb-release-process</artifactId>
-	<!--<packaging>jar</packaging>-->
+	<!--<packaging>jar</packaging> -->
 	<packaging>maven-plugin</packaging>
 	<name>${branch}: Workbench Release Process</name>
 	<description>Workbench Release Process Library</description>
-	<url>http://maven.apache.org</url>	
-	
-	<properties>		
+	<url>http://maven.apache.org</url>
+
+	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
-		<!--  Application mandatory arguments -->
+		<!-- Application mandatory arguments -->
 		<database>E:\Workbench_Bundle\ARF_Bundle\wb-bundle\berkeley-db</database>
 		<releaseDate>20110131</releaseDate>
-		<outputFolder>export</outputFolder>		
-		<!--  Application optional arguments -->
+		<outputFolder>export</outputFolder>
+		<!-- Application optional arguments -->
 		<rf2Format />
 		<invokeDrools />
 		<incrementalRelease />
 		<fromReleaseDate />
 		<toReleaseDate />
 		<fileExtension />
-	</properties>	
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -49,9 +50,9 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
-			<artifactId>id-generation-api</artifactId>
+			<artifactId>id-generation-ws-client</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<artifactId>xercesImpl</artifactId>
 			<groupId>xerces</groupId>
