@@ -1,21 +1,11 @@
 package org.ihtsdo.rf2.util;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,21 +14,15 @@ import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.idgeneration.IdAssignmentImpl;
-//import org.ihtsdo.tk.api.Precedence;
 
 public class IdUtil {
 
@@ -239,24 +223,24 @@ public class IdUtil {
 	// get the description id for the given UUID
 	public static String getSCTId(Config config, UUID uuid) {
 
-		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+//		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
 		long descId = 0L;
 
-		try {
-			descId = idGen.getSCTID(uuid);
-		} catch (NullPointerException e) {
-			// there is no SCTID so we are getting NULL
-			if (logger.isDebugEnabled())
-				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
-
-			try {
-				descId = idGen.createSCTID(uuid, 0, "01", config.getReleaseDate(), "TEST EXECUTION", "12345");
-			} catch (Exception cE) {
-				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
-			}
-		} catch (Exception e) {
-			logger.error("Message : " + uuid, e);
-		}
+//		try {
+//			descId = idGen.getSCTID(uuid);
+//		} catch (NullPointerException e) {
+//			// there is no SCTID so we are getting NULL
+//			if (logger.isDebugEnabled())
+//				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
+//
+//			try {
+//				descId = idGen.createSCTID(uuid, 0, "01", config.getReleaseDate(), "TEST EXECUTION", "12345");
+//			} catch (Exception cE) {
+//				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
+//			}
+//		} catch (Exception e) {
+//			logger.error("Message : " + uuid, e);
+//		}
 		return String.valueOf(descId);
 	}
 
