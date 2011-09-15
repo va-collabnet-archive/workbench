@@ -1,5 +1,6 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
@@ -29,11 +30,11 @@
 			<artifactId>rule-engine-integration</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	<!--	<dependency>
+		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-release-process</artifactId>
 			<version>${project.version}</version>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
@@ -191,40 +192,15 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		<!-- <profile>
-		<id>add-tools-on-windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>sun.jdk</groupId>
-					<artifactId>tools</artifactId>
-					<version>any</version>
-					<scope>system</scope>
-					<systemPath>C:\SoftwareApps\Java\jdk1.6.0_20\lib\tools.jar</systemPath>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>add-tools-on-linux</id>
-			<activation>
-				<os>
-					<name>Linux</name>
-				</os>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>sun.jdk</groupId>
-					<artifactId>tools</artifactId>
-					<version>any</version>
-					<scope>system</scope>
-					<systemPath>${java.home}/../lib/tools.jar</systemPath>
-				</dependency>
-			</dependencies>
-		</profile> -->
+		<!-- <profile> <id>add-tools-on-windows</id> <activation> <os> <family>windows</family> 
+			</os> </activation> <dependencies> <dependency> <groupId>sun.jdk</groupId> 
+			<artifactId>tools</artifactId> <version>any</version> <scope>system</scope> 
+			<systemPath>C:\SoftwareApps\Java\jdk1.6.0_20\lib\tools.jar</systemPath> </dependency> 
+			</dependencies> </profile> <profile> <id>add-tools-on-linux</id> <activation> 
+			<os> <name>Linux</name> </os> </activation> <dependencies> <dependency> <groupId>sun.jdk</groupId> 
+			<artifactId>tools</artifactId> <version>any</version> <scope>system</scope> 
+			<systemPath>${java.home}/../lib/tools.jar</systemPath> </dependency> </dependencies> 
+			</profile> -->
 		<profile>
 			<id>genweb</id>
 			<activation>
