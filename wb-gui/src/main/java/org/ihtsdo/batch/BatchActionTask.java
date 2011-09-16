@@ -18,18 +18,24 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 public abstract class BatchActionTask {
 
     public static int RETIRED_NID;
     public static int CURRENT_NID;
+    public static I_IntSet HISTORIC_ROLE_TYPES = null;
     public static TerminologyStoreDI ts;
     public static TerminologyConstructorBI tsSnapshot;
 
@@ -64,6 +70,13 @@ public abstract class BatchActionTask {
         CURRENT_NID = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
         ts = Ts.get();
         tsSnapshot = ts.getTerminologyConstructor(ec, vc);
+
+        // SETUP HISTORIC ROLE TYPES
+        ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();
+        HISTORIC_ROLE_TYPES = Terms.get().newIntSet();
+        for (ConceptSpec conceptSpec : historicalTypes) {
+            HISTORIC_ROLE_TYPES.add(conceptSpec.getStrict(vc).getNid());
+        }
     }
 
     public static String nidToName(int nid) throws IOException {
