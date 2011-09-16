@@ -27,7 +27,6 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
@@ -52,8 +51,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -233,8 +231,7 @@ public class ConceptVersion implements ConceptVersionBI {
     	if (classifierCharacteristics == null) {
     		IntSet temp = new IntSet();
     		try {
-				temp.add(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
-				temp.add(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid());
+				temp.add(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
 			} catch (ValidationException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
