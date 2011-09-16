@@ -1388,9 +1388,12 @@ public class BdbCommitManager {
          if (canceled) {
             return runnerAlerts;
          }
+         
+//         System.out.println(">>>>>>>>>>>>> Doing in background: " + latch.getCount());
 
          if ((c != null) && (tests != null)) {
             for (I_TestDataConstraints test : tests) {
+//            	System.out.println(">>>>>>>>>>>>> Running test: " + test.getClass().getName());
                if (canceled) {
                   return runnerAlerts;
                }
@@ -1426,8 +1429,9 @@ public class BdbCommitManager {
                } catch (Throwable e) {
                   AceLog.getEditLog().alertAndLogException(e);
                }
-
+//               System.out.println(">>>>>>>>>>>>> Finished Test: " + test.getClass().getName());
                latch.countDown();
+//               System.out.println(">>>>>>>>>>>>> Latch count: " + latch.getCount());
             }
          }
 
@@ -1437,7 +1441,11 @@ public class BdbCommitManager {
       @Override
       protected void done() {
          super.done();
-
+         long remaining = latch.getCount();
+         for (long i = 0; i < remaining; i++) {
+//             System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
+        	 latch.countDown();
+         }
          if (!canceled) {
             runners.remove(c);
          }
