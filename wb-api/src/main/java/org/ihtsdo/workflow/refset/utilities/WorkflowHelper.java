@@ -164,12 +164,9 @@ public class WorkflowHelper {
 		writer.setAutoApproved(bean.getAutoApproved());
 		writer.setOverride(bean.getOverridden());
 		
-		WorkflowHistoryRefsetWriter.lockMutex();
         writer.retireMember();
 		Terms.get().addUncommitted(writer.getRefsetConcept());
 		Terms.get().commit();
-		
-		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
 	public static void updateModelers(ViewCoordinate vc) 
@@ -706,19 +703,15 @@ public class WorkflowHelper {
 		return defaultModeler;
 	}
 
-	public static void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
-		if ((concept != null) && 
-			(inBatch || !WorkflowHistoryRefsetWriter.isInUse())) // Not in the middle of an existing commit
+	public static void initializeWorkflowForConcept(I_GetConceptData concept) throws TerminologyException, IOException {
+		if (concept != null)
     	{
 			ConceptVersionBI modeler = getCurrentModeler();
-        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         	
         	if (modeler != null && isActiveModeler(modeler))
         	{
-        		I_TermFactory tf = Terms.get();
+            	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
-
-				WorkflowHistoryRefsetWriter.lockMutex();
 
 				// Path
 				// TODO: Update Path properly
@@ -749,7 +742,7 @@ public class WorkflowHelper {
 	            	writer.setWorkflowUid(latestBean.getWorkflowId());
 
 	            // Set auto approved based on AceFrameConfig setting
-	            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
+	            if (Terms.get().getActiveAceFrameConfig().isAutoApproveOn()) {
 	            	writer.setAutoApproved(true);
 
 	            	// Identify and overwrite Accept Action
@@ -763,7 +756,7 @@ public class WorkflowHelper {
 	            	writer.setAutoApproved(false);
 
 	            // Override
-	            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
+	            writer.setOverride(Terms.get().getActiveAceFrameConfig().isOverrideOn());
 
 	            // TimeStamps
 		        java.util.Date today = new java.util.Date();
@@ -773,7 +766,7 @@ public class WorkflowHelper {
 		        // Write Member
 				writer.addMember();
 				
-		        Terms.get().addUncommitted(writer.getRefsetConcept());
+				Terms.get().addUncommitted(writer.getRefsetConcept());
         	}
     	}	
 	}
@@ -1312,6 +1305,5 @@ public class WorkflowHelper {
 
         return retList;
     }
-
 }
  

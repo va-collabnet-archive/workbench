@@ -503,7 +503,6 @@ public class BdbCommitManager {
                      notifyCommit();
                      uncommittedCNids.clear();
                      uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
-                     WorkflowHistoryRefsetWriter.unLockMutex();
                      luceneWriterPermit.acquire();
 
                      IdentifierSet descNidsToCommit = new IdentifierSet((IdentifierSet) uncommittedDescNids);
@@ -692,7 +691,6 @@ public class BdbCommitManager {
 
             uncommittedCNids.andNot(commitSet);
             uncommittedCNidsNoChecks.andNot(commitSet);
-            WorkflowHistoryRefsetWriter.unLockMutex();
             luceneWriterPermit.acquire();
 
             IdentifierSet descNidsToCommit = new IdentifierSet();
