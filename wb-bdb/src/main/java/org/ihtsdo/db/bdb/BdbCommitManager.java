@@ -1,5 +1,4 @@
 package org.ihtsdo.db.bdb;
-
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.apache.commons.lang.ArrayUtils;
@@ -49,6 +48,7 @@ import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.lucene.WfHxLuceneManager;
+import org.ihtsdo.lucene.WfHxLuceneWriterAccessor; 
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -511,10 +511,11 @@ public class BdbCommitManager {
                      uncommittedDescNids.clear();
                      luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
+                     luceneWriterPermit.acquire();
                      Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
                      wfMembersToCommit.addAll(uncommittedWfMemberIds);
-                     luceneWriterService.execute(new WfHxLuceneWriter(wfMembersToCommit));
+                     luceneWriterService.execute(WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit));
                      uncommittedWfMemberIds.clear();
                      dataCheckMap.clear();
                   }
@@ -703,10 +704,11 @@ public class BdbCommitManager {
 
             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
+            luceneWriterPermit.acquire();
             Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
             wfMembersToCommit.addAll(uncommittedWfMemberIds);
-            luceneWriterService.execute(new WfHxLuceneWriter(wfMembersToCommit));
+            luceneWriterService.execute(WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit));
             uncommittedWfMemberIds.clear();
             dataCheckMap.remove(c);
          }
@@ -1605,95 +1607,6 @@ public class BdbCommitManager {
       }
    }
 
-
-   private static class WfHxLuceneWriter implements Runnable {
-      private static Set<I_ExtendByRef> wfExtensionsToUpdate;
-
-      //~--- fields -----------------------------------------------------------
-
-      private int                         batchSize = 200;
-      private WorkflowHistoryRefsetReader reader;
-
-      //~--- constructors -----------------------------------------------------
-
-      public WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
-         super();
-         wfExtensionsToUpdate = uncommittedWfMemberIds;
-
-         try {
-            reader = new WorkflowHistoryRefsetReader();
-         } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING,
-                                   "Unable to access Workflow History Refset with error: " + e.getMessage());
-         }
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      public void run() {
-         try {
-            Set<UUID> workflowsUpdated = new HashSet<UUID>();
-
-            for (I_ExtendByRef row : wfExtensionsToUpdate) {
-               UUID workflowId = reader.getWorkflowId(((I_ExtendByRefPartStr) row).getStringValue());
-
-               // If two rows to commit, both will be caught by method below, so do this once per WfId
-               if (!workflowsUpdated.contains(workflowId)) {
-                  workflowsUpdated.add(workflowId);
-
-                  I_GetConceptData                   con            =
-                     Terms.get().getConcept(row.getComponentNid());
-                  SortedSet<WorkflowHistoryJavaBean> latestWorkflow =
-                     WorkflowHelper.getLatestWfHxForConcept(con, workflowId);
-
-                  WfHxLuceneManager.setWorkflowId(workflowId);
-                  LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY,
-                                              getActiveFrame().getViewCoordinate());
-               }
-            }
-         } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-         }
-
-         luceneWriterPermit.release();
-      }
-   }
-   
-   /**
-    * <p>
-    * Register a commit listener
-    * </p>
-    * @param listener
-    */
-   public static void addCommitListener(final ICommitListener listener) {
-       if (listener != null) {
-           listeners = (ICommitListener[]) ArrayUtils.add(listeners, listener);
-       }
-   }
-
-   /**
-    * <p>
-    * Remove the commit listener
-    * </p>
-    * @param listener
-    */
-   public static void removeCommitListener(final ICommitListener listener) {
-       if (listener != null) {
-           listeners = (ICommitListener[]) ArrayUtils.removeElement(listeners, listener);
-       }
-   }
-
-   /**
-    * <p>
-    * Remove all registered commit listener
-    * </p>
-    */
-   public static void removeAllCommitListeners() {
-       if (listeners != null && listeners.length > 0) {
-           listeners = new ICommitListener[0];
-       }
-   }
 
    /**
     * <p>

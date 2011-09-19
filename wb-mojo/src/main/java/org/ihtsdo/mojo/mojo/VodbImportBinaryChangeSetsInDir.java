@@ -88,6 +88,9 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
                     getLog().info("Importing: " + csf.getName());
                     I_ReadChangeSet reader = termFactoryImpl.newBinaryChangeSetReader(csf);
                     reader.read();
+
+                    I_ReadChangeSet wfReader = termFactoryImpl.newWfHxLuceneChangeSetReader(csf);
+                    wfReader.read();
                 }
             } else {
                 getLog().info("No change sets found.");

@@ -70,6 +70,7 @@ public class WorkflowHelper {
 
     private static int activeNidRf1 = 0;
     private static int activeNidRf2 = 0;
+    private static int is_a_relType = 0;
     
 	public final static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -436,6 +437,43 @@ public class WorkflowHelper {
 		
     	return resultSet;
     }
+
+	public static Set<I_GetConceptData> getChildren(I_GetConceptData concept) {
+		
+		Set<I_GetConceptData> resultSet = new HashSet<I_GetConceptData>();
+		
+		try {
+			if (concept != null) {		
+				resultSet.add(concept);
+				Collection<? extends I_RelVersioned> rels = concept.getDestRels();
+	
+		    	if (rels == null || rels.size() == 0) {
+		    		return resultSet;
+				}
+		    	
+				if (activeNidRf1 == 0) {
+					 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+					 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+				}
+				
+				if (is_a_relType == 0) {
+					is_a_relType = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+				}
+	
+		    	for (I_RelVersioned rel : rels) {
+		    		if ((rel.getTypeNid() == is_a_relType) &&
+						((rel.getStatusNid() == activeNidRf1) || (rel.getStatusNid() == activeNidRf2))) {
+		    			resultSet.addAll(getChildren(Terms.get().getConcept(rel.getC1Id())));
+		    		 }
+		    	}
+			}
+		} catch (Exception e) {
+			return new HashSet<I_GetConceptData>();
+		}
+		
+		return resultSet;
+	}
+
 
 	public static ConceptVersionBI lookupEditorCategory(String role, ViewCoordinate vc) throws TerminologyException, IOException, ContraditionException {
 		Set<? extends ConceptVersionBI> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
