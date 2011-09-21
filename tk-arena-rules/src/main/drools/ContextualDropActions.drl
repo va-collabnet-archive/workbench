@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.ihtsdo.concept.Concept;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -86,13 +87,14 @@ global Collection actions;
 global ViewCoordinate vc;
 global ConceptViewSettings cvSettings;
 
+
 rule "rule 1" #concept onto different SNOMED concept
 
    when
       (and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject));
@@ -104,7 +106,7 @@ rule "rule 3" #concept onto NOT snomed concept
       (and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject));
@@ -117,7 +119,7 @@ rule "rule 4" #concept onto same concept
          ViewFact(view == View.STATED)
          $dropTarget: ComponentFact(context == Context.DROP_TARGET)
          $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
-            component.time != Long.MAX_VALUE)
+            ((ComponentVersionBI)this.component).getTime() != Long.MAX_VALUE)
          not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
          not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
          not $refex: RefexFact(context == Context.DROP_TARGET)
@@ -128,7 +130,7 @@ rule "rule 4" #concept onto same concept
 end
 
 
-/* rule "rule 4.1" #refex onto refex
+/*rule "rule 4.1" #refex onto refex
 
    when
          ViewFact(view == View.STATED)
@@ -136,14 +138,14 @@ end
          $dropObject: RefexFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
    then
       actions.add(new ChangeRefexAction("change", $dropObject));
-end */
+end*/
 
 rule "rule 4.2" #CANCEL concept onto same concept
 
    when
          ViewFact(view == View.STATED)
          $dropTarget: ComponentFact(context == Context.DROP_TARGET)
-         $dropObject: ComponentFact(component.chronicle.isUncommitted == true,
+         $dropObject: ComponentFact(((ComponentVersionBI)this.component).getChronicle().isUncommitted() == true,
                 context == Context.DROP_OBJECT, component == $dropTarget.component)
          not $refex: RefexFact(context == Context.DROP_TARGET)
    then
@@ -192,8 +194,8 @@ rule "rule 7" #rel onto rel (in group)
          $dropTarget: RelFact(context == Context.DROP_TARGET)
          $dropObject: RelFact(context == Context.DROP_OBJECT,
                               component == $dropTarget.component,
-                              component.group != 0,
-                              component.time != Long.MAX_VALUE)
+                              getRel().getGroup() != 0,
+                              getRel().getTime() != Long.MAX_VALUE)
 
    then
       actions.add(new UngroupRelAction("ungroup", $dropObject));
@@ -207,8 +209,8 @@ rule "rule 8" #desc onto concept
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
          ($dropObject: DescFact(context == Context.DROP_OBJECT,
-                                component.conceptNid != $dropTarget.component.conceptNid,
-                                component.time != Long.MAX_VALUE))
+                                getDesc().getConceptNid() != $dropTarget.getConcept().getConceptNid(),
+                                getDesc().getTime() != Long.MAX_VALUE))
          (eval($dropObject.getDesc().getTypeNid() !=
                    Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.get(vc).getNid()))
       )
@@ -223,8 +225,8 @@ rule "rule 9" #rel (w/o group) onto rel group"
       ViewFact(view == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
-                           component.group == 0,
-                           component.time != Long.MAX_VALUE)
+                           getRel().getGroup() == 0,
+                           getRel().getTime() != Long.MAX_VALUE)
 
    then
       actions.add(new CopyToRelGroupAction("copy rel", $dropObject, $dropTarget));
@@ -248,10 +250,10 @@ rule "rule 10" #rel w/group onto different rel group"
       ViewFact(view == View.STATED)
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
-      					   component.group != 0,
-      					   component.time != Long.MAX_VALUE,
-      					   component.conceptNid != $dropTarget.component.conceptNid ||
-         (component.conceptNid == $dropTarget.component.conceptNid && component.group != $dropTarget.component.relGroup))
+      					   getRel().getGroup() != 0,
+      					   getRel().getTime() != Long.MAX_VALUE,
+      					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
+         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelGroup()))
    then
       actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget));
 end
@@ -275,8 +277,8 @@ rule "rule 11" #rel onto concept"
    when
        ViewFact(view == View.STATED)
        $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-       $dropObject: RelFact(context == Context.DROP_OBJECT, component.conceptNid != $dropTarget.component.conceptNid,
-          component.time != Long.MAX_VALUE)
+       $dropObject: RelFact(context == Context.DROP_OBJECT, getRel().getConceptNid() != $dropTarget.getConcept().getConceptNid(),
+          getRel().getTime() != Long.MAX_VALUE)
 
    then
        actions.add(new CopyRelAction("copy rel", $dropObject, $dropTarget));
@@ -303,8 +305,8 @@ rule "rule 11.2" #clone rel (in rel group) onto concept
    when
    ViewFact(view == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
-   $dropObject: RelFact(context == Context.DROP_OBJECT, component.group != 0,
-      component.conceptNid == $dropTarget.component.conceptNid, component.time != Long.MAX_VALUE)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, getRel().getGroup() != 0,
+      getRel().getConceptNid() == $dropTarget.getConcept().getConceptNid(), getRel().getTime() != Long.MAX_VALUE)
 
    then
    actions.add(new CloneRelAction("clone rel", $dropObject));
@@ -318,7 +320,7 @@ rule "rule 12" #rel group onto same concept"
    ViewFact(view == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,  
-   							 component.conceptNid == $dropTarget.component.conceptNid)
+   			getRelGroup().getConceptNid() == $dropTarget.getConcept().getConceptNid())
 
    then
    actions.add(new CloneRelGroupAction("clone rel group", $dropObject, $dropTarget));
@@ -335,7 +337,7 @@ rule "rule 12.1" #rel group onto concept"
    ViewFact(view == View.STATED)
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
-   							 component.conceptNid != $dropTarget.component.conceptNid)
+                    getRelGroup().getConceptNid() != $dropTarget.getConcept().getConceptNid())
 
    then
    actions.add(new CopyRelGroupAction("copy rel group", $dropObject, $dropTarget));
@@ -488,13 +490,13 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
    when
       ViewFact(view == View.STATED)
       $dropTarget: RelFact(context == Context.DROP_TARGET,
-      							component.group == 0,
-      							component.time != Long.MAX_VALUE)
+      			getRel().getGroup() == 0,
+      			getRel().getTime() != Long.MAX_VALUE)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
-      					   component != $dropTarget.component,
-      					   component.conceptNid == $dropTarget.component.conceptNid,
-                           component.group == 0,
-                           component.time != Long.MAX_VALUE)
+      			component != $dropTarget.component,
+      			getRel().getConceptNid() == $dropTarget.getRel().getConceptNid(),
+                        getRel().getGroup() == 0,
+                        getRel().getTime() != Long.MAX_VALUE)
 
    then
       actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget));
@@ -504,7 +506,7 @@ rule "rule 22" #set degree of synonymy if not set rf1
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this not isMemberOf Refsets.DEGREE_OF_SYNONYMY,
-							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -517,7 +519,7 @@ rule "rule 22.1" #set degree of synonymy if not set rf2
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2,
-							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -530,7 +532,7 @@ rule "rule 23" #change synonymy from synonymous rf1
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
-							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -542,7 +544,7 @@ rule "rule 23.1" #change synonymy from synonymous rf2
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
-							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -554,7 +556,7 @@ rule "rule 24" #change synonymy from near synonymous rf1
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
-							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -566,7 +568,7 @@ rule "rule 24.1" #change synonymy from near synonymous rf2
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
-							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -578,7 +580,7 @@ rule "rule 25" #change synonymy from non synonymous rf1
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
-							  this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -590,13 +592,13 @@ rule "rule 25.1" #change synonymy from non synonymous rf2
 	when
                 ViewFact(view == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
-							  this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
 		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
-end
+end 
 
 rule "rule 26" #proceedure and decendants onto body structure
 
@@ -605,7 +607,7 @@ rule "rule 26" #proceedure and decendants onto body structure
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
          ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
-         							 context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         							 context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
    then
       actions.add(new CreateRelAction("Proceedure Site", $dropTarget, Snomed.PROCEDURE_SITE, $dropObject));
@@ -619,7 +621,7 @@ rule "rule 27" #proceedure onto morphologic abnormality
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
          ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
-         						   context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         						   context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Proceedure Morphology", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY, $dropObject));
@@ -632,7 +634,8 @@ rule "rule 28" #proceedure onto physical object
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, 
+                        context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Proceedure Device", $dropTarget, Snomed.PROCEDURE_DEVICE, $dropObject));
@@ -647,7 +650,7 @@ rule "rule 29" #proceedure onto substance
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Direct Substance", $dropTarget, Snomed.DIRECT_SUBSTANCE, $dropObject));
@@ -660,7 +663,7 @@ rule "rule 29.1" #proceedure onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Has Focus", $dropTarget, Snomed.HAS_FOCUS, $dropObject));
@@ -671,7 +674,7 @@ rule "rule 30" #proceedure onto specimen
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Has Specimen", $dropTarget, Snomed.HAS_SPECIMEN, $dropObject));
@@ -682,7 +685,7 @@ rule "rule 30.1" #proceedure onto procedure
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Measurement Method", $dropTarget, Snomed.MEASUREMENT_METHOD, $dropObject));
@@ -694,7 +697,7 @@ rule "rule 31" #proceedure onto social concept
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
          ($dropObject: ConceptFact(this isKindOf Snomed.SOCIAL_CONTEXT, this not isKindOf Snomed.PERSON,
-         							 context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         							 context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Recipient Category", $dropTarget, Snomed.RECIPIENT_CATEGORY, $dropObject));
@@ -705,7 +708,7 @@ rule "rule 31.1" #proceedure onto physical force
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Using Energy", $dropTarget, Snomed.USING_ENERGY, $dropObject));
@@ -716,7 +719,7 @@ rule "rule 32" #proceedure onto qualifier value
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Has Intent", $dropTarget, Snomed.HAS_INTENT, $dropObject));
@@ -737,7 +740,7 @@ rule "rule 33" #clinical finding onto body structure
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
          ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
-         							context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         							context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Finding Site", $dropTarget, Snomed.FINDING_SITE, $dropObject));
@@ -748,7 +751,7 @@ rule "rule 34" #clinical finding onto morphologic abnormality
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated Morphology", $dropTarget, Snomed.ASSOCIATED_MORPHOLOGY, $dropObject));
@@ -759,7 +762,7 @@ rule "rule 35" #clinical finding onto procedure
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated With - after", $dropTarget, Snomed.ASSOCIATED_WITH_AFTER, $dropObject));
@@ -773,7 +776,7 @@ rule "rule 36" #clinical finding onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject));
@@ -785,7 +788,7 @@ rule "rule 36.1" #clinical finding onto event
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject));
@@ -796,7 +799,7 @@ rule "rule 37" #clinical finding onto qualifier value
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Clinical Course", $dropTarget, Snomed.CLINICAL_COURSE, $dropObject));
@@ -810,7 +813,7 @@ rule "rule 38" #clinical finding onto person
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Finding Informer", $dropTarget, Snomed.FINDING_INFORMER, $dropObject));
@@ -821,7 +824,7 @@ rule "rule 39" #clinical finding onto observable entity
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject));
@@ -832,7 +835,7 @@ rule "rule 40" #clinical finding onto substance
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -843,7 +846,7 @@ rule "rule 41" #clinical finding onto organism
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -854,7 +857,7 @@ rule "rule 41.1" #clinical finding onto physical object
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -865,7 +868,7 @@ rule "rule 41.2" #clinical finding onto physical force
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -876,7 +879,7 @@ rule "rule 41.3" #clinical finding onto product
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject));
@@ -887,7 +890,7 @@ rule "rule 42" #Specimen onto procedure
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Procedure", $dropTarget, Snomed.SPECIMEN_PROCEDURE, $dropObject));
@@ -898,7 +901,7 @@ rule "rule 43" #Specimen onto person
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
@@ -909,7 +912,7 @@ rule "rule 44" #Specimen onto physical object
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
@@ -920,7 +923,7 @@ rule "rule 45" #Specimen onto environment
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.ENVIRONMENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ENVIRONMENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject));
@@ -931,7 +934,9 @@ rule "rule 46" #Specimen onto morphologic abnormality
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+                             context == Context.DROP_OBJECT, 
+                             getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Source Morphology", $dropTarget, Snomed.SPECIMEN_SOURCE_MORPHOLOGY, $dropObject));
@@ -942,7 +947,7 @@ rule "rule 47" #Specimen onto body structure
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Source Topography", $dropTarget, Snomed.SPECIMEN_SOURCE_TOPOGRAPHY, $dropObject));
@@ -953,7 +958,7 @@ rule "rule 48" #Specimen onto substance
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Specimen Substance", $dropTarget, Snomed.SPECIMEN_SUBSTANCE, $dropObject));
@@ -964,7 +969,7 @@ rule "rule 49" #Product onto substance
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Has Active Ingredient", $dropTarget, Snomed.HAS_ACTIVE_INGREDIENT, $dropObject));
@@ -975,7 +980,7 @@ rule "rule 50" #Product onto qualifier value
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Has Dose Form", $dropTarget, Snomed.HAS_DOSE_FORM, $dropObject));
@@ -986,7 +991,7 @@ rule "rule 51" #Situation with explicit context onto qualifier value
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Finding Context", $dropTarget, Snomed.FINDING_CONTEXT, $dropObject));
@@ -999,7 +1004,7 @@ rule "rule 52" #Situation with explicit context onto person
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Subject Relationship Context", $dropTarget, Snomed.SUBJECT_REL_CONTEXT, $dropObject));
@@ -1010,7 +1015,7 @@ rule "rule 52.1" #Situation with explicit context onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
@@ -1021,7 +1026,7 @@ rule "rule 52.2" #Situation with explicit context onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
@@ -1032,7 +1037,7 @@ rule "rule 52.3" #Situation with explicit context onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
@@ -1043,7 +1048,7 @@ rule "rule 52.4" #Situation with explicit context onto clinical finding
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.LINK_ASSERTION, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.LINK_ASSERTION, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject));
@@ -1054,18 +1059,18 @@ rule "rule 53" #Body structure onto qualifier value
 	(and
          (ViewFact(view == View.STATED))
          ($dropTarget: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_TARGET))
-         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
 		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject));
-end
+end 
 
 rule "rule 54" #change from primitve to defined
 	when
 	(and
          (ViewFact(view == View.STATED))
-         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, component.isDefined == true))
-         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE, component == $dropTarget.component))
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == true))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, getConAttr().getTime() != Long.MAX_VALUE, component == $dropTarget.component))
       )
 	then
 		actions.add(new SetDefinedAction("make primitive", $dropTarget));
@@ -1075,8 +1080,8 @@ rule "rule 55" #change from defined to primitive
 	when
 	(and
          (ViewFact(view == View.STATED))
-         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, component.isDefined == false))
-         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component.time != Long.MAX_VALUE, component == $dropTarget.component))
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == false))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, getConAttr().getTime() != Long.MAX_VALUE, component == $dropTarget.component))
       )
 	then
 		actions.add(new SetDefinedAction("make defined", $dropTarget));
@@ -1085,7 +1090,7 @@ end
 rule "rule 56" #set case sensitivity 
 	when
                 ViewFact(view == View.STATED)
-		$dropTarget: DescFact(context == Context.DROP_TARGET, this.desc.isInitialCaseSignificant == false)
+		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == false)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new SetICSignificantAction("make case sensitive", $dropTarget));
@@ -1094,7 +1099,7 @@ end
 rule "rule 57" #change to non-case-sensitive
 	when
                 ViewFact(view == View.STATED)
-		$dropTarget: DescFact(context == Context.DROP_TARGET, this.desc.isInitialCaseSignificant == true)
+		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == true)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget));
@@ -1103,7 +1108,7 @@ end
 rule "rule 58" #retire inappropriate synonym rf1
 	when
                 ViewFact(view == View.STATED)
-		$dropTarget: DescFact(this.component.typeNid == WbDescType.SYNONYM.lenient.nid,
+		$dropTarget: DescFact(getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
                                         context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -1113,9 +1118,9 @@ end
 rule "rule 58.1" #retire inappropriate synonym rf2
 	when
                 ViewFact(view == View.STATED)
-		$dropTarget: DescFact(this.component.typeNid == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
+		$dropTarget: DescFact(getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
                                         context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings));
-end
+end 

@@ -7,6 +7,7 @@ import java.lang.String;
 import java.util.Collection;
 
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -34,14 +35,14 @@ global ViewCoordinate vc;
 
 rule "add if null concept in host"
 	when
-		$c: ConceptFact(component == null)
+		$c: ConceptFact(this.getComponent() == null)
 	then 
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp"))); 
 end
 
 rule "retire or move"
 	when
-		$c: ConceptFact(component != null); 
+		$c: ConceptFact(this.getComponent() != null); 
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
@@ -50,8 +51,8 @@ end
 
 rule "abandon concept and restart"
 	when
-		$c: ConceptFact(component != null, component.conAttrsActive != null,
-                    component.conAttrsActive.versions.iterator.next.isUncommitted == true); 
+		$c: ConceptFact(this.getComponent() != null, this.getConcept().getConAttrsActive() == null,
+                    ((ConceptChronicleBI)getConcept().getPrimordialVersion()).isUncommitted() == true); 
 	then
 		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end

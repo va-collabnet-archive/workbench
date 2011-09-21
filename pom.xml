@@ -8,7 +8,8 @@
 	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
 	the specific language governing permissions and limitations under the License. -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>ihtsdo-wb-parent</artifactId>
@@ -35,8 +36,8 @@
 	<properties>
 		<branch>trek</branch>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<drools.version>5.1.1</drools.version>
-		<mvel2.version>2.0.16</mvel2.version>
+		<drools.version>5.2.0.Final</drools.version>
+		<mvel2.version>2.1.0.drools2</mvel2.version>
 		<org.apache.lucene.version>3.0.3</org.apache.lucene.version>
 		<wb-icons-version>1.0.7</wb-icons-version>
 		<je.version>4.1.10</je.version>
@@ -75,7 +76,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
-				<artifactId>drools-api</artifactId>
+				<artifactId>knowledge-api</artifactId>
 				<version>${drools.version}</version>
 			</dependency>
 			<dependency>
@@ -103,7 +104,6 @@
 				<artifactId>mvel2</artifactId>
 				<version>${mvel2.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>com.sleepycat</groupId>
 				<artifactId>je</artifactId>
@@ -207,7 +207,6 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
 	<modules>
 		<module>wb-foundation</module>
 		<module>wb-core</module>

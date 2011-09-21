@@ -40,6 +40,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.agent.KnowledgeAgentConfiguration;
 import org.drools.agent.KnowledgeAgentFactory;
@@ -223,7 +225,7 @@ public class RulesLibrary {
 
 					ksession.insert(testConcept);
 
-					ksession.startProcess("org.ihtsdo.qa-execution2");
+					ksession.startProcess("org.ihtsdo.qa-execution3");
 					ksession.fireAllRules();
 
 					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
@@ -560,10 +562,12 @@ public class RulesLibrary {
 			try {
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 			} catch (Exception e) {
-				// agent base not available
+				e.printStackTrace();
+			}
+			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				System.out.println("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
 				kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-				if (kbase != null) {
+				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
 					System.out.println("INFO: Cache load OK.");
 				} else {
 					System.out.println("WARNING: Cache loading failed.");
@@ -571,10 +575,10 @@ public class RulesLibrary {
 			}
 		} else  {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-			if (kbase == null) {
+			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				System.out.println("INFO: Trying Guvnor...");
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
-				if (kbase != null) {
+				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
 					System.out.println("INFO: Guvnor load OK.");
 				} else {
 					System.out.println("WARNING: Guvnor loading failed, No knowledgebase.");
@@ -582,7 +586,7 @@ public class RulesLibrary {
 			}
 		}
 
-		if (kbase == null) throw new Exception("Can't retrieve database...");
+		if (kbase == null || kbase.getKnowledgePackages().size() == 0) throw new Exception("Can't retrieve database...");
 		return kbase;
 	}
 
@@ -603,7 +607,7 @@ public class RulesLibrary {
 		activity.setValue(0);
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
-		KnowledgeBase kbase =  null;
+		KnowledgeBase kbase= null;
 		try {
 			File rulesDirectory = new File("rules");
 			if (!rulesDirectory.exists())
@@ -682,7 +686,10 @@ public class RulesLibrary {
 			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
 			KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
 			//		kaconf.setProperty( "drools.resource.urlcache","rules" );
+			kaconf.setProperty( "drools.agent.newInstance","false" );
 			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
+			SystemEventListener sysEvenListener = new ConsoleSystemEventListener();
+			kagent.setSystemEventListener(sysEvenListener);
 			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
 			kbase = kagent.getKnowledgeBase();
 			try {
@@ -698,7 +705,7 @@ public class RulesLibrary {
 			long elapsed = endTime - startTime;
 			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			String result = "";
-			if (kbase != null) {
+			if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
 				result = "Sucess...";
 			} else {
 				result = "Repository not available...";
@@ -1172,7 +1179,6 @@ public class RulesLibrary {
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
-			//TODO: get config as parameter
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			Set<I_GetConceptData> firstMetChildrenSet = new HashSet<I_GetConceptData>();
@@ -1189,10 +1195,8 @@ public class RulesLibrary {
 				descendants = getDescendants(descendants, loopConcept);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return descendants;
@@ -1210,10 +1214,8 @@ public class RulesLibrary {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {

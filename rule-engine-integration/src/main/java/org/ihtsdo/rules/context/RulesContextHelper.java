@@ -146,9 +146,9 @@ public class RulesContextHelper {
 				KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 				KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-				File flow = new File("rules/qa-execution2.rf");
+				File flow = new File("rules/qa-execution3.bpmn");
 				if (flow.exists()) {
-					kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution2.rf"), ResourceType.DRF);
+					kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution3.bpmn"), ResourceType.BPMN2);
 					kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 
 					for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
