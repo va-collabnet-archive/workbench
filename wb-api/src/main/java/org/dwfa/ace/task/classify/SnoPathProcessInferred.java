@@ -43,8 +43,8 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     private I_IntSet roleTypeSet;
     private I_IntSet statusSet;
+    private I_IntSet statusSetPlusInactive = null; // NOTE: Concept may have been retired as a stated edit
     private PositionSetReadOnly fromPathPos;
-    private PositionSetReadOnly fromPathPosEditSide;
     // GUI
     I_ShowActivity gui;
     private Logger logger;
@@ -53,13 +53,12 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     private LinkedHashMap<Integer, Integer> charMap;
 
     public SnoPathProcessInferred(Logger logger, List<SnoRel> snorels, I_IntSet roleSet,
-            I_IntSet statSet, PositionSetReadOnly pathPosEditSide, PositionSetReadOnly pathPos,
+            I_IntSet statSet, PositionSetReadOnly pathPos,
             I_ShowActivity gui, Precedence precedence, I_ManageContradiction contradictionMgr)
             throws Exception {
         this.logger = logger;
         this.snorels = snorels;
         this.fromPathPos = pathPos;
-        this.fromPathPosEditSide = pathPosEditSide;
         this.roleTypeSet = roleSet;
         this.statusSet = statSet;
         this.gui = gui;
@@ -79,6 +78,10 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         setupCoreNids();
 
         charMap = new LinkedHashMap<Integer, Integer>(); // SCTID, COUNT
+
+        statusSetPlusInactive = Terms.get().newIntSet();
+        statusSetPlusInactive.addAll(statusSet.getSetValues());
+        statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
     }
 
     private void setupCoreNids() throws Exception {
@@ -116,17 +119,10 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
 
         boolean passToCompare = false;
         List<? extends I_ConceptAttributeTuple> attribs = concept.getConceptAttributeTuples(
-                statusSet, fromPathPos, precedence, contradictionMgr);
+                statusSetPlusInactive, fromPathPos, precedence, contradictionMgr);
 
-        if (attribs.size() == 1) {
+        if (attribs.size() >= 1) {
             passToCompare = true;
-        } else if (attribs.isEmpty()) {
-            // check to see if attribute is only on edit path
-            attribs = concept.getConceptAttributeTuples(statusSet, fromPathPosEditSide, precedence,
-                    contradictionMgr);
-            if (attribs.size() == 1) {
-                passToCompare = true;
-            }
         }
 
         if (passToCompare) {

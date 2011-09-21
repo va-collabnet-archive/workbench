@@ -73,6 +73,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
+import java.util.HashSet;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -175,16 +176,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 && System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
             debugDump = true;
         }
-    }
-
-    static {
-        if (System.getProperties().get("SnorocketDebug") != null
-                && System.getProperties().get("SnorocketDebug").toString().toLowerCase().startsWith("t")) {
-            debug = true;
-        }
-        if (System.getProperties().get("SnorocketDebugDump") != null
-                && System.getProperties().get("SnorocketDebugDump").toString().toLowerCase().startsWith("t")) {
-            debugDump = true;
+        if (System.getProperties().get("SnorocketDebugCore") != null
+                && System.getProperties().get("SnorocketDebugCore").toString().toLowerCase().startsWith("t")) {
             au.csiro.snorocket.core.Snorocket.DEBUG_DUMP = true;
         }
     }
@@ -696,8 +689,9 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             startTime = System.currentTimeMillis();
             cClassSnoRels = new ArrayList<SnoRel>();
             SnoPathProcessInferred pcClass = null;
+
             pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                    statusSet, cEditPosSet, cViewPosSet, gui, precedence, contradictionMgr);
+                    statusSet, cViewPosSet, gui, precedence, contradictionMgr);
             tf.iterateConcepts(pcClass);
             logger.log(Level.INFO, "\r\n::: [TestSnoPathInferred] GET INFERRED (View) PATH DATA : {0}",
                     pcClass.getStats(startTime));
@@ -725,12 +719,13 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 //            }
 
             // FILTER RELATIONSHIPS
-            int last = cClassSnoRels.size();
-            for (int idx = last - 1; idx > -1; idx--) {
-                if (Arrays.binarySearch(cNidArray, cClassSnoRels.get(idx).c2Id) < 0) {
-                    cClassSnoRels.remove(idx);
-                }
-            }
+            // removes relationships where the destination concept was not submitted to classifier
+//            int last = cClassSnoRels.size();
+//            for (int idx = last - 1; idx > -1; idx--) {
+//                if (Arrays.binarySearch(cNidArray, cClassSnoRels.get(idx).c2Id) < 0) {
+//                    cClassSnoRels.remove(idx);
+//                }
+//            }
 
             if (debugDump) {
                 dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);

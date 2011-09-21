@@ -3,13 +3,10 @@ package org.ihtsdo.db.bdb;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesRevision;
 import org.ihtsdo.concept.component.description.Description;
@@ -198,7 +195,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                             Long.MAX_VALUE);
                 } else {
                     if (r.revisions == null) {
-                        r.revisions = new CopyOnWriteArrayList<RelationshipRevision>();
+                        r.revisions = new RevisionSet(r.primordialSapNid);
                     }
                     r.revisions.add((RelationshipRevision) r.makeAnalog(blueprint.getStatusNid(),
                             ec.getAuthorNid(), p, Long.MAX_VALUE));
@@ -300,7 +297,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                             Long.MAX_VALUE);
                 } else {
                     if (d.revisions == null) {
-                        d.revisions = new CopyOnWriteArrayList<DescriptionRevision>();
+                        d.revisions = new RevisionSet(d.primordialSapNid);
                     }
                     d.revisions.add((DescriptionRevision) d.makeAnalog(blueprint.getStatusNid(),
                             ec.getAuthorNid(), p, Long.MAX_VALUE));
@@ -383,7 +380,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                             Long.MAX_VALUE);
                 } else {
                     if (img.revisions == null) {
-                        img.revisions = new CopyOnWriteArrayList<ImageRevision>();
+                        img.revisions = new RevisionSet(img.primordialSapNid);
                     }
                     img.revisions.add((ImageRevision) img.makeAnalog(blueprint.getStatusNid(),
                             ec.getAuthorNid(), p, Long.MAX_VALUE));
@@ -459,6 +456,8 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             }
             a.nid = cNid;
             a.enclosingConceptNid = cNid;
+        } else {
+            throw new InvalidCAB("Concept already exists:\n" + blueprint + "\n\n" + newC);
         }
 
         a.setDefined(blueprint.isDefined());
@@ -473,8 +472,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                         ec.getAuthorNid(), p, Long.MAX_VALUE);
             } else {
                 if (a.revisions == null) {
-                    a.revisions =
-                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                    a.revisions =new RevisionSet(a.primordialSapNid);
                 }
                 a.revisions.add((ConceptAttributesRevision) a.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE));
@@ -497,7 +495,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
 
                 if (cac.revisions == null) {
                     cac.revisions =
-                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                            new RevisionSet(cac.primordialSapNid);
                 }
                 ConceptAttributesRevision r = (ConceptAttributesRevision) cac.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE);
@@ -520,7 +518,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
 
                 if (cac.revisions == null) {
                     cac.revisions =
-                            new CopyOnWriteArrayList<ConceptAttributesRevision>();
+                            new RevisionSet(cac.primordialSapNid);
                 }
                 ConceptAttributesRevision r = (ConceptAttributesRevision) cac.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE);

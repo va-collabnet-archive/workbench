@@ -72,11 +72,9 @@ public class SetDefinedAction extends AbstractAction {
     	            Terms.get().addUncommitted(concept);
             	}
             }
-        } catch (TerminologyException e1) {
+        } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        }
+        } 
     }
   
 }

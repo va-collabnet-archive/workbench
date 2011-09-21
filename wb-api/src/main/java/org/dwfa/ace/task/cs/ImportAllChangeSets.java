@@ -105,6 +105,14 @@ public class ImportAllChangeSets extends AbstractTask {
                     throw new RuntimeException(e);
                 }
             }
+
+            public I_ReadChangeSet getChangeSetWfHxReader(File csf) {
+                try {
+                    return Terms.get().newWfHxLuceneChangeSetReader(csf);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         };
         csi.importAllChangeSets(log, validators, rootDirStr, validateChangeSets, ".eccs");
     }

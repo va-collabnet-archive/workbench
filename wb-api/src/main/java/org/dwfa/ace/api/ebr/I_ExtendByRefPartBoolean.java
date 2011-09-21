@@ -16,12 +16,15 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 
 public interface I_ExtendByRefPartBoolean<A extends RefexBooleanAnalogBI<A>> extends I_ExtendByRefPart<A> {
 
+    @Deprecated
     boolean getBooleanValue();
 
-    void setBooleanValue(boolean value);
+    @Deprecated
+    void setBooleanValue(boolean value) throws PropertyVetoException;
 
 }

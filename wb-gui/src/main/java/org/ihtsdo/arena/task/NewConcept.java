@@ -31,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -76,12 +75,14 @@ import org.ihtsdo.util.swing.GuiUtil;
 
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
+import org.ihtsdo.helper.dialect.DialectHelper;
+import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**
  *
@@ -151,6 +152,8 @@ public class NewConcept extends PreviousNextOrCancel {
     private ConceptChronicleBI preferredConcept;
     private ConceptChronicleBI fsnConcept;
     private ConceptChronicleBI synConcept;
+    private String fsnText;
+    private String prefText;
 
     /*
      * -----------------------
@@ -196,17 +199,18 @@ public class NewConcept extends PreviousNextOrCancel {
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
             new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        CsWordsHelper.lazyInit();
-                    } catch (IOException ex) {
-                       AceLog.getAppLog().alertAndLogException(ex);
-                    }
-                }
-            }).start();
-            
+                    new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                CsWordsHelper.lazyInit();
+                            } catch (IOException ex) {
+                                AceLog.getAppLog().alertAndLogException(ex);
+                            }
+                        }
+                    }).start();
+
             synchronized (this) {
                 this.waitTillDone(worker.getLogger());
             }
@@ -232,7 +236,7 @@ public class NewConcept extends PreviousNextOrCancel {
         public CountDownLatch getLatch() {
             return latch;
         }
-        
+
         @Override
         protected Object doInBackground() throws Exception {
             // check return condition for CONTINUE or ITEM_CANCELLED
@@ -311,7 +315,7 @@ public class NewConcept extends PreviousNextOrCancel {
                     createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
 //                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
                 }
-                
+
             }
             return null;
         }
@@ -632,13 +636,15 @@ public class NewConcept extends PreviousNextOrCancel {
 
     public class CopyTextDocumentListener implements DocumentListener {
 
-        String fsnText = "";
         int paren;
-        String prefText = "";
 
         @Override
         public void changedUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -654,7 +660,11 @@ public class NewConcept extends PreviousNextOrCancel {
 
         @Override
         public void insertUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -670,7 +680,11 @@ public class NewConcept extends PreviousNextOrCancel {
 
         @Override
         public void removeUpdate(DocumentEvent arg0) {
+            fsnText = "";
+            prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.replaceAll("[\\s]", " ");
+            fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
             if (paren == -1) {
                 prefText = fsnText;
@@ -686,17 +700,14 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     public void addSpellingVarients(String prefText, String fsnText) {
-        TerminologyHelperDrools th = new TerminologyHelperDrools();
-        String us = "en-us";
-        String gb = "en-gb";
         String varient = "";
         String extra = "";
         if (fsnText.indexOf("(") != -1 && fsnText.indexOf(")") != -1) {
             extra = fsnText.substring(fsnText.indexOf("("), fsnText.indexOf(")") + 1);
         }
-
-        if (th.loadProperties()) {
-            if (th.checkTermSpelling(prefText, us) && th.checkTermSpelling(prefText, gb)) {
+        try {
+            if (DialectHelper.isTextForDialect(prefText, Language.EN_US.getLenient().getNid())
+                    && DialectHelper.isTextForDialect(prefText, Language.EN_UK.getLenient().getNid())) {
                 lang = "en";
 
                 this.inputFsnLabel.setText("fsn en-GB / en-US");
@@ -705,10 +716,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.inputPrefLabel.setVisible(true);
 
                 this.usBoxPref.setVisible(false);
+                this.usBoxPref.setSelected(false);
                 this.usPref.setVisible(false);
                 this.usLabelPref.setVisible(false);
 
                 this.gbBoxPref.setVisible(false);
+                this.gbBoxPref.setSelected(false);
                 this.gbPref.setVisible(false);
                 this.gbLabelPref.setVisible(false);
 
@@ -721,7 +734,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.usBoxFsn.setSelected(false);
                 this.usFsn.setVisible(false);
                 this.usLabelFsn.setVisible(false);
-            } else if (th.checkTermSpelling(prefText, us)) { //check if lang is en-us
+            } else if (DialectHelper.isTextForDialect(prefText, Language.EN_UK.getLenient().getNid())) { //check if lang is en-us
                 lang = "en-us";
 
                 this.inputFsnLabel.setText("fsn en-US");
@@ -729,7 +742,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.inputPrefLabel.setText("pref en-US");
                 this.inputPrefLabel.setVisible(true);
                 //get fsn
-                varient = th.getSpellingTerm(prefText, us);
+                varient = DialectHelper.makeTextForDialect(prefText, Language.EN_US.getLenient().getNid());
                 this.gbFsn.setText(varient + " " + extra);
                 this.gbBoxFsn.setSelected(true);
                 this.gbBoxFsn.setVisible(false);
@@ -741,7 +754,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.usLabelFsn.setVisible(false);
 
                 //get pref
-                varient = th.getSpellingTerm(prefText, us);
+                varient = DialectHelper.makeTextForDialect(prefText, Language.EN_US.getLenient().getNid());
                 this.gbPref.setText(varient);
                 this.gbBoxPref.setSelected(true);
                 this.gbBoxPref.setVisible(false);
@@ -752,7 +765,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.usPref.setVisible(false);
                 this.usLabelPref.setVisible(false);
 
-            } else if (th.checkTermSpelling(prefText, gb)) { //check if lang is en-gb
+            } else if (DialectHelper.isTextForDialect(prefText, Language.EN_US.getLenient().getNid())) { //check if lang is en-gb
                 lang = "en-gb";
 
                 this.inputFsnLabel.setText("fsn en-GB");
@@ -760,7 +773,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.inputPrefLabel.setText("pref en-GB");
                 this.inputPrefLabel.setVisible(true);
                 //get fsn
-                varient = th.getSpellingTerm(prefText, gb);
+                varient = DialectHelper.makeTextForDialect(prefText, Language.EN_UK.getLenient().getNid());
                 this.usFsn.setText(varient + " " + extra);
                 this.usBoxFsn.setSelected(true);
                 this.usBoxFsn.setVisible(false);
@@ -772,7 +785,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.gbLabelFsn.setVisible(false);
 
                 //get pref
-                varient = th.getSpellingTerm(prefText, gb);
+                varient = DialectHelper.makeTextForDialect(prefText, Language.EN_UK.getLenient().getNid());
                 this.usPref.setText(varient);
                 this.usBoxPref.setSelected(true);
                 this.usBoxPref.setVisible(false);
@@ -783,7 +796,12 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.gbPref.setVisible(false);
                 this.gbLabelPref.setVisible(false);
             }
+        } catch (UnsupportedDialectOrLanguage ex) {
+            Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     private void createBlueprintConcept() {
@@ -801,11 +819,12 @@ public class NewConcept extends PreviousNextOrCancel {
 
 
             //create concept blue print
-            if(lang.equals("en-gb")){
-                conceptSpec = new ConceptCB(usFsn.extractText(), pref.extractText(), "en", isa, uuidArray);
-            }else{
-                conceptSpec = new ConceptCB(fsn.extractText(), pref.extractText(), "en", isa, uuidArray);
+            if (lang.equals("en-gb")) {
+                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
+            } else {
+                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
             }
+            conceptSpec.setComponentUuid(UUID.randomUUID());
             newConcept = tc.constructIfNotCurrent(conceptSpec);
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
@@ -815,12 +834,15 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintGbFsnDesc() {
+        String text = gbFsn.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecGbFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     "en-gb",
-                    gbFsn.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecGbFsn);
@@ -850,12 +872,15 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintGbPrefDesc() {
+        String text = gbPref.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecGbPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     "en-gb",
-                    gbPref.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecGbPref);
@@ -905,12 +930,15 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintUsFsnDesc() {
+        String text = usFsn.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecUsFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
                     "en-us",
-                    usFsn.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecUsFsn);
@@ -942,12 +970,15 @@ public class NewConcept extends PreviousNextOrCancel {
     }
 
     private void createBlueprintUsPrefDesc() {
+        String text = usPref.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
             descSpecUsPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
                     "en-us",
-                    usPref.extractText(),
+                    text,
                     false);
 
             tc.construct(descSpecUsPref);

@@ -19,26 +19,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetWriter;
 */
 public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 
-	private static boolean inUse = false;
-
 	public WorkflowHistoryRefsetWriter() throws IOException, TerminologyException {
 		super(workflowHistoryConcept);
 		fields = new WorkflowHistoryRSFields();
 	}
 	
 	// Statics
-	public static void lockMutex() {
-		inUse = true; 
-	}
-	
-	public static boolean isInUse() {
-		return inUse;
-	}
-	
-	public static void unLockMutex() {
-		inUse = false;
-	}
-
 	// Setters
 	public void setWorkflowUid(UUID uid) {
 		((WorkflowHistoryRSFields)fields).setWorkflowUid(uid);
@@ -372,10 +358,8 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
         
         setEffectiveTime(Long.MAX_VALUE);
 
-        WorkflowHistoryRefsetWriter.lockMutex();
         addMember();
         Terms.get().addUncommitted(this.getRefsetConcept());
         Terms.get().commit();
-		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 }

@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import org.dwfa.ace.api.I_AmPart;
@@ -38,7 +39,7 @@ public interface I_ExtendByRefPart<T extends RefexAnalogBI<T>>
      * @deprecated Use {@link #setStatusNid(int)}
      */
     @Deprecated
-    public void setStatus(int idStatus);
+    public void setStatus(int idStatus) throws PropertyVetoException;
 
     public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException;
 

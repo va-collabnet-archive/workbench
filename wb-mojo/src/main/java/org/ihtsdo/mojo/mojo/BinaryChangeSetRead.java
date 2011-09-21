@@ -90,6 +90,9 @@ public class BinaryChangeSetRead extends AbstractMojo {
                 reader.getValidators().add(new ComponentValidator());
             }
             reader.read();
+
+            I_ReadChangeSet wfReader = termFactory.newWfHxLuceneChangeSetReader(new File(changeSetDir, changeSetFileName));
+            wfReader.read();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }

@@ -86,10 +86,9 @@ public class KindOfComputer {
         }
     }
     
+    @Deprecated
     public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
-    	for (IsaCache isac: isaCache.values()) {
-    		isac.updateCacheUsingStatedView(c);
-    	}
+    	updateIsaCaches(c);
     }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {

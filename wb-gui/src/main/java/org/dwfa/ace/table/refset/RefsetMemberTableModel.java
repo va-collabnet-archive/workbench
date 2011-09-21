@@ -1055,11 +1055,9 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         changed = true;
                         break;
                 }
-            } catch (TerminologyException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            } 
             if (changed) {
                 fireTableDataChanged();
                 AceLog.getAppLog().info("refset table changed");

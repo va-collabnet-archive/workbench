@@ -16,10 +16,13 @@
  */
 package org.dwfa.ace.api.cs;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -56,25 +59,29 @@ public class DescriptionValidator extends SimpleValidator {
             }
             for (UniversalAceDescriptionPart part : desc.getVersions()) {
                 if (part.getTime() != Long.MAX_VALUE) {
-                    I_DescriptionPart newPart = tf.newDescriptionPart();
-                    newPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
-                    newPart.setLang(part.getLang());
-                    newPart.setPathId(getNativeId(part.getPathId()));
-                    newPart.setStatusId(getNativeId(part.getStatusId()));
-                    newPart.setText(part.getText());
-                    newPart.setTypeId(getNativeId(part.getTypeId()));
-                    newPart.setTime(part.getTime());
+                    try {
+                        I_DescriptionPart newPart = tf.newDescriptionPart();
+                        newPart.setInitialCaseSignificant(part.getInitialCaseSignificant());
+                        newPart.setLang(part.getLang());
+                        newPart.setPathId(getNativeId(part.getPathId()));
+                        newPart.setStatusId(getNativeId(part.getStatusId()));
+                        newPart.setText(part.getText());
+                        newPart.setTypeId(getNativeId(part.getTypeId()));
+                        newPart.setTime(part.getTime());
 
-                    startParts.add(newPart);
+                        startParts.add(newPart);
 
-                    if (!containsPart(thinDesc, newPart)) {
-                        failureReport.append("concept does not contain a description part match.");
-                        failureReport.append("\n       newPart: " + newPart);
-                        for (I_DescriptionPart descPart : thinDesc.getMutableParts()) {
-                            failureReport.append("\n existing part: " + descPart);
+                        if (!containsPart(thinDesc, newPart)) {
+                            failureReport.append("concept does not contain a description part match.");
+                            failureReport.append("\n       newPart: " + newPart);
+                            for (I_DescriptionPart descPart : thinDesc.getMutableParts()) {
+                                failureReport.append("\n existing part: " + descPart);
+                            }
+                            failureReport.append("\n\n");
+                            return false; // test 2
                         }
-                        failureReport.append("\n\n");
-                        return false; // test 2
+                    } catch (PropertyVetoException ex) {
+                        throw new TerminologyException(ex);
                     }
                 }
             }

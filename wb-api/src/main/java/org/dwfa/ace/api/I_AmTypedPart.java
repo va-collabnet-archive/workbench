@@ -16,20 +16,21 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.AnalogBI;
 
 public interface I_AmTypedPart<T extends AnalogBI> extends I_AmPart<T> {
 
     public int getTypeNid();
 
-    public void setTypeNid(int typeNid);
+    public void setTypeNid(int typeNid) throws PropertyVetoException;
 
     @Deprecated
     public void convertIds(I_MapNativeToNative jarToDbNativeMap);
     @Deprecated
     public int getTypeId();
     @Deprecated
-    public void setTypeId(int typeNid);
+    public void setTypeId(int typeNid) throws PropertyVetoException;
     
 
 }

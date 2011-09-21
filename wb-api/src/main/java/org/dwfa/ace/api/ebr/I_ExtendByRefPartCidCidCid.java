@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidAnalogBI;
 
 public interface I_ExtendByRefPartCidCidCid<A extends RefexCnidCnidCnidAnalogBI<A>> 
@@ -23,6 +24,6 @@ public interface I_ExtendByRefPartCidCidCid<A extends RefexCnidCnidCnidAnalogBI<
 
     public int getC3id();
 
-    public void setC3id(int c3id);
+    public void setC3id(int c3id) throws PropertyVetoException;
 
 }

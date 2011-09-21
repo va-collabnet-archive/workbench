@@ -1521,7 +1521,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 			if ((latestPart == null)
 					|| (part.getTime() >= latestPart.getTime())) {
 				for (Integer currentStatus : getCurrentStatusIds()) {
-					if (part.getStatusId() == currentStatus) {
+					if (part.getStatusNid() == currentStatus) {
 						latestPart = part;
 					}
 				}

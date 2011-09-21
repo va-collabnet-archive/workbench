@@ -25,7 +25,7 @@ public class AceXMLUtil {
 	public static boolean checkProc(int conID){
 		//conIdi =concept.getConceptNid();
 		String oc_key = getOc_key(conID);
-		if(ObjectCache.get(oc_key) != null){
+		if(ObjectCache.INSTANCE.get(oc_key) != null){
 			return true;
 		}
 		else{
@@ -47,11 +47,11 @@ public class AceXMLUtil {
  * @return
  */
 	public static Hashtable<String,String> getUuidInt(){
-		if(ObjectCache.get(CommonXMLStatics.UUID_INT_HT) == null){
+		if(ObjectCache.INSTANCE.get(CommonXMLStatics.UUID_INT_HT) == null){
 			Hashtable<String,String> uuidIntHT = new Hashtable<String, String>();
-			ObjectCache.put(CommonXMLStatics.UUID_INT_HT, uuidIntHT);
+			ObjectCache.INSTANCE.put(CommonXMLStatics.UUID_INT_HT, uuidIntHT);
 		}
-		return (Hashtable<String, String>)ObjectCache.get(CommonXMLStatics.UUID_INT_HT);	
+		return (Hashtable<String, String>)ObjectCache.INSTANCE.get(CommonXMLStatics.UUID_INT_HT);	
 	}
 	
 /**
@@ -115,7 +115,7 @@ public class AceXMLUtil {
 			//log.finest("getIdFromUUID UUIDInt doesn't contain "+uuid_s);
 			//may as well create the xml concept as it will probably be needed
 			I_GetConceptData igcd = AceUtil.getConceptUUID_S(uuid_s);
-			XML_I_GetConceptData x_igcd = new XML_I_GetConceptData(igcd);
+			XML_I_GetConceptData x_igcd = new XML_I_GetConceptData(igcd); // TODO - is this being called for it's side effect?
 			intI = getUuidInt().get(uuid_s);
 		}
 		//log.finest("getIdFromUUID returning intI "+intI);
@@ -198,7 +198,6 @@ public class AceXMLUtil {
 			xml = XMLUtil.convertToStringLeaveCDATA(doc);
 			//log.severe("printXML = \n" + xml);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return xml;

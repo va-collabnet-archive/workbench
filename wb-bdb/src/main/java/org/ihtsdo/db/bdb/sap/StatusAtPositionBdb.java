@@ -64,8 +64,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
    //~--- fields --------------------------------------------------------------
 
-   private boolean   changedSinceSync = false;
-   private Semaphore expandPermit     = new Semaphore(1);
+   private Semaphore expandPermit = new Semaphore(1);
 
    /**
     * TODO future optimization is to use a map that uses an index to the
@@ -88,23 +87,25 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
          expandPermit.acquireUninterruptibly();
 
-         for (int sapNid : commitSapNids.getSetValues()) {
-            min = Math.min(min, sapNid);
-         }
+         try {
+            for (int sapNid : commitSapNids.getSetValues()) {
+               min = Math.min(min, sapNid);
+            }
 
-         for (int sapNid : uncomittedStatusPathEntries.values()) {
-            min = Math.min(min, sapNid);
-         }
+            for (int sapNid : uncomittedStatusPathEntries.values()) {
+               min = Math.min(min, sapNid);
+            }
 
-         for (int i = min; i < sequence.get(); i++) {
-            changedSinceSync                             = true;
-            mutableArray.commitTimes[getMutableIndex(i)] = Long.MIN_VALUE;
-            sapToIntMap.put(getStatusNid(i), getAuthorNid(i), getPathNid(i), Long.MIN_VALUE, i);
-         }
+            for (int i = min; i < sequence.get(); i++) {
+               mutableArray.commitTimes[getMutableIndex(i)] = Long.MIN_VALUE;
+               sapToIntMap.put(getStatusNid(i), getAuthorNid(i), getPathNid(i), Long.MIN_VALUE, i);
+            }
 
-         uncomittedStatusPathEntries.clear();
-         mapperCache.clear();
-         expandPermit.release();
+            uncomittedStatusPathEntries.clear();
+            mapperCache.clear();
+         } finally {
+            expandPermit.release();
+         }
       }
 
       sync();
@@ -139,16 +140,18 @@ public class StatusAtPositionBdb extends ComponentBdb {
       synchronized (uncomittedStatusPathEntries) {
          expandPermit.acquireUninterruptibly();
 
-         for (int sapNid : uncomittedStatusPathEntries.values()) {
-            changedSinceSync                                  = true;
-            mutableArray.commitTimes[getMutableIndex(sapNid)] = time;
-            sapToIntMap.put(getStatusNid(sapNid), getAuthorNid(sapNid), getPathNid(sapNid), time, sapNid);
-            committedSapNids.add(sapNid);
-         }
+         try {
+            for (int sapNid : uncomittedStatusPathEntries.values()) {
+               mutableArray.commitTimes[getMutableIndex(sapNid)] = time;
+               sapToIntMap.put(getStatusNid(sapNid), getAuthorNid(sapNid), getPathNid(sapNid), time, sapNid);
+               committedSapNids.add(sapNid);
+            }
 
-         uncomittedStatusPathEntries.clear();
-         mapperCache.clear();
-         expandPermit.release();
+            uncomittedStatusPathEntries.clear();
+            mapperCache.clear();
+         } finally {
+            expandPermit.release();
+         }
       }
 
       sync();
@@ -246,21 +249,21 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
    @Override
    public void sync() throws IOException {
-      if (changedSinceSync) {
+      expandPermit.acquireUninterruptibly();
+
+      try {
          DatabaseEntry valueEntry = new DatabaseEntry();
 
-         expandPermit.acquireUninterruptibly();
          positionArrayBinder.objectToEntry(mutableArray, valueEntry);
 
          DatabaseEntry theKey = new DatabaseEntry();
 
          IntegerBinding.intToEntry(0, theKey);
          mutable.put(null, theKey, valueEntry);
-         changedSinceSync = false;
+         super.sync();
+      } finally {
          expandPermit.release();
       }
-
-      super.sync();
    }
 
    /**
@@ -419,23 +422,33 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
    public int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
       if (time == Long.MAX_VALUE) {
-         UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, pathNid);
+         UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, pathNid);
 
          if (uncomittedStatusPathEntries.containsKey(usp)) {
             return uncomittedStatusPathEntries.get(usp);
          } else {
-            int statusAtPositionNid = sequence.getAndIncrement();
+            expandPermit.acquireUninterruptibly();
 
-            mapperCache.clear();
-            mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
-            mutableArray.statusNids[getMutableIndex(statusAtPositionNid)]  = statusNid;
-            mutableArray.authorNids[getMutableIndex(statusAtPositionNid)]  = authorNid;
-            mutableArray.pathNids[getMutableIndex(statusAtPositionNid)]    = pathNid;
-            mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
-            uncomittedStatusPathEntries.put(usp, statusAtPositionNid);
-            hits.incrementAndGet();
+            try {
+               if (uncomittedStatusPathEntries.containsKey(usp)) {
+                  return uncomittedStatusPathEntries.get(usp);
+               }
 
-            return statusAtPositionNid;
+               int statusAtPositionNid = sequence.getAndIncrement();
+
+               mapperCache.clear();
+               mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
+               mutableArray.statusNids[getMutableIndex(statusAtPositionNid)]  = statusNid;
+               mutableArray.authorNids[getMutableIndex(statusAtPositionNid)]  = authorNid;
+               mutableArray.pathNids[getMutableIndex(statusAtPositionNid)]    = pathNid;
+               mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
+               uncomittedStatusPathEntries.put(usp, statusAtPositionNid);
+               hits.incrementAndGet();
+
+               return statusAtPositionNid;
+            } finally {
+               expandPermit.release();
+            }
          }
       }
 
@@ -445,28 +458,22 @@ public class StatusAtPositionBdb extends ComponentBdb {
          return sapToIntMap.get(statusNid, authorNid, pathNid, time);
       }
 
+      expandPermit.acquireUninterruptibly();
+
       try {
-         boolean immediateAcquire = expandPermit.tryAcquire();
 
-         if (immediateAcquire == false) {
-            expandPermit.acquireUninterruptibly();
+         // Try one last time...
+         if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
+            hits.incrementAndGet();
 
-            // Try one last time...
-            if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
-               hits.incrementAndGet();
-               expandPermit.release();
-
-               return sapToIntMap.get(statusNid, authorNid, pathNid, time);
-            }
+            return sapToIntMap.get(statusNid, authorNid, pathNid, time);
          }
 
          int statusAtPositionNid = sequence.getAndIncrement();
 
          mapperCache.clear();
-         changedSinceSync = true;
          sapToIntMap.put(statusNid, authorNid, pathNid, time, statusAtPositionNid);
          mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
-         expandPermit.release();
          mutableArray.statusNids[getMutableIndex(statusAtPositionNid)]  = statusNid;
          mutableArray.authorNids[getMutableIndex(statusAtPositionNid)]  = authorNid;
          mutableArray.pathNids[getMutableIndex(statusAtPositionNid)]    = pathNid;
@@ -475,10 +482,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
          return statusAtPositionNid;
       } catch (Throwable e) {
-         expandPermit.release();
-         e.printStackTrace();
-
          throw new RuntimeException(e);
+      } finally {
+         expandPermit.release();
       }
    }
 

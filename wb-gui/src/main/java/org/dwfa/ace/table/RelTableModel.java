@@ -526,13 +526,9 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                 updateDataAlerts(row);
                 Terms.get().addUncommitted(Terms.get().getConcept(rel.getC1Id()));
             }
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
+        } 
         fireTableDataChanged();
     }
 

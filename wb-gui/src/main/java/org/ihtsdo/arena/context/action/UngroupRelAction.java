@@ -58,11 +58,9 @@ public class UngroupRelAction extends AbstractAction {
 					}
 				}
 				
-			} catch (TerminologyException e1) {
+			} catch (Exception e1) {
 				AceLog.getAppLog().alertAndLogException(e1);
-			} catch (IOException e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
+			} 
 			}
 
 	}

@@ -4,8 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.ihtsdo.concept.component.RevisionSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,7 +117,7 @@ public class CidLongMemberTest {
         obj.nid = 1;
         obj.primordialSapNid = 1; 
         obj.primordialUNid = 1;
-        obj.revisions = new CopyOnWriteArrayList<CidLongRevision>();
+        obj.revisions = new RevisionSet(1);
 
         CidLongRevision rev = new CidLongRevision(); 
         rev.primordialComponent = obj; 
@@ -137,7 +137,7 @@ public class CidLongMemberTest {
         obj.nid = 2;
         obj.primordialSapNid = 2; 
         obj.primordialUNid = 2;
-        obj.revisions = new CopyOnWriteArrayList<CidLongRevision>();
+        obj.revisions = new RevisionSet(1);
 
         CidLongRevision rev = new CidLongRevision(); 
         rev.primordialComponent = obj; 

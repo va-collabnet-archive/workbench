@@ -24,6 +24,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
+import org.ihtsdo.arena.contradiction.ContradictionConfig;
 
 public class ConceptNavigator extends JPanel {
 

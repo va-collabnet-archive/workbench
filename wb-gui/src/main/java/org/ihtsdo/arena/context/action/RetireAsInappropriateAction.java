@@ -6,6 +6,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -15,10 +18,12 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
+import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -28,8 +33,10 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.InstructAndWait;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.arena.WizardPanel;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
+import org.ihtsdo.arena.conceptview.PropertyChangeManager;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -54,10 +61,11 @@ public class RetireAsInappropriateAction extends AbstractAction {
     ComponentVersionBI component;
     ComponentVersionBI analogComponent;
     I_ConfigAceFrame config;
-    TerminologyList tl;
+    TermComponentLabel tl;
     WizardPanel wizard;
     ConceptViewSettings settings;
     ConceptChronicleBI refexConcept;
+    int refersToNid = 0;
 
     public RetireAsInappropriateAction(String actionName, DescFact fact, ConceptViewSettings settings) {
         super(actionName);
@@ -98,7 +106,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     }
 
-    private void makeWizardPanel(JPanel wizardPanel) {
+    private void makeWizardPanel(JPanel wizardPanel) throws TerminologyException, IOException {
         Component[] components = wizardPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
             wizardPanel.remove(components[i]);
@@ -134,7 +142,8 @@ public class RetireAsInappropriateAction extends AbstractAction {
         c.gridx = 0;
         c.weighty = 1.0;
         c.weightx = 1.0;
-        tl = new TerminologyList(config);
+        tl = new TermComponentLabel();
+        tl.addTermChangeListener(new ChangeListener());
         wizardPanel.add(tl, c);
         c.weighty = 0.0;
 
@@ -144,6 +153,15 @@ public class RetireAsInappropriateAction extends AbstractAction {
         c.weightx = 0;
         c.weighty = 1;
         wizardPanel.add(new JLabel(""), c);
+    }
+
+    protected class ChangeListener implements PropertyChangeListener {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent e) {
+            I_GetConceptData newValue = (I_GetConceptData) e.getNewValue();
+            refersToNid = newValue.getNid();
+        }
     }
 
     protected void setUpButtons(final JPanel wizardPanel, GridBagConstraints c) {
@@ -177,15 +195,15 @@ public class RetireAsInappropriateAction extends AbstractAction {
     private class ContinueActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            wizard.setWizardPanelVisible(false);
-            if (tl != null) {
-                TerminologyListModel model = (TerminologyListModel) tl.getModel();
-                List<Integer> nidList = model.getNidsInList();
-                for (int nid : nidList) {
-                    retireFromRefexes(component);
-                    retireSynonym();
-                    addToRefersToRefset(nid);
-                }
+            if (refersToNid != 0) {
+                wizard.setWizardPanelVisible(false);
+                retireFromRefexes(component);
+                retireSynonym();
+                addToRefersToRefset(refersToNid);
+            } else {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Please enter a 'refers to' concept", "",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -210,9 +228,9 @@ public class RetireAsInappropriateAction extends AbstractAction {
             if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) component;
                 int statusNid = 0;
-                if(Ts.get().usesRf2Metadata()){
+                if (Ts.get().usesRf2Metadata()) {
                     statusNid = SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getNid();
-                }else{
+                } else {
                     statusNid = SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getNid();
                 }
                 for (PathBI ep : config.getEditingPathSet()) {
@@ -230,8 +248,8 @@ public class RetireAsInappropriateAction extends AbstractAction {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }
-    
-        private void retireFromRefexes(ComponentVersionBI component) {
+
+    private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -269,7 +287,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     }
                     I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
                     Ts.get().addUncommitted(concept);
-                } 
+                }
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -295,7 +313,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     config.getViewCoordinate());
             tc.construct(newSpec);
             if (!refexConcept.isAnnotationStyleRefex()) {
-            Ts.get().addUncommitted(refexConcept);
+                Ts.get().addUncommitted(refexConcept);
             }
             I_GetConceptData concept = Terms.get().getConceptForNid(analogComponent.getNid());
             Ts.get().addUncommitted(concept);

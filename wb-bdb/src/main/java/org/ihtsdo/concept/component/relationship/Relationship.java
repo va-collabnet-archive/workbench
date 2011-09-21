@@ -22,6 +22,7 @@ import org.dwfa.util.HashFunction;
 
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
@@ -48,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>, I_RelPart<RelationshipRevision>,
@@ -86,7 +86,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       primordialSapNid = Bdb.getSapNid(eRel);
 
       if (eRel.getRevisionList() != null) {
-         revisions = new CopyOnWriteArrayList<RelationshipRevision>();
+         revisions = new RevisionSet<RelationshipRevision, Relationship>(primordialSapNid);
 
          for (TkRelationshipRevision erv : eRel.getRevisionList()) {
             revisions.add(new RelationshipRevision(erv, this));
@@ -274,7 +274,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       int additionalVersionCount = input.readShort();
 
       if (additionalVersionCount > 0) {
-         revisions = new CopyOnWriteArrayList<RelationshipRevision>();
+         revisions = new RevisionSet<RelationshipRevision, Relationship>(primordialSapNid);
 
          for (int i = 0; i < additionalVersionCount; i++) {
             revisions.add(new RelationshipRevision(input, this));
@@ -608,8 +608,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       }
 
       if (vForC.size() > 1) {
-          vForC = c.getContradictionManager().resolveVersions(vForC);
+         vForC = c.getContradictionManager().resolveVersions(vForC);
       }
+
       if (vForC.size() > 1) {
          throw new ContraditionException(vForC.toString());
       }
@@ -629,13 +630,13 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
          ArrayList<Version> list = new ArrayList<Version>(count);
 
          if (getTime() != Long.MIN_VALUE) {
-            list.add(new Version());
+            list.add(new Version(this));
          }
 
          if (revisions != null) {
-            for (int i = 0; i < revisions.size(); i++) {
-               if (revisions.get(i).getTime() != Long.MIN_VALUE) {
-                  list.add(new Version(i));
+            for (RelationshipRevision r : revisions) {
+               if (r.getTime() != Long.MIN_VALUE) {
+                  list.add(new Version(r));
                }
             }
          }
@@ -771,12 +772,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
    public class Version extends ConceptComponent<RelationshipRevision, Relationship>.Version
            implements I_RelTuple<RelationshipRevision>, I_RelPart<RelationshipRevision>,
                       RelationshipAnalogBI<RelationshipRevision> {
-      public Version() {
-         super();
-      }
-
-      public Version(int index) {
-         super(index);
+      public Version(RelationshipAnalogBI cv) {
+         super(cv);
       }
 
       //~--- methods ----------------------------------------------------------
@@ -793,8 +790,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       }
 
       public RelationshipRevision makeAnalog() {
-         if (index >= 0) {
-            RelationshipRevision rev = revisions.get(index);
+         if (Relationship.this != getCv()) {
+            RelationshipRevision rev = (RelationshipRevision) getCv();
 
             return new RelationshipRevision(rev, Relationship.this);
          }
@@ -803,41 +800,15 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       }
 
       @Override
+      @Deprecated
       public RelationshipRevision makeAnalog(int statusNid, int pathNid, long time) {
-         if (index >= 0) {
-            RelationshipRevision rev = revisions.get(index);
-
-            if ((rev.getTime() == Long.MAX_VALUE) && (rev.getPathNid() == pathNid)) {
-               rev.setStatusNid(statusNid);
-
-               return rev;
-            }
-
-            return rev.makeAnalog(statusNid, pathNid, time);
-         } else {
-            return Relationship.this.makeAnalog(statusNid, pathNid, time);
-         }
+         return (RelationshipRevision) getCv().makeAnalog(statusNid, Terms.get().getAuthorNid(), pathNid,
+                 time);
       }
 
       @Override
       public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-         RelationshipRevision newR;
-
-         if (index >= 0) {
-            RelationshipRevision rev = revisions.get(index);
-
-            if ((rev.getTime() == Long.MAX_VALUE) && (rev.getPathNid() == pathNid)) {
-               rev.setStatusNid(statusNid);
-               rev.setAuthorNid(authorNid);
-               newR = rev;
-            } else {
-               newR = rev.makeAnalog(statusNid, authorNid, pathNid, time);
-            }
-         } else {
-            newR = Relationship.this.makeAnalog(statusNid, authorNid, pathNid, time);
-         }
-
-         return newR;
+         return (RelationshipRevision) getCv().makeAnalog(statusNid, authorNid, pathNid, time);
       }
 
       //~--- get methods ------------------------------------------------------
@@ -862,20 +833,16 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
       @Override
       public int getCharacteristicId() {
-         if (index >= 0) {
-            return revisions.get(index).getCharacteristicId();
-         }
-
-         return getCharacteristicNid();
+         return getCv().getCharacteristicNid();
       }
 
       @Override
       public int getCharacteristicNid() {
-         if (index >= 0) {
-            return revisions.get(index).getCharacteristicNid();
-         }
+         return getCv().getCharacteristicNid();
+      }
 
-         return Relationship.this.getCharacteristicNid();
+      RelationshipAnalogBI getCv() {
+         return (RelationshipAnalogBI) cv;
       }
 
       @Override
@@ -890,11 +857,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
       @Override
       public int getGroup() {
-         if (index >= 0) {
-            return revisions.get(index).getGroup();
-         }
-
-         return group;
+         return getCv().getGroup();
       }
 
       @Override
@@ -915,20 +878,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       @Override
       @Deprecated
       public int getRefinabilityId() {
-         if (index >= 0) {
-            return revisions.get(index).getRefinabilityId();
-         }
-
-         return getRefinabilityNid();
+         return getCv().getRefinabilityNid();
       }
 
       @Override
       public int getRefinabilityNid() {
-         if (index >= 0) {
-            return revisions.get(index).getRefinabilityNid();
-         }
-
-         return Relationship.this.getRefinabilityNid();
+         return getCv().getRefinabilityNid();
       }
 
       @Override
@@ -953,20 +908,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
       @Override
       public int getTypeNid() {
-         if (index >= 0) {
-            assert revisions.get(index).getTypeNid() != Integer.MAX_VALUE : Relationship.this;
-
-            return revisions.get(index).getTypeNid();
-         } else {
-            assert Relationship.this.typeNid != Integer.MAX_VALUE : Relationship.this;
-
-            return Relationship.this.typeNid;
-         }
+         return getCv().getTypeNid();
       }
 
       @Override
       public ArrayIntList getVariableVersionNids() {
-         if (index >= 0) {
+         if (Relationship.this != getCv()) {
             ArrayIntList resultList = new ArrayIntList(7);
 
             resultList.add(getCharacteristicId());
@@ -998,11 +945,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
       @Override
       public boolean isInferred() {
-         if (index >= 0) {
-            return revisions.get(index).isInferred();
-         }
-
-         return Relationship.this.isInferred();
+         return getCv().isInferred();
       }
 
       @Override
@@ -1014,76 +957,44 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
       @Override
       @Deprecated
-      public void setCharacteristicId(int characteristicId) {
-         if (index >= 0) {
-            revisions.get(index).setCharacteristicId(characteristicId);
-         } else {
-            Relationship.this.setCharacteristicId(characteristicId);
-         }
+      public void setCharacteristicId(int characteristicId) throws PropertyVetoException {
+         getCv().setCharacteristicNid(characteristicId);
       }
 
       @Override
-      public void setCharacteristicNid(int characteristicNid) {
-         if (index >= 0) {
-            revisions.get(index).setCharacteristicNid(characteristicNid);
-         } else {
-            Relationship.this.setCharacteristicNid(characteristicNid);
-         }
+      public void setCharacteristicNid(int characteristicNid) throws PropertyVetoException {
+         getCv().setCharacteristicNid(characteristicNid);
       }
 
       @Override
       public void setDestinationNid(int destNid) throws PropertyVetoException {
-         if (Relationship.this.getTime() == Long.MAX_VALUE) {
-            Relationship.this.setDestinationNid(destNid);
-         } else {
-            throw new UnsupportedOperationException("Relationship.this.getTime() != Long.MAX_VALUE");
-         }
+         getCv().setDestinationNid(destNid);
       }
 
       @Override
-      public void setGroup(int group) {
-         if (index >= 0) {
-            revisions.get(index).setGroup(group);
-         } else {
-            Relationship.this.setGroup(group);
-         }
+      public void setGroup(int group) throws PropertyVetoException {
+         getCv().setGroup(group);
       }
 
       @Override
-      public void setRefinabilityId(int refinabilityId) {
-         if (index >= 0) {
-            revisions.get(index).setRefinabilityId(refinabilityId);
-         } else {
-            Relationship.this.setRefinabilityId(refinabilityId);
-         }
+      public void setRefinabilityId(int refinabilityId) throws PropertyVetoException {
+         getCv().setRefinabilityNid(refinabilityId);
       }
 
       @Override
-      public void setRefinabilityNid(int refinabilityNid) {
-         if (index >= 0) {
-            revisions.get(index).setRefinabilityNid(refinabilityNid);
-         } else {
-            Relationship.this.setRefinabilityNid(refinabilityNid);
-         }
+      public void setRefinabilityNid(int refinabilityNid) throws PropertyVetoException {
+         getCv().setRefinabilityNid(refinabilityNid);
       }
 
       @Override
       @Deprecated
-      public void setTypeId(int type) {
-         if (index >= 0) {
-            revisions.get(index).setTypeNid(type);
-         } else {
-            Relationship.this.setTypeNid(type);
-         }
+      public void setTypeId(int type) throws PropertyVetoException {
+         getCv().setTypeNid(type);
       }
 
       @Override
-      public void setTypeNid(int type) {
-         if (index >= 0) {
-            revisions.get(index).setTypeNid(type);
-         } else {
-            Relationship.this.setTypeNid(type);
-         }
+      public void setTypeNid(int typeNid) throws PropertyVetoException {
+         getCv().setTypeNid(typeNid);
       }
    }
 }

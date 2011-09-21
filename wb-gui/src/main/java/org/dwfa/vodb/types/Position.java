@@ -349,7 +349,12 @@ public class Position implements I_Position {
                     position.getPath().getConceptNid());
             PathBI path = Terms.get().getPath(pathConcept.getUids());
             positions.add(Terms.get().newPosition(path, position.getTime()));
-         } catch (IOException ex) {
+         } 
+         
+         catch(NullPointerException npe){
+         	AceLog.getAppLog().severe("readPositionSet position not found");
+         }
+         catch (IOException ex) {
             if (ex.getCause() != null && NoMappingException.class.isAssignableFrom(ex.getCause().getClass())) {
                AceLog.getAppLog().alertAndLogException(ex.getCause());
             } else {

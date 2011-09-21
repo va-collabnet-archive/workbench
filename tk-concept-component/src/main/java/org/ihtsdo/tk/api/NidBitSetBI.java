@@ -1,33 +1,35 @@
 package org.ihtsdo.tk.api;
 
 public interface NidBitSetBI {
+   public void and(NidBitSetBI other);
 
-    public boolean isMember(int nid);
+   void andNot(NidBitSetBI other);
 
-    public void setMember(int nid);
+   /**
+    *
+    * @return number of set bits.
+    */
+   public int cardinality();
 
-    public void setNotMember(int nid);
+   public void clear();
 
-    public void and(NidBitSetBI other);
+   public NidBitSetItrBI iterator();
 
-    public void or(NidBitSetBI other);
+   public void or(NidBitSetBI other);
 
-    public NidBitSetItrBI iterator();
+   public int totalBits();
 
-    /**
-     * 
-     * @return number of set bits. 
-     */
-    public int cardinality();
+   void union(NidBitSetBI other);
 
-    public int totalBits();
+   void xor(NidBitSetBI other);
 
-    public void clear();
+   //~--- get methods ---------------------------------------------------------
 
-	void andNot(NidBitSetBI other);
+   public boolean isMember(int nid);
 
-	void union(NidBitSetBI other);
+   //~--- set methods ---------------------------------------------------------
 
-	void xor(NidBitSetBI other);
+   public void setMember(int nid);
 
+   public void setNotMember(int nid);
 }

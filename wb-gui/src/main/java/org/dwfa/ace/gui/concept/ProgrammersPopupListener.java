@@ -313,8 +313,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                Terms.get().suspendChangeSetWriters();
 
                I_ReadChangeSet csr = Terms.get().newBinaryChangeSetReader(csf);
-
                csr.read();
+
+               I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
+               wcsr.read();
             } finally {
                Terms.get().resumeChangeSetWriters();
             }

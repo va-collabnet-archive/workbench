@@ -200,6 +200,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
       if (revisions == null) {
          out.writeInt(0);
       } else {
+    	 checkListInt(revisions.size()); 
          out.writeInt(revisions.size());
 
          for (TkRelationshipRevision erv : revisions) {

@@ -230,7 +230,7 @@ public class NidSet implements NidSetBI {
         int count = 0;
         for (int i : setValues) {
             try {
-                if (Ts.get().getConceptNidForNid(i) == i) {
+                if (i < 0 && Ts.get().getConceptNidForNid(i) == i) {
                     buf.append(Ts.get().getConcept(i).toString());
                 } else {
                     buf.append(i);

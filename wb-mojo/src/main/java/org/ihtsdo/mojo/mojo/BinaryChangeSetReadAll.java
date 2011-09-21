@@ -95,11 +95,19 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
 
         importAllChangeSetsTask.setValidators(validatorString);
         importAllChangeSetsTask.setRootDirStr(changeSetDir);
+        runLocal();
+        
         try {
             importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
         } catch (TaskFailedException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
+    }
+    /**
+     * To Allow this class to be extended for example if calling terminology specfic lucene indexing
+     */
+    public void runLocal(){
+    	
     }
 
     public String getChangeSetDir() {

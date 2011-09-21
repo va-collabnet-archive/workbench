@@ -5,14 +5,17 @@ package org.ihtsdo.db.bdb.sap;
 import org.ihtsdo.tk.hash.Hashcode;
 
 public class UncommittedStatusForPath {
+   public int hashCode = Integer.MAX_VALUE;
+   public int authorNid;
    public int pathNid;
    public int statusNid;
 
    //~--- constructors --------------------------------------------------------
 
-   public UncommittedStatusForPath(int statusNid, int pathNid) {
+   public UncommittedStatusForPath(int statusNid, int authorNid, int pathNid) {
       super();
       this.statusNid = statusNid;
+      this.authorNid = authorNid;
       this.pathNid   = pathNid;
    }
 
@@ -23,7 +26,7 @@ public class UncommittedStatusForPath {
       if (obj instanceof UncommittedStatusForPath) {
          UncommittedStatusForPath other = (UncommittedStatusForPath) obj;
 
-         if ((statusNid == other.statusNid) && (pathNid == other.pathNid)) {
+         if ((statusNid == other.statusNid) && (authorNid == other.authorNid) && (pathNid == other.pathNid)) {
             return true;
          }
       }
@@ -33,6 +36,10 @@ public class UncommittedStatusForPath {
 
    @Override
    public int hashCode() {
-      return Hashcode.compute(new int[] { statusNid, pathNid });
+      if (hashCode == Integer.MAX_VALUE) {
+         hashCode = Hashcode.compute(new int[] { statusNid, authorNid, pathNid });
+      }
+
+      return hashCode;
    }
 }

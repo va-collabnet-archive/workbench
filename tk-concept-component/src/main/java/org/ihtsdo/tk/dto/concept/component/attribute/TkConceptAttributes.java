@@ -3,6 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -134,6 +135,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
          out.writeInt(0);
       } else {
          assert revisions.size() < 1024 : "Version count is: " + revisions.size() + "\n\n" + this.toString();
+         checkListInt(revisions.size());
          out.writeInt(revisions.size());
 
          for (TkConceptAttributesRevision cav : revisions) {

@@ -12,6 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
@@ -161,7 +162,7 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.revisions = new CopyOnWriteArrayList<ImageRevision>();
+        obj.revisions = new RevisionSet(1);
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 1;
@@ -182,7 +183,7 @@ public class ImageTest {
         
         // Create an object to test... 
         Image obj = new Image();
-        obj.revisions = new CopyOnWriteArrayList<ImageRevision>();
+        obj.revisions = new RevisionSet(1);
         ImageRevision ir = new ImageRevision(); 
         ir.primordialComponent = obj; 
         ir.sapNid = 2;

@@ -138,18 +138,30 @@ public class WfHxIndexGenerator extends IndexGenerator {
 	public static void initializeSemTags(ViewCoordinate vc) {
 		if (semanticTags == null) {
 			try {
-				I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());
+				I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());				
+				semanticTags = new TreeSet<String>();
 
-				Set<ConceptVersionBI> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept.getVersion(vc));
-		    	semanticTags = new TreeSet<String>();
-		    	
-		    	for (ConceptVersionBI con : semTagConcepts) {
-		    		String semTag = con.getFullySpecifiedDescription().getText();
-		    		
-		    		semTag = WorkflowHelper.parseSpaces(semTag);
-		
-		    		semanticTags.add(semTag);
-		    	}
+				if (vc != null) {
+					Set<ConceptVersionBI> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept.getVersion(vc));
+
+			    	for (ConceptVersionBI con : semTagConcepts) {
+			    		String semTag = con.getFullySpecifiedDescription().getText();
+			    		
+			    		semTag = WorkflowHelper.parseSpaces(semTag);
+			
+			    		semanticTags.add(semTag);
+			    	}
+				} else {
+					Set<I_GetConceptData> semTagConcepts = WorkflowHelper.getChildren(parentSemTagConcept);
+					
+			    	for (I_GetConceptData con : semTagConcepts) {
+			    		String semTag = con.getInitialText();
+			    		
+			    		semTag = WorkflowHelper.parseSpaces(semTag);
+			
+			    		semanticTags.add(semTag);
+			    	}
+				}					
 			} catch (Exception e) {
 			    AceLog.getAppLog().info("Error initializing semantic tags for wf lucene index generator with error,: " + e.getMessage());
 			}

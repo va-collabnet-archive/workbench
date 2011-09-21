@@ -1435,10 +1435,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     private JComponent getContentPanel() throws Exception {
 
-        String custUI = (String) ObjectCache.get(CustomStatics.CUSTOM_UI_CLASS);
+        String custUI = (String) ObjectCache.INSTANCE.get(CustomStatics.CUSTOM_UI_CLASS);
 
         if (custUI != null && custUI.length() > 0) {
-            I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.get(custUI);
+            I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.INSTANCE.get(custUI);
             return cp.getContentPanel(this);
         } else {
             return getDefaultContentPanel();

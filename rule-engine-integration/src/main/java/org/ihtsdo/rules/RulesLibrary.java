@@ -608,45 +608,53 @@ public class RulesLibrary {
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
-		File rulesDirectory = new File("rules");
-		if (!rulesDirectory.exists())
-		{
-			rulesDirectory.mkdir();
-		}
-		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+		try {
+			File rulesDirectory = new File("rules");
+			if (!rulesDirectory.exists())
+			{
+				rulesDirectory.mkdir();
+			}
+			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
 
-		if (serializedKbFile.exists()) {
+			if (serializedKbFile.exists()) {
+				try {
+					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+					// The input stream might contain an individual
+					// package or a collection.
+					kbase = (KnowledgeBase)in.readObject();
+					in.close();
+				} catch (StreamCorruptedException e0) {
+					serializedKbFile.delete();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			String result = "";
+			if (kbase != null) {
+				result = "Sucess...";
+			} else {
+				result = "Cache not available...";
+			}
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 			try {
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-				// The input stream might contain an individual
-				// package or a collection.
-				kbase = (KnowledgeBase)in.readObject();
-				in.close();
-			} catch (StreamCorruptedException e0) {
-				serializedKbFile.delete();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
 				e.printStackTrace();
 			}
-		}
-
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-		String result = "";
-		if (kbase != null) {
-			result = "Sucess...";
-		} else {
-			result = "Cache not available...";
-		}
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-		try {
-			activity.complete();
-			activity.removeActivityFromViewer();
-		} catch (ComputationCanceled e) {
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
 			e.printStackTrace();
 		}
 		return kbase;
@@ -669,43 +677,51 @@ public class RulesLibrary {
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
-		File rulesDirectory = new File("rules");
-		if (!rulesDirectory.exists())
-		{
-			rulesDirectory.mkdir();
-		}
-		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
-		KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-		//		kaconf.setProperty( "drools.resource.urlcache","rules" );
-		kaconf.setProperty( "drools.agent.newInstance","false" );
-		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
-		SystemEventListener sysEvenListener = new ConsoleSystemEventListener();
-		kagent.setSystemEventListener(sysEvenListener);
-		kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
-		kbase = kagent.getKnowledgeBase();
 		try {
-			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-			out.writeObject( kbase );
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-		String result = "";
-		if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
-			result = "Sucess...";
-		} else {
-			result = "Repository not available...";
-		}
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-		try {
-			activity.complete();
-			activity.removeActivityFromViewer();
-		} catch (ComputationCanceled e) {
+			File rulesDirectory = new File("rules");
+			if (!rulesDirectory.exists())
+			{
+				rulesDirectory.mkdir();
+			}
+			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+			KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
+			//		kaconf.setProperty( "drools.resource.urlcache","rules" );
+			kaconf.setProperty( "drools.agent.newInstance","false" );
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
+			SystemEventListener sysEvenListener = new ConsoleSystemEventListener();
+			kagent.setSystemEventListener(sysEvenListener);
+			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			kbase = kagent.getKnowledgeBase();
+			try {
+				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+				out.writeObject( kbase );
+				out.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			String result = "";
+			if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
+				result = "Sucess...";
+			} else {
+				result = "Repository not available...";
+			}
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
 			e.printStackTrace();
 		}
 		return kbase;

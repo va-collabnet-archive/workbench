@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 
 
@@ -36,14 +37,14 @@ public interface I_RelTuple<A extends RelationshipAnalogBI> extends
     public int getRefinabilityId();
 
     @Override
-    public void setStatusId(int statusId);
+    public void setStatusId(int statusId) throws PropertyVetoException;
 
-    public void setCharacteristicId(int characteristicId);
+    public void setCharacteristicId(int characteristicId) throws PropertyVetoException;
 
-    public void setRefinabilityId(int refinabilityId);
+    public void setRefinabilityId(int refinabilityId) throws PropertyVetoException;
 
     @Override
-    public void setGroup(int group);
+    public void setGroup(int group) throws PropertyVetoException;
 
     /**
      * @deprecated

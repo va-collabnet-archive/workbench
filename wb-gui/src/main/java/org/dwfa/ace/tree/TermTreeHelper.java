@@ -56,6 +56,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -118,8 +119,10 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
 
    @Override
    public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-      AceLog.getAppLog().info("Term change. Sequence: " + sequence + " changedXrefs: " + changedXrefs
-                              + " changedComponents: " + changedComponents);
+      if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+         AceLog.getAppLog().info("Term change. Sequence: " + sequence + " changedXrefs: " + changedXrefs
+                                 + " changedComponents: " + changedComponents);
+      }
    }
 
    private I_GetConceptDataForTree handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
