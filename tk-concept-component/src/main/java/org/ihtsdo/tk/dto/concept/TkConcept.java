@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -48,6 +49,8 @@ public class TkConcept {
    public UUID                            primordialUuid;
    public List<TkRefsetAbstractMember<?>> refsetMembers;
    public List<TkRelationship>            relationships;
+   
+   
 
    //~--- constructors --------------------------------------------------------
 
@@ -216,7 +219,7 @@ public class TkConcept {
       }
 
       int descCount = in.readInt();
-
+      TkComponent.checkListInt(descCount);
       if (descCount > 0) {
          descriptions = new ArrayList<TkDescription>(descCount);
 
@@ -226,7 +229,7 @@ public class TkConcept {
       }
 
       int relCount = in.readInt();
-
+      TkComponent.checkListInt(relCount);
       if (relCount > 0) {
          relationships = new ArrayList<TkRelationship>(relCount);
 
@@ -236,7 +239,7 @@ public class TkConcept {
       }
 
       int imgCount = in.readInt();
-
+      TkComponent.checkListInt(imgCount);
       if (imgCount > 0) {
          media = new ArrayList<TkMedia>(imgCount);
 
@@ -246,7 +249,7 @@ public class TkConcept {
       }
 
       int refsetMemberCount = in.readInt();
-
+      TkComponent.checkListInt(refsetMemberCount);
       if (refsetMemberCount > 0) {
          refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(refsetMemberCount);
 
@@ -413,7 +416,8 @@ public class TkConcept {
    }
 
    public void writeExternal(DataOutput out) throws IOException {
-      out.writeInt(dataVersion);
+	   TkComponent.checkListInt(dataVersion);
+	   out.writeInt(dataVersion);
 
       if (primordialUuid == null) {
          primordialUuid = conceptAttributes.primordialUuid;
@@ -432,6 +436,7 @@ public class TkConcept {
       if (descriptions == null) {
          out.writeInt(0);
       } else {
+    	  TkComponent.checkListInt(descriptions.size()); 
          out.writeInt(descriptions.size());
 
          for (TkDescription d : descriptions) {
@@ -442,6 +447,7 @@ public class TkConcept {
       if (relationships == null) {
          out.writeInt(0);
       } else {
+    	  TkComponent.checkListInt(relationships.size()); 
          out.writeInt(relationships.size());
 
          for (TkRelationship r : relationships) {
@@ -452,6 +458,7 @@ public class TkConcept {
       if (media == null) {
          out.writeInt(0);
       } else {
+    	  TkComponent.checkListInt(media.size());    	  
          out.writeInt(media.size());
 
          for (TkMedia img : media) {
@@ -462,6 +469,7 @@ public class TkConcept {
       if (refsetMembers == null) {
          out.writeInt(0);
       } else {
+    	  TkComponent.checkListInt(refsetMembers.size());    	  
          out.writeInt(refsetMembers.size());
 
          for (TkRefsetAbstractMember<?> r : refsetMembers) {
@@ -532,4 +540,7 @@ public class TkConcept {
    public void setRelationships(List<TkRelationship> relationships) {
       this.relationships = relationships;
    }
+   
+
+   
 }
