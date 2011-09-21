@@ -52,7 +52,7 @@ public class TkRefsetCidLongMember extends TkRefsetAbstractMember<TkRefsetCidLon
         if (extraVersions == null) {
             out.writeInt(0);
         } else {
-        	TkConcept.checkListInt(extraVersions.size());
+        	checkListInt(extraVersions.size());
             out.writeInt(extraVersions.size());
             for (TkRefsetCidLongRevision rmv : extraVersions) {
                 rmv.writeExternal(out);

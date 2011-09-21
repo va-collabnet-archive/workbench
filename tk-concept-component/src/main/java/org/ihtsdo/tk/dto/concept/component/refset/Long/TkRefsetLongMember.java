@@ -45,7 +45,7 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
         if (revisions == null) {
             out.writeInt(0);
         } else {
-        	TkConcept.checkListInt(revisions.size());
+        	checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRefsetLongRevision rmv : revisions) {
                 rmv.writeExternal(out);

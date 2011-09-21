@@ -52,7 +52,7 @@ public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntR
         if (revisions == null) {
             out.writeInt(0);
         } else {
-        	TkConcept.checkListInt(revisions.size());
+        	checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRefsetCidIntRevision rmv : revisions) {
                 rmv.writeExternal(out);

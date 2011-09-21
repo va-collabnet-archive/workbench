@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
-import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision> implements I_ConceptualizeExternally {
@@ -46,7 +45,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
         } else {
             assert revisions.size() < 1024: "Version count is: " + 
                     revisions.size() + "\n\n" + this.toString();
-            TkConcept.checkListInt(revisions.size());
+            checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkConceptAttributesRevision cav: revisions) {
                 cav.writeExternal(out);

@@ -66,7 +66,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
         if (revisions == null) {
             out.writeInt(0);
         } else {
-        	TkConcept.checkListInt(revisions.size());
+        	checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRelationshipRevision erv : revisions) {
                 erv.writeExternal(out);

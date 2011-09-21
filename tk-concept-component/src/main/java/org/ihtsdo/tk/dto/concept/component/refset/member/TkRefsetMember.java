@@ -42,7 +42,7 @@ public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
         if (revisions == null) {
             out.writeInt(0);
         } else {
-        	TkConcept.checkListInt(revisions.size());
+        	checkListInt(revisions.size());
             out.writeInt(revisions.size());
             for (TkRefsetRevision rmv : revisions) {
                 rmv.writeExternal(out);

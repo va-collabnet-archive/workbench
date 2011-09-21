@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
@@ -40,6 +41,8 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     public List<TkRefsetAbstractMember<?>> annotations;
 
     public List<V> revisions;
+    
+    public static int maxParts = 1000000;
 
     public TkComponent() {
         super();
@@ -296,5 +299,27 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
         }
         return false;
     }
+    
+    public static void checkListInt(int int2Check) throws IOException{
+    	if(int2Check < 0){
+    		IOException ioe = new IOException(" checkListInt int was less than 0 and = "+int2Check);
+    		ioe.printStackTrace();
+    		throw ioe;
+    	}
+    	if(int2Check > getMaxParts()){
+    		IOException ioe = new IOException(" checkListInt int was greater than 1000000 and = "+int2Check);
+    		ioe.printStackTrace();
+    		throw ioe;
+    	}
+    	
+    }
+
+	public static int getMaxParts() {
+		return maxParts;
+	}
+
+	public static void setMaxParts(int maxPartsI) {
+		maxParts = maxPartsI;
+	}
 
 }
