@@ -192,7 +192,6 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
       if (revisions == null) {
          out.writeInt(0);
       } else {
-    	 checkListInt(revisions.size()); 
          out.writeInt(revisions.size());
 
          for (TkMediaRevision eiv : revisions) {

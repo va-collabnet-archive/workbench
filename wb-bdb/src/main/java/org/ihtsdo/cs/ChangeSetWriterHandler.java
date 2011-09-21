@@ -45,63 +45,32 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
    private Timer timer;
    private Semaphore permit;
    private List<ChangeSetGeneratorBI> writerListForHandler;
-   
-   public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
-           long commitTime, NidSetBI sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy,
-           ChangeSetWriterThreading changeSetWriterThreading) {	
-		
-		super();
-		Semaphore permit1 = new Semaphore(1, true);
-		init(cNidsToWrite,commitTime,sapNidsFromCommit,changeSetPolicy,changeSetWriterThreading,permit1);
-	}
 
    public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
            long commitTime, NidSetBI sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy,
            ChangeSetWriterThreading changeSetWriterThreading,
-           Semaphore permitIn) {
+           Semaphore permit) {
       super();
-      init(cNidsToWrite,commitTime,sapNidsFromCommit,changeSetPolicy,changeSetWriterThreading,permitIn);
+      assert commitTime != Long.MAX_VALUE;
+      assert commitTime != Long.MIN_VALUE;
+      this.permit = permit;
+      this.cNidsToWrite = cNidsToWrite;
+      changedCount = cNidsToWrite.cardinality();
+      this.commitTime = commitTime;
+      this.commitTimeStr = TimeUtil.formatDate(commitTime)
+              + "; gVer: " + Bdb.gVersion.incrementAndGet()
+              + " (" + cNidsToWrite.cardinality() + " concepts)";
+      this.sapNidsFromCommit = sapNidsFromCommit;
+      this.changeSetWriterThreading = changeSetWriterThreading;
+      changeSetWriters.incrementAndGet();
+      this.changeSetPolicy = changeSetPolicy;
+      writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
    }
-   
-   
-private void init(I_RepresentIdSet cNidsToWrite,
-           long commitTime, NidSetBI sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy,
-           ChangeSetWriterThreading changeSetWriterThreading,
-           Semaphore permitIn){
-	
-	assert commitTime != Long.MAX_VALUE;
-    assert commitTime != Long.MIN_VALUE;
-    this.permit = permitIn;
-    this.cNidsToWrite = cNidsToWrite;
-    changedCount = cNidsToWrite.cardinality();
-    this.commitTime = commitTime;
-    this.commitTimeStr = TimeUtil.formatDate(commitTime)
-            + "; gVer: " + Bdb.gVersion.incrementAndGet()
-            + " (" + cNidsToWrite.cardinality() + " concepts)";
-    this.sapNidsFromCommit = sapNidsFromCommit;
-    this.changeSetWriterThreading = changeSetWriterThreading;
-    changeSetWriters.incrementAndGet();
-    this.changeSetPolicy = changeSetPolicy;
-    writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());	
-}
 
    @Override
    public void run() {
       try {
          conceptCount = Bdb.getConceptDb().getCount();
-         if (permit != null) {
- 			AceLog.getAppLog().info("ChangeSetWriterHandler run permit != null avail = "+permit.availablePermits());
- 			try {
- 				permit.acquire();
- 			} catch (InterruptedException e) {
- 				AceLog.getAppLog().severe("ChangeSetWriterHandler.run InterruptedException thrown", e);
- 				e.printStackTrace();
- 				AceLog.getAppLog().alertAndLogException(e);
- 			}
- 		}
-         else{
-        	 AceLog.getAppLog().info("ChangeSetWriterHandler run permit = null");
-         }
 
          activity = Terms.get().newActivityPanel(true, Terms.get().getActiveAceFrameConfig(), "CS writer: " + commitTimeStr + "...",
                  false);

@@ -142,7 +142,6 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
       if (revisions == null) {
          out.writeInt(0);
       } else {
-    	 checkListInt(revisions.size()); 
          out.writeInt(revisions.size());
 
          for (TkRefsetIntRevision rmv : revisions) {

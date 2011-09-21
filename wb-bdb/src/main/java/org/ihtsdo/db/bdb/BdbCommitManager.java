@@ -482,15 +482,10 @@ public class BdbCommitManager {
                            uncommittedCNidsNoChecks.or(uncommittedCNids);
 
                            if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                              /*ChangeSetWriterHandler handler =
+                              ChangeSetWriterHandler handler =
                                  new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
                                                             sapNidsFromCommit, changeSetPolicy.convert(),
-                                                            changeSetWriterThreading, Svn.rwl);*/
-                              
-                              final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
-                                      uncommittedCNidsNoChecks, commitTime,
-                                      sapNidsFromCommit, changeSetPolicy.convert(),
-                                      changeSetWriterThreading);
+                                                            changeSetWriterThreading, Svn.rwl);
 
                               changeSetWriterService.execute(handler);
                               passedRelease = true;

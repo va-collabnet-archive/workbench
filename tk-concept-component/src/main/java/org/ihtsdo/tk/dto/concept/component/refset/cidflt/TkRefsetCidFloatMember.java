@@ -149,7 +149,6 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
       if (revisions == null) {
          out.writeInt(0);
       } else {
-    	 checkListInt(revisions.size());
          out.writeInt(revisions.size());
 
          for (TkRefsetCidFloatRevision rmv : revisions) {
