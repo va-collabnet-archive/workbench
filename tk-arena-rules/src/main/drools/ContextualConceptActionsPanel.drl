@@ -35,29 +35,26 @@ global ViewCoordinate vc;
 
 rule "add if null concept in host"
 	when
-		$c: ConceptFact(this.getComponent() == null)
+		$c: ConceptFact(getConcept() == null)
 	then 
-		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp"))); 
+		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+//                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
 end
 
-rule "retire or move"
+rule "panel has component"
 	when
-		$c: ConceptFact(this.getComponent() != null); 
+		$c: ConceptFact(getConcept() != null) 
 	then
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
+//                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
 end
 
 rule "abandon concept and restart"
 	when
-		$c: ConceptFact(this.getComponent() != null, this.getConcept().getConAttrsActive() == null,
-                    ((ConceptChronicleBI)getConcept().getPrimordialVersion()).isUncommitted() == true); 
+		$c: ConceptFact(getConcept() != null, getConcept().getConAttrsActive() == null,
+                    ((ConceptChronicleBI)getConcept().getPrimordialVersion()).isUncommitted() == true) 
 	then
 		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end
-
-
-
-
-
