@@ -510,7 +510,6 @@ public class BdbCommitManager {
                      uncommittedDescNids.clear();
                      luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
-                     luceneWriterPermit.acquire();
                      Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
                      wfMembersToCommit.addAll(uncommittedWfMemberIds);
@@ -702,7 +701,6 @@ public class BdbCommitManager {
 
             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
-            luceneWriterPermit.acquire();
             Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
             wfMembersToCommit.addAll(uncommittedWfMemberIds);
