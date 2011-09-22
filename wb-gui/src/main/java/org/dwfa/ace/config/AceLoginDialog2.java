@@ -325,13 +325,13 @@ public class AceLoginDialog2 extends javax.swing.JDialog implements ActionListen
     	     repo.testConnection();
     	     
     	 }catch (SVNAuthenticationException svnAEx){
-    		 AceLog.getAppLog().info("checkSVN SVNAuthenticationException");
+    		 AceLog.getAppLog().info("checkSVN SVNAuthenticationException url = "+url);
     		 //ok = false;
     		 //AceLog.getAppLog().alertAndLog(Level.SEVERE, ERR_PASSWORD_S, svnAEx);	
     		 err_msg = ERR_PASSWORD_S;
     	 }
     	 catch (SVNException e){
-    		 AceLog.getAppLog().info("checkSVN SVNException");
+    		 AceLog.getAppLog().info("checkSVN SVNException url = "+url);
     		 //ok = false;
     	    // AceLog.getAppLog().alertAndLog(Level.SEVERE, ERR_NETWORK_S+url+" \n Error = "+e.getMessage(), e);
     	     err_msg = ERR_NETWORK_S+url+" \n Error = "+e.getMessage();
