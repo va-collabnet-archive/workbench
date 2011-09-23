@@ -187,7 +187,7 @@ public class RulesLibrary {
 				kbase.getKnowledgePackages().size() < 2) {
 			noRealtimeRulesAlertShown = true;
 			AceLog.getAppLog().alertAndLogException(
-					new IOException("Warning! No rules in realtime context. QA is disabled."));
+					new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
 		}
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
