@@ -79,8 +79,7 @@ public class Svn implements I_HandleSubversion {
 
     protected static boolean useCachedCredentials = false;
 
-	//private static SvnImpl impl = SvnImpl.SVN_KIT;
-    private static SvnImpl impl = SvnImpl.NATIVE;
+	private static SvnImpl impl = SvnImpl.SVN_KIT;
 
 	private static SVNClientInterface client;
 
