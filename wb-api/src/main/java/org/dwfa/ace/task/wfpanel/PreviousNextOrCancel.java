@@ -55,15 +55,10 @@ import org.dwfa.util.LogWithAlerts;
 public abstract class PreviousNextOrCancel extends AbstractTask {
 
     private static final long serialVersionUID = 1;
-
     private static final int dataVersion = 1;
-
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-
     protected transient Condition returnCondition;
-
     protected transient boolean done;
-
     protected transient I_ConfigAceFrame config;
     protected transient boolean builderVisible;
     protected transient boolean progressPanelVisible;
@@ -107,32 +102,32 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
          */
         public void actionPerformed(ActionEvent e) {
             if (hasValidInput()) {
-        	if (Terms.get().getUncommitted().size() > 0) {
-        		for (I_Transact c: Terms.get().getUncommitted()) {
+                if (Terms.get().getUncommitted().size() > 0) {
+                    for (I_Transact c : Terms.get().getUncommitted()) {
                         AceLog.getAppLog().warning("Uncommitted changes to: " + ((I_GetConceptData) c).toLongString());
-        			
-        		}
-        		HasUncommittedChanges.askToCommit(process);
-        	}
-            if (Terms.get().getUncommitted().size() > 0) {
-                if (!DwfaEnv.isHeadless()) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "There are uncommitted changes - please cancel or commit before continuing.", "",
-                        JOptionPane.ERROR_MESSAGE);
+
+                    }
+                    HasUncommittedChanges.askToCommit(process);
                 }
-            } else {
-                returnCondition = Condition.CONTINUE;
-                done = true;
-                synchronized (PreviousNextOrCancel.this) {
-                    PreviousNextOrCancel.this.notifyAll();
+                if (Terms.get().getUncommitted().size() > 0) {
+                    if (!DwfaEnv.isHeadless()) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                "There are uncommitted changes - please cancel or commit before continuing.", "",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    returnCondition = Condition.CONTINUE;
+                    done = true;
+                    synchronized (PreviousNextOrCancel.this) {
+                        PreviousNextOrCancel.this.notifyAll();
+                    }
                 }
-            }
             } else {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), getInvalidInputMessage(), "",
-                        JOptionPane.ERROR_MESSAGE);
-        }
-    }
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 
@@ -152,17 +147,15 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             if (Terms.get().getUncommitted().size() > 0) {
                 if (!DwfaEnv.isHeadless()) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "There are uncommitted changes - please cancel or commit before continuing.", "",
-                        JOptionPane.ERROR_MESSAGE);
+                            "There are uncommitted changes - please cancel or commit before continuing.", "",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-            returnCondition = Condition.ITEM_CANCELED;
-            done = true;
-            notifyTaskDone();
+                returnCondition = Condition.ITEM_CANCELED;
+                done = true;
+                notifyTaskDone();
+            }
         }
-    }
-
-		
     }
 
     protected void waitTillDone(Logger l) {
@@ -174,12 +167,12 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             }
         }
     }
-    
+
     protected void notifyTaskDone() {
-		synchronized (PreviousNextOrCancel.this) {
+        synchronized (PreviousNextOrCancel.this) {
             PreviousNextOrCancel.this.notifyAll();
         }
-	}
+    }
 
     public String getInvalidInputMessage() {
         return "Invalid input";
@@ -225,7 +218,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         }
         JPanel detailsSheet = config.getWorkflowDetailsSheet();
         if (detailsSheet.isVisible()
-            && detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS) != null) {
+                && detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS) != null) {
             JComponent componentToFocus =
                     (JComponent) detailsSheet.getClientProperty(DetailSheetClientProperties.COMPONENT_FOR_FOCUS);
             componentToFocus.requestFocusInWindow();
@@ -242,6 +235,7 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
             doRun();
         } else {
             SwingUtilities.invokeAndWait(new Runnable() {
+
                 public void run() {
                     doRun();
                 }
@@ -257,15 +251,17 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
         this.done = false;
         this.process = process;
         config = (I_ConfigAceFrame) process.getProperty(getProfilePropName());
+        if (process.getProperty(getProfilePropName()) != null) {
+            builderVisible = config.isBuilderToggleVisible();
+            config.setBuilderToggleVisible(false);
+            subversionButtonVisible = config.isSubversionToggleVisible();
+            config.setSubversionToggleVisible(false);
+            inboxButtonVisible = config.isInboxToggleVisible();
+            config.setInboxToggleVisible(false);
+            workflowPanel = config.getWorkflowPanel();
+            workflowPanel.setVisible(true);
+        }
 
-        builderVisible = config.isBuilderToggleVisible();
-        config.setBuilderToggleVisible(false);
-        subversionButtonVisible = config.isSubversionToggleVisible();
-        config.setSubversionToggleVisible(false);
-        inboxButtonVisible = config.isInboxToggleVisible();
-        config.setInboxToggleVisible(false);
-        workflowPanel = config.getWorkflowPanel();
-        workflowPanel.setVisible(true);
     }
 
     /**
@@ -287,17 +283,19 @@ public abstract class PreviousNextOrCancel extends AbstractTask {
     }
 
     private void doRun() {
-        Component[] components = workflowPanel.getComponents();
-        for (int i = 0; i < components.length; i++) {
-            workflowPanel.remove(components[i]);
-        }
-        workflowPanel.setVisible(false);
-        workflowPanel.repaint();
-        workflowPanel.validate();
-        Container cont = workflowPanel;
-        while (cont != null) {
-            cont.validate();
-            cont = cont.getParent();
+        if (workflowPanel != null) {
+            Component[] components = workflowPanel.getComponents();
+            for (int i = 0; i < components.length; i++) {
+                workflowPanel.remove(components[i]);
+            }
+            workflowPanel.setVisible(false);
+            workflowPanel.repaint();
+            workflowPanel.validate();
+            Container cont = workflowPanel;
+            while (cont != null) {
+                cont.validate();
+                cont = cont.getParent();
+            }
         }
     }
 
