@@ -20,22 +20,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.TerminologySnapshotDI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
-import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 
 /**
  *
@@ -56,7 +47,7 @@ public class MemberSubmissionFileHelper {
                     HashMap msFileSetMap = new HashMap<String, Set<String>>();
                     BufferedReader reader = new BufferedReader(isr);
                     String line = reader.readLine();
-                    Set<String> msFileSet = new HashSet<String>();
+                    Set<String> msFileSet = new LinkedHashSet<String>();
                     while(line != null){
                         msFileSet.add(line);
                         line = reader.readLine();

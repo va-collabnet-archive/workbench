@@ -38,7 +38,7 @@ rule "add if null concept in host"
 		$c: ConceptFact(getConcept() == null)
 	then 
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
-//                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
+                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
 end
 
 rule "panel has component"
@@ -48,7 +48,7 @@ rule "panel has component"
 		actions.add(actionFactory.make(new File("plugins/retire/retire-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/retire/move-concept.bp")));
 		actions.add(actionFactory.make(new File("plugins/arena/newconcept.bp")));
-//                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
+                actions.add(actionFactory.make(new File("plugins/arena/ms-batch-import.bp")));
 end
 
 rule "abandon concept and restart"

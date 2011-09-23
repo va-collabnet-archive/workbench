@@ -244,7 +244,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             }
             MakeNewConcept maker = new MakeNewConcept();
             maker.execute();
-            restore();
+//            restore();
             maker.getLatch().await();
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
@@ -558,10 +558,10 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         saveButton.addActionListener(new PreviousActionListener()); //@akf TODO: make save action listener
         c.gridx++;
 
-        JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
-        cancelButton.setToolTipText("cancel");
-        wizardPanel.add(cancelButton, c);
-        cancelButton.addActionListener(new StopActionListener());
+//        JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
+//        cancelButton.setToolTipText("cancel");
+//        wizardPanel.add(cancelButton, c);
+//        cancelButton.addActionListener(new StopActionListener());
         c.gridx++;
         wizardPanel.add(new JLabel("     "), c);
         wizardPanel.validate();
@@ -1072,34 +1072,35 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         public void actionPerformed(ActionEvent e) {
 
             //make sure parent is valid
-            try {
-                if (parentId != null) {
-                    try {
-                        Set<I_GetConceptData> concepts = Terms.get().getConcept(parentId);
+            if (parentId != null) { //test for valid parent
+                try {
+                    if (parentId.length() == 8) {
+                        Set<I_GetConceptData> concepts;
+                        concepts = Terms.get().getConcept(parentId);
                         for (I_GetConceptData concept : concepts) {
                             parentUuid = concept.getPrimUuid();
                         }
-                    } catch (TerminologyException ex) {
+                        parent = new ConceptSpec(parentFsn, parentUuid);
+                        parent.getLenient();
+                        returnCondition = Condition.CONTINUE;
+                        done = true;
+                        NewConceptFromBatch.this.notifyTaskDone();
+                    } else {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "The parent concept has not been created yet.</br>"
-                                + "Need to create concept with UUID: " + parentUuid, "",
-                                JOptionPane.ERROR_MESSAGE);
-                    } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "The parent concept has not been created yet.</br>"
-                                + "Need to create concept with UUID: " + parentUuid, "",
+                                "The parent concept has not been created yet. Fsn: " + parentFsn + " UUID: " + parentId, "",
                                 JOptionPane.ERROR_MESSAGE);
                     }
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "The parent fsn and UUID do not match. Fsn: " + parentFsn + " UUID: " + parentUuid, "",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (TerminologyException ex) {
+                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                parent = new ConceptSpec(parentFsn, parentUuid);
-                parent.getLenient();
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "The parent fsn and UUID do not match. Fsn: " + parentFsn + " UUID: " + parentUuid, "",
-                        JOptionPane.ERROR_MESSAGE);
-            }
 
-            if (fsn.extractText().length() == 0) {
+            } else if (fsn.extractText().length() == 0) {
                 //please enter the fsn
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "please enter the fsn", "",
