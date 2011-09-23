@@ -357,7 +357,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			List<I_GetConceptData> parents = new ArrayList<I_GetConceptData>();
 
 			I_IntSet allowedTypes = termFactory.newIntSet();
-			allowedTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
+			ConceptSpec spec = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+			allowedTypes.add(termFactory.uuidToNative(spec.getLenient().getPrimUuid()));
 
 			parents.addAll(testedConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, 
 					config.getViewPositionSetReadOnly(), Precedence.PATH, config.getConflictResolutionStrategy()));
