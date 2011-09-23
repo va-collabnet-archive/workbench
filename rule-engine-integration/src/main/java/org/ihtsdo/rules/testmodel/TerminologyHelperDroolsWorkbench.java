@@ -422,7 +422,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			try {
 				I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-				int isaType = Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+				ConceptSpec spec = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+				int isaType = spec.getLenient().getNid();
 				I_IntSet allowedrels = Terms.get().newIntSet();
 				allowedrels.add(isaType);
 				

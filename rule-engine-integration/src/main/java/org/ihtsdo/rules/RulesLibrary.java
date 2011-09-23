@@ -1143,7 +1143,8 @@ public class RulesLibrary {
 		if (histRels == null) {
 			histRels = Terms.get().newIntSet();
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14")));
+			ConceptSpec spec = new ConceptSpec("Concept history attribute (attribute)", UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14"));
+			descendants = getDescendants(descendants, Terms.get().getConcept(spec.getLenient().getNid()));
 			for (I_GetConceptData loopConcept : descendants) {
 				histRels.add(loopConcept.getNid());
 			}
@@ -1157,7 +1158,8 @@ public class RulesLibrary {
 			CptModelRels = Terms.get().newIntSet();
 			CptModelRels = Terms.get().newIntSet();
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99")));
+			ConceptSpec spec = new ConceptSpec("Concept model attribute (attribute)", UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99"));
+			descendants = getDescendants(descendants, Terms.get().getConcept(spec.getLenient().getNid()));
 			for (I_GetConceptData loopConcept : descendants) {
 				CptModelRels.add(loopConcept.getNid());
 			}
