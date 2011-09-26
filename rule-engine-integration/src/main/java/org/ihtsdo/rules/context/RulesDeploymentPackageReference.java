@@ -119,7 +119,7 @@ public class RulesDeploymentPackageReference {
 				try {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
-				} catch (RuntimeException e1) {
+				} catch (Exception e1) {
 					System.out.println("Web Package not accessible: " + getName());
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
@@ -132,7 +132,7 @@ public class RulesDeploymentPackageReference {
 			try {
 				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytes(), recreate);
-			} catch (RuntimeException e1) {
+			} catch (Exception e1) {
 				System.out.println("Web Package not accessible: " + getName());
 			}
 			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
