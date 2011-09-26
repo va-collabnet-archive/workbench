@@ -110,7 +110,7 @@ public class RulesDeploymentPackageReference {
 				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytesForFile(), recreate);
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println("File Package not accessible: " + getName());
 			}
 			if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
 				return fileBased;
@@ -120,7 +120,7 @@ public class RulesDeploymentPackageReference {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
 				} catch (RuntimeException e1) {
-					e1.printStackTrace();
+					System.out.println("Web Package not accessible: " + getName());
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
@@ -133,7 +133,7 @@ public class RulesDeploymentPackageReference {
 				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytes(), recreate);
 			} catch (RuntimeException e1) {
-				e1.printStackTrace();
+				System.out.println("Web Package not accessible: " + getName());
 			}
 			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 				return guvnorBased;
@@ -143,7 +143,7 @@ public class RulesDeploymentPackageReference {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println("File Package not accessible: " + getName());
 				}
 				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 			}
