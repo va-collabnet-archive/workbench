@@ -173,6 +173,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
       if (revisions == null) {
          out.writeInt(0);
       } else {
+    	 checkListInt(revisions.size()); 
          out.writeInt(revisions.size());
 
          for (TkDescriptionRevision edv : revisions) {

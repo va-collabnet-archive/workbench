@@ -131,6 +131,7 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
       if (revisions == null) {
          out.writeInt(0);
       } else {
+    	 checkListInt(revisions.size());
          out.writeInt(revisions.size());
 
          for (TkRefsetBooleanRevision rmv : revisions) {

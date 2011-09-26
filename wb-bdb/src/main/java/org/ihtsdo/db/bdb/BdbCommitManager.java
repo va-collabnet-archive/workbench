@@ -482,10 +482,15 @@ public class BdbCommitManager {
                            uncommittedCNidsNoChecks.or(uncommittedCNids);
 
                            if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                              ChangeSetWriterHandler handler =
+                              /*ChangeSetWriterHandler handler =
                                  new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
                                                             sapNidsFromCommit, changeSetPolicy.convert(),
-                                                            changeSetWriterThreading, Svn.rwl);
+                                                            changeSetWriterThreading, Svn.rwl);*/
+                              
+                              final ChangeSetWriterHandler handler = new ChangeSetWriterHandler(
+                                      uncommittedCNidsNoChecks, commitTime,
+                                      sapNidsFromCommit, changeSetPolicy.convert(),
+                                      changeSetWriterThreading);
 
                               changeSetWriterService.execute(handler);
                               passedRelease = true;
@@ -510,6 +515,7 @@ public class BdbCommitManager {
                      uncommittedDescNids.clear();
                      luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
+                     luceneWriterPermit.acquire();
                      Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
                      wfMembersToCommit.addAll(uncommittedWfMemberIds);
@@ -701,6 +707,7 @@ public class BdbCommitManager {
 
             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
+            luceneWriterPermit.acquire();
             Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
             wfMembersToCommit.addAll(uncommittedWfMemberIds);

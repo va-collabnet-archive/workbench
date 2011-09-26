@@ -2,16 +2,25 @@ package org.ihtsdo.tk.dto.concept.component;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierString;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
-import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
@@ -24,18 +33,6 @@ import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    private static final long serialVersionUID = 1;
 
@@ -45,6 +42,8 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    public List<TkRefsetAbstractMember<?>> annotations;
    public UUID                            primordialUuid;
    public List<V>                         revisions;
+   
+   public static int maxParts = 10000000;
 
    //~--- constructors --------------------------------------------------------
 
@@ -451,4 +450,26 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    public void setRevisions(List<V> revisions) {
       this.revisions = revisions;
    }
+   
+   public static void checkListInt(int int2Check) throws IOException{
+	   	if(int2Check < 0){
+	   		IOException ioe = new IOException(" checkListInt int was less than 0 and = "+int2Check);
+	   		ioe.printStackTrace();
+	   		throw ioe;
+	   	}
+	   	if(int2Check > getMaxParts()){
+	   		IOException ioe = new IOException(" checkListInt int was greater than 1000000 and = "+int2Check);
+	   		ioe.printStackTrace();
+	   		throw ioe;
+	   	}
+	   	
+	   }
+
+		public static int getMaxParts() {
+			return maxParts;
+		}
+
+		public static void setMaxParts(int maxPartsI) {
+			maxParts = maxPartsI;
+		}
 }
