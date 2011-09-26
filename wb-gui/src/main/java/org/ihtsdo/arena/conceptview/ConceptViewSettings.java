@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,8 +69,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
    private static ImageIcon inferredAndStatedView =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
-   public static HashMap<Integer, Set<SoftReference>> arenaPanelMap =
-      new HashMap<Integer, Set<SoftReference>>();
+   public static HashMap<Integer, Set<WeakReference>> arenaPanelMap =
+      new HashMap<Integer, Set<WeakReference>>();
 
    //~--- fields --------------------------------------------------------------
 
@@ -215,12 +215,12 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
-      Set<SoftReference> panelSet = arenaPanelMap.get(linkedTab);
+      Set<WeakReference> panelSet = arenaPanelMap.get(linkedTab);
       if(panelSet != null){
-          panelSet.add(new SoftReference(view));
+          panelSet.add(new WeakReference(view));
       }else{
-          panelSet = new HashSet<SoftReference>();
-          panelSet.add(new SoftReference(view));
+          panelSet = new HashSet<WeakReference>();
+          panelSet.add(new WeakReference(view));
       }
       arenaPanelMap.put(linkedTab, panelSet);
       return view;

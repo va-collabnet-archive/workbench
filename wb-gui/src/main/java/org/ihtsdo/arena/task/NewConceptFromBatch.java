@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -56,7 +56,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
@@ -84,8 +83,6 @@ import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -168,6 +165,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private FixedWidthJEditorPane parentUuidPane;
     private FixedWidthJEditorPane parentFsnPane;
     private ConceptSpec parent;
+    private boolean hasPanel = false;
 
     /*
      * -----------------------
@@ -199,53 +197,78 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         try {
             // Present the user interface in the Workflow panel
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<SoftReference> panelSet = ConceptViewSettings.arenaPanelMap.get(1);
-            for (SoftReference r : panelSet) {
-                ConceptView cv = (ConceptView) r.get();
-                wizard = cv.getCvRenderer().getWizardPanel();
-                host = cv.getSettings().getHost();
-            }
-
-            String fileName = (String) process.getProperty(
-                    ProcessAttachmentKeys.NAME1.getAttachmentKey());
-            String[] part = fileName.split("\\t");
-
-            newConceptId = part[0];
-            newConceptId = newConceptId.toLowerCase();
-            //split UUID into parts 8-4-4-4-12 and insert dashes 
-            String one = newConceptId.substring(0, 8);
-            String two = newConceptId.substring(8, 12);
-            String three = newConceptId.substring(12, 16);
-            String four = newConceptId.substring(16, 20);
-            String five = newConceptId.substring(20, 32);
-            newConceptId = one + "-" + two + "-" + three + "-" + four + "-" + five;
-
-            fsnText = part[1];
-            parentId = part[2];
-            parentFsn = part[3];
-
-            DoSwing swinger = new DoSwing(process);
-            swinger.execute();
-            new Thread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                CsWordsHelper.lazyInit();
-                            } catch (IOException ex) {
-                                AceLog.getAppLog().alertAndLogException(ex);
-                            }
+            Set<WeakReference> panelSet = ConceptViewSettings.arenaPanelMap.get(1);
+            if (panelSet != null) {
+                for (WeakReference r : panelSet) {
+                    ConceptView cv = (ConceptView) r.get();
+                    if (r != null) {
+                        if (cv.getRootPane() != null) {
+                            wizard = cv.getCvRenderer().getWizardPanel();
+                            host = cv.getSettings().getHost();
+                            hasPanel = true;
+                            break;
+                        } else {
+                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                    "<html>There are no tab 1 panels in the arena.<br>"
+                                    + "Please add one and re-launch process", "",
+                                    JOptionPane.ERROR_MESSAGE);
+                            returnCondition = Condition.PREVIOUS;
+                            done = true;
+                            NewConceptFromBatch.this.notifyTaskDone();
                         }
-                    }).start();
-
-            synchronized (this) {
-                this.waitTillDone(worker.getLogger());
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>There are no tab 1 panels in the arena.<br>"
+                        + "Please add one and re-launch process", "",
+                        JOptionPane.ERROR_MESSAGE);
+                returnCondition = Condition.PREVIOUS;
+                done = true;
+                NewConceptFromBatch.this.notifyTaskDone();
             }
-            MakeNewConcept maker = new MakeNewConcept();
-            maker.execute();
-//            restore();
-            maker.getLatch().await();
+
+            if (hasPanel) {
+                String fileName = (String) process.getProperty(
+                        ProcessAttachmentKeys.NAME1.getAttachmentKey());
+                String[] part = fileName.split("\\t");
+
+                newConceptId = part[0];
+                newConceptId = newConceptId.toLowerCase();
+                //split UUID into parts 8-4-4-4-12 and insert dashes 
+                String one = newConceptId.substring(0, 8);
+                String two = newConceptId.substring(8, 12);
+                String three = newConceptId.substring(12, 16);
+                String four = newConceptId.substring(16, 20);
+                String five = newConceptId.substring(20, 32);
+                newConceptId = one + "-" + two + "-" + three + "-" + four + "-" + five;
+
+                fsnText = part[1];
+                parentId = part[2];
+                parentFsn = part[3];
+
+                DoSwing swinger = new DoSwing(process);
+                swinger.execute();
+                new Thread(
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    CsWordsHelper.lazyInit();
+                                } catch (IOException ex) {
+                                    AceLog.getAppLog().alertAndLogException(ex);
+                                }
+                            }
+                        }).start();
+
+                synchronized (this) {
+                    this.waitTillDone(worker.getLogger());
+                }
+                MakeNewConcept maker = new MakeNewConcept();
+                maker.execute();
+                maker.getLatch().await();
+            }
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
@@ -360,11 +383,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 wizard.setWizardPanelVisible(false);
                 host.setTermComponent(newTerm);
                 Ts.get().addUncommitted(newConcept);
-                //wizard.setWizardPanelVisible(false);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 returnCondition = Condition.ITEM_CANCELED;
-//                host.setTermComponent(null);
             } finally {
                 latch.countDown();
             }
@@ -441,7 +462,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 fsn = new FixedWidthJEditorPane();
-                fsn.setFixedWidth(500);
+                fsn.setFixedWidth(400);
                 fsn.setText(fsnText);
                 fsn.setEditable(true);
                 fsn.getDocument().addDocumentListener(new CopyTextDocumentListener());
@@ -465,7 +486,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 pref = new FixedWidthJEditorPane();
-                pref.setFixedWidth(500);
+                pref.setFixedWidth(350);
                 pref.setText("");
                 pref.setEditable(true);
                 wizardPanel.add(pref, c);
@@ -488,7 +509,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 newUuidPane = new FixedWidthJEditorPane();
-                newUuidPane.setFixedWidth(500);
+                newUuidPane.setFixedWidth(350);
                 newUuidPane.setText(newConceptId);
                 newUuidPane.setEditable(false);
                 newUuidPane.getDocument().addDocumentListener(new NewUuidDocumentListener());
@@ -501,7 +522,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 parentFsnPane = new FixedWidthJEditorPane();
-                parentFsnPane.setFixedWidth(500);
+                parentFsnPane.setFixedWidth(350);
                 parentFsnPane.setText(parentFsn);
                 parentFsnPane.setEditable(true);
                 parentFsnPane.getDocument().addDocumentListener(new ParentFsnDocumentListener());
@@ -514,7 +535,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 parentUuidPane = new FixedWidthJEditorPane();
-                parentUuidPane.setFixedWidth(500);
+                parentUuidPane.setFixedWidth(350);
                 parentUuidPane.setText(parentId);
                 parentUuidPane.setEditable(true);
                 parentUuidPane.getDocument().addDocumentListener(new ParentUuidDocumentListener());
@@ -555,13 +576,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getToDoImage())));
         saveButton.setToolTipText("save");
         wizardPanel.add(saveButton, c);
-        saveButton.addActionListener(new PreviousActionListener()); //@akf TODO: make save action listener
+        saveButton.addActionListener(new PreviousActionListener());
         c.gridx++;
 
-//        JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
-//        cancelButton.setToolTipText("cancel");
-//        wizardPanel.add(cancelButton, c);
-//        cancelButton.addActionListener(new StopActionListener());
         c.gridx++;
         wizardPanel.add(new JLabel("     "), c);
         wizardPanel.validate();
@@ -1087,12 +1104,14 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                         NewConceptFromBatch.this.notifyTaskDone();
                     } else {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "The parent concept has not been created yet. Fsn: " + parentFsn + " UUID: " + parentId, "",
+                                "<html>The parent concept has not been created yet."
+                                + "<br>Fsn: " + parentFsn + " UUID: " + parentId, "",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "The parent fsn and UUID do not match. Fsn: " + parentFsn + " UUID: " + parentUuid, "",
+                            "<html>The parent fsn and UUID do not match."
+                            + "<br>Fsn: " + parentFsn + " UUID: " + parentUuid, "",
                             JOptionPane.ERROR_MESSAGE);
                 } catch (TerminologyException ex) {
                     Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
