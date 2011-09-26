@@ -10,6 +10,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
+import java.util.UUID;
+
 public class TkRefsetBooleanRevision extends TkRevision {
    public static final long serialVersionUID = 1;
 
@@ -28,6 +31,12 @@ public class TkRefsetBooleanRevision extends TkRevision {
       readExternal(in, dataVersion);
    }
 
+   public TkRefsetBooleanRevision(TkRefsetBooleanRevision another, Map<UUID, UUID> conversionMap,
+                                  long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.booleanValue = another.booleanValue;
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -40,7 +49,7 @@ public class TkRefsetBooleanRevision extends TkRevision {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-    @Override
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -65,6 +74,11 @@ public class TkRefsetBooleanRevision extends TkRevision {
    }
 
    @Override
+   public TkRefsetBooleanRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetBooleanRevision(this, conversionMap, offset, mapAll);
+   }
+
+   @Override
    public void readExternal(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super.readExternal(in, dataVersion);
       booleanValue = in.readBoolean();
@@ -73,11 +87,11 @@ public class TkRefsetBooleanRevision extends TkRevision {
    /**
     * Returns a string representation of the object.
     */
-    @Override
+   @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(this.booleanValue);
       buff.append(" ");
       buff.append(super.toString());

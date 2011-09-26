@@ -62,10 +62,10 @@ public class RulesDeploymentPackageReference {
 		buff.append("			<resource source='");
 		buff.append(url);
 		//TODO: implement full authentication
-		buff.append("' type='PKG' basicAuthentication='enabled' username='empty' password='empty'/>");
+		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-
+		System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -79,6 +79,7 @@ public class RulesDeploymentPackageReference {
 		String[] parts = url.split("/");
 		File file = new File("rules/" + parts[parts.length-2] + "_" + parts[parts.length-1] + ".guvnor");
 		if (!file.exists()) {
+			System.out.println(file.getName());
 			throw new FileNotFoundException();
 		}
 		try {
@@ -87,10 +88,10 @@ public class RulesDeploymentPackageReference {
 			e.printStackTrace();
 		}
 		//TODO: implement full authentication
-		buff.append("' type='PKG' basicAuthentication='enabled' username='empty' password='empty'/>");
+		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-
+		System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -109,35 +110,45 @@ public class RulesDeploymentPackageReference {
 				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytesForFile(), recreate);
 			} catch (Exception e) {
-				// not found
+				e.printStackTrace();
 			}
-			if (fileBased != null) {
+			if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
 				return fileBased;
 			} else {
-				KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-						getChangeSetXmlBytes(), recreate);
-				if (guvnorBased != null) {
+				KnowledgeBase guvnorBased = null;
+				try {
+					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+							getChangeSetXmlBytes(), recreate);
+				} catch (RuntimeException e1) {
+					e1.printStackTrace();
+				}
+				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
 				}
 			}
 		} else {
-			KnowledgeBase guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
-					getChangeSetXmlBytes(), recreate);
-			if (guvnorBased != null) {
+			KnowledgeBase guvnorBased = null;
+
+			try {
+				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
+						getChangeSetXmlBytes(), recreate);
+			} catch (RuntimeException e1) {
+				e1.printStackTrace();
+			}
+			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 				return guvnorBased;
 			} else {
-				System.out.println("WARNING: KB Recreation failed.");
 				KnowledgeBase fileBased = null;
 				try {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					// not found
+					e.printStackTrace();
 				}
-				if (fileBased != null) return fileBased;
+				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 			}
 		}
-
+		System.out.println("WARNING: KB Recreation failed.");
 		return null;
 
 	}

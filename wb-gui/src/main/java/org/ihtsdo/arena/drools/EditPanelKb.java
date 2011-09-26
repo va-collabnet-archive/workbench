@@ -18,10 +18,14 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.drools.facts.FactFactory;
+import org.ihtsdo.tk.drools.facts.View;
 import org.ihtsdo.tk.spec.SpecBI;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
@@ -31,10 +35,12 @@ public class EditPanelKb {
     private CountDownLatch kbLatch = new CountDownLatch(1);
     private String kbKey = EditPanelKb.class.getCanonicalName();
     private Set<File> kbFiles = new HashSet<File>();
+    private ConceptViewSettings settings;
 
-    public EditPanelKb(I_ConfigAceFrame config) {
+    public EditPanelKb(I_ConfigAceFrame config, ConceptViewSettings settings) {
         super();
         this.config = config;
+        this.settings = settings;
         kbFiles.add(new File("drools-rules/TkApiRules.drl"));
         ACE.threadPool.execute(new KbSetkupRunner());
     }
@@ -71,12 +77,22 @@ public class EditPanelKb {
             globals.put("templates", templates);
             Collection<Object> facts = new ArrayList<Object>();
             ViewCoordinate coordinate = config.getViewCoordinate();
+            
+            View viewType;
+            if (settings.getRelAssertionType() == RelAssertionType.STATED) {
+                viewType = View.STATED;
+            } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED) {
+                viewType = View.INFERRED;
+            } else {
+                viewType = View.STATED_AND_INFERRED;
+            }
+            facts.add(FactFactory.get(viewType));
             facts.add(Ts.get().getConceptVersion(coordinate, c.getNid()));
             boolean executed = DroolsExecutionManager.fireAllRules(kbKey, kbFiles,
                     globals, facts, false);
             if (!executed) {
-                AceLog.getAppLog().warning("### " + kbKey + 
-                        " not executed secondary to prior failure.");
+                AceLog.getAppLog().warning("### " + kbKey
+                        + " not executed secondary to prior failure.");
             }
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);

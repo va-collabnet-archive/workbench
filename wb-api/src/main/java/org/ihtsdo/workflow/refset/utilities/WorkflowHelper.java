@@ -70,6 +70,7 @@ public class WorkflowHelper {
 
     private static int activeNidRf1 = 0;
     private static int activeNidRf2 = 0;
+    private static int is_a_relType = 0;
     
 	public final static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -163,12 +164,9 @@ public class WorkflowHelper {
 		writer.setAutoApproved(bean.getAutoApproved());
 		writer.setOverride(bean.getOverridden());
 		
-		WorkflowHistoryRefsetWriter.lockMutex();
         writer.retireMember();
 		Terms.get().addUncommitted(writer.getRefsetConcept());
 		Terms.get().commit();
-		
-		WorkflowHistoryRefsetWriter.unLockMutex();
 	}
 
 	public static void updateModelers(ViewCoordinate vc) 
@@ -437,6 +435,43 @@ public class WorkflowHelper {
     	return resultSet;
     }
 
+	public static Set<I_GetConceptData> getChildren(I_GetConceptData concept) {
+		
+		Set<I_GetConceptData> resultSet = new HashSet<I_GetConceptData>();
+		
+		try {
+			if (concept != null) {		
+				resultSet.add(concept);
+				Collection<? extends I_RelVersioned> rels = concept.getDestRels();
+	
+		    	if (rels == null || rels.size() == 0) {
+		    		return resultSet;
+				}
+		    	
+				if (activeNidRf1 == 0) {
+					 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+					 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+				}
+				
+				if (is_a_relType == 0) {
+					is_a_relType = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+				}
+	
+		    	for (I_RelVersioned rel : rels) {
+		    		if ((rel.getTypeNid() == is_a_relType) &&
+						((rel.getStatusNid() == activeNidRf1) || (rel.getStatusNid() == activeNidRf2))) {
+		    			resultSet.addAll(getChildren(Terms.get().getConcept(rel.getC1Id())));
+		    		 }
+		    	}
+			}
+		} catch (Exception e) {
+			return new HashSet<I_GetConceptData>();
+		}
+		
+		return resultSet;
+	}
+
+
 	public static ConceptVersionBI lookupEditorCategory(String role, ViewCoordinate vc) throws TerminologyException, IOException, ContraditionException {
 		Set<? extends ConceptVersionBI> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
@@ -668,19 +703,15 @@ public class WorkflowHelper {
 		return defaultModeler;
 	}
 
-	public static void initializeWorkflowForConcept(I_GetConceptData concept, boolean inBatch) throws TerminologyException, IOException {
-		if ((concept != null) && 
-			(inBatch || !WorkflowHistoryRefsetWriter.isInUse())) // Not in the middle of an existing commit
+	public static void initializeWorkflowForConcept(I_GetConceptData concept) throws TerminologyException, IOException {
+		if (concept != null)
     	{
 			ConceptVersionBI modeler = getCurrentModeler();
-        	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         	
         	if (modeler != null && isActiveModeler(modeler))
         	{
-        		I_TermFactory tf = Terms.get();
+            	ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
-
-				WorkflowHistoryRefsetWriter.lockMutex();
 
 				// Path
 				// TODO: Update Path properly
@@ -711,7 +742,7 @@ public class WorkflowHelper {
 	            	writer.setWorkflowUid(latestBean.getWorkflowId());
 
 	            // Set auto approved based on AceFrameConfig setting
-	            if (tf.getActiveAceFrameConfig().isAutoApproveOn()) {
+	            if (Terms.get().getActiveAceFrameConfig().isAutoApproveOn()) {
 	            	writer.setAutoApproved(true);
 
 	            	// Identify and overwrite Accept Action
@@ -725,7 +756,7 @@ public class WorkflowHelper {
 	            	writer.setAutoApproved(false);
 
 	            // Override
-	            writer.setOverride(tf.getActiveAceFrameConfig().isOverrideOn());
+	            writer.setOverride(Terms.get().getActiveAceFrameConfig().isOverrideOn());
 
 	            // TimeStamps
 		        java.util.Date today = new java.util.Date();
@@ -735,7 +766,7 @@ public class WorkflowHelper {
 		        // Write Member
 				writer.addMember();
 				
-		        Terms.get().addUncommitted(writer.getRefsetConcept());
+				Terms.get().addUncommitted(writer.getRefsetConcept());
         	}
     	}	
 	}
@@ -1274,6 +1305,5 @@ public class WorkflowHelper {
 
         return retList;
     }
-
 }
  

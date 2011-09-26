@@ -9,8 +9,8 @@ public interface RelationshipAnalogBI<A extends RelationshipAnalogBI>
 
 
 	public void setDestinationNid(int nid) throws PropertyVetoException;
-	public void setRefinabilityNid(int nid);
-	public void setCharacteristicNid(int nid);
+	public void setRefinabilityNid(int nid) throws PropertyVetoException;
+	public void setCharacteristicNid(int nid) throws PropertyVetoException;
 	public void setGroup(int group) throws PropertyVetoException;
 
 }

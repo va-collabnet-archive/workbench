@@ -116,8 +116,12 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec QUALIFYING_RELATIONSSHIP_RF2 =
             new ConceptSpec("Qualifying relationship (core metadata concept)",
             UUID.fromString("569dac14-a8a5-3cf0-b608-5ae2f1c89461"));
-    // SCT ID: 900000000000522004
+    // SCT ID: NOT APPLICABLE,  USES WORKBENCH CONCEPT
     public static ConceptSpec HISTORICAL_RELATIONSSHIP_RF2 =
+            new ConceptSpec("historical (characteristic type)",
+            UUID.fromString("1d054ca3-2b32-3004-b7af-2701276059d5"));
+    // SCT ID: 900000000000522004
+    public static ConceptSpec HISTORICAL_REFSET_RF2 =
             new ConceptSpec("Historical association reference set (foundation metadata concept)",
             UUID.fromString("fd552da3-92fd-38c1-9982-d60ad6c9020b"));
     

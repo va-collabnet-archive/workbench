@@ -66,6 +66,27 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
+    
+    /**
+     * Retrieves tuples matching the specified allowedStatuses and positions
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param positions
+     *            positions a tuple must be on to be returned
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @param time
+     *          cutoff time to match tuples, tuples with a time greater than
+     *          cutoff will no be returned
+     * @return List of matching tuples
+     * @throws TerminologyException
+     */
+    public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
+            PositionSetBI positions, Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager, long time)
+            throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples using the conflict strategy if specified
@@ -88,7 +109,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @param allowedTypes
      *            types tuples must match to be returned
      * @param positions
-     *            postions a tuple must be on to be returned
+     *            positions a tuple must be on to be returned
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
@@ -96,6 +117,28 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      */
     public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positionSet, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
+            throws IOException;
+    /**
+     * Retrieves tuples matching the specified allowedStatuses, allowedTypes and
+     * positions
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param allowedTypes
+     *            types tuples must match to be returned
+     * @param positions
+     *            postions a tuple must be on to be returned
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @param time
+     *          cutoff time to match tuples, tuples with a time greater than
+     *          cutoff will no be returned
+     * @return List of matching tuples
+     */
+    public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positionSet, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+            long time)
             throws IOException;
 
     /**

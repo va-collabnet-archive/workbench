@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 
 public interface I_ExtendByRefPartStr<A extends RefexStrAnalogBI<A>> extends I_ExtendByRefPart<A> {
@@ -24,6 +25,6 @@ public interface I_ExtendByRefPartStr<A extends RefexStrAnalogBI<A>> extends I_E
 
     public String getStringValue();
 
-    public void setStringValue(String stringValue);
+    public void setStringValue(String stringValue) throws PropertyVetoException;
 
 }

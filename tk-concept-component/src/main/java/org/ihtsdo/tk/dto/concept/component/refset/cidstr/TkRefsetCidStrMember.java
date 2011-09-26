@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrRevision> {
@@ -33,6 +34,19 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
    public TkRefsetCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetCidStrMember(TkRefsetCidStrMember another, Map<UUID, UUID> conversionMap, long offset,
+                               boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid   = conversionMap.get(another.c1Uuid);
+         this.strValue = another.strValue;
+      } else {
+         this.c1Uuid   = another.c1Uuid;
+         this.strValue = another.strValue;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -84,6 +98,11 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRefsetCidStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetCidStrMember(this, conversionMap, offset, mapAll);
    }
 
    @Override

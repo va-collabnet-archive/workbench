@@ -52,9 +52,9 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		String typeId = "";
 		String languageCode = "en";
 		try {
-			if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
+			/*if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
 				boolean bstop=true;
-			}
+			}*/
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -103,11 +103,17 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						conceptid=concept.getUids().iterator().next().toString();
 					}
 				
-					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
-
-					writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+					
+					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
+					}else{
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+					}
+					
+					
 				}
 			}
 		} catch (IOException e) {

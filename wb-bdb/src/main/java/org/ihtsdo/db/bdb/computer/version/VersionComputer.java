@@ -186,12 +186,12 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     matchingTuples, versions, precedencePolicy,
                     contradictionManager, null);
         } else {
-                 addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
-                        positions, matchingTuples, versions, precedencePolicy,
-                        contradictionManager, new InferredFilter(ReferenceConcepts.SNOROCKET.getNid()));
-                addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
-                        positions, matchingTuples, versions, precedencePolicy,
-                        contradictionManager, new StatedFilter(ReferenceConcepts.SNOROCKET.getNid()));
+            addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
+                    positions, matchingTuples, versions, precedencePolicy,
+                    contradictionManager, new InferredFilter(ReferenceConcepts.SNOROCKET.getNid()));
+            addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
+                    positions, matchingTuples, versions, precedencePolicy,
+                    contradictionManager, new StatedFilter(ReferenceConcepts.SNOROCKET.getNid()));
         }
     }
 
@@ -255,6 +255,47 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     contradictionManager, null);
         }
     }
+    
+    public void addSpecifiedVersions(NidSetBI allowedStatus,
+            NidSetBI allowedTypes, PositionSetBI positions,
+            List<V> specifiedVersions, List<? extends V> versions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager,
+            long time) {
+        if (positions == null || positions.size() < 1) {
+            addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes,
+                    specifiedVersions, versions, precedencePolicy,
+                    contradictionManager, null);
+        } else if(time != 0){
+            //add more filters here if needed
+            InferredFilter[] filters = new InferredFilter[1];
+            filters[0] = new CutoffFilter(time);
+            addSpecifiedVersionsWithCutoff(allowedStatus, allowedTypes,
+                    positions, specifiedVersions, versions, precedencePolicy,
+                    contradictionManager,filters);
+        }else {
+            addSpecifiedVersionsWithPositions(allowedStatus, allowedTypes,
+                    positions, specifiedVersions, versions, precedencePolicy,
+                    contradictionManager, null);
+        }
+    }
+    
+    static class CutoffFilter extends InferredFilter{
+        Long cutoffTime;
+        private CutoffFilter(long cutoffTime){
+            this.cutoffTime = cutoffTime;
+        }
+        
+        @Override
+        public boolean pass(ConceptComponent<?, ?>.Version part) {
+            if(part.getTime() > cutoffTime){
+                return false;
+            }else if(part.getTime() < cutoffTime){
+                return true;
+            }
+            return false;
+        }
+    }
 
     private static class StatedFilter extends InferredFilter {
 
@@ -305,8 +346,67 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             return false;
         }
     }
-    
     private static NidSetBI inferredNidSet;
+
+    private void addSpecifiedVersionsWithCutoff(NidSetBI allowedStatus,
+            NidSetBI allowedTypes,
+            PositionSetBI positions,
+            List<V> specifiedVersions,
+            List<? extends V> versions,
+            Precedence precedencePolicy,
+            ContradictionManagerBI contradictionManager, InferredFilter[] filters) {
+        HashSet<V> partsToAdd = new HashSet<V>();
+        for (PositionBI p : positions) {
+            HashSet<V> partsForPosition = new HashSet<V>();
+            PositionMapper mapper = Bdb.getSapDb().getMapper(p);
+            nextpart:
+            for (V part : versions) {
+                if (part.getTime() == Long.MIN_VALUE) {
+                    continue nextpart;
+                }
+                for (InferredFilter filter : filters) {
+                    if (filter != null && !filter.pass(part)) {
+                        continue nextpart;
+                    }
+                }
+                if (allowedTypes != null) {
+                    if (allowedTypes.contains(
+                            ((I_AmTypedPart) part).getTypeNid()) == false) {
+                        if (mapper.onRoute(part)) {
+                            handlePart(partsForPosition, mapper, part,
+                                    precedencePolicy, contradictionManager,
+                                    allowedStatus);
+                            partsForPosition.remove(part);
+                        }
+                        continue nextpart;
+                    }
+                }
+                if (mapper.onRoute(part)) {
+                    if (partsForPosition.isEmpty()) {
+                        partsForPosition.add(part);
+                    } else {
+                        handlePart(partsForPosition, mapper, part,
+                                precedencePolicy, contradictionManager,
+                                allowedStatus);
+                    }
+                }
+            }
+            if (allowedStatus != null) {
+                List<V> partsToCompare = new ArrayList<V>(partsForPosition);
+                for (V part : partsToCompare) {
+                    if (allowedStatus != null) {
+                        if (!allowedStatus.contains(part.getStatusNid())) {
+                            partsForPosition.remove(part);
+                        }
+                    }
+                }
+            }
+            if (partsForPosition.size() > 0) {
+                partsToAdd.addAll(partsForPosition);
+            }
+        }
+        specifiedVersions.addAll(partsToAdd);
+    }
 
     private void addSpecifiedVersionsWithPositions(NidSetBI allowedStatus,
             NidSetBI allowedTypes,

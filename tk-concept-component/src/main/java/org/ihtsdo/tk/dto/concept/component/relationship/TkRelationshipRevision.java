@@ -10,6 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRelationshipRevision extends TkRevision {
@@ -31,6 +32,23 @@ public class TkRelationshipRevision extends TkRevision {
    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRelationshipRevision(TkRelationshipRevision another, Map<UUID, UUID> conversionMap, long offset,
+                                 boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.characteristicUuid = conversionMap.get(another.characteristicUuid);
+         this.refinabilityUuid   = conversionMap.get(another.refinabilityUuid);
+         this.group              = another.group;
+         this.typeUuid           = conversionMap.get(another.typeUuid);
+      } else {
+         this.characteristicUuid = another.characteristicUuid;
+         this.refinabilityUuid   = another.refinabilityUuid;
+         this.group              = another.group;
+         this.typeUuid           = another.typeUuid;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -81,6 +99,11 @@ public class TkRelationshipRevision extends TkRevision {
       }
 
       return false;
+   }
+
+   @Override
+   public TkRelationshipRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRelationshipRevision(this, conversionMap, offset, mapAll);
    }
 
    @Override

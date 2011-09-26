@@ -16,21 +16,22 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 
 public interface I_DescriptionPart<A extends DescriptionAnalogBI> extends I_AmTypedPart<A> {
 
     public boolean isInitialCaseSignificant();
 
-    public void setInitialCaseSignificant(boolean capStatus);
+    public void setInitialCaseSignificant(boolean capStatus) throws PropertyVetoException;
 
     public String getLang();
 
-    public void setLang(String lang);
+    public void setLang(String lang) throws PropertyVetoException;
 
     public String getText();
 
-    public void setText(String text);
+    public void setText(String text) throws PropertyVetoException;
 
     public I_DescriptionPart duplicate();
 

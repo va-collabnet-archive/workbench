@@ -89,6 +89,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
+import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.drools.facts.View;
 
 public abstract class DragPanel<T extends Object> extends JPanel implements Transferable {
    private static final AtomicInteger atomicInt = new AtomicInteger();
@@ -229,11 +231,21 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                   AceLog.getAppLog().fine("dropTarget: " + thingToDrag);
                   AceLog.getAppLog().fine("thingToDrop: " + thingToDrop);
                }
+               
+               View viewType; 
+               if(getSettings().relAssertionType == RelAssertionType.STATED){
+                   viewType = View.STATED;
+               }else if (getSettings().relAssertionType == RelAssertionType.INFERRED){
+                   viewType = View.INFERRED;
+               }else{
+                   viewType = View.STATED_AND_INFERRED;
+               }
 
                Collection<Object> facts = new ArrayList<Object>();
 
                facts.add(FactFactory.get(Context.DROP_OBJECT, thingToDrop, coordinate));
                facts.add(FactFactory.get(Context.DROP_TARGET, thingToDrag, coordinate));
+               facts.add(FactFactory.get(viewType));
                DroolsExecutionManager.fireAllRules(DragPanel.class.getCanonicalName(), kbFiles, globals,
                        facts, false);
             }

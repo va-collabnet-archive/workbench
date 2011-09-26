@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
@@ -86,7 +88,8 @@ public abstract class RF2AbstractImpl {
 	protected NidSetBI textDefinTypes;
 
 	private I_GetConceptData snomedRoot;
-
+	private I_GetConceptData snomedMetaRoot;
+	
 	protected I_IntSet allStatusSet;
 
 	protected int preferredNid;
@@ -151,6 +154,7 @@ public abstract class RF2AbstractImpl {
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			snomedMetaRoot = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			this.preferredNid=tf.uuidToNative(UUID.fromString("266f1bc3-3361-39f3-bffe-69db9daea56e"));
 			this.acceptableNid=tf.uuidToNative(UUID.fromString("12b9e103-060e-3256-9982-18c1191af60e"));
 			this.currentNid=tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
@@ -520,11 +524,53 @@ public abstract class RF2AbstractImpl {
 			/*int len= conceptid.length();
 			CharSequence partition = conceptid.substring(len-3, len).subSequence(0, 2);
 			if(partition.equals("00")){		*/	
-				export(concept, conceptid);				
-			//}	
+			
+			String active="0"; //Default value
+			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+					allStatuses, 
+					currenAceConfig.getViewPositionSetReadOnly(), 
+					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+			if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+				
+				String conceptStatus = getStatusType(attributes.getStatusNid());
+				if (conceptStatus.equals("0")) {
+					active = "1";
+				} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+					active = "1";
+				} else {
+					active = "0";
+				}
+				
+				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0")) && active.equals("1") ){
+					conceptid=concept.getUids().iterator().next().toString();
+				}
+			}
+			
+			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
+				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
+			}else{
+				//System.out.println("=====" + concept.getInitialText());
+				export(concept, conceptid);	
+			}
 		}
 	}
-
+	
+	public boolean isMetaConcept(I_GetConceptData concept) throws IOException, TerminologyException {
+	boolean isMetaConcept = false;
+		if (snomedMetaRoot.isParentOf(concept, 
+				currenAceConfig.getAllowedStatus(),
+				currenAceConfig.getDestRelTypes(), 
+				currenAceConfig.getViewPositionSetReadOnly(), 
+				currenAceConfig.getPrecedence(), 
+				currenAceConfig.getConflictResolutionStrategy())) {
+			isMetaConcept=true;
+		}
+		System.out.println("==is meta concept===" + isMetaConcept);
+		return isMetaConcept;
+	}
+	
 	public NidSetBI getAllStatuses() throws TerminologyException, IOException {
 		NidSetBI allStatuses = new NidSet();
 		Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();

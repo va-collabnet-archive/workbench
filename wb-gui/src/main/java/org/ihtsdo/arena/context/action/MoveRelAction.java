@@ -13,7 +13,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -67,11 +66,6 @@ public class MoveRelAction extends AbstractAction {
 						config.getDbConfig().getUserConcept().getNid(), 
 						pathItr.next().getConceptNid(), 
 						Long.MAX_VALUE);
-				
-				while (pathItr.hasNext()) {
-					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
-							pathItr.next().getConceptNid(), Long.MAX_VALUE);
-				}
 			}
 			
 			Terms.get().addUncommitted(concept);

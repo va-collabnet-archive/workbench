@@ -57,7 +57,7 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	@Override
 	public void export(I_GetConceptData concept, String conceptid) throws IOException {
-		String langEffectiveTime = "";
+		String effectiveTime = "";
 		String descriptionid = "";
 		String active = "";
 		UUID refsetuuid = null;
@@ -94,23 +94,23 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					if (languageExtension != null) {
 
 						long lastVersion = Long.MIN_VALUE;
-						I_ExtendByRefPartCid languageExtensionPart=null;
+						I_ExtendByRefPartCid extensionPart=null;
 						for (I_ExtendByRefVersion loopTuple : languageExtension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
 								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
 
 							if (loopTuple.getTime() >= lastVersion) {
 								lastVersion = loopTuple.getTime();
-								languageExtensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
+								extensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
 							}
 						}
-						if (languageExtensionPart == null) {
+						if (extensionPart == null) {
 							if (logger.isDebugEnabled()) {
 								logger.debug("Language refset extension part not found!");
 							}
 						}else{
 
-							extensionStatusId = languageExtensionPart.getStatusNid();
-							int acceptabilityNid = languageExtensionPart.getC1id();
+							extensionStatusId = extensionPart.getStatusNid();
+							int acceptabilityNid = extensionPart.getC1id();
 							descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 							String status = getStatusType(extensionStatusId);
@@ -121,33 +121,30 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							} else {
 								I_GetConceptData con=tf.getConcept(extensionStatusId);
 								logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
-								System.exit(0);
 							}
-							if (logger.isDebugEnabled()) {
-								logger.debug("extensionStatusId :" + extensionStatusId + "active : " + active);
-							}
-
+							
 							if (acceptabilityNid == preferredNid) { // preferred
 								acceptabilityId = I_Constants.PREFERRED;
 							} else if (acceptabilityNid == acceptableNid) { 
 								acceptabilityId = I_Constants.ACCEPTABLE;
 							} else {
-								logger.error("unknown acceptabilityId =====>" + acceptabilityNid + "conceptis  =====>" + conceptid + " descriptionid ===>" + descriptionid);
-								System.exit(0);
+								logger.error("unknown acceptabilityId =====>" + acceptabilityNid + "conceptid  =====>" + conceptid + " descriptionid ===>" + descriptionid);
 							}
 
-							if (descriptionid==null || descriptionid.equals("")){
+							if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
 								descriptionid=description.getUUIDs().iterator().next().toString();
 							}
-							refsetuuid = languageExtensionPart.getPrimUuid();
-							Date langEffectiveDate = new Date(languageExtensionPart.getTime());
-							langEffectiveTime = getDateFormat().format(langEffectiveDate);
-
-							writeRF2TypeLine(refsetuuid, langEffectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
+							
+							if (descriptionid==null || descriptionid.equals("")){
+								logger.error("Unplublished Retired Concept of Lang Refset : " + concept.getUUIDs().iterator().next().toString());
+							}else {
+								refsetuuid = extensionPart.getPrimUuid();
+								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+	
+								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
+							}
 						}
-
 					} 
-
 				}
 			}
 		} catch (IOException e) {

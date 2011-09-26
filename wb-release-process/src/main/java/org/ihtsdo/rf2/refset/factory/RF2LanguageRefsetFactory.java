@@ -8,7 +8,6 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.factory.RF2AbstractFactory;
 import org.ihtsdo.rf2.refset.impl.RF2LanguageImpl;
-import org.ihtsdo.rf2.refset.impl.RF2LanguageUSImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 

@@ -31,6 +31,9 @@ public class CancelActionListener implements ActionListener {
         if (n == JOptionPane.YES_OPTION) {
             try {
                 I_GetConceptData cToCancel = settings.getConcept();
+                AceLog.getAppLog().info("Canceling on concept: "
+                    + cToCancel.toUserString()
+                    + " UUID: " + cToCancel.getPrimUuid().toString());
                 cToCancel.cancel();
                 Ts.get().addUncommitted(cToCancel);
                 if (cToCancel.isCanceled()) {

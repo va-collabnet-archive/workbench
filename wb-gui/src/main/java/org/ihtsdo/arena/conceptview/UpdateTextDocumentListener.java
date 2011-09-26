@@ -20,6 +20,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -32,9 +33,11 @@ import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
+import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -57,6 +60,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     int prefNid;
     int acceptNid;
     TerminologyConstructorBI tc;
+    String text;
 
     public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
             DescriptionAnalogBI desc) throws TerminologyException, IOException {
@@ -69,8 +73,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void insertUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -84,8 +91,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void removeUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -99,8 +109,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+        text = editorPane.extractText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
         try {
-            desc.setText(editorPane.extractText());
+            desc.setText(text);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
@@ -154,7 +167,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 }
 
                 //set initial word case sensitivity
-                String descText = editorPane.extractText();
+                String descText = text;
                 String initialWord = null;
                 if (descText.indexOf(" ") != -1) {
                     initialWord = descText.substring(0, descText.indexOf(" "));
@@ -209,17 +222,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
+        } catch (UnsupportedDialectOrLanguage ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 
-    private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB {
-        TerminologyHelperDrools th = new TerminologyHelperDrools();
+    private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
 
-        desc.setText(editorPane.extractText());
-
-        if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+        desc.setText(text);
+            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -238,7 +250,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -247,7 +259,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 RefexChronicleBI<?> newRefex = tc.construct(refexSpecUs);
                 I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
                 Ts.get().addUncommitted(refex);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
                 RefexCAB refexSpecGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -257,17 +269,13 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
                 Ts.get().addUncommitted(refex);
             }
-        }
     }
 
-    private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB {
-        TerminologyHelperDrools th = new TerminologyHelperDrools();
+    private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
+        desc.setText(text);
 
-        desc.setText(editorPane.extractText());
-
-        if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in both 
+            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in both 
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -286,7 +294,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
                 RefexCAB refexSpecUs = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         desc.getNid(),
@@ -307,7 +315,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
                 Ts.get().addUncommitted(refexUs);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
                 /* REMOVED FOR RF2
                 RefexCAB refexSpecUs = new RefexCAB(
                 TK_REFSET_TYPE.CID,
@@ -329,25 +337,19 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 Ts.get().addUncommitted(refexGb);
 
             }
-        }
     }
 
     private void doFsnUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex)
-            throws PropertyVetoException, IOException, InvalidCAB {
+            throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
         TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                 config.getViewCoordinate());
-        TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
-
-
-
-        if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+        desc.setText(text);
+            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
                 usRefex.setCnid1(prefNid);
                 gbRefex.setCnid1(prefNid);
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
                 if (usRefex == null) {
                     doFsnUpdate();
                 } else {
@@ -360,7 +362,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
                 if (gbRefex == null) {
                     doFsnUpdate();
                 } else {
@@ -374,19 +376,17 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     }
                 }
             }
-        }
     }
 
-    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException, IOException, InvalidCAB {
+    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException, 
+            IOException, InvalidCAB, UnsupportedDialectOrLanguage {
         TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                 config.getViewCoordinate());
-        TerminologyHelperDrools th = new TerminologyHelperDrools();
 
-        desc.setText(editorPane.extractText());
+        desc.setText(text);
 
-        if (th.loadProperties()) {
-            if (th.checkTermSpelling(editorPane.extractText(), "en-gb")
-                    && th.checkTermSpelling(editorPane.extractText(), "en-us")) {//acceptable in both
+            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
                 if (usRefex == null) {
                     //forget GB
                     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
@@ -412,7 +412,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     gbRefex.setCnid1(acceptNid);
                 }
 
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-us")) { //acceptable in US
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
                 if (usRefex == null) {
                     doSynUpdate();
                 } else {
@@ -425,7 +425,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
-            } else if (th.checkTermSpelling(editorPane.extractText(), "en-gb")) { //acceptable in GB
+            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
                 if (gbRefex == null) {
                     doSynUpdate();
                 } else {
@@ -439,6 +439,5 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     }
                 }
             }
-        }
     }
 }

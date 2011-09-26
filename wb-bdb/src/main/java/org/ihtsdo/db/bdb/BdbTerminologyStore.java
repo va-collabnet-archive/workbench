@@ -34,6 +34,7 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
+import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -50,6 +51,7 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.TermChangeListener;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
@@ -353,6 +355,26 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public long getSequence() {
         return Bdb.gVersion.incrementAndGet();
+    }
+
+    @Override
+    public void addTermChangeListener(TermChangeListener cl) {
+        LastChange.addTermChangeListener(cl);
+    }
+
+    @Override
+    public void removeTermChangeListener(TermChangeListener cl) {
+        LastChange.removeTermChangeListener(cl);
+    }
+
+    @Override
+    public boolean hasPath(int nid) throws IOException {
+        return BdbPathManager.get().hasPath(nid);
+    }
+
+    @Override
+    public List<? extends PathBI> getPathChildren(int nid) {
+        return BdbPathManager.get().getPathChildren(nid);
     }
 
     private class ConceptGetter implements I_ProcessUnfetchedConceptData {

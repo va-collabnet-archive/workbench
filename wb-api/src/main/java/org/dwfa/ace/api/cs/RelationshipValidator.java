@@ -16,10 +16,13 @@
  */
 package org.dwfa.ace.api.cs;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -126,29 +129,33 @@ public class RelationshipValidator extends SimpleValidator {
 
         for (UniversalAceRelationshipPart part : beanRelationship.getVersions()) {
             if (part.getTime() != Long.MAX_VALUE) {
-                I_RelPart newPart = termFactory.newRelPart();
-                newPart.setTime(part.getTime());
-                newPart.setPathId(getNativeId(part.getPathId()));
-                newPart.setCharacteristicId(getNativeId(part.getCharacteristicId()));
-                newPart.setGroup(part.getGroup());
-                newPart.setRefinabilityId(getNativeId(part.getRefinabilityId()));
-                newPart.setTypeId(getNativeId(part.getTypeId()));
-                newPart.setStatusId(getNativeId(part.getStatusId()));
+                try {
+                    I_RelPart newPart = termFactory.newRelPart();
+                    newPart.setTime(part.getTime());
+                    newPart.setPathId(getNativeId(part.getPathId()));
+                    newPart.setCharacteristicId(getNativeId(part.getCharacteristicId()));
+                    newPart.setGroup(part.getGroup());
+                    newPart.setRefinabilityId(getNativeId(part.getRefinabilityId()));
+                    newPart.setTypeId(getNativeId(part.getTypeId()));
+                    newPart.setStatusId(getNativeId(part.getStatusId()));
 
-                if (containsPart(databaseRelationship, newPart) == false) {
+                    if (containsPart(databaseRelationship, newPart) == false) {
 
-                    failureReport.append("concept does not contain a relationship part match. relId: ");
-                    failureReport.append(beanRelId);
-                    failureReport.append(" c1id: ");
-                    failureReport.append(beanC2Id);
-                    failureReport.append(" c2id: ");
-                    failureReport.append(beanC2Id);
-                    failureReport.append("\n newPart: " + newPart);
-                    for (I_RelPart repPart : databaseRelationship.getMutableParts()) {
-                        failureReport.append("\nexisting: " + repPart);
+                        failureReport.append("concept does not contain a relationship part match. relId: ");
+                        failureReport.append(beanRelId);
+                        failureReport.append(" c1id: ");
+                        failureReport.append(beanC2Id);
+                        failureReport.append(" c2id: ");
+                        failureReport.append(beanC2Id);
+                        failureReport.append("\n newPart: " + newPart);
+                        for (I_RelPart repPart : databaseRelationship.getMutableParts()) {
+                            failureReport.append("\nexisting: " + repPart);
+                        }
+                        failureReport.append("\n\n");
+                        return false; // Test 5
                     }
-                    failureReport.append("\n\n");
-                    return false; // Test 5
+                } catch (PropertyVetoException ex) {
+                    throw new TerminologyException(ex);
                 }
             }
         }

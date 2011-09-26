@@ -113,7 +113,7 @@ public class TestSnoPathProcessInferred extends AbstractTask {
 
             SnoPathProcessInferred pcClass = null;
             pcClass = new SnoPathProcessInferred(logger, cClassSnoRels, allowedRoleTypes,
-                    statusSet, cEditPosSet, cViewPosSet, null, precedence, contradictionMgr);
+                    statusSet, cViewPosSet, null, precedence, contradictionMgr);
             tf.iterateConcepts(pcClass);
             logger.info("\r\n::: [TestSnoPathProcessInferred] GET INFERRED (View) PATH DATA : "
                     + pcClass.getStats(startTime));

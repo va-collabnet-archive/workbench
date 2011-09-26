@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFloatRevision> {
@@ -32,6 +33,19 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
    public TkRefsetCidFloatMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetCidFloatMember(TkRefsetCidFloatMember another, Map<UUID, UUID> conversionMap, long offset,
+                                 boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid     = conversionMap.get(another.c1Uuid);
+         this.floatValue = another.floatValue;
+      } else {
+         this.c1Uuid     = another.c1Uuid;
+         this.floatValue = another.floatValue;
+      }
    }
 
    //~--- methods -------------------------------------------------------------
@@ -83,6 +97,11 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRefsetCidFloatMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetCidFloatMember(this, conversionMap, offset, mapAll);
    }
 
    @Override

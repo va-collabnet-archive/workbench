@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
@@ -56,6 +57,36 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
       readExternal(in, dataVersion);
    }
 
+   public TkComponent(TkComponent<V> another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (another.additionalIds != null) {
+         this.additionalIds = new ArrayList<TkIdentifier>(another.additionalIds.size());
+
+         for (TkIdentifier id : another.additionalIds) {
+            this.additionalIds.add((TkIdentifier) id.makeConversion(conversionMap, offset, mapAll));
+         }
+      }
+
+      if (another.annotations != null) {
+         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(another.annotations.size());
+
+         for (TkRefsetAbstractMember<?> r : another.annotations) {
+            this.annotations.add((TkRefsetAbstractMember<?>) r.makeConversion(conversionMap, offset, mapAll));
+         }
+      }
+
+      this.primordialUuid = conversionMap.get(another.primordialUuid);
+
+      if (another.revisions != null) {
+         this.revisions = new ArrayList<V>(another.revisions.size());
+
+         for (V r : another.revisions) {
+            this.revisions.add((V) r.makeConversion(conversionMap, offset, mapAll));
+         }
+      }
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -68,6 +99,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;

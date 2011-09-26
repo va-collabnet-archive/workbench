@@ -116,6 +116,12 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
  
     // transient
     private transient File profileFile;
+    //The List of User concept UUIDs
+    private List<UUID> userConcept_UUIDs;
+    //The list of user path UUIDs
+    private List<UUID> userpath_UUIDs;
+    // Max CS File Size 
+    private int maxCSFileSize = 512000;
 
     public AceConfig() throws TerminologyException, IOException {
         super();
@@ -192,6 +198,9 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     afc.setMasterConfig(this);
                 }
             }
+            if(username != null && username.length() > 0){
+            	aceFrames.get(0).setUsername(username);
+            }
             if (username == null || username.equals("null")) {
                 username = aceFrames.get(0).getUsername();
             }
@@ -228,15 +237,19 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             }
             try {
                 if (objDataVersion >= 8) {
-                    userConcept = Terms.get().getConcept(Terms.get().uuidToNative((List<UUID>) in.readObject()));
+                	setUserConcept_UUIDs((List<UUID>) in.readObject());
+                    userConcept = Terms.get().getConcept(Terms.get().uuidToNative(getUserConcept_UUIDs()));
                 } else {
+                	setUserConcept_UUIDs((List<UUID>)ArchitectonicAuxiliary.Concept.USER.getUids());
                     userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
                 }
                 if (objDataVersion >= 9) {
-                    userPath = Terms.get().getConcept(Terms.get().uuidToNative((List<UUID>) in.readObject()));
+                	setUserpath_UUIDs((List<UUID>) in.readObject());
+                    userPath = Terms.get().getConcept(Terms.get().uuidToNative(getUserpath_UUIDs()));
                     fullName = (String) in.readObject();
                 } else {
-                    userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                	setUserpath_UUIDs((List<UUID>)ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                	userPath = Terms.get().getConcept(Terms.get().uuidToNative(getUserpath_UUIDs()));
                     fullName = username;
                 }
             } catch (Exception e) {
@@ -448,11 +461,11 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         }
         File changeSetFile = new File(getChangeSetRoot(), getChangeSetWriterFileName());
         if (changeSetFile.exists()) {
-            int maxSize = 512000;
-            if (changeSetFile.length() > maxSize) {
+            //int maxSize = 512000;
+            if (changeSetFile.length() > maxCSFileSize) {
                 renameChangeSetFile();
                 AceLog.getAppLog().info(
-                    "change set exceeds " + maxSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
+                    "change set exceeds " + maxCSFileSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
             }
         }
         FileOutputStream fos = new FileOutputStream(profileFile);
@@ -607,4 +620,30 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     public void setUserChangesChangeSetPolicy(ChangeSetPolicy policy) {
         this.userChangesChangeSetPolicy = policy;
     }
+
+	public List<UUID> getUserConcept_UUIDs() {
+		return userConcept_UUIDs;
+	}
+
+	public void setUserConcept_UUIDs(List<UUID> userConcept_UUIDs) {
+		this.userConcept_UUIDs = userConcept_UUIDs;
+	}
+
+	public List<UUID> getUserpath_UUIDs() {
+		return userpath_UUIDs;
+	}
+
+	public void setUserpath_UUIDs(List<UUID> userpath_UUIDs) {
+		this.userpath_UUIDs = userpath_UUIDs;
+	}
+
+	public int getMaxCSFileSize() {
+		return maxCSFileSize;
+	}
+
+	public void setMaxCSFileSize(int maxCSFileSize) {
+		this.maxCSFileSize = maxCSFileSize;
+	}
+
+
 }

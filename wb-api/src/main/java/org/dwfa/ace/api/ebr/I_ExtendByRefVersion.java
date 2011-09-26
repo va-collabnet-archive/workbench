@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api.ebr;
 
+import java.beans.PropertyVetoException;
 import java.util.List;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -35,7 +36,7 @@ public interface I_ExtendByRefVersion<T extends RefexAnalogBI<T>> extends I_Exte
      * @deprecated Use {@link #setStatusId(int)}
      */
     @Deprecated
-    public void setStatus(int idStatus);
+    public void setStatus(int idStatus) throws PropertyVetoException;
 
     public void addVersion(I_ExtendByRefPart<T> part);
 

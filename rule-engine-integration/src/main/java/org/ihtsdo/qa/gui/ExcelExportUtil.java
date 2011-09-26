@@ -1,6 +1,5 @@
 package org.ihtsdo.qa.gui;
 
-import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

@@ -549,7 +549,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			cClassSnoRels = new ArrayList<SnoRel>();
 			startTime = System.currentTimeMillis();
 			SnoPathProcessInferred pcClass = new SnoPathProcessInferred(logger,
-					cClassSnoRels, allowedRoleTypes, statusSet, cEditPosSet,
+					cClassSnoRels, allowedRoleTypes, statusSet,
 					cClassPosSet, gui, precedence, contradictionMgr);
 			tf.iterateConcepts(pcClass);
 			logger.info("\r\n::: [SnorocketTask] GET INFERRED PATH DATA"

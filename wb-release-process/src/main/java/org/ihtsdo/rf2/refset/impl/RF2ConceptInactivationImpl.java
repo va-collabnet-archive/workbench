@@ -57,7 +57,6 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
-			//String moduleId = getMetaModuleID(concept);
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 			Date LIMITED = getDateFormat().parse(I_Constants.limited_policy_change);
@@ -81,24 +80,12 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 
 					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-
-					/*	    
-					System.out.println("<==== effectiveTime ===>" + effectiveTime);
-					System.out.println("<==== conceptStatus ===>" + conceptStatus);
-					System.out.println("<==== active ===>" + active);
-					System.out.println("<==== valueId ===>" + valueId);
-					System.out.println("<==== priorValueId ===>" + priorValueId);					
-					System.out.println("<==== firstLimitedPassed ===>" + firstLimitedPassed);
-					System.out.println("<==== priorLimitedActiveFlag ===>" + priorLimitedActiveFlag);
-					System.out.println("<==== firstInactivePassed ===>" + firstInactivePassed);
-			 		*/	
-					
-						if (!valueId.equals("XXX")) {
-							WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-						} else {
-							WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, "");
-							recordCounter++;
-						}
+					if (!valueId.equals("XXX")) {
+						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+					} else {
+						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, "");
+						recordCounter++;
+					}
 				}
 			}
 		} catch (IOException e) {

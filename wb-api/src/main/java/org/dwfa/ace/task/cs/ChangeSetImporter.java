@@ -74,6 +74,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             List<File> changeSetFiles = new ArrayList<File>();
             addAllChangeSetFiles(rootFile, changeSetFiles, suffix, prefix);
             TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
+            TreeSet<I_ReadChangeSet> wfHxReaderSet = getSortedReaderSet();
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = getChangeSetReader(csf);
                 if (validateChangeSets == true && validatorArray.length > 0) {
@@ -83,6 +84,10 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
+                
+                I_ReadChangeSet wcsr = getChangeSetWfHxReader(csf);
+                wfHxReaderSet.add(wcsr);
+
                 logger.log(Level.INFO, "Adding reader: {0}\nThis has nextCommitTime() of : {1} ({2})", new Object[]{csf.getAbsolutePath(), csr.nextCommitTime(), new Date(csr.nextCommitTime())});
             }
 
@@ -95,6 +100,14 @@ public abstract class ChangeSetImporter implements ActionListener {
                 activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
                 readNext(readerSet);
             }
+
+            activity.setValue(0);
+            while (wfHxReaderSet.size() > 0 && continueImport) {
+                activity.setValue(max - avaibleBytes(wfHxReaderSet));
+                activity.setProgressInfoLower(wfHxReaderSet.first().getChangeSetFile().getName());
+                readNext(wfHxReaderSet);
+            }
+
             if (commitAfterImport) {
                 Terms.get().commit();
             }
@@ -118,6 +131,8 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     public abstract I_ReadChangeSet getChangeSetReader(File csf);
+
+    public abstract I_ReadChangeSet getChangeSetWfHxReader(File csf);
 
     public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
         TreeSet<I_ReadChangeSet> readerSet = new TreeSet<I_ReadChangeSet>(new Comparator<I_ReadChangeSet>() {

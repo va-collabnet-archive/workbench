@@ -70,8 +70,9 @@ public class SnoRelLong implements Comparable<Object> {
         }
     } // SnoRel.compareTo()
 
+    @Override
     public String toString() {
-        return new String(c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group);
+        return c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group;
     }
 
     public String toStringHdr() {

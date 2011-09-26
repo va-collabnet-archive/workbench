@@ -649,11 +649,9 @@ public class ImageTableModel extends AbstractTableModel implements PropertyChang
                 }
                 fireTableDataChanged();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-		}
+        } 
     }
 
 }

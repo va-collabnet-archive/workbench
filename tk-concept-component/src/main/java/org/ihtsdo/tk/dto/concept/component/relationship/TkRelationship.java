@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
@@ -38,6 +39,26 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
       readExternal(in, dataVersion);
    }
 
+   public TkRelationship(TkRelationship another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+
+      if (mapAll) {
+         this.c1Uuid             = conversionMap.get(another.c1Uuid);
+         this.c2Uuid             = conversionMap.get(another.c2Uuid);
+         this.characteristicUuid = conversionMap.get(another.characteristicUuid);
+         this.refinabilityUuid   = conversionMap.get(another.refinabilityUuid);
+         this.relGroup           = another.relGroup;
+         this.typeUuid           = conversionMap.get(another.typeUuid);
+      } else {
+         this.c1Uuid             = another.c1Uuid;
+         this.c2Uuid             = another.c2Uuid;
+         this.characteristicUuid = another.characteristicUuid;
+         this.refinabilityUuid   = another.refinabilityUuid;
+         this.relGroup           = another.relGroup;
+         this.typeUuid           = another.typeUuid;
+      }
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -50,7 +71,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
-    @Override
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -104,9 +125,14 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *
     * @return a hash code value for this <tt>ERelationship</tt>.
     */
-    @Override
+   @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRelationship makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRelationship(this, conversionMap, offset, mapAll);
    }
 
    @Override
@@ -133,11 +159,11 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
    /**
     * Returns a string representation of the object.
     */
-    @Override
+   @Override
    public String toString() {
       StringBuilder buff = new StringBuilder();
 
-        buff.append(this.getClass().getSimpleName()).append(": ");
+      buff.append(this.getClass().getSimpleName()).append(": ");
       buff.append(" c1: ");
       buff.append(informAboutUuid(this.c1Uuid));
       buff.append(" type:");

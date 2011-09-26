@@ -54,6 +54,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN) })
 public class ChangeRolesToStatus extends AbstractTask {
@@ -99,11 +100,6 @@ public class ChangeRolesToStatus extends AbstractTask {
                 throw new TaskFailedException("You must select at least one editing path. ");
             }
 
-            Set<PositionBI> positionSet = new HashSet<PositionBI>();
-            for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Integer.MAX_VALUE));
-            }
-            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
            
             ViewCoordinate vc = config.getViewCoordinate();
@@ -113,7 +109,8 @@ public class ChangeRolesToStatus extends AbstractTask {
             //get rels that are NOT isa
             for (RelationshipChronicleBI rel : relsOut) {
                 for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
+                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid())) && 
+                            relv.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
                     	//change status
                     	for (PathBI editPath : config.getEditingPathSet()) {
                     		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
@@ -128,25 +125,6 @@ public class ChangeRolesToStatus extends AbstractTask {
                 }
             }
             
-            //remove roles which concept is target of
-            Collection<? extends RelationshipChronicleBI> relsIn = concept.getRelsIncoming();
-            
-            for (RelationshipChronicleBI rel : relsIn) {
-                for (RelationshipVersionBI relv : rel.getVersions(vc)) {
-                    if (!(vc.getIsaTypeNids().contains(relv.getTypeNid()))) {
-                    	//change status
-                    	for (PathBI editPath : config.getEditingPathSet()) {
-                    		Set<I_RelPart> partsToAdd = new HashSet<I_RelPart>();
-	                    	I_RelPart newPart = (I_RelPart) relv.makeAnalog(
-	                    			newStatusConcept.getConceptNid(), 
-	                    			config.getDbConfig().getUserConcept().getNid(),
-	                    			editPath.getConceptNid(), 
-	                    			Long.MAX_VALUE);
-                    	}
-
-                    }
-                }
-            }
             Terms.get().addUncommitted(concept);
             return Condition.CONTINUE;
         } catch (IllegalArgumentException e) {

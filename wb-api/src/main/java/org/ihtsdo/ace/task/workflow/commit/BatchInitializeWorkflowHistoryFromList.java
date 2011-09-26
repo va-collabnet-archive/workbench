@@ -69,7 +69,7 @@ public class BatchInitializeWorkflowHistoryFromList extends AbstractTask
         	for (int i = 0; i < model.getSize(); i++)
         	{
         		I_GetConceptData con = model.getElementAt(i);
-        		WorkflowHelper.initializeWorkflowForConcept(con, true);        
+        		WorkflowHelper.initializeWorkflowForConcept(con);        
         	}
         } catch (Exception e) {
             throw new TaskFailedException(e);

@@ -1,34 +1,64 @@
 package org.ihtsdo.arena.conceptview;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import org.dwfa.ace.api.I_GetConceptData;
+//~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.util.concurrent.ExecutionException;
+
+import javax.swing.SwingWorker;
+
 public class CommitActionListener implements ActionListener {
+   ConceptViewSettings settings;
 
-    ConceptViewSettings settings;
+   //~--- constructors --------------------------------------------------------
 
-    public CommitActionListener(ConceptViewSettings settings) {
-        this.settings = settings;
-    }
+   public CommitActionListener(ConceptViewSettings settings) {
+      this.settings = settings;
+   }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        try {
-            if (settings != null) {
-                I_GetConceptData c = settings.getConcept();
-                if (c != null) {
-                    if (c.commit(
-                            settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                            settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert())) {
-                        settings.getView().getCvRenderer().updateCancelAndCommit();
-                    }
-                }
+   //~--- methods -------------------------------------------------------------
+
+   @Override
+   public void actionPerformed(ActionEvent e) {
+      try {
+         if (settings != null) {
+            CommitTask ct = new CommitTask();
+            ct.execute();
+         }
+      } catch (Exception e1) {
+         AceLog.getAppLog().alertAndLogException(e1);
+      }
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   private class CommitTask extends SwingWorker<Boolean, Object> {
+      @Override
+      protected Boolean doInBackground() throws Exception {
+         I_GetConceptData c = settings.getConcept();
+
+         return c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+                         settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert());
+      }
+
+      @Override
+      protected void done() {
+         try {
+            if (get()) {
+               settings.getView().getCvRenderer().updateCancelAndCommit();
             }
-        } catch (Exception e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        }
-    }
+         } catch (InterruptedException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         } catch (ExecutionException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
+   }
 }

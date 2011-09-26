@@ -641,6 +641,3 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer
       }
    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

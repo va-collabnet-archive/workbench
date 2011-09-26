@@ -159,7 +159,8 @@ public enum ProcessAttachmentKeys {
     RELEASE_DATE,
     COLLABNET_ARTIFACT_SUBMITTER,
     START_DATE,
-    END_DATE;
+    END_DATE,
+    STRING_SET;
 
     public String getAttachmentKey() {
         return "A: " + this.name();

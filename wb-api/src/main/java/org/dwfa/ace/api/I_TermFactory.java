@@ -290,6 +290,8 @@ public interface I_TermFactory {
 
     I_ReadChangeSet newBinaryChangeSetReader(File changeSetFile) throws IOException;
 
+	I_ReadChangeSet newWfHxLuceneChangeSetReader(File changeSetFile) throws IOException;
+
     void loadFromSingleJar(String jarFile, String dataPrefix) throws Exception;
 
     void loadFromDirectory(File dataDir, String encoding) throws Exception;

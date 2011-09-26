@@ -25,7 +25,7 @@ public class RF2StatedRelationshipFactory extends RF2AbstractFactory {
 
 	public void export() throws IOException, Exception {
 
-		logger.info("Started Stated Relationship Export ...");
+		logger.info("Started Stated Relationship Snapshot Export ...");
 
 		try {
 
@@ -35,7 +35,7 @@ public class RF2StatedRelationshipFactory extends RF2AbstractFactory {
 
 			closeExportFileWriter();
 
-			logger.info("Finished Stated Relationship Export.");
+			logger.info("Finished Stated Relationship Snapshot Export...");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());

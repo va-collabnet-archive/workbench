@@ -11,8 +11,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.rules.context.RulesContextHelper;
-import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
-import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 
 public class UpdateAllPackagesTask extends SwingWorker<Object, Object> {
 	

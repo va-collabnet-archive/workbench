@@ -84,7 +84,7 @@ public class UpdateWorkflowHistoryOnCommit extends AbstractConceptTest
     		
     		if (latestBean == null ||
     			!WorkflowHelper.isBeginWorkflowAction(Terms.get().getConcept(latestBean.getAction()).getVersion(vc))) {
-    			WorkflowHelper.initializeWorkflowForConcept(concept, false);
+    			WorkflowHelper.initializeWorkflowForConcept(concept);
     		}
         }
     		catch (Exception e) {

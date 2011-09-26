@@ -23,7 +23,6 @@ import java.util.Calendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import javax.swing.*;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -37,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -114,12 +114,13 @@ public class QACaseDetailsPanel extends JPanel {
 		assignedTo.repaint();
 
 		dispositionStatusCombo.removeAllItems();
-		dispositionStatusCombo.addItem("");
-		for (DispositionStatus object : this.dispositionStatuses) {
-			if (rule.isWhitelistAllowed() && object.getName().equals("Cleared")) {
-				dispositionStatusCombo.addItem(object);
-			} else if (!object.getName().equals("Cleared")) {
-				dispositionStatusCombo.addItem(object);
+		dispositionStatusCombo.addItem("Any");
+		for (DispositionStatus dispStatus : this.dispositionStatuses) {
+			
+			if (!rule.isWhitelistAllowed() && dispStatus.getName().equalsIgnoreCase("cleared")) {
+				dispositionStatusCombo.addItem(dispStatus);
+			} else if (!dispStatus.getName().equals("Cleared")) {
+				dispositionStatusCombo.addItem(dispStatus);
 			}
 		}
 		dispositionStatusCombo.addItemListener(new ItemListener() {

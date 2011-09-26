@@ -1,11 +1,14 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.Collection;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 
 import org.dwfa.ace.api.I_AmPart;
@@ -125,7 +128,11 @@ public class UpdateDescFromSpecAction extends AbstractAction {
 						SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
 						config.getEditingPathSet().iterator().next().getConceptNid(), 
 						Long.MAX_VALUE);
-				newPart.setText(descSpec.getDescText());
+                try {
+                    newPart.setText(descSpec.getDescText());
+                } catch (PropertyVetoException ex) {
+                    throw new IOException(ex);
+                }
 				description.addVersion(newPart);
 			
 			}

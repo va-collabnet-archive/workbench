@@ -16,8 +16,11 @@
  */
 package org.dwfa.ace.api.cs;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_TermFactory;
@@ -71,20 +74,24 @@ public class ConceptAttributeValidator extends SimpleValidator {
                 }
 
                 if (!match) {
-                    failureReport.append("\nConcept does not contain a concept attribute part match.");
-                    I_ConceptAttributePart newConceptAttributePart = tf.newConceptAttributePart();
-                    newConceptAttributePart.setStatusId(getNativeId(part.getConceptStatus()));
-                    newConceptAttributePart.setDefined(part.isDefined());
-                    newConceptAttributePart.setPathId(getNativeId(part.getPathId()));
-                    newConceptAttributePart.setTime(part.getTime());
-                    failureReport.append("\n   newPart is " + part);
-                    failureReport.append("\n   new native part: " + newConceptAttributePart);
+                    try {
+                        failureReport.append("\nConcept does not contain a concept attribute part match.");
+                        I_ConceptAttributePart newConceptAttributePart = tf.newConceptAttributePart();
+                        newConceptAttributePart.setStatusId(getNativeId(part.getConceptStatus()));
+                        newConceptAttributePart.setDefined(part.isDefined());
+                        newConceptAttributePart.setPathId(getNativeId(part.getPathId()));
+                        newConceptAttributePart.setTime(part.getTime());
+                        failureReport.append("\n   newPart is " + part);
+                        failureReport.append("\n   new native part: " + newConceptAttributePart);
 
-                    for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getMutableParts()) {
-                        failureReport.append("\n     existing part: " + conceptAttributePart);
+                        for (I_ConceptAttributePart conceptAttributePart : thinConAttr.getMutableParts()) {
+                            failureReport.append("\n     existing part: " + conceptAttributePart);
+                        }
+                        failureReport.append("\n\n");
+                        return false; // test 2
+                    } catch (PropertyVetoException ex) {
+                      throw new TerminologyException(ex);
                     }
-                    failureReport.append("\n\n");
-                    return false; // test 2
                 }
             }
 

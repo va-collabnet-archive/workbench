@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.api;
 
+import java.beans.PropertyVetoException;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 
 public interface I_ImagePart<A extends MediaAnalogBI>
@@ -23,7 +24,7 @@ public interface I_ImagePart<A extends MediaAnalogBI>
 
     public String getTextDescription();
 
-    public void setTextDescription(String name);
+    public void setTextDescription(String name) throws PropertyVetoException;
 
     @Deprecated
     public I_ImagePart duplicate();

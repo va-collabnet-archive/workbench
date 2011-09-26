@@ -9,7 +9,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
@@ -47,7 +46,7 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
     @Override
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append(this.getClass().getSimpleName() + ":{");
+        buf.append(this.getClass().getSimpleName()).append(":{");
         buf.append(" c1Nid: ");
         ConceptComponent.addNidToBuffer(buf, c1Nid);
         buf.append(" c2Nid: ");
@@ -289,22 +288,27 @@ public class CidCidCidRevision extends RefsetRevision<CidCidCidRevision, CidCidC
         modified();
     }
 
+    @Override
     public int getCnid1() {
         return c1Nid;
     }
 
+    @Override
     public int getCnid2() {
         return c2Nid;
     }
 
+    @Override
     public int getCnid3() {
         return c3Nid;
     }
 
+    @Override
     protected TK_REFSET_TYPE getTkRefsetType() {
         return TK_REFSET_TYPE.CID_CID_CID;
     }
 
+    @Override
     protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexProperty.CNID1, getCnid1());
         rcs.with(RefexProperty.CNID2, getCnid2());

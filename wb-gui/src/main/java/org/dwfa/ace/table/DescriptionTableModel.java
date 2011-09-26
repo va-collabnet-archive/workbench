@@ -314,15 +314,9 @@ protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOExce
                     Terms.get().addUncommitted(Terms.get().getConcept(desc.getConceptNid()));
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        
-
-
-
-}
+        } 
     }
 
     private class UpdateDataAlertsTimerTask extends TimerTask {

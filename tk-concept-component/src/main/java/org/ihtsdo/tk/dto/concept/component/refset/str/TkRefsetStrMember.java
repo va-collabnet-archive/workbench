@@ -14,6 +14,8 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevision> {
    public static final long serialVersionUID = 1;
@@ -31,6 +33,12 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
    public TkRefsetStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRefsetStrMember(TkRefsetStrMember another, Map<UUID, UUID> conversionMap, long offset,
+                            boolean mapAll) {
+      super(another, conversionMap, offset, mapAll);
+      this.strValue = another.strValue;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -77,6 +85,11 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
    @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
+   }
+
+   @Override
+   public TkRefsetStrMember makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+      return new TkRefsetStrMember(this, conversionMap, offset, mapAll);
    }
 
    @Override

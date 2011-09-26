@@ -16,6 +16,7 @@
  */
 package org.dwfa.ace.task.status;
 
+import java.beans.PropertyVetoException;
 import java.util.List;
 
 import org.dwfa.ace.api.I_AmTuple;
@@ -28,19 +29,19 @@ import org.dwfa.ace.api.Terms;
 public class TupleListUtil {
 
 	
-    public static void setStatus(I_GetConceptData status, List<? extends I_AmTuple> tuples) {
+    public static void setStatus(I_GetConceptData status, List<? extends I_AmTuple> tuples) throws PropertyVetoException {
         for (I_AmTuple t : tuples) {
             t.setStatusId(status.getConceptNid());
         }
     }
 
-    public static void setVersion(int version, List<? extends I_AmTuple> tuples) {
+    public static void setVersion(int version, List<? extends I_AmTuple> tuples) throws PropertyVetoException {
         for (I_AmTuple t : tuples) {
             t.setTime(Terms.get().convertToThickVersion(version));
         }
     }
 
-    public static void setPath(int pathId, List<? extends I_AmTuple> tuples) {
+    public static void setPath(int pathId, List<? extends I_AmTuple> tuples) throws PropertyVetoException {
         for (I_AmTuple t : tuples) {
             t.setPathId(pathId);
         }

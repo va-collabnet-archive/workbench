@@ -96,16 +96,16 @@ public class ChangeConceptStatus extends AbstractTask {
             Set<I_ConceptAttributePart> partsToAdd = new HashSet<I_ConceptAttributePart>();
 
             Set<PositionBI> positionSet = new HashSet<PositionBI>();
-            for (PathBI editPath : config.getEditingPathSet()) {
-                positionSet.add(Terms.get().newPosition(editPath, Long.MAX_VALUE));
+            for (PositionBI viewPosition : config.getViewPositionSet()) {
+                positionSet.add(viewPosition);
             }
-            PositionSetReadOnly positionsForEdit = new PositionSetReadOnly(positionSet);
+            PositionSetReadOnly positionsForView = new PositionSetReadOnly(positionSet);
             I_GetConceptData newStatusConcept = Terms.get().getConcept(newStatus.ids);
             if (newStatusConcept == null) {
                 throw new TaskFailedException("newStatusConcept is null. Ids: " + Arrays.asList(newStatus.ids));
             }
             for (PathBI editPath : config.getEditingPathSet()) {
-                List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForEdit, 
+                List<? extends I_ConceptAttributeTuple> tuples = concept.getConceptAttributeTuples(null, positionsForView, 
                     config.getPrecedence(), config.getConflictResolutionStrategy());
                 for (I_ConceptAttributeTuple t : tuples) {
                     if (t.getStatusNid() != newStatusConcept.getConceptNid()) {

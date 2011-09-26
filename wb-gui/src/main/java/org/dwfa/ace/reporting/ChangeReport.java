@@ -17,6 +17,7 @@
 package org.dwfa.ace.reporting;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 
@@ -35,19 +36,23 @@ import org.dwfa.tapi.spec.ConceptSpec;
  * @requiresDependencyResolution compile
  */
 public class ChangeReport extends ChangeReportBase {
+
     private int parentConceptNid;
 
     public ChangeReport(String v1, String v2, String path1_uuid, String path2_uuid,
-                boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex,boolean deleted_concepts_refex,
-                boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
-                boolean changed_rel_author, boolean changed_refex_author, String author1, String author2, boolean changed_defined,
-                boolean added_descriptions, boolean deleted_descriptions, boolean changed_description_status,
-                boolean changed_description_term, boolean changed_description_type, boolean changed_description_language,
-                boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
-                boolean changed_relationship_status, boolean changed_relationship_characteristic,
-                boolean changed_relationship_refinability, boolean changed_relationship_type,
-                boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid) {
+            List<Integer> v1_relationship_characteristic_filter_int, List<Integer> v2_relationship_characteristic_filter_int,
+            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
+            boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
+            boolean changed_rel_author, boolean changed_refex_author,
+            List<Integer> author1, List<Integer> author2, boolean changed_defined,
+            boolean added_descriptions, boolean deleted_descriptions, boolean changed_description_status,
+            boolean changed_description_term, boolean changed_description_type, boolean changed_description_language,
+            boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
+            boolean changed_relationship_status, boolean changed_relationship_characteristic,
+            boolean changed_relationship_refinability, boolean changed_relationship_type,
+            boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid) {
         super(v1, v2, path1_uuid, path2_uuid,
+                v1_relationship_characteristic_filter_int, v2_relationship_characteristic_filter_int,
                 added_concepts, deleted_concepts, added_concepts_refex, deleted_concepts_refex,
                 changed_concept_status, changed_concept_author, changed_description_author,
                 changed_rel_author, changed_refex_author, author1, author2, changed_defined,

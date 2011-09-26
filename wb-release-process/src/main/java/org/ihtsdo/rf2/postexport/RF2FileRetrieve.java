@@ -21,6 +21,7 @@ public class RF2FileRetrieve {
 	private static final String QUALIFIER_FILENAME_PART = "Qualifier";
 	private static final String REFSETSIMPLE_FILENAME_PART = "Refset_Simple";
 	private static final String TEXTDEFINITION_FILENAME_PART = "TextDefinition";
+	private static final String IDENTIFIER_FILENAME_PART = "Identifier_";
 	
 	private String releaseFolder;
 	private String conceptFile;
@@ -35,6 +36,7 @@ public class RF2FileRetrieve {
 	private String ICD9CrossMapFile;
 	private String statedRelationshipFile;
 	private String textDefinitionFile;
+	private String identifierFile;
 	
 	public RF2FileRetrieve(String releaseFolder) throws Exception {
 		super();
@@ -147,6 +149,10 @@ public class RF2FileRetrieve {
 			if (component.getName().indexOf(TEXTDEFINITION_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
 				textDefinitionFile=component.getAbsolutePath();
 			}
+			if (component.getName().indexOf(IDENTIFIER_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
+				identifierFile=component.getAbsolutePath();
+			}
+			
 		}
 	}
 	/**
@@ -212,4 +218,8 @@ public class RF2FileRetrieve {
 	public String getTextDefinitionFile() {
 		return textDefinitionFile;
 	}
+	public String getIdentifierFile() {
+		return identifierFile;
+	}
+	
 }
