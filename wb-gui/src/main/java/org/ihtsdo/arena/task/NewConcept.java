@@ -62,6 +62,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -78,7 +79,12 @@ import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -195,7 +201,7 @@ public class NewConcept extends PreviousNextOrCancel {
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
             host.unlink();
-
+          
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
             new Thread(
@@ -1056,6 +1062,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     && fsn.extractText().indexOf(")") > fsn.extractText().indexOf("(")) {
                 //get text parts and make query term
                 String fullFsn = fsn.extractText();
+                fullFsn = fullFsn.replaceAll("\n", "");
+                fullFsn = fullFsn.replaceAll("   *", " ");
                 String[] fsnWords = fullFsn.split("\\s");
                 HashSet<String> wordSet = new HashSet<String>();
                 for (String word : fsnWords) {
