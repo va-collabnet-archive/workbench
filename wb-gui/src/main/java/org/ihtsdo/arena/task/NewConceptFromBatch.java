@@ -1091,7 +1091,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             //make sure parent is valid
             if (parentId != null) { //test for valid parent
                 try {
-                    if (parentId.length() == 8) {
+                    if (parentId.length() < 32) {
                         Set<I_GetConceptData> concepts;
                         concepts = Terms.get().getConcept(parentId);
                         for (I_GetConceptData concept : concepts) {
