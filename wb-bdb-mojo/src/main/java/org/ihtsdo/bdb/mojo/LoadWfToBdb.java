@@ -49,6 +49,7 @@ import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -82,21 +83,29 @@ public class LoadWfToBdb extends AbstractMojo {
 	private File wfLuceneDir;
 
 	public void execute() throws MojoExecutionException {
+        ViewCoordinate vc;
 		try {
             Bdb.allowWfLuceneSetup(true);
-			Bdb.setup(berkeleyDir.getAbsolutePath());
 
+	        try {
+	        	// Setup Database
+				Bdb.setup(berkeleyDir.getAbsolutePath());
+	        	vc = DefaultConfig.newProfile().getViewCoordinate();
+	        } catch (Exception e) {
+				throw new MojoExecutionException("Failed to setup or read database successfully from directory: " + berkeleyDir.getAbsolutePath(), e);
+	        }
+	        
+	        // Init Lucene
 			LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
 	        WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
-	        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY, DefaultConfig.newProfile().getViewCoordinate());
+
+	        // Generate Lucene Index
+	        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY, vc);
 
 			Bdb.close();
 		} catch (Exception ex) {
 			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
-		} catch (Throwable ex) {
-			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
 		}
-
 	}
 
 
