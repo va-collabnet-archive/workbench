@@ -65,7 +65,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		System.out.println(buff.toString());
+		//System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -91,7 +91,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		System.out.println(buff.toString());
+		//System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 

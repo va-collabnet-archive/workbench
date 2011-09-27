@@ -181,6 +181,7 @@ public class RulesLibrary {
 			Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
 		}
 		long startTime = System.currentTimeMillis();
+		//System.out.println("Starting concept check...");
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		if (!noRealtimeRulesAlertShown &&
 				context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) &&
@@ -189,6 +190,7 @@ public class RulesLibrary {
 			AceLog.getAppLog().alertAndLogException(
 					new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
 		}
+		//System.out.println("KBase: null = " + (kbase==null) + "; Size: " + kbase.getKnowledgePackages().size());
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
 			if (kbase != null) {
@@ -217,7 +219,7 @@ public class RulesLibrary {
 					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-
+					//System.out.println("Test concept converted...");
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Testing concept...");
 						config.setStatusMessage("Testing concept...");
@@ -229,7 +231,7 @@ public class RulesLibrary {
 					ksession.fireAllRules();
 
 					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
-
+					System.out.println("Results size: " + results.getResultsItems().size());
 					for (ResultsItem resultsItem : results.getResultsItems() ) {
 						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
@@ -285,6 +287,8 @@ public class RulesLibrary {
 
 					ksession.dispose();
 				}
+			} else {
+				//System.out.println("QA Skipped, kbase was null...");
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();
