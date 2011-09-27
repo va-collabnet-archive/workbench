@@ -70,6 +70,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -627,7 +628,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       Collection<? extends Version> versions = this.getVersions(vc);
 
       if (ec.getEditPaths().length != 1) {
-         throw new IOException("To many edit paths: " + ec);
+         throw new IOException("Edit paths != 1: " + ec.getEditPaths().length + " " + Arrays.asList(ec));
       }
 
       int pathNid = ec.getEditPaths()[0];
