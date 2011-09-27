@@ -161,6 +161,13 @@ public class BatchQACheck extends AbstractMojo {
 	 * @parameter
 	 */
 	private String pkgUrl;
+	
+	/**
+	 * UUIDs of rules to ignore.
+	 * 
+	 * @parameter
+	 */
+	private List<String> ignoreRules;
 
 
 	private File executionDetailsOutput;
@@ -197,10 +204,16 @@ public class BatchQACheck extends AbstractMojo {
 			validateParamenters();
 			openDb();
 			RulesContextHelper contextHelper = new RulesContextHelper(config);
+			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
+			
+			for (RulesDeploymentPackageReference loopPkg : contextHelper.getPackagesForContext(context)) {
+				contextHelper.removePkgReferenceFromContext(loopPkg, context);
+			}
+			
 			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
 				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
-				contextHelper.addPkgReferenceToContext(pkgReference, tf.getConcept(UUID.fromString(context_uuid)));
+				contextHelper.addPkgReferenceToContext(pkgReference, context);
 			}
 			cleanKbFileCache();
 			exportExecutionDescriptor(contextHelper);
