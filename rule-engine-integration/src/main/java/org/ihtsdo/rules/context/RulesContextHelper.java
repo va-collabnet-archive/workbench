@@ -187,6 +187,8 @@ public class RulesContextHelper {
 					kbCache.put(context.getConceptNid(), kbase);
 					Terms.get().setKnowledgeBaseCache(kbCache);
 					lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
+				} else {
+					System.out.println("ERROR: Required flow file is missing in rules folder: " + flow.getName());
 				}
 				returnBase = kbase;
 			}

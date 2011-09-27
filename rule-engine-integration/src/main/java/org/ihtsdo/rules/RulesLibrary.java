@@ -231,7 +231,7 @@ public class RulesLibrary {
 					ksession.fireAllRules();
 
 					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
-					System.out.println("Results size: " + results.getResultsItems().size());
+					//System.out.println("Results size: " + results.getResultsItems().size());
 					for (ResultsItem resultsItem : results.getResultsItems() ) {
 						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
