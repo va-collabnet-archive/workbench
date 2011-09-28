@@ -43,7 +43,7 @@ public class MemberSubmissionFileHelper {
             initLock.lock();
                 if (msFileSetMap == null) {
                     InputStreamReader isr =
-                        new InputStreamReader(new FileInputStream(memberFile), "UTF-16");
+                        new InputStreamReader(new FileInputStream(memberFile), "UTF-8");
                     HashMap msFileSetMap = new HashMap<String, Set<String>>();
                     BufferedReader reader = new BufferedReader(isr);
                     String line = reader.readLine();
