@@ -207,18 +207,11 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                             host = cv.getSettings().getHost();
                             hasPanel = true;
                             break;
-                        } else {
-                            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                    "<html>There are no tab 1 panels in the arena.<br>"
-                                    + "Please add one and re-launch process", "",
-                                    JOptionPane.ERROR_MESSAGE);
-                            returnCondition = Condition.PREVIOUS;
-                            done = true;
-                            NewConceptFromBatch.this.notifyTaskDone();
                         }
                     }
                 }
-            } else {
+            }
+            if (!hasPanel) {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "<html>There are no tab 1 panels in the arena.<br>"
                         + "Please add one and re-launch process", "",
@@ -227,7 +220,6 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 done = true;
                 NewConceptFromBatch.this.notifyTaskDone();
             }
-
             if (hasPanel) {
                 String fileName = (String) process.getProperty(
                         ProcessAttachmentKeys.NAME1.getAttachmentKey());
@@ -245,6 +237,16 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
                 fsnText = part[1];
                 parentId = part[2];
+                if (parentId.length() == 32) {
+                    parentId = parentId.toLowerCase();
+                    //split UUID into parts 8-4-4-4-12 and insert dashes 
+                    one = parentId.substring(0, 8);
+                    two = parentId.substring(8, 12);
+                    three = parentId.substring(12, 16);
+                    four = parentId.substring(16, 20);
+                    five = parentId.substring(20, 32);
+                    parentId = one + "-" + two + "-" + three + "-" + four + "-" + five;
+                }
                 parentFsn = part[3];
 
                 DoSwing swinger = new DoSwing(process);
@@ -718,7 +720,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -731,7 +733,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -744,7 +746,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -1091,23 +1093,16 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             //make sure parent is valid
             if (parentId != null) { //test for valid parent
                 try {
-                    if (parentId.length() != 32) {
-                        Set<I_GetConceptData> concepts;
-                        concepts = Terms.get().getConcept(parentId);
-                        for (I_GetConceptData concept : concepts) {
-                            parentUuid = concept.getPrimUuid();
-                        }
-                        parent = new ConceptSpec(parentFsn, parentUuid);
-                        parent.getLenient();
-                        returnCondition = Condition.CONTINUE;
-                        done = true;
-                        NewConceptFromBatch.this.notifyTaskDone();
-                    } else {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "<html>The parent concept has not been created yet."
-                                + "<br>Fsn: " + parentFsn + " UUID: " + parentId, "",
-                                JOptionPane.ERROR_MESSAGE);
+                    Set<I_GetConceptData> concepts;
+                    concepts = Terms.get().getConcept(parentId);
+                    for (I_GetConceptData concept : concepts) {
+                        parentUuid = concept.getPrimUuid();
                     }
+                    parent = new ConceptSpec(parentFsn, parentUuid);
+                    parent.getLenient();
+                    returnCondition = Condition.CONTINUE;
+                    done = true;
+                    NewConceptFromBatch.this.notifyTaskDone();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "<html>The parent fsn and UUID do not match."
