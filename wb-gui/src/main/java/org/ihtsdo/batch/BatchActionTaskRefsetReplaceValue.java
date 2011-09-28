@@ -74,7 +74,9 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
             if (rvbi.getCollectionNid() == collectionNid) {
                 if (matchValue == null) {
                     // RETIRE old value
-                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                    for (int editPath : ec.getEditPaths()) {
+                        rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                    }
                     if (collectionConcept.isAnnotationStyleRefex()) {
                         // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                         changedReferencedConcept = true; // pass to BatchActionProcessor
@@ -143,7 +145,9 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
 
                     if (matched) {
                         // RETIRE old value
-                        rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                        for (int editPath : ec.getEditPaths()) {
+                            rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                        }
                         if (collectionConcept.isAnnotationStyleRefex()) {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor

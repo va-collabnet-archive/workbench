@@ -59,12 +59,14 @@ public class BatchActionTaskParentRetire extends BatchActionTask {
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         boolean changed = false;
-        for (RelationshipVersionBI r : c.getRelsOutgoingActive()) {
-            if (r.getDestinationNid() == selectedDestNid
-                    && r.getTypeNid() == selectedRoleTypeNid
-                    && r.isStated()) {
+        for (RelationshipVersionBI rvbi : c.getRelsOutgoingActive()) {
+            if (rvbi.getDestinationNid() == selectedDestNid
+                    && rvbi.getTypeNid() == selectedRoleTypeNid
+                    && rvbi.isStated()) {
 
-                r.makeAnalog(RETIRED_NID, ec.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
+                for (int editPath : ec.getEditPaths()) {
+                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                }
                 changed = true;
 
                 BatchActionEventReporter.add(new BatchActionEvent(c,

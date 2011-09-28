@@ -44,17 +44,19 @@ public class BatchActionTaskRoleRetire extends BatchActionTask {
     public void setValueNid(int valueNid) {
         this.valueNid = valueNid;
     }
-    
+
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         boolean changed = false;
         Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : rels) {
-            if (rvbi.getTypeNid() == roleNid 
+            if (rvbi.getTypeNid() == roleNid
                     && rvbi.getDestinationNid() == valueNid
                     && rvbi.isStated()) {
 
-                rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                for (int editPath : ec.getEditPaths()) {
+                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                }
                 changed = true;
 
                 BatchActionEventReporter.add(new BatchActionEvent(c,
@@ -68,7 +70,7 @@ public class BatchActionTaskRoleRetire extends BatchActionTask {
         if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c,
                     BatchActionTaskType.ROLE_RETIRE,
-                    BatchActionEventType.EVENT_NOOP, 
+                    BatchActionEventType.EVENT_NOOP,
                     "does not have rel to retire: " + nidToName(c.getNid())
                     + " :: " + nidToName(roleNid) + " :: " + nidToName(valueNid)));
         }

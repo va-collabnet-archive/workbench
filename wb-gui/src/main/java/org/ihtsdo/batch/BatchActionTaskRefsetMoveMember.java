@@ -104,7 +104,9 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
                 if (matchValue == null) {
 
                     // RETIRE MoveFrom
-                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                    for (int editPath : ec.getEditPaths()) {
+                        rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                    }
                     if (collectionFromConcept.isAnnotationStyleRefex()) {
                         // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                         changedReferencedConcept = true; // pass to BatchActionProcessor
@@ -172,7 +174,9 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
 
                     if (matched) {
                         // RETIRE MoveFrom
-                        rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                        for (int editPath : ec.getEditPaths()) {
+                            rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                        }
                         if (collectionFromConcept.isAnnotationStyleRefex()) {
                             // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
                             changedReferencedConcept = true; // pass to BatchActionProcessor
