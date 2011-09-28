@@ -59,6 +59,7 @@ public class ContradictionEditorGenerator implements I_InitComponentMenus {
                 AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
                 newFrameConfig.setAceFrame(((AceFrameConfig) AceConfig.config.getActiveConfig()).getAceFrame());
                 newFrameConfig.setDbConfig(AceConfig.config.getActiveConfig().getDbConfig());
+                newFrameConfig.setWorker(AceConfig.config.getActiveConfig().getWorker());
 
                 ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
                 

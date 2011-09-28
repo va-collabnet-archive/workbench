@@ -309,7 +309,8 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
                         new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
                 AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
                 newFrameConfig.setDbConfig(AceConfig.config.getActiveConfig().getDbConfig());
-                
+                newFrameConfig.setWorker(AceConfig.config.getActiveConfig().getWorker());
+
                 ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
                 newFrame.setVisible(true);
             } catch (Exception e1) {

@@ -988,11 +988,11 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public PathSetReadOnly getEditingPathSetReadOnly() {
-        return config.getPromotionPathSetReadOnly();
+        return config.getEditingPathSetReadOnly();
     }
 
     public Set<PathBI> getEditingPathSet() {
-        return config.getPromotionPathSet();
+        return config.getEditingPathSet();
     }
 
     public I_IntList getEditStatusTypePopup() {
