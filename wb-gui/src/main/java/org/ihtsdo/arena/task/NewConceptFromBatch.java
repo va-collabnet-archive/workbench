@@ -87,6 +87,7 @@ import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  *
@@ -1103,15 +1104,31 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     returnCondition = Condition.CONTINUE;
                     done = true;
                     NewConceptFromBatch.this.notifyTaskDone();
-                } catch (IOException ex) {
+                }catch (ValidationException ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "<html>The parent fsn and UUID do not match."
                             + "<br>Fsn: " + parentFsn + " UUID: " + parentUuid, "",
                             JOptionPane.ERROR_MESSAGE);
+                }catch (AssertionError ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
+                }catch (IOException ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 } catch (TerminologyException ex) {
-                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 } catch (ParseException ex) {
-                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 }
 
             } else if (fsn.extractText().length() == 0) {
