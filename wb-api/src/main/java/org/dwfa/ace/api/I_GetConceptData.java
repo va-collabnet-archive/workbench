@@ -213,12 +213,22 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
+    
+     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+           PositionSetBI positions, Precedence precedencePolicy, 
+           ContradictionManagerBI contradictionManager, Long cutoffTime)
+           throws IOException, TerminologyException;
 
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException;
+    
+     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+           PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+           int classifierNid, RelAssertionType relAssertionType, Long cutoffTime)
+           throws IOException, TerminologyException;
 
     /**
      * Retrieves tuples matching the specified allowedStatuses, allowedTypes and

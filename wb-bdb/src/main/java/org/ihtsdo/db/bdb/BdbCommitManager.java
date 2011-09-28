@@ -317,7 +317,7 @@ public class BdbCommitManager {
                          + Ts.get().getComponent(uncommittedCNidsNoChecksItr.nid()).toUserString()
                          + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
                   }
-
+                  Bdb.getSapDb().commit(Long.MIN_VALUE);
                   Bdb.getSapDb().commit(Long.MIN_VALUE);
                   KindOfComputer.reset();
                   handleCanceledConcepts(uncommittedCNids);

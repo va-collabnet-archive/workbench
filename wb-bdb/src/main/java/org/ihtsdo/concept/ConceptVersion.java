@@ -791,6 +791,11 @@ public class ConceptVersion implements ConceptVersionBI {
     public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException {
         return concept.getCurrentRefsetMembers(vc);
     }
+    
+    @Override
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime) throws IOException {
+        return concept.getCurrentRefsetMembers(vc, cutoffTime);
+    }
 
     @Override
     public Set<Integer> getAllSapNids() throws IOException {
