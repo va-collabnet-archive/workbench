@@ -126,16 +126,9 @@ public class RF2IDGeneratorMojo extends ReleaseConfigMojo {
 	
 
 	
-	public void execute() throws MojoExecutionException {
-		
-		System.out.println("===========================execute==========================");
+	public void execute() throws MojoExecutionException {		
 		Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/idGenerator.xml");
-		System.out.println("===========================exportFolder==========================" + exportFolder);
-		System.out.println("===========================releaseDate==========================" + releaseDate);
-		System.out.println("===========================destinationFolder==========================" + destinationFolder);
-		System.out.println("===========================username==========================" + username);
-		System.out.println("===========================password==========================" + password);
-		System.out.println("===========================endpointURL==========================" + endpointURL);
+		
 		// set all the values passed via mojo
 		config.setOutputFolderName(exportFolder);
 //		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
