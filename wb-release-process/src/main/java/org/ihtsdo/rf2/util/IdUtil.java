@@ -21,6 +21,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
 
@@ -222,26 +223,24 @@ public class IdUtil {
 
 	// get the description id for the given UUID
 	public static String getSCTId(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		long sctId = 0L;
 
-//		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
-		long descId = 0L;
-
-//		try {
-//			descId = idGen.getSCTID(uuid);
-//		} catch (NullPointerException e) {
-//			// there is no SCTID so we are getting NULL
-//			if (logger.isDebugEnabled())
-//				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
-//
-//			try {
-//				descId = idGen.createSCTID(uuid, 0, "01", config.getReleaseDate(), "TEST EXECUTION", "12345");
-//			} catch (Exception cE) {
-//				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
-//			}
-//		} catch (Exception e) {
-//			logger.error("Message : " + uuid, e);
-//		}
-		return String.valueOf(descId);
+		try {
+			sctId = idGen.getSCTID(uuid);
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
+			try {
+				sctId = idGen.createSCTID(uuid, 0, "01", config.getReleaseDate(), "TEST EXECUTION", "12345");
+			} catch (Exception cE) {
+				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + uuid, e);
+		}
+		return String.valueOf(sctId);
 	}
 
 	public static String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
