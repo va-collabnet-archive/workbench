@@ -146,16 +146,21 @@ public class RulesContextHelper {
 				KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 				KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-				File flow = new File("rules/qa-execution2.rf");
+				File flow = new File("rules/qa-execution3.bpmn");
 				if (flow.exists()) {
-					kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution2.rf"), ResourceType.DRF);
+					kbuilder.add(ResourceFactory.newFileResource("rules/qa-execution3.bpmn"), ResourceType.BPMN2);
 					kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 
 					for (RulesDeploymentPackageReference deploymentPackage : getPackagesForContext(context)) {
-						KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(recreate);
-						if (loopKBase != null) {
-							loopKBase = filterForContext(loopKBase, context, config);
-							kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+						try {
+							KnowledgeBase loopKBase = deploymentPackage.getKnowledgeBase(recreate);
+							if (loopKBase != null) {
+								loopKBase = filterForContext(loopKBase, context, config);
+								kbase.addKnowledgePackages(loopKBase.getKnowledgePackages());
+							}
+						} catch (Exception e) {
+							// ignoring exception during rules regeneration, errors will be logged
+							// and context build will continue
 						}
 					}
 
@@ -168,20 +173,22 @@ public class RulesContextHelper {
 								JOptionPane.WARNING_MESSAGE);
 					}
 
-					//				try {
-					//					ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-					//					out.writeObject( kbase );
-					//					out.writeObject( kbase.getKnowledgePackages() );
-					//					out.close();
-					//				} catch (FileNotFoundException e) {
-					//					AceLog.getAppLog().alertAndLogException(e);
-					//				} catch (IOException e) {
-					//					AceLog.getAppLog().alertAndLogException(e);
-					//				}
+					try {
+						ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+						out.writeObject( kbase );
+						out.writeObject( kbase.getKnowledgePackages() );
+						out.close();
+					} catch (FileNotFoundException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					} catch (IOException e) {
+						AceLog.getAppLog().alertAndLogException(e);
+					}
 
 					kbCache.put(context.getConceptNid(), kbase);
 					Terms.get().setKnowledgeBaseCache(kbCache);
 					lastCacheUpdateTime = Calendar.getInstance().getTimeInMillis();
+				} else {
+					System.out.println("ERROR: Required flow file is missing in rules folder: " + flow.getName());
 				}
 				returnBase = kbase;
 			}

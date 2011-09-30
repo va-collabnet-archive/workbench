@@ -3,12 +3,13 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>2.6.0-trek-35-SNAPSHOT</version>
+		<version>2.6.0-trek-37-SNAPSHOT</version>
 	</parent>
 	<artifactId>rule-engine-integration</artifactId>
 	<name>${branch}: Rules engine integration</name>
 	<url>http://maven.apache.org</url>
-	<!-- <repositories> <repository> <id>drools jboss repository</id> <url>http://repository.jboss.com/maven2/</url> </repository> </repositories> -->
+	<!-- <repositories> <repository> <id>drools jboss repository</id> <url>http://repository.jboss.com/maven2/</url> 
+		</repository> </repositories> -->
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
@@ -27,7 +28,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
-			<artifactId>drools-api</artifactId>
+			<artifactId>knowledge-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jbpm</groupId>
+			<artifactId>jbpm-bpmn2</artifactId>
+			<version>5.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>

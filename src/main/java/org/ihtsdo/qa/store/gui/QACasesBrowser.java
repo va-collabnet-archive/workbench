@@ -6,6 +6,7 @@
 package org.ihtsdo.qa.store.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -16,6 +17,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,7 +29,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,11 +40,15 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -123,6 +131,11 @@ public class QACasesBrowser extends JPanel {
 		caseTable.setTransferHandler(th);
 		caseTable.setDragEnabled(false);
 
+		TableColumn tc = caseTable.getColumnModel().getColumn(1);
+		tc.setCellEditor(caseTable.getDefaultEditor(Boolean.class));
+		tc.setCellRenderer(caseTable.getDefaultRenderer(Boolean.class));
+		tc.setHeaderRenderer(new CheckBoxHeader(new MyItemListener()));
+
 		TableColumn conceptUuidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_UUID);
 		TableColumn conceptSctidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_SCTID);
 		TableColumn rowCheckBoxCol = caseTable.getColumnModel().getColumn(tableModel.ROW_CHECKBOX);
@@ -190,6 +203,8 @@ public class QACasesBrowser extends JPanel {
 		comboBox6.addItem("50");
 		comboBox6.addItem("75");
 		comboBox6.addItem("100");
+		comboBox6.addItem("500");
+		comboBox6.addItem("1000");
 	}
 
 	private void setupAssignedToFilterCombo() {
@@ -202,6 +217,7 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	public void setupPanel(QAStoreBI store) {
+		setupBatchDispoStatusCombo();
 		if (rule == null || !this.rule.getRuleUuid().equals(resultsPanel.getRule().getRuleUuid())) {
 			if (this.rule != null) {
 				this.rule = resultsPanel.getRule();
@@ -213,7 +229,7 @@ public class QACasesBrowser extends JPanel {
 			panel4.setVisible(false);
 
 			clearTable1();
-
+			((CheckBoxHeader)caseTable.getColumnModel().getColumn(1).getHeaderRenderer()).setSelected(false);
 			QADatabase qaDatabase = getQaDatabase(coordinate.getDatabaseUuid());
 			label7.setText(qaDatabase.getName());
 
@@ -227,7 +243,6 @@ public class QACasesBrowser extends JPanel {
 
 			setupStatusCombo();
 			setupDispositionCombo();
-			setupBatchDispoStatusCombo();
 			conceptNameTextField.setText("");
 			showFilters = false;
 			filterButton.setText("Show filters");
@@ -332,6 +347,9 @@ public class QACasesBrowser extends JPanel {
 	}
 
 	private void clearTable1() {
+		bathcSaveButton.setEnabled(false);
+		batchDispositionStatus.setEditable(false);
+		batchAssigneTo.setEditable(false);
 		tableModel.clearData();
 		caseTable.revalidate();
 		caseTable.repaint();
@@ -340,9 +358,15 @@ public class QACasesBrowser extends JPanel {
 	private void setupDispositionCombo() {
 		dispoStatusComboBox.removeAllItems();
 		dispoStatusComboBox.addItem("Any");
-		for (DispositionStatus object : this.dispositionStatuses) {
-			dispoStatusComboBox.addItem(object);
+		for (DispositionStatus dispStatus : this.dispositionStatuses) {
+			if (!rule.isWhitelistAllowed() && dispStatus.getName().equalsIgnoreCase("cleared")) {
+				dispoStatusComboBox.addItem(dispStatus);
+			} else if (!dispStatus.getName().equals("Cleared")) {
+				dispoStatusComboBox.addItem(dispStatus);
+			}
 		}
+		dispoStatusComboBox.revalidate();
+		dispoStatusComboBox.repaint();
 	}
 
 	private void setupStatusCombo() {
@@ -567,92 +591,68 @@ public class QACasesBrowser extends JPanel {
 		messageLabel = new JLabel();
 		bathcSaveButton = new JButton();
 
-		//======== this ========
+		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 12, 0, 0, 0, 9, 22, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4};
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 12, 0, 0, 0, 9, 22, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4 };
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {99, 52, 88, 0, 96, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 99, 52, 88, 0, 96, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 
-			//---- label1 ----
+			// ---- label1 ----
 			label1.setText("Database");
-			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label2 ----
+			// ---- label2 ----
 			label2.setText("Path");
-			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label3 ----
+			// ---- label3 ----
 			label3.setText("Time");
-			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label6 ----
+			// ---- label6 ----
 			label6.setText("Rule code");
-			panel1.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label12 ----
+			// ---- label12 ----
 			label12.setText("Rule name");
-			panel1.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label12, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label7 ----
+			// ---- label7 ----
 			label7.setText("text");
-			panel1.add(label7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label8 ----
+			// ---- label8 ----
 			label8.setText("text");
-			panel1.add(label8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label9 ----
+			// ---- label9 ----
 			label9.setText("text");
-			panel1.add(label9, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label9, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label10 ----
+			// ---- label10 ----
 			label10.setText("text");
-			panel1.add(label10, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label10, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label13 ----
+			// ---- label13 ----
 			label13.setText("text");
-			panel1.add(label13, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label13, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label14 ----
+			// ---- label14 ----
 			label14.setText("Sort by");
-			panel1.add(label14, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel1.add(comboBox1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(label14, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(comboBox1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- searchButton ----
+			// ---- searchButton ----
 			searchButton.setText("Search");
 			searchButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			searchButton.addActionListener(new ActionListener() {
@@ -661,11 +661,9 @@ public class QACasesBrowser extends JPanel {
 					button3ActionPerformed(e);
 				}
 			});
-			panel1.add(searchButton, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(searchButton, new GridBagConstraints(5, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- filterButton ----
+			// ---- filterButton ----
 			filterButton.setText("Show filters");
 			filterButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			filterButton.addActionListener(new ActionListener() {
@@ -674,78 +672,54 @@ public class QACasesBrowser extends JPanel {
 					button2ActionPerformed(e);
 				}
 			});
-			panel1.add(filterButton, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(filterButton, new GridBagConstraints(6, 2, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
-		add(separator1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(separator1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
 
-		//======== panel4 ========
+		// ======== panel4 ========
 		{
 			panel4.setVisible(false);
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {395, 0, 0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 395, 0, 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 
-			//---- label11 ----
+			// ---- label11 ----
 			label11.setText("Concept name");
-			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label4 ----
+			// ---- label4 ----
 			label4.setText("Status");
-			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label5 ----
+			// ---- label5 ----
 			label5.setText("Disposition");
-			panel4.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label5, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label21 ----
+			// ---- label21 ----
 			label21.setText("Assigned to");
-			panel4.add(label21, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
-			panel4.add(conceptNameTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
-			panel4.add(statusComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
-			panel4.add(dispoStatusComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
-			panel4.add(assignedToFilterComboBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel4.add(label21, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel4.add(conceptNameTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(statusComboBox, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(dispoStatusComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(assignedToFilterComboBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
+		add(panel4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
 
-				//---- caseTable ----
+				// ---- caseTable ----
 				caseTable.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -754,30 +728,24 @@ public class QACasesBrowser extends JPanel {
 				});
 				scrollPane1.setViewportView(caseTable);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
+		add(panel2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
 
-		//======== panel3 ========
+		// ======== panel3 ========
 		{
 			panel3.setLayout(new GridBagLayout());
-			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- label15 ----
+			// ---- label15 ----
 			label15.setText("Show ");
 			label15.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label15, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- comboBox6 ----
+			// ---- comboBox6 ----
 			comboBox6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			comboBox6.addItemListener(new ItemListener() {
 				@Override
@@ -785,21 +753,15 @@ public class QACasesBrowser extends JPanel {
 					comboBox6ItemStateChanged(e);
 				}
 			});
-			panel3.add(comboBox6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(comboBox6, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label16 ----
+			// ---- label16 ----
 			label16.setText("rows per page");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label16, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label16, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- previousButton ----
+			// ---- previousButton ----
 			previousButton.setText("<");
 			previousButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			previousButton.addActionListener(new ActionListener() {
@@ -808,46 +770,34 @@ public class QACasesBrowser extends JPanel {
 					button3ActionPerformed(e);
 				}
 			});
-			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- startLineLabel ----
+			// ---- startLineLabel ----
 			startLineLabel.setText("0");
 			startLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(startLineLabel, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(startLineLabel, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label18 ----
+			// ---- label18 ----
 			label18.setText("to");
 			label18.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label18, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label18, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- endLineLabel ----
+			// ---- endLineLabel ----
 			endLineLabel.setText("0");
 			endLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label20 ----
+			// ---- label20 ----
 			label20.setText("of");
 			label20.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label20, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label20, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- totalLinesLabel ----
+			// ---- totalLinesLabel ----
 			totalLinesLabel.setText("0");
 			totalLinesLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- nextButton ----
+			// ---- nextButton ----
 			nextButton.setText(">");
 			nextButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			nextButton.addActionListener(new ActionListener() {
@@ -856,55 +806,39 @@ public class QACasesBrowser extends JPanel {
 					button4ActionPerformed(e);
 				}
 			});
-			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
-		add(separator2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 2, 0), 0, 0));
+		add(panel3, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
+		add(separator2, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 2, 0), 0, 0));
 
-		//======== panel5 ========
+		// ======== panel5 ========
 		{
 			panel5.setLayout(new GridBagLayout());
-			((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- label17 ----
+			// ---- label17 ----
 			label17.setText("Assign to");
-			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(label17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- batchAssigneTo ----
+			// ---- batchAssigneTo ----
 			batchAssigneTo.setToolTipText("Select cases from the above table to make multiple assignment");
 			batchAssigneTo.setEnabled(false);
-			panel5.add(batchAssigneTo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(batchAssigneTo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label19 ----
+			// ---- label19 ----
 			label19.setText("Disposition status");
-			panel5.add(label19, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(label19, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- batchDispositionStatus ----
+			// ---- batchDispositionStatus ----
 			batchDispositionStatus.setToolTipText("Select cases from the above table to change disposition statuces");
 			batchDispositionStatus.setEnabled(false);
-			panel5.add(batchDispositionStatus, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel5.add(messageLabel, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(batchDispositionStatus, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel5.add(messageLabel, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- bathcSaveButton ----
+			// ---- bathcSaveButton ----
 			bathcSaveButton.setText("Save");
 			bathcSaveButton.setEnabled(false);
 			bathcSaveButton.addActionListener(new ActionListener() {
@@ -913,13 +847,9 @@ public class QACasesBrowser extends JPanel {
 					bathcSaveButtonActionPerformed(e);
 				}
 			});
-			panel5.add(bathcSaveButton, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel5.add(bathcSaveButton, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(panel5, new GridBagConstraints(0, 6, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -973,6 +903,7 @@ public class QACasesBrowser extends JPanel {
 	private JComboBox batchDispositionStatus;
 	private JLabel messageLabel;
 	private JButton bathcSaveButton;
+
 	// //GEN-END:variables
 
 	class CaseTableModel extends AbstractTableModel {
@@ -1050,6 +981,93 @@ public class QACasesBrowser extends JPanel {
 			return false;
 		}
 
+	}
+
+	class CheckBoxHeader extends JCheckBox implements TableCellRenderer, MouseListener {
+		protected CheckBoxHeader rendererComponent;
+		protected int column;
+		protected boolean mousePressed = false;
+
+		public CheckBoxHeader(ItemListener itemListener) {
+			rendererComponent = this;
+			rendererComponent.addItemListener(itemListener);
+		}
+
+		public CheckBoxHeader getComp(){
+			return this.rendererComponent;
+		}
+		
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			if (table != null) {
+				JTableHeader header = table.getTableHeader();
+				if (header != null) {
+					rendererComponent.setForeground(header.getForeground());
+					rendererComponent.setBackground(header.getBackground());
+					rendererComponent.setFont(header.getFont());
+					header.addMouseListener(rendererComponent);
+				}
+			}
+			setColumn(column);
+			rendererComponent.setText("Check All");
+			setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+			return rendererComponent;
+		}
+
+		protected void setColumn(int column) {
+			this.column = column;
+		}
+
+		public int getColumn() {
+			return column;
+		}
+
+		protected void handleClickEvent(MouseEvent e) {
+			if (mousePressed) {
+				mousePressed = false;
+				JTableHeader header = (JTableHeader) (e.getSource());
+				JTable tableView = header.getTable();
+				TableColumnModel columnModel = tableView.getColumnModel();
+				int viewColumn = columnModel.getColumnIndexAtX(e.getX());
+				int column = tableView.convertColumnIndexToModel(viewColumn);
+
+				if (viewColumn == this.column && e.getClickCount() == 1 && column != -1) {
+					doClick();
+				}
+			}
+		}
+
+		public void mouseClicked(MouseEvent e) {
+			handleClickEvent(e);
+			((JTableHeader) e.getSource()).repaint();
+		}
+
+		public void mousePressed(MouseEvent e) {
+			mousePressed = true;
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		}
+
+		public void mouseEntered(MouseEvent e) {
+		}
+
+		public void mouseExited(MouseEvent e) {
+		}
+	}
+
+	class MyItemListener implements ItemListener {
+		public void itemStateChanged(ItemEvent e) {
+			Object source = e.getSource();
+			if (source instanceof AbstractButton == false)
+				return;
+			boolean checked = e.getStateChange() == ItemEvent.SELECTED;
+			batchAssigneTo.setEnabled(checked);
+			batchAssigneTo.setEnabled(checked);
+			bathcSaveButton.setEnabled(checked);
+			for (int x = 0, y = caseTable.getRowCount(); x < y; x++) {
+				caseTable.setValueAt(new Boolean(checked), x, 1);
+			}
+		}
 	}
 
 }

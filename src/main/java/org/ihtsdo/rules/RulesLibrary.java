@@ -40,6 +40,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.SystemEventListener;
+import org.drools.SystemEventListenerFactory;
 import org.drools.agent.KnowledgeAgent;
 import org.drools.agent.KnowledgeAgentConfiguration;
 import org.drools.agent.KnowledgeAgentFactory;
@@ -179,14 +181,16 @@ public class RulesLibrary {
 			Terms.get().getActiveAceFrameConfig().setStatusMessage("Getting KnowledgeBase...");
 		}
 		long startTime = System.currentTimeMillis();
+		//System.out.println("Starting concept check...");
 		KnowledgeBase kbase = contextHelper.getKnowledgeBaseForContext(context, config);
 		if (!noRealtimeRulesAlertShown &&
 				context.getUids().containsAll(RefsetAuxiliary.Concept.REALTIME_PRECOMMIT_QA_CONTEXT.getUids()) &&
 				kbase.getKnowledgePackages().size() < 2) {
 			noRealtimeRulesAlertShown = true;
 			AceLog.getAppLog().alertAndLogException(
-					new IOException("Warning! No rules in realtime context. QA is disabled."));
+					new IOException("Warning! No rules in context" + context.toString() + ". QA is disabled."));
 		}
+		//System.out.println("KBase: null = " + (kbase==null) + "; Size: " + kbase.getKnowledgePackages().size());
 		ResultsCollectorWorkBench results = new ResultsCollectorWorkBench();
 		try {
 			if (kbase != null) {
@@ -215,7 +219,7 @@ public class RulesLibrary {
 					}
 
 					DrConcept testConcept = DrComponentHelper.getDrConcept(conceptBi, "Last version", inferredOrigin);
-
+					//System.out.println("Test concept converted...");
 					if (!DwfaEnv.isHeadless()) {
 						activity.setProgressInfoLower("Testing concept...");
 						config.setStatusMessage("Testing concept...");
@@ -223,11 +227,11 @@ public class RulesLibrary {
 
 					ksession.insert(testConcept);
 
-					ksession.startProcess("org.ihtsdo.qa-execution2");
+					ksession.startProcess("org.ihtsdo.qa-execution3");
 					ksession.fireAllRules();
 
 					//ResultsCollectorWorkBench results = (ResultsCollectorWorkBench) ksession.getGlobal("resultsCollector");
-
+					//System.out.println("Results size: " + results.getResultsItems().size());
 					for (ResultsItem resultsItem : results.getResultsItems() ) {
 						ALERT_TYPE alertType = ALERT_TYPE.ERROR;
 
@@ -283,6 +287,8 @@ public class RulesLibrary {
 
 					ksession.dispose();
 				}
+			} else {
+				//System.out.println("QA Skipped, kbase was null...");
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();
@@ -560,10 +566,12 @@ public class RulesLibrary {
 			try {
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
 			} catch (Exception e) {
-				// agent base not available
+				e.printStackTrace();
+			}
+			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				System.out.println("WARNING: Agent based connection with guvnor not available, trying to load from cache...");
 				kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-				if (kbase != null) {
+				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
 					System.out.println("INFO: Cache load OK.");
 				} else {
 					System.out.println("WARNING: Cache loading failed.");
@@ -571,10 +579,10 @@ public class RulesLibrary {
 			}
 		} else  {
 			kbase = getKnowledgeBaseFromFileCache(referenceUuid);
-			if (kbase == null) {
+			if (kbase == null || kbase.getKnowledgePackages().size() == 0) {
 				System.out.println("INFO: Trying Guvnor...");
 				kbase = getKnowledgeBaseWithAgent(referenceUuid, bytes);
-				if (kbase != null) {
+				if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
 					System.out.println("INFO: Guvnor load OK.");
 				} else {
 					System.out.println("WARNING: Guvnor loading failed, No knowledgebase.");
@@ -582,7 +590,7 @@ public class RulesLibrary {
 			}
 		}
 
-		if (kbase == null) throw new Exception("Can't retrieve database...");
+		if (kbase == null || kbase.getKnowledgePackages().size() == 0) throw new Exception("Can't retrieve database...");
 		return kbase;
 	}
 
@@ -604,45 +612,53 @@ public class RulesLibrary {
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
-		File rulesDirectory = new File("rules");
-		if (!rulesDirectory.exists())
-		{
-			rulesDirectory.mkdir();
-		}
-		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+		try {
+			File rulesDirectory = new File("rules");
+			if (!rulesDirectory.exists())
+			{
+				rulesDirectory.mkdir();
+			}
+			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
 
-		if (serializedKbFile.exists()) {
+			if (serializedKbFile.exists()) {
+				try {
+					ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+					// The input stream might contain an individual
+					// package or a collection.
+					kbase = (KnowledgeBase)in.readObject();
+					in.close();
+				} catch (StreamCorruptedException e0) {
+					serializedKbFile.delete();
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			String result = "";
+			if (kbase != null) {
+				result = "Sucess...";
+			} else {
+				result = "Cache not available...";
+			}
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
 			try {
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-				// The input stream might contain an individual
-				// package or a collection.
-				kbase = (KnowledgeBase)in.readObject();
-				in.close();
-			} catch (StreamCorruptedException e0) {
-				serializedKbFile.delete();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
 				e.printStackTrace();
 			}
-		}
-
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-		String result = "";
-		if (kbase != null) {
-			result = "Sucess...";
-		} else {
-			result = "Cache not available...";
-		}
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-		try {
-			activity.complete();
-			activity.removeActivityFromViewer();
-		} catch (ComputationCanceled e) {
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
 			e.printStackTrace();
 		}
 		return kbase;
@@ -665,40 +681,51 @@ public class RulesLibrary {
 		activity.setIndeterminate(true);
 		long startTime = System.currentTimeMillis();
 		KnowledgeBase kbase= null;
-		File rulesDirectory = new File("rules");
-		if (!rulesDirectory.exists())
-		{
-			rulesDirectory.mkdir();
-		}
-		File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
-		KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
-		//		kaconf.setProperty( "drools.resource.urlcache","rules" );
-		KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
-		kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
-		kbase = kagent.getKnowledgeBase();
 		try {
-			ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
-			out.writeObject( kbase );
-			out.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-		String result = "";
-		if (kbase != null) {
-			result = "Sucess...";
-		} else {
-			result = "Repository not available...";
-		}
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
-		try {
-			activity.complete();
-			activity.removeActivityFromViewer();
-		} catch (ComputationCanceled e) {
+			File rulesDirectory = new File("rules");
+			if (!rulesDirectory.exists())
+			{
+				rulesDirectory.mkdir();
+			}
+			File serializedKbFile = new File(rulesDirectory, "knowledge_packages-" + referenceUuid.toString() + ".pkg");
+			KnowledgeAgentConfiguration kaconf = KnowledgeAgentFactory.newKnowledgeAgentConfiguration();
+			//		kaconf.setProperty( "drools.resource.urlcache","rules" );
+			kaconf.setProperty( "drools.agent.newInstance","false" );
+			KnowledgeAgent kagent = KnowledgeAgentFactory.newKnowledgeAgent( "Agent", kaconf );
+			SystemEventListener sysEvenListener = new ConsoleSystemEventListener();
+			kagent.setSystemEventListener(sysEvenListener);
+			kagent.applyChangeSet( ResourceFactory.newByteArrayResource(bytes) );
+			kbase = kagent.getKnowledgeBase();
+			try {
+				ObjectOutputStream out = new ObjectOutputStream( new FileOutputStream( serializedKbFile ) );
+				out.writeObject( kbase );
+				out.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			String result = "";
+			if (kbase != null && kbase.getKnowledgePackages().size() > 0) {
+				result = "Sucess...";
+			} else {
+				result = "Repository not available...";
+			}
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; " + result);
+			try {
+				activity.complete();
+				activity.removeActivityFromViewer();
+			} catch (ComputationCanceled e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error");
 			e.printStackTrace();
 		}
 		return kbase;
@@ -1120,7 +1147,8 @@ public class RulesLibrary {
 		if (histRels == null) {
 			histRels = Terms.get().newIntSet();
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14")));
+			ConceptSpec spec = new ConceptSpec("Concept history attribute (attribute)", UUID.fromString("f323b5dd-1f97-3873-bcbc-3563663dda14"));
+			descendants = getDescendants(descendants, Terms.get().getConcept(spec.getLenient().getNid()));
 			for (I_GetConceptData loopConcept : descendants) {
 				histRels.add(loopConcept.getNid());
 			}
@@ -1134,7 +1162,8 @@ public class RulesLibrary {
 			CptModelRels = Terms.get().newIntSet();
 			CptModelRels = Terms.get().newIntSet();
 			Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
-			descendants = getDescendants(descendants, Terms.get().getConcept(UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99")));
+			ConceptSpec spec = new ConceptSpec("Concept model attribute (attribute)", UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99"));
+			descendants = getDescendants(descendants, Terms.get().getConcept(spec.getLenient().getNid()));
 			for (I_GetConceptData loopConcept : descendants) {
 				CptModelRels.add(loopConcept.getNid());
 			}
@@ -1156,7 +1185,6 @@ public class RulesLibrary {
 	public static Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
-			//TODO: get config as parameter
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			Set<I_GetConceptData> firstMetChildrenSet = new HashSet<I_GetConceptData>();
@@ -1173,10 +1201,8 @@ public class RulesLibrary {
 				descendants = getDescendants(descendants, loopConcept);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return descendants;
@@ -1194,10 +1220,8 @@ public class RulesLibrary {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 		} catch (TerminologyException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
