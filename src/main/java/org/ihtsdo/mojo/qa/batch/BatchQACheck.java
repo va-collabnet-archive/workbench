@@ -215,6 +215,7 @@ public class BatchQACheck extends AbstractMojo {
 				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
 				contextHelper.addPkgReferenceToContext(pkgReference, context);
 			}
+			contextHelper.clearCache();
 			cleanKbFileCache();
 			exportExecutionDescriptor(contextHelper);
 			performQA(executionUUID, contextHelper);
