@@ -131,7 +131,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    protected void treeSelectionChanged(TreeSelectionEvent evt) {
       TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
 
-      if ((node != null) && !(node instanceof RootNode)) {
+      if ((node != null) &&!(node instanceof RootNode)) {
          try {
             aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getCnid()));
          } catch (IOException ex) {
@@ -147,15 +147,10 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       int      childCount = root.getChildren().size();
 
       for (int i = 0; i < childCount; i++) {
-         TaxonomyNode childNode = (TaxonomyNode) model.getChild(root, i);
-
-         if (aceFrameConfig.getChildrenExpandedNodes().contains(childNode.getCnid())) {
-            TreePath           tp        = new TreePath(childNode);
-            TreeExpansionEvent treeEvent = new TreeExpansionEvent(model, tp);
-
-            handleCollapse(treeEvent, aceFrameConfig);
-            expandTree(treeEvent);
-         }
+         TaxonomyNode       childNode = (TaxonomyNode) model.getChild(root, i);
+         TreePath           tp        = new TreePath(NodePath.getTreePath(model, childNode));
+         tree.collapseRow(i);
+         tree.collapsePath(tp);
       }
    }
 
@@ -295,6 +290,10 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       return treeView;
    }
 
+   NodeFactory getNodeFactory() {
+      return model.nodeFactory;
+   }
+
    public ConcurrentHashMap<Long, TaxonomyNode> getNodeMap() {
       return model.getNodeMap();
    }
@@ -320,8 +319,4 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    public void setTreeActivityPanel(ActivityPanel activity) {
       this.activity = activity;
    }
-
-    NodeFactory getNodeFactory() {
-        return model.nodeFactory;
-    }
 }
