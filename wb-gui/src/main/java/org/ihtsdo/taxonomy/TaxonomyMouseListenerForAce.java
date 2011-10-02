@@ -7,7 +7,6 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.config.AceFrame;
@@ -18,6 +17,8 @@ import org.dwfa.ace.search.SimilarConceptQuery;
 import org.dwfa.ace.tree.I_RenderAndFocusOnBean;
 import org.dwfa.tapi.TerminologyException;
 
+import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
+import org.ihtsdo.taxonomy.nodes.LeafNodeMultiParent;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNodeRoot;
@@ -38,7 +39,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -69,11 +69,10 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
          for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {
                TaxonomyNode extraParentNode = null;
-               long[] nodesToCompare = new long[node.getNodesToCompare().length + 1];
+               long[]       nodesToCompare  = new long[node.getNodesToCompare().length + 1];
 
                System.arraycopy(node.getNodesToCompare(), 0, nodesToCompare, 0,
                                 node.getNodesToCompare().length);
-               
                nodesToCompare[node.getNodesToCompare().length] = Long.MAX_VALUE;
 
                if (parent.getRelsOutgoingActiveIsa().isEmpty()) {
@@ -84,7 +83,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                           node.parentNodeId, nodesToCompare);
                }
 
-                helper.getNodeMap().put(extraParentNode.nodeId, extraParentNode);
+               helper.getNodeMap().put(extraParentNode.nodeId, extraParentNode);
                extraParentNode.setParentDepth(node.getParentDepth() + 1);
                helper.getRenderer().setupTaxonomyNode(extraParentNode, parent);
                node.addExtraParent(extraParentNode);
@@ -153,15 +152,15 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                   Rectangle bounds = tree.getRowBounds(selRow);
 
                   if (e.getClickCount() == 1) {
-                     Rectangle iconBounds = renderer.getIconRect(node.getParentDepth());
+                     if (node.hasExtraParents()) {
+                        Rectangle iconBounds = renderer.getIconRect(node.getParentDepth());
 
-                     if ((e.getPoint().x > bounds.x + iconBounds.x)
-                             && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
-                        openOrCloseParent(tree, model, node, bounds);
+                        if ((e.getPoint().x > bounds.x + iconBounds.x)
+                                && (e.getPoint().x + 1 < bounds.x + iconBounds.x + iconBounds.width)) {
+                           openOrCloseParent(tree, model, node, bounds);
+                        }
                      }
-                  } else if (e.getClickCount() == 2) {
-                     openOrCloseParent(tree, model, node, bounds);
-                  }
+                  } 
 
                   // tree.setSelectionPath(new TreePath(selPath.getPath()));
                   int newRow = tree.getRowForPath(selPath);

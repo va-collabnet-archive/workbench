@@ -55,6 +55,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.taxonomy.nodes.InternalNode;
 
 /**
  *
@@ -147,7 +148,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       int      childCount = root.getChildren().size();
 
       for (int i = 0; i < childCount; i++) {
-         TaxonomyNode       childNode = (TaxonomyNode) model.getChild(root, i);
+         InternalNode       childNode = (InternalNode) model.getChild(root, i);
+         model.nodeFactory.removeDescendents(childNode);
          TreePath           tp        = new TreePath(NodePath.getTreePath(model, childNode));
          tree.collapseRow(i);
          tree.collapsePath(tp);
@@ -213,11 +215,14 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       statedInferredButton = new JButton(new AbstractAction("", statedView) {
          @Override
          public void actionPerformed(ActionEvent e) {
+            ViewCoordinate vc = model.ts.getViewCoordinate();
             switch (assertionType) {
             case INFERRED :
                assertionType = RelAssertionType.INFERRED_THEN_STATED;
                statedInferredButton.setIcon(inferredThenStatedView);
                statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+               vc.setRelAssertionType(assertionType);
+               model.ts = Ts.get().getSnapshot(vc);
                updateHierarchyView("changed from stated to inferred then stated");
 
                break;
@@ -226,6 +231,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                assertionType = RelAssertionType.STATED;
                statedInferredButton.setIcon(statedView);
                statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+               vc.setRelAssertionType(assertionType);
+               model.ts = Ts.get().getSnapshot(vc);
                updateHierarchyView("changed from inferred to stated");
 
                break;
@@ -235,6 +242,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                statedInferredButton.setIcon(inferredView);
                statedInferredButton.setToolTipText(
                    "showing inferred, toggle to show inferred then stated...");
+               vc.setRelAssertionType(assertionType);
+               model.ts = Ts.get().getSnapshot(vc);
                updateHierarchyView("changed from stated to inferred");
 
                break;

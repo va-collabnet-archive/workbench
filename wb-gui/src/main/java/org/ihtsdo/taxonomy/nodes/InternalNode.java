@@ -54,6 +54,12 @@ public class InternalNode extends TaxonomyNode {
       return childrenAreSet;
    }
 
+   public void clearChildren() {
+      nidNodeMap.clear();
+      children.clear();
+      childrenAreSet = false;
+   }
+
    //~--- get methods ---------------------------------------------------------
 
    @Override
