@@ -115,6 +115,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -766,16 +767,16 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     private JTableWithDragImage clauseTable;
     private JPanel topPanel;
     private JComponent contentPanel;
-    private TermTreeHelper treeHelper;
+    private TaxonomyHelper treeHelper;
     JScrollPane specTreeScroller;
     JScrollPane commentScroller;
-    private TermTreeHelper refsetTree;
+    private TaxonomyHelper refsetTree;
     private JTableWithDragImage commentTable;
     private ReflexiveRefsetCommentTableModel commentTableModel;
     private RefsetSpecPanel refsetSpecPanel;
     private JPanel leftTogglePane;
 
-    public RefsetSpecEditor(ACE ace, TermTreeHelper treeHelper, TermTreeHelper refsetTree, RefsetSpecPanel refsetSpecPanel)
+    public RefsetSpecEditor(ACE ace, TaxonomyHelper treeHelper, TaxonomyHelper refsetTree, RefsetSpecPanel refsetSpecPanel)
             throws Exception {
         super();
         this.ace = ace;

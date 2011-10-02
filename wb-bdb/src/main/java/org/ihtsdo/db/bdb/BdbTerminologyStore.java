@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
@@ -23,6 +25,7 @@ import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
+import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.Concept;
@@ -33,6 +36,7 @@ import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -60,6 +64,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
@@ -375,6 +380,30 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public List<? extends PathBI> getPathChildren(int nid) {
         return BdbPathManager.get().getPathChildren(nid);
+    }
+
+    @Override
+    public int[] getPossibleChildren(int parentNid, ViewCoordinate vc) throws IOException {
+        if (vc.getIsaCoordinates().size() == 1) {
+            IsaCoordinate isaCoordinate = vc.getIsaCoordinates().iterator().next();
+            IsaCache cache = KindOfComputer.getIsaCacheMap().get(isaCoordinate);
+            if (cache != null && cache.isReady()) {
+                int[] allPossibleNids = Bdb.xref.getDestRelOrigins(parentNid, vc.getIsaTypeNids());
+                IntList viewPossibleNids = new IntList();
+                for (int childNid: allPossibleNids) {
+                    try {
+                        if (cache.isKindOf(childNid, parentNid)) {
+                            viewPossibleNids.add(childNid);
+                        }
+                    } catch (Exception ex) {
+                        throw new IOException(ex);
+                    }
+                }
+                return viewPossibleNids.getListArray();
+            }
+            
+        }
+        return Bdb.xref.getDestRelOrigins(parentNid, vc.getIsaTypeNids());
     }
 
     private class ConceptGetter implements I_ProcessUnfetchedConceptData {

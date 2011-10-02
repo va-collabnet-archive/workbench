@@ -105,7 +105,6 @@ import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.task.search.IsKindOf;
 import org.dwfa.ace.task.svn.SvnPrompter;
-import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.bpa.data.SortedSetModel;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
@@ -134,6 +133,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.taxonomy.PathExpander;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -1928,7 +1928,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             @Override
             public void run() {
                 try {
-                    new ExpandPathToNodeStateListener(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
+                    new PathExpander(getAceFrame().getCdePanel().getTree(), AceFrameConfig.this,
                             getHierarchySelection());
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);

@@ -2,20 +2,21 @@ package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel.LabelText;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
-import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.ace.tree.TermTreeHelper;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
+import org.ihtsdo.taxonomy.PathExpander;
+import org.ihtsdo.taxonomy.TaxonomyHelper;
+import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -54,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
    public static final int  NAVIGATOR_WIDTH = 350;
@@ -92,7 +94,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    private transient ConceptChangedListener conceptChangedListener;
    private transient JToggleButton          navButton;
    private transient ConceptNavigator       navigator;
-   private transient JTreeWithDragImage     navigatorTree;
+   private transient TaxonomyTree           navigatorTree;
    private transient JButton                statedInferredButton;
 
    // transient
@@ -439,10 +441,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    protected ConceptNavigator getNavigator() {
       if (navigator == null) {
          try {
-            TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(config);
+            TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config);
             JScrollPane    treeScroller           = hierarchicalTreeHelper.getHierarchyPanel();
+            hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
 
-            navigatorTree = (JTreeWithDragImage) treeScroller.getViewport().getView();
+            navigatorTree = (TaxonomyTree) treeScroller.getViewport().getView();
             navigatorTree.setFont(navigatorTree.getFont().deriveFont(getFontSize()));
             navigator = new ConceptNavigator(treeScroller, config, view);
 
@@ -460,12 +463,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                @Override
                public void run() {
                   try {
-                     ExpandPathToNodeStateListener expandPathToNodeStateListener =
-                        new ExpandPathToNodeStateListener(navigatorTree, config,
-                           (I_GetConceptData) getHost().getTermComponent());
+                     PathExpander epl = new PathExpander(navigatorTree, config,
+                                           (ConceptChronicleBI) getHost().getTermComponent());
+
+                     ACE.threadPool.submit(epl);
                   } catch (IOException e) {
-                     AceLog.getAppLog().alertAndLogException(e);
-                  } catch (TerminologyException e) {
                      AceLog.getAppLog().alertAndLogException(e);
                   }
                }

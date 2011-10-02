@@ -41,6 +41,7 @@ import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.logging.Level;
 
+import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -64,9 +65,10 @@ import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.tapi.TerminologyException;
 
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.taxonomy.PathExpander;
 import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class TransporterLabel extends JLabel implements I_ContainTermComponent, ActionListener {
@@ -243,6 +245,7 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 
     }
 
+    @Override
     public I_ConfigAceFrame getConfig() {
         return this.ace.getAceFrameConfig();
     }
@@ -261,18 +264,18 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
         return dragImage;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Show in taxonomy")) {
             try {
-                new ExpandPathToNodeStateListener(this.ace.getTree(), this.ace.getAceFrameConfig(),
-                    (I_GetConceptData) termComponent);
+                PathExpander epl = new PathExpander(this.ace.getTree(), this.ace.getAceFrameConfig(),
+                    (ConceptChronicleBI) termComponent);
                 this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
-            } catch (IOException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
-            } catch (TerminologyException e1) {
-                AceLog.getAppLog().alertAndLogException(e1);
-			}
-        } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
+                ACE.threadPool.submit(epl);
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+         } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
             I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
             viewer.setTermComponent(termComponent);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {

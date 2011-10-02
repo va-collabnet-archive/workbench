@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+
 package org.ihtsdo.tk.hash;
 
 /**
@@ -21,17 +23,31 @@ package org.ihtsdo.tk.hash;
  * @author kec
  */
 public class Hashcode {
-        public static int compute(int[] parts) {
-        int hash = 0;
-        int len = parts.length;
-        for (int i = 0; i < len; i++) {
-            hash <<= 1;
-            if (hash < 0) {
-                hash |= 1;
-            }
-            hash ^= parts[i];
-        }
-        return hash;
-    }
+   public static int compute(int... parts) {
+      int hash = 0;
+      int len  = parts.length;
 
+      for (int i = 0; i < len; i++) {
+         hash <<= 1;
+
+         if (hash < 0) {
+            hash |= 1;
+         }
+
+         hash ^= parts[i];
+      }
+
+      return hash;
+   }
+
+   public static int computeLong(long... parts) {
+      int[] intParts = new int[parts.length * 2];
+
+      for (int i = 0; i < parts.length; i++) {
+         intParts[i * 2]     = (int) parts[i];
+         intParts[i * 2 + 1] = (int) (parts[i] >>> 32);
+      }
+
+      return compute(intParts);
+   }
 }

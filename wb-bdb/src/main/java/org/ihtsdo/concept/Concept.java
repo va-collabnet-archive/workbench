@@ -118,6 +118,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
    public static ReferenceType                                refType      = ReferenceType.WEAK;
@@ -164,7 +165,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    NidSetBI                    allowedTypes;
    ContradictionManagerBI      contradictionManager;
    private I_ManageConceptData data;
-   private int                 nid;
+   protected int                 nid;
+   protected int                 hashCode;
    PositionSetBI               positions;
    Precedence                  precedencePolicy;
 
@@ -174,6 +176,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       super();
       assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
       this.nid = nid;
+      this.hashCode = Hashcode.compute(nid);
 
       switch (refType) {
       case SOFT :
@@ -205,6 +208,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     */
    protected Concept(int nid, byte[] roBytes, byte[] mutableBytes) throws IOException {
       this.nid = nid;
+      this.hashCode = Hashcode.compute(nid);
       data     = new ConceptDataSimpleReference(this, roBytes, mutableBytes);
 
       if (Bdb.watchList.containsKey(nid)) {
@@ -355,7 +359,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    @Override
    public int hashCode() {
-      return HashFunction.hashCode(new int[] { nid });
+      return hashCode;
    }
 
    @Override

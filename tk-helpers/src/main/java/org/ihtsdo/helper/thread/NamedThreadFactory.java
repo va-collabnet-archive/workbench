@@ -11,12 +11,22 @@ public class NamedThreadFactory implements ThreadFactory {
     AtomicInteger factoryCount = new AtomicInteger();
     ThreadGroup threadGroup;
     String threadNamePrefix;
+    int threadPriority;
 
     public NamedThreadFactory(ThreadGroup threadGroup,
             String threadNamePrefix) {
+        this(threadGroup, threadNamePrefix, Thread.NORM_PRIORITY);
+    }
+
+    public NamedThreadFactory(ThreadGroup threadGroup,
+            String threadNamePrefix, int threadPriority) {
         super();
         this.threadGroup = threadGroup;
         this.threadNamePrefix = threadNamePrefix;
+        this.threadPriority = threadPriority;
+        if (threadGroup.getMaxPriority() < threadPriority) {
+            threadGroup.setMaxPriority(threadPriority);
+        }
     }
 
     @Override
@@ -24,6 +34,8 @@ public class NamedThreadFactory implements ThreadFactory {
         String threadName = threadNamePrefix + " " + 
                 factoryCount.incrementAndGet();
         //AceLog.getAppLog().info("Creating thread: " + threadName);
-        return new Thread(threadGroup, r, threadName);
+        Thread t = new Thread(threadGroup, r, threadName);
+        t.setPriority(threadPriority);
+        return t;
     }
 }

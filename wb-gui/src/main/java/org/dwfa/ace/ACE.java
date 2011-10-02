@@ -161,9 +161,6 @@ import org.dwfa.ace.task.commit.I_Fixup;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.ace.task.gui.toptoggles.TopToggleTypes;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.ace.tree.TermTreeHelper;
-import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.gui.glue.PropertyListenerGlue;
@@ -188,6 +185,9 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.taxonomy.TaxonomyHelper;
+import org.ihtsdo.taxonomy.TaxonomyMouseListenerForAce;
+import org.ihtsdo.taxonomy.TaxonomyTree;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
 
@@ -1116,7 +1116,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel dataCheckListPanel;
     private RefsetSpecPanel refsetSpecPanel;
     private SnoRocketTabPanel snoRocketPanel;
-    public TermTreeHelper treeHelper;
+    public TaxonomyHelper treeHelper;
     private JFrame frame;
 
     public String getPluginRoot() {
@@ -1446,10 +1446,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     }
 
     private JComponent getDefaultContentPanel() throws Exception {
-        treeHelper = new TermTreeHelper(this.aceFrameConfig);
+        treeHelper = new TaxonomyHelper(this.aceFrameConfig);
 
         termTree = treeHelper.getHierarchyPanel();
-        treeHelper.addMouseListener(new TreeMouseListener(this));
+        treeHelper.addMouseListener(new TaxonomyMouseListenerForAce(this, treeHelper));
         conceptPanels = new ArrayList<ConceptPanel>();
         c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.TREE_LINK, conceptTabs, 1, this.pluginRoot);
         c1Panel.setAce(this, LINK_TYPE.TREE_LINK);
@@ -3010,7 +3010,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             // Nothing to do...
         } else if (evt.getPropertyName().equals("roots")) {
             try {
-                treeHelper.setRoots();
+                throw new UnsupportedOperationException("changing roots");
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
@@ -3490,7 +3490,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         return dataCheckListModel;
     }
 
-    public JTreeWithDragImage getTree() {
+    public TaxonomyTree getTree() {
         return treeHelper.getTree();
     }
 

@@ -92,7 +92,7 @@ public class KindOfComputer {
     }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
-        if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
+        if (isaCache.get(isaCoordinate) != null) {
             return isaCache.get(isaCoordinate);
         } else {
             IsaCache tempIsaCache =
@@ -108,22 +108,6 @@ public class KindOfComputer {
             isaCache.put(isaCoordinate, tempIsaCache);
             return tempIsaCache;
         }
-        //		if (isaCache == null) {
-        //			lock.lock();
-        //			try {
-        //				if (isaCache == null) {
-        //					IsaCache tempIsaCache = 
-        //						new IsaCache(Bdb.getConceptDb().getConceptNidSet());
-        //					tempIsaCache.setup(
-        //							Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-        //				}
-        //			} catch (Exception e) {
-        //				throw new IOException(e);
-        //			} finally {
-        //				lock.unlock();
-        //			}
-        //		}
-        //		return isaCache;
     }
 
     public static IsaCache setupIsaCacheAndWait(IsaCoordinate isaCoordinate)

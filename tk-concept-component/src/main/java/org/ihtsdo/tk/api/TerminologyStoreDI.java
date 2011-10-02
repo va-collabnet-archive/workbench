@@ -84,6 +84,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    List<? extends PathBI> getPathChildren(int nid);
 
+   int[] getPossibleChildren(int cNid, ViewCoordinate vc) throws IOException;
+
    long getSequence();
 
    TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
