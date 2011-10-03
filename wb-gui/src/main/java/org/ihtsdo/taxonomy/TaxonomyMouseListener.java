@@ -66,7 +66,7 @@ public class TaxonomyMouseListener  extends MouseAdapter {
                           node.parentNodeId, nodesToCompare);
                }
 
-                helper.getNodeMap().put(extraParentNode.nodeId, extraParentNode);
+                helper.getNodeStore().add(extraParentNode);
                extraParentNode.setParentDepth(node.getParentDepth() + 1);
                helper.getRenderer().setupTaxonomyNode(extraParentNode, parent);
                node.addExtraParent(extraParentNode);
@@ -216,7 +216,7 @@ public class TaxonomyMouseListener  extends MouseAdapter {
          TaxonomyNode parentNode = model.getParent(node);
 
          for (Long extraParentNodeId : node.getExtraParents()) {
-            removeAllExtraParents(model, model.nodeMap.get(extraParentNodeId));
+            removeAllExtraParents(model, model.nodeStore.get(extraParentNodeId));
             parentNode.getChildren().remove(extraParentNodeId);
          }
 

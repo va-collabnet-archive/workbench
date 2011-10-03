@@ -41,7 +41,6 @@ import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.logging.Level;
 
-import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -65,7 +64,8 @@ import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
+
+import org.ihtsdo.concurrent.future.FutureHelper;
 
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.taxonomy.PathExpander;
@@ -271,7 +271,7 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
                 PathExpander epl = new PathExpander(this.ace.getTree(), this.ace.getAceFrameConfig(),
                     (ConceptChronicleBI) termComponent);
                 this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
-                ACE.threadPool.submit(epl);
+                FutureHelper.addFuture(ACE.threadPool.submit(epl));
             } catch (IOException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }

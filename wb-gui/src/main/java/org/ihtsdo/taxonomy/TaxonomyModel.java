@@ -39,8 +39,7 @@ public class TaxonomyModel implements TreeModel {
    private int                                      nextChildIndex = 0;
    protected CopyOnWriteArraySet<TreeModelListener> listeners      =
       new CopyOnWriteArraySet<TreeModelListener>();
-   protected ConcurrentHashMap<Long, TaxonomyNode>  nodeMap        = new ConcurrentHashMap<Long,
-                                                                        TaxonomyNode>();
+   protected NodeStore                              nodeStore      = new NodeStore();
    private Iterator<Long>                           childItr;
    private TaxonomyNode                             lastParentNode;
    protected NodeFactory                            nodeFactory;
@@ -54,7 +53,7 @@ public class TaxonomyModel implements TreeModel {
       ts          = Ts.get().getSnapshot(vc);
       nodeFactory = new NodeFactory(this, renderer, tree);
       rootNode    = new RootNode(nodeFactory.getNodeComparator());
-      nodeMap.put(rootNode.nodeId, rootNode);
+      nodeStore.add(rootNode);
 
       for (int cnid : roots.getListArray()) {
          nodeFactory.makeNode(cnid, rootNode);
@@ -183,7 +182,7 @@ public class TaxonomyModel implements TreeModel {
 
       if (childItr.hasNext()) {
          Long         nsi   = childItr.next();
-         TaxonomyNode child = nodeMap.get(nsi);
+         TaxonomyNode child = nodeStore.get(nsi);
 
          if (child != null) {
             return child;
@@ -213,12 +212,12 @@ public class TaxonomyModel implements TreeModel {
       return nodeId;
    }
 
-   public ConcurrentHashMap<Long, TaxonomyNode> getNodeMap() {
-      return nodeMap;
+   public NodeStore getNodeStore() {
+      return nodeStore;
    }
 
    public TaxonomyNode getParent(TaxonomyNode node) {
-      return nodeMap.get(node.parentNodeId);
+      return nodeStore.get(node.parentNodeId);
    }
 
    public static int getParentNid(long nodeId) {
@@ -244,7 +243,7 @@ public class TaxonomyModel implements TreeModel {
          if (aNode == rootNode) {
             retNodes = new TaxonomyNode[depth];
          } else {
-            retNodes = getPathToRoot(nodeMap.get(aNode.parentNodeId), depth);
+            retNodes = getPathToRoot(nodeStore.get(aNode.parentNodeId), depth);
          }
 
          retNodes[retNodes.length - depth] = aNode;
@@ -266,7 +265,7 @@ public class TaxonomyModel implements TreeModel {
 
       TaxonomyNode taxonomyNode = (TaxonomyNode) node;
 
-      if (taxonomyNode == null || taxonomyNode.isLeaf()) {
+      if ((taxonomyNode == null) || taxonomyNode.isLeaf()) {
          return true;
       }
 

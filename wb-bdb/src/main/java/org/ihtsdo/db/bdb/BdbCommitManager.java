@@ -1,7 +1,7 @@
 package org.ihtsdo.db.bdb;
+
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.apache.commons.lang.ArrayUtils;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -16,7 +16,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
@@ -47,8 +46,7 @@ import org.ihtsdo.db.change.BdbCommitSequence;
 import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
-import org.ihtsdo.lucene.WfHxLuceneManager;
-import org.ihtsdo.lucene.WfHxLuceneWriterAccessor; 
+import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -56,10 +54,6 @@ import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
-import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
-import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -80,8 +74,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -126,17 +118,13 @@ public class BdbCommitManager {
    private static ExecutorService             changeSetWriterService;
    private static ExecutorService             dbWriterService;
    private static ExecutorService             luceneWriterService;
-   
-   
+
    /**
     * <p>
     * listeners
     * </p>
     */
    private static ICommitListener[] listeners = new ICommitListener[0];
-
-   
-   
    //J-
      private static ConcurrentHashMap<I_GetConceptData, 
                                       Collection<AlertToDataConstraintFailure>> dataCheckMap =
@@ -228,7 +216,7 @@ public class BdbCommitManager {
                                          + e.getMessage());
                }
             } else {
-                wfHistoryRefsetId = Integer.MAX_VALUE;
+               wfHistoryRefsetId = Integer.MAX_VALUE;
             }
          }
       }
@@ -303,20 +291,32 @@ public class BdbCommitManager {
                try {
                   NidBitSetItrBI uncommittedCNidsItr         = uncommittedCNids.iterator();
                   NidBitSetItrBI uncommittedCNidsNoChecksItr = uncommittedCNidsNoChecks.iterator();
+                  Set<Integer>   cNidSet                     = new HashSet<Integer>();
 
                   while (uncommittedCNidsItr.next()) {
-                     AceLog.getAppLog().info(
-                         "Canceling on concept: "
-                         + Ts.get().getComponent(uncommittedCNidsItr.nid()).toUserString() + " UUID: "
-                         + Ts.get().getUuidsForNid(uncommittedCNidsItr.nid()).toString());
+                     cNidSet.addAll(Concept.get(uncommittedCNidsItr.nid()).getConceptNidsAffectedByCommit());
+
+                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine(
+                            "Canceling on concept: "
+                            + Ts.get().getComponent(uncommittedCNidsItr.nid()).toUserString() + " UUID: "
+                            + Ts.get().getUuidsForNid(uncommittedCNidsItr.nid()).toString());
+                     }
                   }
 
                   while (uncommittedCNidsNoChecksItr.next()) {
-                     AceLog.getAppLog().info(
-                         "Canceling on concept: "
-                         + Ts.get().getComponent(uncommittedCNidsNoChecksItr.nid()).toUserString()
-                         + " UUID: " + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
+                     cNidSet.addAll(
+                         Concept.get(uncommittedCNidsNoChecksItr.nid()).getConceptNidsAffectedByCommit());
+
+                     if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                        AceLog.getAppLog().fine(
+                            "Canceling on concept: "
+                            + Ts.get().getComponent(uncommittedCNidsNoChecksItr.nid()).toUserString()
+                            + " UUID: "
+                            + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
+                     }
                   }
+                  LastChange.touchComponents(cNidSet);
                   Bdb.getSapDb().commit(Long.MIN_VALUE);
                   Bdb.getSapDb().commit(Long.MIN_VALUE);
                   KindOfComputer.reset();
@@ -454,11 +454,9 @@ public class BdbCommitManager {
 
                      while (uncommittedCNidItrNoChecks.next()) {
                         if (getActiveFrame() != null) {
-
                            for (IsaCoordinate isac :
                                    getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-                              KindOfComputer.updateIsaCache(isac,
-                                      uncommittedCNidItrNoChecks.nid());
+                              KindOfComputer.updateIsaCache(isac, uncommittedCNidItrNoChecks.nid());
                            }
                         }
                      }
@@ -500,6 +498,7 @@ public class BdbCommitManager {
                            throw new RuntimeException("Can't handle policy: " + changeSetPolicy);
                         }
                      }
+
                      notifyCommit();
                      uncommittedCNids.clear();
                      uncommittedCNidsNoChecks = Terms.get().getEmptyIdSet();
@@ -652,11 +651,13 @@ public class BdbCommitManager {
             Bdb.getConceptDb().writeConcept(c);
 
             if (wfHistoryRefsetId < 0) {
-                commitSet.setMember(wfHistoryRefsetId);
-                Concept wfRefset = (Concept) Ts.get().getConcept(wfHistoryRefsetId);
-                sapNidsFromCommit.addAll(wfRefset.setCommitTime(commitTime).getSetValues());
-                wfRefset.modified();
-                Bdb.getConceptDb().writeConcept(wfRefset);
+               commitSet.setMember(wfHistoryRefsetId);
+
+               Concept wfRefset = (Concept) Ts.get().getConcept(wfHistoryRefsetId);
+
+               sapNidsFromCommit.addAll(wfRefset.setCommitTime(commitTime).getSetValues());
+               wfRefset.modified();
+               Bdb.getConceptDb().writeConcept(wfRefset);
             }
 
             if (writeChangeSets) {
@@ -1083,6 +1084,43 @@ public class BdbCommitManager {
       }
    }
 
+   private static void notifyCommit() {
+      if ((listeners != null) && (listeners.length > 0)) {
+         final CommitEvent event;
+
+         event = new CommitEvent(uncommittedCNidsNoChecks);
+
+         for (final ICommitListener listener : listeners) {
+            try {
+               listener.afterCommit(event);
+            } catch (final Exception exception) {
+
+               // @todo handle exception
+               exception.printStackTrace();
+            }
+         }
+      }
+   }
+
+   /**
+    * <p>
+    * notify the commit event
+    * </p>
+    */
+   private static void notifyShutdown() {
+      if ((listeners != null) && (listeners.length > 0)) {
+         for (final ICommitListener listener : listeners) {
+            try {
+               listener.shutdown();
+            } catch (final Exception exception) {
+
+               // @todo handle exception
+               exception.printStackTrace();
+            }
+         }
+      }
+   }
+
    public static void removeUncommitted(final Concept concept) {
       if (uncommittedCNids.isMember(concept.getNid())) {
          uncommittedCNids.setNotMember(concept.getNid());
@@ -1386,12 +1424,12 @@ public class BdbCommitManager {
          if (canceled) {
             return runnerAlerts;
          }
-         
-//         System.out.println(">>>>>>>>>>>>> Doing in background: " + latch.getCount());
 
+//       System.out.println(">>>>>>>>>>>>> Doing in background: " + latch.getCount());
          if ((c != null) && (tests != null)) {
             for (I_TestDataConstraints test : tests) {
-//            	System.out.println(">>>>>>>>>>>>> Running test: " + test.getClass().getName());
+
+//             System.out.println(">>>>>>>>>>>>> Running test: " + test.getClass().getName());
                if (canceled) {
                   return runnerAlerts;
                }
@@ -1427,9 +1465,11 @@ public class BdbCommitManager {
                } catch (Throwable e) {
                   AceLog.getEditLog().alertAndLogException(e);
                }
-//               System.out.println(">>>>>>>>>>>>> Finished Test: " + test.getClass().getName());
+
+//             System.out.println(">>>>>>>>>>>>> Finished Test: " + test.getClass().getName());
                latch.countDown();
-//               System.out.println(">>>>>>>>>>>>> Latch count: " + latch.getCount());
+
+//             System.out.println(">>>>>>>>>>>>> Latch count: " + latch.getCount());
             }
          }
 
@@ -1439,11 +1479,15 @@ public class BdbCommitManager {
       @Override
       protected void done() {
          super.done();
+
          long remaining = latch.getCount();
+
          for (long i = 0; i < remaining; i++) {
-//             System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
-        	 latch.countDown();
+
+//          System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
+            latch.countDown();
          }
+
          if (!canceled) {
             runners.remove(c);
          }
@@ -1601,40 +1645,5 @@ public class BdbCommitManager {
             }
          }
       }
-   }
-
-
-   /**
-    * <p>
-    * notify the commit event
-    * </p>
-    */
-   private static void notifyShutdown() {
-       if (listeners != null && listeners.length > 0) {
-           for (final ICommitListener listener : listeners) {
-               try {
-                   listener.shutdown();
-               } catch (final Exception exception) {
-                   // @todo handle exception
-                   exception.printStackTrace();
-               }
-           }
-       }
-   }
-
-   private static void notifyCommit() {
-       if (listeners != null && listeners.length > 0) {
-           final CommitEvent event;
-           event = new CommitEvent(uncommittedCNidsNoChecks);
-           for (final ICommitListener listener : listeners) {
-               try {
-                   listener.afterCommit(event);
-               } catch (final Exception exception) {
-                   // @todo handle exception
-                   exception.printStackTrace();
-               }
-           }
-       }
-
    }
 }

@@ -30,6 +30,7 @@ import java.lang.ref.WeakReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -210,6 +211,12 @@ public class LastChange {
 
    public static void touchComponent(int nid) {
       touch(nid, Change.COMPONENT);
+   }
+
+   public static void touchComponents(Collection<Integer> cNidSet) {
+      for (Integer cNid : cNidSet) {
+         touch(cNid, Change.COMPONENT);
+      }
    }
 
    public static void touchXref(int nid) {

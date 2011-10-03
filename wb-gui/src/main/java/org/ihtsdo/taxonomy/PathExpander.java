@@ -7,10 +7,11 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.vodb.types.IntList;
+import org.dwfa.ace.log.AceLog;
 
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -21,8 +22,6 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.List;
-import org.dwfa.ace.ACE;
-import org.dwfa.ace.log.AceLog;
 
 /**
  *
@@ -48,35 +47,35 @@ public class PathExpander implements Runnable {
 
    @Override
    public void run() {
-       try {
-           Collection<List<Integer>> nidPaths = focus.getNidPathsToRoot();
-           
-           List<Integer> shortestPath = null;
-           
-           for (List<Integer> nidPath : nidPaths) {
-               if (shortestPath == null) {
-                   shortestPath = nidPath;
-               } else {
-                   if (shortestPath.size() > nidPath.size()) {
-                       shortestPath = nidPath;
-                   }
+      try {
+         Collection<List<Integer>> nidPaths     = focus.getNidPathsToRoot();
+         List<Integer>             shortestPath = null;
+
+         for (List<Integer> nidPath : nidPaths) {
+            if (shortestPath == null) {
+               shortestPath = nidPath;
+            } else {
+               if (shortestPath.size() > nidPath.size()) {
+                  shortestPath = nidPath;
                }
-           }
-           
-           TaxonomyNode parent = model.getRoot();
-           
-           for (int i = shortestPath.size() - 1; i > -1; i--) {
-               TaxonomyNode node = model.nodeFactory.makeNode(shortestPath.get(i), parent);
-               
-               parent = node;
-           }
-           
-           TaxonomyNode focusNode = model.nodeFactory.makeNode(focus.getNid(), parent);
-           PathSegmentExpander expander = new PathSegmentExpander(tree.getNodeFactory(),
-                   NodePath.getTreePath(model, focusNode), 1);
-           ACE.threadPool.submit(expander);
-       } catch (Exception ex) {
-           AceLog.getAppLog().alertAndLogException(ex);
-       }
+            }
+         }
+
+         TaxonomyNode parent = model.getRoot();
+
+         for (int i = shortestPath.size() - 1; i > -1; i--) {
+            TaxonomyNode node = model.nodeFactory.makeNode(shortestPath.get(i), parent);
+
+            parent = node;
+         }
+
+         TaxonomyNode        focusNode = model.nodeFactory.makeNode(focus.getNid(), parent);
+         PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
+                                            NodePath.getTreePath(model, focusNode), 1);
+
+         FutureHelper.addFuture(ACE.threadPool.submit(expander));
+      } catch (Exception ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      }
    }
 }

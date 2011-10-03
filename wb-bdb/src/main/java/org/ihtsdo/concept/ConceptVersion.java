@@ -55,7 +55,6 @@ import org.ihtsdo.tk.spec.ValidationException;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -63,12 +62,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersion> {
+   private static IntSet classifierCharacteristics;
+
+   //~--- fields --------------------------------------------------------------
+
    private Concept        concept;
    NidListBI              fsnOrder;
    NidListBI              preferredOrder;
@@ -149,55 +150,6 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       return getNid() - o.getNid();
    }
 
-    private static IntSet classifierCharacteristics;
-    private static void setupClassifierCharacteristics() {
-    	if (classifierCharacteristics == null) {
-    		IntSet temp = new IntSet();
-    		try {
-				temp.add(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
-			} catch (ValidationException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-    		classifierCharacteristics = temp;
-    	}
-    }
-    @Override
-    public Collection<? extends RelationshipChronicleBI> getRelsOutgoing()
-            throws IOException {
-    	setupClassifierCharacteristics();
-    	Collection<? extends RelationshipChronicleBI> allRels = concept.getRelsOutgoing();
-    	Collection<RelationshipChronicleBI> results = new ArrayList<RelationshipChronicleBI>(allRels.size());
-    	switch (vc.getRelAssertionType()) {
-    	case INFERRED:
-    		for (RelationshipChronicleBI rc: allRels) {
-    			for (RelationshipVersionBI<?> rv: rc.getVersions()) {
-    				if (classifierCharacteristics.contains(rv.getCharacteristicNid())) {
-    					results.add(rc);
-    					break;
-    				}
-    			}
-    		}
-    		return results;
-    	case INFERRED_THEN_STATED:
-    		return allRels;
-    	case STATED:
-    		for (RelationshipChronicleBI rc: allRels) {
-    			for (RelationshipVersionBI<?> rv: rc.getVersions()) {
-    				if (!classifierCharacteristics.contains(rv.getCharacteristicNid())) {
-    					results.add(rc);
-    					break;
-    				}
-    			}
-    		}
-    		return results;
-    		default: 
-    			throw new RuntimeException("Can't handle: " + vc.getRelAssertionType());
-    	}
-     }
-
-
    @Override
    public boolean equals(Object obj) {
       if (obj instanceof ConceptVersion) {
@@ -255,6 +207,22 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       }
 
       throw new UnsupportedOperationException("Can't handle constraint of type: " + constraint);
+   }
+
+   private static void setupClassifierCharacteristics() {
+      if (classifierCharacteristics == null) {
+         IntSet temp = new IntSet();
+
+         try {
+            temp.add(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
+         } catch (ValidationException e) {
+            throw new RuntimeException(e);
+         } catch (IOException e) {
+            throw new RuntimeException(e);
+         }
+
+         classifierCharacteristics = temp;
+      }
    }
 
    private void setupFsnOrder() {
@@ -363,6 +331,10 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       return concept.getConceptNid();
    }
 
+   public Collection<Integer> getConceptNidsAffectedByCommit() throws IOException {
+      return concept.getConceptNidsAffectedByCommit();
+   }
+
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
            throws IOException {
@@ -389,6 +361,12 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
            throws IOException {
       return concept.getCurrentRefsetMembers(vc);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+           throws IOException {
+      return concept.getCurrentRefsetMembers(vc, cutoffTime);
    }
 
    @Override
@@ -485,22 +463,23 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
    private Collection<List<Integer>> getNidPathsToRootNoAdd(List<Integer> nidPath) throws IOException {
       TreeSet<List<Integer>> pathList = new TreeSet<List<Integer>>(new Comparator<List<Integer>>() {
-
-            @Override
-            public int compare(List<Integer> o1, List<Integer> o2) {
-                if (o1.size() != o2.size()) {
-                    return o1.size() - o2.size();
-                }
-                int size = o1.size();
-                for (int i = 0; i < size; i++) {
-                    if (o1.get(i) != o2.get(i)) {
-                        return o1.get(i) - o2.get(i);
-                    }
-                }
-                return 0;
-                
+         @Override
+         public int compare(List<Integer> o1, List<Integer> o2) {
+            if (o1.size() != o2.size()) {
+               return o1.size() - o2.size();
             }
-        });
+
+            int size = o1.size();
+
+            for (int i = 0; i < size; i++) {
+               if (o1.get(i) != o2.get(i)) {
+                  return o1.get(i) - o2.get(i);
+               }
+            }
+
+            return 0;
+         }
+      });
 
       try {
          Collection<? extends ConceptVersionBI> parents = getRelsOutgoingDestinationsActiveIsa();
@@ -747,6 +726,49 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
+   public Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException {
+      setupClassifierCharacteristics();
+
+      Collection<? extends RelationshipChronicleBI> allRels = concept.getRelsOutgoing();
+      Collection<RelationshipChronicleBI>           results =
+         new ArrayList<RelationshipChronicleBI>(allRels.size());
+
+      switch (vc.getRelAssertionType()) {
+      case INFERRED :
+         for (RelationshipChronicleBI rc : allRels) {
+            for (RelationshipVersionBI<?> rv : rc.getVersions()) {
+               if (classifierCharacteristics.contains(rv.getCharacteristicNid())) {
+                  results.add(rc);
+
+                  break;
+               }
+            }
+         }
+
+         return results;
+
+      case INFERRED_THEN_STATED :
+         return allRels;
+
+      case STATED :
+         for (RelationshipChronicleBI rc : allRels) {
+            for (RelationshipVersionBI<?> rv : rc.getVersions()) {
+               if (!classifierCharacteristics.contains(rv.getCharacteristicNid())) {
+                  results.add(rc);
+
+                  break;
+               }
+            }
+         }
+
+         return results;
+
+      default :
+         throw new RuntimeException("Can't handle: " + vc.getRelAssertionType());
+      }
+   }
+
+   @Override
    public Collection<? extends RelationshipVersionBI> getRelsOutgoingActive()
            throws IOException, ContraditionException {
       Collection<RelationshipVersionBI> returnValues = new ArrayList<RelationshipVersionBI>();
@@ -974,14 +996,9 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       if (children.isEmpty()) {
          return false;
       }
- 
+
       return true;
    }
-   
-    @Override
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime) throws IOException {
-        return concept.getCurrentRefsetMembers(vc, cutoffTime);
-    }
 
    @Override
    public boolean hasHistoricalRels() throws IOException, ContraditionException {

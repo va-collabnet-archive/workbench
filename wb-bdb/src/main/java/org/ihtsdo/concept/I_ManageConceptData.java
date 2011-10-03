@@ -1,158 +1,165 @@
 package org.ihtsdo.concept;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
+//~--- non-JDK imports --------------------------------------------------------
+
+import com.sleepycat.bind.tuple.TupleInput;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+
+import org.ihtsdo.concept.ConceptDataManager.AddDescriptionSet;
+import org.ihtsdo.concept.ConceptDataManager.AddImageSet;
+import org.ihtsdo.concept.ConceptDataManager.AddMemberSet;
+import org.ihtsdo.concept.ConceptDataManager.AddSrcRelSet;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.image.Image;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-
-import com.sleepycat.bind.tuple.TupleInput;
-import org.ihtsdo.concept.ConceptDataManager.AddDescriptionSet;
-import org.ihtsdo.concept.ConceptDataManager.AddImageSet;
-import org.ihtsdo.concept.ConceptDataManager.AddMemberSet;
-import org.ihtsdo.concept.ConceptDataManager.AddSrcRelSet;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.IOException;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 public interface I_ManageConceptData {
+   void add(Description desc) throws IOException;
 
-    int getNid();
+   void add(Image img) throws IOException;
 
-    void resetNidData();
+   void add(RefsetMember<?, ?> refsetMember) throws IOException;
 
-    int getReadWriteDataVersion() throws InterruptedException,
-            ExecutionException, IOException;
+   void add(Relationship rel) throws IOException;
 
-    AddSrcRelSet getSourceRels() throws IOException;
+   /**
+    * For single-concept cancel.
+    */
+   void cancel() throws IOException;
 
-    Collection<Relationship> getSourceRelsIfChanged() throws IOException;
+   void diet();
 
-    AddDescriptionSet getDescriptions() throws IOException;
+   void modified();
 
-    Collection<Description> getDescriptionsIfChanged() throws IOException;
+   void modified(long sequence);
 
-    ConceptAttributes getConceptAttributes() throws IOException;
+   boolean readyToWrite();
 
-    ConceptAttributes getConceptAttributesIfChanged() throws IOException;
+   void resetNidData();
 
-    RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
+   //~--- get methods ---------------------------------------------------------
 
-    AddMemberSet getRefsetMembers() throws IOException;
+   Collection<Integer> getAllNids() throws IOException;
 
-    Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
+   ComponentChroncileBI<?> getComponent(int nid) throws IOException;
 
-    AddImageSet getImages() throws IOException;
+   ConceptAttributes getConceptAttributes() throws IOException;
 
-    Collection<Image> getImagesIfChanged() throws IOException;
+   ConceptAttributes getConceptAttributesIfChanged() throws IOException;
 
-    /**
-     * Destination rels are stored as a relid and a type id in
-     * an array.
-     *
-     * @return
-     * @throws IOException
-     */
-    List<Relationship> getDestRels() throws IOException;
+   public Collection<Integer> getConceptNidsAffectedByCommit() throws IOException;
 
-    List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
+   Set<Integer> getDescNids() throws IOException;
 
-    void set(ConceptAttributes attr) throws IOException;
+   Set<Integer> getDescNidsReadOnly() throws IOException;
 
-    void add(Description desc) throws IOException;
+   AddDescriptionSet getDescriptions() throws IOException;
 
-    void add(Relationship rel) throws IOException;
+   Collection<Description> getDescriptionsIfChanged() throws IOException;
 
-    void add(Image img) throws IOException;
+   /**
+    * Destination rels are stored as a relid and a type id in
+    * an array.
+    *
+    * @return
+    * @throws IOException
+    */
+   List<Relationship> getDestRels() throws IOException;
 
-    void add(RefsetMember<?, ?> refsetMember) throws IOException;
+   List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
 
-    Collection<Integer> getAllNids() throws IOException;
+   Set<Integer> getImageNids() throws IOException;
 
-    byte[] getReadOnlyBytes() throws IOException;
+   Set<Integer> getImageNidsReadOnly() throws IOException;
 
-    byte[] getReadWriteBytes() throws IOException;
+   AddImageSet getImages() throws IOException;
 
-    TupleInput getReadWriteTupleInput() throws IOException;
+   Collection<Image> getImagesIfChanged() throws IOException;
 
-    ComponentChroncileBI<?> getComponent(int nid) throws IOException;
+   long getLastChange();
 
-    Set<Integer> getDescNidsReadOnly() throws IOException;
+   long getLastWrite();
 
-    Set<Integer> getDescNids() throws IOException;
+   Set<Integer> getMemberNids() throws IOException;
 
-    Set<Integer> getSrcRelNidsReadOnly() throws IOException;
+   Set<Integer> getMemberNidsReadOnly() throws IOException;
 
-    Set<Integer> getSrcRelNids() throws IOException;
+   int getNid();
 
-    Set<Integer> getImageNidsReadOnly() throws IOException;
+   byte[] getReadOnlyBytes() throws IOException;
 
-    Set<Integer> getImageNids() throws IOException;
+   byte[] getReadWriteBytes() throws IOException;
 
-    Set<Integer> getMemberNidsReadOnly() throws IOException;
+   int getReadWriteDataVersion() throws InterruptedException, ExecutionException, IOException;
 
-    Set<Integer> getMemberNids() throws IOException;
+   TupleInput getReadWriteTupleInput() throws IOException;
 
-    RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
+   RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException;
 
-    boolean isUncommitted();
+   RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException;
 
-    void modified();
+   AddMemberSet getRefsetMembers() throws IOException;
 
-    long getLastChange();
+   Collection<RefsetMember<?, ?>> getRefsetMembersIfChanged() throws IOException;
 
-    long getLastWrite();
+   AddSrcRelSet getSourceRels() throws IOException;
 
-    void setLastWrite(long version);
+   Collection<Relationship> getSourceRelsIfChanged() throws IOException;
 
-    boolean isUnwritten();
+   Set<Integer> getSrcRelNids() throws IOException;
 
-    boolean isPrimordial() throws IOException;
+   Set<Integer> getSrcRelNidsReadOnly() throws IOException;
 
-    boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
+   NidListBI getUncommittedNids();
 
+   boolean isAnnotationIndex() throws IOException;
 
-    void setAnnotationStyleRefset(boolean annotationStyleRefset);
+   boolean isAnnotationStyleRefex() throws IOException;
 
-    /**
-     * For single-concept commit.
-     * @param time
-     */
-    NidSetBI setCommitTime(long time);
+   /**
+    *
+    * @return
+    * @deprecated use isAnnotationStyleRefex
+    */
+   @Deprecated
+   boolean isAnnotationStyleSet() throws IOException;
 
-    /**
-     * For single-concept cancel.
-     */
-    void cancel() throws IOException;
+   boolean isLeafByDestRels(I_ConfigAceFrame aceConfig) throws IOException;
 
-    void diet();
+   boolean isPrimordial() throws IOException;
 
-    boolean readyToWrite();
+   boolean isUncommitted();
 
-    boolean isAnnotationStyleRefex() throws IOException;
-    
-    /**
-     * 
-     * @return
-     * @deprecated use isAnnotationStyleRefex
-     */
+   boolean isUnwritten();
 
-    @Deprecated
-    boolean isAnnotationStyleSet() throws IOException;
+   //~--- set methods ---------------------------------------------------------
 
-    public boolean isAnnotationIndex() throws IOException;
+   void set(ConceptAttributes attr) throws IOException;
 
-    public void setAnnotationIndex(boolean annotationIndex) throws IOException;;
+   public void setAnnotationIndex(boolean annotationIndex) throws IOException;;
 
-    public void modified(long sequence);
+   void setAnnotationStyleRefset(boolean annotationStyleRefset);
 
-    public NidListBI getUncommittedNids();
+   /**
+    * For single-concept commit.
+    * @param time
+    */
+   NidSetBI setCommitTime(long time);
 
+   void setLastWrite(long version);
 }

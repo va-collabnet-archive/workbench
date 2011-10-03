@@ -30,12 +30,14 @@ import org.ihtsdo.db.bdb.I_GetNidData;
 import org.ihtsdo.db.bdb.NidDataFromBdb;
 import org.ihtsdo.db.bdb.NidDataInMemory;
 import org.ihtsdo.db.util.NidPairForRel;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupChronicleBI;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -44,6 +46,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,6 +119,38 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       getMemberNids().add(refsetMember.nid);
       addToMemberMap(refsetMember);
       modified();
+   }
+
+   private void addConceptNidsAffectedByCommit(Collection<? extends ConceptComponent<?, ?>> componentList,
+           Collection<Integer> affectedConceptNids)
+           throws IOException {
+      if (componentList != null) {
+         for (ConceptComponent<?, ?> cc : componentList) {
+            addConceptNidsAffectedByCommit(cc, affectedConceptNids);
+         }
+      }
+   }
+
+   private void addConceptNidsAffectedByCommit(ConceptComponent<?, ?> cc,
+           Collection<Integer> affectedConceptNids)
+           throws IOException {
+      if (cc != null) {
+         if (cc.isUncommitted()) {
+            if (cc instanceof RelationshipChronicleBI) {
+               RelationshipChronicleBI r = (RelationshipChronicleBI) cc;
+
+               affectedConceptNids.add(r.getOriginNid());
+               affectedConceptNids.add(r.getDestinationNid());
+            } else if (cc instanceof RefexChronicleBI) {
+               RefexChronicleBI r = (RefexChronicleBI) cc;
+
+               affectedConceptNids.add(Ts.get().getConceptNidForNid(r.getReferencedComponentNid()));
+               affectedConceptNids.add(r.getCollectionNid());
+            } else {
+               affectedConceptNids.add(getNid());
+            }
+         }
+      }
    }
 
    @Override
@@ -559,6 +594,19 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public ConceptAttributes getConceptAttributesIfChanged() throws IOException {
       return attributes.get();
+   }
+
+   @Override
+   public Collection<Integer> getConceptNidsAffectedByCommit() throws IOException {
+      Collection<Integer> uncommittedNids = new HashSet<Integer>();
+
+      addConceptNidsAffectedByCommit(attributes.get(), uncommittedNids);
+      addConceptNidsAffectedByCommit(srcRels.get(), uncommittedNids);
+      addConceptNidsAffectedByCommit(descriptions.get(), uncommittedNids);
+      addConceptNidsAffectedByCommit(images.get(), uncommittedNids);
+      addConceptNidsAffectedByCommit(refsetMembers.get(), uncommittedNids);
+
+      return uncommittedNids;
    }
 
    @Override

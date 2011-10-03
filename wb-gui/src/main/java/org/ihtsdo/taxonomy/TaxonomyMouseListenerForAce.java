@@ -17,8 +17,6 @@ import org.dwfa.ace.search.SimilarConceptQuery;
 import org.dwfa.ace.tree.I_RenderAndFocusOnBean;
 import org.dwfa.tapi.TerminologyException;
 
-import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
-import org.ihtsdo.taxonomy.nodes.LeafNodeMultiParent;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNodeRoot;
@@ -83,7 +81,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
                           node.parentNodeId, nodesToCompare);
                }
 
-               helper.getNodeMap().put(extraParentNode.nodeId, extraParentNode);
+               helper.getNodeStore().add(extraParentNode);
                extraParentNode.setParentDepth(node.getParentDepth() + 1);
                helper.getRenderer().setupTaxonomyNode(extraParentNode, parent);
                node.addExtraParent(extraParentNode);
@@ -239,7 +237,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
          TaxonomyNode parentNode = model.getParent(node);
 
          for (Long extraParentNodeId : node.getExtraParents()) {
-            removeAllExtraParents(model, model.nodeMap.get(extraParentNodeId));
+            removeAllExtraParents(model, model.nodeStore.get(extraParentNodeId));
             parentNode.getChildren().remove(extraParentNodeId);
          }
 

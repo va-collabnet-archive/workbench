@@ -7,19 +7,24 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
+import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -36,9 +41,10 @@ import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -48,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
@@ -55,7 +62,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.taxonomy.nodes.InternalNode;
 
 /**
  *
@@ -100,10 +106,9 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    @Override
    public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-      if (AceLog.getAppLog().isLoggable(Level.INFO)) {
-         AceLog.getAppLog().info("Term change. Sequence: " + sequence + " changedXrefs: " + changedXrefs
-                                 + " changedComponents: " + changedComponents);
-      }
+      ChangeWorker changeWorker = new ChangeWorker(sequence, changedXrefs, changedComponents);
+
+      FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
    }
 
    protected void collapseTree(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
@@ -148,9 +153,12 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       int      childCount = root.getChildren().size();
 
       for (int i = 0; i < childCount; i++) {
-         InternalNode       childNode = (InternalNode) model.getChild(root, i);
+         InternalNode childNode = (InternalNode) model.getChild(root, i);
+
          model.nodeFactory.removeDescendents(childNode);
-         TreePath           tp        = new TreePath(NodePath.getTreePath(model, childNode));
+
+         TreePath tp = new TreePath(NodePath.getTreePath(model, childNode));
+
          tree.collapseRow(i);
          tree.collapsePath(tp);
       }
@@ -216,6 +224,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          @Override
          public void actionPerformed(ActionEvent e) {
             ViewCoordinate vc = model.ts.getViewCoordinate();
+
             switch (assertionType) {
             case INFERRED :
                assertionType = RelAssertionType.INFERRED_THEN_STATED;
@@ -303,8 +312,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       return model.nodeFactory;
    }
 
-   public ConcurrentHashMap<Long, TaxonomyNode> getNodeMap() {
-      return model.getNodeMap();
+   public NodeStore getNodeStore() {
+      return model.getNodeStore();
    }
 
    public TaxonomyNodeRenderer getRenderer() {
@@ -327,5 +336,90 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    public void setTreeActivityPanel(ActivityPanel activity) {
       this.activity = activity;
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   protected class ChangeWorker extends SwingWorker<List<TaxonomyNode>, TaxonomyNode> {
+      List<Long>   nodesToChange = new ArrayList<Long>();
+      Set<Integer> changedComponents;
+      Set<Integer> changedXrefs;
+      long         sequence;
+
+      //~--- constructors -----------------------------------------------------
+
+      public ChangeWorker(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
+         this.sequence          = sequence;
+         this.changedXrefs      = changedXrefs;
+         this.changedComponents = changedComponents;
+      }
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      protected List<TaxonomyNode> doInBackground() throws Exception {
+          List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
+         IdentifierSet      changedConcepts = new IdentifierSet();
+         TerminologyStoreDI ts              = Ts.get();
+
+         for (int changedComponentNid : changedComponents) {
+            processComponentNid(ts, changedComponentNid, changedConcepts);
+         }
+
+         for (int changedComponentNid : changedXrefs) {
+            processComponentNid(ts, changedComponentNid, changedConcepts);
+         }
+
+         for (Long nodeId : nodesToChange) {
+            TaxonomyNode nodeToChange = model.getNodeStore().get(nodeId);
+            TaxonomyNode newNode      =
+               model.nodeFactory.makeNode(model.ts.getConceptVersion(nodeToChange.getCnid()),
+                                          nodeToChange.getParentNid(),
+                                          model.getNodeStore().get(nodeToChange.parentNodeId));
+            boolean contentChanged  = !newNode.getText().equals(nodeToChange.getText());
+            boolean childrenChanged = (newNode.isLeaf() != nodeToChange.isLeaf())
+                                      || !newNode.getChildren().equals(nodeToChange.getChildren());
+            boolean parentsChanged = newNode.hasExtraParents() != nodeToChange.hasExtraParents() ||
+                    !newNode.getExtraParents().equals(nodeToChange.getExtraParents());
+            if (parentsChanged || childrenChanged) {
+                
+            } else if (contentChanged) {
+                contentChangedList.add(newNode);
+            }
+         }
+
+         return contentChangedList;
+      }
+
+        @Override
+        protected void process(List<TaxonomyNode> chunks) {
+            for (TaxonomyNode node: chunks) {
+                model.treeStructureChanged(NodePath.getTreePath(model, node));
+            }
+        }
+
+      @Override
+      protected void done() {
+         try {
+            List<TaxonomyNode> contentChangedList = get();
+             for (TaxonomyNode node: contentChangedList) {
+                model.valueForPathChanged(NodePath.getTreePath(model, node), node);
+            }
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
+
+      private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
+                                       IdentifierSet changedConcepts)
+              throws IOException {
+         int              cnid    = ts.getConceptNidForNid(changedComponentNid);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
+
+         if (!nodeIds.isEmpty()) {
+            changedConcepts.setMember(cnid);
+            nodesToChange.addAll(nodeIds);
+         }
+      }
    }
 }

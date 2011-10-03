@@ -40,6 +40,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.taxonomy.PathExpander;
 
@@ -88,14 +89,15 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 
    //~--- methods -------------------------------------------------------------
 
+   @Override
    public void actionPerformed(ActionEvent e) {
       if (e.getActionCommand().equals("Show in taxonomy")) {
          try {
-            AceFrameConfig     frameConfig = (AceFrameConfig) config;
-            PathExpander epl         =
-               new PathExpander(frameConfig.getAceFrame().getCdePanel().getTree(), config, rowConcept);
+            AceFrameConfig frameConfig = (AceFrameConfig) config;
+            PathExpander   epl         = new PathExpander(frameConfig.getAceFrame().getCdePanel().getTree(),
+                                            config, rowConcept);
 
-            ACE.threadPool.submit(epl);
+            FutureHelper.addFuture(ACE.threadPool.submit(epl));
             config.setHierarchySelection(rowConcept);
          } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);

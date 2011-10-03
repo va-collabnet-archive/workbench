@@ -7,8 +7,10 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.log.AceLog;
 
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -17,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.TreePath;
-import org.dwfa.ace.ACE;
 
 /**
  *
@@ -55,7 +56,8 @@ public class PathSegmentExpander extends SwingWorker<Integer, Object> {
 
          if (newIndex < path.getPathCount()) {
             PathSegmentExpander nextSegmentExpander = new PathSegmentExpander(factory, path, newIndex);
-            ACE.threadPool.submit(nextSegmentExpander);
+
+            FutureHelper.addFuture(ACE.threadPool.submit(nextSegmentExpander));
             factory.tree.expandPath(path.getParentPath());
          } else {
             int row = factory.tree.getRowForPath(path);

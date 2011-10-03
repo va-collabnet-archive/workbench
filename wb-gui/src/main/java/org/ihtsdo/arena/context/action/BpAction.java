@@ -25,6 +25,7 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.ihtsdo.arena.ScrollablePanel;
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.thread.NamedThreadFactory;
 
 public class BpAction extends AbstractAction implements Runnable {
@@ -156,7 +157,7 @@ public class BpAction extends AbstractAction implements Runnable {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        executorService.submit(this);
+        FutureHelper.addFuture(executorService.submit(this));
     }
 
     @Override

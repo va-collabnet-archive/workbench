@@ -33,7 +33,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.dwfa.vodb.types.IntSet;
 
@@ -57,6 +56,7 @@ import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
+import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.db.util.NidPairForRel;
@@ -102,6 +102,7 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -118,7 +119,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.ihtsdo.tk.hash.Hashcode;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
    public static ReferenceType                                refType      = ReferenceType.WEAK;
@@ -165,8 +165,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    NidSetBI                    allowedTypes;
    ContradictionManagerBI      contradictionManager;
    private I_ManageConceptData data;
-   protected int                 nid;
-   protected int                 hashCode;
+   protected int               hashCode;
+   protected int               nid;
    PositionSetBI               positions;
    Precedence                  precedencePolicy;
 
@@ -175,7 +175,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    private Concept(int nid) throws IOException {
       super();
       assert nid != Integer.MAX_VALUE : "nid == Integer.MAX_VALUE";
-      this.nid = nid;
+      this.nid      = nid;
       this.hashCode = Hashcode.compute(nid);
 
       switch (refType) {
@@ -207,9 +207,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     * @throws IOException
     */
    protected Concept(int nid, byte[] roBytes, byte[] mutableBytes) throws IOException {
-      this.nid = nid;
+      this.nid      = nid;
       this.hashCode = Hashcode.compute(nid);
-      data     = new ConceptDataSimpleReference(this, roBytes, mutableBytes);
+      data          = new ConceptDataSimpleReference(this, roBytes, mutableBytes);
 
       if (Bdb.watchList.containsKey(nid)) {
          AceLog.getAppLog().info("############  Constructing concept: " + nid + " ############");
@@ -244,6 +244,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    @Override
    public void cancel() throws IOException {
+      LastChange.touchComponents(getConceptNidsAffectedByCommit());
       data.cancel();
 
       if (BdbCommitManager.forget(getConceptAttributes())) {
@@ -971,22 +972,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       return getConceptAttributeTuples(config.getAllowedStatus(), config.getViewPositionSetReadOnly(),
                                        precedencePolicy, contradictionManager);
    }
-   
-   @Override
-   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
-           PositionSetBI positionSet, Precedence precedencePolicy,
-           ContradictionManagerBI contradictionManager, long time)
-           throws IOException, TerminologyException {
-      List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
-      ConceptAttributes attr = getConceptAttributes();
-
-      if (attr != null) {
-         attr.addTuples(allowedStatus, positionSet, returnTuples,
-                 precedencePolicy, contradictionManager, time);
-      }
-
-      return returnTuples;
-   }
 
    @Override
    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
@@ -998,6 +983,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       if (attr != null) {
          attr.addTuples(allowedStatus, positionSet, returnTuples, precedencePolicy, contradictionManager);
+      }
+
+      return returnTuples;
+   }
+
+   @Override
+   public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
+           PositionSetBI positionSet, Precedence precedencePolicy,
+           ContradictionManagerBI contradictionManager, long time)
+           throws IOException, TerminologyException {
+      List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
+      ConceptAttributes             attr         = getConceptAttributes();
+
+      if (attr != null) {
+         attr.addTuples(allowedStatus, positionSet, returnTuples, precedencePolicy, contradictionManager,
+                        time);
       }
 
       return returnTuples;
@@ -1023,6 +1024,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    @Override
    public int getConceptNid() {
       return nid;
+   }
+
+   public Collection<Integer> getConceptNidsAffectedByCommit() throws IOException {
+      return data.getConceptNidsAffectedByCommit();
    }
 
    @Override
@@ -1065,8 +1070,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       return Collections.unmodifiableCollection(returnValues);
    }
-   
-   
+
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
            throws IOException {
@@ -1076,9 +1080,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       for (RefexChronicleBI<?> refex : refexes) {
          for (RefexVersionBI<?> version : refex.getVersions(vc)) {
-             if(version.getTime() < cutoffTime){
-                 returnValues.add(version);
-             }
+            if (version.getTime() < cutoffTime) {
+               returnValues.add(version);
+            }
          }
       }
 
@@ -1204,22 +1208,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                                   config.getViewPositionSetReadOnly(), config.getPrecedence(),
                                   config.getConflictResolutionStrategy());
    }
-   
-   @Override
-   public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(NidSetBI allowedStatus,
-           NidSetBI allowedTypes, PositionSetBI positions, Precedence precedencePolicy,
-           ContradictionManagerBI contradictionManager, long time)
-           throws IOException {
-      List<I_DescriptionTuple<DescriptionRevision>> returnDescriptions =
-         new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
-
-      for (Description desc : getDescriptions()) {
-         desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions, precedencePolicy,
-                        contradictionManager, time);
-      }
-
-      return returnDescriptions;
-   }
 
    @Override
    public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(NidSetBI allowedStatus,
@@ -1232,6 +1220,22 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       for (Description desc : getDescriptions()) {
          desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions, precedencePolicy,
                         contradictionManager);
+      }
+
+      return returnDescriptions;
+   }
+
+   @Override
+   public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(NidSetBI allowedStatus,
+           NidSetBI allowedTypes, PositionSetBI positions, Precedence precedencePolicy,
+           ContradictionManagerBI contradictionManager, long time)
+           throws IOException {
+      List<I_DescriptionTuple<DescriptionRevision>> returnDescriptions =
+         new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
+
+      for (Description desc : getDescriptions()) {
+         desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions, precedencePolicy,
+                        contradictionManager, time);
       }
 
       return returnDescriptions;
@@ -1579,10 +1583,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    public Collection<Relationship> getNativeSourceRels() throws IOException {
-       if (isCanceled()) {
-       	 return new ConcurrentSkipListSet<Relationship>(new ComponentComparator());
-       }
-       return data.getSourceRels();
+      if (isCanceled()) {
+         return new ConcurrentSkipListSet<Relationship>(new ComponentComparator());
+      }
+
+      return data.getSourceRels();
    }
 
    @Override
@@ -1927,18 +1932,18 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       return returnRels;
    }
-   
+
    @Override
    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-           PositionSetBI positions, Precedence precedencePolicy, 
-           ContradictionManagerBI contradictionManager, Long cutoffTime)
+           PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+           Long cutoffTime)
            throws IOException, TerminologyException {
       List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 
       for (I_RelVersioned rel : getSourceRels()) {
-         if(rel.getTime() < cutoffTime){
-             rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
-                       contradictionManager);
+         if (rel.getTime() < cutoffTime) {
+            rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
+                          contradictionManager);
          }
       }
 
@@ -1965,7 +1970,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       return actualValues;
    }
-   
+
    @Override
    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
@@ -1978,8 +1983,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
       for (Relationship rel : getSourceRels()) {
          for (Relationship.Version rv : rel.getVersions(coordinate)) {
-            if (((allowedTypes == null) || allowedTypes.contains(rv.getTypeNid())) &&
-                   rv.getTime() < cutoffTime) {
+            if (((allowedTypes == null) || allowedTypes.contains(rv.getTypeNid()))
+                    && (rv.getTime() < cutoffTime)) {
                actualValues.add(rv);
             }
          }

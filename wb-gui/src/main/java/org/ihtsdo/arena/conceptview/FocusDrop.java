@@ -8,6 +8,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.taxonomy.PathExpander;
 import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -55,7 +56,7 @@ public class FocusDrop extends JLabel implements I_AcceptConcept {
       try {
          PathExpander epl = new PathExpander(navigatorTree, config, (ConceptChronicleBI) c);
 
-         ACE.threadPool.submit(epl);
+         FutureHelper.addFuture(ACE.threadPool.submit(epl));
       } catch (IOException e1) {
          AceLog.getAppLog().alertAndLogException(e1);
       }
