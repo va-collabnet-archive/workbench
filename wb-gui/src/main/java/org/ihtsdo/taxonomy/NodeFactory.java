@@ -59,6 +59,13 @@ public class NodeFactory {
    public static ExecutorService taxonomyExecutors =
       Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
                                    new NamedThreadFactory(new ThreadGroup("NodeFactory "), "Taxonomy "));
+   public static ExecutorService childFinderExecutors =
+      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+                                   new NamedThreadFactory(new ThreadGroup("NodeFactory "), "ChildFinder "));
+
+   public static ExecutorService pathExpanderExecutors =
+      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+                                   new NamedThreadFactory(new ThreadGroup("NodeFactory "), "PathExpander "));
 
    //~--- fields --------------------------------------------------------------
 
@@ -360,7 +367,7 @@ public class NodeFactory {
          try {
             ConceptVersionBI        parent         = model.ts.getConceptVersion(parentNode.getCnid());
             ChildFinder             dataFinder     = new ChildFinder(parent, parentNode, this);
-            Future<Object>          finderFuture   = taxonomyExecutors.submit(dataFinder);
+            Future<Object>          finderFuture   = childFinderExecutors.submit(dataFinder);
             long                    lastPublish    = System.currentTimeMillis();
             ArrayList<TaxonomyNode> nodesToPublish = new ArrayList<TaxonomyNode>();
 

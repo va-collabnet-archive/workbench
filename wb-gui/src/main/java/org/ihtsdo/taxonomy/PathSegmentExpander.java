@@ -57,7 +57,7 @@ public class PathSegmentExpander extends SwingWorker<Integer, Object> {
          if (newIndex < path.getPathCount()) {
             PathSegmentExpander nextSegmentExpander = new PathSegmentExpander(factory, path, newIndex);
 
-            FutureHelper.addFuture(ACE.threadPool.submit(nextSegmentExpander));
+            FutureHelper.addFuture(NodeFactory.pathExpanderExecutors.submit(nextSegmentExpander));
             factory.tree.expandPath(path.getParentPath());
          } else {
             int row = factory.tree.getRowForPath(path);

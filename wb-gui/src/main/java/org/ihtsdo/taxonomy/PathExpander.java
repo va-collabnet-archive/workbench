@@ -7,7 +7,6 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 
@@ -73,7 +72,7 @@ public class PathExpander implements Runnable {
          PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
                                             NodePath.getTreePath(model, focusNode), 1);
 
-         FutureHelper.addFuture(ACE.threadPool.submit(expander));
+         FutureHelper.addFuture(NodeFactory.pathExpanderExecutors.submit(expander));
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }
