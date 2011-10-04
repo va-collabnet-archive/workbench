@@ -78,7 +78,11 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
                     membersForConcept.get(cNid);
             for (TkRefsetAbstractMember<?> member : set) {
                 ComponentChroncileBI<?> component = c.getComponent(Bdb.uuidToNid(member.getComponentUuid()));
-                component.addAnnotation(RefsetMemberFactory.create(member, cNid));
+                if (component != null) {
+                    component.addAnnotation(RefsetMemberFactory.create(member, cNid));
+                } else {
+                    AceLog.getAppLog().warning("Cannot import annotation. Component is null for: " + member);
+                }
             }
             membersForConcept.remove(cNid);
             BdbCommitManager.addUncommittedNoChecks(c);
