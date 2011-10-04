@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.log.AceLog;
 
+import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.helper.thread.NamedThreadFactory;
 import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
@@ -49,23 +50,22 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.ExpandVetoException;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.concurrent.future.FutureHelper;
 
 /**
  *
  * @author kec
  */
 public class NodeFactory {
-   public static ExecutorService taxonomyExecutors =
+   private static ThreadGroup    nodeFactoryThreadGroup = new ThreadGroup("NodeFactory ");
+   public static ExecutorService taxonomyExecutors      =
       Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(new ThreadGroup("NodeFactory "), "Taxonomy "));
-   public static ExecutorService childFinderExecutors =
-      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(new ThreadGroup("NodeFactory "), "ChildFinder "));
-
+                                   new NamedThreadFactory(nodeFactoryThreadGroup, "Taxonomy "));
    public static ExecutorService pathExpanderExecutors =
       Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(new ThreadGroup("NodeFactory "), "PathExpander "));
+                                   new NamedThreadFactory(nodeFactoryThreadGroup, "PathExpander "));
+   public static ExecutorService childFinderExecutors =
+      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+                                   new NamedThreadFactory(nodeFactoryThreadGroup, "ChildFinder "));
 
    //~--- fields --------------------------------------------------------------
 
@@ -129,6 +129,49 @@ public class NodeFactory {
       return node;
    }
 
+   public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
+           throws ContraditionException, IOException {
+      if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
+         boolean multiParent = false;
+
+         for (RelationshipVersionBI isaRel : nodeConcept.getRelsOutgoingActiveIsa()) {
+            if (isaRel.getDestinationNid() != parentNode.getCnid()) {
+               multiParent = true;
+
+               break;
+            }
+         }
+
+         if (multiParent) {
+            LeafNodeMultiParent node = new LeafNodeMultiParent(nodeConcept.getNid(), parentCnid,
+                                          parentNode.nodeId);
+
+            renderer.setupTaxonomyNode(node, nodeConcept);
+            model.nodeStore.add(node);
+
+            return node;
+         } else {
+            LeafNode node = new LeafNode(nodeConcept.getNid(), parentCnid, parentNode.nodeId);
+
+            renderer.setupTaxonomyNode(node, nodeConcept);
+            model.nodeStore.add(node);
+
+            return node;
+         }
+      }
+
+      InternalNodeMultiParent node = new InternalNodeMultiParent(nodeConcept.getNid(), parentCnid,
+                                        parentNode.nodeId, nodeComparator);
+
+      node.setIsLeaf(nodeConcept.isLeaf());
+      setExtraParents(nodeConcept, node);
+      renderer.setupTaxonomyNode(node, nodeConcept);
+      model.nodeStore.add(node);
+
+      // makeChildNodes(node);
+      return node;
+   }
+
    private TaxonomyNode makeNodeFromScratch(ConceptVersionBI nodeConcept, TaxonomyNode parentNode)
            throws Exception, IOException, ContraditionException {
       Long         nodeId       = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getCnid());
@@ -137,50 +180,9 @@ public class NodeFactory {
       if (existingNode != null) {
          return existingNode;
       }
+
       return makeNode(nodeConcept, parentNode.getCnid(), parentNode);
    }
-
-    public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode) throws ContraditionException, IOException {
-        if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
-           boolean multiParent = false;
-
-           for (RelationshipVersionBI isaRel : nodeConcept.getRelsOutgoingActiveIsa()) {
-              if (isaRel.getDestinationNid() != parentNode.getCnid()) {
-                 multiParent = true;
-
-                 break;
-              }
-           }
-
-           if (multiParent) {
-              LeafNodeMultiParent node = new LeafNodeMultiParent(nodeConcept.getNid(), parentCnid,
-                                            parentNode.nodeId);
-
-              renderer.setupTaxonomyNode(node, nodeConcept);
-              model.nodeStore.add(node);
-
-              return node;
-           } else {
-              LeafNode node = new LeafNode(nodeConcept.getNid(), parentCnid, parentNode.nodeId);
-
-              renderer.setupTaxonomyNode(node, nodeConcept);
-              model.nodeStore.add(node);
-
-              return node;
-           }
-        }
-
-        InternalNodeMultiParent node = new InternalNodeMultiParent(nodeConcept.getNid(), parentCnid,
-                                          parentNode.nodeId, nodeComparator);
-
-        node.setIsLeaf(nodeConcept.isLeaf());
-        setExtraParents(nodeConcept, node);
-        renderer.setupTaxonomyNode(node, nodeConcept);
-        model.nodeStore.add(node);
-
-        // makeChildNodes(node);
-        return node;
-    }
 
    public void removeDescendents(TaxonomyNode parent) {
       if (!parent.isLeaf()) {
@@ -200,6 +202,7 @@ public class NodeFactory {
                model.nodeStore.remove(nodeId);
             }
          }
+
          ((InternalNode) parent).clearChildren();
       }
    }
