@@ -34,34 +34,35 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 	   }
 	   
 	   public static class WfHxLuceneWriter implements Runnable {
-		      private static Set<I_ExtendByRef> wfExtensionsToUpdate;
+	      private static Set<I_ExtendByRef> wfExtensionsToUpdate;
 
-		      //~--- fields -----------------------------------------------------------
+	      //~--- fields -----------------------------------------------------------
 
-		      private WorkflowHistoryRefsetReader reader;
+	      private WorkflowHistoryRefsetReader reader;
 
-		      //~--- constructors -----------------------------------------------------
+	      //~--- constructors -----------------------------------------------------
 
-		      private WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
-		         super();
-		         wfExtensionsToUpdate = uncommittedWfMemberIds;
+	      private WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
+	         super();
+	         wfExtensionsToUpdate = uncommittedWfMemberIds;
 
-		         try {
-		            reader = new WorkflowHistoryRefsetReader();
-		         } catch (Exception e) {
-		            AceLog.getAppLog().log(Level.WARNING,
-		                                   "Unable to access Workflow History Refset with error: " + e.getMessage());
-		         }
-		      }
+	         try {
+	            reader = new WorkflowHistoryRefsetReader();
+	         } catch (Exception e) {
+	            AceLog.getAppLog().log(Level.WARNING,
+	                                   "Unable to access Workflow History Refset with error: " + e.getMessage());
+	         }
+	      }
 
-		      //~--- methods ----------------------------------------------------------
+	      //~--- methods ----------------------------------------------------------
 
-		      @Override
-		      public void run() {
-		         try {
-		            Set<UUID> workflowsUpdated = new HashSet<UUID>();
+	      @Override
+	      public void run() {
+	         try {
+	            Set<UUID> workflowsUpdated = new HashSet<UUID>();
 
-		            for (I_ExtendByRef row : wfExtensionsToUpdate) {
+	            for (I_ExtendByRef row : wfExtensionsToUpdate) {
+	            	if (reader != null) {
 		               UUID workflowId = reader.getWorkflowId(((I_ExtendByRefPartStr) row).getStringValue());
 
 		               // If two rows to commit, both will be caught by method below, so do this once per WfId
@@ -84,12 +85,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 		                  LuceneManager.writeToLucene(latestWorkflow, LuceneSearchType.WORKFLOW_HISTORY, vc);
 		               }
 		            }
-		         } catch (Exception e) {
-		            AceLog.getAppLog().alertAndLogException(e);
-		         }
+	            }
+	         } catch (Exception e) {
+	            AceLog.getAppLog().alertAndLogException(e);
+	         }
 
-		         luceneWriterPermit.release();
-		      }
-		   }
-
+	         luceneWriterPermit.release();
+	      }
+	   }
    }
