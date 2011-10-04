@@ -316,6 +316,7 @@ public class BdbCommitManager {
                             + Ts.get().getUuidsForNid(uncommittedCNidsNoChecksItr.nid()).toString());
                      }
                   }
+
                   LastChange.touchComponents(cNidSet);
                   Bdb.getSapDb().commit(Long.MIN_VALUE);
                   Bdb.getSapDb().commit(Long.MIN_VALUE);
@@ -338,6 +339,17 @@ public class BdbCommitManager {
    }
 
    public static boolean commit() {
+      try {
+         I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
+
+         if (frameConfig != null) {
+            return commit(frameConfig.getDbConfig().getUserChangesChangeSetPolicy(),
+                          frameConfig.getDbConfig().getChangeSetWriterThreading());
+         }
+      } catch (Exception ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      }
+
       return commit(ChangeSetPolicy.MUTABLE_ONLY, ChangeSetWriterThreading.SINGLE_THREAD);
    }
 
