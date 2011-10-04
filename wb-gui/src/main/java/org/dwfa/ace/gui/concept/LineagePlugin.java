@@ -54,12 +54,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
@@ -169,7 +164,11 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
       DefaultTreeModel       model = (DefaultTreeModel) lineageTree.getModel();
       DefaultMutableTreeNode root  = new DefaultMutableTreeNode("ROOT");
 
-      model.setRoot(root);
+      try {
+        model.setRoot(root);
+      } catch (EmptyStackException ex) {
+          ex.printStackTrace();
+      }
 
       RelAssertionType relAssertionType = RelAssertionType.INFERRED;
 

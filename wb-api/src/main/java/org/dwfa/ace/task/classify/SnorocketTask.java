@@ -74,6 +74,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import java.util.HashSet;
+import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -807,7 +808,18 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         cRocketSnoRels = null; // :MEMORY:
 
         SnoQuery.setDirty(true);
-        config.fireCommit();
+        if (SwingUtilities.isEventDispatchThread()) {
+            config.fireCommit();
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    config.fireCommit();
+                }
+            });
+        }
+        
 
         return Condition.CONTINUE;
     }
