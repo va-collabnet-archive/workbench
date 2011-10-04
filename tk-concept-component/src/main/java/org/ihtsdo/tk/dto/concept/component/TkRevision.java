@@ -144,7 +144,12 @@ public abstract class TkRevision implements I_VersionExternally {
                ComponentBI component = Ts.get().getComponent(nid);
 
                sb.append("comp: '");
-               sb.append(component.toUserString());
+               if (component != null) {
+                   sb.append(component.toUserString());
+               } else {
+                   sb.append("null");
+               }
+               
                sb.append("' ");
                sb.append(nid);
                sb.append(" ");
