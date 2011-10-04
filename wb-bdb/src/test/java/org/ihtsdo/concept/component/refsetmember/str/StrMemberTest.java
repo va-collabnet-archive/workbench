@@ -116,7 +116,6 @@ public class StrMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.revisions = new RevisionSet(1);
 
         StrRevision rev = new StrRevision(); 
@@ -138,7 +137,6 @@ public class StrMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.revisions = new RevisionSet(1);
 
         StrRevision rev = new StrRevision(); 

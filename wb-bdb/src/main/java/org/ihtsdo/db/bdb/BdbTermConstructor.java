@@ -177,7 +177,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             r.enclosingConceptNid = c.getNid();
             r.nid = Bdb.uuidToNid(blueprint.getComponentUuid());
             Bdb.getNidCNidMap().setCNidForNid(c.getNid(), r.nid);
-            r.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+            r.setPrimordialUuid(blueprint.getComponentUuid());
             try {
                 r.setDestinationNid(blueprint.getDestNid());
             } catch (PropertyVetoException ex) {
@@ -284,7 +284,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             d.enclosingConceptNid = c.getNid();
             d.nid = Bdb.uuidToNid(blueprint.getComponentUuid());
             Bdb.getNidCNidMap().setCNidForNid(c.getNid(), d.nid);
-            d.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+            d.setPrimordialUuid(blueprint.getComponentUuid());
             d.setTypeNid(blueprint.getTypeNid());
             d.primordialSapNid = Integer.MIN_VALUE;
             d.setLang(blueprint.getLang());
@@ -367,7 +367,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             img.enclosingConceptNid = c.getNid();
             img.nid = Bdb.uuidToNid(blueprint.getComponentUuid());
             Bdb.getNidCNidMap().setCNidForNid(c.getNid(), img.nid);
-            img.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+            img.setPrimordialUuid(blueprint.getComponentUuid());
             img.setTypeNid(blueprint.getTypeNid());
             img.setFormat(blueprint.getFormat());
             img.setImage(blueprint.getDataBytes());
@@ -461,7 +461,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         }
 
         a.setDefined(blueprint.isDefined());
-        a.primordialUNid = Bdb.getUuidsToNidMap().getUNid(blueprint.getComponentUuid());
+        a.setPrimordialUuid(blueprint.getComponentUuid());
 
         boolean primoridal = true;
         for (int p : ec.getEditPaths()) {

@@ -117,7 +117,6 @@ public class LongMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.revisions = new RevisionSet(1);
 
         LongRevision rev = new LongRevision(); 
@@ -139,7 +138,6 @@ public class LongMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.revisions = new RevisionSet(1);
 
         LongRevision rev = new LongRevision(); 

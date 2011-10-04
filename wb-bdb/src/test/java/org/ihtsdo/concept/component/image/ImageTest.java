@@ -173,7 +173,6 @@ public class ImageTest {
 
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.versions = null; 
         
         return obj; 
@@ -194,7 +193,6 @@ public class ImageTest {
 
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.versions = null; 
         
         return obj; 

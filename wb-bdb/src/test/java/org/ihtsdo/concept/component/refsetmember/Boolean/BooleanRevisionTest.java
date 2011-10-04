@@ -121,7 +121,6 @@ public class BooleanRevisionTest {
          
         member.nid = 1;
         member.primordialSapNid = 1; 
-        member.primordialUNid = 1;
 
         obj.primordialComponent = member; 
         obj.sapNid = 1; 
@@ -139,8 +138,7 @@ public class BooleanRevisionTest {
          
         member.nid = 2;
         member.primordialSapNid = 2; 
-        member.primordialUNid = 2;
-
+ 
         obj.primordialComponent = member; 
         obj.sapNid = 2; 
         

@@ -116,7 +116,6 @@ public class CidStrMemberTest {
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
-        obj.primordialUNid = 1;
         obj.revisions = new RevisionSet(1);
 
         CidStrRevision rev = new CidStrRevision(); 
@@ -139,7 +138,6 @@ public class CidStrMemberTest {
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 2;
         obj.revisions = new RevisionSet(1);
 
         CidStrRevision rev = new CidStrRevision(); 

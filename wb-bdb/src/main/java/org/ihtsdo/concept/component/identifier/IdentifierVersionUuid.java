@@ -12,22 +12,24 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 public class IdentifierVersionUuid extends IdentifierVersion {
 
-    private int uNid;
+    private long msb;
+    private long lsb;
 
     @Override
     public final boolean readyToWriteIdentifier() {
-        assert uNid != Integer.MAX_VALUE: toString();
         return true;
     }
 
     public IdentifierVersionUuid(TupleInput input) {
         super(input);
-        uNid = input.readInt();
+        msb = input.readLong();
+        lsb = input.readLong();
     }
 
     public IdentifierVersionUuid(TkIdentifierUuid idv) {
         super(idv);
-        uNid = Bdb.getUuidsToNidMap().getUNid(idv.getDenotation());
+        msb = idv.getDenotation().getMostSignificantBits();
+        lsb = idv.getDenotation().getLeastSignificantBits();
     }
 
     public IdentifierVersionUuid() {
@@ -36,7 +38,8 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 
     public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int authorNid, int pathNid, long time) {
         super(statusNid, authorNid, pathNid, time);
-        uNid = Bdb.getUuidsToNidMap().getUNid((UUID) another.getDenotation());
+        msb = another.msb;
+        lsb = another.lsb;
     }
 
     public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid,
@@ -51,23 +54,25 @@ public class IdentifierVersionUuid extends IdentifierVersion {
 
     @Override
     protected void writeSourceIdToBdb(TupleOutput output) {
-        output.writeInt(uNid);
+        output.writeLong(msb);
+        output.writeLong(lsb);
     }
 
     public UUID getUuid() {
-        return Bdb.getUuidDb().getUuid(uNid);
+        return new UUID(msb, lsb);
     }
 
     @Override
-    public Object getDenotation() {
-        return Bdb.getUuidDb().getUuid(uNid);
+    public UUID getDenotation() {
+        return getUuid();
     }
 
     @Override
     public void setDenotation(Object sourceDenotation) {
         if (sourceDenotation instanceof UUID) {
             UUID uuid = (UUID) sourceDenotation;
-            uNid = Bdb.getUuidsToNidMap().getUNid(uuid);
+        msb = uuid.getMostSignificantBits();
+        lsb = uuid.getLeastSignificantBits();
         }
     }
 
@@ -77,10 +82,10 @@ public class IdentifierVersionUuid extends IdentifierVersion {
      */
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
-        buf.append(this.getClass().getSimpleName() + ": ");
-        buf.append("uuid:" + getUuid());
+        buf.append(this.getClass().getSimpleName()).append(": ");
+        buf.append("uuid:").append(getUuid());
         buf.append(" ");
         buf.append(super.toString());
         return buf.toString();
@@ -93,9 +98,17 @@ public class IdentifierVersionUuid extends IdentifierVersion {
         }
         if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
             IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
-            return this.uNid == another.uNid && super.equals(another);
+            return this.msb == another.msb && 
+                    this.lsb == another.lsb && super.equals(another);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + (int) (this.msb ^ (this.msb >>> 32));
+        return hash;
     }
 
     @Override

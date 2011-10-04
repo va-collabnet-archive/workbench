@@ -12,8 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
@@ -252,7 +250,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public List<UUID> getUuidsForNid(int nid) {
+    public List<UUID> getUuidsForNid(int nid) throws IOException {
         return Bdb.getUuidsToNidMap().getUuidsForNid(nid);
     }
 

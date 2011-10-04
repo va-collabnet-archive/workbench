@@ -34,8 +34,6 @@ import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.db.bdb.id.UuidBdb;
-import org.ihtsdo.db.bdb.id.UuidsToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.db.bdb.xref.Xref;
 import org.ihtsdo.db.util.NidPair;
@@ -63,6 +61,7 @@ import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 
 public class Bdb {
 
@@ -70,8 +69,7 @@ public class Bdb {
     public static AtomicLong gVersion = new AtomicLong();
     private static Bdb readOnly;
     private static Bdb mutable;
-    private static UuidBdb uuidDb;
-    private static UuidsToNidMapBdb uuidsToNidMapDb;
+    private static UuidToNidMapBdb uuidsToNidMapDb;
     public static NidCNidMapBdb nidCidMapDb;
     private static StatusAtPositionBdb statusAtPositionDb;
     private static ConceptBdb conceptDb;
@@ -275,10 +273,8 @@ public class Bdb {
             readOnly = new Bdb(readOnlyExists, readOnlyDir);
             inform(activity, "loading property database...");
             propDb = new PropertiesBdb(readOnly, mutable);
-            inform(activity, "loading uuid database...");
-            uuidDb = new UuidBdb(readOnly, mutable);
             inform(activity, "loading uuid to nid map database...");
-            uuidsToNidMapDb = new UuidsToNidMapBdb(readOnly, mutable);
+            uuidsToNidMapDb = new UuidToNidMapBdb(readOnly, mutable);
 
             inform(activity, "loading nid->cid database...");
             nidCidMapDb = new NidCNidMapBdb(readOnly, mutable);
@@ -443,7 +439,7 @@ public class Bdb {
         return Concept.get(cNid);
     }
 
-    public static UuidsToNidMapBdb getUuidsToNidMap() {
+    public static UuidToNidMapBdb getUuidsToNidMap() {
         return uuidsToNidMapDb;
     }
 
@@ -485,7 +481,6 @@ public class Bdb {
                 activity.setMaximum(9);
                 setProperty(G_VERSION, Long.toString(gVersion.incrementAndGet()));
                 activity.setProgressInfoLower("Writing uuidDb... ");
-                uuidDb.sync();
                 activity.setValue(1);
                 activity.setProgressInfoLower("Writing uuidsToNidMapDb... ");
                 uuidsToNidMapDb.sync();
@@ -596,7 +591,6 @@ public class Bdb {
                 activity.setProgressInfoLower("9/11: Starting mutable.bdbEnv.sync().");
                 mutable.bdbEnv.sync();
                 activity.setProgressInfoLower("10/11: mutable.bdbEnv.sync() finished.");
-                uuidDb.close();
                 uuidsToNidMapDb.close();
                 nidCidMapDb.close();
                 statusAtPositionDb.close();
@@ -617,7 +611,6 @@ public class Bdb {
         }
         mutable = null;
         readOnly = null;
-        uuidDb = null;
         uuidsToNidMapDb = null;
         nidCidMapDb = null;
         statusAtPositionDb = null;
@@ -640,10 +633,6 @@ public class Bdb {
 
     public static int uuidToNid(UUID... uuids) {
         return uuidsToNidMapDb.uuidsToNid(uuids);
-    }
-
-    public static UuidBdb getUuidDb() {
-        return uuidDb;
     }
 
     public static ComponentBI getComponent(int nid) throws IOException {

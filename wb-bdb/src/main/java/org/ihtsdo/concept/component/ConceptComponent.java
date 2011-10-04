@@ -24,7 +24,6 @@ import org.dwfa.ace.utypes.UniversalAceIdentification;
 import org.dwfa.ace.utypes.UniversalAceIdentificationPart;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.HashFunction;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.Position;
 
@@ -101,7 +100,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    public int                                       nid;
 
    /**
-    * primordial: first created or developed Sap = status, author, position
+    * primordial: first created or developed Sap = status, author, position; position = path, time;
     */
    public int primordialSapNid;
 
@@ -109,7 +108,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     * primordial: first created or developed
     *
     */
-   public int               primordialUNid;
+   
+   protected long primordialMsb;
+   protected long primordialLsb;
+   
+   public void setPrimordialUuid(UUID pUuid) {
+       this.primordialMsb = pUuid.getMostSignificantBits();
+       this.primordialLsb = pUuid.getLeastSignificantBits();
+   }
+   
    public RevisionSet<R, C> revisions;
 
    //~--- constructors --------------------------------------------------------
@@ -143,7 +150,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                                     + "\nprocessing: " + this.toString());
       }
 
-      assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
       assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
    }
 
@@ -173,9 +179,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       this.primordialSapNid = Bdb.getSapNid(eComponent);
       assert primordialSapNid > 0 : " Processing nid: " + enclosingConceptNid;
-      this.primordialUNid = Bdb.getUuidsToNidMap().getUNid(eComponent.getPrimordialComponentUuid());
+      this.primordialMsb = eComponent.getPrimordialComponentUuid().getMostSignificantBits();
+      this.primordialLsb = eComponent.getPrimordialComponentUuid().getLeastSignificantBits();
       convertId(eComponent.additionalIds);
-      assert this.primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
       assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
 
       if (eComponent.getAnnotations() != null) {
@@ -510,7 +516,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          return false;
       }
 
-      if (this.primordialUNid != another.primordialUNid) {
+      if (this.primordialLsb != another.primordialLsb) {
+         return false;
+      }
+
+      if (this.primordialMsb != another.primordialMsb) {
          return false;
       }
 
@@ -620,7 +630,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    @Override
    public int hashCode() {
-      return HashFunction.hashCode(new int[] { nid, primordialSapNid });
+      return Hashcode.compute(new int[] { nid, primordialSapNid });
    }
 
    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
@@ -755,8 +765,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    public final void readComponentFromBdb(TupleInput input) {
-      nid              = input.readInt();
-      primordialSapNid = input.readInt();
+      this.nid              = input.readInt();
+      this.primordialMsb = input.readLong();
+      this.primordialLsb = input.readLong();
+
+      this.primordialSapNid = input.readInt();
       assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
       readIdentifierFromBdb(input);
       readAnnotationsFromBdb(input);
@@ -768,7 +781,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    private void readIdentifierFromBdb(TupleInput input) {
 
       // nid, list size, and conceptNid are read already by the binder...
-      primordialUNid = input.readInt();
 
       int listSize = input.readShort();
 
@@ -899,7 +911,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       buf.append("nid:");
       buf.append(nid);
       buf.append(" pUuid:");
-      buf.append(Bdb.getUuidDb().getUuid(primordialUNid));
+      buf.append(new UUID(primordialMsb, primordialLsb));
       buf.append(" sap: ");
 
       if (primordialSapNid == Integer.MIN_VALUE) {
@@ -973,10 +985,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                        + "\t\tanother.primordialSapNid = ").append(another.primordialSapNid).append("\n");
       }
 
-      if (this.primordialUNid != another.primordialUNid) {
-         buf.append("\tConceptComponent.primordialUNid not equal: \n"
-                    + "\t\tthis.primordialUNid = ").append(this.primordialUNid).append("\n"
-                       + "\t\tanother.primordialUNid = ").append(another.primordialUNid).append("\n");
+      if (this.primordialMsb != another.primordialMsb) {
+         buf.append("\tConceptComponent.primordialMsb not equal: \n"
+                    + "\t\tthis.primordialMsb = ").append(this.primordialMsb).append("\n"
+                       + "\t\tanother.primordialMsb = ").append(another.primordialMsb).append("\n");
+      }
+
+      if (this.primordialLsb != another.primordialLsb) {
+         buf.append("\tConceptComponent.primordialLsb not equal: \n"
+                    + "\t\tthis.primordialLsb = ").append(this.primordialLsb).append("\n"
+                       + "\t\tanother.primordialLsb = ").append(another.primordialLsb).append("\n");
       }
 
       if (this.additionalIdVersions != null) {
@@ -1039,6 +1057,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
       assert primordialSapNid != Integer.MAX_VALUE;
       output.writeInt(nid);
+      output.writeLong(primordialMsb);
+      output.writeLong(primordialLsb);
       output.writeInt(primordialSapNid);
       writeIdentifierToBdb(output, maxReadOnlyStatusAtPositionNid);
       writeAnnotationsToBdb(output, maxReadOnlyStatusAtPositionNid);
@@ -1046,10 +1066,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    private void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-      assert primordialSapNid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
-      assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
-      assert primordialUNid != Integer.MIN_VALUE : "Processing nid: " + enclosingConceptNid;
-      output.writeInt(primordialUNid);
 
       List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
 
@@ -1216,12 +1232,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    @Override
    public final Object getDenotation() {
-      return Bdb.getUuidDb().getUuid(primordialUNid);
+      return new UUID(primordialMsb, primordialLsb);
    }
 
    public Object getDenotation(int authorityNid) throws IOException, TerminologyException {
       if (getAuthorityNid() == authorityNid) {
-         return Bdb.getUuidDb().getUuid(primordialUNid);
+         return new UUID(primordialMsb, primordialLsb);
       }
 
       for (I_IdPart id : getMutableIdParts()) {
@@ -1388,7 +1404,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    @Override
    public UUID getPrimUuid() {
-      return Bdb.getUuidDb().getUuid(primordialUNid);
+      return new UUID(primordialMsb, primordialLsb);
    }
 
    protected int getPrimordialStatusAtPositionNid() {
@@ -1539,7 +1555,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    public final List<UUID> getUUIDs() {
       List<UUID> returnValues = new ArrayList<UUID>();
 
-      returnValues.add(Bdb.getUuidDb().getUuid(primordialUNid));
+      returnValues.add(new UUID(primordialMsb, primordialLsb));
 
       if (additionalIdVersions != null) {
          for (IdentifierVersion idv : additionalIdVersions) {
@@ -1696,8 +1712,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     */
    @Override
    public boolean isSetup() {
-      assert primordialUNid != Integer.MIN_VALUE;
-
       return primordialSapNid != Integer.MAX_VALUE;
    }
 
@@ -2291,7 +2305,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       @Override
       public UUID getPrimUuid() {
-         return Bdb.getUuidDb().getUuid(primordialUNid);
+         return new UUID(primordialMsb, primordialLsb);
       }
 
       @Override
