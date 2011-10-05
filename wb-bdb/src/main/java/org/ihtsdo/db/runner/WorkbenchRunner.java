@@ -2,7 +2,6 @@ package org.ihtsdo.db.runner;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import java.util.Collection;
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
@@ -42,6 +41,7 @@ import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
+import org.ihtsdo.taxonomy.NodeFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -71,6 +71,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -335,6 +336,7 @@ public class WorkbenchRunner {
                try {
                   System.out.println("Starting bdb shutdown from shutdown hook...");
                   System.out.flush();
+                  NodeFactory.close();
                   Bdb.close();
                } catch (InterruptedException e) {
                   e.printStackTrace();
@@ -580,42 +582,6 @@ public class WorkbenchRunner {
       }
    }
 
-    private void setupIsaCache(Collection<IsaCoordinate> isaCoordinates) throws Exception, ComputationCanceled, InterruptedException, IOException {
-        // Startup queues in profile sub-directories here...
-        // Isa Cache Setup start
-        long          isaStartTime = System.currentTimeMillis();
-        ActivityPanel activityIsa  = new ActivityPanel(null, true);
-
-        activityIsa.setIndeterminate(true);
-        activityIsa.setStopButtonVisible(false);
-        activityIsa.setProgressInfoUpper("Isa Cache pre-computation");
-        activityIsa.setProgressInfoLower("Setting up isa cache...");
-        ActivityViewer.addActivity(activityIsa);
-
-        List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
-
-        if (isaCacheCreateOnStartUp) {
-              for (IsaCoordinate isac : isaCoordinates) {
-                 latches.add(Terms.get().setupIsaCache(isac).getLatch());
-              }
-           
-
-           // Await isa cache finalization
-           for (CountDownLatch latch : latches) {
-              latch.await();
-           }
-
-           long   isaLoadTime = System.currentTimeMillis() - isaStartTime;
-           String elapsedStr  = TimeUtil.getElapsedTimeString(isaLoadTime);
-
-           activityIsa.setProgressInfoLower("Elapsed: " + elapsedStr);
-           activityIsa.complete();
-        } else {
-           activityIsa.setProgressInfoLower("Configured to not generate Isa Cache on startup");
-           activityIsa.complete();
-        }
-    }
-
    //~--- methods -------------------------------------------------------------
 
    private void checkCustom() {
@@ -709,7 +675,7 @@ public class WorkbenchRunner {
    }
 
    private void handleNormalFrame(final I_ConfigAceFrame ace) {
-       SwingUtilities.invokeLater(new Runnable() {
+      SwingUtilities.invokeLater(new Runnable() {
          @Override
          public void run() {
             try {
@@ -732,15 +698,16 @@ public class WorkbenchRunner {
                              ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
                   ace.setViewPositions(viewPositions);
                }
+
                setupIsaCache(ace.getViewCoordinate().getIsaCoordinates());
 
                AceFrame af = new AceFrame(args, lc, ace, startup);
+
                af.setVisible(true);
             } catch (Exception e) {
                AceLog.getAppLog().alertAndLogException(e);
             }
          }
-
       });
    }
 
@@ -761,6 +728,43 @@ public class WorkbenchRunner {
                processFile(f, lc);
             }
          }
+      }
+   }
+
+   private void setupIsaCache(Collection<IsaCoordinate> isaCoordinates)
+           throws Exception, ComputationCanceled, InterruptedException, IOException {
+
+      // Startup queues in profile sub-directories here...
+      // Isa Cache Setup start
+      long          isaStartTime = System.currentTimeMillis();
+      ActivityPanel activityIsa  = new ActivityPanel(null, true);
+
+      activityIsa.setIndeterminate(true);
+      activityIsa.setStopButtonVisible(false);
+      activityIsa.setProgressInfoUpper("Isa Cache pre-computation");
+      activityIsa.setProgressInfoLower("Setting up isa cache...");
+      ActivityViewer.addActivity(activityIsa);
+
+      List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
+
+      if (isaCacheCreateOnStartUp) {
+         for (IsaCoordinate isac : isaCoordinates) {
+            latches.add(Terms.get().setupIsaCache(isac).getLatch());
+         }
+
+         // Await isa cache finalization
+         for (CountDownLatch latch : latches) {
+            latch.await();
+         }
+
+         long   isaLoadTime = System.currentTimeMillis() - isaStartTime;
+         String elapsedStr  = TimeUtil.getElapsedTimeString(isaLoadTime);
+
+         activityIsa.setProgressInfoLower("Elapsed: " + elapsedStr);
+         activityIsa.complete();
+      } else {
+         activityIsa.setProgressInfoLower("Configured to not generate Isa Cache on startup");
+         activityIsa.complete();
       }
    }
 

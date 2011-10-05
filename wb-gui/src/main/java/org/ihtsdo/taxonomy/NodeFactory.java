@@ -42,6 +42,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
@@ -56,8 +59,8 @@ import javax.swing.tree.TreePath;
  * @author kec
  */
 public class NodeFactory {
-   private static ThreadGroup    nodeFactoryThreadGroup = new ThreadGroup("NodeFactory ");
-   public static ExecutorService taxonomyExecutors      =
+   private static final ThreadGroup nodeFactoryThreadGroup = new ThreadGroup("NodeFactory ");
+   public static ExecutorService    taxonomyExecutors      =
       Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
                                    new NamedThreadFactory(nodeFactoryThreadGroup, "Taxonomy "));
    public static ExecutorService pathExpanderExecutors =
@@ -92,6 +95,29 @@ public class NodeFactory {
 
       tree.addTreeExpansionListener(l);
       tree.addTreeWillExpandListener(l);
+   }
+
+   public static void close() {
+      try {
+         pathExpanderExecutors.shutdown();
+         pathExpanderExecutors.awaitTermination(2, TimeUnit.MINUTES);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      try {
+         taxonomyExecutors.shutdown();
+         taxonomyExecutors.awaitTermination(2, TimeUnit.MINUTES);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+      }
+
+      try {
+         childFinderExecutors.shutdown();
+         childFinderExecutors.awaitTermination(2, TimeUnit.MINUTES);
+      } catch (InterruptedException ex) {
+         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+      }
    }
 
    public void collapseNode(TaxonomyNode node) {
