@@ -428,7 +428,8 @@ public class SnorocketMojo extends AbstractMojo {
 
             // WRITEBACK RESULTS
             startTime = System.currentTimeMillis();
-            logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cViewPathNid));
+            //logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cViewPathNid));
+            logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cEditPathNid));
 
             // Commit
             // :!!!: tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
