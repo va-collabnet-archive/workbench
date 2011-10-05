@@ -1160,13 +1160,13 @@ public class DiffBase {
                 System.out.println("A:  " + a);
             }
         }
-        if (noDescendantsV1
+        if (noDescendantsV1 && a1 != null
                 && a1.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
-            return;
+            a1 = null;
         }
-        if (noDescendantsV2
+        if (noDescendantsV2 && a2 != null
                 && a2.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
-            return;
+            a2 = null;
         }
         if (v1_concept_status_filter_int.size() > 0 && a1 != null
                 && !v1_concept_status_filter_int.contains(a1.getStatusNid())) {
@@ -1492,8 +1492,8 @@ public class DiffBase {
             if (member.getTime() > v1_id) {
                 members1.remove(member);
             }
-            if(noDescendantsV1
-                && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))){
+            if (noDescendantsV1
+                    && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
                 members1.remove(member);
             }
         }
@@ -1501,8 +1501,8 @@ public class DiffBase {
             if (member.getTime() > v2_id) {
                 members2.remove(member);
             }
-            if(noDescendantsV2
-                && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))){
+            if (noDescendantsV2
+                    && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
                 members2.remove(member);
             }
         }

@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,6 +40,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -62,9 +64,11 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
+import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.ihtsdo.arena.ScrollablePanel;
 import org.ihtsdo.arena.ScrollablePanel.ScrollDirection;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
@@ -376,7 +380,7 @@ public class CreateReport extends AbstractTask {
                 workflowPanel.remove(components[i]);
             }
             workflowPanel.setVisible(true);
-            
+
             ScrollablePanel scrollPanel = new ScrollablePanel(new GridBagLayout(), ScrollDirection.TOP_TO_BOTTOM);
             GridBagConstraints c = new GridBagConstraints();
             c.fill = GridBagConstraints.BOTH;
@@ -560,22 +564,39 @@ public class CreateReport extends AbstractTask {
             scrollPanel.add(v2RelStatusList, c);
 
             c.gridy++;
-            c.ipady = 0;
+            c.gridx = 0;
+            c.weightx = 1.0;
             c.gridwidth = 1;
             c.weightx = 0.0;
-            JCheckBox addedConcepts = new JCheckBox("Added Concepts");
-            addedConcepts.addItemListener(new AddedConceptsItemListener());
-            scrollPanel.add(addedConcepts, c);
+            JCheckBox changedConceptAuth = new JCheckBox("<html>Changed Concept <br>(filtered by Author)");
+            changedConceptAuth.addItemListener(new ChangedConceptAuthorItemListener());
+            scrollPanel.add(changedConceptAuth, c);
 
             c.gridx = 1;
+            c.weightx = 1.0;
             c.gridwidth = 1;
-            c.weightx = 0.0;
-            JCheckBox deletedConcepts = new JCheckBox("Deleted Concepts");
-            deletedConcepts.addItemListener(new DeletedConceptsItemListener());
-            scrollPanel.add(deletedConcepts, c);
+            JCheckBox changedDescAuth = new JCheckBox("<html>Changed Description <br>(filtered by Author)");
+            changedDescAuth.addItemListener(new ChangedDescAuthorItemListener());
+            scrollPanel.add(changedDescAuth, c);
 
-            c.gridx = 0;
             c.gridy++;
+            c.gridx = 0;
+            c.weightx = 1.0;
+            c.gridwidth = 1;
+            JCheckBox changedRelAuth = new JCheckBox("<html>Changed Relationship <br>(filtered by Author)");
+            changedRelAuth.addItemListener(new ChangedRelAuthorItemListener());
+            scrollPanel.add(changedRelAuth, c);
+
+
+            c.gridx = 1;
+            c.weightx = 1.0;
+            c.gridwidth = 1;
+            JCheckBox changedRefexAuth = new JCheckBox("<html>Changed Refex <br>(filtered by Author)");
+            changedRefexAuth.addItemListener(new ChangedRefexAuthorItemListener());
+            scrollPanel.add(changedRefexAuth, c);
+
+            c.gridy++;
+            c.gridx = 0;
             c.gridwidth = 1;
             c.weightx = 0.0;
             JCheckBox addedConceptsRefex = new JCheckBox("Added Concepts to Refex");
@@ -591,43 +612,27 @@ public class CreateReport extends AbstractTask {
 
             c.gridy++;
             c.gridx = 0;
+            c.gridwidth = 1;
+            c.weightx = 0.0;
+            JCheckBox addedConcepts = new JCheckBox("Added Concepts");
+            addedConcepts.addItemListener(new AddedConceptsItemListener());
+            scrollPanel.add(addedConcepts, c);
+
+            c.gridx = 1;
+            c.gridwidth = 1;
+            c.weightx = 0.0;
+            JCheckBox deletedConcepts = new JCheckBox("Deleted Concepts");
+            deletedConcepts.addItemListener(new DeletedConceptsItemListener());
+            scrollPanel.add(deletedConcepts, c);
+
+            c.gridy++;
+            c.gridx = 0;
             c.weightx = 1.0;
             c.gridwidth = 1;
             c.weightx = 0.0;
             JCheckBox changedStatus = new JCheckBox("Changed Concept Status");
             changedStatus.addItemListener(new ChangedConceptStatusItemListener());
             scrollPanel.add(changedStatus, c);
-
-            c.gridx = 1;
-            c.weightx = 1.0;
-            c.gridwidth = 1;
-            c.weightx = 0.0;
-            JCheckBox changedConceptAuth = new JCheckBox("<html>Changed Concept <br>(filtered by Author)");
-            changedConceptAuth.addItemListener(new ChangedConceptAuthorItemListener());
-            scrollPanel.add(changedConceptAuth, c);
-
-            c.gridy++;
-            c.gridx = 0;
-            c.weightx = 1.0;
-            c.gridwidth = 1;
-            JCheckBox changedDescAuth = new JCheckBox("<html>Changed Description <br>(filtered by Author)");
-            changedDescAuth.addItemListener(new ChangedDescAuthorItemListener());
-            scrollPanel.add(changedDescAuth, c);
-
-            c.gridx = 1;
-            c.weightx = 1.0;
-            c.gridwidth = 1;
-            JCheckBox changedRelAuth = new JCheckBox("<html>Changed Relationship <br>(filtered by Author)");
-            changedRelAuth.addItemListener(new ChangedRelAuthorItemListener());
-            scrollPanel.add(changedRelAuth, c);
-
-            c.gridy++;
-            c.gridx = 0;
-            c.weightx = 1.0;
-            c.gridwidth = 1;
-            JCheckBox changedRefexAuth = new JCheckBox("<html>Changed Refex <br>(filtered by Author)");
-            changedRefexAuth.addItemListener(new ChangedRefexAuthorItemListener());
-            scrollPanel.add(changedRefexAuth, c);
 
             c.gridx = 1;
             c.weightx = 1.0;
@@ -752,15 +757,15 @@ public class CreateReport extends AbstractTask {
             c.weightx = 0;
             c.weighty = 1;
             scrollPanel.add(new JPanel(), c);
-            
+
             //make scroller
             JScrollPane scroller = new JScrollPane(scrollPanel);
             scroller.setAutoscrolls(false);
             scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
             scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            scroller.setMinimumSize(new Dimension(475,475));
+            scroller.setMinimumSize(new Dimension(475, 475));
             scroller.setPreferredSize(new Dimension(475, 700));
-            
+
             workflowPanel.add(scroller);
             GuiUtil.tickle(workflowPanel);
         }
@@ -1204,12 +1209,56 @@ public class CreateReport extends AbstractTask {
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent e) {
-            panel.setVisible(false);
-            workflowPanel.setVisible(false);
-            returnCondition = Condition.CONTINUE;
-            done = true;
-            synchronized (CreateReport.this) {
-                CreateReport.this.notifyAll();
+            boolean checked = false;
+            if (v1 == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Please enter a start date.", "",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (v2 == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Please enter an end date.", "",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (v1PathList.getModel().getElementAt(0) == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Please enter path for v1.", "",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (v2PathList.getModel().getElementAt(0) == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Please enter path for v2.", "",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (taxonomyList.getModel().getElementAt(0) == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Please enter a parent concept.", "",
+                        JOptionPane.ERROR_MESSAGE);
+            } else if (v1 != null && v2 != null) {
+                try {
+                    ThinVersionHelper.convert(v1);
+                    checked = true;
+                } catch (ParseException ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>Please enter a valid date for v1."
+                            + "<br> YYYY.MM.DD HH:mm:SS", "",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+                try {
+                    ThinVersionHelper.convert(v2);
+                } catch (ParseException ex) {
+                    checked = false;
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>Please enter a valid date for v2."
+                            + "<br> YYYY.MM.DD HH:mm:SS", "",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            if (checked) {
+                panel.setVisible(false);
+                workflowPanel.setVisible(false);
+                returnCondition = Condition.CONTINUE;
+                done = true;
+                synchronized (CreateReport.this) {
+                    CreateReport.this.notifyAll();
+                }
             }
         }
     }
