@@ -32,7 +32,6 @@ import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
-import org.ihtsdo.lucene.WfHxLuceneWriterAccessor.WfHxLuceneWriter;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.je.DatabaseException;
@@ -222,8 +221,10 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
             		}
 
             		if (wfMembersToCommit.size() > 0) {
-		                WfHxLuceneWriter writer = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
-		                writer.run();
+            			Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+		                if (luceneWriter != null) {
+		                	luceneWriter.run();
+		                }
             		}
         		}
 	        } catch (Exception e) {

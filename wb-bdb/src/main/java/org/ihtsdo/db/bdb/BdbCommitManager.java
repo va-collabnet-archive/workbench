@@ -204,24 +204,22 @@ public class BdbCommitManager {
 
       addUncommitted(member.getEnclosingConcept());
 
-      if ((wfHistoryRefsetId != Integer.MAX_VALUE) && (wfHistoryRefsetId == 0)) {
-         if (wfHistoryRefsetId == 0) {
-            if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
-               try {
-                  wfHistoryRefsetId =
-                     Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids());
-               } catch (Exception e) {
-                  AceLog.getAppLog().log(Level.WARNING,
-                                         "Unable to access Workflow History Refset UUID with error: "
-                                         + e.getMessage());
-               }
-            } else {
-               wfHistoryRefsetId = Integer.MAX_VALUE;
-            }
-         }
+      if (wfHistoryRefsetId == 0) {
+    	  if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
+    		  try {
+    			  wfHistoryRefsetId =
+    				  Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+    		  } catch (Exception e) {
+    			  AceLog.getAppLog().log(Level.WARNING,
+                                     	 "Unable to access Workflow History Refset UUID with error: " +
+                                     	 e.getMessage());
+    		  }
+    	  } else {
+    		  wfHistoryRefsetId = Integer.MAX_VALUE;
+    	  }
       }
 
-      if (wfHistoryRefsetId == extension.getRefsetId()) {
+      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
          addUncommittedWfMemberId(extension);
       }
    }
@@ -521,11 +519,19 @@ public class BdbCommitManager {
                      uncommittedDescNids.clear();
                      luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
-                     Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
+                     if (uncommittedWfMemberIds.size() > 0) {
+	                     Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
+	
+	                     wfMembersToCommit.addAll(uncommittedWfMemberIds);
+	                     
+	                     Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+	                     if (luceneWriter != null) {
+	                    	 luceneWriterService.execute(luceneWriter);
+	                     }
 
-                     wfMembersToCommit.addAll(uncommittedWfMemberIds);
-                     luceneWriterService.execute(WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit));
-                     uncommittedWfMemberIds.clear();
+	                     uncommittedWfMemberIds.clear();
+                     }
+                     
                      dataCheckMap.clear();
                   }
                }
@@ -714,11 +720,18 @@ public class BdbCommitManager {
 
             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
-            Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
+            if (uncommittedWfMemberIds.size() > 0) {
+                Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
-            wfMembersToCommit.addAll(uncommittedWfMemberIds);
-            luceneWriterService.execute(WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit));
-            uncommittedWfMemberIds.clear();
+                wfMembersToCommit.addAll(uncommittedWfMemberIds);
+
+                Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+                if (luceneWriter != null) {
+               	 	luceneWriterService.execute(luceneWriter);
+                }
+                
+                uncommittedWfMemberIds.clear();
+            }
             dataCheckMap.remove(c);
          }
       } catch (Exception e1) {
