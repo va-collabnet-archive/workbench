@@ -25,6 +25,7 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
+			<version>5.2.0.Final.IHTSDO</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
@@ -33,7 +34,6 @@
 		<dependency>
 			<groupId>org.jbpm</groupId>
 			<artifactId>jbpm-bpmn2</artifactId>
-			<version>5.1.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.drools</groupId>
