@@ -34,6 +34,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -46,179 +48,186 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  */
 public class DialectHelper {
 
-   private static Map<Integer, Map<String, String>> variantMap = null;
-   private static Map<Integer, Set<String>> variantSetMap = null;
-   private static Lock initLock = new ReentrantLock();
+    private static Map<Integer, Map<String, String>> variantMap = null;
+    private static Map<Integer, Set<String>> variantSetMap = null;
+    private static Lock initLock = new ReentrantLock();
 
-   private static void lazyInit(int dialectOrLanguageNid)
-           throws UnsupportedDialectOrLanguage, IOException {
-      if (variantMap == null) {
-         initLock.lock();
-         try {
-            if (variantMap == null) {
-               HashMap<Integer, Map<String, String>> initialVariantMap =
-                       new HashMap<Integer, Map<String, String>>();
-               variantSetMap = new HashMap<Integer, Set<String>>();
-               ViewCoordinate vc = Ts.get().getMetadataVC();
-               TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
+    private static void lazyInit(int dialectOrLanguageNid)
+            throws UnsupportedDialectOrLanguage, IOException {
+        if (variantMap == null) {
+            initLock.lock();
+            try {
+                if (variantMap == null) {
+                    HashMap<Integer, Map<String, String>> initialVariantMap =
+                            new HashMap<Integer, Map<String, String>>();
+                    variantSetMap = new HashMap<Integer, Set<String>>();
+                    ViewCoordinate vc = Ts.get().getMetadataVC();
+                    ViewCoordinate vcAll = Ts.get().getMetadataVC().getVcWithAllStatusValues();
+                    TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
 
-               ConceptVersionBI enVariantTextRefsetC =
-                       Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataVC());
-               Collection<? extends RefexChronicleBI<?>> enVariants =
-                       enVariantTextRefsetC.getRefexes();
-               Set<String> variantSet = new HashSet<String>();
-               for (RefexChronicleBI<?> refex : enVariants) {
-                  RefexStrVersionBI variantText =
-                          (RefexStrVersionBI) refex.getVersion(vc);
-                  variantSet.add(variantText.getStr1());
-               }
-               variantSetMap.put(Language.EN.get(vc).getNid(), variantSet);
+                    ConceptVersionBI enVariantTextRefsetC =
+                            Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataVC());
+                    Collection<? extends RefexChronicleBI<?>> enVariants =
+                            enVariantTextRefsetC.getRefexes();
+                    Set<String> variantSet = new HashSet<String>();
+                    for (RefexChronicleBI<?> refex : enVariants) {
+                        RefexStrVersionBI variantText =
+                                (RefexStrVersionBI) refex.getVersion(vcAll);
+                        if (variantText.getStatusNid() == SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid() ||
+                                variantText.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+                            variantSet.add(variantText.getStr1());
+                        }
+                    }
+                    variantSetMap.put(Language.EN.get(vc).getNid(), variantSet);
 
-               addDialect(Language.EN_AU, vc, Language.EN_AU_TEXT_VARIANTS,
-                       ts, initialVariantMap);
-               addDialect(Language.EN_CA, vc, Language.EN_CA_TEXT_VARIANTS,
-                       ts, initialVariantMap);
-               addDialect(Language.EN_NZ, vc, Language.EN_NZ_TEXT_VARIANTS,
-                       ts, initialVariantMap);
-               addDialect(Language.EN_UK, vc, Language.EN_UK_TEXT_VARIANTS,
-                       ts, initialVariantMap);
-               addDialect(Language.EN_US, vc, Language.EN_US_TEXT_VARIANTS,
-                       ts, initialVariantMap);
-               DialectHelper.variantMap = initialVariantMap;
+                    addDialect(Language.EN_AU, vcAll, Language.EN_AU_TEXT_VARIANTS,
+                            ts, initialVariantMap);
+                    addDialect(Language.EN_CA, vcAll, Language.EN_CA_TEXT_VARIANTS,
+                            ts, initialVariantMap);
+                    addDialect(Language.EN_NZ, vcAll, Language.EN_NZ_TEXT_VARIANTS,
+                            ts, initialVariantMap);
+                    addDialect(Language.EN_UK, vcAll, Language.EN_UK_TEXT_VARIANTS,
+                            ts, initialVariantMap);
+                    addDialect(Language.EN_US, vcAll, Language.EN_US_TEXT_VARIANTS,
+                            ts, initialVariantMap);
+                    DialectHelper.variantMap = initialVariantMap;
+                }
+            } catch (ContraditionException ex) {
+                throw new IOException(ex);
+            } finally {
+                initLock.unlock();
             }
-         } catch (ContraditionException ex) {
+        }
+        if (!variantMap.containsKey(dialectOrLanguageNid)
+                && !variantSetMap.containsKey(dialectOrLanguageNid)) {
+            throw new UnsupportedDialectOrLanguage("nid: " + dialectOrLanguageNid);
+        }
+    }
+
+    private static void addDialect(ConceptSpec dialectSpec,
+            ViewCoordinate vc,
+            ConceptSpec varientsSpec,
+            TerminologySnapshotDI ts,
+            HashMap<Integer, Map<String, String>> initialVariantMap) throws ContraditionException, IOException {
+        ConceptVersionBI dialectC = dialectSpec.get(vc);
+        ConceptVersionBI variantTextRefsetC = varientsSpec.get(vc);
+
+        Collection<? extends RefexChronicleBI<?>> dialectVarients =
+                variantTextRefsetC.getCurrentRefsetMembers();
+        Map<String, String> variantDialectMap = new HashMap<String, String>();
+        for (RefexChronicleBI<?> refex : dialectVarients) {
+            RefexStrVersionBI dialectText = (RefexStrVersionBI) refex.getVersion(vc);
+            if (dialectText.getStatusNid() == SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid() ||
+                                dialectText.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+                RefexStrVersionBI variantText = (RefexStrVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
+                variantDialectMap.put(variantText.getStr1(), dialectText.getStr1());
+            }
+        }
+        initialVariantMap.put(dialectC.getNid(), variantDialectMap);
+    }
+
+    public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
+            int dialectNid, ViewCoordinate vc) throws IOException,
+            ContraditionException, UnsupportedDialectOrLanguage {
+        lazyInit(dialectNid);
+        if (isTextForDialect(desc.getText(), dialectNid)) {
+            return false;
+        }
+        String dialectText = makeTextForDialect(desc.getText(), dialectNid);
+        ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
+                desc.getConceptNid());
+        for (DescriptionVersionBI d : concept.getDescsActive()) {
+            if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasDialectVariants(String text, int languageNid)
+            throws UnsupportedDialectOrLanguage, IOException {
+        lazyInit(languageNid);
+        String[] tokens = text.split("\\s+");
+        Set<String> dialectVariants = variantSetMap.get(languageNid);
+        for (String token : tokens) {
+            if (dialectVariants.contains(token.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isTextForDialect(String text, int dialectNid)
+            throws UnsupportedDialectOrLanguage, IOException {
+        lazyInit(dialectNid);
+        String[] tokens = text.split("\\s+");
+        Map<String, String> dialectVariants = variantMap.get(dialectNid);
+        for (String token : tokens) {
+            if (dialectVariants.containsKey(token.toLowerCase())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String makeTextForDialect(String text, int dialectNid)
+            throws UnsupportedDialectOrLanguage, IOException {
+        lazyInit(dialectNid);
+        String[] tokens = text.split("\\s+");
+        Map<String, String> dialectVariants = variantMap.get(dialectNid);
+        for (int i = 0; i < tokens.length; i++) {
+            if (dialectVariants.containsKey(tokens[i].toLowerCase())) {
+                boolean upperCase = Character.isUpperCase(tokens[i].charAt(0));
+                tokens[i] = dialectVariants.get(tokens[i].toLowerCase());
+                if (upperCase) {
+                    if (Character.isLowerCase(tokens[i].charAt(0))) {
+                        tokens[i] = Character.toUpperCase(tokens[i].charAt(0))
+                                + tokens[i].substring(1);
+                    }
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < tokens.length; i++) {
+            sb.append(tokens[i]);
+            if (i < tokens.length - 1) {
+                sb.append(' ');
+            }
+        }
+        return sb.toString();
+    }
+
+    public static DescriptionSpec getDescriptionSpecForDialect(
+            DescriptionVersionBI desc,
+            ConceptSpec dialectSpec, ViewCoordinate vc)
+            throws UnsupportedDialectOrLanguage, IOException {
+        return getDescriptionSpecForDialect(
+                desc,
+                dialectSpec.get(vc).getNid(), vc);
+    }
+
+    public static DescriptionSpec getDescriptionSpecForDialect(
+            DescriptionVersionBI desc,
+            int dialectNid, ViewCoordinate vc)
+            throws UnsupportedDialectOrLanguage, IOException {
+        try {
+            lazyInit(dialectNid);
+            String variantText = makeTextForDialect(desc.getText(), dialectNid);
+
+            UUID descUuid = UuidT5Generator.getDescUuid(desc.getText(),
+                    Ts.get().getConcept(dialectNid).getPrimUuid(),
+                    Ts.get().getConcept(desc.getConceptNid()).getPrimUuid());
+
+            DescriptionSpec ds = new DescriptionSpec(new UUID[]{descUuid},
+                    SpecFactory.get(Ts.get().getConcept(desc.getConceptNid()), vc),
+                    SpecFactory.get(Ts.get().getConcept(desc.getTypeNid()), vc),
+                    variantText);
+            ds.setLangText(desc.getLang());
+            return ds;
+        } catch (NoSuchAlgorithmException ex) {
             throw new IOException(ex);
-         } finally {
-            initLock.unlock();
-         }
-      }
-      if (!variantMap.containsKey(dialectOrLanguageNid)
-              && !variantSetMap.containsKey(dialectOrLanguageNid)) {
-         throw new UnsupportedDialectOrLanguage("nid: " + dialectOrLanguageNid);
-      }
-   }
-
-   private static void addDialect(ConceptSpec dialectSpec,
-           ViewCoordinate vc,
-           ConceptSpec varientsSpec,
-           TerminologySnapshotDI ts,
-           HashMap<Integer, Map<String, String>> initialVariantMap) throws ContraditionException, IOException {
-      ConceptVersionBI dialectC = dialectSpec.get(vc);
-      ConceptVersionBI variantTextRefsetC = varientsSpec.get(vc);
-
-      Collection<? extends RefexChronicleBI<?>> dialectVarients =
-              variantTextRefsetC.getCurrentRefsetMembers();
-      Map<String, String> variantDialectMap = new HashMap<String, String>();
-      for (RefexChronicleBI<?> refex : dialectVarients) {
-         RefexStrVersionBI dialectText = (RefexStrVersionBI) refex.getVersion(vc);
-         RefexStrVersionBI variantText = (RefexStrVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
-         variantDialectMap.put(variantText.getStr1(), dialectText.getStr1());
-      }
-      initialVariantMap.put(dialectC.getNid(), variantDialectMap);
-   }
-
-   public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
-           int dialectNid, ViewCoordinate vc) throws IOException,
-           ContraditionException, UnsupportedDialectOrLanguage {
-      lazyInit(dialectNid);
-      if (isTextForDialect(desc.getText(), dialectNid)) {
-         return false;
-      }
-      String dialectText = makeTextForDialect(desc.getText(), dialectNid);
-      ConceptVersionBI concept = Ts.get().getConceptVersion(vc,
-              desc.getConceptNid());
-      for (DescriptionVersionBI d : concept.getDescsActive()) {
-         if (d.getText().toLowerCase().equals(dialectText.toLowerCase())) {
-            return false;
-         }
-      }
-      return true;
-   }
-
-   public static boolean hasDialectVariants(String text, int languageNid)
-           throws UnsupportedDialectOrLanguage, IOException {
-      lazyInit(languageNid);
-      String[] tokens = text.split("\\s+");
-      Set<String> dialectVariants = variantSetMap.get(languageNid);
-      for (String token : tokens) {
-         if (dialectVariants.contains(token.toLowerCase())) {
-            return true;
-         }
-      }
-      return false;
-   }
-
-   public static boolean isTextForDialect(String text, int dialectNid)
-           throws UnsupportedDialectOrLanguage, IOException {
-      lazyInit(dialectNid);
-      String[] tokens = text.split("\\s+");
-      Map<String, String> dialectVariants = variantMap.get(dialectNid);
-      for (String token : tokens) {
-         if (dialectVariants.containsKey(token.toLowerCase())) {
-            return false;
-         }
-      }
-      return true;
-   }
-
-   public static String makeTextForDialect(String text, int dialectNid)
-           throws UnsupportedDialectOrLanguage, IOException {
-      lazyInit(dialectNid);
-      String[] tokens = text.split("\\s+");
-      Map<String, String> dialectVariants = variantMap.get(dialectNid);
-      for (int i = 0; i < tokens.length; i++) {
-         if (dialectVariants.containsKey(tokens[i].toLowerCase())) {
-            boolean upperCase = Character.isUpperCase(tokens[i].charAt(0));
-            tokens[i] = dialectVariants.get(tokens[i].toLowerCase());
-            if (upperCase) {
-               if (Character.isLowerCase(tokens[i].charAt(0))) {
-                  tokens[i] = Character.toUpperCase(tokens[i].charAt(0)) +
-                          tokens[i].substring(1);
-               }
-            }
-         }
-      }
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < tokens.length; i++) {
-         sb.append(tokens[i]);
-         if (i < tokens.length - 1) {
-            sb.append(' ');
-         }
-      }
-      return sb.toString();
-   }
-
-   public static DescriptionSpec getDescriptionSpecForDialect(
-           DescriptionVersionBI desc,
-           ConceptSpec dialectSpec, ViewCoordinate vc)
-           throws UnsupportedDialectOrLanguage, IOException {
-      return getDescriptionSpecForDialect(
-              desc,
-              dialectSpec.get(vc).getNid(), vc);
-   }
-
-   public static DescriptionSpec getDescriptionSpecForDialect(
-           DescriptionVersionBI desc,
-           int dialectNid, ViewCoordinate vc)
-           throws UnsupportedDialectOrLanguage, IOException {
-      try {
-         lazyInit(dialectNid);
-         String variantText = makeTextForDialect(desc.getText(), dialectNid);
-         
-         UUID descUuid = UuidT5Generator.getDescUuid(desc.getText(),
-                 Ts.get().getConcept(dialectNid).getPrimUuid(),
-                 Ts.get().getConcept(desc.getConceptNid()).getPrimUuid());
-         
-         DescriptionSpec ds = new DescriptionSpec(new UUID[]{descUuid},
-                 SpecFactory.get(Ts.get().getConcept(desc.getConceptNid()), vc),
-                 SpecFactory.get(Ts.get().getConcept(desc.getTypeNid()), vc),
-                 variantText);
-         ds.setLangText(desc.getLang());
-         return ds;
-      } catch (NoSuchAlgorithmException ex) {
-         throw new IOException(ex);
-      } catch (UnsupportedEncodingException ex) {
-         throw new IOException(ex);
-      }
-   }
+        } catch (UnsupportedEncodingException ex) {
+            throw new IOException(ex);
+        }
+    }
 }
