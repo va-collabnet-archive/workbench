@@ -85,7 +85,6 @@ public class SnorocketMojo extends AbstractMojo {
      * Directory of the berkeley database.
      *
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
-     * @required
      */
     private File berkeleyDir;
     /**
@@ -216,7 +215,10 @@ public class SnorocketMojo extends AbstractMojo {
         SnoQuery.initAll();
 
         try {
-            Bdb.setup(berkeleyDir.getAbsolutePath());
+        	tf = Terms.get();
+        	if (tf == null) {
+        		Bdb.setup(berkeleyDir.getAbsolutePath());
+        	}
             tf = Terms.get();
             config = getMojoDbConfig();
             tf.setActiveAceFrameConfig(config);

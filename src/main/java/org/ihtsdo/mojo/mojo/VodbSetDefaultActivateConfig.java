@@ -50,13 +50,6 @@ public class VodbSetDefaultActivateConfig extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty("java.awt.headless", "true");
         try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName(), this.getClass(), targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-            }
             I_TermFactory tf = Terms.get();
             I_ConfigAceFrame activeConfig = NewDefaultProfile.newProfile(null, null, null, null, null);
 

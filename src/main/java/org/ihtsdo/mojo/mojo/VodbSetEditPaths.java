@@ -58,14 +58,6 @@ public class VodbSetEditPaths extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + editPaths, this.getClass(),
-                    targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
-            }
             I_ConfigAceFrame activeConfig = Terms.get().getActiveAceFrameConfig();
             I_TermFactory tf = Terms.get();
 
