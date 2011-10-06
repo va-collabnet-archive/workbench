@@ -1006,13 +1006,13 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         
         // While single origin, go up before finding common origin.  Because the 
         // recursive instances of a single origin directly over the view position is a false-positive.
-		while (viewPos.getPath().getOrigins().size() == 1) {
-			viewPos = viewPos.getPath().getOrigins().iterator().next();
-			
+		while (viewPos.getPath().getOrigins().size() == 0 || viewPos.getPath().getOrigins().size() == 1) {
 			if (viewPos.getPath().getOrigins().size() == 0) {
 				// To handle case where view path has one origin recursively to the top-level path
 				return initialViewPos;
 			}
+
+			viewPos = viewPos.getPath().getOrigins().iterator().next();
 		}
 		
 		// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
