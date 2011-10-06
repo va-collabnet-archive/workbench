@@ -954,7 +954,7 @@ public class WorkflowHelper {
 												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
 												   new Long(ref.getMutableParts().get(0).getTime()));
 			} catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member");
+			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ((I_ExtendByRefPartStr)ref).getStringValue());
 		}
 		
 		return bean;
