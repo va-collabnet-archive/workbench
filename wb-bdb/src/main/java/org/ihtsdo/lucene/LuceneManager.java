@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.DefaultSimilarity;
@@ -20,13 +21,17 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ParallelMultiSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Similarity;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
+import org.dwfa.ace.api.I_DescriptionVersioned;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
@@ -178,14 +183,23 @@ public abstract class LuceneManager {
 	}
 
 	protected static class ShortTextSimilarity extends DefaultSimilarity { 
+		public ShortTextSimilarity(){}
 
-		public float lengthNorm(String fieldName, int numTerms) { 
-			return (float)(1.0 / numTerms); 
-		} 
-
-		public float tf(float freq) { 
-			return (float)freq; 
-		} 
+		public float idf(int docFreq, int numDocs) {
+			return(float)1.0;
+		}
+		public float coord(int overlap, int maxOverlap) {
+			return 1.0f;
+		}
+		public float tf(float freq) {
+			return 1.0f;
+		}
+		public float tf(int freq) {
+			return 1.0f;
+		}
+		public float lengthNorm(String fieldName, int numTerms) {
+			return (float)(1.0/(numTerms*5));
+		}
 
 	} 
 
@@ -242,12 +256,26 @@ public abstract class LuceneManager {
 
 			if (searcherCopy == null) {
 				if (type == LuceneSearchType.DESCRIPTION) {
-					IndexSearcher readOnlySearcher = new IndexSearcher(descLuceneReadOnlyDir, true);
-					readOnlySearcher.setSimilarity(new ShortTextSimilarity());
-					IndexSearcher mutableSearcher = new IndexSearcher(descLuceneMutableDir, true);
-					mutableSearcher.setSimilarity(new ShortTextSimilarity());
-					searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
-					descSearcher = searcherCopy;
+					IndexSearcher readOnlySearcher = null;
+					try {
+						readOnlySearcher = new IndexSearcher(descLuceneReadOnlyDir, true);
+					} catch (java.io.FileNotFoundException e) {
+						//ignore not accesible readonly
+					}
+					if (readOnlySearcher != null) {
+						readOnlySearcher.setSimilarity(new ShortTextSimilarity());
+						IndexSearcher mutableSearcher = new IndexSearcher(descLuceneMutableDir, true);
+						mutableSearcher.setSimilarity(new ShortTextSimilarity());
+						searcherCopy = new ParallelMultiSearcher(readOnlySearcher, mutableSearcher);
+						searcherCopy.setSimilarity(new ShortTextSimilarity());
+						descSearcher = searcherCopy;
+					} else {
+						IndexSearcher mutableSearcher = new IndexSearcher(descLuceneMutableDir, true);
+						mutableSearcher.setSimilarity(new ShortTextSimilarity());
+						searcherCopy = new ParallelMultiSearcher(mutableSearcher);
+						searcherCopy.setSimilarity(new ShortTextSimilarity());
+						descSearcher = searcherCopy;
+					}
 				} else {
 					IndexSearcher allHxSearcher = new IndexSearcher(wfHxLuceneDir, true);
 					searcherCopy = new ParallelMultiSearcher(allHxSearcher);
@@ -289,6 +317,27 @@ public abstract class LuceneManager {
 					}
 				}
 			}
+			
+			// Lucene match explainer code, useful to tweak the lucene score, uncomment for debug purposes only
+//			for (ScoreDoc sd : newDocs) {
+//				Document d = searcher.doc(sd.doc);
+//				I_DescriptionVersioned desc = null;
+//				try {
+//					desc = Terms.get().getDescription(Integer.valueOf(d.get("dnid")), 
+//							Integer.valueOf(d.get("cnid")));
+//				} catch (NumberFormatException e) {
+//					e.printStackTrace();
+//				} catch (TerminologyException e) {
+//					e.printStackTrace();
+//				}
+//				if (desc != null) {
+//					System.out.println("-------------------------" + desc.getText());
+//				} else {
+//					System.out.println("------------------------- Null");
+//				}
+//				System.out.println(searcher.explain(q,sd.doc).toString());
+//			}
+			
 			topDocs.scoreDocs = newDocs.toArray(new ScoreDoc[newDocs.size()]);
 			topDocs.totalHits = topDocs.scoreDocs.length;
 			return new SearchResult(topDocs, searcherCopy);
@@ -320,7 +369,7 @@ public abstract class LuceneManager {
 
 	public static void createLuceneIndex(LuceneSearchType type, ViewCoordinate viewCoord) throws Exception {
 		IndexWriter writer;
-
+		Similarity.setDefault(new ShortTextSimilarity());
 		init(type);
 		Stopwatch timer = new Stopwatch();
 		timer.start();
