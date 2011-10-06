@@ -2,14 +2,17 @@
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
@@ -40,18 +43,62 @@ import org.ihtsdo.tk.contradiction.PositionForSet;
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
      // Class Variables
-    private PositionMapper conflictMapper;
+    private AtomicReference<PositionMapper> conflictMapper;
 
 	private AtomicInteger viewPathNid = null;
 	private AtomicInteger commonOriginPathNid;
 	private AtomicBoolean isReturnVersionsUseCase;
-	private ViewCoordinate viewCoord;
-	private Set<ComponentVersionBI> returnVersionCollection;
-
-	private ComponentVersionBI singleVersion;
 	
+	private AtomicReference<ViewCoordinate> viewCoord;
+	private AtomicReference<PositionBI> currentUserViewPos;
+	private AtomicReference<ComponentVersionBI> singleVersion;
+	
+    private ConcurrentSkipListSet<PositionBI> viewPosMap = new ConcurrentSkipListSet<PositionBI>(new PositionBIComparator());
+ 	private ConcurrentSkipListSet<ComponentVersionBI> returnVersionCollection = new ConcurrentSkipListSet<ComponentVersionBI>(new ComponentVersionComparator());
+	
+    private class PositionBIComparator implements Comparator<PositionBI> { 
+		
+		public int compare(PositionBI a, PositionBI b) {
+			try {
+				if (a.getPath().getConceptNid() == b.getPath().getConceptNid()) {
+					if (a.getTime() < b.getTime()) {
+						return -1;
+					} else {
+						return 1;
+					} 
+				} else {
+					if (a.getPath().getConceptNid() < b.getPath().getConceptNid())
+						return -1;
+					else 
+						return 1;
+				}
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup FSN Comparator", e);
+			}
+			
+			return 0;
+		}
+	}
+
+    private class ComponentVersionComparator implements Comparator<ComponentVersionBI> { 
+		
+		public int compare(ComponentVersionBI a, ComponentVersionBI b) {
+			try {
+				if (a.getTime() < b.getTime()) {;
+					return -1;
+				} else {
+					return 1;
+				}
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup FSN Comparator", e);
+			}
+			
+			return 0;
+		}
+	}
+
 	public ContradictionIdentifier(ViewCoordinate vc, boolean useCase) {
-		viewCoord = vc;
+		viewCoord = new AtomicReference<ViewCoordinate>(vc);
 		isReturnVersionsUseCase = new AtomicBoolean(useCase);
 	}
 	
@@ -66,32 +113,35 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         
         Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap = new HashMap<PositionForSet, HashMap<Integer, ComponentVersionBI>>();
 
-        for (PositionBI pos : viewCoord.getPositionSet())
+        for (PositionBI pos : viewCoord.get().getPositionSet())
         {
         	try {
-            	initializeViewPos(pos);
-            
-		        ContradictionResult result = analyzeContradictionPerComponent((Concept)conceptChronicle, foundPositionsMap);
-	    
-		        if (result == ContradictionResult.CONTRADICTION) {
-		        	return result;
-		        } else {
-		            // Ensure new changes are visible to one another.  
-		            // Otherwise, is a contradiction or possible duplicate new component
-			        ContradictionResult foundPosResult = areFoundPositionsReachable((Concept)conceptChronicle, foundPositionsMap);
-			
-			        if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
-			            return ContradictionResult.CONTRADICTION;
-				    } else if (result == ContradictionResult.DUPLICATE_EDIT) {
-				            isDuplicateEdit = true;
-			        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW)) {
-				    	isDuplicateNew = true;
-				    } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-				        isSingleEdit = true;
-			        }
-			    }
+            	if (!viewPosMap.contains(pos) && initializeViewPos(pos)) {
+	            
+			        ContradictionResult result = analyzeContradictionPerComponent((Concept)conceptChronicle, foundPositionsMap);
+		    
+			        if (result == ContradictionResult.CONTRADICTION) {
+			        	return result;
+			        } else {
+			            // Ensure new changes are visible to one another.  
+			            // Otherwise, is a contradiction or possible duplicate new component
+				        ContradictionResult foundPosResult = areFoundPositionsReachable((Concept)conceptChronicle, foundPositionsMap);
+				
+				        if (foundPosResult.equals(ContradictionResult.CONTRADICTION)) {
+				            return ContradictionResult.CONTRADICTION;
+					    } else if (result == ContradictionResult.DUPLICATE_EDIT) {
+					            isDuplicateEdit = true;
+				        } else if (foundPosResult.equals(ContradictionResult.DUPLICATE_NEW)) {
+					    	isDuplicateNew = true;
+					    } else if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+					        isSingleEdit = true;
+				        }
+				    }
+            	} else {
+            		viewPosMap.add(pos);
+            	}
 			} catch (Exception e) {
-		    	AceLog.getAppLog().log(Level.WARNING, "Failure in detecting conflict on concept: " + conceptChronicle.getPrimUuid());
+		    	AceLog.getAppLog().log(Level.WARNING, "Failure in detecting conflict on concept: " + conceptChronicle.getPrimUuid(), e);
 		    	return ContradictionResult.ERROR;
 		    }
         }
@@ -102,7 +152,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             return ContradictionResult.DUPLICATE_NEW;
         } else if (isSingleEdit) {
 			if (isReturnVersionsUseCase.get()) {
-				returnVersionCollection.add(singleVersion);
+				returnVersionCollection.add(singleVersion.get());
 			}
             return ContradictionResult.SINGLE_MODELER_CHANGE;
         } else {
@@ -248,7 +298,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		
 		        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
 						isSingleEdit = true;
-						singleVersion = developerVersions.iterator().next();
+						singleVersion = new AtomicReference<ComponentVersionBI>(developerVersions.iterator().next());
 		        	} else if (result == ContradictionResult.CONTRADICTION)	{
 			        	// Have potential contradiction, unless developers made same changes
 						ComponentVersionBI compareWithVersion = latestOriginVersion;
@@ -297,7 +347,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 			if (initialVersion == null) {
 				initialVersion = version;
 			} else {
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)initialVersion, (Version)version, Terms.get().getActiveAceFrameConfig().getPrecedence());
 				if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
 					isContradiction = true;
 					
@@ -338,7 +388,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					testingVersion = getCurrentVersion(concept, compType, version);
 				}
 
-				RELATIVE_POSITION relPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 
 				if (relPosition != RELATIVE_POSITION.EQUAL) 
 				{
@@ -537,7 +587,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						HashMap<Integer, ComponentVersionBI> testingVersionMap = foundPositionsMap.get(testingPositionKey);
 						testingVersion = testingVersionMap.get(testingVersionMap.keySet().iterator().next());
 	
-						RELATIVE_POSITION retPosition = conflictMapper.fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
+						RELATIVE_POSITION retPosition = conflictMapper.get().fastRelativePosition((Version)currentVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
 						
 						if (retPosition == RELATIVE_POSITION.CONTRADICTION)
 						{
@@ -673,18 +723,16 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 		try
 		{
-			ViewCoordinate viewCoord = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-
 			if (compType == ComponentType.ATTRIBUTE)
 			{
 				ConceptAttributes attr = concept.getConceptAttributes();
-				currentVersion = attr.getVersion(viewCoord);
+				currentVersion = attr.getVersion(viewCoord.get());
 			}
 			else if (compType == ComponentType.DESCRIPTION)
 			{
 				
 				Description desc = concept.getDescription(componentNid);
-				currentVersion = identifyDescriptionViewCoord(desc, viewCoord, adjudicatorVersionPosition);
+				currentVersion = desc.getVersion(viewCoord.get());
 			} 
 			else if (compType == ComponentType.SRC_RELATIONSHIP)
 			{
@@ -714,21 +762,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		} 
 		
 		return currentVersion;
-	}
-
-
-    private ComponentVersionBI identifyDescriptionViewCoord(Description desc, ViewCoordinate viewCoord, PositionBI position) throws IOException {
-    	Collection<Description.Version> currentDescriptionVersions = desc.getVersions();
-		
-		for (Description.Version version : currentDescriptionVersions)
-		{
-			if (version.getPosition().equals(position))
-			{
-				 return version;
-			}
-		}
-		
-		return null;
 	}
 
 	// Get the Position of the current version
@@ -863,7 +896,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
 					isSingleEdit = true;
-					singleVersion = developerVersions.iterator().next();
+					singleVersion= new AtomicReference<ComponentVersionBI>(developerVersions.iterator().next());
 	        	} else if (result == ContradictionResult.CONTRADICTION)	{
 		        	// Have potential contradiction, unless developers made same changes
 					ComponentVersionBI compareWithVersion = latestOriginVersion;
@@ -928,37 +961,58 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 
 	// Initialize the PositionMapper used for identifying contradictions
-	private void initializeViewPos(PositionBI pos) {
+	private boolean initializeViewPos(PositionBI pos) {
 		try 
 		{
-        	setViewPos(pos);
-        	
-            conflictMapper = Bdb.getSapDb().getMapper(pos);
-
-            if (!conflictMapper.isSetup()) {
-            	conflictMapper.queueForSetup();
-            }
-            
-            // find the least common ancestor based on view position
-            PathBI commonOriginPath = identifyCommonOriginPosition(pos).getPath();
-			commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
-
-			if (isReturnVersionsUseCase.get()) {
-				returnVersionCollection = new HashSet<ComponentVersionBI>();
-			}
+        	if (currentUserViewPos == null || !currentUserViewPos.equals(pos)) {
+        		currentUserViewPos = new AtomicReference(pos);
+        		PositionBI initialViewPos = pos;
+	        	setViewPos(pos);
+	            // find the least common ancestor based on view position
+	        	PositionBI calculatedPos = identifyCommonOriginPosition(pos);
+	        	
+	        	if (calculatedPos.equals(initialViewPos)) {
+	        		// Represents Single origin from view Pos to top Origin. No ContraIdent required.
+	        		return false;
+	        	}
+	        	
+	        	PathBI commonOriginPath = calculatedPos.getPath();
+				commonOriginPathNid = new AtomicInteger(commonOriginPath.getConceptNid());
+	
+				
+	            conflictMapper = new AtomicReference<PositionMapper>(Bdb.getSapDb().getMapper(pos));
+	
+	            if (!conflictMapper.get().isSetup()) {
+	            	conflictMapper.get().queueForSetup();
+	            }
+	            
+	
+				if (isReturnVersionsUseCase.get()) {
+					returnVersionCollection.clear();
+				}
+        	}
         } catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to Initialize Globals", e);
+            return false;
         }
+        
+        return true;
 	}
 
     private PositionBI identifyCommonOriginPosition(PositionBI viewPos) throws TerminologyException, IOException {
         // Identify leastCommonAncestor of View Position from Origins of view position 
         Set<HashSet<PositionBI>> groupedOriginsOfOrigins = new HashSet<HashSet<PositionBI>>();
-
+        PositionBI initialViewPos = viewPos;
+        
         // While single origin, go up before finding common origin.  Because the 
         // recursive instances of a single origin directly over the view position is a false-positive.
 		while (viewPos.getPath().getOrigins().size() == 1) {
 			viewPos = viewPos.getPath().getOrigins().iterator().next();
+			
+			if (viewPos.getPath().getOrigins().size() == 0) {
+				// To handle case where view path has one origin recursively to the top-level path
+				return initialViewPos;
+			}
 		}
 		
 		// Ignoring actual viewPos as that will always be leastCommonAncestor by definition
