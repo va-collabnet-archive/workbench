@@ -66,7 +66,6 @@ public class CheckCyclesMojo extends AbstractMojo {
      * Directory of the berkeley database.
      *
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
-     * @required
      */
     private File berkeleyDir;
     /**
@@ -151,8 +150,10 @@ public class CheckCyclesMojo extends AbstractMojo {
         try {
             logger = getLog();
             logger.info("\r\n::: [CheckCyclesMojo] execute() -- begin");
-
-            Bdb.setup(berkeleyDir.getAbsolutePath());
+            tf = Terms.get();
+            if (tf == null) {
+            	Bdb.setup(berkeleyDir.getAbsolutePath());
+            }
             tf = Terms.get();
             setupCoreNids();
             config = getMojoDbConfig();
