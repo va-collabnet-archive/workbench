@@ -86,24 +86,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="countRuleCases" resultType="Integer"
 		parameterType="RuleFilterCoords">
-		select count(*)
-		from qa_db.qa_case c
-		inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
-		inner join qa_db.qa_component comp on c.QA_component = comp.component_uid
-		and r.rule_uid = #{ruleUuid}
-		and c.database_uid = #{databaseUuid}
-		and c.path_uid = #{pathUuid}
+		select count(*) qa_db.view_cases
+		where
+			rule_uid = #{ruleUuid}
+			and database_uid = #{databaseUuid}
+			and path_uid = #{pathUuid}
 		<if test="name != null">
-			and comp.name like #{name}
+			and name like #{name}
 		</if>
 		<if test="assignedToFilter != null">
-			and c.assigned_to = #{assignedToFilter}
+			and assigned_to = #{assignedToFilter}
 		</if>
 		<if test="dispStatusUuidFilter != null">
-			and c.disposition_status_uid = #{dispStatusUuidFilter}
+			and disposition_status_uid = #{dispStatusUuidFilter}
 		</if>
 		<if test="statusFilter != null">
-			and c.status = #{statusFilter}
+			and status = #{statusFilter}
 		</if>
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 	</select>
@@ -114,38 +112,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectRuleCases" resultMap="qaCaseResultMap"
 		parameterType="RuleFilterCoords">
-		select *
-		from qa_db.qa_case c
-		inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
-		inner join qa_db.qa_component comp on c.QA_component = comp.component_uid
-		and r.rule_uid = #{ruleUuid}
-		and c.database_uid = #{databaseUuid}
-		and c.path_uid = #{pathUuid}
+		select * qa_db.view_cases
+		where 
+		rule_uid = #{ruleUuid}
+		and database_uid = #{databaseUuid}
+		and path_uid = #{pathUuid}
 		<if test="name != null">
-			and comp.name like #{name}
+			and name like #{name}
 		</if>
 		<if test="assignedToFilter != null">
-			and c.assigned_to = #{assignedToFilter}
+			and assigned_to = #{assignedToFilter}
 		</if>
 		<if test="dispStatusUuidFilter != null">
-			and c.disposition_status_uid = #{dispStatusUuidFilter}
+			and disposition_status_uid = #{dispStatusUuidFilter}
 		</if>
 		<if test="statusFilter != null">
-			and c.status = #{statusFilter}
+			and status = #{statusFilter}
 		</if>
 		order by 	<!-- CONCEPT_NAME(1), STATUS(2), DISPOSITION(3), ASSIGNED_TO(4), TIME(5); -->
 		<choose>
 			<when test="sortBy.keySet().iterator().next() == 1">
-				comp.name, c.status, c.disposition_status_uid
+				name, status, disposition_status_uid
 			</when>
 			<when test="sortBy.keySet().iterator().next() == 2">
-				c.status, c.disposition_status_uid, comp.name
+				status, disposition_status_uid, name
 			</when>
 			<when test="sortBy.keySet().iterator().next() == 3">
-				c.disposition_status_uid, comp.name, c.status
+				disposition_status_uid, name, status
 			</when>
 			<otherwise>
-				comp.name, c.status, c.disposition_status_uid
+				name, status, disposition_status_uid
 			</otherwise>
 		</choose>
 		<include refid="pagingSql"/>
