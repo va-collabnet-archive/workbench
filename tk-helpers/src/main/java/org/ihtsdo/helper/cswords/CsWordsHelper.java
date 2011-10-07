@@ -29,12 +29,8 @@ import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  *
@@ -51,7 +47,7 @@ public class CsWordsHelper {
             initLock.lock();
             try {
                 if (csWordSetMap == null) {
-                    ViewCoordinate vc = Ts.get().getMetadataVC().getVcWithAllStatusValues();
+                    ViewCoordinate vc = Ts.get().getMetadataVC();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
                     HashMap csWordSetMap = new HashMap<Integer, Set<String>>();
                     ConceptVersionBI csWordsRefsetC =
@@ -67,8 +63,7 @@ public class CsWordsHelper {
                     for (RefexChronicleBI<?> refex : csWords) {
                         RefexCnidStrVersionBI member =
                                 (RefexCnidStrVersionBI) refex.getVersion(vc);
-                        if (member.getStatusNid() == SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid() ||
-                                member.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+                        if (member != null) {
                             int typeNid = member.getCnid1();
                             if (typeNid == icSigNid) {
                                 csWordSet.add(member.getStr1());
@@ -76,10 +71,10 @@ public class CsWordsHelper {
                                 maybeCsWordSet.add(member.getStr1());
                             }
                         }
-                        csWordSetMap.put(icSigNid, csWordSet);
-                        csWordSetMap.put(maybeSigNid, maybeCsWordSet);
-                        CsWordsHelper.csWordSetMap = csWordSetMap;
                     }
+                    csWordSetMap.put(icSigNid, csWordSet);
+                    csWordSetMap.put(maybeSigNid, maybeCsWordSet);
+                    CsWordsHelper.csWordSetMap = csWordSetMap;
                 }
             } catch (ContraditionException ex) {
                 throw new IOException(ex);

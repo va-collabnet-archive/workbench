@@ -36,6 +36,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.example.binding.Language;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
@@ -62,7 +63,6 @@ public class DialectHelper {
                             new HashMap<Integer, Map<String, String>>();
                     variantSetMap = new HashMap<Integer, Set<String>>();
                     ViewCoordinate vc = Ts.get().getMetadataVC();
-                    ViewCoordinate vcAll = Ts.get().getMetadataVC().getVcWithAllStatusValues();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
 
                     ConceptVersionBI enVariantTextRefsetC =
@@ -72,23 +72,22 @@ public class DialectHelper {
                     Set<String> variantSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : enVariants) {
                         RefexStrVersionBI variantText =
-                                (RefexStrVersionBI) refex.getVersion(vcAll);
-                        if (variantText.getStatusNid() == SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid() ||
-                                variantText.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+                                (RefexStrVersionBI) refex.getVersion(vc);
+                        if (variantText != null) {
                             variantSet.add(variantText.getStr1());
                         }
                     }
                     variantSetMap.put(Language.EN.get(vc).getNid(), variantSet);
 
-                    addDialect(Language.EN_AU, vcAll, Language.EN_AU_TEXT_VARIANTS,
+                    addDialect(Language.EN_AU, vc, Language.EN_AU_TEXT_VARIANTS,
                             ts, initialVariantMap);
-                    addDialect(Language.EN_CA, vcAll, Language.EN_CA_TEXT_VARIANTS,
+                    addDialect(Language.EN_CA, vc, Language.EN_CA_TEXT_VARIANTS,
                             ts, initialVariantMap);
-                    addDialect(Language.EN_NZ, vcAll, Language.EN_NZ_TEXT_VARIANTS,
+                    addDialect(Language.EN_NZ, vc, Language.EN_NZ_TEXT_VARIANTS,
                             ts, initialVariantMap);
-                    addDialect(Language.EN_UK, vcAll, Language.EN_UK_TEXT_VARIANTS,
+                    addDialect(Language.EN_UK, vc, Language.EN_UK_TEXT_VARIANTS,
                             ts, initialVariantMap);
-                    addDialect(Language.EN_US, vcAll, Language.EN_US_TEXT_VARIANTS,
+                    addDialect(Language.EN_US, vc, Language.EN_US_TEXT_VARIANTS,
                             ts, initialVariantMap);
                     DialectHelper.variantMap = initialVariantMap;
                 }
@@ -117,8 +116,7 @@ public class DialectHelper {
         Map<String, String> variantDialectMap = new HashMap<String, String>();
         for (RefexChronicleBI<?> refex : dialectVarients) {
             RefexStrVersionBI dialectText = (RefexStrVersionBI) refex.getVersion(vc);
-            if (dialectText.getStatusNid() == SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid() ||
-                                dialectText.getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+            if (dialectText != null) {
                 RefexStrVersionBI variantText = (RefexStrVersionBI) ts.getComponentVersion(dialectText.getReferencedComponentNid());
                 variantDialectMap.put(variantText.getStr1(), dialectText.getStr1());
             }
