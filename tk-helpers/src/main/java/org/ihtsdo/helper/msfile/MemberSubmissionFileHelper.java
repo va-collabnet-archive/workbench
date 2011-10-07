@@ -39,27 +39,23 @@ public class MemberSubmissionFileHelper {
 
     public static void lazyInit(String member, File memberFile)
             throws IOException {
-        if (msFileSetMap == null) {
-            initLock.lock();
-                if (msFileSetMap == null) {
-                    InputStreamReader isr =
-                        new InputStreamReader(new FileInputStream(memberFile), "UTF-8");
-                    HashMap msFileSetMap = new HashMap<String, Set<String>>();
-                    BufferedReader reader = new BufferedReader(isr);
-                    String line = reader.readLine();
-                    Set<String> msFileSet = new LinkedHashSet<String>();
-                    while(line != null){
-                        msFileSet.add(line);
-                        line = reader.readLine();
-                    }
-                    msFileSetMap.put(member, msFileSet);
-                    MemberSubmissionFileHelper.msFileSetMap = msFileSetMap;
-                }
-                initLock.unlock();
+        initLock.lock();
+        InputStreamReader isr =
+                new InputStreamReader(new FileInputStream(memberFile), "UTF-8");
+        HashMap msFileSetMap = new HashMap<String, Set<String>>();
+        BufferedReader reader = new BufferedReader(isr);
+        String line = reader.readLine();
+        Set<String> msFileSet = new LinkedHashSet<String>();
+        while (line != null) {
+            msFileSet.add(line);
+            line = reader.readLine();
         }
+        msFileSetMap.put(member, msFileSet);
+        MemberSubmissionFileHelper.msFileSetMap = msFileSetMap;
+        initLock.unlock();
     }
-    
-    public static Set<String> getMsFileSet (String member, File msFile) throws IOException {
+
+    public static Set<String> getMsFileSet(String member, File msFile) throws IOException {
         lazyInit(member, msFile);
         Set<String> line = msFileSetMap.get(member);
         return line;
