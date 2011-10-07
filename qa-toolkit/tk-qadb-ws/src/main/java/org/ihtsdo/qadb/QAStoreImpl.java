@@ -595,6 +595,50 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setPageLenght(pageLenght);
 		coords.setSortBy(sortBy);
 		
+		getFilterCoords(filter, coords);
+
+		long queryStartTime = System.currentTimeMillis();
+		List<QACase> ruleCases = sqlSession.selectList("org.ihtsdo.qadb.data.QACaseMapper.selectRuleCases", coords);
+		long queryEndTime = System.currentTimeMillis();
+		logger.info(ruleCases.size() + " Rule cases selected in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
+
+			for (QACase qaCase : ruleCases) {
+//				if (dispoFilterValue != null) {
+//					logger.info("DISPO STATUS FILTER");
+//					logger.info(qaCase.getDispositionStatus().getDispositionStatusUuid());
+//					logger.info(dispoFilterValue.toString());
+//					logger.info(!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString()));
+//					if (!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString())) {
+//						logger.debug("Ignoring disposition status filtered case");
+//						continue;
+//					}
+//				}
+//				if (statusFilterValue != null) {
+//					logger.info("STATUS FILTER");
+//					logger.info("QaCase is active & statusFilterValue = closed " + (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")));
+//					logger.info("QACAse is active " + qaCase.isActive());
+//					logger.info("Status filter value " + statusFilterValue.toString());
+//					if (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")) {
+//						logger.debug("Ignoring status filtered case");
+//						continue;
+//					} else if (!qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Open")) {
+//						logger.debug("Ignoring status filtered case");
+//						continue;
+//					}
+//				}
+//				if(assignedToFilter != null){
+//					if(qaCase.getAssignedTo() == null || !qaCase.getAssignedTo().equals(assignedToFilter.toString())){
+//						continue;
+//					}
+//				}
+				QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
+				lines.add(loopLine);
+			}
+		logger.info("Returning " + lines.size() + " Lines");
+		return lines;
+	}
+
+	private void getFilterCoords(HashMap<Integer, Object> filter, RuleFilterCoords coords) {
 		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
 			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
 		}
@@ -609,66 +653,18 @@ public class QAStoreImpl implements QAStoreBI {
 				coords.setDispStatusUuidFilter(dispoFilterValue.toString());
 			}
 			if (statusFilterValue != null) {
-				coords.setStatusFilter(statusFilterValue.toString().equals("Open") ? 1 : 0);
+				Integer statusFilter = null;
+				if(statusFilterValue.toString().equals("Open")){
+					statusFilter = 1;
+				}else if(statusFilterValue.toString().equals("Close")){
+					statusFilter = 0;
+				}
+				coords.setStatusFilter(statusFilter);
 			}
 			if(assignedToFilter != null){
 				coords.setAssignedToFilter(assignedToFilter.toString());
 			}
 		}
-
-		long queryStartTime = System.currentTimeMillis();
-		List<QACase> ruleCases = sqlSession.selectList("org.ihtsdo.qadb.data.QACaseMapper.selectRuleCases", coords);
-		long queryEndTime = System.currentTimeMillis();
-		logger.info(ruleCases.size() + " Rule cases selected in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
-
-		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
-			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
-			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
-			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
-			logger.debug("Disposition Status Filter " + dispoFilterValue);
-			logger.debug("Status Filter" + statusFilterValue);
-			for (QACase qaCase : ruleCases) {
-				if (dispoFilterValue != null) {
-					logger.info("DISPO STATUS FILTER");
-					logger.info(qaCase.getDispositionStatus().getDispositionStatusUuid());
-					logger.info(dispoFilterValue.toString());
-					logger.info(!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString()));
-					if (!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString())) {
-						logger.debug("Ignoring disposition status filtered case");
-						continue;
-					}
-				}
-				if (statusFilterValue != null) {
-					logger.info("STATUS FILTER");
-					logger.info("QaCase is active & statusFilterValue = closed " + (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")));
-					logger.info("QACAse is active " + qaCase.isActive());
-					logger.info("Status filter value " + statusFilterValue.toString());
-					if (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")) {
-						logger.debug("Ignoring status filtered case");
-						continue;
-					} else if (!qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Open")) {
-						logger.debug("Ignoring status filtered case");
-						continue;
-					}
-				}
-				if(assignedToFilter != null){
-					if(qaCase.getAssignedTo() == null || !qaCase.getAssignedTo().equals(assignedToFilter.toString())){
-						continue;
-					}
-				}
-				QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
-				lines.add(loopLine);
-			}
-		} else {
-			for (QACase qaCase : ruleCases) {
-				QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
-				lines.add(loopLine);
-			}
-		}
-		logger.info("Returning " + lines.size() + " Lines");
-		return lines;
 	}
 	public Integer countQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
@@ -681,26 +677,7 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setStartLine(startLine-1);
 		coords.setPageLenght(pageLenght);
 		
-		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
-			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
-		}
-		
-		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
-			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
-			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
-			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
-			if (dispoFilterValue != null) {
-				coords.setDispStatusUuidFilter(dispoFilterValue.toString());
-			}
-			if (statusFilterValue != null) {
-				coords.setStatusFilter(statusFilterValue.toString().equals("Open") ? 1 : 0);
-			}
-			if(assignedToFilter != null){
-				coords.setAssignedToFilter(assignedToFilter.toString());
-			}
-		}
+		getFilterCoords(filter, coords);
 		
 		long queryStartTime = System.currentTimeMillis();
 		Integer count = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.QACaseMapper.countRuleCases", coords);
