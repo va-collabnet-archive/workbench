@@ -561,7 +561,7 @@ public class QAStoreImpl implements QAStoreBI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new RulesReportPage(reducedLines, sortBy, filter, startLine, startLine + reducedLines.size() - 1, totalLines);
+		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + reducedLines.size() - 1, totalLines);
 	}
 	
 	@Override
