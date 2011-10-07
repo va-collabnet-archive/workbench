@@ -12,6 +12,7 @@ import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
@@ -358,9 +359,9 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
       @Override
       protected List<TaxonomyNode> doInBackground() throws Exception {
-          List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
-         IdentifierSet      changedConcepts = new IdentifierSet();
-         TerminologyStoreDI ts              = Ts.get();
+         List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
+         IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
+         TerminologyStoreDI ts                 = Ts.get();
 
          for (int changedComponentNid : changedComponents) {
             processComponentNid(ts, changedComponentNid, changedConcepts);
@@ -378,35 +379,36 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                                           model.getNodeStore().get(nodeToChange.parentNodeId));
             boolean contentChanged  = !newNode.getText().equals(nodeToChange.getText());
             boolean childrenChanged = (newNode.isLeaf() != nodeToChange.isLeaf())
-                                      || !newNode.getChildren().equals(nodeToChange.getChildren());
-            boolean parentsChanged = newNode.hasExtraParents() != nodeToChange.hasExtraParents() ||
-                    !newNode.getExtraParents().equals(nodeToChange.getExtraParents());
-            if (parentsChanged || childrenChanged) {
-                
-            } else if (contentChanged) {
-                contentChangedList.add(newNode);
+                                      ||!newNode.getChildren().equals(nodeToChange.getChildren());
+            boolean parentsChanged = (newNode.hasExtraParents() != nodeToChange.hasExtraParents())
+                                     ||!newNode.getExtraParents().equals(nodeToChange.getExtraParents());
+
+            if (parentsChanged || childrenChanged) {}
+            else if (contentChanged) {
+               contentChangedList.add(newNode);
             }
          }
 
          return contentChangedList;
       }
 
-        @Override
-        protected void process(List<TaxonomyNode> chunks) {
-            for (TaxonomyNode node: chunks) {
-                model.treeStructureChanged(NodePath.getTreePath(model, node));
-            }
-        }
-
       @Override
       protected void done() {
          try {
             List<TaxonomyNode> contentChangedList = get();
-             for (TaxonomyNode node: contentChangedList) {
-                model.valueForPathChanged(NodePath.getTreePath(model, node), node);
+
+            for (TaxonomyNode node : contentChangedList) {
+               model.valueForPathChanged(NodePath.getTreePath(model, node), node);
             }
-        } catch (Exception ex) {
+         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
+
+      @Override
+      protected void process(List<TaxonomyNode> chunks) {
+         for (TaxonomyNode node : chunks) {
+            model.treeStructureChanged(NodePath.getTreePath(model, node));
          }
       }
 

@@ -9,6 +9,7 @@ package org.ihtsdo.taxonomy;
 
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.IdentifierSet;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concurrent.future.FutureHelper;
@@ -270,7 +271,7 @@ public class NodeFactory {
          this.worker     = worker;
          this.parent     = parent;
          this.parentNode = parentNode;
-         dataSet         = new IdentifierSet();
+         dataSet         = (IdentifierSet) Terms.get().getEmptyIdSet();
 
          for (int cnid : Ts.get().getPossibleChildren(parentNode.getCnid(), model.ts.getViewCoordinate())) {
             dataSet.setMember(cnid);
