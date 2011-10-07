@@ -30,6 +30,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -371,13 +372,20 @@ public class TaxonomyNodeRenderer extends JLabel
       }
 
       StringBuilder buff = new StringBuilder();
-      String conceptDesc;
-      
+      String        conceptDesc;
+
       switch (typeToRender) {
       case FSN :
          try {
-             conceptDesc = cv.getFullySpecifiedDescription().getText();
-            node.setSortComparable(conceptDesc.toLowerCase());
+            DescriptionVersionBI desc = cv.getFullySpecifiedDescription();
+
+            if (desc != null) {
+               conceptDesc = desc.getText();
+               node.setSortComparable(conceptDesc.toLowerCase());
+            } else {
+               conceptDesc = "no fsn";
+               node.setSortComparable(conceptDesc.toLowerCase());
+            }
          } catch (ContraditionException ex) {
             conceptDesc = cv.getFsnDescsActive().iterator().next().getText();
             node.setSortComparable(conceptDesc.toLowerCase());
@@ -387,7 +395,16 @@ public class TaxonomyNodeRenderer extends JLabel
 
       case PREFERRED :
          try {
-             conceptDesc = cv.getPreferredDescription().getText();
+            DescriptionVersionBI desc = cv.getPreferredDescription();
+
+            if (desc != null) {
+               conceptDesc = desc.getText();
+               node.setSortComparable(conceptDesc.toLowerCase());
+            } else {
+               conceptDesc = "no fsn";
+               node.setSortComparable(conceptDesc.toLowerCase());
+            }
+
             node.setSortComparable(conceptDesc.toLowerCase());
          } catch (ContraditionException ex) {
             conceptDesc = cv.getPrefDescsActive().iterator().next().getText();
