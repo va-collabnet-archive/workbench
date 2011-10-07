@@ -293,10 +293,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       return addIdVersion(v);
    }
 
-   public boolean addLongId(Long longId, int authorityNid, int statusNid, int authorNid, int pathNid,
+   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec,
                             long time) {
-      IdentifierVersionLong v = new IdentifierVersionLong(statusNid, authorNid, pathNid, time);
-
+      IdentifierVersionLong v = null;
+      for(int path : ec.getEditPaths()){
+          v = new IdentifierVersionLong(statusNid, ec.getAuthorNid(), path, time);
+      }
       v.setAuthorityNid(authorityNid);
       v.setDenotation(longId);
 
@@ -2097,6 +2099,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          super();
          this.cv = cv;
       }
+   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec,
+                            long time) {
+      
+      return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, ec, time);
+   }
 
       //~--- methods ----------------------------------------------------------
 
@@ -2110,7 +2117,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
          return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, pathNid, time);
       }
-
+      
       @Override
       public boolean addMutableIdPart(I_IdPart srcId) {
          return ConceptComponent.this.addMutableIdPart(srcId);
