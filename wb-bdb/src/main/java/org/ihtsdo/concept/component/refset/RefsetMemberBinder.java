@@ -87,7 +87,7 @@ public class RefsetMemberBinder extends TupleBinding<Collection<RefsetMember<?, 
 
          Object component = Concept.componentsCRHM.get(nid);
 
-         if (component instanceof RefsetMember) {
+         if ((component == null) || (component instanceof RefsetMember)) {
             RefsetMember<?, ?> refsetMember = (RefsetMember<?, ?>) component;
 
             if ((refsetMember != null) && (refsetMember.getTime() == Long.MIN_VALUE)) {
