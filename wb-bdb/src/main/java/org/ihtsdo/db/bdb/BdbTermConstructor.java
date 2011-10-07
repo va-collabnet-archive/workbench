@@ -428,7 +428,8 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
             return construct(blueprint);
         } else {
             I_GetConceptData concept = Terms.get().getConceptForNid(cc.getNid());
-            if (concept.isCanceled() || concept.getPrimUuid().toString().length() == 0) {
+            if (concept.isCanceled() || concept.getPrimUuid().toString().length() == 0 ||
+                    concept.getConAttrs().getVersions().isEmpty()) {
                 return construct(blueprint);
             }else{
                 throw new InvalidCAB(
