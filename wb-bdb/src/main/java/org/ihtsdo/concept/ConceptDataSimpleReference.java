@@ -858,6 +858,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
       Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
 
+      if (refsetMembersMap.get() != null) {
+         return refsetMembersMap.get().get(memberNid);
+      }
+
       if (refsetMemberList.size() < useMemberMapThreshold) {
          for (RefsetMember<?, ?> member : refsetMemberList) {
             if (member.nid == memberNid) {
