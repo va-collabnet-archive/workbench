@@ -553,14 +553,13 @@ public class QAStoreImpl implements QAStoreBI {
 	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
 		Integer totalLines = 0;
-		List<RulesReportLine> reducedLines = new ArrayList<RulesReportLine>();
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
 			totalLines = countRulesByCoords(qaCoordinate, sortBy, filter, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + reducedLines.size() - 1, totalLines);
+		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
 	}
 	
 	private Integer countRulesByCoords(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
@@ -570,9 +569,6 @@ public class QAStoreImpl implements QAStoreBI {
 			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
 			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
 			coords.setViewPointTime(qaCoordinate.getViewPointTime());
-			coords.setStartLine(startLine-1);
-			coords.setPageLenght(pageLenght);
-			List<DispositionStatus> existingDispStatuses = getAllDispositionStatus();
 			if (filter != null) {
 				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
 					coords.setName("%" + filter.get(RulesReportColumn.RULE_NAME).toString() + "%");
@@ -588,7 +584,6 @@ public class QAStoreImpl implements QAStoreBI {
 				}
 			}
 			result = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.RuleMapper.selectRulesCount", coords);
-			logger.debug("rules selected by coordinates...");
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
