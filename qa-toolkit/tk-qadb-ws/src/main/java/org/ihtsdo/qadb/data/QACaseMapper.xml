@@ -86,7 +86,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="countRuleCases" resultType="Integer"
 		parameterType="RuleFilterCoords">
-		select count(*) qa_db.view_cases
+		select count(*) from qa_db.view_cases
 		where
 			rule_uid = #{ruleUuid}
 			and database_uid = #{databaseUuid}
@@ -112,7 +112,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectRuleCases" resultMap="qaCaseResultMap"
 		parameterType="RuleFilterCoords">
-		select * qa_db.view_cases
+		select * from qa_db.view_cases
 		where 
 		rule_uid = #{ruleUuid}
 		and database_uid = #{databaseUuid}

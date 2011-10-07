@@ -67,15 +67,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectStatusCount" parameterType="RuleFilterCoords"
 		resultType="int">
 		select count(*) as statusCount
-		from qa_db.qa_case c
-		inner join
-		qa_db.qa_rule r on c.rule_uid = r.rule_uid
-		where r.rule_uid =
-		#{ruleUuid}
-		and c.status = #{status}
-		and c.database_uid =
-		#{databaseUuid}
-		and c.path_uid = #{pathUuid}
+			from qa_db.qa_case c
+			inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
+			where 
+				r.rule_uid = #{ruleUuid}
+				and c.status = #{status}
+				and c.database_uid = #{databaseUuid}
+				and c.path_uid = #{pathUuid}
 		<!-- and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
 		group by c.status;
 	</select>
@@ -85,19 +83,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectDispositionStatusCounts" parameterType="RuleFilterCoords"
 		resultType="DispStatusCount">
 		select d.disposition_status_uid as dispStatus, count(*) as statusCount
-		from qa_db.qa_case c
-		inner join qa_db.qa_rule r on c.rule_uid =
-		r.rule_uid
-		inner join qa_db.qa_disposition_status d on
-		c.disposition_status_uid =
-		d.disposition_status_uid
-		where r.rule_uid =
-		#{ruleUuid}
-		and c.database_uid = #{databaseUuid}
-		and c.path_uid =
-		#{pathUuid}
+			from qa_db.qa_case c
+				inner join qa_db.qa_rule r on c.rule_uid = r.rule_uid
+				inner join qa_db.qa_disposition_status d on c.disposition_status_uid = d.disposition_status_uid
+			where r.rule_uid = #{ruleUuid}
+				and c.database_uid = #{databaseUuid}
+				and c.path_uid = #{pathUuid}
 		<!--and c.effective_time <![CDATA[ < ]]> #{viewPointTime} -->
-		group by c.disposition_status_uid;
+			group by c.disposition_status_uid;
 	</select>
 
 	<select id="selectAllRules" resultType="Rule" resultMap="ruleResultMap">
