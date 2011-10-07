@@ -93,6 +93,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and r.rule_uid = #{ruleUuid}
 		and c.database_uid = #{databaseUuid}
 		and c.path_uid = #{pathUuid}
+		<if test="name != null">
+			and comp.name like #{name}
+		</if>
 		<if test="assignedToFilter != null">
 			and c.assigned_to = #{assignedToFilter}
 		</if>
@@ -120,6 +123,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		and c.path_uid = #{pathUuid}
 		<if test="name != null">
 			and comp.name like #{name}
+		</if>
+		<if test="assignedToFilter != null">
+			and c.assigned_to = #{assignedToFilter}
+		</if>
+		<if test="dispStatusUuidFilter != null">
+			and c.disposition_status_uid = #{dispStatusUuidFilter}
+		</if>
+		<if test="statusFilter != null">
+			and c.status = #{statusFilter}
 		</if>
 		order by 	<!-- CONCEPT_NAME(1), STATUS(2), DISPOSITION(3), ASSIGNED_TO(4), TIME(5); -->
 		<choose>

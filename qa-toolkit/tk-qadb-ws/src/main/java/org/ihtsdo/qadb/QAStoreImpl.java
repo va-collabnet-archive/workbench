@@ -598,6 +598,23 @@ public class QAStoreImpl implements QAStoreBI {
 		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
 			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
 		}
+		
+		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
+				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
+			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
+			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
+			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
+			if (dispoFilterValue != null) {
+				coords.setDispStatusUuidFilter(dispoFilterValue.toString());
+			}
+			if (statusFilterValue != null) {
+				coords.setStatusFilter(statusFilterValue.toString().equals("Open") ? 1 : 0);
+			}
+			if(assignedToFilter != null){
+				coords.setAssignedToFilter(assignedToFilter.toString());
+			}
+		}
 
 		long queryStartTime = System.currentTimeMillis();
 		List<QACase> ruleCases = sqlSession.selectList("org.ihtsdo.qadb.data.QACaseMapper.selectRuleCases", coords);
@@ -625,9 +642,9 @@ public class QAStoreImpl implements QAStoreBI {
 				}
 				if (statusFilterValue != null) {
 					logger.info("STATUS FILTER");
-					logger.info(qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed"));
-					logger.info(qaCase.isActive());
-					logger.info(statusFilterValue.toString());
+					logger.info("QaCase is active & statusFilterValue = closed " + (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")));
+					logger.info("QACAse is active " + qaCase.isActive());
+					logger.info("Status filter value " + statusFilterValue.toString());
 					if (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")) {
 						logger.debug("Ignoring status filtered case");
 						continue;
