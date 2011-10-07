@@ -324,6 +324,8 @@ public class QAStoreImpl implements QAStoreBI {
 			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
 			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
 			coords.setViewPointTime(qaCoordinate.getViewPointTime());
+			coords.setStartLine(startLine-1);
+			coords.setPageLenght(pageLenght);
 			List<DispositionStatus> existingDispStatuses = getAllDispositionStatus();
 			if (filter != null) {
 				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
@@ -555,7 +557,7 @@ public class QAStoreImpl implements QAStoreBI {
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
 			totalLines = lines.size();
-			reducedLines = reduceLines(lines, startLine, pageLenght);
+			//reducedLines = reduceLines(lines, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
