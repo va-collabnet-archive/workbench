@@ -88,6 +88,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                     ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
             allowedStatusNids.add(getNidForUuids(
                     ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
+            allowedStatusNids.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 
             NidSetBI isaTypeNids = new NidSet();
             isaTypeNids.add(getNidForUuids(
