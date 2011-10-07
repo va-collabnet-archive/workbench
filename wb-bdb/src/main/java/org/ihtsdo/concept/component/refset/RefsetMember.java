@@ -545,6 +545,17 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
       return returnTuples;
    }
+   
+   
+   public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c, long time) {
+      List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
+
+      getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null,
+              c.getPositionSet(), returnTuples, getVersions(), c.getPrecedence(),
+              c.getContradictionManager(), time);
+
+      return returnTuples;
+   }
 
    @Override
    public boolean hasExtensions() throws IOException {

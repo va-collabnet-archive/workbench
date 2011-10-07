@@ -443,25 +443,27 @@ public abstract class ChangeReportBase extends DiffBase {
     }
 
     @Override
-    protected void addedConceptToRefex(I_GetConceptData c, I_GetConceptData m)
+    protected void addedConceptToRefex(I_GetConceptData c, String m)
             throws Exception {
         super.addedConceptToRefex(c, m);
         startChange(c);
         changes += "<tr><td>" + "Added member concept" + "</td><td>" + " "
-                + "</td><td>" + getConceptName(m.getConceptNid()) + "</td></tr>";
-        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
+                + "</td><td>" + m + "</td></tr>";
+        changes_xml += startElement("added_concept") + m
                 + endElement("added_concept") + "\n";
     }
 
     @Override
-    protected void deletedConceptFromRefex(I_GetConceptData c, I_GetConceptData m)
+    protected void deletedConceptFromRefex(I_GetConceptData c, String m1,
+        String m2)
             throws Exception {
-        super.deletedConceptFromRefex(c, m);
+        super.deletedConceptFromRefex(c, m1, m2);
         startChange(c);
-        changes += "<tr><td>" + "Deleted member concept" + "</td><td>"
-                + getConceptName(m.getConceptNid()) + "</td><td>" + " " + "</td></tr>";
-        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
-                + endElement("added_concept") + "\n";
+        changes += "<tr><td>" + "Changed member concept" + "</td><td>"
+                + m1 + "</td><td>" 
+                + m2 + "</td></tr>";
+        changes_xml += startElement("retired_concept") + m1
+                + endElement("retired_concept") + "\n";
     }
     String config_html = "";
 

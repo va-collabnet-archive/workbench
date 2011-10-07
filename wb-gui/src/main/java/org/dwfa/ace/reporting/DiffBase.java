@@ -64,6 +64,8 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -122,7 +124,7 @@ public class DiffBase {
      * 
      * @parameter default-value=true
      */
-    protected boolean deleted_concepts_refex;
+    protected boolean changed_concepts_refex;
     /**
      * Set to true to include concepts with changed status.
      * 
@@ -503,7 +505,7 @@ public class DiffBase {
             List<Integer> v1_concept_status_filter_int, List<Integer> v2_concept_status_filter_int,
             List<Integer> v1_description_status_filter_int, List<Integer> v2_description_status_filter_int,
             List<Integer> v1_relationship_status_filter_int, List<Integer> v2_relationship_status_filter_int,
-            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
+            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean changed_concepts_refex,
             boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
             boolean changed_rel_author, boolean changed_refex_author,
             List<Integer> author1, List<Integer> author2, boolean changed_defined,
@@ -522,7 +524,7 @@ public class DiffBase {
         this.added_concepts = added_concepts;
         this.deleted_concepts = deleted_concepts;
         this.added_concepts_refex = added_concepts_refex;
-        this.deleted_concepts_refex = deleted_concepts_refex;
+        this.changed_concepts_refex = changed_concepts_refex;
         this.changed_concept_status = changed_concept_status;
         this.v1_concept_status_filter_int = v1_concept_status_filter_int;
         this.v2_concept_status_filter_int = v2_concept_status_filter_int;
@@ -649,7 +651,7 @@ public class DiffBase {
         logConfig("deleted_concepts", "" + this.deleted_concepts);
         logConfig("added_concepts_refex", "" + this.added_concepts_refex);
         this.diff_count.put(this.added_concept_change_refex, 0);
-        logConfig("deleted_concepts_refex", "" + this.deleted_concepts_refex);
+        logConfig("changed_concepts_refex", "" + this.changed_concepts_refex);
         this.diff_count.put(this.deleted_concept_change_refex, 0);
         logConfig("changed_concept_status", "" + this.changed_concept_status);
         this.diff_count.put(this.concept_status_change, 0);
@@ -1145,9 +1147,9 @@ public class DiffBase {
 
     protected void compareAttributes(I_GetConceptData c) throws Exception {
         List<? extends I_ConceptAttributeTuple> a1s = c.getConceptAttributeTuples(null, allowed_position1, precedence,
-                contradiction_mgr);
+                contradiction_mgr, v1_id);
         List<? extends I_ConceptAttributeTuple> a2s = c.getConceptAttributeTuples(null, allowed_position2, precedence,
-                contradiction_mgr);
+                contradiction_mgr, v2_id);
         I_ConceptAttributeTuple<?> a1 = (a1s != null && a1s.size() > 0 ? a1s.get(0) : null);
         I_ConceptAttributeTuple<?> a2 = (a2s != null && a2s.size() > 0 ? a2s.get(0) : null);
         if (debug_p) {
@@ -1506,24 +1508,50 @@ public class DiffBase {
                 members2.remove(member);
             }
         }
-        if (this.deleted_concepts_refex) {
-            for (RefexVersionBI member : members1) {
+        if (this.changed_concepts_refex) {
+            for (RefexVersionBI member1 : members1) {
                 if (changed_concept_author) {
-                    if (v1_concept_author_int.size() > 0 && member != null
-                            && !v1_concept_author_int.contains(member.getAuthorNid())) {
+                    if (v1_concept_author_int.size() > 0 && member1 != null
+                            && !v1_concept_author_int.contains(member1.getAuthorNid())) {
                         return;
                     }
                 }
-                if (!members2.contains(member)) {
-                    I_GetConceptData memberConcept = Terms.get().getConcept(
-                            Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                    deletedConceptFromRefex(c, memberConcept);
+                if (!members2.contains(member1)) {
+                    String m1 = member1.toUserString();
+                    String m2 = "";
+                    deletedConceptFromRefex(c, m1, m2);
+                }
+                for (RefexVersionBI member2 : members2) {
+                    if (member1.getNid() == member2.getNid()) {
+                        if (RefexStrVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexStrVersionBI rsv1 = (RefexStrVersionBI) member1;
+                            RefexStrVersionBI rsv2 = (RefexStrVersionBI) member2;
+                            if (!rsv1.getStr1().equals(rsv2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
+                        } else if (RefexCnidStrVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexCnidStrVersionBI rcsv1 = (RefexCnidStrVersionBI) member1;
+                            RefexCnidStrVersionBI rcsv2 = (RefexCnidStrVersionBI) member2;
+                            if (!rcsv1.getStr1().equals(rcsv2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            } else if (rcsv1.getCnid1() != rcsv2.getCnid1()) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
+                        }
+                    }
                 }
             }
         }
         if (this.added_concepts_refex) {
 
             for (RefexVersionBI member : members2) {
+                RefexCnidStrVersionBI rv = (RefexCnidStrVersionBI) member;
                 if (changed_concept_author) {
                     if (v1_concept_author_int.size() > 0 && member != null
                             && !v1_concept_author_int.contains(member.getAuthorNid())) {
@@ -1531,19 +1559,19 @@ public class DiffBase {
                     }
                 }
                 if (!members1.contains(member)) {
-                    I_GetConceptData memberConcept = Terms.get().getConcept(
-                            Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                    addedConceptToRefex(c, memberConcept);
+                    String m = member.toUserString();
+                    addedConceptToRefex(c, m);
                 }
             }
         }
     }
 
-    protected void addedConceptToRefex(I_GetConceptData c, I_GetConceptData m) throws Exception {
+    protected void addedConceptToRefex(I_GetConceptData c, String m) throws Exception {
         incr(this.added_concept_change_refex);
     }
 
-    protected void deletedConceptFromRefex(I_GetConceptData c, I_GetConceptData m) throws Exception {
+    protected void deletedConceptFromRefex(I_GetConceptData c, String m1,
+            String m2) throws Exception {
         incr(this.deleted_concept_change_refex);
     }
 

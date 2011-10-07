@@ -122,6 +122,17 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                                        precedencePolicy, contradictionManager);
       relTupleList.addAll(tuplesToReturn);
    }
+   
+   @Override
+   public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
+                         List<I_RelTuple> relTupleList, Precedence precedencePolicy,
+                         ContradictionManagerBI contradictionManager, Long time) {
+      List<Version> tuplesToReturn = new ArrayList<Version>();
+
+      computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn, getVersions(),
+                                       precedencePolicy, contradictionManager, time);
+      relTupleList.addAll(tuplesToReturn);
+   }
 
    @Override
    public boolean addVersion(I_RelPart part) {

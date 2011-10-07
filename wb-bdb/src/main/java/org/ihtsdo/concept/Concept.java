@@ -1072,17 +1072,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long time)
            throws IOException {
-      Collection<? extends RefexChronicleBI<?>> refexes      = getRefsetMembers();
+        ConcurrentSkipListSet<RefsetMember<?, ?>> refsetMembers = getRefsetMembers();
       List<RefexVersionBI<?>>                   returnValues =
-         new ArrayList<RefexVersionBI<?>>(refexes.size());
+         new ArrayList<RefexVersionBI<?>>(refsetMembers.size());
 
-      for (RefexChronicleBI<?> refex : refexes) {
-         for (RefexVersionBI<?> version : refex.getVersions(vc)) {
-            if (version.getTime() < cutoffTime) {
-               returnValues.add(version);
-            }
+      for (RefsetMember refex : refsetMembers) {
+         for (Object o : refex.getVersions(vc, time)) {
+             RefexVersionBI version = (RefexVersionBI) o;
+            returnValues.add(version);
          }
       }
 

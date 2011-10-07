@@ -606,7 +606,7 @@ public class CreateReport extends AbstractTask {
             c.gridx = 1;
             c.weightx = 1.0;
             c.gridwidth = 1;
-            JCheckBox deletedConceptsRefex = new JCheckBox("Deleted Concepts from Refex");
+            JCheckBox deletedConceptsRefex = new JCheckBox("Changed Concepts in Refex");
             deletedConceptsRefex.addItemListener(new DeletedConceptsRefexItemListener());
             scrollPanel.add(deletedConceptsRefex, c);
 
