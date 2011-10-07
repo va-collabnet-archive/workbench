@@ -64,6 +64,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</trim>
 		<include refid="pagingSql"/>
 	</select>
+	<select id="selectRulesCount" parameterType="RuleFilterCoords"
+		resultMap="ruleResultMap">
+		select count(*) from qa_db.qa_rule r
+		inner join qa_severity s on
+		r.severity_uid = s.severity_uid
+		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+			<if test="name != null">
+				r.name like #{name}
+			</if>
+			<if test="ruleCode != null">
+				AND r.rule_code like #{ruleCode}
+			</if>
+			<if test="ruleCategory != null">
+				AND r.rule_category = #{ruleCategory}
+			</if>
+			<if test="severity != null">
+				AND r.severity_uid = #{severity}
+			</if>
+		</trim>
+	</select>
 	
 	<sql id="pagingSql">
 		LIMIT #{startLine}, #{pageLenght}

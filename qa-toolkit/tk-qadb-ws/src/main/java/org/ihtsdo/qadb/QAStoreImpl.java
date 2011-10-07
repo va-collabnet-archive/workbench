@@ -556,14 +556,45 @@ public class QAStoreImpl implements QAStoreBI {
 		List<RulesReportLine> reducedLines = new ArrayList<RulesReportLine>();
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
-			totalLines = lines.size();
-			//reducedLines = reduceLines(lines, startLine, pageLenght);
+			totalLines = countRulesByCoords(qaCoordinate, sortBy, filter, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + reducedLines.size() - 1, totalLines);
 	}
 	
+	private Integer countRulesByCoords(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
+		Integer result = 0;
+		try {
+			RuleFilterCoords coords = new RuleFilterCoords();
+			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
+			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
+			coords.setViewPointTime(qaCoordinate.getViewPointTime());
+			coords.setStartLine(startLine-1);
+			coords.setPageLenght(pageLenght);
+			List<DispositionStatus> existingDispStatuses = getAllDispositionStatus();
+			if (filter != null) {
+				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
+					coords.setName("%" + filter.get(RulesReportColumn.RULE_NAME).toString() + "%");
+				}
+				if (filter.containsKey(RulesReportColumn.RULE_CODE)) {
+					coords.setRuleCode("%" + filter.get(RulesReportColumn.RULE_CODE).toString() + "%");
+				}
+				if (filter.containsKey(RulesReportColumn.CATEGORY)) {
+					coords.setRuleCategory(filter.get(RulesReportColumn.CATEGORY).toString());
+				}
+				if (filter.containsKey(RulesReportColumn.SEVERITY)) {
+					coords.setSeverity(filter.get(RulesReportColumn.SEVERITY).toString());
+				}
+			}
+			result = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.RuleMapper.selectRulesCount", coords);
+			logger.debug("rules selected by coordinates...");
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
 	@Override
 	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
@@ -605,34 +636,6 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.info(ruleCases.size() + " Rule cases selected in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
 
 			for (QACase qaCase : ruleCases) {
-//				if (dispoFilterValue != null) {
-//					logger.info("DISPO STATUS FILTER");
-//					logger.info(qaCase.getDispositionStatus().getDispositionStatusUuid());
-//					logger.info(dispoFilterValue.toString());
-//					logger.info(!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString()));
-//					if (!qaCase.getDispositionStatus().getDispositionStatusUuid().equals(dispoFilterValue.toString())) {
-//						logger.debug("Ignoring disposition status filtered case");
-//						continue;
-//					}
-//				}
-//				if (statusFilterValue != null) {
-//					logger.info("STATUS FILTER");
-//					logger.info("QaCase is active & statusFilterValue = closed " + (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")));
-//					logger.info("QACAse is active " + qaCase.isActive());
-//					logger.info("Status filter value " + statusFilterValue.toString());
-//					if (qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Closed")) {
-//						logger.debug("Ignoring status filtered case");
-//						continue;
-//					} else if (!qaCase.isActive() && statusFilterValue.toString().equalsIgnoreCase("Open")) {
-//						logger.debug("Ignoring status filtered case");
-//						continue;
-//					}
-//				}
-//				if(assignedToFilter != null){
-//					if(qaCase.getAssignedTo() == null || !qaCase.getAssignedTo().equals(assignedToFilter.toString())){
-//						continue;
-//					}
-//				}
 				QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
 				lines.add(loopLine);
 			}
