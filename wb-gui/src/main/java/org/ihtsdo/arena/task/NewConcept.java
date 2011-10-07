@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -62,7 +64,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -79,12 +80,7 @@ import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -97,7 +93,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
     @Spec(directory = "tasks/arena/wizard", type = BeanType.TASK_BEAN)})
-public class NewConcept extends PreviousNextOrCancel {
+public class NewConcept extends PreviousNextOrCancel{
 
     /*
      * -----------------------
@@ -201,7 +197,7 @@ public class NewConcept extends PreviousNextOrCancel {
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
             host.unlink();
-          
+
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
             new Thread(
@@ -385,6 +381,12 @@ public class NewConcept extends PreviousNextOrCancel {
                     wizardPanel.remove(components[i]);
                 }
 
+                JPanel workflowPanel = config.getWorkflowPanel();
+                Component[] componentsPanel = workflowPanel.getComponents();
+                for (int i = 0; i < componentsPanel.length; i++) {
+                    workflowPanel.remove(componentsPanel[i]);
+                }
+                
                 wizardPanel.setLayout(new GridBagLayout());
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
@@ -599,6 +601,8 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.weightx = 0;
                 c.weighty = 1;
                 wizardPanel.add(new JPanel(), c);
+                fsn.requestFocusInWindow();
+                wizardPanel.repaint();
                 GuiUtil.tickle(wizardPanel);
             } catch (InterruptedException ex) {
                 Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
@@ -636,7 +640,6 @@ public class NewConcept extends PreviousNextOrCancel {
             cont.validate();
             cont = cont.getParent();
         }
-        continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
 
