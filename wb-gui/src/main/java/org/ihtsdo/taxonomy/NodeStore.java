@@ -57,10 +57,12 @@ public class NodeStore {
       if (node != null) {
          Collection<Long> nodeIds = nidToNodeIdMap.get(node.getCnid());
 
-         nodeIds.remove(nodeId);
+         if (nodeIds != null) {
+            nodeIds.remove(nodeId);
 
-         if (nodeIds.isEmpty()) {
-            nidToNodeIdMap.remove(node.getCnid());
+            if (nodeIds.isEmpty()) {
+               nidToNodeIdMap.remove(node.getCnid());
+            }
          }
       }
    }
