@@ -14,6 +14,7 @@ import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
 import org.ihtsdo.taxonomy.PathExpander;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
+import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -36,12 +37,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import java.lang.ref.WeakReference;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
 import java.util.Set;
+
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -55,7 +57,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
-import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
    public static final int  NAVIGATOR_WIDTH = 350;
@@ -71,8 +72,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
    private static ImageIcon inferredAndStatedView =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
-   public static HashMap<Integer, Set<WeakReference>> arenaPanelMap =
-      new HashMap<Integer, Set<WeakReference>>();
+   public static HashMap<Integer, Set<WeakReference>> arenaPanelMap = new HashMap<Integer,
+                                                                         Set<WeakReference>>();
 
    //~--- fields --------------------------------------------------------------
 
@@ -217,14 +218,18 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }
+
       Set<WeakReference> panelSet = arenaPanelMap.get(linkedTab);
-      if(panelSet != null){
-          panelSet.add(new WeakReference(view));
-      }else{
-          panelSet = new HashSet<WeakReference>();
-          panelSet.add(new WeakReference(view));
+
+      if (panelSet != null) {
+         panelSet.add(new WeakReference(view));
+      } else {
+         panelSet = new HashSet<WeakReference>();
+         panelSet.add(new WeakReference(view));
       }
+
       arenaPanelMap.put(linkedTab, panelSet);
+
       return view;
    }
 
@@ -441,10 +446,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    protected ConceptNavigator getNavigator() {
       if (navigator == null) {
          try {
-            TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config);
-            JScrollPane    treeScroller           = hierarchicalTreeHelper.getHierarchyPanel();
-            hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
+            TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config,
+                                                       "ConceptView taxnomy tab: " + linkedTab);
+            JScrollPane treeScroller = hierarchicalTreeHelper.getHierarchyPanel();
 
+            hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
             navigatorTree = (TaxonomyTree) treeScroller.getViewport().getView();
             navigatorTree.setFont(navigatorTree.getFont().deriveFont(getFontSize()));
             navigator = new ConceptNavigator(treeScroller, config, view);
@@ -496,8 +502,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
             JLayeredPane layers = renderer.getRootPane().getLayeredPane();
 
             if (showNavigator) {
+               navigator = getNavigator();
                setNavigatorLocation();
-               getNavigator().setVisible(true);
+               navigator.setVisible(true);
 
                if (((JToggleButton) e.getSource()).isSelected() == false) {
                   ((JToggleButton) e.getSource()).setSelected(true);
@@ -505,11 +512,12 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
                view.setHistoryShown(historyWasShown);
             } else {
-               getNavigator().setVisible(false);
+               navigator.setVisible(false);
                historyWasShown = view.isHistoryShown();
                view.setHistoryShown(false);
-               getNavigator().invalidate();
-               layers.remove(getNavigator());
+               navigator.invalidate();
+               layers.remove(navigator);
+               navigator = null;
 
                if (((JToggleButton) e.getSource()).isSelected()) {
                   ((JToggleButton) e.getSource()).setSelected(false);
@@ -651,23 +659,25 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    }
 
    public void setNavigatorLocation() {
-      int          rightSpace = -1;
-      int          leftSpace  = -1;
-      JLayeredPane layers     = renderer.getRootPane().getLayeredPane();
-      Point        loc        = SwingUtilities.convertPoint(renderer, new Point(0, 0), layers);
+      if (navigator != null) {
+         int          rightSpace = -1;
+         int          leftSpace  = -1;
+         JLayeredPane layers     = renderer.getRootPane().getLayeredPane();
+         Point        loc        = SwingUtilities.convertPoint(renderer, new Point(0, 0), layers);
 
-      if (layers.getWidth() > loc.x + renderer.getWidth() + getNavigator().getWidth() + rightSpace) {
-         loc.x = loc.x + renderer.getWidth() + rightSpace;
-         getNavigator().setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
-         getNavigator().setDropSide(SIDE.RIGHT);
-      } else {
-         loc.x = loc.x - getNavigator().getWidth() - leftSpace;
-         getNavigator().setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
-         getNavigator().setDropSide(SIDE.LEFT);
+         if (layers.getWidth() > loc.x + renderer.getWidth() + navigator.getWidth() + rightSpace) {
+            loc.x = loc.x + renderer.getWidth() + rightSpace;
+            navigator.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, Color.GRAY));
+            navigator.setDropSide(SIDE.RIGHT);
+         } else {
+            loc.x = loc.x - navigator.getWidth() - leftSpace;
+            navigator.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.GRAY));
+            navigator.setDropSide(SIDE.LEFT);
+         }
+
+         navigator.setBounds(loc.x, loc.y, navigator.getWidth(), renderer.getHeight() + 1);
+         layers.add(navigator, JLayeredPane.PALETTE_LAYER);
       }
-
-      getNavigator().setBounds(loc.x, loc.y, getNavigator().getWidth(), renderer.getHeight() + 1);
-      layers.add(getNavigator(), JLayeredPane.PALETTE_LAYER);
    }
 
    //~--- inner classes -------------------------------------------------------

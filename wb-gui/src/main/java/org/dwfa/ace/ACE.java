@@ -1734,7 +1734,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
               || "updateHierarchyView".equals(evt.getPropertyName())) {
          treeHelper.updateHierarchyView(evt.getPropertyName());
       } else if (evt.getPropertyName().equals("commit")) {
-         treeHelper.updateHierarchyView(evt.getPropertyName());
          removeConfigPalette();
       } else if (evt.getPropertyName().equals("commitEnabled")) {
          if (commitButton != null) {
@@ -2166,7 +2165,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     * this class is listening and when the user fires one of these commands, it
     * calls the appropriate action on the currently focused component.
     */
-
    public Component getConceptListEditor()
            throws IOException, ClassNotFoundException, NoSuchAlgorithmException, TerminologyException {
       if (conceptListEditor == null) {
@@ -2229,7 +2227,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    }
 
    private JComponent getDefaultContentPanel() throws Exception {
-      treeHelper = new TaxonomyHelper(this.aceFrameConfig);
+      treeHelper = new TaxonomyHelper(this.aceFrameConfig, "Ace Taxonomy");
       termTree   = treeHelper.getHierarchyPanel();
       treeHelper.addMouseListener(new TaxonomyMouseListenerForAce(this, treeHelper));
       conceptPanels = new ArrayList<ConceptPanel>();
@@ -2576,7 +2574,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
       // topPanel.add(getComponentToggles2(), c);
       // c.gridx++;
-
       File   componentPluginDir = new File(getPluginRoot() + File.separator + "viewer");
       File[] plugins            = componentPluginDir.listFiles(new FilenameFilter() {
          @Override

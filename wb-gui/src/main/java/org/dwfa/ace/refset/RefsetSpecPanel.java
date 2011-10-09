@@ -156,9 +156,9 @@ public class RefsetSpecPanel extends JPanel {
       split          = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
       split.setOneTouchExpandable(true);
       hierarchicalTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
-              new IntSet(), false));
+              new IntSet(), false), "Refset hierarchy");
       refsetAndParentOnlyTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
-              new IntSet(), true));
+              new IntSet(), true), " Refset parent-only hierarchy");
       bottomPanelVerticalBox = new Box(BoxLayout.Y_AXIS);
       bottomTabs             = new JTabbedPane();
       bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());

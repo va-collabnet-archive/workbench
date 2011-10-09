@@ -66,6 +66,7 @@ public class InternalNodeMultiParent extends InternalNode {
                node.setSortComparable(this.getSortComparable());
                node.getChildren().addAll(this.getChildren());
                node.nidNodeMap.putAll(this.nidNodeMap);
+               node.setChildrenAreSet(this.childrenAreSet);
 
                return node;
             }
@@ -102,6 +103,7 @@ public class InternalNodeMultiParent extends InternalNode {
 
    //~--- set methods ---------------------------------------------------------
 
+   @Override
    public void setHasExtraParents(boolean hasExtraParents) {
       this.hasExtraParents = hasExtraParents;
    }

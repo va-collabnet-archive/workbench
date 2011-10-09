@@ -431,7 +431,11 @@ public class NodeFactory {
             }
 
             finderFuture.get();
-            parentNode.childrenAreSet();
+
+            if (parentNode instanceof InternalNode) {
+               ((InternalNode) parentNode).setChildrenAreSet(true);
+            }
+
             model.nodeStore.add(parentNode.getFinalNode());
 
             return null;

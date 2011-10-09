@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -81,18 +82,24 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    private I_ConfigAceFrame     aceFrameConfig;
    private ActivityPanel        activity;
    private RelAssertionType     assertionType;
+   private String               helperName;
    private TaxonomyModel        model;
    private TaxonomyNodeRenderer renderer;
    private JButton              statedInferredButton;
    private TaxonomyTree         tree;
 
+   //~--- constant enums ------------------------------------------------------
+
+   static enum NodeAction { CHILDREN_CHANGED, ADDED_AS_PARENT }
+
    //~--- constructors --------------------------------------------------------
 
-   public TaxonomyHelper(I_ConfigAceFrame config) {
+   public TaxonomyHelper(I_ConfigAceFrame config, String helperName) {
       super();
       this.aceFrameConfig = config;
       this.assertionType  = config.getRelAssertionType();
       Ts.get().addTermChangeListener(this);
+      this.helperName = helperName;
    }
 
    //~--- methods -------------------------------------------------------------
@@ -128,11 +135,17 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    @Override
    public void propertyChange(PropertyChangeEvent evt) {
-      updateHierarchyView(evt.getPropertyName());
+
+      // updateHierarchyView(evt.getPropertyName());
    }
 
    public void removeTreeSelectionListener(TreeSelectionListener tsl) {
       tree.removeTreeSelectionListener(tsl);
+   }
+
+   @Override
+   public String toString() {
+      return helperName;
    }
 
    protected void treeSelectionChanged(TreeSelectionEvent evt) {
@@ -339,9 +352,11 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       this.activity = activity;
    }
 
+   ;
+
    //~--- inner classes -------------------------------------------------------
 
-   protected class ChangeWorker extends SwingWorker<List<TaxonomyNode>, TaxonomyNode> {
+   protected class ChangeWorker extends SwingWorker<List<TaxonomyNode>, NodeChangeRecord> {
       List<Long>   nodesToChange = new ArrayList<Long>();
       Set<Integer> changedComponents;
       Set<Integer> changedXrefs;
@@ -372,19 +387,36 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          }
 
          for (Long nodeId : nodesToChange) {
-            TaxonomyNode nodeToChange = model.getNodeStore().get(nodeId);
-            TaxonomyNode newNode      =
-               model.nodeFactory.makeNode(model.ts.getConceptVersion(nodeToChange.getCnid()),
-                                          nodeToChange.getParentNid(),
-                                          model.getNodeStore().get(nodeToChange.parentNodeId));
-            boolean contentChanged  = !newNode.getText().equals(nodeToChange.getText());
-            boolean childrenChanged = (newNode.isLeaf() != nodeToChange.isLeaf())
-                                      ||!newNode.getChildren().equals(nodeToChange.getChildren());
-            boolean parentsChanged = (newNode.hasExtraParents() != nodeToChange.hasExtraParents())
-                                     ||!newNode.getExtraParents().equals(nodeToChange.getExtraParents());
+            TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
+            TaxonomyNode newNode = model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
+                                      oldNode.getParentNid(), model.getNodeStore().get(oldNode.parentNodeId));
+            boolean childrenChanged = false;
 
-            if (parentsChanged || childrenChanged) {}
-            else if (contentChanged) {
+            if (oldNode.childrenAreSet()) {
+               CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
+
+               latch.await();
+            }
+
+            boolean contentChanged = !newNode.getText().equals(oldNode.getText());
+            boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
+                                     ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
+
+            if (parentsChanged) {
+
+               //
+            }
+
+            if (childrenChanged) {
+               NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
+                                               newNode);
+
+               publish(changeRec);
+
+               //
+            }
+
+            if (contentChanged) {
                contentChangedList.add(newNode);
             }
          }
@@ -406,9 +438,27 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       }
 
       @Override
-      protected void process(List<TaxonomyNode> chunks) {
-         for (TaxonomyNode node : chunks) {
-            model.treeStructureChanged(NodePath.getTreePath(model, node));
+      protected void process(List<NodeChangeRecord> chunks) {
+         for (NodeChangeRecord nodeChangeRec : chunks) {
+            switch (nodeChangeRec.action) {
+            case ADDED_AS_PARENT :
+               break;
+
+            case CHILDREN_CHANGED :
+               int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
+
+               for (int i = 0; i < removedNodeIndices.length; i++) {
+                  removedNodeIndices[i] = i;
+               }
+
+               model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
+               model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
+
+               break;
+
+            default :
+               throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
+            }
          }
       }
 
@@ -422,6 +472,26 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
             changedConcepts.setMember(cnid);
             nodesToChange.addAll(nodeIds);
          }
+      }
+
+      @Override
+      public String toString() {
+         return helperName + " change worker";
+      }
+   }
+
+
+   private static class NodeChangeRecord {
+      NodeAction   action;
+      TaxonomyNode newNode;
+      TaxonomyNode oldNode;
+
+      //~--- constructors -----------------------------------------------------
+
+      public NodeChangeRecord(NodeAction action, TaxonomyNode oldNode, TaxonomyNode newNode) {
+         this.action  = action;
+         this.oldNode = oldNode;
+         this.newNode = newNode;
       }
    }
 }

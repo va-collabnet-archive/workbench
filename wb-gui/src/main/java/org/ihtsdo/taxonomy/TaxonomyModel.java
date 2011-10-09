@@ -93,6 +93,17 @@ public class TaxonomyModel implements TreeModel {
       fireTreeNodesInserted(this, getPathToRoot(parentNode), newNodeIndices, newChildren);
    }
 
+   void nodesWereRemoved(TaxonomyNode parentNode, int[] removedNodeIndices) {
+      int      cCount          = removedNodeIndices.length;
+      Object[] removedChildren = new Object[cCount];
+
+      for (int counter = 0; counter < cCount; counter++) {
+         removedChildren[counter] = getChild(parentNode, removedNodeIndices[counter]);
+      }
+
+      fireTreeNodesInserted(this, getPathToRoot(parentNode), removedNodeIndices, removedChildren);
+   }
+
    @Override
    public void removeTreeModelListener(TreeModelListener l) {
       listeners.remove(l);

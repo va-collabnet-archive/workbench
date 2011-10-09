@@ -774,7 +774,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             return;
          }
 
-         setupHistoryPane();
+         if (settings.isNavigatorSetup()) {
+            setupHistoryPane();
+         }
       } catch (Exception e) {
          AceLog.getAppLog().alertAndLogException(e);
       }
@@ -786,7 +788,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
       settings.getConfig().addPropertyChangeListener("commit", pcal);
       GuiUtil.tickle(cView);
 
-      if (settings.getNavigator() != null) {
+      if (settings.isNavigatorSetup()) {
          SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -794,104 +796,106 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                   return;
                }
 
-               settings.getNavigator().updateHistoryPanel();
+               if (settings.isNavigatorSetup()) {
+                  settings.getNavigator().updateHistoryPanel();
 
-               // show subpanels which are uncomitted
-               if (activeDescriptionPanels != null) {
-                  for (DragPanelDescription dc : activeDescriptionPanels) {
-                     if (stop) {
-                        return;
-                     }
+                  // show subpanels which are uncomitted
+                  if (activeDescriptionPanels != null) {
+                     for (DragPanelDescription dc : activeDescriptionPanels) {
+                        if (stop) {
+                           return;
+                        }
 
-                     for (JComponent ref : dc.getRefexSubpanels()) {
-                        DragPanelExtension rp = (DragPanelExtension) ref;
+                        for (JComponent ref : dc.getRefexSubpanels()) {
+                           DragPanelExtension rp = (DragPanelExtension) ref;
 
-                        if (rp.getThingToDrag().isUncommitted()) {
-                           rp.setVisible(true);
+                           if (rp.getThingToDrag().isUncommitted()) {
+                              rp.setVisible(true);
+                           }
                         }
                      }
                   }
-               }
 
-               if (inactiveDescriptionPanels != null) {
-                  for (DragPanelDescription dc : inactiveDescriptionPanels) {
-                     if (stop) {
-                        return;
-                     }
+                  if (inactiveDescriptionPanels != null) {
+                     for (DragPanelDescription dc : inactiveDescriptionPanels) {
+                        if (stop) {
+                           return;
+                        }
 
-                     if (dc.getThingToDrag().isUncommitted()) {
-                        dc.setVisible(true);
-                     }
-                  }
-               }
-
-               if (inactiveInferredRelPanels != null) {
-                  for (DragPanelRel rel : inactiveInferredRelPanels) {
-                     if (stop) {
-                        return;
-                     }
-
-                     if (rel.getThingToDrag().isUncommitted()) {
-                        rel.setVisible(true);
-                     }
-                  }
-               }
-
-               if (inactiveStatedRelPanels != null) {
-                  for (DragPanelRel rel : inactiveStatedRelPanels) {
-                     if (stop) {
-                        return;
-                     }
-
-                     if (rel.getThingToDrag().isUncommitted()) {
-                        rel.setVisible(true);
-                     }
-                  }
-               }
-
-               if (activeInferredRelPanels != null) {
-                  for (DragPanelRel rel : activeInferredRelPanels) {
-                     if (stop) {
-                        return;
-                     }
-
-                     if (rel.getThingToDrag().isUncommitted()) {
-                        rel.setVisible(true);
-                     }
-                  }
-               }
-
-               if (activeStatedRelPanels != null) {
-                  for (DragPanelRel rel : activeStatedRelPanels) {
-                     if (stop) {
-                        return;
-                     }
-
-                     if (rel.getThingToDrag().isUncommitted()) {
-                        rel.setVisible(true);
-                     }
-                  }
-               }
-
-               if (inactiveStatedRels != null) {
-                  for (I_RelTuple rel : inactiveStatedRels) {
-                     if ((rel.getGroup() > 0) && rel.isUncommitted()) {
-                        List<JComponent> historyPanels = cpr.getHistoryPanels();
-
-                        for (JComponent panel : historyPanels) {
-                           panel.setVisible(true);
+                        if (dc.getThingToDrag().isUncommitted()) {
+                           dc.setVisible(true);
                         }
                      }
                   }
-               }
 
-               if (inactiveInferredRels != null) {
-                  for (I_RelTuple rel : inactiveInferredRels) {
-                     if ((rel.getGroup() > 0) && rel.isUncommitted()) {
-                        List<JComponent> historyPanels = cpr.getHistoryPanels();
+                  if (inactiveInferredRelPanels != null) {
+                     for (DragPanelRel rel : inactiveInferredRelPanels) {
+                        if (stop) {
+                           return;
+                        }
 
-                        for (JComponent panel : historyPanels) {
-                           panel.setVisible(true);
+                        if (rel.getThingToDrag().isUncommitted()) {
+                           rel.setVisible(true);
+                        }
+                     }
+                  }
+
+                  if (inactiveStatedRelPanels != null) {
+                     for (DragPanelRel rel : inactiveStatedRelPanels) {
+                        if (stop) {
+                           return;
+                        }
+
+                        if (rel.getThingToDrag().isUncommitted()) {
+                           rel.setVisible(true);
+                        }
+                     }
+                  }
+
+                  if (activeInferredRelPanels != null) {
+                     for (DragPanelRel rel : activeInferredRelPanels) {
+                        if (stop) {
+                           return;
+                        }
+
+                        if (rel.getThingToDrag().isUncommitted()) {
+                           rel.setVisible(true);
+                        }
+                     }
+                  }
+
+                  if (activeStatedRelPanels != null) {
+                     for (DragPanelRel rel : activeStatedRelPanels) {
+                        if (stop) {
+                           return;
+                        }
+
+                        if (rel.getThingToDrag().isUncommitted()) {
+                           rel.setVisible(true);
+                        }
+                     }
+                  }
+
+                  if (inactiveStatedRels != null) {
+                     for (I_RelTuple rel : inactiveStatedRels) {
+                        if ((rel.getGroup() > 0) && rel.isUncommitted()) {
+                           List<JComponent> historyPanels = cpr.getHistoryPanels();
+
+                           for (JComponent panel : historyPanels) {
+                              panel.setVisible(true);
+                           }
+                        }
+                     }
+                  }
+
+                  if (inactiveInferredRels != null) {
+                     for (I_RelTuple rel : inactiveInferredRels) {
+                        if ((rel.getGroup() > 0) && rel.isUncommitted()) {
+                           List<JComponent> historyPanels = cpr.getHistoryPanels();
+
+                           for (JComponent panel : historyPanels) {
+                              panel.setVisible(true);
+                           }
                         }
                      }
                   }
@@ -1406,7 +1410,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             return;
          }
 
-         settings.getNavigator().updateHistoryPanel();
+         if (settings.isNavigatorSetup()) {
+            settings.getNavigator().updateHistoryPanel();
+         }
       }
    }
 
