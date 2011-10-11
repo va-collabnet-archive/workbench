@@ -485,7 +485,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                                             bean.setWorkflowId(latestBean.getWorkflowId());
                                         }
 
+                                    	WorkflowHelper.setAdvancingWorkflowLock(true);
                                         writer.updateWorkflowHistory(bean);
+                                    	WorkflowHelper.setAdvancingWorkflowLock(false);
                                     }
                                 }
                             } catch (Exception e1) {
@@ -594,8 +596,12 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                                 // See if state prevents retirement
                                 if (currentModelerUUID.equals(latestModelerUUID) && !autoApproved) {
-                                    WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean, viewCoord);
                                     updateOopsButton(settings.getConcept());
+
+                                	WorkflowHelper.setAdvancingWorkflowLock(true);
+                                    WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean, viewCoord);
+                                	WorkflowHelper.setAdvancingWorkflowLock(false);
+
                                     workflowToggleButton.doClick();
                                 }
                             }

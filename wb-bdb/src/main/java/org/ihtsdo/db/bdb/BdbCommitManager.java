@@ -54,6 +54,7 @@ import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -93,7 +94,7 @@ import javax.swing.SwingWorker;
 public class BdbCommitManager {
    private static final int                   PERMIT_COUNT             = 50;
    public static String                       pluginRoot               = "plugins";
-   private static int                         wfHistoryRefsetId        = 0;
+   private static int                         wfHistoryRefsetId        = WorkflowHelper.getWorkflowRefsetNid();
    private static final AtomicInteger         writerCount              = new AtomicInteger(0);
    private static boolean                     writeChangeSets          = true;
    private static Set<I_ExtendByRef>          uncommittedWfMemberIds   = new HashSet<I_ExtendByRef>();
@@ -203,21 +204,6 @@ public class BdbCommitManager {
       RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
 
       addUncommitted(member.getEnclosingConcept());
-
-      if (wfHistoryRefsetId == 0) {
-    	  if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
-    		  try {
-    			  wfHistoryRefsetId =
-    				  Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
-    		  } catch (Exception e) {
-    			  AceLog.getAppLog().log(Level.WARNING,
-                                     	 "Unable to access Workflow History Refset UUID with error: " +
-                                     	 e.getMessage());
-    		  }
-    	  } else {
-    		  wfHistoryRefsetId = Integer.MAX_VALUE;
-    	  }
-      }
 
       if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
          addUncommittedWfMemberId(extension);

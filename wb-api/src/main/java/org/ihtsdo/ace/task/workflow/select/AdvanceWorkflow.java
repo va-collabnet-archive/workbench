@@ -17,6 +17,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
 
@@ -59,7 +60,10 @@ public class AdvanceWorkflow extends AbstractTask {
     		{
     			if (bean.getAction().equals(selectedActionUid))
     			{
+    				WorkflowHelper.setAdvancingWorkflowLock(true);
     				writer.updateWorkflowHistory(bean);
+    				WorkflowHelper.setAdvancingWorkflowLock(false);
+    				
         	        return Condition.CONTINUE;
     			}
     		}
