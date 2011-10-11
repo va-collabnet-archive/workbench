@@ -65,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="pagingSql"/>
 	</select>
 	<select id="selectRulesCount" parameterType="RuleFilterCoords"
-		resultMap="ruleResultMap">
+		resultType="Integer">
 		select count(*) from qa_db.qa_rule r
 		inner join qa_severity s on
 		r.severity_uid = s.severity_uid
