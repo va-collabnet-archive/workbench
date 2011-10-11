@@ -555,10 +555,17 @@ public class QAStoreImpl implements QAStoreBI {
 		Integer totalLines = 0;
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
+			logger.debug("Rules report line size: " +  lines.size());
 			totalLines = countRulesByCoords(qaCoordinate, sortBy, filter, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		logger.debug("lines " + lines);
+		logger.debug("sortBy " +  sortBy);
+		logger.debug("filter " + filter);
+		logger.debug("startLine " + startLine);
+		logger.debug("page size " + (startLine + lines.size() -1));
+		logger.debug("total lines " + totalLines);
 		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
 	}
 	
@@ -584,6 +591,7 @@ public class QAStoreImpl implements QAStoreBI {
 				}
 			}
 			result = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.RuleMapper.selectRulesCount", coords);
+			logger.debug("Rules amount: " + result);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
