@@ -137,6 +137,7 @@ rule "rule 4.2" #CANCEL concept onto same concept
          $dropObject: ComponentFact(((ComponentVersionBI)this.component).getChronicle().isUncommitted() == true,
                 context == Context.DROP_OBJECT, component == $dropTarget.component)
          not $refex: RefexFact(context == Context.DROP_TARGET)
+         not $relGroup: RelGroupFact(context == Context.DROP_TARGET)
    then
       actions.add(new CancelAction("cancel", $dropObject, vc));
 end
