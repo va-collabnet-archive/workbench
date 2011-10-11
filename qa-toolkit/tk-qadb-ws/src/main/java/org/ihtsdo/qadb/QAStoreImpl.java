@@ -637,11 +637,10 @@ public class QAStoreImpl implements QAStoreBI {
 		List<QACase> ruleCases = sqlSession.selectList("org.ihtsdo.qadb.data.QACaseMapper.selectRuleCases", coords);
 		long queryEndTime = System.currentTimeMillis();
 		logger.info(ruleCases.size() + " Rule cases selected in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
-
-			for (QACase qaCase : ruleCases) {
-				QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
-				lines.add(loopLine);
-			}
+		for (QACase qaCase : ruleCases) {
+			QACasesReportLine loopLine = new QACasesReportLine(qaCase, qaCase.getComponentUuid(), qaCase.getDispositionStatus());
+			lines.add(loopLine);
+		}
 		logger.info("Returning " + lines.size() + " Lines");
 		return lines;
 	}
