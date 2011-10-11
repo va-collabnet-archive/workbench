@@ -211,7 +211,7 @@ public class DrComponentHelper {
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
 			modelersRolesSet.setRolesSetType("Modelers");
 
-			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(config.getAllowedStatus(), 
+			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
 					null, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
 					config.getConflictResolutionStrategy())) {
@@ -230,11 +230,13 @@ public class DrComponentHelper {
 				loopRel.setFactContextName(factContextName);
 				loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
 
-				if (relTuple.getCharacteristicNid() == historical) {
+				if (relTuple.getCharacteristicNid() == historical && 
+						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
 					concept.getOutgoingRelationships().add(loopRel);
 				}
 
-				if (relTuple.getCharacteristicNid() == stated) {
+				if (relTuple.getCharacteristicNid() == stated && 
+						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
 					statedRolesSet.getRelationships().add(loopRel);
 				}
 
@@ -242,7 +244,8 @@ public class DrComponentHelper {
 					modelersRolesSet.getRelationships().add(loopRel);
 				}
 
-				if (relTuple.getCharacteristicNid() == inferred) {
+				if (relTuple.getCharacteristicNid() == inferred && 
+						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
 					inferredRolesSet.getRelationships().add(loopRel);
 				}
 			}
