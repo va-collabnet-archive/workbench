@@ -82,7 +82,10 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						}
 					}
 					String descriptionstatus = getStatusType(description.getStatusNid());
-
+					
+					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
+					
+					
 					if (descriptionstatus.equals("0") || descriptionstatus.equals("6") || descriptionstatus.equals("8"))
 						active = "1";
 					else
@@ -109,8 +112,12 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
+					}else if(getConfig().getRf2Format().equals("false") ){
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
+						
 					}else{
-						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
+						//writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
 					}
 					
 					
@@ -132,6 +139,13 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 			String caseSignificanceId) throws IOException {
 		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
 				+ caseSignificanceId);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
+	
+	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
+			String caseSignificanceId, String authorName) throws IOException {
+		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
+				+ caseSignificanceId + "\t"	+ authorName);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 
