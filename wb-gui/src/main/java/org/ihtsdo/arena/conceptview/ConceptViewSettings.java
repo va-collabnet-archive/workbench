@@ -84,9 +84,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
     private DescType relTarget = DescType.FULLY_SPECIFIED;
     RelAssertionType relAssertionType = RelAssertionType.STATED;
     private DescType refexName = DescType.PREFERRED;
-    private DescType c3Refex = DescType.PREFERRED;
-    private DescType c2Refex = DescType.PREFERRED;
-    private DescType c1Refex = DescType.PREFERRED;
+    private DescType c3Refex = DescType.FULLY_SPECIFIED;
+    private DescType c2Refex = DescType.FULLY_SPECIFIED;
+    private DescType c1Refex = DescType.FULLY_SPECIFIED;
     private transient ConceptChangedListener conceptChangedListener;
     private transient JToggleButton navButton;
     private transient ConceptNavigator navigator;

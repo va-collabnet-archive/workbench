@@ -84,7 +84,7 @@ public class TaxonomyNodeRenderer extends JLabel
    private boolean          drawsFocusBorderAroundIcon = false;
    private int              labelStart                 = 0;
    private IntSet           viewerImageTypes           = new IntSet();
-   private DescTypeToRender typeToRender               = DescTypeToRender.PREFERRED;
+   private DescTypeToRender typeToRender               = DescTypeToRender.FSN;
    private boolean          selected                   = false;
    private I_ConfigAceFrame aceConfig;
    private Color            backgroundNonSelectionColor;
