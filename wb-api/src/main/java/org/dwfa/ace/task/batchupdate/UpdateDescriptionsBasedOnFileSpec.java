@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import javax.swing.JList;
@@ -36,10 +37,15 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
@@ -51,6 +57,7 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -96,6 +103,7 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 			File inputFile = new File(filename);
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			model.clear();
@@ -130,8 +138,8 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 					String newText = columns[2];
 					SearchResult results = tf.doLuceneSearch(descriptionId);
 					int dnid = Integer.valueOf(results.searcher.doc(results.topDocs.scoreDocs[0].doc).get("dnid"));
-					I_DescriptionVersioned description = tf.getDescription(dnid);
-					I_GetConceptData concept = tf.getConcept(description.getConceptNid());
+					I_DescriptionVersioned oldDescription = tf.getDescription(dnid);
+					I_GetConceptData concept = tf.getConcept(oldDescription.getConceptNid());
 					I_DescriptionTuple tuple = null;
 					for (I_DescriptionTuple loopTuple : concept.getDescriptionTuples(null, null, 
 							config.getViewPositionSetReadOnly(), config.getPrecedence(), 
@@ -140,15 +148,16 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 							tuple = loopTuple;
 						}
 					}
-					
+
 					if (tuple != null && tuple.getText().equals(oldText)) {
+
 						I_DescriptionPart newPart= (I_DescriptionPart) tuple.makeAnalog(
 								SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
 								config.getDbConfig().getUserConcept().getNid(), 
 								config.getEditingPathSet().iterator().next().getConceptNid(), 
 								Long.MAX_VALUE);
-						
-						tf.newDescription(UUID.randomUUID(), 
+
+						I_DescriptionVersioned newDescription = tf.newDescription(UUID.randomUUID(), 
 								concept, 
 								newPart.getLang(), 
 								newText, 
@@ -156,7 +165,68 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 								config, 
 								tf.getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()), 
 								Long.MAX_VALUE);
-						
+
+						List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(
+								oldDescription.getDescId(), true);
+						for (I_ExtendByRef extension : extensions) {
+							if (extension.getRefsetId() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID() ||
+									extension.getRefsetId() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
+								I_ExtendByRefVersion loopTuple = extension.getTuples(
+										config.getAllowedStatus(), 
+										config.getViewPositionSetReadOnly(), 
+										config.getPrecedence(), 
+										config.getConflictResolutionStrategy()).iterator().next();
+								I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) 
+								loopTuple.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
+										config.getDbConfig().getUserConcept().getConceptNid(), 
+										config.getEditingPathSetReadOnly().iterator().next().getConceptNid(),
+										Long.MAX_VALUE);
+
+								refsetHelper.newRefsetExtension(extension.getRefsetId(), 
+										newDescription.getDescId(), EConcept.REFSET_TYPES.CID, 
+										new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
+												newExtConceptPart.getC1id()), config);
+								
+							}
+						}
+						boolean equalsSynonymExists = false;
+						String semtagLessDescription = newDescription.getText().substring(0,
+								newDescription.getText().lastIndexOf("(") - 1).trim();
+						if (oldDescription.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
+							for (I_DescriptionTuple loopTuple : concept.getDescriptionTuples(
+									config.getAllowedStatus(), 
+									config.getDescTypes(), 
+									config.getViewPositionSetReadOnly(), 
+									config.getPrecedence(), 
+									config.getConflictResolutionStrategy())) {
+								if (loopTuple.getText().equals(semtagLessDescription)) {
+									equalsSynonymExists = true;
+								}
+							}
+						}
+
+						if (!equalsSynonymExists) {
+							I_DescriptionVersioned newSynonym = tf.newDescription(UUID.randomUUID(), 
+									concept, 
+									newPart.getLang(), 
+									semtagLessDescription, 
+									tf.getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID()), 
+									config, 
+									tf.getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()), 
+									Long.MAX_VALUE);
+
+							for (I_ExtendByRef extension : extensions) {
+								if (extension.getRefsetId() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID() ||
+										extension.getRefsetId() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
+									refsetHelper.newRefsetExtension(extension.getRefsetId(), 
+											newSynonym.getDescId(), EConcept.REFSET_TYPES.CID, 
+											new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
+													SnomedMetadataRfx.getDESC_ACCEPTABLE_NID()), config);
+								}
+							}
+
+						}
+
 						model.addElement(concept);
 						tf.addUncommittedNoChecks(concept);
 						modified++;
@@ -174,6 +244,9 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 					activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";");
 					activity.complete();
 					Terms.get().getActiveAceFrameConfig().setStatusMessage("");
+				}
+				if (modified > 0) {
+					config.setCommitEnabled(true);
 				}
 				JOptionPane.showMessageDialog(null,
 						"Batch update finished: Lines: " + lines + 
