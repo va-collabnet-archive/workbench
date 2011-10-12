@@ -950,7 +950,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
     }
 
-    private void setupHistoryPane() throws IOException, ContraditionException {
+    protected void setupHistoryPane() throws IOException, ContraditionException {
         if (paths == null) {
             return;
         }
