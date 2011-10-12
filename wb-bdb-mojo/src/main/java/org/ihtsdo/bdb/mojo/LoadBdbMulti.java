@@ -159,20 +159,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
-                // Can revert this part once wfHistory.jbin generation (via wf-lucene-init) 
-		FileInputStream  fis = null;
-		try {
-			fis = new FileInputStream(conceptsFile);
-		} catch (FileNotFoundException e) {
-			getLog().info("Could not locate eConcept file: " + conceptsFile.getAbsolutePath());	
-			
-			if (conceptsFile.getAbsolutePath().contains("wfHistory.jbin")) {
-				continue;
-			} else {
-				throw e;
-			}
-		}
-
+				FileInputStream  fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
