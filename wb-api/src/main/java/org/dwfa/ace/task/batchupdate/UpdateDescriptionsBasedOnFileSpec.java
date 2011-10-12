@@ -38,6 +38,7 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -59,6 +60,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
@@ -190,22 +192,40 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 							}
 						}
 						boolean equalsSynonymExists = false;
+						I_DescriptionTuple inactiveDescription = null;
 						String semtagLessDescription = newDescription.getText().substring(0,
 								newDescription.getText().lastIndexOf("(") - 1).trim();
+						I_IntSet allStatuses = tf.newIntSet();
+						allStatuses.addAll(config.getAllowedStatus().getSetValues());
+						allStatuses.add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
+						I_IntSet searchTypes = tf.newIntSet();
+						searchTypes.add(SnomedMetadataRfx.getDES_SYNONYM_NID());
 						if (oldDescription.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
-							for (I_DescriptionTuple loopTuple : concept.getDescriptionTuples(
-									config.getAllowedStatus(), 
-									config.getDescTypes(), 
+							List<? extends I_DescriptionTuple> descriptionsInConcept = concept.getDescriptionTuples(
+									null, 
+									searchTypes, 
 									config.getViewPositionSetReadOnly(), 
-									config.getPrecedence(), 
-									config.getConflictResolutionStrategy())) {
+									Precedence.TIME, 
+									config.getConflictResolutionStrategy());
+							for (I_DescriptionTuple loopTuple : descriptionsInConcept) {
 								if (loopTuple.getText().equals(semtagLessDescription)) {
 									equalsSynonymExists = true;
+									if (loopTuple.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+										inactiveDescription = loopTuple;
+									}
 								}
 							}
 						}
+						
+						if (equalsSynonymExists && inactiveDescription != null) {
+							inactiveDescription.makeAnalog(
+									SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
+									config.getDbConfig().getUserConcept().getConceptNid(), 
+									config.getEditingPathSetReadOnly().iterator().next().getConceptNid(),
+									Long.MAX_VALUE);
+						}
 
-						if (!equalsSynonymExists) {
+						if (!equalsSynonymExists && inactiveDescription == null) {
 							I_DescriptionVersioned newSynonym = tf.newDescription(UUID.randomUUID(), 
 									concept, 
 									newPart.getLang(), 
