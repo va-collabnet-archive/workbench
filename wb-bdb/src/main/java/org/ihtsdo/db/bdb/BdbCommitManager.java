@@ -94,7 +94,7 @@ import javax.swing.SwingWorker;
 public class BdbCommitManager {
    private static final int                   PERMIT_COUNT             = 50;
    public static String                       pluginRoot               = "plugins";
-   private static int                         wfHistoryRefsetId        = WorkflowHelper.getWorkflowRefsetNid();
+   private static int                         wfHistoryRefsetId        = 0;
    private static final AtomicInteger         writerCount              = new AtomicInteger(0);
    private static boolean                     writeChangeSets          = true;
    private static Set<I_ExtendByRef>          uncommittedWfMemberIds   = new HashSet<I_ExtendByRef>();
@@ -205,9 +205,7 @@ public class BdbCommitManager {
 
       addUncommitted(member.getEnclosingConcept());
 
-      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
-         addUncommittedWfMemberId(extension);
-      }
+      handleWorkflowHistoryExtensions(extension);
    }
 
    public static void addUncommittedDescNid(int dNid) {
@@ -1066,6 +1064,16 @@ public class BdbCommitManager {
          } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
+      }
+   }
+
+   private static void handleWorkflowHistoryExtensions(I_ExtendByRef extension) {
+      if (wfHistoryRefsetId == 0) {
+    	  wfHistoryRefsetId = WorkflowHelper.getWorkflowRefsetNid();
+   	  }
+   	  
+      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
+    	  addUncommittedWfMemberId(extension);
       }
    }
 
