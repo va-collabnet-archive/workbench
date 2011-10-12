@@ -63,6 +63,8 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 			if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
 				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
 				
+				String authorName = tf.getConcept(attributes.getAuthorNid()).getInitialText();
+				
 				if (attributes.isDefined()) {
 					definitionStatusId = I_Constants.FULLY_DEFINED;
 				} else {
@@ -91,7 +93,12 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 					conceptid=concept.getUUIDs().iterator().next().toString();
 				}
 				
-				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
+			if(getConfig().getRf2Format().equals("false") ){
+				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);
+			}else{			
+				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);
+				//writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
+			}
 				
 			}
 		} catch (IOException e) {
@@ -113,5 +120,9 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 
+	public static void writeRF2TypeLine(String conceptid, String effectiveTime, String active, String moduleId, String definitionStatusId , String authorName) throws IOException {
+		WriteUtil.write(getConfig(), conceptid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + definitionStatusId + "\t" + authorName);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
 
 }
