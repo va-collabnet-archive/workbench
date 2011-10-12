@@ -350,7 +350,7 @@ public abstract class LuceneManager {
 		if (type == LuceneSearchType.DESCRIPTION) {
 			return DescriptionLuceneManager.matchLimit;
 		} else {
-			return WfHxLuceneManager.calculateMatchLimit();
+			return WfHxLuceneManager.matchLimit;
 		}
 	}
 
