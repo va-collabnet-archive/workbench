@@ -93,7 +93,8 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						active = "0";
 					
 					moduleId = getConceptMetaModuleID(concept , effectiveTime);
-				
+					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
+					
 					if (conceptid==null || conceptid.equals("") || conceptid.equals("0") ){
 						conceptid=concept.getUids().iterator().next().toString();
 					}
@@ -102,15 +103,19 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
 					
+					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Text-definition: " + description.getUUIDs().iterator().next().toString());
+					}else if(getConfig().getRf2Format().equals("false") ){
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
 					}else{
 						/*getConfig().getBw().write(
 							descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
 							+ caseSignificanceId);
 						getConfig().getBw().write("\r\n");
 						*/
-						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
+						//writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
 					}
 				}
 			}
@@ -127,6 +132,13 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 			String caseSignificanceId) throws IOException {
 		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
 				+ caseSignificanceId);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
+	
+	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
+			String caseSignificanceId, String authorName) throws IOException {
+		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
+				+ caseSignificanceId + "\t"	+ authorName);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 }
