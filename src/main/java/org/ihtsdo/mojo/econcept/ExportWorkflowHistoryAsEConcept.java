@@ -38,7 +38,6 @@ import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
  * in eConcept format.
  *
  * @goal export-workflow-history-as-econcept
- * @phase process-resources
  */
 
 public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
