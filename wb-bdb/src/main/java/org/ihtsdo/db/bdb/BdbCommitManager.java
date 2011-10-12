@@ -654,7 +654,7 @@ public class BdbCommitManager {
             c.modified();
             Bdb.getConceptDb().writeConcept(c);
 
-            if (wfHistoryRefsetId < 0) {
+            if (uncommittedWfMemberIds.size() < 0) {
                commitSet.setMember(wfHistoryRefsetId);
 
                Concept wfRefset = (Concept) Ts.get().getConcept(wfHistoryRefsetId);
