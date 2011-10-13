@@ -121,7 +121,6 @@ public class DescriptionRevisionTest {
         desc.revisions = null;
         desc.nid = 4;
         desc.primordialSapNid = 4; 
-        desc.primordialUNid = 4;
         desc.versions = null; 
 
         obj.primordialComponent = desc; 
@@ -138,7 +137,6 @@ public class DescriptionRevisionTest {
         desc.revisions = null;
         desc.nid = 5;
         desc.primordialSapNid = 5; 
-        desc.primordialUNid = 5;
         desc.versions = null; 
 
         obj.primordialComponent = desc; 

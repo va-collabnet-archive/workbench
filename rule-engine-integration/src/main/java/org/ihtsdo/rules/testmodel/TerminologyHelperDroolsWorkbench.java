@@ -360,9 +360,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			ConceptSpec spec = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
 			allowedTypes.add(termFactory.uuidToNative(spec.getLenient().getPrimUuid()));
 
-			parents.addAll(testedConcept.getSourceRelTargets(config.getAllowedStatus(), allowedTypes, 
-					config.getViewPositionSetReadOnly(), Precedence.PATH, config.getConflictResolutionStrategy()));
-
+			for (I_RelTuple loopTuple : testedConcept.getSourceRelTuples(config.getAllowedStatus(), 
+					allowedTypes, config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), config.getConflictResolutionStrategy(), 
+					config.getClassifierConcept().getConceptNid(), 
+					RelAssertionType.STATED)) {
+				parents.add(Terms.get().getConcept(loopTuple.getC2Id()));
+			}
+			
 			Set<String> parentSemtags = new HashSet<String>();
 			for (I_GetConceptData loopParent : parents) {
 				for (I_DescriptionTuple loopDescription : loopParent.getDescriptionTuples(config.getAllowedStatus(), 

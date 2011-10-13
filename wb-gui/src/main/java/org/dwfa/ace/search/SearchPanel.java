@@ -58,7 +58,9 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -66,6 +68,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
@@ -74,21 +77,20 @@ import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
+import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsFromCollectionTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
@@ -646,7 +648,15 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel {
                     DESC_FIELD.TEXT, DESC_FIELD.TYPE}, config);
         descTable = new JTableWithDragImage(model);
         descTable.setAutoCreateColumnsFromModel(true);
-        SortClickListener.setupSorter(descTable);
+        
+        //SortClickListener.setupSorter(descTable); //replaced by auto sort capable sorter below
+        TableRowSorter<DescriptionsFromCollectionTableModel> trs = new TableRowSorter<DescriptionsFromCollectionTableModel>(model);
+        trs.setSortsOnUpdates(true);
+        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
+        trs.setSortKeys(sortKeys);        
+        descTable.setRowSorter(trs);
+        
         descTable.setDragEnabled(false);
         descTable.setTransferHandler(new TerminologyTransferHandler(this));
         DescriptionTableRenderer renderer = new DescriptionTableRenderer(config, true);

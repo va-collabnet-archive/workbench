@@ -26,6 +26,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.concept.component.identifier.IdentifierVersionLong;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -52,6 +53,10 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public UUID getPrimUuid() {
         return primordialComponent.getPrimUuid();
     }
+   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec,
+                            long time) {
+      return primordialComponent.addLongId(longId, authorityNid, statusNid, ec, time);
+   }
 
     @Override
     public final List<UUID> getUUIDs() {
@@ -62,7 +67,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public final int getNid() {
         return primordialComponent.getNid();
     }
-
+    
     public Revision(int statusAtPositionNid, C primordialComponent) {
         super();
         assert primordialComponent != null;

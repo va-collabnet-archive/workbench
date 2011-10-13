@@ -1,8 +1,23 @@
 package org.ihtsdo.arena.taxonomyview;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.tree.JTreeWithDragImage;
+
+import org.ihtsdo.arena.ArenaComponentSettings;
+import org.ihtsdo.taxonomy.TaxonomyHelper;
+import org.ihtsdo.taxonomy.TaxonomyMouseListener;
+
+//~--- JDK imports ------------------------------------------------------------
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,81 +26,86 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.tree.JTreeWithDragImage;
-import org.dwfa.ace.tree.TermTreeHelper;
-import org.ihtsdo.arena.ArenaComponentSettings;
-
 public class TaxonomyViewSettings extends ArenaComponentSettings {
+   private static final int dataVersion = 1;
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 1;
-    // transient
-    private JScrollPane view;
+   /**
+    *
+    */
+   private static final long serialVersionUID = 1L;
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-    }
+   //~--- fields --------------------------------------------------------------
 
-    private void readObject(ObjectInputStream in) throws IOException,
-            ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
-            //
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
+   // transient
+   private JScrollPane view;
 
-    }
+   //~--- methods -------------------------------------------------------------
 
-    @Override
-    public String getTitle() {
-        return "Taxonomy Viewer";
-    }
+   @Override
+   public JComponent makeComponent(I_ConfigAceFrame config) {
+      if (view == null) {
+         TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config, "Arena taxonomy");
 
-    @Override
-    public I_HostConceptPlugins getHost() {
-        return null;
-    }
+         try {
+            view = hierarchicalTreeHelper.getHierarchyPanel();
+            hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
 
-    @Override
-    public JComponent getLinkComponent() {
-        return new JLabel("   ");
-    }
-
-    @Override
-    public JComponent makeComponent(I_ConfigAceFrame config) {
-        if (view == null) {
-            TermTreeHelper hierarchicalTreeHelper = new TermTreeHelper(config);
-            try {
-                view = hierarchicalTreeHelper.getHierarchyPanel();
-            } catch (Exception e) {
-                AceLog.getAppLog().alertAndLogException(e);
-            }
             JTreeWithDragImage tree = (JTreeWithDragImage) view.getViewport().getView();
+
             tree.setFont(tree.getFont().deriveFont(getFontSize()));
-        }
-        return view;
-    }
+         } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+         }
+      }
 
-    @Override
-    public List<AbstractButton> getSpecializedButtons() {
-        return new ArrayList<AbstractButton>();
-    }
+      return view;
+   }
 
-    @Override
-    protected void setupSubtypes() {
-        // TODO Auto-generated method stub
-    }
+   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
 
-    @Override
-    public I_GetConceptData getConcept() {
-        return null;
-    }
+      if (objDataVersion == dataVersion) {
+
+         //
+      } else {
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+   }
+
+   @Override
+   protected void setupSubtypes() {
+
+      // TODO Auto-generated method stub
+   }
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   @Override
+   public I_GetConceptData getConcept() {
+      return null;
+   }
+
+   @Override
+   public I_HostConceptPlugins getHost() {
+      return null;
+   }
+
+   @Override
+   public JComponent getLinkComponent() {
+      return new JLabel("   ");
+   }
+
+   @Override
+   public List<AbstractButton> getSpecializedButtons() {
+      return new ArrayList<AbstractButton>();
+   }
+
+   @Override
+   public String getTitle() {
+      return "Taxonomy Viewer";
+   }
 }

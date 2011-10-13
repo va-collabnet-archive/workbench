@@ -131,7 +131,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			}
 			
 		} catch (TerminologyException e) {
-		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues on bean: " + vals.toString() + " with error: " + e.getMessage());
+		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #3 on bean: " + vals.toString() + " with error: " + e.getMessage());
 		}
 	}
 
@@ -207,10 +207,23 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		WorkflowHistoryJavaBean bean = null;
 		try {
 			bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-			WorkflowLuceneSearchResult vals = lastBeanInWfMap.get(bean.getWorkflowId());
-			doc = createDoc(bean, vals);
+			
+			if (bean != null) {			
+				WorkflowLuceneSearchResult vals = lastBeanInWfMap.get(bean.getWorkflowId());
+				
+				if (vals == null) {
+					WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
+		    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), bean.getWorkflowId());
+		    		vals = new WorkflowLuceneSearchResult(latestBean);
+		    		lastBeanInWfMap.put(bean.getWorkflowId(), vals);
+				}
+
+				doc = createDoc(bean, vals);
+			} else {
+			    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #1 on bean: " + ((I_ExtendByRefPartStr)row).getStringValue());
+			}
 		} catch (Exception e) {
-		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues on bean: " + bean.toString() + " with error: " + e.getMessage());
+		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #2 on bean: " + bean.toString() + " with error: " + e.getMessage());
 		}
 
 		return doc;

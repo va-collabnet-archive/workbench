@@ -55,11 +55,9 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.example.binding.Snomed;
 
-
-
 //import org.ihtsdo.arena;
-
-@BeanList(specs = { @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN)})
+@BeanList(specs = {
+    @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN)})
 public class SelectExtension extends PreviousNextOrCancel {
 
     /*
@@ -70,16 +68,14 @@ public class SelectExtension extends PreviousNextOrCancel {
     // Serialization Properties
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
-
     // Task Attribute Properties
     private String instruction = "<html>Select extension for concept being moved:";
     private String relParentPropName = ProcessAttachmentKeys.REL_PARENT.getAttachmentKey();
-
     // Other Properties
     private JComboBox refsetSelectionComboBox;
     private I_GetConceptData selectedParentConcept;
-    private WizardBI wizard; 
-    
+    private WizardBI wizard;
+
 
     /*
      * -----------------------
@@ -107,17 +103,16 @@ public class SelectExtension extends PreviousNextOrCancel {
         }
     }
 
-   
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do
     }
 
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
-    	
+
         try {
             // Present the user interface in the Workflow panel
-        	wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
-        	
+            wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
+
             DoSwing swinger = new DoSwing(process);
             swinger.start();
             swinger.get();
@@ -130,6 +125,7 @@ public class SelectExtension extends PreviousNextOrCancel {
                 doRun(process, worker);
             } else {
                 SwingUtilities.invokeAndWait(new Runnable() {
+
                     public void run() {
                         doRun(process, worker);
                     }
@@ -157,9 +153,9 @@ public class SelectExtension extends PreviousNextOrCancel {
 
                 // get selected item from ComboBox presented to the user
                 selectedParentConcept = (I_GetConceptData) refsetSelectionComboBox.getSelectedItem();
-                
-                process.setProperty(relParentPropName, selectedParentConcept);    
-                
+
+                process.setProperty(relParentPropName, selectedParentConcept);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -181,15 +177,14 @@ public class SelectExtension extends PreviousNextOrCancel {
         return false;
     }
 
-   
     private class DoSwing extends SwingWorker<Boolean> {
 
         I_EncodeBusinessProcess process;
-        
+
         public DoSwing(I_EncodeBusinessProcess process) {
             super();
             this.process = process;
-            wizard.setWizardPanelVisible(true); 
+            wizard.setWizardPanelVisible(true);
         }
 
         @Override
@@ -200,17 +195,23 @@ public class SelectExtension extends PreviousNextOrCancel {
 
         @Override
         protected void finished() {
-    
-        	JPanel wizardPanel = wizard.getWizardPanel(); 
-        	
-        	Component[] components = wizardPanel.getComponents();
+
+            JPanel wizardPanel = wizard.getWizardPanel();
+
+            Component[] components = wizardPanel.getComponents();
             for (int i = 0; i < components.length; i++) {
                 wizardPanel.remove(components[i]);
             }
-        	
+
             wizardPanel.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH; 
+            c.fill = GridBagConstraints.BOTH;
+
+            JPanel workflowPanel = config.getWorkflowPanel();
+            Component[] componentsPanel = workflowPanel.getComponents();
+            for (int i = 0; i < componentsPanel.length; i++) {
+                workflowPanel.remove(componentsPanel[i]);
+            }
 
             // Add the Instructions
             c.gridx = 0;
@@ -225,37 +226,36 @@ public class SelectExtension extends PreviousNextOrCancel {
             c.gridy = 0;
             I_GetConceptData parentList[] = new I_GetConceptData[3];
             try {
-            	UUID[] uuidsArray = Snomed.CORE.getUuids();
-            	List<UUID> uuidsCore = Arrays.asList(uuidsArray);
-            	uuidsArray = Snomed.EXTENSION_0.getUuids();
-            	List<UUID> uuidsExtn1 = Arrays.asList(uuidsArray);
-            	uuidsArray = Snomed.EXTENSION_13.getUuids();
-            	List<UUID> uuidsExtn2 = Arrays.asList(uuidsArray);
-            	
-            	parentList[0] = Terms.get().getConcept(uuidsCore);
-            	parentList[1] = Terms.get().getConcept(uuidsExtn1);
-            	parentList[2] = Terms.get().getConcept(uuidsExtn2);
+                UUID[] uuidsArray = Snomed.CORE.getUuids();
+                List<UUID> uuidsCore = Arrays.asList(uuidsArray);
+                uuidsArray = Snomed.EXTENSION_0.getUuids();
+                List<UUID> uuidsExtn1 = Arrays.asList(uuidsArray);
+                uuidsArray = Snomed.EXTENSION_13.getUuids();
+                List<UUID> uuidsExtn2 = Arrays.asList(uuidsArray);
+
+                parentList[0] = Terms.get().getConcept(uuidsCore);
+                parentList[1] = Terms.get().getConcept(uuidsExtn1);
+                parentList[2] = Terms.get().getConcept(uuidsExtn2);
             } catch (TerminologyException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-                   
-            refsetSelectionComboBox = new JComboBox(parentList);   
+
+            refsetSelectionComboBox = new JComboBox(parentList);
             wizardPanel.add(refsetSelectionComboBox, c);
-            
+
             // Add the processing buttons
             c.weightx = 0.0;
             setUpButtons(wizardPanel, c);
-            
+
             //empty thing
             c.gridx = 0;
             c.gridy = 1;
             c.weightx = 0;
-        	c.weighty = 1;
+            c.weighty = 1;
             wizardPanel.add(new JPanel(), c);
         }
-
     }
 
     protected static String getToDoImage() {
@@ -289,8 +289,8 @@ public class SelectExtension extends PreviousNextOrCancel {
         continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
-    
-    private class CancelActionListener implements ActionListener{
+
+    private class CancelActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -298,7 +298,6 @@ public class SelectExtension extends PreviousNextOrCancel {
             done = true;
             notifyTaskDone();
         }
-        
     }
 
     /**
@@ -319,7 +318,7 @@ public class SelectExtension extends PreviousNextOrCancel {
     public void setInstruction(String instruction) {
         this.instruction = instruction;
     }
-    
+
     public String getRelParentPropName() {
         return relParentPropName;
     }
@@ -327,5 +326,4 @@ public class SelectExtension extends PreviousNextOrCancel {
     public void setRelParentPropName(String newStatusPropName) {
         this.relParentPropName = newStatusPropName;
     }
-
 }

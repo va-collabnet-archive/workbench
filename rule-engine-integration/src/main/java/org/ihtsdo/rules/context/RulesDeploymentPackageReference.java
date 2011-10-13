@@ -65,7 +65,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		System.out.println(buff.toString());
+		//System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -91,7 +91,7 @@ public class RulesDeploymentPackageReference {
 		buff.append("' type='PKG' basicAuthentication='enabled' username='alopez' password='snomed'/>");
 		buff.append("		</add>");
 		buff.append("</change-set>");
-		System.out.println(buff.toString());
+		//System.out.println(buff.toString());
 		return buff.toString().getBytes();
 	}
 
@@ -110,7 +110,7 @@ public class RulesDeploymentPackageReference {
 				fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytesForFile(), recreate);
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println("File Package not accessible: " + getName());
 			}
 			if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
 				return fileBased;
@@ -119,8 +119,8 @@ public class RulesDeploymentPackageReference {
 				try {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
-				} catch (RuntimeException e1) {
-					e1.printStackTrace();
+				} catch (Exception e1) {
+					System.out.println("Web Package not accessible: " + getName());
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
@@ -132,8 +132,8 @@ public class RulesDeploymentPackageReference {
 			try {
 				guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 						getChangeSetXmlBytes(), recreate);
-			} catch (RuntimeException e1) {
-				e1.printStackTrace();
+			} catch (Exception e1) {
+				System.out.println("Web Package not accessible: " + getName());
 			}
 			if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 				return guvnorBased;
@@ -143,7 +143,7 @@ public class RulesDeploymentPackageReference {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println("File Package not accessible: " + getName());
 				}
 				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 			}

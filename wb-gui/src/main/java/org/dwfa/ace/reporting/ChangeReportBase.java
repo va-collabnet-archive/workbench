@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 
@@ -39,7 +38,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.SNOMED;
-import org.dwfa.tapi.spec.ConceptSpec;
 import org.ihtsdo.tk.Ts;
 
 /**
@@ -61,6 +59,9 @@ public abstract class ChangeReportBase extends DiffBase {
 
     public ChangeReportBase(String v1, String v2, String path1_uuid, String path2_uuid,
             List<Integer> v1_relationship_characteristic_filter_int, List<Integer> v2_relationship_characteristic_filter_int,
+            List<Integer> v1_concept_status_filter_int, List<Integer> v2_concept_status_filter_int,
+            List<Integer> v1_description_status_filter_int, List<Integer> v2_description_status_filter_int,
+            List<Integer> v1_rel_status_filter_int, List<Integer> v2_rel_status_filter_int,
             boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
             boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
             boolean changed_rel_author, boolean changed_refex_author,
@@ -70,9 +71,13 @@ public abstract class ChangeReportBase extends DiffBase {
             boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
             boolean changed_relationship_status, boolean changed_relationship_characteristic,
             boolean changed_relationship_refinability, boolean changed_relationship_type,
-            boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid) {
+            boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid,
+            boolean noDescendantsV1, boolean noDescendantsV2) {
         super(v1, v2, path1_uuid, path2_uuid,
                 v1_relationship_characteristic_filter_int, v2_relationship_characteristic_filter_int,
+                v1_concept_status_filter_int, v2_concept_status_filter_int,
+                v1_description_status_filter_int, v2_description_status_filter_int,
+                v1_rel_status_filter_int, v2_rel_status_filter_int,
                 added_concepts, deleted_concepts, added_concepts_refex, deleted_concepts_refex,
                 changed_concept_status, changed_concept_author, changed_description_author,
                 changed_rel_author, changed_refex_author, author1, author2, changed_defined,
@@ -81,7 +86,7 @@ public abstract class ChangeReportBase extends DiffBase {
                 changed_description_case, added_relationships, deleted_relationships,
                 changed_relationship_status, changed_relationship_characteristic,
                 changed_relationship_refinability, changed_relationship_type,
-                changed_relationship_group, config);
+                changed_relationship_group, config, noDescendantsV1, noDescendantsV2);
         this.parentConceptNid = parentConceptNid;
         String curDir = System.getProperty("user.dir");
         report_dir = new File(curDir + "/reports");
@@ -438,25 +443,27 @@ public abstract class ChangeReportBase extends DiffBase {
     }
 
     @Override
-    protected void addedConceptToRefex(I_GetConceptData c, I_GetConceptData m)
+    protected void addedConceptToRefex(I_GetConceptData c, String m)
             throws Exception {
         super.addedConceptToRefex(c, m);
         startChange(c);
         changes += "<tr><td>" + "Added member concept" + "</td><td>" + " "
-                + "</td><td>" + getConceptName(m.getConceptNid()) + "</td></tr>";
-        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
+                + "</td><td>" + m + "</td></tr>";
+        changes_xml += startElement("added_concept") + m
                 + endElement("added_concept") + "\n";
     }
 
     @Override
-    protected void deletedConceptFromRefex(I_GetConceptData c, I_GetConceptData m)
+    protected void deletedConceptFromRefex(I_GetConceptData c, String m1,
+        String m2)
             throws Exception {
-        super.deletedConceptFromRefex(c, m);
+        super.deletedConceptFromRefex(c, m1, m2);
         startChange(c);
-        changes += "<tr><td>" + "Deleted member concept" + "</td><td>"
-                + getConceptName(m.getConceptNid()) + "</td><td>" + " " + "</td></tr>";
-        changes_xml += startElement("added_concept") + conceptRef(m.getConceptNid())
-                + endElement("added_concept") + "\n";
+        changes += "<tr><td>" + "Changed member concept" + "</td><td>"
+                + m1 + "</td><td>" 
+                + m2 + "</td></tr>";
+        changes_xml += startElement("retired_concept") + m1
+                + endElement("retired_concept") + "\n";
     }
     String config_html = "";
 

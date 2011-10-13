@@ -10,6 +10,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
@@ -91,7 +93,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/instruct", type = BeanType.TASK_BEAN),
     @Spec(directory = "tasks/arena/wizard", type = BeanType.TASK_BEAN)})
-public class NewConcept extends PreviousNextOrCancel {
+public class NewConcept extends PreviousNextOrCancel{
 
     /*
      * -----------------------
@@ -379,6 +381,12 @@ public class NewConcept extends PreviousNextOrCancel {
                     wizardPanel.remove(components[i]);
                 }
 
+                JPanel workflowPanel = config.getWorkflowPanel();
+                Component[] componentsPanel = workflowPanel.getComponents();
+                for (int i = 0; i < componentsPanel.length; i++) {
+                    workflowPanel.remove(componentsPanel[i]);
+                }
+                
                 wizardPanel.setLayout(new GridBagLayout());
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
@@ -593,6 +601,8 @@ public class NewConcept extends PreviousNextOrCancel {
                 c.weightx = 0;
                 c.weighty = 1;
                 wizardPanel.add(new JPanel(), c);
+                fsn.requestFocusInWindow();
+                wizardPanel.repaint();
                 GuiUtil.tickle(wizardPanel);
             } catch (InterruptedException ex) {
                 Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
@@ -630,7 +640,6 @@ public class NewConcept extends PreviousNextOrCancel {
             cont.validate();
             cont = cont.getParent();
         }
-        continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
 
@@ -1056,6 +1065,8 @@ public class NewConcept extends PreviousNextOrCancel {
                     && fsn.extractText().indexOf(")") > fsn.extractText().indexOf("(")) {
                 //get text parts and make query term
                 String fullFsn = fsn.extractText();
+                fullFsn = fullFsn.replaceAll("\n", "");
+                fullFsn = fullFsn.replaceAll("   *", " ");
                 String[] fsnWords = fullFsn.split("\\s");
                 HashSet<String> wordSet = new HashSet<String>();
                 for (String word : fsnWords) {

@@ -113,7 +113,6 @@ public class DescriptionTest {
         obj.revisions = null;
         obj.nid = 1;
         obj.primordialSapNid = 2; 
-        obj.primordialUNid = 3;
         obj.versions = null; 
         
         return obj; 
@@ -126,7 +125,6 @@ public class DescriptionTest {
         obj.revisions = null;
         obj.nid = 4;
         obj.primordialSapNid = 4; 
-        obj.primordialUNid = 4;
         obj.versions = null; 
         
         return obj; 

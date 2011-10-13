@@ -32,7 +32,6 @@ import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
-import org.ihtsdo.lucene.WfHxLuceneWriterAccessor.WfHxLuceneWriter;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 import com.sleepycat.je.DatabaseException;
@@ -215,15 +214,21 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
             			if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
  
                             int memberId = Terms.get().uuidToNative(member.getUuids());
-                            Object unknownClass = Terms.get().getExtension(memberId);
-                            I_ExtendByRef ref = (I_ExtendByRef)unknownClass;
-                            wfMembersToCommit.add(ref);
+            				try {
+	                            Object unknownClass = Terms.get().getExtension(memberId);
+	                            I_ExtendByRef ref = (I_ExtendByRef)unknownClass;
+	                            wfMembersToCommit.add(ref);
+            				} catch (Exception e) {
+            		            AceLog.getAppLog().log(Level.WARNING, "Failed getting extension with memberId: " + memberId);
+            			    }
             			}
             		}
 
             		if (wfMembersToCommit.size() > 0) {
-		                WfHxLuceneWriter writer = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
-		                writer.run();
+            			Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+		                if (luceneWriter != null) {
+		                	luceneWriter.run();
+		                }
             		}
         		}
 	        } catch (Exception e) {

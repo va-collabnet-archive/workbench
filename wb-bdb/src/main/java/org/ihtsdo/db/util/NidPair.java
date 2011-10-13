@@ -3,10 +3,10 @@ package org.ihtsdo.db.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dwfa.util.HashFunction;
 import org.ihtsdo.cern.colt.list.IntArrayList;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.hash.Hashcode;
 
 public abstract class NidPair implements Comparable<NidPair> {
 
@@ -98,7 +98,7 @@ public abstract class NidPair implements Comparable<NidPair> {
         assert nid2 != 0;
         this.nid1 = nid1;
         this.nid2 = nid2;
-        this.hash = HashFunction.hashCode(new int[]{nid1, nid2});
+        this.hash = Hashcode.compute(new int[]{nid1, nid2});
     }
 
     public long asLong() {

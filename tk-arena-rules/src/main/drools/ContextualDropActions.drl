@@ -137,6 +137,8 @@ rule "rule 4.2" #CANCEL concept onto same concept
          $dropObject: ComponentFact(((ComponentVersionBI)this.component).getChronicle().isUncommitted() == true,
                 context == Context.DROP_OBJECT, component == $dropTarget.component)
          not $refex: RefexFact(context == Context.DROP_TARGET)
+         not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
+         not $relGroup: RelGroupFact(context == Context.DROP_TARGET)
    then
       actions.add(new CancelAction("cancel", $dropObject, vc));
 end
@@ -1059,7 +1061,7 @@ rule "rule 54" #change from primitve to defined
 	(and
          (ViewFact(getView() == View.STATED))
          ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == true))
-         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, getConAttr().getTime() != Long.MAX_VALUE, component == $dropTarget.component))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component == $dropTarget.component))
       )
 	then
 		actions.add(new SetDefinedAction("make primitive", $dropTarget));
@@ -1070,7 +1072,7 @@ rule "rule 55" #change from defined to primitive
 	(and
          (ViewFact(getView() == View.STATED))
          ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == false))
-         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, getConAttr().getTime() != Long.MAX_VALUE, component == $dropTarget.component))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component == $dropTarget.component))
       )
 	then
 		actions.add(new SetDefinedAction("make defined", $dropTarget));

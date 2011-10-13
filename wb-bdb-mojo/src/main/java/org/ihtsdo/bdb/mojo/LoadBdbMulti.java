@@ -62,6 +62,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -158,20 +159,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
-                // Can revert this part once wfHistory.jbin generation (via wf-lucene-init) 
-		FileInputStream  fis = null;
-		try {
-			fis = new FileInputStream(conceptsFile);
-		} catch (FileNotFoundException e) {
-			getLog().info("Could not locate eConcept file: " + conceptsFile.getAbsolutePath());	
-			
-			if (conceptsFile.getAbsolutePath().contains("wfHistory.jbin")) {
-				continue;
-			} else {
-				throw e;
-			}
-		}
-
+				FileInputStream  fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
@@ -415,7 +403,8 @@ public class LoadBdbMulti extends AbstractMojo {
                         RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
-                        textRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                        textRefexSpec.with(RefexProperty.STATUS_NID, 
+                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
                         textRefexSpec.setMemberContentUuid();
 
                         RefexChronicleBI<?> textRefex = amender.constructIfNotCurrent(textRefexSpec);
@@ -424,7 +413,8 @@ public class LoadBdbMulti extends AbstractMojo {
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);
-                        variantRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                        variantRefexSpec.with(RefexProperty.STATUS_NID, 
+                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
                         variantRefexSpec.setMemberContentUuid();
                         amender.constructIfNotCurrent(variantRefexSpec);
 
@@ -493,7 +483,8 @@ public class LoadBdbMulti extends AbstractMojo {
                                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
                         wordRefexSpec.with(RefexProperty.STRING1, word);
                         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
-                        wordRefexSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                        wordRefexSpec.with(RefexProperty.STATUS_NID, 
+                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
                         wordRefexSpec.setMemberContentUuid();
 
                         wordRefex = amender.constructIfNotCurrent(wordRefexSpec);

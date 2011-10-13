@@ -73,11 +73,13 @@ public class BatchActionTaskParentReplace extends BatchActionTask {
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws Exception {
         // RETIRE EXISTING PARENT
         boolean changed = false;
-        for (RelationshipVersionBI r : c.getRelsOutgoingActive()) {
-            if (r.getDestinationNid() == moveFromDestNid 
-                    && r.getTypeNid() == moveFromRoleTypeNid
-                    && r.isStated()) {
-                r.makeAnalog(RETIRED_NID, ec.getAuthorNid(), r.getPathNid(), Long.MAX_VALUE);
+        for (RelationshipVersionBI rvbi : c.getRelsOutgoingActive()) {
+            if (rvbi.getDestinationNid() == moveFromDestNid
+                    && rvbi.getTypeNid() == moveFromRoleTypeNid
+                    && rvbi.isStated()) {
+                for (int editPath : ec.getEditPaths()) {
+                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                }
                 changed = true;
             }
         }

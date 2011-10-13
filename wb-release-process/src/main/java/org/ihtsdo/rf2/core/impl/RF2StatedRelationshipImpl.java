@@ -67,6 +67,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
+				String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
 				if (idParts != null) {
@@ -173,9 +174,15 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					
 					if (relationshipId==null || relationshipId.equals("")){
 						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else if(getConfig().getRf2Format().equals("false") ){
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+							characteristicTypeId, modifierId, authorName);
 					}else{
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId);
+								characteristicTypeId, modifierId, authorName);
+						/*
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+							characteristicTypeId, modifierId);*/
 					}
 				}
 			}
@@ -195,6 +202,13 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			String characteristicTypeId, String modifierId) throws IOException {
 		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
+	
+	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
+			String characteristicTypeId, String modifierId, String authorName) throws IOException {
+		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
+				+ "\t" + characteristicTypeId + "\t" + modifierId + "\t" + authorName);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 }

@@ -84,6 +84,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    List<? extends PathBI> getPathChildren(int nid);
 
+   int[] getPossibleChildren(int cNid, ViewCoordinate vc) throws IOException;
+
    long getSequence();
 
    TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
@@ -92,7 +94,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
 
-   List<UUID> getUuidsForNid(int nid);
+   List<UUID> getUuidsForNid(int nid) throws IOException;
 
    boolean hasPath(int nid) throws IOException;
 

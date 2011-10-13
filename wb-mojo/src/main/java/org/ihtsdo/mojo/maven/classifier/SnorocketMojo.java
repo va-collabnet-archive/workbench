@@ -85,7 +85,6 @@ public class SnorocketMojo extends AbstractMojo {
      * Directory of the berkeley database.
      *
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
-     * @required
      */
     private File berkeleyDir;
     /**
@@ -216,7 +215,10 @@ public class SnorocketMojo extends AbstractMojo {
         SnoQuery.initAll();
 
         try {
-            Bdb.setup(berkeleyDir.getAbsolutePath());
+        	tf = Terms.get();
+        	if (tf == null) {
+        		Bdb.setup(berkeleyDir.getAbsolutePath());
+        	}
             tf = Terms.get();
             config = getMojoDbConfig();
             tf.setActiveAceFrameConfig(config);
@@ -428,7 +430,8 @@ public class SnorocketMojo extends AbstractMojo {
 
             // WRITEBACK RESULTS
             startTime = System.currentTimeMillis();
-            logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cViewPathNid));
+            //logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cViewPathNid));
+            logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cEditPathNid));
 
             // Commit
             // :!!!: tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);

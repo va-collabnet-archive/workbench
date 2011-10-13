@@ -63,8 +63,13 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
+			System.out.println("==expecting around 3===" + relationships.size());
+			
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
+				
+				String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
+				
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
@@ -76,6 +81,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						if (c != null)  characteristicTypeId = c.toString();
 					}
 				}
+				
 				if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION)){
 					destinationId = "";
 					I_Identify id = tf.getId(rel.getC2Id());
@@ -132,6 +138,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							}
 						}
 					}
+					System.out.println("==relationshipId==" + relationshipId);
+					
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) { 														
 						active = "1";
@@ -170,17 +178,27 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							continue;
 						}
 					}
-		
+					System.out.println("==destinationId==" + destinationId);
+					
 					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
 						relationshipId=rel.getUUIDs().iterator().next().toString();
 					}
 					
 					if (relationshipId==null || relationshipId.equals("")){
 						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+					}else if(getConfig().getRf2Format().equals("false") ){
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+								characteristicTypeId, modifierId, authorName);
 					}else{
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId);
+								characteristicTypeId, modifierId, authorName);
+						/*
+						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+							characteristicTypeId, modifierId);*/
 					}
+					
+					
+					
 				}
 			}
 
@@ -196,6 +214,13 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String characteristicTypeId, String modifierId) throws IOException {
 		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
+		WriteUtil.write(getConfig(), "\r\n");
+	}
+	
+	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
+			String characteristicTypeId, String modifierId, String authorName) throws IOException {
+		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
+				+ "\t" + characteristicTypeId + "\t" + modifierId + "\t" + authorName);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 

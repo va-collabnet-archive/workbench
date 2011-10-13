@@ -93,6 +93,8 @@ public class WorkflowHelper {
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
 	
 	private static UUID overrideActionUid = null;
+	private static boolean advancingWorkflowLock = false;
+	private static int wfHistoryRefsetId = 0;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -954,7 +956,7 @@ public class WorkflowHelper {
 												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
 												   new Long(ref.getMutableParts().get(0).getTime()));
 			} catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member");
+			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ((I_ExtendByRefPartStr)ref).getStringValue());
 		}
 		
 		return bean;
@@ -1305,5 +1307,32 @@ public class WorkflowHelper {
 
         return retList;
     }
+
+	public static void setAdvancingWorkflowLock(boolean lock) {
+		advancingWorkflowLock = lock;
+	}
+
+	public static boolean isAdvancingWorkflowLock() {
+		return advancingWorkflowLock;
+	}
+
+	public static int getWorkflowRefsetNid() {
+		if (wfHistoryRefsetId != 0) {
+			return wfHistoryRefsetId;
+		} else {
+			if (Ts.get() != null) {
+				try {
+					if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
+						wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+						return wfHistoryRefsetId;
+					}
+				} catch (Exception e) {
+					AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: ");
+				}
+			}
+		}
+
+		return 0;
+	}
 }
  

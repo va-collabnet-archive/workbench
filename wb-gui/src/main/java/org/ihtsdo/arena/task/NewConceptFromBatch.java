@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
@@ -66,6 +66,7 @@ import org.ihtsdo.arena.conceptview.ConceptView;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -73,7 +74,10 @@ import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.util.swing.GuiUtil;
@@ -83,13 +87,18 @@ import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  *
@@ -158,8 +167,10 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private ConceptChronicleBI fsnConcept;
     private ConceptChronicleBI synConcept;
     private String fsnText;
+    private String fsnSctId;
     private String prefText;
     private String newConceptId;
+    private String newConceptSctId;
     private UUID newConceptUuid;
     private UUID parentUuid;
     private String parentId;
@@ -168,6 +179,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
     private FixedWidthJEditorPane parentUuidPane;
     private FixedWidthJEditorPane parentFsnPane;
     private ConceptSpec parent;
+    private boolean hasPanel = false;
+    private boolean hasSctId = false;
+    private boolean hasFsnSctId = false;
 
     /*
      * -----------------------
@@ -199,53 +213,101 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         try {
             // Present the user interface in the Workflow panel
             config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<SoftReference> panelSet = ConceptViewSettings.arenaPanelMap.get(1);
-            for (SoftReference r : panelSet) {
-                ConceptView cv = (ConceptView) r.get();
-                wizard = cv.getCvRenderer().getWizardPanel();
-                host = cv.getSettings().getHost();
-            }
-
-            String fileName = (String) process.getProperty(
-                    ProcessAttachmentKeys.NAME1.getAttachmentKey());
-            String[] part = fileName.split("\\t");
-
-            newConceptId = part[0];
-            newConceptId = newConceptId.toLowerCase();
-            //split UUID into parts 8-4-4-4-12 and insert dashes 
-            String one = newConceptId.substring(0, 8);
-            String two = newConceptId.substring(8, 12);
-            String three = newConceptId.substring(12, 16);
-            String four = newConceptId.substring(16, 20);
-            String five = newConceptId.substring(20, 32);
-            newConceptId = one + "-" + two + "-" + three + "-" + four + "-" + five;
-
-            fsnText = part[1];
-            parentId = part[2];
-            parentFsn = part[3];
-
-            DoSwing swinger = new DoSwing(process);
-            swinger.execute();
-            new Thread(
-                    new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                CsWordsHelper.lazyInit();
-                            } catch (IOException ex) {
-                                AceLog.getAppLog().alertAndLogException(ex);
-                            }
+            Set<WeakReference> panelSet = ConceptViewSettings.arenaPanelMap.get(1);
+            if (panelSet != null) {
+                for (WeakReference r : panelSet) {
+                    ConceptView cv = (ConceptView) r.get();
+                    if (r != null) {
+                        if (cv.getRootPane() != null) {
+                            wizard = cv.getCvRenderer().getWizardPanel();
+                            host = cv.getSettings().getHost();
+                            hasPanel = true;
+                            break;
                         }
-                    }).start();
-
-            synchronized (this) {
-                this.waitTillDone(worker.getLogger());
+                    }
+                }
             }
-            MakeNewConcept maker = new MakeNewConcept();
-            maker.execute();
-//            restore();
-            maker.getLatch().await();
+            if (!hasPanel) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>There are no tab 1 panels in the arena.<br>"
+                        + "Please add one and re-launch process", "",
+                        JOptionPane.ERROR_MESSAGE);
+                returnCondition = Condition.PREVIOUS;
+                done = true;
+                NewConceptFromBatch.this.notifyTaskDone();
+            }
+            if (hasPanel) {
+                String fileName = (String) process.getProperty(
+                        ProcessAttachmentKeys.NAME1.getAttachmentKey());
+                String[] part = fileName.split("\\t");
+                if (part.length == 4) {
+                    newConceptId = part[0];
+                    fsnText = part[1];
+                    parentId = part[2];
+                    parentFsn = part[3];
+                } else if (part.length == 5) {
+                    newConceptId = part[0];
+                    fsnText = part[1];
+                    parentId = part[2];
+                    parentFsn = part[3];
+                    newConceptSctId = part[4];
+                    hasSctId = true;
+                } else if (part.length == 6) {
+                    newConceptId = part[0];
+                    fsnText = part[1];
+                    parentId = part[2];
+                    parentFsn = part[3];
+                    newConceptSctId = part[4];
+                    fsnSctId = part[5];
+                    hasSctId = true;
+                    hasFsnSctId = true;
+                }
+
+                if (newConceptId.length() == 32) {
+                    newConceptId = newConceptId.toLowerCase();
+                    //split UUID into parts 8-4-4-4-12 and insert dashes 
+                    String one = newConceptId.substring(0, 8);
+                    String two = newConceptId.substring(8, 12);
+                    String three = newConceptId.substring(12, 16);
+                    String four = newConceptId.substring(16, 20);
+                    String five = newConceptId.substring(20, 32);
+                    newConceptId = one + "-" + two + "-" + three + "-" + four + "-" + five;
+                }
+
+                if (parentId.length() == 32) {
+                    parentId = parentId.toLowerCase();
+                    //split UUID into parts 8-4-4-4-12 and insert dashes 
+                    String one = parentId.substring(0, 8);
+                    String two = parentId.substring(8, 12);
+                    String three = parentId.substring(12, 16);
+                    String four = parentId.substring(16, 20);
+                    String five = parentId.substring(20, 32);
+                    parentId = one + "-" + two + "-" + three + "-" + four + "-" + five;
+                }
+
+
+                DoSwing swinger = new DoSwing(process);
+                swinger.execute();
+                new Thread(
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                try {
+                                    CsWordsHelper.lazyInit();
+                                } catch (IOException ex) {
+                                    AceLog.getAppLog().alertAndLogException(ex);
+                                }
+                            }
+                        }).start();
+
+                synchronized (this) {
+                    this.waitTillDone(worker.getLogger());
+                }
+                MakeNewConcept maker = new MakeNewConcept();
+                maker.execute();
+                maker.getLatch().await();
+            }
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
         } catch (IllegalAccessException e) {
@@ -360,11 +422,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 wizard.setWizardPanelVisible(false);
                 host.setTermComponent(newTerm);
                 Ts.get().addUncommitted(newConcept);
-                //wizard.setWizardPanelVisible(false);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 returnCondition = Condition.ITEM_CANCELED;
-//                host.setTermComponent(null);
             } finally {
                 latch.countDown();
             }
@@ -441,7 +501,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 fsn = new FixedWidthJEditorPane();
-                fsn.setFixedWidth(500);
+                fsn.setFixedWidth(400);
                 fsn.setText(fsnText);
                 fsn.setEditable(true);
                 fsn.getDocument().addDocumentListener(new CopyTextDocumentListener());
@@ -458,6 +518,21 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridx = 0;
                 c.weightx = 0.0;
 
+                //new concept fsn SctID
+                c.gridy++;
+                c.weightx = 0.0;
+                JLabel fsnScdIdLabel = new JLabel("Fsn SctId:");
+                fsnScdIdLabel.setVisible(hasFsnSctId);
+                wizardPanel.add(fsnScdIdLabel, c);
+                c.gridy++;
+                c.weightx = 1.0;
+                FixedWidthJEditorPane fsnSctIdPane = new FixedWidthJEditorPane();
+                fsnSctIdPane.setFixedWidth(350);
+                fsnSctIdPane.setText(fsnSctId);
+                fsnSctIdPane.setEditable(false);
+                fsnSctIdPane.setVisible(hasFsnSctId);
+                wizardPanel.add(fsnSctIdPane, c);
+
                 //new concept preferred name
                 c.gridy++;
                 c.weightx = 0.0;
@@ -465,7 +540,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 pref = new FixedWidthJEditorPane();
-                pref.setFixedWidth(500);
+                pref.setFixedWidth(350);
                 pref.setText("");
                 pref.setEditable(true);
                 wizardPanel.add(pref, c);
@@ -488,11 +563,26 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 newUuidPane = new FixedWidthJEditorPane();
-                newUuidPane.setFixedWidth(500);
+                newUuidPane.setFixedWidth(350);
                 newUuidPane.setText(newConceptId);
                 newUuidPane.setEditable(false);
                 newUuidPane.getDocument().addDocumentListener(new NewUuidDocumentListener());
                 wizardPanel.add(newUuidPane, c);
+
+                //new concept SctID
+                c.gridy++;
+                c.weightx = 0.0;
+                JLabel sctIdLabel = new JLabel("SctId:");
+                sctIdLabel.setVisible(hasSctId);
+                wizardPanel.add(sctIdLabel, c);
+                c.gridy++;
+                c.weightx = 1.0;
+                FixedWidthJEditorPane sctIdPane = new FixedWidthJEditorPane();
+                sctIdPane.setFixedWidth(350);
+                sctIdPane.setText(newConceptSctId);
+                sctIdPane.setEditable(false);
+                sctIdPane.setVisible(hasSctId);
+                wizardPanel.add(sctIdPane, c);
 
                 //parent fsn
                 c.gridy++;
@@ -501,7 +591,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 parentFsnPane = new FixedWidthJEditorPane();
-                parentFsnPane.setFixedWidth(500);
+                parentFsnPane.setFixedWidth(350);
                 parentFsnPane.setText(parentFsn);
                 parentFsnPane.setEditable(true);
                 parentFsnPane.getDocument().addDocumentListener(new ParentFsnDocumentListener());
@@ -514,7 +604,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 c.gridy++;
                 c.weightx = 1.0;
                 parentUuidPane = new FixedWidthJEditorPane();
-                parentUuidPane.setFixedWidth(500);
+                parentUuidPane.setFixedWidth(350);
                 parentUuidPane.setText(parentId);
                 parentUuidPane.setEditable(true);
                 parentUuidPane.getDocument().addDocumentListener(new ParentUuidDocumentListener());
@@ -555,13 +645,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         JButton saveButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getToDoImage())));
         saveButton.setToolTipText("save");
         wizardPanel.add(saveButton, c);
-        saveButton.addActionListener(new PreviousActionListener()); //@akf TODO: make save action listener
+        saveButton.addActionListener(new PreviousActionListener());
         c.gridx++;
 
-//        JButton cancelButton = new JButton(new ImageIcon(InstructAndWait.class.getResource(getCancelImage())));
-//        cancelButton.setToolTipText("cancel");
-//        wizardPanel.add(cancelButton, c);
-//        cancelButton.addActionListener(new StopActionListener());
         c.gridx++;
         wizardPanel.add(new JLabel("     "), c);
         wizardPanel.validate();
@@ -701,7 +787,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -714,7 +800,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -727,7 +813,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             text = parentUuidPane.extractText();
             text = text.replaceAll("[\\s]", " ");
             text = text.replaceAll("   *", " ");
-            if (text.length() > 8) {
+            if (text.length() == 36) {
                 parentUuid = UUID.fromString(text);
             } else {
                 parentId = text;
@@ -849,8 +935,38 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 conceptSpec = new ConceptCB(fsnText, prefText, "en",
                         Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
             }
+            //@akf TODO set SCT id of new concept
+
             conceptSpec.setComponentUuid(newConceptUuid);
             newConcept = tc.constructIfNotCurrent(conceptSpec);
+
+            // add sct id of component
+            if (hasSctId) {
+                Long sctId = Long.parseLong(newConceptSctId);
+                ConAttrAnalogBI analog = (ConAttrAnalogBI) newConcept.getConAttrs();
+                analog.addLongId(sctId,
+                        Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
+                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+                        config.getEditCoordinate(),
+                        Long.MAX_VALUE);
+            }
+            // add sct id of fsn
+            if (hasFsnSctId) {
+                Long sctId = Long.parseLong(fsnSctId);
+                DescriptionAnalogBI analog = 
+                        (DescriptionAnalogBI) newConcept.getVersion(config.getViewCoordinate()).getFullySpecifiedDescription();
+                for (PathBI ep : config.getEditingPathSet()) {
+                    analog.addLongId(sctId,
+                            Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
+                            SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+                            config.getEditCoordinate(),
+                            Long.MAX_VALUE);
+
+                }
+            }
+
+        } catch (ContraditionException e) {
+            AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (InvalidCAB e) {
@@ -1074,30 +1190,41 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             //make sure parent is valid
             if (parentId != null) { //test for valid parent
                 try {
-                    if (parentId.length() == 8) {
-                        Set<I_GetConceptData> concepts;
-                        concepts = Terms.get().getConcept(parentId);
-                        for (I_GetConceptData concept : concepts) {
-                            parentUuid = concept.getPrimUuid();
-                        }
-                        parent = new ConceptSpec(parentFsn, parentUuid);
-                        parent.getLenient();
-                        returnCondition = Condition.CONTINUE;
-                        done = true;
-                        NewConceptFromBatch.this.notifyTaskDone();
-                    } else {
-                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "The parent concept has not been created yet. Fsn: " + parentFsn + " UUID: " + parentId, "",
-                                JOptionPane.ERROR_MESSAGE);
+                    Set<I_GetConceptData> concepts;
+                    concepts = Terms.get().getConcept(parentId);
+                    for (I_GetConceptData concept : concepts) {
+                        parentUuid = concept.getPrimUuid();
                     }
+                    parent = new ConceptSpec(parentFsn, parentUuid);
+                    parent.getLenient();
+                    returnCondition = Condition.CONTINUE;
+                    done = true;
+                    NewConceptFromBatch.this.notifyTaskDone();
+                } catch (ValidationException ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent fsn and UUID do not match."
+                            + "<br>Fsn: " + parentFsn + " UUID: " + parentUuid, "",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (AssertionError ex) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "The parent fsn and UUID do not match. Fsn: " + parentFsn + " UUID: " + parentUuid, "",
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
                             JOptionPane.ERROR_MESSAGE);
                 } catch (TerminologyException ex) {
-                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 } catch (ParseException ex) {
-                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                            "<html>The parent concpet has not been created."
+                            + "<br>Fsn: " + parentFsn, "",
+                            JOptionPane.ERROR_MESSAGE);
                 }
 
             } else if (fsn.extractText().length() == 0) {

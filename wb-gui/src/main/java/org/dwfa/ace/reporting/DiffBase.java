@@ -64,6 +64,8 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -122,7 +124,7 @@ public class DiffBase {
      * 
      * @parameter default-value=true
      */
-    protected boolean deleted_concepts_refex;
+    protected boolean changed_concepts_refex;
     /**
      * Set to true to include concepts with changed status.
      * 
@@ -453,7 +455,7 @@ public class DiffBase {
     protected NidSetBI pref_type;
     protected NidSetBI fsn_type;
     protected int classifier_type;
-    protected Precedence precedence = Precedence.TIME;
+    protected Precedence precedence = Precedence.PATH;
     protected ContradictionManagerBI contradiction_mgr = new IdentifyAllConflictStrategy();
     protected int added_concept_change;
     protected int deleted_concept_change;
@@ -495,11 +497,15 @@ public class DiffBase {
     protected I_ConfigAceFrame config;
     protected long v1_id;
     protected long v2_id;
-    
+    protected boolean noDescendantsV1 = false;
+    protected boolean noDescendantsV2 = false;
 
     public DiffBase(String v1, String v2, String path1_uuid, String path2_uuid,
             List<Integer> v1_relationship_characteristic_filter_int, List<Integer> v2_relationship_characteristic_filter_int,
-            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
+            List<Integer> v1_concept_status_filter_int, List<Integer> v2_concept_status_filter_int,
+            List<Integer> v1_description_status_filter_int, List<Integer> v2_description_status_filter_int,
+            List<Integer> v1_relationship_status_filter_int, List<Integer> v2_relationship_status_filter_int,
+            boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean changed_concepts_refex,
             boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
             boolean changed_rel_author, boolean changed_refex_author,
             List<Integer> author1, List<Integer> author2, boolean changed_defined,
@@ -509,51 +515,31 @@ public class DiffBase {
             boolean changed_relationship_status, boolean changed_relationship_characteristic,
             boolean changed_relationship_refinability,
             boolean changed_relationship_type, boolean changed_relationship_group,
-            I_ConfigAceFrame config) {
+            I_ConfigAceFrame config, boolean noDescendantsV1, boolean noDescendantsV2) {
         this.config = config;
         this.v1 = v1;
         this.v2 = v2;
-        // Bouchta dev path "7d44dc19-cdb3-434f-98a3-56a5d3e9498a";
-        //snomed core"8c230474-9f11-30ce-9cad-185a96fd03a2";
-//        path1_uuid = "0417d174-54e9-4840-9609-e56d357b61d8"; //<- alan
-//        path2_uuid = "0417d174-54e9-4840-9609-e56d357b61d8";
         this.path1_uuid = path1_uuid;
         this.path2_uuid = path2_uuid;
         this.added_concepts = added_concepts;
         this.deleted_concepts = deleted_concepts;
         this.added_concepts_refex = added_concepts_refex;
-        this.deleted_concepts_refex = deleted_concepts_refex;
+        this.changed_concepts_refex = changed_concepts_refex;
         this.changed_concept_status = changed_concept_status;
-//        String statusRetired = "e1956e7b-08b4-3ad0-ab02-b411869f1c09";
-//        String statusDup = "cbe19851-49f7-32f7-bb27-2d24be0e77e8";
-//        String statusOutdated = "ad6b6532-0cb7-35d0-be04-47a9e4634ed8";
-//        String statusAmbiguous = "3b397a0a-b510-391b-bd2e-5dd168c092ba";
-//        String statusErroneous = "a09cc39f-2c01-3563-84cc-bad7d7fb597f";
-//        String statusMoved = "76367831-522f-3250-83a4-8609ab298436";
-//        v1_concept_status.add(statusRetired);
-//        v1_concept_status.add(statusDup);
-//        v1_concept_status.add(statusOutdated);
-//        v1_concept_status.add(statusAmbiguous);
-//        v1_concept_status.add(statusErroneous);
-//        v1_concept_status.add(statusMoved);
-//        String statusCurrent = "2faa9261-8fb2-11db-b606-0800200c9a66";
-//        String statusLimited = "4bc081d8-9f64-3a89-a668-d11ca031979b";
-//        String statusPendingMoved = "11c24184-4d8a-3cd3-bc30-bb0aa4c76e93";
-//        v2_concept_status.add(statusCurrent);
-//        v2_concept_status.add(statusLimited);
-//        v2_concept_status.add(statusPendingMoved);
+        this.v1_concept_status_filter_int = v1_concept_status_filter_int;
+        this.v2_concept_status_filter_int = v2_concept_status_filter_int;
         this.changed_concept_author = changed_concept_author;
         this.changed_description_author = changed_description_author;
         this.changed_rel_author = changed_rel_author;
         this.changed_refex_author = changed_refex_author;
-//        author1 = "923e9866-2d12-4dd8-b5c2-5799092454dc"; //<- user: 'user'
         v1_concept_author_int = author1;
-//        author2 = "923e9866-2d12-4dd8-b5c2-5799092454dc";
         v2_concept_author_int = author2;
         this.changed_defined = changed_defined;
         this.added_descriptions = added_descriptions;
         this.deleted_descriptions = deleted_descriptions;
         this.changed_description_status = changed_description_status;
+        this.v1_description_status_filter_int = v1_description_status_filter_int;
+        this.v2_description_status_filter_int = v2_description_status_filter_int;
         this.changed_description_term = changed_description_term;
         this.changed_description_type = changed_description_type;
         this.changed_description_language = changed_description_language;
@@ -561,14 +547,16 @@ public class DiffBase {
         this.added_relationships = added_relationships;
         this.deleted_relationships = deleted_relationships;
         this.changed_relationship_status = changed_relationship_status;
+        this.v1_relationship_status_filter_int = v1_relationship_status_filter_int;
+        this.v2_relationship_status_filter_int = v2_relationship_status_filter_int;
         this.v1_relationship_characteristic_filter_int = v1_relationship_characteristic_filter_int;
         this.v2_relationship_characteristic_filter_int = v2_relationship_characteristic_filter_int;
         this.changed_relationship_characteristic = changed_relationship_characteristic;
         this.changed_relationship_refinability = changed_relationship_refinability;
         this.changed_relationship_type = changed_relationship_type;
         this.changed_relationship_group = changed_relationship_group;
-
-
+        this.noDescendantsV1 = noDescendantsV1;
+        this.noDescendantsV2 = noDescendantsV2;
     }
 
     protected void logConfig(String... str) throws Exception {
@@ -604,6 +592,8 @@ public class DiffBase {
         }
         logConfig("path1", path1_uuid);
         logConfig("path2", path2_uuid);
+        logConfig("path1 - exclude descendants", "" + this.noDescendantsV1);
+        logConfig("path2 - exclude descendants", "" + this.noDescendantsV1);
         logConfig("v1", v1);
         logConfig("v2", v2);
         // logConfig("v1", pos1.toString());
@@ -643,8 +633,8 @@ public class DiffBase {
             throws Exception {
         I_TermFactory tf = Terms.get();
         if (conceptNids.isEmpty()) {
-                logConfig(tag, "null");
-            }
+            logConfig(tag, "null");
+        }
         for (Integer conceptNid : conceptNids) {
             I_GetConceptData con = tf.getConcept(conceptNid);
             if (con == null) {
@@ -661,14 +651,14 @@ public class DiffBase {
         logConfig("deleted_concepts", "" + this.deleted_concepts);
         logConfig("added_concepts_refex", "" + this.added_concepts_refex);
         this.diff_count.put(this.added_concept_change_refex, 0);
-        logConfig("deleted_concepts_refex", "" + this.deleted_concepts_refex);
+        logConfig("changed_concepts_refex", "" + this.changed_concepts_refex);
         this.diff_count.put(this.deleted_concept_change_refex, 0);
         logConfig("changed_concept_status", "" + this.changed_concept_status);
         this.diff_count.put(this.concept_status_change, 0);
-        this.v1_concept_status_int = buildConceptEnum(this.v1_concept_status,
-                "v1_concept_status");
-        this.v2_concept_status_int = buildConceptEnum(this.v2_concept_status,
-                "v2_concept_status");
+//        this.v1_concept_status_int = buildConceptEnum(this.v1_concept_status,
+//                "v1_concept_status");
+//        this.v2_concept_status_int = buildConceptEnum(this.v2_concept_status,
+//                "v2_concept_status");
         logConfig("changed_concept_author", "" + this.changed_concept_author);
         logConfig("changed_description_author", "" + this.changed_description_author);
         logConfig("changed_rel_author", "" + this.changed_rel_author);
@@ -687,10 +677,12 @@ public class DiffBase {
                 "v1_isa_filter");
         this.v2_isa_filter_int = buildConceptEnum(this.v2_isa_filter,
                 "v2_isa_filter");
-        this.v1_concept_status_filter_int = buildConceptEnum(
-                this.v1_concept_status_filter, "v1_concept_status_filter");
-        this.v2_concept_status_filter_int = buildConceptEnum(
-                this.v2_concept_status_filter, "v2_concept_status_filter");
+        logConfigList(v1_concept_status_filter_int, "v1_concept_status_filter");
+        logConfigList(v2_concept_status_filter_int, "v2_concept_status_filter");
+//        this.v1_concept_status_filter_int = buildConceptEnum(
+//                this.v1_concept_status_filter, "v1_concept_status_filter");
+//        this.v2_concept_status_filter_int = buildConceptEnum(
+//                this.v2_concept_status_filter, "v2_concept_status_filter");
         logConfig("added_descriptions", "" + this.added_descriptions);
         this.diff_count.put(this.added_description_change, 0);
         logConfig("deleted_descriptions", "" + this.deleted_descriptions);
@@ -698,10 +690,10 @@ public class DiffBase {
         logConfig("changed_description_status", ""
                 + this.changed_description_status);
         this.diff_count.put(this.description_status_change, 0);
-        this.v1_description_status_int = buildConceptEnum(
-                this.v1_description_status, "v1_description_status");
-        this.v2_description_status_int = buildConceptEnum(
-                this.v2_description_status, "v2_description_status");
+//        this.v1_description_status_int = buildConceptEnum(
+//                this.v1_description_status, "v1_description_status");
+//        this.v2_description_status_int = buildConceptEnum(
+//                this.v2_description_status, "v2_description_status");
         logConfig("changed_description_term", ""
                 + this.changed_description_term);
         this.diff_count.put(this.description_term_change, 0);
@@ -714,12 +706,14 @@ public class DiffBase {
         logConfig("changed_description_case", ""
                 + this.changed_description_case);
         this.diff_count.put(this.description_case_change, 0);
-        this.v1_description_status_filter_int = buildConceptEnum(
-                this.v1_description_status_filter,
-                "v1_description_status_filter");
-        this.v2_description_status_filter_int = buildConceptEnum(
-                this.v2_description_status_filter,
-                "v2_description_status_filter");
+        logConfigList(v1_description_status_filter_int, "v1_description_status_filter");
+        logConfigList(v2_description_status_filter_int, "v2_description_status_filter");
+//        this.v1_description_status_filter_int = buildConceptEnum(
+//                this.v1_description_status_filter,
+//                "v1_description_status_filter");
+//        this.v2_description_status_filter_int = buildConceptEnum(
+//                this.v2_description_status_filter,
+//                "v2_description_status_filter");
         this.v1_description_type_filter_int = buildConceptEnum(
                 this.v1_description_type_filter, "v1_description_type_filter");
         this.v2_description_type_filter_int = buildConceptEnum(
@@ -743,10 +737,10 @@ public class DiffBase {
         logConfig("changed_relationship_status", ""
                 + this.changed_relationship_status);
         this.diff_count.put(this.relationship_status_change, 0);
-        this.v1_relationship_status_int = buildConceptEnum(
-                this.v1_relationship_status, "v1_relationship_status");
-        this.v2_relationship_status_int = buildConceptEnum(
-                this.v2_relationship_status, "v2_relationship_status");
+//        this.v1_relationship_status_int = buildConceptEnum(
+//                this.v1_relationship_status, "v1_relationship_status");
+//        this.v2_relationship_status_int = buildConceptEnum(
+//                this.v2_relationship_status, "v2_relationship_status");
         logConfig("changed_relationship_characteristic", ""
                 + this.changed_relationship_characteristic);
         this.diff_count.put(this.relationship_characteristic_change, 0);
@@ -759,12 +753,14 @@ public class DiffBase {
         logConfig("changed_relationship_group", ""
                 + this.changed_relationship_group);
         this.diff_count.put(this.relationship_group_change, 0);
-        this.v1_relationship_status_filter_int = buildConceptEnum(
-                this.v1_relationship_status_filter,
-                "v1_relationship_status_filter");
-        this.v2_relationship_status_filter_int = buildConceptEnum(
-                this.v2_relationship_status_filter,
-                "v2_relationship_status_filter");
+        logConfigList(v1_relationship_status_filter_int, "v1_relationship_status_filter");
+        logConfigList(v2_relationship_status_filter_int, "v2_relationship_status_filter");
+//        this.v1_relationship_status_filter_int = buildConceptEnum(
+//                this.v1_relationship_status_filter,
+//                "v1_relationship_status_filter");
+//        this.v2_relationship_status_filter_int = buildConceptEnum(
+//                this.v2_relationship_status_filter,
+//                "v2_relationship_status_filter");
         logConfigList(v1_relationship_characteristic_filter_int, "v1_relationship_characteristic_filter");
         logConfigList(v2_relationship_characteristic_filter_int, "v2_relationship_characteristic_filter");
 //        this.v1_relationship_characteristic_filter_int = buildConceptEnum(
@@ -1151,9 +1147,9 @@ public class DiffBase {
 
     protected void compareAttributes(I_GetConceptData c) throws Exception {
         List<? extends I_ConceptAttributeTuple> a1s = c.getConceptAttributeTuples(null, allowed_position1, precedence,
-                contradiction_mgr);
+                contradiction_mgr, v1_id);
         List<? extends I_ConceptAttributeTuple> a2s = c.getConceptAttributeTuples(null, allowed_position2, precedence,
-                contradiction_mgr);
+                contradiction_mgr, v2_id);
         I_ConceptAttributeTuple<?> a1 = (a1s != null && a1s.size() > 0 ? a1s.get(0) : null);
         I_ConceptAttributeTuple<?> a2 = (a2s != null && a2s.size() > 0 ? a2s.get(0) : null);
         if (debug_p) {
@@ -1166,7 +1162,14 @@ public class DiffBase {
                 System.out.println("A:  " + a);
             }
         }
-
+        if (noDescendantsV1 && a1 != null
+                && a1.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
+            a1 = null;
+        }
+        if (noDescendantsV2 && a2 != null
+                && a2.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
+            a2 = null;
+        }
         if (v1_concept_status_filter_int.size() > 0 && a1 != null
                 && !v1_concept_status_filter_int.contains(a1.getStatusNid())) {
             return;
@@ -1251,7 +1254,10 @@ public class DiffBase {
         List<? extends I_DescriptionTuple> d2s = c.getDescriptionTuples(null,
                 null, allowed_position2, precedence, contradiction_mgr, v2_id);
         for (I_DescriptionTuple d2 : d2s) {
-
+            if (noDescendantsV2
+                    && d2.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
+                continue;
+            }
             descriptions++;
             if (!testDescriptionFilter(d2,
                     v2_description_status_filter_int,
@@ -1265,6 +1271,10 @@ public class DiffBase {
             boolean found = false;
             for (I_DescriptionTuple d1 : d1s) {
                 if (d1.getDescId() == d2.getDescId()) {
+                    if (noDescendantsV1
+                            && d1.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
+                        continue;
+                    }
                     if (!testDescriptionFilter(d1,
                             v1_description_status_filter_int,
                             v1_description_type_filter_int,
@@ -1348,13 +1358,13 @@ public class DiffBase {
 
     protected void compareRelationships(I_GetConceptData c) throws Exception {
         List<? extends I_RelTuple> d1s = (this.v1_assertion_type_filter_enum == null ? c.getSourceRelTuples(null, null, allowed_position1, precedence,
-                contradiction_mgr) : c.getSourceRelTuples(null, null,
+                contradiction_mgr, v1_id) : c.getSourceRelTuples(null, null,
                 allowed_position1, precedence, contradiction_mgr,
-                classifier_type, v1_assertion_type_filter_enum));
+                classifier_type, v1_assertion_type_filter_enum, v1_id));
         List<? extends I_RelTuple> d2s = (this.v2_assertion_type_filter_enum == null ? c.getSourceRelTuples(null, null, allowed_position2, precedence,
-                contradiction_mgr) : c.getSourceRelTuples(null, null,
+                contradiction_mgr, v2_id) : c.getSourceRelTuples(null, null,
                 allowed_position2, precedence, contradiction_mgr,
-                classifier_type, v2_assertion_type_filter_enum));
+                classifier_type, v2_assertion_type_filter_enum, v2_id));
         if (debug_p) {
             for (I_RelTuple d1 : c.getSourceRelTuples(null, null, null,
                     precedence, contradiction_mgr)) {
@@ -1371,6 +1381,10 @@ public class DiffBase {
         }
         for (I_RelTuple d2 : d2s) {
             relationships++;
+            if (noDescendantsV2
+                    && d2.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
+                continue;
+            }
             if (!testRelationshipFilter(d2, v2_relationship_status_filter_int,
                     v2_relationship_type_filter_int,
                     v2_relationship_characteristic_filter_int,
@@ -1381,7 +1395,10 @@ public class DiffBase {
             boolean found = false;
             for (I_RelTuple d1 : d1s) {
                 if (d1.getRelId() == d2.getRelId()) {
-                    found = true;
+                    if (noDescendantsV1
+                            && d1.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
+                        continue;
+                    }
                     if (!testRelationshipFilter(d1,
                             v1_relationship_status_filter_int,
                             v1_relationship_type_filter_int,
@@ -1390,6 +1407,7 @@ public class DiffBase {
                             v1_concept_author_int)) {
                         continue;
                     }
+                    found = true;
 //                    if (changed_rel_author) {
 //                        if (v1_concept_author_int.size() > 0 && d1 != null
 //                                && !v1_concept_author_int.contains(d1.getAuthorNid())) {
@@ -1470,27 +1488,70 @@ public class DiffBase {
         ViewCoordinate vc2 = new ViewCoordinate(vc);
         vc2.setPositionSet(allowed_position2);
         ConceptChronicleBI concept = Ts.get().getConcept(c.getConceptNid());
-        Collection<? extends RefexVersionBI<?>> members1 = concept.getCurrentRefsetMembers(vc1);
-        Collection<? extends RefexVersionBI<?>> members2 = concept.getCurrentRefsetMembers(vc2);
-
-        if (this.added_concepts_refex) {
-            for (RefexVersionBI member : members1) {
+        Collection<? extends RefexVersionBI<?>> members1 = concept.getCurrentRefsetMembers(vc1, v1_id);
+        Collection<? extends RefexVersionBI<?>> members2 = concept.getCurrentRefsetMembers(vc2, v2_id);
+        for (RefexVersionBI member : members1) {
+            if (member.getTime() > v1_id) {
+                members1.remove(member);
+            }
+            if (noDescendantsV1
+                    && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path1_uuid))) {
+                members1.remove(member);
+            }
+        }
+        for (RefexVersionBI member : members2) {
+            if (member.getTime() > v2_id) {
+                members2.remove(member);
+            }
+            if (noDescendantsV2
+                    && member.getPathNid() != Ts.get().getNidForUuids(UUID.fromString(path2_uuid))) {
+                members2.remove(member);
+            }
+        }
+        if (this.changed_concepts_refex) {
+            for (RefexVersionBI member1 : members1) {
                 if (changed_concept_author) {
-                    if (v1_concept_author_int.size() > 0 && member != null
-                            && !v1_concept_author_int.contains(member.getAuthorNid())) {
+                    if (v1_concept_author_int.size() > 0 && member1 != null
+                            && !v1_concept_author_int.contains(member1.getAuthorNid())) {
                         return;
                     }
                 }
-                if (!members2.contains(member)) {
-                    I_GetConceptData memberConcept = Terms.get().getConcept(
-                            Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                    deletedConceptFromRefex(c, memberConcept);
+                if (!members2.contains(member1)) {
+                    String m1 = member1.toUserString();
+                    String m2 = "";
+                    deletedConceptFromRefex(c, m1, m2);
+                }
+                for (RefexVersionBI member2 : members2) {
+                    if (member1.getNid() == member2.getNid()) {
+                        if (RefexStrVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexStrVersionBI rsv1 = (RefexStrVersionBI) member1;
+                            RefexStrVersionBI rsv2 = (RefexStrVersionBI) member2;
+                            if (!rsv1.getStr1().equals(rsv2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
+                        } else if (RefexCnidStrVersionBI.class.isAssignableFrom(member1.getClass())) {
+                            RefexCnidStrVersionBI rcsv1 = (RefexCnidStrVersionBI) member1;
+                            RefexCnidStrVersionBI rcsv2 = (RefexCnidStrVersionBI) member2;
+                            if (!rcsv1.getStr1().equals(rcsv2)) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            } else if (rcsv1.getCnid1() != rcsv2.getCnid1()) {
+                                String m1 = member1.toUserString();
+                                String m2 = member2.toUserString();
+                                deletedConceptFromRefex(c, m1, m2);
+                            }
+                        }
+                    }
                 }
             }
         }
-        if (this.deleted_concepts_refex) {
+        if (this.added_concepts_refex) {
 
             for (RefexVersionBI member : members2) {
+                RefexCnidStrVersionBI rv = (RefexCnidStrVersionBI) member;
                 if (changed_concept_author) {
                     if (v1_concept_author_int.size() > 0 && member != null
                             && !v1_concept_author_int.contains(member.getAuthorNid())) {
@@ -1498,19 +1559,19 @@ public class DiffBase {
                     }
                 }
                 if (!members1.contains(member)) {
-                    I_GetConceptData memberConcept = Terms.get().getConcept(
-                            Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                    addedConceptToRefex(c, memberConcept);
+                    String m = member.toUserString();
+                    addedConceptToRefex(c, m);
                 }
             }
         }
     }
 
-    protected void addedConceptToRefex(I_GetConceptData c, I_GetConceptData m) throws Exception {
+    protected void addedConceptToRefex(I_GetConceptData c, String m) throws Exception {
         incr(this.added_concept_change_refex);
     }
 
-    protected void deletedConceptFromRefex(I_GetConceptData c, I_GetConceptData m) throws Exception {
+    protected void deletedConceptFromRefex(I_GetConceptData c, String m1,
+            String m2) throws Exception {
         incr(this.deleted_concept_change_refex);
     }
 

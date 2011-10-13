@@ -35,15 +35,10 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		}
 	}
 
-	public int getTotalCount() {
-		try {
-			return Terms.get().getRefsetExtensionMembers(refsetNid).size();
-		} catch (IOException e) {
-			AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset members with error: " + e.getMessage());
-		}
-		
-		return 0;
+	public boolean isInitialized() {
+		return refsetConcept != null;
 	}
+
 	public WorkflowHistoryJavaBean getLatestBeanForWorkflowId(int conceptNid, UUID workflowId) {
 		long currentTime = 0;
 		WorkflowHistoryJavaBean lastBean = null;

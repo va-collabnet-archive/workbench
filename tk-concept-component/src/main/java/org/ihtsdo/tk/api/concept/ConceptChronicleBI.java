@@ -41,6 +41,8 @@ public interface ConceptChronicleBI extends
 
     Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
             throws IOException;
+    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+           throws IOException;
 
     boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
             ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException;

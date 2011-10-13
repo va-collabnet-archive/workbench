@@ -25,6 +25,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
+import org.ihtsdo.taxonomy.TaxonomyTree;
 
 public class ConceptNavigator extends JPanel {
 
@@ -107,7 +108,7 @@ public class ConceptNavigator extends JPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    private JTreeWithDragImage navigatorTree;
+    private TaxonomyTree navigatorTree;
     private JScrollPane treeScroller;
     private JScrollPane historyScroller;
     private JScrollPane statedInferredScroller;
@@ -130,7 +131,7 @@ public class ConceptNavigator extends JPanel {
         ConceptChangeListener ccl = new ConceptChangeListener();
         this.view.addHostListener(ccl);
 
-        navigatorTree = (JTreeWithDragImage) treeScroller.getViewport().getView();
+        navigatorTree = (TaxonomyTree) treeScroller.getViewport().getView();
         focusDrop = new FocusDrop(new ImageIcon(ACE.class.getResource("/16x16/plain/flash.png")),
                 navigatorTree, config);
         topPanel = setupTopPanel();

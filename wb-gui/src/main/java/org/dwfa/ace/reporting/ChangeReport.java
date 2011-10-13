@@ -41,6 +41,9 @@ public class ChangeReport extends ChangeReportBase {
 
     public ChangeReport(String v1, String v2, String path1_uuid, String path2_uuid,
             List<Integer> v1_relationship_characteristic_filter_int, List<Integer> v2_relationship_characteristic_filter_int,
+            List<Integer> v1_concept_status_filter_int, List<Integer> v2_concept_status_filter_int,
+            List<Integer> v1_description_status_filter_int, List<Integer> v2_description_status_filter_int,
+            List<Integer> v1_rel_status_filter_int, List<Integer> v2_rel_status_filter_int,
             boolean added_concepts, boolean deleted_concepts, boolean added_concepts_refex, boolean deleted_concepts_refex,
             boolean changed_concept_status, boolean changed_concept_author, boolean changed_description_author,
             boolean changed_rel_author, boolean changed_refex_author,
@@ -50,9 +53,13 @@ public class ChangeReport extends ChangeReportBase {
             boolean changed_description_case, boolean added_relationships, boolean deleted_relationships,
             boolean changed_relationship_status, boolean changed_relationship_characteristic,
             boolean changed_relationship_refinability, boolean changed_relationship_type,
-            boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid) {
+            boolean changed_relationship_group, I_ConfigAceFrame config, int parentConceptNid,
+            boolean noDescendantsV1, boolean noDescendantsV2) {
         super(v1, v2, path1_uuid, path2_uuid,
                 v1_relationship_characteristic_filter_int, v2_relationship_characteristic_filter_int,
+                v1_concept_status_filter_int, v2_concept_status_filter_int,
+                v1_description_status_filter_int, v2_description_status_filter_int,
+                v1_rel_status_filter_int, v2_rel_status_filter_int,
                 added_concepts, deleted_concepts, added_concepts_refex, deleted_concepts_refex,
                 changed_concept_status, changed_concept_author, changed_description_author,
                 changed_rel_author, changed_refex_author, author1, author2, changed_defined,
@@ -60,7 +67,8 @@ public class ChangeReport extends ChangeReportBase {
                 changed_description_term, changed_description_type, changed_description_language,
                 changed_description_case, added_relationships, deleted_relationships,
                 changed_relationship_status, changed_relationship_characteristic, changed_relationship_refinability,
-                changed_relationship_type, changed_relationship_group, config, parentConceptNid);
+                changed_relationship_type, changed_relationship_group, config, parentConceptNid,
+                noDescendantsV1, noDescendantsV2);
         this.parentConceptNid = parentConceptNid;
     }
 

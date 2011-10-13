@@ -991,6 +991,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws Exception {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec, long time) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     /**

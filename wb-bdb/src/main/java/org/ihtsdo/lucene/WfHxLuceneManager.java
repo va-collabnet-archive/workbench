@@ -23,10 +23,9 @@ public class WfHxLuceneManager extends LuceneManager {
 
     static final String wfLuceneFileSuffix = "lucene";
 	protected static File wfHxLuceneDirFile = new File("target/workflow/lucene");
-        protected static File runningLuceneDirFile = new File("workflow/lucene");
-	private static boolean recalculateMatchLimit = true;
-	private static int matchLimit = 0;
+	protected static File runningLuceneDirFile = new File("workflow/lucene");
 	private static UUID workflowIdToUpdate = null;
+	public final static int matchLimit = 10000000;
 
 	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws CorruptIndexException, IOException {
         int idx = beans.size() - 1;
@@ -69,48 +68,27 @@ public class WfHxLuceneManager extends LuceneManager {
     }
 
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
-        recalculateMatchLimit = true;
-
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
         
-        SearchResult result;
-		if (searcher.getTotalCount() > 0) {
+		if (searcher.isInitialized()) {
 	        WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
 	    	
 	        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
 	
 
-            result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+	        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
 	        if (result.topDocs.totalHits > 0) {
 	            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
 	        } else {
 	            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
 	        }
+	        
+	        return result;
         } else {
             TopDocs emptyDocs = new TopDocs(0, new ScoreDoc[0], 0);
 
-            result = new SearchResult(emptyDocs, null);
+            return new SearchResult(emptyDocs, null);
         }
-	        
-        return result;
-	}
-
-	public static void setRecalculateMatchLimit(boolean val) {
-		recalculateMatchLimit = val;
-	}
-
-	public static int calculateMatchLimit() {
-		try {
-			if (matchLimit == 0 || recalculateMatchLimit) {
-				WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-				matchLimit = searcher.getTotalCount();
-				recalculateMatchLimit = false;
-			}
-			return matchLimit;
-		} catch (Exception e) {
-            AceLog.getAppLog().info("Problem analyzing WfHx Refset.");
-			return 0;
-		} 
 	}
 
 	public static void setWorkflowId(UUID workflowId) {
