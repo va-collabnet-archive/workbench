@@ -45,6 +45,14 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	 */
 	private String exportFolder;
 	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -56,7 +64,13 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
 			
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDef.xml");
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDef.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDefqa.xml");			
+			
 			
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
@@ -64,7 +78,7 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-
+			config.setRf2Format(rF2Format);
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
 

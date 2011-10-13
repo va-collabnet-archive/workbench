@@ -66,11 +66,25 @@ public class RF2TextDefinitionPostMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String outputFolder;
+	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDef.xml");
-
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDef.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDefqa.xml");
+			
+			
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
