@@ -98,7 +98,9 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 	   				StringBuffer str = new StringBuffer();
 	   				
 	   				for (I_ExtendByRef id : wfExtensionsToUpdate) {
-	   					str.append(" " + id.getPrimUuid());
+	   					if (id != null) {
+	   						str.append(" " + id.getPrimUuid());
+	   					}
 	   				}
 
 	   				AceLog.getAppLog().log(Level.WARNING, "Failed in adding following Workflow Member UUID's to refset:" + str.toString(), e);
