@@ -935,7 +935,6 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 conceptSpec = new ConceptCB(fsnText, prefText, "en",
                         Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
             }
-            //@akf TODO set SCT id of new concept
 
             conceptSpec.setComponentUuid(newConceptUuid);
             newConcept = tc.constructIfNotCurrent(conceptSpec);
