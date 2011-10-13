@@ -214,9 +214,13 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
             			if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
  
                             int memberId = Terms.get().uuidToNative(member.getUuids());
-                            Object unknownClass = Terms.get().getExtension(memberId);
-                            I_ExtendByRef ref = (I_ExtendByRef)unknownClass;
-                            wfMembersToCommit.add(ref);
+            				try {
+	                            Object unknownClass = Terms.get().getExtension(memberId);
+	                            I_ExtendByRef ref = (I_ExtendByRef)unknownClass;
+	                            wfMembersToCommit.add(ref);
+            				} catch (Exception e) {
+            		            AceLog.getAppLog().log(Level.WARNING, "Failed getting extension with memberId: " + memberId);
+            			    }
             			}
             		}
 
