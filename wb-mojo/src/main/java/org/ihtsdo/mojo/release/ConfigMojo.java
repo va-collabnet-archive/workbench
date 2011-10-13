@@ -26,7 +26,7 @@ public class ConfigMojo extends AbstractMojo {
 	/**
 	 * rF2Format
 	 * 
-	 * @parameter
+	 * @parameter default-value="false"
 	 * @required
 	 */
 	private String rF2Format;
@@ -34,7 +34,7 @@ public class ConfigMojo extends AbstractMojo {
 	/**
 	 * invokeDroolsRules
 	 * 
-	 * @parameter default-value="true"
+	 * @parameter default-value="false"
 	 */
 	private String invokeDroolsRules;
 
