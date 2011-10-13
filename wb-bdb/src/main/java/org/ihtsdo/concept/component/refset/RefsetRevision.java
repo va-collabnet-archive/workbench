@@ -1,9 +1,12 @@
 package org.ihtsdo.concept.component.refset;
 
-import java.beans.PropertyVetoException;
+//~--- non-JDK imports --------------------------------------------------------
+
+import com.sleepycat.bind.tuple.TupleInput;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -11,145 +14,161 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
-import com.sleepycat.bind.tuple.TupleInput;
+//~--- JDK imports ------------------------------------------------------------
+
+import java.beans.PropertyVetoException;
+
 import java.io.IOException;
 
+import java.util.Set;
+
 public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends RefsetMember<V, C>>
-        extends Revision<V, C>
-        implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
+        extends Revision<V, C> implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
+   public RefsetRevision() {
+      super();
+   }
 
-    @Override
-    public final boolean readyToWriteRevision() {
-        assert readyToWriteRefsetRevision(): assertionString();
-        return true;
-    }
+   public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
+      super(statusAtPositionNid, primordialComponent);
+   }
 
-    public abstract boolean readyToWriteRefsetRevision();
+   public RefsetRevision(TkRevision eVersion, C member) {
+      super(Bdb.uuidToNid(eVersion.getStatusUuid()), Bdb.uuidToNid(eVersion.getAuthorUuid()),
+            Bdb.uuidToNid(eVersion.getPathUuid()), eVersion.getTime(), member);
+   }
 
-    public RefsetRevision(int statusNid, int pathNid, long time,
-            C primordialComponent) {
-        super(statusNid,
-                Terms.get().getAuthorNid(),
-                pathNid, time, primordialComponent);
-    }
+   public RefsetRevision(TupleInput input, C primordialComponent) {
+      super(input, primordialComponent);
+   }
 
-    public RefsetRevision(int statusNid, int authorNid, int pathNid, long time,
-            C primordialComponent) {
-        super(statusNid, authorNid,
-                pathNid, time, primordialComponent);
-    }
+   public RefsetRevision(int statusNid, int pathNid, long time, C primordialComponent) {
+      super(statusNid, Terms.get().getAuthorNid(), pathNid, time, primordialComponent);
+   }
 
-    public RefsetRevision(int statusAtPositionNid, C primordialComponent) {
-        super(statusAtPositionNid, primordialComponent);
-    }
+   public RefsetRevision(int statusNid, int authorNid, int pathNid, long time, C primordialComponent) {
+      super(statusNid, authorNid, pathNid, time, primordialComponent);
+   }
 
-    public RefsetRevision(TupleInput input, C primordialComponent) {
-        super(input, primordialComponent);
-    }
+   //~--- methods -------------------------------------------------------------
 
-    public RefsetRevision(TkRevision eVersion,
-            C member) {
-        super(Bdb.uuidToNid(eVersion.getStatusUuid()),
-                Bdb.uuidToNid(eVersion.getAuthorUuid()),
-                Bdb.uuidToNid(eVersion.getPathUuid()),
-                eVersion.getTime(),
-                member);
-    }
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+      allNids.add(primordialComponent.referencedComponentNid);
+      allNids.add(primordialComponent.refsetNid);
+      addRefsetTypeNids(allNids);
+   }
 
-    public RefsetRevision() {
-        super();
-    }
+   protected abstract void addRefsetTypeNids(Set<Integer> allNids);
 
-    @Override
-    public final int compareTo(I_ExtendByRefPart<V> o) {
-        return this.toString().compareTo(o.toString());
-    }
+   protected abstract void addSpecProperties(RefexCAB rcs);
 
-    @Override
-    @Deprecated
-    public final int getStatus() {
-        return getStatusNid();
-    }
+   @Override
+   public final int compareTo(I_ExtendByRefPart<V> o) {
+      return this.toString().compareTo(o.toString());
+   }
 
-    @Override
-    @Deprecated
-    public final void setStatus(int idStatus) {
-        throw new UnsupportedOperationException();
-    }
+   @Override
+   @Deprecated
+   public I_ExtendByRefPart<V> duplicate() {
+      throw new UnsupportedOperationException();
+   }
 
-    @Override
-    @Deprecated
-    public I_ExtendByRefPart<V> duplicate() {
-        throw new UnsupportedOperationException();
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append(super.toString());
-        return buf.toString();
-    }
+      if (RefsetRevision.class.isAssignableFrom(obj.getClass())) {
+         RefsetRevision<?, ?> another = (RefsetRevision<?, ?>) obj;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (RefsetRevision.class.isAssignableFrom(obj.getClass())) {
-            RefsetRevision<?, ?> another = (RefsetRevision<?, ?>) obj;
-            if (this.sapNid == another.sapNid) {
-                return true;
-            }
-        }
-        return false;
-    }
+         if (this.sapNid == another.sapNid) {
+            return true;
+         }
+      }
 
-    public abstract V makeAnalog();
+      return false;
+   }
 
-    @Override
-    public String toUserString() {
-        return toString();
-    }
+   public abstract V makeAnalog();
 
-    @Override
-    public int getCollectionNid() {
-        return primordialComponent.refsetNid;
-    }
+   public abstract boolean readyToWriteRefsetRevision();
 
-    @Override
-    public void setCollectionNid(int collectionNid) throws PropertyVetoException {
-        primordialComponent.setCollectionNid(collectionNid);
-    }
+   @Override
+   public final boolean readyToWriteRevision() {
+      assert readyToWriteRefsetRevision() : assertionString();
 
-    @Override
-    public RefexCAB getRefexEditSpec() throws IOException {
-        RefexCAB rcs = new RefexCAB(getTkRefsetType(),
-                primordialComponent.getReferencedComponentNid(),
-                primordialComponent.getRefsetId(),
-                getPrimUuid());
-        addSpecProperties(rcs);
-        return rcs;
-    }
+      return true;
+   }
 
-    protected abstract TK_REFSET_TYPE getTkRefsetType();
+   /*
+    *  (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      StringBuilder buf = new StringBuilder();
 
-    protected abstract void addSpecProperties(RefexCAB rcs);
+      buf.append(super.toString());
 
-    @Override
-    public int getReferencedComponentNid() {
-        return primordialComponent.getReferencedComponentNid();
-    }
+      return buf.toString();
+   }
 
-    @Override
-    public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
-        primordialComponent.setReferencedComponentNid(componentNid);
-    }
+   @Override
+   public String toUserString() {
+      return toString();
+   }
 
-    @Override
-    public RefsetMember getPrimordialVersion() {
-        return primordialComponent;
-    }
+   //~--- get methods ---------------------------------------------------------
+
+   @Override
+   public int getCollectionNid() {
+      return primordialComponent.refsetNid;
+   }
+
+   @Override
+   public RefsetMember getPrimordialVersion() {
+      return primordialComponent;
+   }
+
+   @Override
+   public int getReferencedComponentNid() {
+      return primordialComponent.getReferencedComponentNid();
+   }
+
+   @Override
+   public RefexCAB getRefexEditSpec() throws IOException {
+      RefexCAB rcs = new RefexCAB(getTkRefsetType(), primordialComponent.getReferencedComponentNid(),
+                                  primordialComponent.getRefsetId(), getPrimUuid());
+
+      addSpecProperties(rcs);
+
+      return rcs;
+   }
+
+   @Override
+   @Deprecated
+   public final int getStatus() {
+      return getStatusNid();
+   }
+
+   protected abstract TK_REFSET_TYPE getTkRefsetType();
+
+   //~--- set methods ---------------------------------------------------------
+
+   @Override
+   public void setCollectionNid(int collectionNid) throws PropertyVetoException {
+      primordialComponent.setCollectionNid(collectionNid);
+   }
+
+   @Override
+   public void setReferencedComponentNid(int componentNid) throws PropertyVetoException {
+      primordialComponent.setReferencedComponentNid(componentNid);
+   }
+
+   @Override
+   @Deprecated
+   public final void setStatus(int idStatus) {
+      throw new UnsupportedOperationException();
+   }
 }

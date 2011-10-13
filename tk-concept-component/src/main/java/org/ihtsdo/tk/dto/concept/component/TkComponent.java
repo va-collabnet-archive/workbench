@@ -2,6 +2,14 @@ package org.ihtsdo.tk.dto.concept.component;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
@@ -30,11 +38,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    private static final long serialVersionUID = 1;
@@ -85,6 +89,34 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             this.revisions.add((V) r.makeConversion(conversionMap, offset, mapAll));
          }
       }
+   }
+
+   public TkComponent(ComponentVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+                      long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, conversionMap, offset, mapAll);
+
+      Collection<? extends IdBI> anotherAdditionalIds = another.getAdditionalIds();
+
+      if (anotherAdditionalIds != null) {
+         this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
+         nextId:
+         for (IdBI id : anotherAdditionalIds) {
+            for (int nid : id.getAllNidsForId()) {
+               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                  continue nextId;
+               }
+            }
+
+            this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id).makeConversion(conversionMap,
+                    offset, mapAll));
+         }
+      }
+
+      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = another.getAnnotations();
+
+      processAnnotations(anotherAnnotations, vc, exclusions, conversionMap);
+      this.primordialUuid = conversionMap.get(another.getPrimUuid());
    }
 
    //~--- methods -------------------------------------------------------------
@@ -154,6 +186,27 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    public int hashCode() {
       return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(), statusUuid.hashCode(),
                                          pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
+   }
+
+   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate vc,
+                                   NidBitSetBI exclusions, Map<UUID, UUID> conversionMap)
+           throws IOException, ContraditionException {
+      if ((annotations != null) &&!annotations.isEmpty()) {
+         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotations.size());
+
+         for (RefexChronicleBI<?> r : annotations) {
+            nextVersion:
+            for (RefexVersionBI v : r.getVersions(vc)) {
+               for (int vNid : v.getAllNidsForVersion()) {
+                  if (exclusions.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
+                     continue nextVersion;
+                  }
+               }
+
+               this.annotations.add(v.getTkRefsetMemberActiveOnly(vc, exclusions, conversionMap));
+            }
+         }
+      }
    }
 
    @Override

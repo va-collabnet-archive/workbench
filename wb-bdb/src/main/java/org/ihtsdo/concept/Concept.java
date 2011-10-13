@@ -87,6 +87,7 @@ import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
@@ -836,6 +837,16 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       return c;
    }
 
+   @Override
+   public Collection<? extends IdBI> getAdditionalIds() throws IOException {
+      return getConAttrs().getAdditionalIds();
+   }
+
+   @Override
+   public Collection<? extends IdBI> getAllIds() throws IOException {
+      return getConAttrs().getAdditionalIds();
+   }
+
    public Collection<Integer> getAllNids() throws IOException {
       return data.getAllNids();
    }
@@ -1074,13 +1085,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long time)
            throws IOException {
-        ConcurrentSkipListSet<RefsetMember<?, ?>> refsetMembers = getRefsetMembers();
-      List<RefexVersionBI<?>>                   returnValues =
+      ConcurrentSkipListSet<RefsetMember<?, ?>> refsetMembers = getRefsetMembers();
+      List<RefexVersionBI<?>>                   returnValues  =
          new ArrayList<RefexVersionBI<?>>(refsetMembers.size());
 
       for (RefsetMember refex : refsetMembers) {
          for (Object o : refex.getVersions(vc, time)) {
-             RefexVersionBI version = (RefexVersionBI) o;
+            RefexVersionBI version = (RefexVersionBI) o;
+
             returnValues.add(version);
          }
       }

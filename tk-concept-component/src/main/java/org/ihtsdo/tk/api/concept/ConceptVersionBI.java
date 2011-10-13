@@ -34,7 +34,15 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
    ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
 
-   Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers() throws IOException;
+   /**
+    *
+    * @return
+    * @throws IOException
+    * @deprecated use getRefsetMembersActive
+    */
+   @Deprecated
+   Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers()
+           throws IOException, ContraditionException;
 
    Collection<? extends DescriptionVersionBI> getDescsActive() throws IOException, ContraditionException;
 
@@ -50,9 +58,13 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
    Collection<? extends MediaVersionBI> getMediaActive() throws IOException, ContraditionException;
 
+   Collection<List<Integer>> getNidPathsToRoot() throws IOException;
+
    Collection<? extends DescriptionVersionBI> getPrefDescsActive() throws IOException;
 
    DescriptionVersionBI getPreferredDescription() throws IOException, ContraditionException;
+
+   Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContraditionException;
 
    Collection<? extends RelGroupVersionBI> getRelGroups() throws IOException, ContraditionException;
 
@@ -85,6 +97,9 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
    Collection<? extends RelationshipVersionBI> getRelsOutgoingActive()
            throws IOException, ContraditionException;
 
+   Collection<? extends RelationshipVersionBI> getRelsOutgoingActiveIsa()
+           throws IOException, ContraditionException;
+
    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations() throws IOException;
 
    Collection<? extends ConceptVersionBI> getRelsOutgoingDestinations(int typeNid) throws IOException;
@@ -107,9 +122,6 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
    int[] getRelsOutgoingDestinationsNidsActiveIsa() throws IOException;
 
-   Collection<? extends RelationshipVersionBI> getRelsOutgoingActiveIsa()
-           throws IOException, ContraditionException;
-
    Collection<? extends DescriptionVersionBI> getSynonyms() throws IOException;
 
    ViewCoordinate getViewCoordinate();
@@ -119,13 +131,11 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
    // TODO to here
    boolean hasHistoricalRels() throws IOException, ContraditionException;
 
-   boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
-
-   boolean isMember(int evalRefsetNid) throws IOException;
-
    boolean isChildOf(ConceptVersionBI child) throws IOException;
+
+   boolean isKindOf(ConceptVersionBI parentKind) throws IOException;
 
    boolean isLeaf() throws IOException;
 
-   Collection<List<Integer>> getNidPathsToRoot() throws IOException;
+   boolean isMember(int evalRefsetNid) throws IOException;
 }

@@ -4,8 +4,10 @@ package org.ihtsdo.tk.dto.concept.component;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.ext.I_VersionExternally;
+import org.ihtsdo.tk.api.id.IdBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -37,9 +39,41 @@ public abstract class TkRevision implements I_VersionExternally {
       super();
    }
 
+   public TkRevision(IdBI id) throws IOException {
+      super();
+      this.authorUuid = Ts.get().getComponent(id.getAuthorNid()).getPrimUuid();
+      this.pathUuid   = Ts.get().getComponent(id.getPathNid()).getPrimUuid();
+      this.statusUuid = Ts.get().getComponent(id.getStatusNid()).getPrimUuid();
+      this.time       = id.getTime();
+   }
+
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+
+   public TkRevision(ComponentVersionBI another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
+           throws IOException {
+      super();
+
+      if (mapAll) {
+         this.statusUuid = conversionMap.get(Ts.get().getComponent(another.getStatusNid()).getPrimUuid());
+         this.authorUuid = conversionMap.get(Ts.get().getComponent(another.getAuthorNid()).getPrimUuid());
+         this.pathUuid   = conversionMap.get(Ts.get().getComponent(another.getPathNid()).getPrimUuid());
+      } else {
+         this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
+         this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
+         this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
+      }
+
+      if (pathUuid == null) {
+         System.out.println("ouch");
+      }
+
+      assert pathUuid != null : another;
+      assert authorUuid != null : another;
+      assert statusUuid != null : another;
+      this.time = another.getTime() + offset;
    }
 
    public TkRevision(TkRevision another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
@@ -55,6 +89,13 @@ public abstract class TkRevision implements I_VersionExternally {
          this.pathUuid   = another.pathUuid;
       }
 
+      if (pathUuid == null) {
+         System.out.println("ouch");
+      }
+
+      assert pathUuid != null : another;
+      assert authorUuid != null : another;
+      assert statusUuid != null : another;
       this.time = another.time + offset;
    }
 
@@ -144,12 +185,13 @@ public abstract class TkRevision implements I_VersionExternally {
                ComponentBI component = Ts.get().getComponent(nid);
 
                sb.append("comp: '");
+
                if (component != null) {
-                   sb.append(component.toUserString());
+                  sb.append(component.toUserString());
                } else {
-                   sb.append("null");
+                  sb.append("null");
                }
-               
+
                sb.append("' ");
                sb.append(nid);
                sb.append(" ");

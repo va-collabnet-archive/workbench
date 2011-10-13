@@ -43,12 +43,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Image extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>, I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -90,6 +85,11 @@ public class Image extends ConceptComponent<ImageRevision, Image>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+      allNids.add(typeNid);
+   }
 
    @Override
    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,

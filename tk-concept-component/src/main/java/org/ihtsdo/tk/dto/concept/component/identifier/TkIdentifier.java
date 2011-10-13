@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.identifier;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.id.LongIdBI;
+import org.ihtsdo.tk.api.id.StringIdBI;
+import org.ihtsdo.tk.api.id.UuidIdBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -27,6 +32,11 @@ public abstract class TkIdentifier extends TkRevision {
       super();
    }
 
+   public TkIdentifier(IdBI id) throws IOException {
+      super(id);
+      this.authorityUuid = Ts.get().getComponent(id.getAuthorNid()).getPrimUuid();
+   }
+
    public TkIdentifier(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
@@ -43,6 +53,24 @@ public abstract class TkIdentifier extends TkRevision {
    }
 
    //~--- methods -------------------------------------------------------------
+
+   public static TkIdentifier convertId(IdBI id) throws IOException {
+      Object denotation = id.getDenotation();
+
+      switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
+      case LONG :
+         return new TkIdentifierLong((LongIdBI) id);
+
+      case STRING :
+         return new TkIdentifierString((StringIdBI) id);
+
+      case UUID :
+         return new TkIdentifierUuid((UuidIdBI) id);
+
+      default :
+         throw new UnsupportedOperationException();
+      }
+   }
 
    /**
     * Compares this object to the specified object. The result is <tt>true</tt>

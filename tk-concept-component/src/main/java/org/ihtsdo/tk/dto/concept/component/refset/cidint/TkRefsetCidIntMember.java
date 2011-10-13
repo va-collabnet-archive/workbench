@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidint;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -47,6 +52,20 @@ public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntR
          this.c1Uuid   = another.c1Uuid;
          this.intValue = another.intValue;
       }
+   }
+
+   public TkRefsetCidIntMember(RefexCnidIntVersionBI another, NidBitSetBI exclusions,
+                               Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+      } else {
+         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+      }
+
+      this.intValue = another.getInt1();
    }
 
    //~--- methods -------------------------------------------------------------
@@ -168,6 +187,7 @@ public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntR
       return intValue;
    }
 
+   @Override
    public List<TkRefsetCidIntRevision> getRevisionList() {
       return revisions;
    }

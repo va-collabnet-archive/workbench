@@ -6,7 +6,6 @@ import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
@@ -122,6 +121,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
 
    @Override
+   public ConceptVersionBI getConceptForNid(int nid) throws IOException {
+      return getConceptForNid(store.getConceptNidForNid(nid));
+   }
+
+   @Override
    public ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException {
       return new ConceptVersion(Bdb.getConcept(Bdb.uuidsToNid(uuids)), vc);
    }
@@ -162,12 +166,12 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
 
    @Override
+   public int[] getPossibleChildren(int cNid) throws IOException {
+      return store.getPossibleChildren(cNid, vc);
+   }
+
+   @Override
    public ViewCoordinate getViewCoordinate() {
       return vc;
    }
-
-    @Override
-    public int[] getPossibleChildren(int cNid) throws IOException {
-        return store.getPossibleChildren(cNid, vc);
-    }
 }

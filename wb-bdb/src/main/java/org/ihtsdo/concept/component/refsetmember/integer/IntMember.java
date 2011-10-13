@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -20,12 +19,17 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntMember;
 import org.ihtsdo.tk.dto.concept.component.refset.integer.TkRefsetIntRevision;
+import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -33,9 +37,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.ihtsdo.tk.hash.Hashcode;
+import java.util.*;
 
 public class IntMember extends RefsetMember<IntRevision, IntMember>
         implements I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
@@ -71,7 +73,13 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
    //~--- methods -------------------------------------------------------------
 
-    @Override
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+
+      //
+   }
+
+   @Override
    protected void addSpecProperties(RefexCAB rcs) {
       rcs.with(RefexProperty.INTEGER1, this.intValue);
    }
@@ -175,17 +183,24 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
    //~--- get methods ---------------------------------------------------------
 
-    @Override
+   @Override
    public int getInt1() {
       return intValue;
    }
 
-    @Override
+   @Override
    public int getIntValue() {
       return intValue;
    }
 
-    @Override
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetIntMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.INT;
    }
@@ -200,7 +215,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
       return new ArrayIntList(2);
    }
 
-    @Override
+   @Override
    protected VersionComputer<RefsetMember<IntRevision, IntMember>.Version> getVersionComputer() {
       return computer;
    }
@@ -222,7 +237,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
          }
 
          if (revisions != null) {
-            for (RefexIntAnalogBI r: revisions) {
+            for (RefexIntAnalogBI r : revisions) {
                if (r.getTime() != Long.MIN_VALUE) {
                   list.add(new Version(r));
                }
@@ -243,7 +258,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
       modified();
    }
 
-    @Override
+   @Override
    public void setIntValue(int intValue) {
       this.intValue = intValue;
       modified();
@@ -257,12 +272,10 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
       private Version(RefexIntAnalogBI cv) {
          super(cv);
       }
-      RefexIntAnalogBI getCv() {
-          return (RefexIntAnalogBI) cv;
-      }
+
       //~--- methods ----------------------------------------------------------
 
-        @Override
+      @Override
       public int compareTo(I_ExtendByRefPart<IntRevision> o) {
          if (I_ExtendByRefPartInt.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartInt<IntRevision> another = (I_ExtendByRefPartInt<IntRevision>) o;
@@ -287,13 +300,17 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
       //~--- get methods ------------------------------------------------------
 
+      RefexIntAnalogBI getCv() {
+         return (RefexIntAnalogBI) cv;
+      }
+
       @Override
-      public ERefsetIntMember getERefsetMember() throws TerminologyException, IOException {
+      public ERefsetIntMember getERefsetMember() throws IOException {
          return new ERefsetIntMember(this);
       }
 
       @Override
-      public ERefsetIntRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetIntRevision getERefsetRevision() throws IOException {
          return new ERefsetIntRevision(this);
       }
 

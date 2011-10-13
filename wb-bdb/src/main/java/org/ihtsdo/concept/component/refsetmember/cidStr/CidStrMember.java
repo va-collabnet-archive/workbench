@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -21,10 +20,14 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidStrMember;
 import org.ihtsdo.etypes.ERefsetCidStrRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -35,8 +38,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
         implements I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
@@ -73,6 +75,11 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -207,6 +214,13 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    @Override
    public String getStringValue() {
       return strValue;
+   }
+
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidStrMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
@@ -349,12 +363,12 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
       }
 
       @Override
-      public ERefsetCidStrMember getERefsetMember() throws TerminologyException, IOException {
+      public ERefsetCidStrMember getERefsetMember() throws IOException {
          return new ERefsetCidStrMember(this);
       }
 
       @Override
-      public ERefsetCidStrRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetCidStrRevision getERefsetRevision() throws IOException {
          return new ERefsetCidStrRevision(this);
       }
 

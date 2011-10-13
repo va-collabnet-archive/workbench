@@ -2,6 +2,7 @@ package org.ihtsdo.tk.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -22,6 +23,8 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
    ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
 
    ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
+
+   ConceptVersionBI getConceptForNid(int nid) throws IOException;
 
    ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
 

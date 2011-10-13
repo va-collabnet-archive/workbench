@@ -2,6 +2,10 @@ package org.ihtsdo.tk.dto.concept.component.refset.Long;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -39,6 +43,13 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
                              boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
       this.longValue = another.longValue;
+   }
+
+   public TkRefsetLongMember(RefexLongVersionBI another, NidBitSetBI exclusions,
+                             Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+      this.longValue = another.getLong1();
    }
 
    //~--- methods -------------------------------------------------------------

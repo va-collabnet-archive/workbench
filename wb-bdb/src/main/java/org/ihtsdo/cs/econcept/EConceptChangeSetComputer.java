@@ -3,7 +3,6 @@ package org.ihtsdo.cs.econcept;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -216,21 +215,17 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                   if ((commitSapNids == null) || commitSapNids.contains(v.getSapNid())) {
                      changed.set(true);
 
-                     try {
-                        if (eMember == null) {
-                           eMember = v.getERefsetMember();
+                     if (eMember == null) {
+                        eMember = v.getERefsetMember();
 
-                           if (eMember != null) {
-                              eRefsetMembers.add(eMember);
-                              setupFirstVersion(eMember, v);
-                           }
-                        } else {
-                           TkRevision eRevision = v.getERefsetRevision();
-
-                           setupRevision(eMember, v, eRevision);
+                        if (eMember != null) {
+                           eRefsetMembers.add(eMember);
+                           setupFirstVersion(eMember, v);
                         }
-                     } catch (TerminologyException e) {
-                        throw new IOException(e);
+                     } else {
+                        TkRevision eRevision = v.getERefsetRevision();
+
+                        setupRevision(eMember, v, eRevision);
                      }
                   }
                }
@@ -347,25 +342,21 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                   if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
                           && (mv.getTime() != Long.MAX_VALUE)) {
                      if ((commitSapNids == null) || commitSapNids.contains(mv.getSapNid())) {
-                        try {
-                           if (eMember == null) {
-                              eMember = mv.getERefsetMember();
+                        if (eMember == null) {
+                           eMember = mv.getERefsetMember();
 
-                              if (eMember != null) {
-                                 if (ec.getAnnotations() == null) {
-                                    ec.setAnnotations(new ArrayList());
-                                 }
-
-                                 ec.getAnnotations().add(eMember);
-                                 setupFirstVersion(eMember, mv);
+                           if (eMember != null) {
+                              if (ec.getAnnotations() == null) {
+                                 ec.setAnnotations(new ArrayList());
                               }
-                           } else {
-                              TkRevision eRevision = mv.getERefsetRevision();
 
-                              setupRevision(eMember, mv, eRevision);
+                              ec.getAnnotations().add(eMember);
+                              setupFirstVersion(eMember, mv);
                            }
-                        } catch (TerminologyException e) {
-                           throw new IOException(e);
+                        } else {
+                           TkRevision eRevision = mv.getERefsetRevision();
+
+                           setupRevision(eMember, mv, eRevision);
                         }
                      }
                   }
@@ -383,28 +374,24 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
 
                Object denotation = idv.getDenotation();
 
-               try {
-                  switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
-                  case LONG :
-                     ec.additionalIds.add(new EIdentifierLong(idv));
+               switch (IDENTIFIER_PART_TYPES.getType(denotation.getClass())) {
+               case LONG :
+                  ec.additionalIds.add(new EIdentifierLong(idv));
 
-                     break;
+                  break;
 
-                  case STRING :
-                     ec.additionalIds.add(new EIdentifierString(idv));
+               case STRING :
+                  ec.additionalIds.add(new EIdentifierString(idv));
 
-                     break;
+                  break;
 
-                  case UUID :
-                     ec.additionalIds.add(new EIdentifierUuid(idv));
+               case UUID :
+                  ec.additionalIds.add(new EIdentifierUuid(idv));
 
-                     break;
+                  break;
 
-                  default :
-                     throw new UnsupportedOperationException();
-                  }
-               } catch (TerminologyException terminologyException) {
-                  throw new IOException(terminologyException);
+               default :
+                  throw new UnsupportedOperationException();
                }
             }
          }

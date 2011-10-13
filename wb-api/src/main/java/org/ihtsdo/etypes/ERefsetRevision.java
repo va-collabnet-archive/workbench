@@ -1,29 +1,34 @@
 package org.ihtsdo.etypes;
 
-import java.io.DataInput;
-import java.io.IOException;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.tapi.TerminologyException;
+
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.DataInput;
+import java.io.IOException;
+
 public class ERefsetRevision extends TkRefsetRevision {
+   protected static final long serialVersionUID = 1;
 
-    protected static final long serialVersionUID = 1;
+   //~--- constructors --------------------------------------------------------
 
-    public ERefsetRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-        super();
-        readExternal(in, dataVersion);
-    }
+   public ERefsetRevision() {
+      super();
+   }
 
-    public ERefsetRevision(I_ExtendByRefPart part) throws TerminologyException, IOException {
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
-        time = part.getTime();
-    }
+   public ERefsetRevision(I_ExtendByRefPart part) throws IOException {
+      pathUuid   = Terms.get().nidToUuid(part.getPathId());
+      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      time       = part.getTime();
+   }
 
-    public ERefsetRevision() {
-        super();
-    }
+   public ERefsetRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+      super();
+      readExternal(in, dataVersion);
+   }
 }

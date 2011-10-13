@@ -2,6 +2,15 @@ package org.ihtsdo.tk.dto.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -29,10 +38,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkConcept {
    public static final String PADDING          = "     ";
@@ -65,40 +71,121 @@ public class TkConcept {
       this.annotationStyleRefex = another.annotationStyleRefex;
 
       if (another.conceptAttributes != null) {
-         this.conceptAttributes = another.conceptAttributes.makeConversion(conversionMap, offset,
-                 mapAll);
+         this.conceptAttributes = another.conceptAttributes.makeConversion(conversionMap, offset, mapAll);
       }
+
       if (another.descriptions != null) {
-          this.descriptions = new ArrayList<TkDescription>(another.descriptions.size());
-          for (TkDescription d: another.descriptions) {
-              this.descriptions.add(d.makeConversion(conversionMap, offset, mapAll));
-          }
+         this.descriptions = new ArrayList<TkDescription>(another.descriptions.size());
+
+         for (TkDescription d : another.descriptions) {
+            this.descriptions.add(d.makeConversion(conversionMap, offset, mapAll));
+         }
       }
 
       if (another.media != null) {
-          this.media = new ArrayList<TkMedia>(another.media.size());
-          for (TkMedia d: another.media) {
-              this.media.add(d.makeConversion(conversionMap, offset, mapAll));
-          }
+         this.media = new ArrayList<TkMedia>(another.media.size());
+
+         for (TkMedia d : another.media) {
+            this.media.add(d.makeConversion(conversionMap, offset, mapAll));
+         }
       }
 
       this.primordialUuid = conversionMap.get(another.primordialUuid);
 
       if (another.refsetMembers != null) {
-          this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(another.refsetMembers.size());
-          for (TkRefsetAbstractMember<?> d: another.refsetMembers) {
-              this.refsetMembers.add((TkRefsetAbstractMember<?>) d.makeConversion(conversionMap, offset, mapAll));
-          }
+         this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(another.refsetMembers.size());
+
+         for (TkRefsetAbstractMember<?> d : another.refsetMembers) {
+            this.refsetMembers.add((TkRefsetAbstractMember<?>) d.makeConversion(conversionMap, offset,
+                    mapAll));
+         }
       }
 
       if (another.relationships != null) {
-          this.relationships = new ArrayList<TkRelationship>(another.relationships.size());
-          for (TkRelationship d: another.relationships) {
-              this.relationships.add(d.makeConversion(conversionMap, offset, mapAll));
-          }
+         this.relationships = new ArrayList<TkRelationship>(another.relationships.size());
+
+         for (TkRelationship d : another.relationships) {
+            this.relationships.add(d.makeConversion(conversionMap, offset, mapAll));
+         }
+      }
+   }
+
+   public TkConcept(ConceptVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+                    long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super();
+      this.primordialUuid       = conversionMap.get(another.getPrimUuid());
+      this.annotationStyleRefex = another.isAnnotationStyleRefex();
+      this.conceptAttributes    = new TkConceptAttributes(another.getConAttrsActive(), exclusions,
+              conversionMap, offset, mapAll, vc);
+
+      Collection<? extends DescriptionVersionBI> activeDescriptions = another.getDescsActive();
+
+      if (activeDescriptions != null) {
+         this.descriptions = new ArrayList<TkDescription>(activeDescriptions.size());
+         nextDescription:
+         for (DescriptionVersionBI d : activeDescriptions) {
+            for (int nid : d.getAllNidsForVersion()) {
+               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                  continue nextDescription;
+               }
+            }
+
+            this.descriptions.add(new TkDescription(d, exclusions, conversionMap, offset, mapAll, vc));
+         }
       }
 
-   
+      Collection<? extends MediaVersionBI> activeMedia = another.getMediaActive();
+
+      if (activeMedia != null) {
+         this.media = new ArrayList<TkMedia>(activeMedia.size());
+         nextMedia:
+         for (MediaVersionBI d : activeMedia) {
+            for (int nid : d.getAllNidsForVersion()) {
+               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                  continue nextMedia;
+               }
+            }
+
+            this.media.add(new TkMedia(d, exclusions, conversionMap, offset, mapAll, vc));
+         }
+      }
+
+      Collection<? extends RefexVersionBI<?>> activeRefsetMembers = another.getRefsetMembersActive();
+
+      if (activeRefsetMembers != null) {
+         this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(activeRefsetMembers.size());
+         nextRefsetMember:
+         for (RefexVersionBI d : activeRefsetMembers) {
+            for (int nid : d.getAllNidsForVersion()) {
+               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                  if (Ts.get().getComponent(nid) == null) {
+                     System.out.println("Null component for: " + d);
+                  }
+
+                  continue nextRefsetMember;
+               }
+            }
+
+            this.refsetMembers.add(d.getTkRefsetMemberActiveOnly(vc, exclusions, conversionMap));
+         }
+      }
+
+      Collection<? extends RelationshipVersionBI> rels = another.getRelsOutgoingActive();
+
+      if (rels != null) {
+         this.relationships = new ArrayList<TkRelationship>(rels.size());
+         nextRel:
+         for (RelationshipVersionBI d : rels) {
+            for (int nid : d.getAllNidsForVersion()) {
+               if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
+                  continue nextRel;
+               }
+            }
+
+            this.relationships.add(new TkRelationship(d, exclusions, conversionMap, offset, mapAll, vc));
+         }
+      }
    }
 
    //~--- methods -------------------------------------------------------------

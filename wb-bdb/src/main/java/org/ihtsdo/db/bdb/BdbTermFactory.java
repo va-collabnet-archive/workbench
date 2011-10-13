@@ -176,6 +176,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.swing.JComponent;
@@ -436,7 +437,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       }
 
       // Clean up any sub-activities...
-
       return Condition.ITEM_CANCELED;
    }
 
@@ -978,7 +978,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    public PathBI newPath(Collection<? extends PositionBI> origins, I_GetConceptData pathConcept,
                          I_ConfigAceFrame commitConfig)
            throws TerminologyException, IOException {
-      assert (pathConcept != null) && (pathConcept.getConceptNid() != 0);
+      assert(pathConcept != null) && (pathConcept.getConceptNid() != 0);
 
       ArrayList<PositionBI> originList = new ArrayList<PositionBI>();
 
@@ -1694,7 +1694,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    }
 
    @Override
-   public I_Identify getAuthorityId() throws TerminologyException, IOException {
+   public I_Identify getAuthorityId() throws IOException {
       throw new UnsupportedOperationException();
    }
 
@@ -1851,12 +1851,12 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    }
 
    @Override
-   public I_Identify getId(Collection<UUID> uids) throws TerminologyException, IOException {
+   public I_Identify getId(Collection<UUID> uids) throws IOException {
       return getId(Bdb.uuidsToNid(uids));
    }
 
    @Override
-   public I_Identify getId(int nid) throws TerminologyException, IOException {
+   public I_Identify getId(int nid) throws IOException {
       Concept concept = Bdb.getConceptForComponent(nid);
 
       if (concept != null) {
@@ -1867,7 +1867,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    }
 
    @Override
-   public I_Identify getId(UUID uuid) throws TerminologyException, IOException {
+   public I_Identify getId(UUID uuid) throws IOException {
       return getId(Bdb.uuidToNid(uuid));
    }
 
@@ -1955,7 +1955,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    }
 
    @Override
-   public I_Identify getPreviousAuthorityId() throws TerminologyException, IOException {
+   public I_Identify getPreviousAuthorityId() throws IOException {
       throw new UnsupportedOperationException();
    }
 

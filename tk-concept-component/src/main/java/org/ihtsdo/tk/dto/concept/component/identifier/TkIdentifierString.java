@@ -1,5 +1,9 @@
 package org.ihtsdo.tk.dto.concept.component.identifier;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.tk.api.id.StringIdBI;
+
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.DataInput;
@@ -21,6 +25,11 @@ public class TkIdentifierString extends TkIdentifier {
 
    public TkIdentifierString() {
       super();
+   }
+
+   public TkIdentifierString(StringIdBI id) throws IOException {
+      super(id);
+      denotation = id.getDenotation();
    }
 
    public TkIdentifierString(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

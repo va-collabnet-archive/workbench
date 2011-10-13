@@ -20,10 +20,15 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -34,8 +39,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexCnidCnidAnalogBI<CidCidRevision> {
@@ -72,6 +76,12 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+      allNids.add(c2Nid);
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -210,6 +220,13 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    @Override
    public int getCnid2() {
       return c2Nid;
+   }
+
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
    @Override
@@ -361,12 +378,12 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
       }
 
       @Override
-      public ERefsetCidCidMember getERefsetMember() throws TerminologyException, IOException {
+      public ERefsetCidCidMember getERefsetMember() throws IOException {
          return new ERefsetCidCidMember(this);
       }
 
       @Override
-      public ERefsetCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetCidCidRevision getERefsetRevision() throws IOException {
          return new ERefsetCidCidRevision(this);
       }
 

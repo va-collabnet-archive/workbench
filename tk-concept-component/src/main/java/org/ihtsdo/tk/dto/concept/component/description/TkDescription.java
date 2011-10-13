@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.description;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
@@ -53,6 +58,24 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
       this.initialCaseSignificant = another.initialCaseSignificant;
       this.lang                   = another.lang;
       this.text                   = another.text;
+   }
+
+   public TkDescription(DescriptionVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+                        long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.conceptUuid = conversionMap.get(Ts.get().getComponent(another.getConceptNid()).getPrimUuid());
+         this.typeUuid    = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+      } else {
+         this.conceptUuid = Ts.get().getComponent(another.getConceptNid()).getPrimUuid();
+         this.typeUuid    = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+      }
+
+      this.initialCaseSignificant = another.isInitialCaseSignificant();
+      this.lang                   = another.getLang();
+      this.text                   = another.getText();
    }
 
    //~--- methods -------------------------------------------------------------

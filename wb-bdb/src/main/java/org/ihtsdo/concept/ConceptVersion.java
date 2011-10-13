@@ -36,6 +36,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -291,6 +292,21 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    //~--- get methods ---------------------------------------------------------
+
+   @Override
+   public Collection<? extends IdBI> getAdditionalIds() throws IOException {
+      return concept.getAdditionalIds();
+   }
+
+   @Override
+   public Collection<? extends IdBI> getAllIds() throws IOException {
+      return concept.getAllIds();
+   }
+
+   @Override
+   public Set<Integer> getAllNidsForVersion() throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
 
    @Override
    public Set<Integer> getAllSapNids() throws IOException {
@@ -556,6 +572,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    @Override
    public Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException {
       return concept.getRefsetMembers();
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException {
+      return concept.getCurrentRefsetMembers(vc);
    }
 
    @Override
@@ -1031,8 +1052,27 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
-   public boolean isActive(NidSetBI allowedStatusNids) {
-      throw new UnsupportedOperationException("Not supported yet.");
+   public boolean isActive(NidSetBI allowedStatusNids) throws IOException {
+      try {
+         if (getConAttrsActive() == null) {
+            return false;
+         }
+
+         return allowedStatusNids.contains(getConAttrsActive().getStatusNid());
+      } catch (ContraditionException ex) {
+         for (ConAttrVersionBI version : concept.getConceptAttributes().getVersions(vc)) {
+            if (allowedStatusNids.contains(version.getStatusNid())) {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public boolean isActive(ViewCoordinate vc) throws IOException {
+      return isActive(vc.getAllowedStatusNids());
    }
 
    @Override

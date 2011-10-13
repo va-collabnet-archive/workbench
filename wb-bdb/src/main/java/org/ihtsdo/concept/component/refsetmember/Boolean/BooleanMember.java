@@ -10,7 +10,6 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -20,13 +19,17 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -36,6 +39,9 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
@@ -70,6 +76,12 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+
+      // ;
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -191,6 +203,13 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
    }
 
    @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.BOOLEAN;
    }
@@ -298,7 +317,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
 
       @Override
       public int hashCodeOfParts() {
-         if (getBooleanValue()) {
+         if (getBoolean1()) {
             return Integer.MAX_VALUE;
          } else {
             return Integer.MIN_VALUE;
@@ -323,12 +342,12 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
       }
 
       @Override
-      public ERefsetBooleanMember getERefsetMember() throws TerminologyException, IOException {
+      public TkRefsetBooleanMember getERefsetMember() throws IOException {
          return new ERefsetBooleanMember(this);
       }
 
       @Override
-      public ERefsetBooleanRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetBooleanRevision getERefsetRevision() throws IOException {
          return new ERefsetBooleanRevision(this);
       }
 

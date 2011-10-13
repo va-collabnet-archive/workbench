@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -20,10 +19,14 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -34,8 +37,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class StrMember extends RefsetMember<StrRevision, StrMember>
         implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
@@ -70,6 +72,12 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+
+      //
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -187,6 +195,13 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetStrMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.STR;
    }
@@ -291,12 +306,12 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
       }
 
       @Override
-      public ERefsetStrMember getERefsetMember() throws TerminologyException, IOException {
+      public ERefsetStrMember getERefsetMember() throws IOException {
          return new ERefsetStrMember(this);
       }
 
       @Override
-      public ERefsetStrRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetStrRevision getERefsetRevision() throws IOException {
          return new ERefsetStrRevision(this);
       }
 

@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.identifier;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.id.LongIdBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -25,6 +26,11 @@ public class TkIdentifierLong extends TkIdentifier {
 
    public TkIdentifierLong() {
       super();
+   }
+
+   public TkIdentifierLong(LongIdBI id) throws IOException {
+      super(id);
+      denotation = id.getDenotation();
    }
 
    public TkIdentifierLong(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
