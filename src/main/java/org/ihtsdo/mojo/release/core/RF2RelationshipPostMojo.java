@@ -71,11 +71,24 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String outputFolder;
+	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
-
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
+			
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
