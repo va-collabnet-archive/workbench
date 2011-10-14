@@ -276,7 +276,8 @@ public class RulesContextHelper {
 
 			termFactory.addUncommittedNoChecks(newConcept);
 
-			termFactory.commit();
+			newConcept.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+					config.getDbConfig().getChangeSetWriterThreading().convert());
 
 			promote(newConcept);
 
@@ -685,7 +686,8 @@ public class RulesContextHelper {
 							termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 
 							0, config);
 					termFactory.addUncommittedNoChecks(context);
-					termFactory.commit();
+					context.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+							config.getDbConfig().getChangeSetWriterThreading().convert());
 					promote(context);
 				}
 			} catch (TerminologyException e) {
@@ -724,7 +726,8 @@ public class RulesContextHelper {
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(context);
-					termFactory.commit();
+					context.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+							config.getDbConfig().getChangeSetWriterThreading().convert());
 					promote(context);
 				}
 			}
