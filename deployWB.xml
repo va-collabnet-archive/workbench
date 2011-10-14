@@ -1,0 +1,211 @@
+<project name="NHS-WorkBench" default="init" basedir=".">
+	<import file="${import.file}" optional="true" />
+	<description>	
+		Deploy WB
+		Author: Adam Flinton
+		Date:	14 Ocotober, 2010
+    </description>
+	<!-- Load environment variables in -->
+	<property name="project.properties" value="deployWB.properties" />
+	<property environment="env" />
+	<property file="${project.properties}" />
+	
+	<!-- 
+	
+	Actions:
+	1) Delete lib
+	2) Delete all eccs etc files from profiles
+	3) Copy XML + props file from service-ui/TextFiles to config
+	4) Optional rebuild BDB
+	5) Optional Produce Zip File
+	6) Optional Exec
+	
+	
+	-->
+	
+	<property name="ant.dir" value="./ext-lib" />
+	<property name="bdb.dir" value="berkeley-db" />
+	
+	<property name="task.execute.bl" value="yes" />
+	<property name="project.lib.dir" value="target" />
+	<property name="project.config.dir" value="./service-ui/TextFiles" />
+	
+	<property name="wb.dir" value="ext-lib" />
+	<property name="wb.lib.dir" value="${wb.dir}/lib" />
+	<property name="wb.profiles.dir" value="${wb.dir}/profiles" />
+	<property name="wb.bdb.dir" value="${wb.dir}/${bdb.dir}" />
+	<property name="wb.config.dir" value="${wb.dir}/config" />
+	
+
+	<property name="rebuild.bdb.bl" value="no" />
+	<property name="rebuild.bdb.dir" value="" />
+	
+
+	<!-- Zip -->
+	<property name="zip.bl" value="no" />
+	<property name="output.dir" value="output" />
+	
+	<property name="dist.dir" value="${project.name}-${DSTAMP}" />
+	<!-- <property name="dist.zip.name" value="${dist.dir}.zip" /> -->
+	
+	<property name="exec.bl" value="no" />
+
+	<property name="project.classpath" value="D:/Ant/apache-ant-1.8.1/lib" />
+	
+	<path id="project.class.path">
+        <path path="${project.classpath}"/>
+    </path>
+	
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="project.class.path"/>
+
+		<target name="init" >
+		<!--  <echo message="project.classpath:  ${project.classpath}"/> -->
+		<!-- Create the time stamp -->
+		<tstamp />
+		<osfamily property="os.family" />
+		<echo message="${os.family}" />
+		<echo message="task.execute.bl: ${task.execute.bl}"/>
+		<!-- <if>
+			<equals arg1="${task.execute.bl}" arg2="yes" />
+			<then>		
+				<antcall target="build-wb-lib"/>
+				<antcall target="build-wb-profiles"/>
+				<antcall target="copy-wb-config"/>
+				
+				<if>
+					<equals arg1="${zip.bl}" arg2="yes" />
+						<then>
+							<antcall target="zipupdist"/>
+						</then>
+				</if>
+				
+				<if>
+					<equals arg1="${rebuild.bdb.bl}" arg2="yes" />
+						<then>
+							<antcall target="replaceBDB"/>
+						</then>
+				</if>
+				
+				<if>
+					<equals arg1="${exec.bl}" arg2="yes" />
+						<then>
+							<antcall target="exec-WB"/>
+						</then>
+				</if>
+				
+				
+			</then>
+		</if> -->
+
+
+	</target>
+	
+	<target name="build-wb-lib" description="rebuild the wb lib from target">
+		<echo> "build-wb-lib Called"</echo>
+		<delete dir="${wb.lib.dir}" failonerror="true" />
+		<mkdir dir="${wb.lib.dir}" />
+		<copy todir="${wb.lib.dir}" failonerror="false">
+			<fileset dir="${project.lib.dir}" includes="**/*" />
+		</copy>
+	</target>
+	
+	<target name="build-wb-profiles" description="delete all eccs files from profiles">	
+		<echo> "build-wb-profiles Called"</echo>	
+		<delete failonerror="true">
+			<fileset dir="${wb.profiles.dir}" includes="**/*.eccs"/>
+			<fileset dir="${wb.profiles.dir}" includes="**/*.cswe"/>
+			<fileset dir="${wb.profiles.dir}" includes="**/*.cswc"/>
+			<fileset dir="${wb.profiles.dir}" includes="**/*.xls"/>
+		</delete>
+	</target>
+	
+	<target name="copy-wb-config" description="copy all new config files">	
+		<echo>"copy-wb-config Called"</echo>	
+		<copy file="${project.config.dir}/main.xml" tofile="${wb.config.dir}/main.xml" overwrite="true"/>
+		<copy file="${project.config.dir}/custom.properties" tofile="${wb.config.dir}/custom.properties" overwrite="true"/>
+		<!-- Default WB config files??? -->
+	</target>
+	
+
+
+	
+	<!-- Zip up files and save to output.file-->
+	<target name="zipupdist" description="Zip up files and save to output.file">
+		<mkdir dir="${output.dir}" />
+		<zip destfile="${output.dir}/${project.name}-${DSTAMP}.zip" basedir="${wb.dir}" excludes="**/${bdb.dir}/**"/>
+	</target>
+	
+	<!-- Deletes old bdb folder and copies in a new one -->
+	<target name="replaceBDB" description="Deletes old bdb folder and copies in a new one">
+		<delete dir="${wb.bdb.dir}" failonerror="true" />
+			<copy todir="${wb.bdb.dir}">
+			<fileset dir="${rebuild.bdb.dir}/${bdb.dir}"/>
+		</copy>
+	</target>
+	
+	<target name="exec-WB" description="Starts up workbench">
+			<if>
+			<equals arg1="${os.family}" arg2="windows" />
+			<then>
+			<property name="exec-full-path" location="${wb.dir}/aaa_wb.bat"/>
+			<antcall target="exec-WB1"/>
+			
+			
+				<!-- <available property="startup.bat_present" file="${exec-full-path}"/>
+				<echo>"BatFile present = ${startup.bat_present}" </echo>
+				<echo>"exec-full-path = ${exec-full-path}" </echo>
+				<exec executable="${exec-full-path}" spawn="true"/> -->
+					<!--<env key="CATALINA_HOME" path="${server.home}" />
+				</exec> -->
+			</then>
+			<elseif>
+				<equals arg1="${os.family}" arg2="unix" />
+				<then>
+				<property name="exec-full-path" location="${wb.dir}/aaa_wb.sh"/>
+				<antcall target="exec-WB1"/>
+				<!-- <available property="aaa_wb.sh_present" file="${exec-full-path}"/>
+				<property name="exec-full-path" location="${wb.dir}/aaa_wb.sh"/>
+				<echo>"Shell Script present = ${aaa_wb.sh_present} TEST SHELL SCRIPT" </echo>
+				<echo>"exec-full-path = ${exec-full-path}" </echo>
+					<exec executable="${exec-full-path}" spawn="true"/> -->
+				</then>
+			</elseif>
+			<else>
+			<echo>"Not Windows or Unix" </echo>
+			</else>
+		</if>
+	</target>
+	
+	<target name="exec-WB1" description="Starts up workbench">
+	<if>
+	<available file="${exec-full-path}"/>
+	<then>
+	<echo>"Exec file present = ${exec-full-path}" </echo>
+	
+			<if>
+			<equals arg1="${os.family}" arg2="windows" />
+			<then>
+				<exec executable="cmd">
+					<arg value="/c"/>
+					<arg value="${exec-full-path}"/>
+					<arg value="-p"/>
+				</exec>
+
+			</then>
+			<else>
+				<exec executable="${exec-full-path}" spawn="true"/>
+			</else>
+		</if>	
+	
+	
+	</then>
+	<else>
+	<echo>"Exec file not present = ${exec-full-path}" </echo>
+	</else>
+	</if>
+	
+	
+	</target>
+	
+
+</project>
