@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.nhs.cfh.deploy</groupId>
+	<artifactId>wb-deploy</artifactId>
+	<version>${custom-ui.version}</version>
+	<packaging>pom</packaging>
+	<name>The NHS WorkBench Deploy</name>
+	<description>A Deployment build for the Workbench</description>
+	<scm>
+	<!-- TODO parameterise the SCM details --> 
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek_mirror_UK</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek_mirror_UK</developerConnection>
+	<!-- <url>https://csfe.aceworkspace.net/sf/scm/do/listRepositories/projects.ihtsdo_subset_editor/scm</url>-->
+	</scm>
+	<properties>
+		<!-- ant deploy properties -->
+		<!-- Run the Ant Script? Values: yes or no -->
+		<runAntDeploy>yes</runAntDeploy>
+		<!--
+			Delete the old BDB directory and copy in a new one? Values : yes or
+			no
+		-->
+		<AntDeployRebuildBDB>no</AntDeployRebuildBDB>
+		<!--
+			The Directory where the BDB files to be copied in are held. Values :
+			FilePath
+		-->
+		<AntDeployRebuildBDB_Dir>D:/adam/Share/bdb/2010-05-04-All+CrossLInks</AntDeployRebuildBDB_Dir>
+		<!--
+			Create a zip file (will not include the BDB Dir)? Values : yes or no
+		-->
+		<AntDeployCreateZip>no</AntDeployCreateZip>
+		<!-- The Folder to output the Zip file to. Values : FilePath -->
+		<AntDeployCreateZip_Dir>D:/adam/Test/TestInstance/zips</AntDeployCreateZip_Dir>
+		<!-- The path to the default Workbench instance. Values : FilePath -->
+		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/nhs-subset-editor-sa-bundle</AntDeployWorkBenchDeploy_Dir> -->
+		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/wb-bundle-test/wb-bundle</AntDeployWorkBenchDeploy_Dir> -->
+		<AntDeployWorkBenchDeploy_Dir>D:\Data\Terminology\WB_Builds\trektest\editor-sync-1.0.1-SNAPSHOT-assembly</AntDeployWorkBenchDeploy_Dir> 
+		
+		
+		<!-- Run workbench? Values :  yes or no -->
+		<AntDeployExec>no</AntDeployExec>
+	</properties>
+	<profiles>
+		<profile>
+			<activation>
+				<property>
+					<name>!workbench.version</name>
+				</property>
+			</activation>
+			<properties>
+				<custom-ui.version>0.0.1-SNAPSHOT</custom-ui.version>
+				<workbench.version>2.6.0-trek-38-SNAPSHOT</workbench.version>
+			</properties>
+		</profile>
+	</profiles>
+	<dependencies>
+		<!-- Why is the com.sun jar set as org.dwfa.jini? -->
+		<dependency>
+			<groupId>com.sun.jini</groupId>
+			<artifactId>start</artifactId>
+			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-mmb</artifactId>
+			<version>${workbench.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ant-contrib</groupId>
+			<artifactId>ant-contrib</artifactId>
+			<version>1.0b3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ant</groupId>
+					<artifactId>ant</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant-nodeps</artifactId>
+			<version>1.6.5</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<!--  <resources>
+			<resource>
+				<directory>./TextFiles</directory>
+			</resource> 
+		</resources> -->
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>build-release</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<!--
+								<tasks> <echo>ANT Build Dir: ${basedir}</echo> </tasks>
+							-->
+							<target>
+								<property name="project.classpath" refid="maven.runtime.classpath" />
+								<property name="task.execute.bl" value="${runAntDeploy}" />
+								<property name="rebuild.bdb.bl" value="${AntDeployRebuildBDB}" />
+								<property name="rebuild.bdb.dir" value="${AntDeployRebuildBDB_Dir}" />
+								<property name="zip.bl" value="${AntDeployCreateZip}" />
+								<property name="output.dir" value="${AntDeployCreateZip_Dir}" />
+								<property name="wb.dir" value="${AntDeployWorkBenchDeploy_Dir}" />
+								<property name="exec.bl" value="${AntDeployExec}" />
+								<ant antfile="${basedir}/deployWB.xml" target="init"
+									inheritRefs="true" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
