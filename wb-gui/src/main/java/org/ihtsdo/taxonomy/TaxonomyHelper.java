@@ -254,8 +254,10 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    public void updateNewModel(String propChangeName) {
       try {
+         model.unLink();
          model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
                                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+         model.addTreeWillExpandListener(tree);
          expandToLastSelection();
       } catch (IOException ex) {
          AceLog.getAppLog().alertAndLogException(ex);
