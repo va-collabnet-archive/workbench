@@ -47,6 +47,8 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 @AllowDataCheckSuppression
 public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
@@ -196,6 +198,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 					.localize().getNid());
 			statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
 					.localize().getNid());
+			
+			statuses.add(Bdb.uuidToNid(SnomedMetadataRf1.CURRENT_RF1.getUuids()));
+			statuses.add(Bdb.uuidToNid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -287,6 +293,11 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 					.localize().getNid());
 			statuses.add(ArchitectonicAuxiliary.Concept.REVIEWED_NOT_APPROVED_DELETION
 					.localize().getNid());
+			
+
+			statuses.add(Bdb.uuidToNid(SnomedMetadataRf1.CURRENT_RF1.getUuids()));
+			statuses.add(Bdb.uuidToNid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

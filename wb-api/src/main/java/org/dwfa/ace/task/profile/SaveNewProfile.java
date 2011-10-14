@@ -149,6 +149,10 @@ public class SaveNewProfile extends AbstractTask {
                     sequenceToFind = "src/main/resources/profiles/";
                     sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
                 }
+                if (sequenceLocation == -1) {
+                    sequenceToFind = "/profiles/";
+                    sequenceLocation = creatorSvd.getRepositoryUrlStr().indexOf(sequenceToFind);
+                }
                 int sequenceEnd = sequenceLocation + sequenceToFind.length();
                 String profileDirRepoUrl = creatorSvd.getRepositoryUrlStr().substring(0, sequenceEnd);
                 String repositoryUrlStr = profileDirRepoUrl + profileToSave.getUsername();

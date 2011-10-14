@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.dwfa.ace.I_ImplementTaxonomyTreeNode;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -32,6 +33,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.Ts;
 
 @BeanList(specs = { @Spec(directory = "tasks/refset/spec", type = BeanType.TASK_BEAN) })
 public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
@@ -80,9 +82,14 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
             }
         } else {
             if (c3Description == null) {
-                DefaultMutableTreeNode node = 
+                /*DefaultMutableTreeNode node = 
                         (DefaultMutableTreeNode) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
-                I_GetConceptData c = (I_GetConceptData) node.getUserObject();
+                I_GetConceptData c = (I_GetConceptData) node.getUserObject();*/
+            	
+            	I_ImplementTaxonomyTreeNode node        = (I_ImplementTaxonomyTreeNode) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
+                I_GetConceptData  c = (I_GetConceptData) Ts.get().getConcept(node.getCnid());
+            	
+            	
             	refsetMap.put(REFSET_PROPERTY.CID_THREE, 
             			c.getNid());
             } else {

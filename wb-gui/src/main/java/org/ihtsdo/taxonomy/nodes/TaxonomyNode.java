@@ -6,6 +6,7 @@
 package org.ihtsdo.taxonomy.nodes;
 
 //~--- non-JDK imports --------------------------------------------------------
+import org.dwfa.ace.I_ImplementTaxonomyTreeNode;
 import org.ihtsdo.taxonomy.TaxonomyModel;
 import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.NodeIcon;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -25,7 +26,7 @@ import java.util.List;
  *
  * @author kec
  */
-public abstract class TaxonomyNode {
+public abstract class TaxonomyNode implements I_ImplementTaxonomyTreeNode {
 
     static Collection<Long> empty = Collections.unmodifiableCollection(new ArrayList<Long>());
     //~--- fields --------------------------------------------------------------

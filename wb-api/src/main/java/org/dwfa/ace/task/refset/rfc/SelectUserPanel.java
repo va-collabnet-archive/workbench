@@ -35,6 +35,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -134,6 +135,8 @@ public class SelectUserPanel extends JPanel {
      * @return The set of valid users.
      */
     private TreeSet<I_GetConceptData> getValidUsers() {
+    	
+    	AceLog.getAppLog().info("getValidUsers user");
         TreeSet<I_GetConceptData> validUsers = new TreeSet<I_GetConceptData>();
         try {
             I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
@@ -141,7 +144,7 @@ public class SelectUserPanel extends JPanel {
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
             I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
             Set<Integer> currentStatuses = helper.getCurrentStatusIds();
-
+            AceLog.getAppLog().info("getValidUsers currentStatuses size =  = "+currentStatuses.size());
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(allowedTypes);
@@ -151,7 +154,7 @@ public class SelectUserPanel extends JPanel {
             descAllowedTypes.add(descriptionType.getConceptNid());
 
             for (I_GetConceptData user : allUsers) {
-
+            	AceLog.getAppLog().info("getValidUsers user = "+user.toLongString());
                 I_DescriptionTuple latestTuple = null;
                 int latestVersion = Integer.MIN_VALUE;
 
@@ -159,19 +162,42 @@ public class SelectUserPanel extends JPanel {
                         user.getDescriptionTuples(null, descAllowedTypes, Terms.get().getActiveAceFrameConfig()
                             .getViewPositionSetReadOnly(), config.getPrecedence(), config
                             .getConflictResolutionStrategy());
+                AceLog.getAppLog().info("getValidUsers 	descriptionResults.size()"+descriptionResults.size());
                 for (I_DescriptionTuple descriptionTuple : descriptionResults) {
+                	
+                	
 
                     if (descriptionTuple.getVersion() > latestVersion) {
                         latestVersion = descriptionTuple.getVersion();
                         latestTuple = descriptionTuple;
+                        AceLog.getAppLog().info("getValidUsers 	latestTuple = "+latestTuple.toString());
+                    }
+                    else{
+                    	AceLog.getAppLog().info("getValidUsers 	descriptionTuple.getVersion() !> latestVersion");
                     }
                 }
                 if (latestTuple != null) {
+                	AceLog.getAppLog().info("getValidUsers 	latestTuple != null and getStatusId()"+latestTuple.getStatusId());
+                	boolean ok = false;
+                	String msg="";
                     for (int currentStatusId : currentStatuses) {
                         if (latestTuple.getStatusId() == currentStatusId) {
+                        	AceLog.getAppLog().info("getValidUsers adding the validUser = "+user.toLongString());
                             validUsers.add(user);
+                            ok = true;
                         }
+                        else{
+                        	//AceLog.getAppLog().info("getValidUsers latestTuple.getStatusId() != currentStatusId "+currentStatusId);
+                        	msg = msg + " "+currentStatusId;
+                        }
+                        
                     }
+                    if(!ok){
+                    	AceLog.getAppLog().info("getValidUsers msg = "+msg);
+                    }
+                }
+                else{
+                	AceLog.getAppLog().info("getValidUsers 	latestTuple == null");
                 }
             }
 
