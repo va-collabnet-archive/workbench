@@ -27,6 +27,7 @@ import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -49,17 +50,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingWorker;
-import javax.swing.ToolTipManager;
+import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -75,17 +69,18 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    private static ImageIcon statedView =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
    private static ImageIcon preferredDisplay =
-      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component.png"));
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/car_compact_green.png"));
    private static ImageIcon inferredView =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
    private static ImageIcon inferredThenStatedView =
       new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
    private static ImageIcon fsnDisplay =
-      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component_yellow.png"));
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/truck_red.png"));
 
    //~--- fields --------------------------------------------------------------
 
    private boolean              displayingFsn = true;
+   private TaxonomyNode         selectedNode  = null;
    private I_ConfigAceFrame     aceFrameConfig;
    private ActivityPanel        activity;
    private RelAssertionType     assertionType;
@@ -132,6 +127,24 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       TaxonomyNode node = handleCollapse(evt, aceFrameConfig);
    }
 
+   private void expandToLastSelection() {
+      if (selectedNode != null) {
+         SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+               try {
+                  PathExpander expander = new PathExpander(tree, aceFrameConfig,
+                                             Ts.get().getConcept(selectedNode.getCnid()));
+
+                  model.nodeFactory.pathExpanderExecutors.execute(expander);
+               } catch (IOException ex) {
+                  AceLog.getAppLog().alertAndLogException(ex);
+               }
+            }
+         });
+      }
+   }
+
    protected void expandTree(TreeExpansionEvent evt) {
       TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
    }
@@ -158,7 +171,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
          vc.setRelAssertionType(assertionType);
          model.ts = Ts.get().getSnapshot(vc);
-         updateHierarchyView("changed from stated to inferred then stated");
+         updateNewModel("changed from stated to inferred then stated");
 
          break;
 
@@ -168,7 +181,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
          vc.setRelAssertionType(assertionType);
          model.ts = Ts.get().getSnapshot(vc);
-         updateHierarchyView("changed from inferred to stated");
+         updateNewModel("changed from inferred to stated");
 
          break;
 
@@ -178,7 +191,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
          vc.setRelAssertionType(assertionType);
          model.ts = Ts.get().getSnapshot(vc);
-         updateHierarchyView("changed from stated to inferred");
+         updateNewModel("changed from stated to inferred");
 
          break;
       }
@@ -193,7 +206,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                  || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
                  || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
                  || "updateHierarchyView".equals(evt.getPropertyName())) {
-         updateHierarchyView(evt.getPropertyName());
+         updateNewModel(evt.getPropertyName());
       }
    }
 
@@ -211,6 +224,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
       if ((node != null) &&!(node instanceof RootNode)) {
          try {
+            selectedNode = node;
             aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getCnid()));
          } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -234,12 +248,15 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          tree.collapseRow(i);
          tree.collapsePath(tp);
       }
+
+      expandToLastSelection();
    }
 
    public void updateNewModel(String propChangeName) {
       try {
          model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
                                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+         expandToLastSelection();
       } catch (IOException ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       } catch (Exception ex) {
@@ -343,13 +360,13 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                displayingFsn = false;
                fsnPreferredButton.setIcon(preferredDisplay);
                fsnPreferredButton.setToolTipText("displaying preferred term, toggle to show fsn");
-               updateHierarchyView("changedToPreferred");
+               updateNewModel("changedToPreferred");
             } else {
                renderer.setTypeToRender(DescTypeToRender.FSN);
                displayingFsn = true;
                fsnPreferredButton.setIcon(fsnDisplay);
                fsnPreferredButton.setToolTipText("displaying fsn, toggle to show preferred term");
-               updateHierarchyView("changedToFsn");
+               updateNewModel("changedToFsn");
             }
 
             TaxonomyNode parent = (TaxonomyNode) tree.getModel().getRoot();
@@ -357,6 +374,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
             handleDisplayChange();
          }
       });
+      fsnPreferredButton.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 3));
 
       JPanel             buttonPanel = new JPanel(new GridBagLayout());
       GridBagConstraints c           = new GridBagConstraints();
@@ -371,13 +389,14 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       buttonPanel.add(statedInferredButton, c);
       c.gridx++;
       buttonPanel.add(fsnPreferredButton, c);
-      treeView.setColumnHeaderView(buttonPanel);
       c.gridx++;
       c.weightx = 1;
 
-      JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString());
+      JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString().trim());
 
+      view.setHorizontalAlignment(SwingConstants.LEFT);
       buttonPanel.add(view, c);
+      treeView.setColumnHeaderView(buttonPanel);
 
       return treeView;
    }
