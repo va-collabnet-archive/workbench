@@ -75,10 +75,11 @@ public class NodeFactory {
 
    private ConcurrentSkipListMap<Long, MakeChildNodesWorker> childWorkerMap = new ConcurrentSkipListMap<Long,
                                                                                  MakeChildNodesWorker>();
-   private TaxonomyModel        model;
-   private NodeComparator       nodeComparator;
-   private TaxonomyNodeRenderer renderer;
-   protected JTree              tree;
+   private NodeExpansionListener expansionListener;
+   private TaxonomyModel         model;
+   private NodeComparator        nodeComparator;
+   private TaxonomyNodeRenderer  renderer;
+   protected JTree               tree;
 
    //~--- constructors --------------------------------------------------------
 
@@ -87,15 +88,14 @@ public class NodeFactory {
       this.renderer       = renderer;
       this.tree           = tree;
       this.nodeComparator = new NodeComparator(model.nodeStore);
+      expansionListener   = new NodeExpansionListener(tree);
    }
 
    //~--- methods -------------------------------------------------------------
 
    public void addNodeExpansionListener(JTree tree) {
-      NodeExpansionListener l = new NodeExpansionListener(tree);
-
-      tree.addTreeExpansionListener(l);
-      tree.addTreeWillExpandListener(l);
+      tree.addTreeExpansionListener(expansionListener);
+      tree.addTreeWillExpandListener(expansionListener);
    }
 
    public static void close() {
@@ -232,6 +232,11 @@ public class NodeFactory {
 
          ((InternalNode) parent).clearChildren();
       }
+   }
+
+   void unLink() {
+      tree.removeTreeExpansionListener(expansionListener);
+      tree.removeTreeWillExpandListener(expansionListener);
    }
 
    //~--- get methods ---------------------------------------------------------

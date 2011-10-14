@@ -8,17 +8,25 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.etypes.ERefsetCidFloatMember;
+import org.ihtsdo.etypes.ERefsetCidFloatRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidflt.TkRefsetCidFloatRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -29,11 +37,10 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember>
-        implements RefexCnidFloatAnalogBI<CidFloatRevision> {
+        implements RefexCnidFloatAnalogBI<CidFloatRevision>, I_ExtendByRefPartCidFloat<CidFloatRevision> {
    private static VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version> computer =
       new VersionComputer<RefsetMember<CidFloatRevision, CidFloatMember>.Version>();
 
@@ -69,9 +76,19 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    //~--- methods -------------------------------------------------------------
 
    @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+   }
+
+   @Override
    protected void addSpecProperties(RefexCAB rcs) {
       rcs.with(RefexProperty.CNID1, getCnid1());
       rcs.with(RefexProperty.FLOAT1, getFloat1());
+   }
+
+   @Override
+   public I_ExtendByRefPart duplicate() {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
@@ -176,6 +193,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    }
 
    @Override
+   public int getC1id() {
+      return getCnid1();
+   }
+
+   @Override
    public int getCnid1() {
       return c1Nid;
    }
@@ -190,6 +212,18 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    }
 
    @Override
+   public float getMeasurementValue() {
+      return getFloat1();
+   }
+
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidFloatMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.CID_FLOAT;
    }
@@ -197,6 +231,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    @Override
    public int getTypeId() {
       return REFSET_TYPES.CID_FLOAT.getTypeNid();
+   }
+
+   @Override
+   public int getUnitsOfMeasureId() {
+      return getC1Nid();
    }
 
    @Override
@@ -251,6 +290,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    }
 
    @Override
+   public void setC1id(int c1id) throws PropertyVetoException {
+      setC1Nid(c1Nid);
+   }
+
+   @Override
    public void setCnid1(int cnid) throws PropertyVetoException {
       this.c1Nid = cnid;
       modified();
@@ -267,10 +311,20 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
       modified();
    }
 
+   @Override
+   public void setMeasurementValue(float measurementValue) {
+      setFloatValue(floatValue);
+   }
+
+   @Override
+   public void setUnitsOfMeasureId(int conceptId) {
+      setC1Nid(conceptId);
+   }
+
    //~--- inner classes -------------------------------------------------------
 
    public class Version extends RefsetMember<CidFloatRevision, CidFloatMember>.Version
-           implements RefexCnidFloatAnalogBI<CidFloatRevision> {
+           implements RefexCnidFloatAnalogBI<CidFloatRevision>, I_ExtendByRefPartCidFloat<CidFloatRevision> {
       private Version(RefexCnidFloatAnalogBI cv) {
          super(cv);
       }
@@ -302,6 +356,11 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
       //~--- get methods ------------------------------------------------------
 
       @Override
+      public int getC1id() {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
       public int getCnid1() {
          return getCv().getCnid1();
       }
@@ -311,11 +370,36 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
       }
 
       @Override
+      public ERefsetCidFloatMember getERefsetMember() throws IOException {
+         return new ERefsetCidFloatMember(this);
+      }
+
+      @Override
+      public ERefsetCidFloatRevision getERefsetRevision() throws IOException {
+         return new ERefsetCidFloatRevision(this);
+      }
+
+      @Override
       public float getFloat1() {
          return getCv().getFloat1();
       }
 
+      @Override
+      public float getMeasurementValue() {
+         return getCv().getFloat1();
+      }
+
+      @Override
+      public int getUnitsOfMeasureId() {
+         return getCv().getCnid1();
+      }
+
       //~--- set methods ------------------------------------------------------
+
+      @Override
+      public void setC1id(int c1id) throws PropertyVetoException {
+         getCv().setCnid1(c1id);
+      }
 
       @Override
       public void setCnid1(int cnid1) throws PropertyVetoException {
@@ -325,6 +409,16 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
       @Override
       public void setFloat1(float f) throws PropertyVetoException {
          getCv().setFloat1(f);
+      }
+
+      @Override
+      public void setMeasurementValue(float measurementValue) {
+         ((I_ExtendByRefPartCidFloat) getCv()).setMeasurementValue(measurementValue);
+      }
+
+      @Override
+      public void setUnitsOfMeasureId(int conceptId) {
+         ((I_ExtendByRefPartCidFloat) getCv()).setUnitsOfMeasureId(conceptId);
       }
    }
 }

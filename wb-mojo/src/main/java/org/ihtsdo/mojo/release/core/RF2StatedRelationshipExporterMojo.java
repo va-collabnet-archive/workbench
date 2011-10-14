@@ -44,6 +44,14 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -55,9 +63,15 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 			} catch (NoSuchAlgorithmException e) {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
-
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/statedrelationship.xml");
-
+			
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/statedrelationship.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/statedrelationshipqa.xml");
+		
+			
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 
@@ -66,7 +80,7 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 //			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
 //			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
-			
+			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");

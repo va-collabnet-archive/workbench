@@ -1,208 +1,244 @@
 package org.ihtsdo.concept.component.refsetmember.Boolean;
 
-import java.beans.PropertyVetoException;
-import java.io.IOException;
-import java.util.Collection;
+//~--- non-JDK imports --------------------------------------------------------
+
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
+
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartBoolean;
 import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
+
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember.Version;
+import org.ihtsdo.etypes.ERefsetBooleanMember;
+import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Boolean.TkRefsetBooleanRevision;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
-import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.bind.tuple.TupleOutput;
+//~--- JDK imports ------------------------------------------------------------
+
+import java.beans.PropertyVetoException;
+
+import java.io.IOException;
+
+import java.util.*;
 
 public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMember>
         implements I_ExtendByRefPartBoolean<BooleanRevision>, RefexBooleanAnalogBI<BooleanRevision> {
+   private boolean booleanValue;
 
-    private boolean booleanValue;
+   //~--- constructors --------------------------------------------------------
 
-            
-    @Override
-    public boolean readyToWriteRefsetRevision() {
-        return true;
-    }
+   public BooleanRevision() {
+      super();
+   }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append(this.getClass().getSimpleName()).append(":{");
-        buf.append(" booleanValue:").append(this.booleanValue);
-        buf.append(super.toString());
-        return buf.toString();
-    }
+   protected BooleanRevision(int statusAtPositionNid, BooleanMember primoridalMember) {
+      super(statusAtPositionNid, primoridalMember);
+      this.booleanValue = primoridalMember.getBooleanValue();
+   }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (BooleanRevision.class.isAssignableFrom(obj.getClass())) {
-            BooleanRevision another = (BooleanRevision) obj;
-            return this.booleanValue == another.booleanValue
-                    && super.equals(obj);
-        }
-        return false;
-    }
+   public BooleanRevision(TkRefsetBooleanRevision eVersion, BooleanMember booleanMember) {
+      super(eVersion, booleanMember);
+      this.booleanValue = eVersion.isBooleanValue();
+   }
 
-    protected BooleanRevision(int statusNid, int pathNid, long time,
-            BooleanMember primoridalMember) {
-        super(statusNid, pathNid, time, primoridalMember);
-        this.booleanValue = primoridalMember.getBooleanValue();
-    }
+   public BooleanRevision(TupleInput input, BooleanMember primoridalMember) {
+      super(input, primoridalMember);
+      booleanValue = input.readBoolean();
+   }
 
-    protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time,
-            BooleanMember primoridalMember) {
-        super(statusNid, authorNid, pathNid, time, primoridalMember);
-        this.booleanValue = primoridalMember.getBooleanValue();
-    }
+   protected BooleanRevision(int statusNid, int pathNid, long time, BooleanMember primoridalMember) {
+      super(statusNid, pathNid, time, primoridalMember);
+      this.booleanValue = primoridalMember.getBooleanValue();
+   }
 
-    protected BooleanRevision(int statusAtPositionNid,
-            BooleanMember primoridalMember) {
-        super(statusAtPositionNid,
-                primoridalMember);
-        this.booleanValue = primoridalMember.getBooleanValue();
-    }
+   protected BooleanRevision(int statusNid, int pathNid, long time, BooleanRevision another) {
+      super(statusNid, pathNid, time, another.primordialComponent);
+      this.booleanValue = another.getBooleanValue();
+   }
 
-    protected BooleanRevision(int statusNid, int pathNid, long time,
-            BooleanRevision another) {
-        super(statusNid, pathNid, time, another.primordialComponent);
-        this.booleanValue = another.getBooleanValue();
-    }
+   protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time,
+                             BooleanMember primoridalMember) {
+      super(statusNid, authorNid, pathNid, time, primoridalMember);
+      this.booleanValue = primoridalMember.getBooleanValue();
+   }
 
-    protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time,
-            BooleanRevision another) {
-        super(statusNid, authorNid, pathNid, time, another.primordialComponent);
-        this.booleanValue = another.getBooleanValue();
-    }
+   protected BooleanRevision(int statusNid, int authorNid, int pathNid, long time, BooleanRevision another) {
+      super(statusNid, authorNid, pathNid, time, another.primordialComponent);
+      this.booleanValue = another.getBooleanValue();
+   }
 
-    @Override
-    public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathNid() == pathNid) {
-            this.setStatusNid(statusNid);
-            return this;
-        }
-        BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
-        primordialComponent.addRevision(newR);
-        return newR;
+   //~--- methods -------------------------------------------------------------
 
-    }
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
 
-    @Override
-    public BooleanRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        if (this.getTime() == time && this.getPathNid() == pathNid) {
-            this.setStatusNid(statusNid);
-            return this;
-        }
-        BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
-        primordialComponent.addRevision(newR);
-        return newR;
+      // ;
+   }
 
-    }
+   protected void addSpecProperties(RefexCAB rcs) {
+      rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
+   }
 
-    @Override
-    public BooleanRevision makeAnalog() {
-        return new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    public BooleanRevision(TupleInput input,
-            BooleanMember primoridalMember) {
-        super(input, primoridalMember);
-        booleanValue = input.readBoolean();
-    }
+      if (BooleanRevision.class.isAssignableFrom(obj.getClass())) {
+         BooleanRevision another = (BooleanRevision) obj;
 
-    public BooleanRevision(TkRefsetBooleanRevision eVersion,
-            BooleanMember booleanMember) {
-        super(eVersion, booleanMember);
-        this.booleanValue = eVersion.isBooleanValue();
-    }
+         return (this.booleanValue == another.booleanValue) && super.equals(obj);
+      }
 
-    public BooleanRevision() {
-        super();
-    }
+      return false;
+   }
 
-    @Override
-    public UniversalAceExtByRefPart getUniversalPart()
-            throws TerminologyException, IOException {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
+   @Override
+   public BooleanRevision makeAnalog() {
+      return new BooleanRevision(getStatusNid(), getPathNid(), getTime(), this);
+   }
 
-    @Override
-    public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
-        // TODO
-        throw new UnsupportedOperationException();
-    }
+   @Override
+   public BooleanRevision makeAnalog(int statusNid, int pathNid, long time) {
+      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
+         this.setStatusNid(statusNid);
 
-    public boolean getBooleanValue() {
-        return booleanValue;
-    }
+         return this;
+      }
 
-    public void setBooleanValue(boolean booleanValue) {
-        this.booleanValue = booleanValue;
-        modified();
-    }
+      BooleanRevision newR = new BooleanRevision(statusNid, pathNid, time, this);
 
-    @Override
-    protected void writeFieldsToBdb(TupleOutput output) {
-        output.writeBoolean(booleanValue);
-    }
+      primordialComponent.addRevision(newR);
 
-    @Override
-    public ArrayIntList getVariableVersionNids() {
-        ArrayIntList variableNids = new ArrayIntList(2);
-        return variableNids;
-    }
+      return newR;
+   }
 
-    @Override
-    public BooleanMember.Version getVersion(ViewCoordinate c)
-            throws ContraditionException {
-        return (Version) ((BooleanMember) primordialComponent).getVersion(c);
-    }
+   @Override
+   public BooleanRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
+         this.setStatusNid(statusNid);
 
-    @Override
-    public Collection<BooleanMember.Version> getVersions() {
-        return ((BooleanMember) primordialComponent).getVersions();
-    }
+         return this;
+      }
 
-    @Override
-    public Collection<? extends RefexVersionBI<BooleanRevision>> getVersions(
-            ViewCoordinate c) {
-        return ((BooleanMember) primordialComponent).getVersions(c);
-    }
+      BooleanRevision newR = new BooleanRevision(statusNid, authorNid, pathNid, time, this);
 
-	@Override
-	public void setBoolean1(boolean l) throws PropertyVetoException {
-		this.booleanValue = l;
-		modified();
-		
-	}
+      primordialComponent.addRevision(newR);
 
-	@Override
-	public boolean getBoolean1() {
-		return this.booleanValue;
-	}
-	
-	protected TK_REFSET_TYPE getTkRefsetType() {
-		return TK_REFSET_TYPE.BOOLEAN;
-	}
+      return newR;
+   }
 
-	protected void addSpecProperties(RefexCAB rcs) {
-		rcs.with(RefexProperty.BOOLEAN1, getBoolean1());
-	}
+   @Override
+   public I_ExtendByRefPart<BooleanRevision> makePromotionPart(PathBI promotionPath) {
+
+      // TODO
+      throw new UnsupportedOperationException();
+   }
+
+   @Override
+   public boolean readyToWriteRefsetRevision() {
+      return true;
+   }
+
+   /*
+    *  (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      StringBuilder buf = new StringBuilder();
+
+      buf.append(this.getClass().getSimpleName()).append(":{");
+      buf.append(" booleanValue:").append(this.booleanValue);
+      buf.append(super.toString());
+
+      return buf.toString();
+   }
+
+   @Override
+   protected void writeFieldsToBdb(TupleOutput output) {
+      output.writeBoolean(booleanValue);
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   @Override
+   public boolean getBoolean1() {
+      return this.booleanValue;
+   }
+
+   public boolean getBooleanValue() {
+      return booleanValue;
+   }
+
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   protected TK_REFSET_TYPE getTkRefsetType() {
+      return TK_REFSET_TYPE.BOOLEAN;
+   }
+
+   @Override
+   public UniversalAceExtByRefPart getUniversalPart() throws TerminologyException, IOException {
+
+      // TODO
+      throw new UnsupportedOperationException();
+   }
+
+   @Override
+   public ArrayIntList getVariableVersionNids() {
+      ArrayIntList variableNids = new ArrayIntList(2);
+
+      return variableNids;
+   }
+
+   @Override
+   public BooleanMember.Version getVersion(ViewCoordinate c) throws ContraditionException {
+      return (Version) ((BooleanMember) primordialComponent).getVersion(c);
+   }
+
+   @Override
+   public Collection<BooleanMember.Version> getVersions() {
+      return ((BooleanMember) primordialComponent).getVersions();
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<BooleanRevision>> getVersions(ViewCoordinate c) {
+      return ((BooleanMember) primordialComponent).getVersions(c);
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   @Override
+   public void setBoolean1(boolean l) throws PropertyVetoException {
+      this.booleanValue = l;
+      modified();
+   }
+
+   public void setBooleanValue(boolean booleanValue) {
+      this.booleanValue = booleanValue;
+      modified();
+   }
 }

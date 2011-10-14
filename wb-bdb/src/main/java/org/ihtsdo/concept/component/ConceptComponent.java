@@ -39,6 +39,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPairForRefset;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentBI;
@@ -52,6 +53,7 @@ import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
@@ -83,10 +85,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ihtsdo.helper.time.TimeHelper;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
-        implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, I_IdPart, I_IdVersion,
+        implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
                    I_HandleFutureStatusAtPositionSetup {
    private static boolean          fixAlert         = true;
    private static AnnotationWriter annotationWriter = new AnnotationWriter();
@@ -98,25 +99,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    public int                                       enclosingConceptNid;
    private ArrayList<IdVersion>                     idVersions;
    public int                                       nid;
-
-   /**
-    * primordial: first created or developed Sap = status, author, position; position = path, time;
-    */
-   public int primordialSapNid;
+   protected long                                   primordialLsb;
 
    /**
     * primordial: first created or developed
     *
     */
-   
    protected long primordialMsb;
-   protected long primordialLsb;
-   
-   public void setPrimordialUuid(UUID pUuid) {
-       this.primordialMsb = pUuid.getMostSignificantBits();
-       this.primordialLsb = pUuid.getLeastSignificantBits();
-   }
-   
+
+   /**
+    * primordial: first created or developed Sap = status, author, position; position = path, time;
+    */
+   public int               primordialSapNid;
    public RevisionSet<R, C> revisions;
 
    //~--- constructors --------------------------------------------------------
@@ -265,6 +259,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       return annotations.add((RefsetMember<?, ?>) annotation);
    }
+
+   abstract protected void addComponentNids(Set<Integer> allNids);
 
    public boolean addIdVersion(IdentifierVersion srcId) {
       if (additionalIdVersions == null) {
@@ -768,9 +764,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    public final void readComponentFromBdb(TupleInput input) {
       this.nid              = input.readInt();
-      this.primordialMsb = input.readLong();
-      this.primordialLsb = input.readLong();
-
+      this.primordialMsb    = input.readLong();
+      this.primordialLsb    = input.readLong();
       this.primordialSapNid = input.readInt();
       assert primordialSapNid != 0 : "Processing nid: " + enclosingConceptNid;;
       readIdentifierFromBdb(input);
@@ -783,7 +778,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    private void readIdentifierFromBdb(TupleInput input) {
 
       // nid, list size, and conceptNid are read already by the binder...
-
       int listSize = input.readShort();
 
       if (listSize != 0) {
@@ -1068,7 +1062,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    private void writeIdentifierToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-
       List<IdentifierVersion> partsToWrite = new ArrayList<IdentifierVersion>();
 
       if (additionalIdVersions != null) {
@@ -1094,6 +1087,41 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    public ArrayList<IdentifierVersion> getAdditionalIdentifierParts() {
       return additionalIdVersions;
+   }
+
+   @Override
+   public Collection<? extends IdBI> getAdditionalIds() {
+      return getAdditionalIdentifierParts();
+   }
+
+   @Override
+   public Collection<? extends IdBI> getAllIds() {
+      return getIdVersions();
+   }
+
+   @Override
+   public Set<Integer> getAllNidsForId() throws IOException {
+      HashSet<Integer> allNids = new HashSet<Integer>();
+
+      allNids.add(nid);
+      allNids.add(getStatusNid());
+      allNids.add(getAuthorNid());
+      allNids.add(getPathNid());
+
+      return allNids;
+   }
+
+   @Override
+   public Set<Integer> getAllNidsForVersion() throws IOException {
+      HashSet<Integer> allNids = new HashSet<Integer>();
+
+      allNids.add(nid);
+      allNids.add(getStatusNid());
+      allNids.add(getAuthorNid());
+      allNids.add(getPathNid());
+      addComponentNids(allNids);
+
+      return allNids;
    }
 
    public Set<Integer> getAllSapNids() throws IOException {
@@ -1695,6 +1723,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Override
+   public boolean isActive(ViewCoordinate vc) {
+      return isActive(vc.getAllowedStatusNids());
+   }
+
+   @Override
    public boolean isBaselineGeneration() {
       return primordialSapNid <= Bdb.getSapDb().getReadOnlyMax();
    }
@@ -1815,6 +1848,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
    }
 
+   public void setPrimordialUuid(UUID pUuid) {
+      this.primordialMsb = pUuid.getMostSignificantBits();
+      this.primordialLsb = pUuid.getLeastSignificantBits();
+   }
+
    @Deprecated
    public void setStatus(int idStatus) {
       setStatusId(idStatus);
@@ -1925,6 +1963,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       //~--- get methods ------------------------------------------------------
+
+      @Override
+      public Set<Integer> getAllNidsForId() throws IOException {
+         if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
+            return getMutableIdPart().getAllNidsForId();
+         }
+
+         return getAllNidsForId();
+      }
 
       @Override
       public int getAuthorNid() {
@@ -2095,6 +2142,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       protected ComponentVersionBI cv;
 
       //~--- constructors -----------------------------------------------------
+
       public Version(ComponentVersionBI cv) {
          super();
          this.cv = cv;
@@ -2205,6 +2253,21 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          }
 
          return Collections.unmodifiableList(additionalIdVersions);
+      }
+
+      @Override
+      public Collection<? extends IdBI> getAdditionalIds() {
+         return ConceptComponent.this.getAdditionalIds();
+      }
+
+      @Override
+      public Collection<? extends IdBI> getAllIds() {
+         return ConceptComponent.this.getIdVersions();
+      }
+
+      @Override
+      public Set<Integer> getAllNidsForVersion() throws IOException {
+         return cv.getAllNidsForVersion();
       }
 
       public Set<Integer> getAllSapNids() throws IOException {
@@ -2399,8 +2462,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       @Override
-      public boolean isActive(NidSetBI allowedStatusNids) {
+      public boolean isActive(NidSetBI allowedStatusNids) throws IOException {
          return cv.isActive(allowedStatusNids);
+      }
+
+      @Override
+      public boolean isActive(ViewCoordinate vc) throws IOException {
+         return isActive(vc.getAllowedStatusNids());
       }
 
       @Override

@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.identifier;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.id.UuidIdBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -32,6 +33,11 @@ public class TkIdentifierUuid extends TkIdentifier {
       super();
       this.denotation    = denotation;
       this.authorityUuid = generatedUuid;
+   }
+
+   public TkIdentifierUuid(UuidIdBI id) throws IOException {
+      super(id);
+      denotation = id.getDenotation();
    }
 
    public TkIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

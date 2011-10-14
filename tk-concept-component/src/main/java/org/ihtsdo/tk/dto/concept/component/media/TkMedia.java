@@ -2,6 +2,12 @@ package org.ihtsdo.tk.dto.concept.component.media;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -54,6 +60,24 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
          this.textDescription = another.textDescription;
          this.typeUuid        = another.typeUuid;
       }
+   }
+
+   public TkMedia(MediaVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap, long offset,
+                  boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.conceptUuid = conversionMap.get(Ts.get().getComponent(another.getConceptNid()).getPrimUuid());
+         this.typeUuid    = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+      } else {
+         this.conceptUuid = Ts.get().getComponent(another.getConceptNid()).getPrimUuid();
+         this.typeUuid    = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+      }
+
+      this.dataBytes       = another.getMedia();
+      this.format          = another.getFormat();
+      this.textDescription = another.getTextDescription();
    }
 
    //~--- methods -------------------------------------------------------------

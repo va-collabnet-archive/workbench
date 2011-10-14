@@ -93,8 +93,10 @@ public class WorkflowHelper {
 	private static final String unrecognizedLoginMessage = "Login is unrecognlized.  You will be defaulted to generic-user workflow permissions";
 	
 	private static UUID overrideActionUid = null;
-	private static boolean advancingWorkflowLock = false;
+
 	private static int wfHistoryRefsetId = 0;
+	private static boolean advancingWorkflowLock = false;
+	private static boolean wfCapabilitiesAvailable = false;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -955,8 +957,8 @@ public class WorkflowHelper {
 												   Terms.get().nidToUuid(ref.getComponentNid()), 
 												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
 												   new Long(ref.getMutableParts().get(0).getTime()));
-			} catch (Exception e) {
-			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ((I_ExtendByRefPartStr)ref).getStringValue());
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ref);
 		}
 		
 		return bean;
@@ -1316,6 +1318,14 @@ public class WorkflowHelper {
 		return advancingWorkflowLock;
 	}
 
+	public static void setWorkflowCapabilitiesAvailable(boolean val) {
+		wfCapabilitiesAvailable = val;
+	}
+
+	public static boolean isWorkflowCapabilitiesAvailable() {
+		return wfCapabilitiesAvailable;
+	}
+
 	public static int getWorkflowRefsetNid() {
 		if (wfHistoryRefsetId != 0) {
 			return wfHistoryRefsetId;
@@ -1324,7 +1334,8 @@ public class WorkflowHelper {
 				try {
 					if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
 						wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
-						return wfHistoryRefsetId;
+
+				        return wfHistoryRefsetId;
 					}
 				} catch (Exception e) {
 					AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: ");

@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidflt;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -46,6 +51,21 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
          this.c1Uuid     = another.c1Uuid;
          this.floatValue = another.floatValue;
       }
+   }
+
+   public TkRefsetCidFloatMember(RefexCnidFloatVersionBI another, NidBitSetBI exclusions,
+                                 Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
+                                 ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+      } else {
+         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+      }
+
+      this.floatValue = another.getFloat1();
    }
 
    //~--- methods -------------------------------------------------------------
@@ -168,10 +188,12 @@ public class TkRefsetCidFloatMember extends TkRefsetAbstractMember<TkRefsetCidFl
       return floatValue;
    }
 
+   @Override
    public List<TkRefsetCidFloatRevision> getRevisionList() {
       return revisions;
    }
 
+   @Override
    public List<TkRefsetCidFloatRevision> getRevisions() {
       return revisions;
    }

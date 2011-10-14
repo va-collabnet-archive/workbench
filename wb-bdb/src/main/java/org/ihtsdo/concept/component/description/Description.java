@@ -44,10 +44,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,6 +97,11 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+      allNids.add(typeNid);
+   }
 
    public void addTuples(NidSetBI allowedStatus, I_Position viewPosition,
                          List<Description.Version> matchingTuples, Precedence precedence,

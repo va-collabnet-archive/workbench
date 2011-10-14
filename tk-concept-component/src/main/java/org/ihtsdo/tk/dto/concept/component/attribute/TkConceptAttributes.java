@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
@@ -36,9 +41,17 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
       readExternal(in, dataVersion);
    }
 
-   public TkConceptAttributes(TkConceptAttributes another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+   public TkConceptAttributes(TkConceptAttributes another, Map<UUID, UUID> conversionMap, long offset,
+                              boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
       this.defined = another.defined;
+   }
+
+   public TkConceptAttributes(ConAttrVersionBI another, NidBitSetBI exclusions,
+                              Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+      this.defined = another.isDefined();
    }
 
    //~--- methods -------------------------------------------------------------

@@ -2,6 +2,10 @@ package org.ihtsdo.tk.dto.concept.component.refset.integer;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -38,6 +42,13 @@ public class TkRefsetIntMember extends TkRefsetAbstractMember<TkRefsetIntRevisio
                             boolean mapAll) {
       super(another, conversionMap, offset, mapAll);
       this.intValue = another.intValue;
+   }
+
+   public TkRefsetIntMember(RefexIntVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
+                            long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+      this.intValue = another.getInt1();
    }
 
    //~--- methods -------------------------------------------------------------

@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidstr;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -47,6 +52,20 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
          this.c1Uuid   = another.c1Uuid;
          this.strValue = another.strValue;
       }
+   }
+
+   public TkRefsetCidStrMember(RefexCnidStrVersionBI another, NidBitSetBI exclusions,
+                               Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+      } else {
+         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+      }
+
+      this.strValue = another.getStr1();
    }
 
    //~--- methods -------------------------------------------------------------

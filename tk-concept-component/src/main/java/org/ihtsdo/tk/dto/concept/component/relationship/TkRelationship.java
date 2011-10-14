@@ -2,7 +2,12 @@ package org.ihtsdo.tk.dto.concept.component.relationship;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_RelateExternally;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -57,6 +62,32 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
          this.relGroup           = another.relGroup;
          this.typeUuid           = another.typeUuid;
       }
+   }
+
+   public TkRelationship(RelationshipVersionBI another, NidBitSetBI exclusions,
+                         Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.c1Uuid             =
+            conversionMap.get(Ts.get().getComponent(another.getOriginNid()).getPrimUuid());
+         this.c2Uuid             =
+            conversionMap.get(Ts.get().getComponent(another.getDestinationNid()).getPrimUuid());
+         this.characteristicUuid =
+            conversionMap.get(Ts.get().getComponent(another.getCharacteristicNid()).getPrimUuid());
+         this.refinabilityUuid =
+            conversionMap.get(Ts.get().getComponent(another.getRefinabilityNid()).getPrimUuid());
+         this.typeUuid = conversionMap.get(Ts.get().getComponent(another.getTypeNid()).getPrimUuid());
+      } else {
+         this.c1Uuid             = Ts.get().getComponent(another.getOriginNid()).getPrimUuid();
+         this.c2Uuid             = Ts.get().getComponent(another.getDestinationNid()).getPrimUuid();
+         this.characteristicUuid = Ts.get().getComponent(another.getCharacteristicNid()).getPrimUuid();
+         this.refinabilityUuid   = Ts.get().getComponent(another.getRefinabilityNid()).getPrimUuid();
+         this.typeUuid           = Ts.get().getComponent(another.getTypeNid()).getPrimUuid();
+      }
+
+      this.relGroup = another.getGroup();
    }
 
    //~--- methods -------------------------------------------------------------
@@ -215,6 +246,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC1Uuid()
     */
+   @Override
    public UUID getC1Uuid() {
       return c1Uuid;
    }
@@ -223,6 +255,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getC2Uuid()
     */
+   @Override
    public UUID getC2Uuid() {
       return c2Uuid;
    }
@@ -231,6 +264,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getCharacteristicUuid()
     */
+   @Override
    public UUID getCharacteristicUuid() {
       return characteristicUuid;
    }
@@ -239,6 +273,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRefinabilityUuid()
     */
+   @Override
    public UUID getRefinabilityUuid() {
       return refinabilityUuid;
    }
@@ -247,10 +282,12 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getRelGroup()
     */
+   @Override
    public int getRelGroup() {
       return relGroup;
    }
 
+   @Override
    public List<TkRelationshipRevision> getRevisionList() {
       return revisions;
    }
@@ -259,6 +296,7 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
     *  (non-Javadoc)
     * @see org.ihtsdo.tk.concept.component.relationship.I_RelateExternally#getTypeUuid()
     */
+   @Override
    public UUID getTypeUuid() {
       return typeUuid;
    }

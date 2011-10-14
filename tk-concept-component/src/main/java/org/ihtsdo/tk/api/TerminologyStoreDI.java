@@ -58,6 +58,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    ConceptChronicleBI getConcept(UUID... uuids) throws IOException;
 
+   ConceptChronicleBI getConceptForNid(int nid) throws IOException;
+
    int getConceptNidForNid(int nid) throws IOException;
 
    ConceptVersionBI getConceptVersion(ViewCoordinate vc, Collection<UUID> uuids) throws IOException;

@@ -1,118 +1,136 @@
 package org.ihtsdo.concept.component.identifier;
 
-import java.util.UUID;
-
-import org.dwfa.ace.api.I_IdPart;
-import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
-import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
+//~--- non-JDK imports --------------------------------------------------------
 
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-public class IdentifierVersionUuid extends IdentifierVersion {
+import org.dwfa.ace.api.I_IdPart;
 
-    private long msb;
-    private long lsb;
+import org.ihtsdo.concept.component.ConceptComponent.IDENTIFIER_PART_TYPES;
+import org.ihtsdo.tk.api.id.UuidIdBI;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 
-    @Override
-    public final boolean readyToWriteIdentifier() {
-        return true;
-    }
+//~--- JDK imports ------------------------------------------------------------
 
-    public IdentifierVersionUuid(TupleInput input) {
-        super(input);
-        msb = input.readLong();
-        lsb = input.readLong();
-    }
+import java.util.UUID;
 
-    public IdentifierVersionUuid(TkIdentifierUuid idv) {
-        super(idv);
-        msb = idv.getDenotation().getMostSignificantBits();
-        lsb = idv.getDenotation().getLeastSignificantBits();
-    }
+public class IdentifierVersionUuid extends IdentifierVersion implements UuidIdBI {
+   private long lsb;
+   private long msb;
 
-    public IdentifierVersionUuid() {
-        super();
-    }
+   //~--- constructors --------------------------------------------------------
 
-    public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int authorNid, int pathNid, long time) {
-        super(statusNid, authorNid, pathNid, time);
-        msb = another.msb;
-        lsb = another.lsb;
-    }
+   public IdentifierVersionUuid() {
+      super();
+   }
 
-    public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid,
-            long time) {
-        super(statusNid, authorNid, pathNid, time);
-    }
+   public IdentifierVersionUuid(TkIdentifierUuid idv) {
+      super(idv);
+      msb = idv.getDenotation().getMostSignificantBits();
+      lsb = idv.getDenotation().getLeastSignificantBits();
+   }
 
-    @Override
-    public IDENTIFIER_PART_TYPES getType() {
-        return IDENTIFIER_PART_TYPES.UUID;
-    }
+   public IdentifierVersionUuid(TupleInput input) {
+      super(input);
+      msb = input.readLong();
+      lsb = input.readLong();
+   }
 
-    @Override
-    protected void writeSourceIdToBdb(TupleOutput output) {
-        output.writeLong(msb);
-        output.writeLong(lsb);
-    }
+   public IdentifierVersionUuid(int statusNid, int authorNid, int pathNid, long time) {
+      super(statusNid, authorNid, pathNid, time);
+   }
 
-    public UUID getUuid() {
-        return new UUID(msb, lsb);
-    }
+   public IdentifierVersionUuid(IdentifierVersionUuid another, int statusNid, int authorNid, int pathNid,
+                                long time) {
+      super(statusNid, authorNid, pathNid, time);
+      msb = another.msb;
+      lsb = another.lsb;
+   }
 
-    @Override
-    public UUID getDenotation() {
-        return getUuid();
-    }
+   //~--- methods -------------------------------------------------------------
 
-    @Override
-    public void setDenotation(Object sourceDenotation) {
-        if (sourceDenotation instanceof UUID) {
-            UUID uuid = (UUID) sourceDenotation;
-        msb = uuid.getMostSignificantBits();
-        lsb = uuid.getLeastSignificantBits();
-        }
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    /*
-     * (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder();
+      if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
+         IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
 
-        buf.append(this.getClass().getSimpleName()).append(": ");
-        buf.append("uuid:").append(getUuid());
-        buf.append(" ");
-        buf.append(super.toString());
-        return buf.toString();
-    }
+         return (this.msb == another.msb) && (this.lsb == another.lsb) && super.equals(another);
+      }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (IdentifierVersionUuid.class.isAssignableFrom(obj.getClass())) {
-            IdentifierVersionUuid another = (IdentifierVersionUuid) obj;
-            return this.msb == another.msb && 
-                    this.lsb == another.lsb && super.equals(another);
-        }
-        return false;
-    }
+      return false;
+   }
 
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + (int) (this.msb ^ (this.msb >>> 32));
-        return hash;
-    }
+   @Override
+   public int hashCode() {
+      int hash = 3;
 
-    @Override
-    public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        return new IdentifierVersionUuid(this, statusNid, authorNid, pathNid, time);
-    }
+      hash = 97 * hash + (int) (this.msb ^ (this.msb >>> 32));
+
+      return hash;
+   }
+
+   @Override
+   public I_IdPart makeIdAnalog(int statusNid, int authorNid, int pathNid, long time) {
+      return new IdentifierVersionUuid(this, statusNid, authorNid, pathNid, time);
+   }
+
+   @Override
+   public final boolean readyToWriteIdentifier() {
+      return true;
+   }
+
+   /*
+    * (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      StringBuilder buf = new StringBuilder();
+
+      buf.append(this.getClass().getSimpleName()).append(": ");
+      buf.append("uuid:").append(getUuid());
+      buf.append(" ");
+      buf.append(super.toString());
+
+      return buf.toString();
+   }
+
+   @Override
+   protected void writeSourceIdToBdb(TupleOutput output) {
+      output.writeLong(msb);
+      output.writeLong(lsb);
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   @Override
+   public UUID getDenotation() {
+      return getUuid();
+   }
+
+   @Override
+   public IDENTIFIER_PART_TYPES getType() {
+      return IDENTIFIER_PART_TYPES.UUID;
+   }
+
+   public UUID getUuid() {
+      return new UUID(msb, lsb);
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   @Override
+   public void setDenotation(Object sourceDenotation) {
+      if (sourceDenotation instanceof UUID) {
+         UUID uuid = (UUID) sourceDenotation;
+
+         msb = uuid.getMostSignificantBits();
+         lsb = uuid.getLeastSignificantBits();
+      }
+   }
 }

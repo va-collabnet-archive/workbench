@@ -190,18 +190,14 @@ public class IdTableModel extends AbstractTableModel implements PropertyChangeLi
       }
 
       if (allTuples == null) {
-         try {
-            int nid = getNidFromTermComponent(tc);
+         int nid = getNidFromTermComponent(tc);
 
-            if (nid != Integer.MIN_VALUE) {
-               I_Identify id = Terms.get().getId(nid);
+         if (nid != Integer.MIN_VALUE) {
+            I_Identify id = Terms.get().getId(nid);
 
-               if (id != null) {
-                  allTuples = id.getIdVersions();
-               }
+            if (id != null) {
+               allTuples = id.getIdVersions();
             }
-         } catch (TerminologyException e) {
-            throw new ToIoException(e);
          }
       }
 

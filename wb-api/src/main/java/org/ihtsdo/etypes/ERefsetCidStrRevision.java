@@ -1,31 +1,35 @@
 package org.ihtsdo.etypes;
 
-import java.io.DataInput;
-import java.io.IOException;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
-import org.dwfa.tapi.TerminologyException;
+
 import org.ihtsdo.tk.dto.concept.component.refset.cidstr.TkRefsetCidStrRevision;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.DataInput;
+import java.io.IOException;
+
 public class ERefsetCidStrRevision extends TkRefsetCidStrRevision {
+   public static final long serialVersionUID = 1;
 
-    public static final long serialVersionUID = 1;
+   //~--- constructors --------------------------------------------------------
 
-    public ERefsetCidStrRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
-        super(in, dataVersion);
-    }
+   public ERefsetCidStrRevision() {
+      super();
+   }
 
-    public ERefsetCidStrRevision(I_ExtendByRefPartCidString part) throws TerminologyException, IOException {
-        c1Uuid = Terms.get().nidToUuid(part.getC1id());
-        strValue = part.getStringValue();
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
-        time = part.getTime();
-    }
+   public ERefsetCidStrRevision(I_ExtendByRefPartCidString part) throws IOException {
+      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
+      strValue   = part.getStringValue();
+      pathUuid   = Terms.get().nidToUuid(part.getPathId());
+      statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      time       = part.getTime();
+   }
 
-    public ERefsetCidStrRevision() {
-        super();
-    }
-
+   public ERefsetCidStrRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
+      super(in, dataVersion);
+   }
 }

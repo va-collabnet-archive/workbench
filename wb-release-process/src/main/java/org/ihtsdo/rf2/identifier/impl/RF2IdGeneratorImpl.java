@@ -149,7 +149,10 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 			
 			// open rf2 file and  check for uuid line then get sctid from webservice and update wherever applicable...
 			try {			
-				BufferedWriter rf2FileWriter = new BufferedWriter(new FileWriter(sctIdFile));			
+				FileOutputStream fos = new FileOutputStream(sctIdFile);
+	            OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF8");
+	            BufferedWriter rf2FileWriter = new BufferedWriter(osw);
+	              
 				FileInputStream fis = new FileInputStream(file);
 				InputStreamReader isr = new InputStreamReader(fis, "UTF-8");				
 				BufferedReader rf2FileReader = new BufferedReader(isr);

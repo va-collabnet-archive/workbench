@@ -20,13 +20,19 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidCidRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
+import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -34,13 +40,12 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.ihtsdo.tk.hash.Hashcode;
+import java.util.*;
 
 public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMember>
         implements I_ExtendByRefPartCidCidCid<CidCidCidRevision>,
-                   RefexCnidCnidCnidVersionBI<CidCidCidRevision>, RefexCnidCnidCnidAnalogBI<CidCidCidRevision> {
+                   RefexCnidCnidCnidVersionBI<CidCidCidRevision>,
+                   RefexCnidCnidCnidAnalogBI<CidCidCidRevision> {
    private static VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version> computer =
       new VersionComputer<RefsetMember<CidCidCidRevision, CidCidCidMember>.Version>();
 
@@ -76,6 +81,13 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+      allNids.add(c2Nid);
+      allNids.add(c3Nid);
+   }
 
    protected void addSpecProperties(RefexCAB rcs) {
       rcs.with(RefexProperty.CNID1, getCnid1());
@@ -237,6 +249,13 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
       return c3Nid;
    }
 
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.CID_CID_CID;
    }
@@ -279,7 +298,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
          }
 
          if (revisions != null) {
-            for (CidCidCidRevision r: revisions) {
+            for (CidCidCidRevision r : revisions) {
                if (r.getTime() != Long.MIN_VALUE) {
                   list.add(new Version(r));
                }
@@ -326,15 +345,15 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
    @Override
    public void setCnid1(int cnid1) throws PropertyVetoException {
-     this.c1Nid = cnid1;
+      this.c1Nid = cnid1;
       modified();
    }
 
    @Override
    public void setCnid2(int cnid2) throws PropertyVetoException {
-       this.c2Nid = cnid2;
+      this.c2Nid = cnid2;
       modified();
-  }
+   }
 
    @Override
    public void setCnid3(int cnid) throws PropertyVetoException {
@@ -400,12 +419,12 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
       }
 
       @Override
-      public ERefsetCidCidCidMember getERefsetMember() throws TerminologyException, IOException {
+      public ERefsetCidCidCidMember getERefsetMember() throws IOException {
          return new ERefsetCidCidCidMember(this);
       }
 
       @Override
-      public ERefsetCidCidCidRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetCidCidCidRevision getERefsetRevision() throws IOException {
          return new ERefsetCidCidCidRevision(this);
       }
 
@@ -418,7 +437,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
       @Override
       public void setC2id(int c2id) throws PropertyVetoException {
-          getCv().setCnid2(c2id);
+         getCv().setCnid2(c2id);
       }
 
       @Override

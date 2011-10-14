@@ -2,6 +2,11 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidcidcid;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
@@ -51,6 +56,23 @@ public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidC
       }
    }
 
+   public TkRefsetCidCidCidMember(RefexCnidCnidCnidVersionBI another, NidBitSetBI exclusions,
+                                  Map<UUID, UUID> conversionMap, long offset, boolean mapAll,
+                                  ViewCoordinate vc)
+           throws IOException, ContraditionException {
+      super(another, exclusions, conversionMap, offset, mapAll, vc);
+
+      if (mapAll) {
+         this.c1Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid1()).getPrimUuid());
+         this.c2Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid2()).getPrimUuid());
+         this.c3Uuid = conversionMap.get(Ts.get().getComponent(another.getCnid3()).getPrimUuid());
+      } else {
+         this.c1Uuid = Ts.get().getComponent(another.getCnid1()).getPrimUuid();
+         this.c2Uuid = Ts.get().getComponent(another.getCnid2()).getPrimUuid();
+         this.c3Uuid = Ts.get().getComponent(another.getCnid3()).getPrimUuid();
+      }
+   }
+
    //~--- methods -------------------------------------------------------------
 
    /**
@@ -63,6 +85,7 @@ public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidC
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;
@@ -101,6 +124,7 @@ public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidC
     *
     * @return a hash code value for this <tt>ERefsetCidCidCidMember</tt>.
     */
+   @Override
    public int hashCode() {
       return this.primordialUuid.hashCode();
    }
@@ -184,6 +208,7 @@ public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidC
       return c3Uuid;
    }
 
+   @Override
    public List<TkRefsetCidCidCidRevision> getRevisionList() {
       return revisions;
    }

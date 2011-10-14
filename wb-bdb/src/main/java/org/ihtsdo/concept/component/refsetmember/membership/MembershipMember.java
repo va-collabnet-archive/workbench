@@ -8,24 +8,33 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.etypes.ERefsetLongMember;
+import org.ihtsdo.etypes.ERefsetRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetMember;
 import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
+import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.ihtsdo.tk.hash.Hashcode;
+import java.util.*;
 
 public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> {
    private static VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version> computer =
@@ -55,7 +64,13 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
 
    //~--- methods -------------------------------------------------------------
 
-    @Override
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+
+      //
+   }
+
+   @Override
    protected void addSpecProperties(RefexCAB rcs) {
 
       // no fields to add...
@@ -155,6 +170,13 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
    //~--- get methods ---------------------------------------------------------
 
    @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.MEMBER;
    }
@@ -203,5 +225,48 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       }
 
       return (List<Version>) versions;
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   public class Version extends RefsetMember<MembershipRevision, MembershipMember>.Version
+           implements I_ExtendByRefVersion<MembershipRevision>, I_ExtendByRefPart<MembershipRevision>,
+                      RefexAnalogBI<MembershipRevision> {
+      private Version(RefexAnalogBI cv) {
+         super(cv);
+      }
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      public int compareTo(I_ExtendByRefPart<MembershipRevision> o) {
+         return super.compareTo(o);
+      }
+
+      @Override
+      public I_ExtendByRefPart<MembershipRevision> duplicate() {
+         return (I_ExtendByRefPart<MembershipRevision>) super.duplicate();
+      }
+
+      @Override
+      public int hashCodeOfParts() {
+         return Hashcode.compute(new int[] { getNid() });
+      }
+
+      //~--- get methods ------------------------------------------------------
+
+      RefexLongAnalogBI getCv() {
+         return (RefexLongAnalogBI) cv;
+      }
+
+      @Override
+      public ERefsetLongMember getERefsetMember() throws IOException {
+         return new ERefsetLongMember(this);
+      }
+
+      @Override
+      public ERefsetRevision getERefsetRevision() throws IOException {
+         return new ERefsetRevision(this);
+      }
    }
 }

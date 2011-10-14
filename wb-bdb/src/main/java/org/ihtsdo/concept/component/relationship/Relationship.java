@@ -45,10 +45,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>, I_RelPart<RelationshipRevision>,
@@ -96,6 +93,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
    //~--- methods -------------------------------------------------------------
 
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+      allNids.add(c2Nid);
+      allNids.add(characteristicNid);
+      allNids.add(refinabilityNid);
+      allNids.add(typeNid);
+   }
+
    public boolean addPart(RelationshipRevision part) {
       return revisions.add(part);
    }
@@ -122,7 +127,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                                        precedencePolicy, contradictionManager);
       relTupleList.addAll(tuplesToReturn);
    }
-   
+
    @Override
    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
                          List<I_RelTuple> relTupleList, Precedence precedencePolicy,
@@ -130,7 +135,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       List<Version> tuplesToReturn = new ArrayList<Version>();
 
       computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn, getVersions(),
-                                       precedencePolicy, contradictionManager, time);
+                                    precedencePolicy, contradictionManager, time);
       relTupleList.addAll(tuplesToReturn);
    }
 

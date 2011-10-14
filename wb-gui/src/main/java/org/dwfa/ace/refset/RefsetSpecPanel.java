@@ -901,10 +901,8 @@ public class RefsetSpecPanel extends JPanel {
          } else {
             return false;
          }
-      } catch (TerminologyException e) {
-         e.printStackTrace();
       } catch (IOException e) {
-         e.printStackTrace();
+         AceLog.getAppLog().alertAndLogException(e);
       }
 
       return false;

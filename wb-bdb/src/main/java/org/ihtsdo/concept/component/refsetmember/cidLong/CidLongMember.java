@@ -8,6 +8,9 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -15,10 +18,16 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.etypes.ERefsetCidLongMember;
+import org.ihtsdo.etypes.ERefsetCidLongRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidlong.TkRefsetCidLongRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -29,11 +38,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidLong;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import java.util.*;
 
 public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
         implements RefexCnidLongAnalogBI<CidLongRevision> {
@@ -70,6 +75,11 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -195,6 +205,13 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidLongMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.CID_LONG;
    }
@@ -235,7 +252,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
          }
 
          if (revisions != null) {
-            for (CidLongRevision r: revisions) {
+            for (CidLongRevision r : revisions) {
                if (r.getTime() != Long.MIN_VALUE) {
                   list.add(new Version(r));
                }
@@ -271,89 +288,100 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
       this.longValue = longValue;
       modified();
    }
-   
-      //~--- inner classes -------------------------------------------------------
-    public class Version extends RefsetMember<CidLongRevision, CidLongMember>.Version
-            implements I_ExtendByRefVersion<CidLongRevision>, I_ExtendByRefPartCidLong<CidLongRevision>,
-            RefexCnidLongAnalogBI<CidLongRevision> {
 
-        private Version(RefexCnidLongAnalogBI cv) {
-            super(cv);
-        }
+   //~--- inner classes -------------------------------------------------------
 
-        //~--- methods ----------------------------------------------------------
-        @Override
-        public int compareTo(I_ExtendByRefPart<CidLongRevision> o) {
-            if (I_ExtendByRefPartCidLong.class.isAssignableFrom(o.getClass())) {
-                I_ExtendByRefPartCidLong<CidLongRevision> another = (I_ExtendByRefPartCidLong<CidLongRevision>) o;
+   public class Version extends RefsetMember<CidLongRevision, CidLongMember>.Version
+           implements I_ExtendByRefVersion<CidLongRevision>, I_ExtendByRefPartCidLong<CidLongRevision>,
+                      RefexCnidLongAnalogBI<CidLongRevision> {
+      private Version(RefexCnidLongAnalogBI cv) {
+         super(cv);
+      }
 
-                if (this.getC1id() != another.getC1id()) {
-                    return this.getC1id() - another.getC1id();
-                }
+      //~--- methods ----------------------------------------------------------
 
-                if (this.getLong1() != another.getLongValue()) {
-                    if (this.getLong1() - another.getLongValue() > 0) {
-                        return 1;
-                    }
-                    return -1;
-                }
+      @Override
+      public int compareTo(I_ExtendByRefPart<CidLongRevision> o) {
+         if (I_ExtendByRefPartCidLong.class.isAssignableFrom(o.getClass())) {
+            I_ExtendByRefPartCidLong<CidLongRevision> another = (I_ExtendByRefPartCidLong<CidLongRevision>) o;
+
+            if (this.getC1id() != another.getC1id()) {
+               return this.getC1id() - another.getC1id();
             }
 
-            return super.compareTo(o);
-        }
+            if (this.getLong1() != another.getLongValue()) {
+               if (this.getLong1() - another.getLongValue() > 0) {
+                  return 1;
+               }
 
-        @Override
-        public int hashCodeOfParts() {
-            return Hashcode.compute(new int[]{getC1Nid(), (int) getLong1()});
-        }
+               return -1;
+            }
+         }
 
-        //~--- get methods ------------------------------------------------------
-        @Override
-        public int getC1id() {
-            return getCv().getCnid1();
-        }
+         return super.compareTo(o);
+      }
 
-        @Override
-        public int getCnid1() {
-            return getCv().getCnid1();
-        }
+      @Override
+      public int hashCodeOfParts() {
+         return Hashcode.compute(new int[] { getC1Nid(), (int) getLong1() });
+      }
 
-        RefexCnidLongAnalogBI getCv() {
-            return (RefexCnidLongAnalogBI) cv;
-        }
+      //~--- get methods ------------------------------------------------------
 
+      @Override
+      public int getC1id() {
+         return getCv().getCnid1();
+      }
 
+      @Override
+      public int getCnid1() {
+         return getCv().getCnid1();
+      }
 
-        //~--- set methods ------------------------------------------------------
-        @Override
-        public void setC1id(int c1id) throws PropertyVetoException {
-            getCv().setCnid1(c1id);
-        }
+      RefexCnidLongAnalogBI getCv() {
+         return (RefexCnidLongAnalogBI) cv;
+      }
 
-        @Override
-        public void setCnid1(int cnid1) throws PropertyVetoException {
-            getCv().setCnid1(cnid1);
-        }
+      @Override
+      public ERefsetCidLongMember getERefsetMember() throws IOException {
+         return new ERefsetCidLongMember(this);
+      }
 
-        @Override
-        public long getLongValue() {
-            return getCv().getLong1();
-        }
+      @Override
+      public ERefsetCidLongRevision getERefsetRevision() throws IOException {
+         return new ERefsetCidLongRevision(this);
+      }
 
-        @Override
-        public void setLongValue(long longValue) throws PropertyVetoException {
-            getCv().setLong1(longValue);
-        }
+      @Override
+      public long getLong1() {
+         return getCv().getLong1();
+      }
 
-        @Override
-        public void setLong1(long l) throws PropertyVetoException {
-            getCv().setLong1(l);
-        }
+      @Override
+      public long getLongValue() {
+         return getCv().getLong1();
+      }
 
-        @Override
-        public long getLong1() {
-            return getCv().getLong1();
-        }
+      //~--- set methods ------------------------------------------------------
+
+      @Override
+      public void setC1id(int c1id) throws PropertyVetoException {
+         getCv().setCnid1(c1id);
+      }
+
+      @Override
+      public void setCnid1(int cnid1) throws PropertyVetoException {
+         getCv().setCnid1(cnid1);
+      }
+
+      @Override
+      public void setLong1(long l) throws PropertyVetoException {
+         getCv().setLong1(l);
+      }
+
+      @Override
+      public void setLongValue(long longValue) throws PropertyVetoException {
+         getCv().setLong1(longValue);
+      }
    }
-
 }

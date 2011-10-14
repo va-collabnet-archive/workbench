@@ -1,6 +1,7 @@
 package org.ihtsdo.concept.component.refsetmember.cidInt;
 
 //~--- non-JDK imports --------------------------------------------------------
+
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
@@ -21,10 +22,14 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidIntMember;
 import org.ihtsdo.etypes.ERefsetCidIntRevision;
+import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidint.TkRefsetCidIntRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -35,357 +40,376 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
         implements I_ExtendByRefPartCidInt<CidIntRevision>, RefexCnidIntAnalogBI<CidIntRevision> {
+   private static VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> computer =
+      new VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version>();
 
-    private static VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> computer =
-            new VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version>();
-    //~--- fields --------------------------------------------------------------
-    private int c1Nid;
-    private int intValue;
+   //~--- fields --------------------------------------------------------------
 
-    //~--- constructors --------------------------------------------------------
-    public CidIntMember() {
-        super();
-    }
+   private int c1Nid;
+   private int intValue;
 
-    public CidIntMember(int enclosingConceptNid, TupleInput input) throws IOException {
-        super(enclosingConceptNid, input);
-    }
+   //~--- constructors --------------------------------------------------------
 
-    public CidIntMember(TkRefsetCidIntMember refsetMember, int enclosingConceptNid) throws IOException {
-        super(refsetMember, enclosingConceptNid);
-        c1Nid = Bdb.uuidToNid(refsetMember.getC1Uuid());
-        intValue = refsetMember.getIntValue();
+   public CidIntMember() {
+      super();
+   }
 
-        if (refsetMember.getRevisionList() != null) {
-            revisions = new RevisionSet<CidIntRevision, CidIntMember>(primordialSapNid);
+   public CidIntMember(int enclosingConceptNid, TupleInput input) throws IOException {
+      super(enclosingConceptNid, input);
+   }
 
-            for (TkRefsetCidIntRevision eVersion : refsetMember.getRevisionList()) {
-                revisions.add(new CidIntRevision(eVersion, this));
-            }
-        }
-    }
+   public CidIntMember(TkRefsetCidIntMember refsetMember, int enclosingConceptNid) throws IOException {
+      super(refsetMember, enclosingConceptNid);
+      c1Nid    = Bdb.uuidToNid(refsetMember.getC1Uuid());
+      intValue = refsetMember.getIntValue();
 
-    //~--- methods -------------------------------------------------------------
-    @Override
-    protected void addSpecProperties(RefexCAB rcs) {
-        rcs.with(RefexProperty.CNID1, getCnid1());
-        rcs.with(RefexProperty.INTEGER1, getInt1());
-    }
+      if (refsetMember.getRevisionList() != null) {
+         revisions = new RevisionSet<CidIntRevision, CidIntMember>(primordialSapNid);
 
-    @Override
-    public CidIntRevision duplicate() {
-        throw new UnsupportedOperationException();
-    }
+         for (TkRefsetCidIntRevision eVersion : refsetMember.getRevisionList()) {
+            revisions.add(new CidIntRevision(eVersion, this));
+         }
+      }
+   }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
+   //~--- methods -------------------------------------------------------------
 
-        if (CidIntMember.class.isAssignableFrom(obj.getClass())) {
-            CidIntMember another = (CidIntMember) obj;
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+   }
 
-            if (super.equals(another)) {
-                return (this.c1Nid == another.c1Nid) && (this.intValue == another.intValue);
-            }
-        }
+   @Override
+   protected void addSpecProperties(RefexCAB rcs) {
+      rcs.with(RefexProperty.CNID1, getCnid1());
+      rcs.with(RefexProperty.INTEGER1, getInt1());
+   }
 
-        return false;
-    }
+   @Override
+   public CidIntRevision duplicate() {
+      throw new UnsupportedOperationException();
+   }
 
-    @Override
-    public int hashCode() {
-        return Hashcode.compute(new int[]{c1Nid});
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    @Override
-    public CidIntRevision makeAnalog() {
-        CidIntRevision newR = new CidIntRevision(getStatusNid(), getPathNid(), getTime(), this);
+      if (CidIntMember.class.isAssignableFrom(obj.getClass())) {
+         CidIntMember another = (CidIntMember) obj;
 
-        return newR;
-    }
-
-    @Override
-    public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
-        if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
-            this.setStatusNid(statusNid);
-
-            return this;
-        }
-
-        CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    public CidIntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
-
-        addRevision(newR);
-
-        return newR;
-    }
-
-    @Override
-    protected boolean membersEqual(ConceptComponent<CidIntRevision, CidIntMember> obj) {
-        if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
-            CidIntMember another = (CidIntMember) obj;
-
+         if (super.equals(another)) {
             return (this.c1Nid == another.c1Nid) && (this.intValue == another.intValue);
-        }
+         }
+      }
 
-        return false;
-    }
+      return false;
+   }
 
-    @Override
-    protected void readMemberFields(TupleInput input) {
-        c1Nid = input.readInt();
-        intValue = input.readInt();
-    }
+   @Override
+   public int hashCode() {
+      return Hashcode.compute(new int[] { c1Nid });
+   }
 
-    @Override
-    protected final CidIntRevision readMemberRevision(TupleInput input) {
-        return new CidIntRevision(input, this);
-    }
+   @Override
+   public CidIntRevision makeAnalog() {
+      CidIntRevision newR = new CidIntRevision(getStatusNid(), getPathNid(), getTime(), this);
 
-    @Override
-    public boolean readyToWriteRefsetMember() {
-        assert c1Nid != Integer.MAX_VALUE;
+      return newR;
+   }
 
-        return true;
-    }
+   @Override
+   public I_AmPart makeAnalog(int statusNid, int pathNid, long time) {
+      if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
+         this.setStatusNid(statusNid);
 
-    /*
-     *  (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
+         return this;
+      }
 
-        buf.append(this.getClass().getSimpleName()).append(":{");
-        buf.append("c1Nid: ");
-        ConceptComponent.addNidToBuffer(buf, c1Nid);
-        buf.append(" intValue: ").append(this.intValue);
-        buf.append(super.toString());
+      CidIntRevision newR = new CidIntRevision(statusNid, pathNid, time, this);
 
-        return buf.toString();
-    }
+      addRevision(newR);
 
-    @Override
-    protected void writeMember(TupleOutput output) {
-        output.writeInt(c1Nid);
-        output.writeInt(intValue);
-    }
+      return newR;
+   }
 
-    //~--- get methods ---------------------------------------------------------
-    public int getC1Nid() {
-        return c1Nid;
-    }
+   @Override
+   public CidIntRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
+      CidIntRevision newR = new CidIntRevision(statusNid, authorNid, pathNid, time, this);
 
-    @Override
-    public int getC1id() {
-        return getC1Nid();
-    }
+      addRevision(newR);
 
-    @Override
-    public int getCnid1() {
-        return c1Nid;
-    }
+      return newR;
+   }
 
-    @Override
-    public int getInt1() {
-        return intValue;
-    }
+   @Override
+   protected boolean membersEqual(ConceptComponent<CidIntRevision, CidIntMember> obj) {
+      if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
+         CidIntMember another = (CidIntMember) obj;
 
-    @Override
-    public int getIntValue() {
-        return intValue;
-    }
+         return (this.c1Nid == another.c1Nid) && (this.intValue == another.intValue);
+      }
 
-    @Override
-    protected TK_REFSET_TYPE getTkRefsetType() {
-        return TK_REFSET_TYPE.CID_INT;
-    }
+      return false;
+   }
 
-    @Override
-    public int getTypeId() {
-        return REFSET_TYPES.CID_INT.getTypeNid();
-    }
+   @Override
+   protected void readMemberFields(TupleInput input) {
+      c1Nid    = input.readInt();
+      intValue = input.readInt();
+   }
 
-    @Override
-    public ArrayIntList getVariableVersionNids() {
-        ArrayIntList variableNids = new ArrayIntList(3);
+   @Override
+   protected final CidIntRevision readMemberRevision(TupleInput input) {
+      return new CidIntRevision(input, this);
+   }
 
-        variableNids.add(getC1Nid());
+   @Override
+   public boolean readyToWriteRefsetMember() {
+      assert c1Nid != Integer.MAX_VALUE;
 
-        return variableNids;
-    }
+      return true;
+   }
 
-    @Override
-    protected VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> getVersionComputer() {
-        return computer;
-    }
+   /*
+    *  (non-Javadoc)
+    * @see java.lang.Object#toString()
+    */
+   @Override
+   public String toString() {
+      StringBuffer buf = new StringBuffer();
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Version> getVersions() {
-        if (versions == null) {
-            int count = 1;
+      buf.append(this.getClass().getSimpleName()).append(":{");
+      buf.append("c1Nid: ");
+      ConceptComponent.addNidToBuffer(buf, c1Nid);
+      buf.append(" intValue: ").append(this.intValue);
+      buf.append(super.toString());
 
-            if (revisions != null) {
-                count = count + revisions.size();
+      return buf.toString();
+   }
+
+   @Override
+   protected void writeMember(TupleOutput output) {
+      output.writeInt(c1Nid);
+      output.writeInt(intValue);
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   public int getC1Nid() {
+      return c1Nid;
+   }
+
+   @Override
+   public int getC1id() {
+      return getC1Nid();
+   }
+
+   @Override
+   public int getCnid1() {
+      return c1Nid;
+   }
+
+   @Override
+   public int getInt1() {
+      return intValue;
+   }
+
+   @Override
+   public int getIntValue() {
+      return intValue;
+   }
+
+   @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidIntMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
+   protected TK_REFSET_TYPE getTkRefsetType() {
+      return TK_REFSET_TYPE.CID_INT;
+   }
+
+   @Override
+   public int getTypeId() {
+      return REFSET_TYPES.CID_INT.getTypeNid();
+   }
+
+   @Override
+   public ArrayIntList getVariableVersionNids() {
+      ArrayIntList variableNids = new ArrayIntList(3);
+
+      variableNids.add(getC1Nid());
+
+      return variableNids;
+   }
+
+   @Override
+   protected VersionComputer<RefsetMember<CidIntRevision, CidIntMember>.Version> getVersionComputer() {
+      return computer;
+   }
+
+   @SuppressWarnings("unchecked")
+   @Override
+   public List<Version> getVersions() {
+      if (versions == null) {
+         int count = 1;
+
+         if (revisions != null) {
+            count = count + revisions.size();
+         }
+
+         ArrayList<Version> list = new ArrayList<Version>(count);
+
+         if (getTime() != Long.MIN_VALUE) {
+            list.add(new Version(this));
+         }
+
+         if (revisions != null) {
+            for (CidIntRevision r : revisions) {
+               if (r.getTime() != Long.MIN_VALUE) {
+                  list.add(new Version(r));
+               }
+            }
+         }
+
+         versions = list;
+      }
+
+      return (List<Version>) versions;
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   public void setC1Nid(int c1Nid) {
+      this.c1Nid = c1Nid;
+      modified();
+   }
+
+   @Override
+   public void setC1id(int c1id) {
+      setC1Nid(c1id);
+   }
+
+   @Override
+   public void setCnid1(int cnid1) throws PropertyVetoException {
+      this.c1Nid = cnid1;
+      modified();
+   }
+
+   @Override
+   public void setInt1(int l) throws PropertyVetoException {
+      this.intValue = l;
+      modified();
+   }
+
+   @Override
+   public void setIntValue(int intValue) {
+      this.intValue = intValue;
+      modified();
+   }
+
+   //~--- inner classes -------------------------------------------------------
+
+   public class Version extends RefsetMember<CidIntRevision, CidIntMember>.Version
+           implements I_ExtendByRefVersion<CidIntRevision>, I_ExtendByRefPartCidInt<CidIntRevision>,
+                      RefexCnidIntAnalogBI<CidIntRevision> {
+      private Version(RefexCnidIntAnalogBI cv) {
+         super(cv);
+      }
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      public int compareTo(I_ExtendByRefPart<CidIntRevision> o) {
+         if (I_ExtendByRefPartCidInt.class.isAssignableFrom(o.getClass())) {
+            I_ExtendByRefPartCidInt<CidIntRevision> another = (I_ExtendByRefPartCidInt<CidIntRevision>) o;
+
+            if (this.getC1id() != another.getC1id()) {
+               return this.getC1id() - another.getC1id();
             }
 
-            ArrayList<Version> list = new ArrayList<Version>(count);
-
-            if (getTime() != Long.MIN_VALUE) {
-                list.add(new Version(this));
+            if (this.getIntValue() != another.getIntValue()) {
+               return this.getIntValue() - another.getIntValue();
             }
+         }
 
-            if (revisions != null) {
-                for (CidIntRevision r : revisions) {
-                    if (r.getTime() != Long.MIN_VALUE) {
-                        list.add(new Version(r));
-                    }
-                }
-            }
+         return super.compareTo(o);
+      }
 
-            versions = list;
-        }
+      @Override
+      public I_ExtendByRefPartCidInt<CidIntRevision> duplicate() {
+         return (I_ExtendByRefPartCidInt<CidIntRevision>) super.duplicate();
+      }
 
-        return (List<Version>) versions;
-    }
+      @Override
+      public int hashCodeOfParts() {
+         return Hashcode.compute(new int[] { getC1Nid(), getIntValue() });
+      }
 
-    //~--- set methods ---------------------------------------------------------
-    public void setC1Nid(int c1Nid) {
-        this.c1Nid = c1Nid;
-        modified();
-    }
+      //~--- get methods ------------------------------------------------------
 
-    @Override
-    public void setC1id(int c1id) {
-        setC1Nid(c1id);
-    }
+      @Override
+      public int getC1id() {
+         return getCv().getCnid1();
+      }
 
-    @Override
-    public void setCnid1(int cnid1) throws PropertyVetoException {
-        this.c1Nid = cnid1;
-        modified();
-    }
+      @Override
+      public int getCnid1() {
+         return getCv().getCnid1();
+      }
 
-    @Override
-    public void setInt1(int l) throws PropertyVetoException {
-        this.intValue = l;
-        modified();
-    }
+      RefexCnidIntAnalogBI getCv() {
+         return (RefexCnidIntAnalogBI) cv;
+      }
 
-    @Override
-    public void setIntValue(int intValue) {
-        this.intValue = intValue;
-        modified();
-    }
+      @Override
+      public ERefsetCidIntMember getERefsetMember() throws IOException {
+         return new ERefsetCidIntMember(this);
+      }
 
-    //~--- inner classes -------------------------------------------------------
-    public class Version extends RefsetMember<CidIntRevision, CidIntMember>.Version
-            implements I_ExtendByRefVersion<CidIntRevision>, I_ExtendByRefPartCidInt<CidIntRevision>,
-            RefexCnidIntAnalogBI<CidIntRevision> {
+      @Override
+      public ERefsetCidIntRevision getERefsetRevision() throws IOException {
+         return new ERefsetCidIntRevision(this);
+      }
 
-        private Version(RefexCnidIntAnalogBI cv) {
-            super(cv);
-        }
+      @Override
+      public int getInt1() {
+         return getCv().getInt1();
+      }
 
-        //~--- methods ----------------------------------------------------------
-        @Override
-        public int compareTo(I_ExtendByRefPart<CidIntRevision> o) {
-            if (I_ExtendByRefPartCidInt.class.isAssignableFrom(o.getClass())) {
-                I_ExtendByRefPartCidInt<CidIntRevision> another = (I_ExtendByRefPartCidInt<CidIntRevision>) o;
+      @Override
+      public int getIntValue() {
+         return getCv().getInt1();
+      }
 
-                if (this.getC1id() != another.getC1id()) {
-                    return this.getC1id() - another.getC1id();
-                }
+      //~--- set methods ------------------------------------------------------
 
-                if (this.getIntValue() != another.getIntValue()) {
-                    return this.getIntValue() - another.getIntValue();
-                }
-            }
+      @Override
+      public void setC1id(int c1id) throws PropertyVetoException {
+         getCv().setCnid1(c1id);
+      }
 
-            return super.compareTo(o);
-        }
+      @Override
+      public void setCnid1(int cnid1) throws PropertyVetoException {
+         getCv().setCnid1(cnid1);
+      }
 
-        @Override
-        public I_ExtendByRefPartCidInt<CidIntRevision> duplicate() {
-            return (I_ExtendByRefPartCidInt<CidIntRevision>) super.duplicate();
-        }
+      @Override
+      public void setInt1(int i) throws PropertyVetoException {
+         getCv().setInt1(i);
+      }
 
-        @Override
-        public int hashCodeOfParts() {
-            return Hashcode.compute(new int[]{getC1Nid(), getIntValue()});
-        }
-
-        //~--- get methods ------------------------------------------------------
-        @Override
-        public int getC1id() {
-            return getCv().getCnid1();
-        }
-
-        @Override
-        public int getCnid1() {
-            return getCv().getCnid1();
-        }
-
-        RefexCnidIntAnalogBI getCv() {
-            return (RefexCnidIntAnalogBI) cv;
-        }
-
-        @Override
-        public ERefsetCidIntMember getERefsetMember() throws TerminologyException, IOException {
-            return new ERefsetCidIntMember(this);
-        }
-
-        @Override
-        public ERefsetCidIntRevision getERefsetRevision() throws TerminologyException, IOException {
-            return new ERefsetCidIntRevision(this);
-        }
-
-        @Override
-        public int getInt1() {
-            return getCv().getInt1();
-        }
-
-        @Override
-        public int getIntValue() {
-            return getCv().getInt1();
-        }
-
-        //~--- set methods ------------------------------------------------------
-        @Override
-        public void setC1id(int c1id) throws PropertyVetoException {
-            getCv().setCnid1(c1id);
-        }
-
-        @Override
-        public void setCnid1(int cnid1) throws PropertyVetoException {
-            getCv().setCnid1(cnid1);
-        }
-
-        @Override
-        public void setInt1(int i) throws PropertyVetoException {
-            getCv().setInt1(i);
-        }
-
-        @Override
-        public void setIntValue(int intValue) throws PropertyVetoException {
-            getCv().setInt1(intValue);
-        }
-    }
+      @Override
+      public void setIntValue(int intValue) throws PropertyVetoException {
+         getCv().setInt1(intValue);
+      }
+   }
 }

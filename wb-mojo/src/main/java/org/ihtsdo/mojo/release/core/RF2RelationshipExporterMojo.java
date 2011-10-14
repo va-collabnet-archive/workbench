@@ -46,16 +46,31 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	 */
 	private String exportFolder;
 
+	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
+		
+			
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 
 			config.setReleaseDate(releaseDate);
-			
+			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");

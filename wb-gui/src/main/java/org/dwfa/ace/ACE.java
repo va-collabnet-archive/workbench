@@ -88,6 +88,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPanel;
@@ -108,6 +109,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -610,8 +612,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void addSearchLinkedComponent(I_ContainTermComponent component) {
         searchPanel.addLinkedComponent(component);
-        wfSearchPanel.addLinkedComponent(component);
-    }
+        if (wfSearchPanel != null) {
+			wfSearchPanel.addLinkedComponent(component);
+    	}
+	}
 
     public void addTaxonomySelectionListener(TermComponentTreeSelectionListener treeListener) {
         treeHelper.addTreeSelectionListener(treeListener);
@@ -1838,8 +1842,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     public void removeSearchLinkedComponent(I_ContainTermComponent component) {
         searchPanel.removeLinkedComponent(component);
-        wfSearchPanel.removeLinkedComponent(component);
-    }
+        if (wfSearchPanel != null) {
+			wfSearchPanel.removeLinkedComponent(component);
+    	}
+	}
 
     public void removeTaxonomySelectionListener(TermComponentTreeSelectionListener treeListener) {
         treeHelper.removeTreeSelectionListener(treeListener);
@@ -1913,11 +1919,15 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         searchPanel.addComponentListener(new ResizePalettesListener());
 
         try {
-            wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
-            wfSearchPanel.addComponentListener(new ResizePalettesListener());
-            wfSearchPanel.setMinimumSize(new Dimension(0, 0));
-        } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+			if (Ts.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid()) != null) {
+	            WorkflowHelper.setWorkflowCapabilitiesAvailable(true);
+	            wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
+	            wfSearchPanel.addComponentListener(new ResizePalettesListener());
+	            wfSearchPanel.setMinimumSize(new Dimension(0, 0));
+			}
+        } catch (NoSuchFieldError e) {
+            AceLog.getAppLog().log(Level.INFO, "Workflow history is not present in this bundle");
+            WorkflowHelper.setWorkflowCapabilitiesAvailable(false);
         }
 
         GridBagConstraints c = new GridBagConstraints();

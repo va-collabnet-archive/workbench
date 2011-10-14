@@ -230,113 +230,132 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
 
         desc.setText(text);
-            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
-                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
-                RefexCAB refexSpecUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        usConcept.getNid());
-                refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+        RefexCAB refexSpecUs = new RefexCAB(
+                TK_REFSET_TYPE.CID,
+                desc.getNid(),
+                usConcept.getNid());
+        refexSpecUs.put(RefexProperty.CNID1, prefNid);
+        RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
-                RefexCAB refexSpecGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        gbConcept.getNid());
-                refexSpecGb.put(RefexProperty.CNID1, prefNid);
-                RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+        RefexCAB refexSpecGb = new RefexCAB(
+                TK_REFSET_TYPE.CID,
+                desc.getNid(),
+                gbConcept.getNid());
+        refexSpecGb.put(RefexProperty.CNID1, prefNid);
+        RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
-                I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
-                Ts.get().addUncommitted(refexGb);
-                I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
-                Ts.get().addUncommitted(refexUs);
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
-                RefexCAB refexSpecUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        usConcept.getNid());
-                refexSpecUs.put(RefexProperty.CNID1, prefNid);
-                RefexChronicleBI<?> newRefex = tc.construct(refexSpecUs);
-                I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
-                Ts.get().addUncommitted(refex);
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
-                RefexCAB refexSpecGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        gbConcept.getNid());
-                refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefex = tc.construct(refexSpecGb);
-                I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
-                Ts.get().addUncommitted(refex);
-            }
+        I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
+        Ts.get().addUncommitted(refexGb);
+        I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
+        Ts.get().addUncommitted(refexUs);
+        //Removed for one FSN in Rf1/Rf2 transition
+//        if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+//                && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
+//            RefexCAB refexSpecUs = new RefexCAB(
+//                    TK_REFSET_TYPE.CID,
+//                    desc.getNid(),
+//                    usConcept.getNid());
+//            refexSpecUs.put(RefexProperty.CNID1, acceptNid);
+//            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+//
+//            RefexCAB refexSpecGb = new RefexCAB(
+//                    TK_REFSET_TYPE.CID,
+//                    desc.getNid(),
+//                    gbConcept.getNid());
+//            refexSpecGb.put(RefexProperty.CNID1, prefNid);
+//            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+//
+//            I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
+//            Ts.get().addUncommitted(refexGb);
+//            I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
+//            Ts.get().addUncommitted(refexUs);
+//        } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
+//            RefexCAB refexSpecUs = new RefexCAB(
+//                    TK_REFSET_TYPE.CID,
+//                    desc.getNid(),
+//                    usConcept.getNid());
+//            refexSpecUs.put(RefexProperty.CNID1, prefNid);
+//            RefexChronicleBI<?> newRefex = tc.construct(refexSpecUs);
+//            I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
+//            Ts.get().addUncommitted(refex);
+//        } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
+//            RefexCAB refexSpecGb = new RefexCAB(
+//                    TK_REFSET_TYPE.CID,
+//                    desc.getNid(),
+//                    gbConcept.getNid());
+//            refexSpecGb.put(RefexProperty.CNID1, acceptNid);
+//            RefexChronicleBI<?> newRefex = tc.construct(refexSpecGb);
+//            I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
+//            Ts.get().addUncommitted(refex);
+//        }
     }
 
     private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
         desc.setText(text);
 
-            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
-                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in both 
-                RefexCAB refexSpecUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        usConcept.getNid());
-                refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+        if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in both 
+            RefexCAB refexSpecUs = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    desc.getNid(),
+                    usConcept.getNid());
+            refexSpecUs.put(RefexProperty.CNID1, acceptNid);
+            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
-                RefexCAB refexSpecGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        gbConcept.getNid());
-                refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+            RefexCAB refexSpecGb = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    desc.getNid(),
+                    gbConcept.getNid());
+            refexSpecGb.put(RefexProperty.CNID1, acceptNid);
+            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
-                I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
-                Ts.get().addUncommitted(refexGb);
-                I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
-                Ts.get().addUncommitted(refexUs);
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
-                RefexCAB refexSpecUs = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        usConcept.getNid());
-                refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+            I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
+            Ts.get().addUncommitted(refexGb);
+            I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
+            Ts.get().addUncommitted(refexUs);
+        } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
+            RefexCAB refexSpecUs = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    desc.getNid(),
+                    usConcept.getNid());
+            refexSpecUs.put(RefexProperty.CNID1, acceptNid);
+            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
+            /* REMOVED FOR RF2
+            RefexCAB refexSpecGb = new RefexCAB(
+            TK_REFSET_TYPE.CID,
+            desc.getNid(),
+            gbConcept.getNid());
+            refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+            
+            I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
+            Ts.get().addUncommitted(refexGb); */
+
+            I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
+            Ts.get().addUncommitted(refexUs);
+        } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
                 /* REMOVED FOR RF2
-                RefexCAB refexSpecGb = new RefexCAB(
-                TK_REFSET_TYPE.CID,
-                desc.getNid(),
-                gbConcept.getNid());
-                refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-                RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
-                
-                I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
-                Ts.get().addUncommitted(refexGb); */
+            RefexCAB refexSpecUs = new RefexCAB(
+            TK_REFSET_TYPE.CID,
+            desc.getNid(),
+            Refsets.EN_GB_LANG.getLenient().getNid());
+            refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+            I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
+            Ts.get().addUncommitted(refexUs); */
 
-                I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
-                Ts.get().addUncommitted(refexUs);
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
-                /* REMOVED FOR RF2
-                RefexCAB refexSpecUs = new RefexCAB(
-                TK_REFSET_TYPE.CID,
-                desc.getNid(),
-                Refsets.EN_GB_LANG.getLenient().getNid());
-                refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-                RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
-                I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
-                Ts.get().addUncommitted(refexUs); */
+            RefexCAB refexSpecGb = new RefexCAB(
+                    TK_REFSET_TYPE.CID,
+                    desc.getNid(),
+                    gbConcept.getNid());
+            refexSpecGb.put(RefexProperty.CNID1, acceptNid);
+            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
-                RefexCAB refexSpecGb = new RefexCAB(
-                        TK_REFSET_TYPE.CID,
-                        desc.getNid(),
-                        gbConcept.getNid());
-                refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-                RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+            I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
+            Ts.get().addUncommitted(refexGb);
 
-                I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
-                Ts.get().addUncommitted(refexGb);
-
-            }
+        }
     }
 
     private void doFsnUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex)
@@ -345,79 +364,53 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 config.getViewCoordinate());
 
         desc.setText(text);
-            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
-                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
-                usRefex.setCnid1(prefNid);
-                gbRefex.setCnid1(prefNid);
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
-                if (usRefex == null) {
-                    doFsnUpdate();
-                } else {
-                    usRefex.setCnid1(prefNid);
-                }
-                //forget GB
-                List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
-                for (I_ExtendByRef ext : extensions) {
-                    if (ext.getRefsetId() == gbConcept.getNid()) {
-                        Terms.get().forget(ext);
-                    }
-                }
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
-                if (gbRefex == null) {
-                    doFsnUpdate();
-                } else {
-                    gbRefex.setCnid1(prefNid);
-                }
-                //forget US
-                List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
-                for (I_ExtendByRef ext : extensions) {
-                    if (ext.getRefsetId() == usConcept.getNid()) {
-                        Terms.get().forget(ext);
-                    }
-                }
-            }
+
+        usRefex.setCnid1(prefNid);
+        gbRefex.setCnid1(prefNid);
+        //Removed for one FSN in RF1/RF2 transition
+//        if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+//                && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//preferred in both
+//            usRefex.setCnid1(prefNid);
+//            gbRefex.setCnid1(prefNid);
+//        } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
+//            if (usRefex == null) {
+//                doFsnUpdate();
+//            } else {
+//                usRefex.setCnid1(prefNid);
+//            }
+//            //forget GB
+//            List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+//            for (I_ExtendByRef ext : extensions) {
+//                if (ext.getRefsetId() == gbConcept.getNid()) {
+//                    Terms.get().forget(ext);
+//                }
+//            }
+//        } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
+//            if (gbRefex == null) {
+//                doFsnUpdate();
+//            } else {
+//                gbRefex.setCnid1(prefNid);
+//            }
+//            //forget US
+//            List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+//            for (I_ExtendByRef ext : extensions) {
+//                if (ext.getRefsetId() == usConcept.getNid()) {
+//                    Terms.get().forget(ext);
+//                }
+//            }
+//        }
     }
 
-    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException, 
+    private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException,
             IOException, InvalidCAB, UnsupportedDialectOrLanguage {
         TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         desc.setText(text);
 
-            if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
-                    && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
-                if (usRefex == null) {
-                    //forget GB
-                    List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
-                    for (I_ExtendByRef ext : extensions) {
-                        if (ext.getRefsetId() == gbConcept.getNid()) {
-                            Terms.get().forget(ext);
-                        }
-                    }
-                    doSynUpdate();
-                } else {
-                    usRefex.setCnid1(acceptNid);
-                }
-                if (gbRefex == null) {
-                    //forget US
-                    List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
-                    for (I_ExtendByRef ext : extensions) {
-                        if (ext.getRefsetId() == usConcept.getNid()) {
-                            Terms.get().forget(ext);
-                        }
-                    }
-                    doSynUpdate();
-                } else {
-                    gbRefex.setCnid1(acceptNid);
-                }
-
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
-                if (usRefex == null) {
-                    doSynUpdate();
-                } else {
-                    usRefex.setCnid1(acceptNid);
-                }
+        if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
+                && DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) {//acceptable in both
+            if (usRefex == null) {
                 //forget GB
                 List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
                 for (I_ExtendByRef ext : extensions) {
@@ -425,12 +418,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
-            } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
-                if (gbRefex == null) {
-                    doSynUpdate();
-                } else {
-                    gbRefex.setCnid1(acceptNid);
-                }
+                doSynUpdate();
+            } else {
+                usRefex.setCnid1(acceptNid);
+            }
+            if (gbRefex == null) {
                 //forget US
                 List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
                 for (I_ExtendByRef ext : extensions) {
@@ -438,6 +430,37 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         Terms.get().forget(ext);
                     }
                 }
+                doSynUpdate();
+            } else {
+                gbRefex.setCnid1(acceptNid);
             }
+
+        } else if (DialectHelper.isTextForDialect(text, Language.EN_UK.getLenient().getNid())) { //acceptable in US
+            if (usRefex == null) {
+                doSynUpdate();
+            } else {
+                usRefex.setCnid1(acceptNid);
+            }
+            //forget GB
+            List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+            for (I_ExtendByRef ext : extensions) {
+                if (ext.getRefsetId() == gbConcept.getNid()) {
+                    Terms.get().forget(ext);
+                }
+            }
+        } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
+            if (gbRefex == null) {
+                doSynUpdate();
+            } else {
+                gbRefex.setCnid1(acceptNid);
+            }
+            //forget US
+            List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(desc.getNid(), true);
+            for (I_ExtendByRef ext : extensions) {
+                if (ext.getRefsetId() == usConcept.getNid()) {
+                    Terms.get().forget(ext);
+                }
+            }
+        }
     }
 }

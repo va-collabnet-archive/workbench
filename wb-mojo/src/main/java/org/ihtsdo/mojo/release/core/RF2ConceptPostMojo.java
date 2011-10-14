@@ -66,10 +66,25 @@ public class RF2ConceptPostMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String outputFolder;
+	
+	/**
+	 * Location of the rF2Format.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String rF2Format;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
+			
+			Config config;
+			
+			if(rF2Format.equals("true"))
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
+			else
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/conceptqa.xml");
+			
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);

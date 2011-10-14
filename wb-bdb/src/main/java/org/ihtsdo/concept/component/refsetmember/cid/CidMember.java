@@ -5,15 +5,12 @@ package org.ihtsdo.concept.component.refsetmember.cid;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
-import java.beans.PropertyVetoException;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
-
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -23,24 +20,29 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidRevision;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.beans.PropertyVetoException;
+
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CidMember extends RefsetMember<CidRevision, CidMember>
         implements I_ExtendByRefPartCid<CidRevision>, RefexCnidAnalogBI<CidRevision> {
@@ -75,6 +77,11 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addRefsetTypeNids(Set<Integer> allNids) {
+      allNids.add(c1Nid);
+   }
 
    @Override
    protected void addSpecProperties(RefexCAB rcs) {
@@ -211,6 +218,13 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    }
 
    @Override
+   public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
+           Map<UUID, UUID> conversionMap)
+           throws ContraditionException, IOException {
+      return new TkRefsetCidMember(this, exclusionSet, conversionMap, 0, true, vc);
+   }
+
+   @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.CID;
    }
@@ -328,12 +342,12 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
       }
 
       @Override
-      public ERefsetCidMember getERefsetMember() throws TerminologyException, IOException {
+      public TkRefsetCidMember getERefsetMember() throws IOException {
          return new ERefsetCidMember(this, CidMember.this);
       }
 
       @Override
-      public ERefsetCidRevision getERefsetRevision() throws TerminologyException, IOException {
+      public ERefsetCidRevision getERefsetRevision() throws IOException {
          return new ERefsetCidRevision(this);
       }
 
@@ -350,7 +364,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
       @Override
       @Deprecated
-      public void setC1id(int c1id)  throws PropertyVetoException {
+      public void setC1id(int c1id) throws PropertyVetoException {
          getCv().setCnid1(c1id);
       }
 

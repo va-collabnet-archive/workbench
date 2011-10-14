@@ -46,11 +46,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
@@ -88,6 +84,12 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+
+      // nothing to add
+   }
 
    public void addTuples(NidSetBI allowedStatus, PositionBI viewPosition, List<Version> returnTuples,
                          Precedence precedencePolicy, I_ManageContradiction contradictionManager) {

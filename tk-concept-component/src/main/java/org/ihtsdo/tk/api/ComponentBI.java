@@ -1,47 +1,55 @@
 package org.ihtsdo.tk.api;
 
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-
 public interface ComponentBI {
-    
-    /**
-     * 
-     * @return the primordial if known. The IUnknown UUID (00000000-0000-0000-C000-000000000046) if not known.
-     */
+   boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException;
 
-    UUID getPrimUuid();
+   String toUserString();
 
-    List<UUID> getUUIDs();
+   //~--- get methods ---------------------------------------------------------
 
-    int getNid();
+   Collection<? extends IdBI> getAdditionalIds() throws IOException;
 
-    int getConceptNid();
+   Collection<? extends IdBI> getAllIds() throws IOException;
 
-    String toUserString();
-    
-    Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
+   Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;
 
-    Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException;
+   int getConceptNid();
 
-    Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz) throws IOException;
 
-    Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
-            throws IOException;
+   Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
 
-    Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+           throws IOException;
 
-    boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getInactiveRefexes(ViewCoordinate xyz) throws IOException;
 
-    Collection<? extends RefexChronicleBI<?>> getAnnotations() throws IOException;
+   int getNid();
 
-    Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz) throws IOException;
+   /**
+    *
+    * @return the primordial if known. The IUnknown UUID (00000000-0000-0000-C000-000000000046) if not known.
+    */
+   UUID getPrimUuid();
 
+   Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
+
+   Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException;
+
+   List<UUID> getUUIDs();
 }

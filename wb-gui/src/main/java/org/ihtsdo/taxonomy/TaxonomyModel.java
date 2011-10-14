@@ -117,6 +117,11 @@ public class TaxonomyModel implements TreeModel {
       }
    }
 
+   void unLink() {
+      nodeFactory.unLink();
+      listeners.clear();
+   }
+
    @Override
    public void valueForPathChanged(TreePath path, Object newValue) {
       TreeModelEvent evt = new TreeModelEvent(newValue, path);

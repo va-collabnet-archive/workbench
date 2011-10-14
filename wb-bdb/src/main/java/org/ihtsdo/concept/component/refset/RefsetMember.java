@@ -28,6 +28,9 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.etypes.ERefsetMemberMember;
+import org.ihtsdo.etypes.ERefsetRevision;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -51,10 +54,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
         extends ConceptComponent<R, C> implements I_ExtendByRef, RefexChronicleBI<R>, RefexAnalogBI<R> {
@@ -85,6 +85,15 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
    }
 
    //~--- methods -------------------------------------------------------------
+
+   @Override
+   protected void addComponentNids(Set<Integer> allNids) {
+      allNids.add(referencedComponentNid);
+      allNids.add(refsetNid);
+      addRefsetTypeNids(allNids);
+   }
+
+   protected abstract void addRefsetTypeNids(Set<Integer> allNids);
 
    protected abstract void addSpecProperties(RefexCAB rcs);
 
@@ -545,8 +554,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
       return returnTuples;
    }
-   
-   
+
    public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c, long time) {
       List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
 
@@ -708,11 +716,11 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
          return (RefexAnalogBI<R>) cv;
       }
 
-      public TkRefsetAbstractMember<?> getERefsetMember() throws TerminologyException, IOException {
+      public TkRefsetAbstractMember<?> getERefsetMember() throws IOException {
          throw new UnsupportedOperationException("subclass must override");
       }
 
-      public TkRevision getERefsetRevision() throws TerminologyException, IOException {
+      public TkRevision getERefsetRevision() throws IOException {
          throw new UnsupportedOperationException("subclass must override");
       }
 
@@ -751,6 +759,13 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
       @Deprecated
       public int getStatus() {
          return getCv().getSapNid();
+      }
+
+      @Override
+      public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc,
+              NidBitSetBI exclusionSet, Map<UUID, UUID> conversionMap)
+              throws ContraditionException, IOException {
+         return getCv().getTkRefsetMemberActiveOnly(vc, exclusionSet, conversionMap);
       }
 
       @Override
@@ -806,7 +821,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
       @Override
       @Deprecated
       public void setStatus(int idStatus) throws PropertyVetoException {
-          getCv().setStatusNid(idStatus);
+         getCv().setStatusNid(idStatus);
       }
    }
 }

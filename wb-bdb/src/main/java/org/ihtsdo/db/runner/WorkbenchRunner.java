@@ -503,7 +503,9 @@ public class WorkbenchRunner {
                            ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
                         }
 
-                        handleNormalFrame(ace);
+                        HandleNormalFrame handler = new HandleNormalFrame(ace);
+
+                        new Thread(handler, "Frame setup").start();
                      }
                   } else {
                      login = false;
@@ -672,43 +674,6 @@ public class WorkbenchRunner {
 
       prompter.setUsername(username);
       prompter.setPassword(password);
-   }
-
-   private void handleNormalFrame(final I_ConfigAceFrame ace) {
-      SwingUtilities.invokeLater(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               boolean startup = firstStartup;
-
-               firstStartup = false;
-
-               if ((ace.getViewPositionSet() == null) || ace.getViewPositionSet().isEmpty()) {
-                  Set<PositionBI> viewPositions = new HashSet<PositionBI>();
-
-                  viewPositions.add(
-                      new Position(
-                          Long.MAX_VALUE,
-                          Bdb.getPathManager().get(
-                             ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getNid())));
-                  viewPositions.add(
-                      new Position(
-                          Long.MAX_VALUE,
-                          Bdb.getPathManager().get(
-                             ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
-                  ace.setViewPositions(viewPositions);
-               }
-
-               setupIsaCache(ace.getViewCoordinate().getIsaCoordinates());
-
-               AceFrame af = new AceFrame(args, lc, ace, startup);
-
-               af.setVisible(true);
-            } catch (Exception e) {
-               AceLog.getAppLog().alertAndLogException(e);
-            }
-         }
-      });
    }
 
    private void processFile(File file, LifeCycle lc) throws Exception {
@@ -920,6 +885,58 @@ public class WorkbenchRunner {
 
       public String getPassword() {
          return password;
+      }
+   }
+
+
+   class HandleNormalFrame extends javax.swing.SwingWorker<Object, Object> {
+      boolean          startup = firstStartup;;
+      I_ConfigAceFrame ace;
+
+      //~--- constructors -----------------------------------------------------
+
+      public HandleNormalFrame(I_ConfigAceFrame ace) {
+         this.ace = ace;
+      }
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      protected Object doInBackground() throws Exception {
+         firstStartup = false;
+
+         if ((ace.getViewPositionSet() == null) || ace.getViewPositionSet().isEmpty()) {
+            Set<PositionBI> viewPositions = new HashSet<PositionBI>();
+
+            viewPositions.add(
+                new Position(
+                    Long.MAX_VALUE,
+                    Bdb.getPathManager().get(
+                       ArchitectonicAuxiliary.Concept.SNOMED_CORE.localize().getNid())));
+            viewPositions.add(
+                new Position(
+                    Long.MAX_VALUE,
+                    Bdb.getPathManager().get(
+                       ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.localize().getNid())));
+            ace.setViewPositions(viewPositions);
+         }
+
+         setupIsaCache(ace.getViewCoordinate().getIsaCoordinates());
+
+         return null;
+      }
+
+      @Override
+      protected void done() {
+         try {
+            super.get();
+
+            AceFrame af = new AceFrame(args, lc, ace, startup);
+
+            af.setVisible(true);
+         } catch (Exception exception) {
+            AceLog.getAppLog().alertAndLogException(exception);
+         }
       }
    }
 
