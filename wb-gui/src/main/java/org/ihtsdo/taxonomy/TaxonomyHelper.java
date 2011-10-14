@@ -1,11 +1,12 @@
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.activity.ActivityPanel;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -17,6 +18,7 @@ import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.DescTypeToRender;
 import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
@@ -64,579 +66,590 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.DescTypeToRender;
 
 /**
  *
  * @author kec
  */
 public class TaxonomyHelper extends TermChangeListener implements PropertyChangeListener {
+   private static ImageIcon statedView =
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
+   private static ImageIcon preferredDisplay =
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component.png"));
+   private static ImageIcon inferredView =
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
+   private static ImageIcon inferredThenStatedView =
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
+   private static ImageIcon fsnDisplay =
+      new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component_yellow.png"));
 
-    private static ImageIcon statedView =
-            new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
-    private static ImageIcon inferredView =
-            new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
-    private static ImageIcon inferredThenStatedView =
-            new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
-    private static ImageIcon fsnDisplay =
-            new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component_yellow.png"));
-    private static ImageIcon preferredDisplay =
-            new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/component.png"));
-    //~--- fields --------------------------------------------------------------
-    private I_ConfigAceFrame aceFrameConfig;
-    private ActivityPanel activity;
-    private RelAssertionType assertionType;
-    private String helperName;
-    private TaxonomyModel model;
-    private TaxonomyNodeRenderer renderer;
-    private JButton statedInferredButton;
-    private TaxonomyTree tree;
-    private JButton fsnPreferredButton;
-    private boolean displayingFsn = true;
+   //~--- fields --------------------------------------------------------------
 
-    //~--- constant enums ------------------------------------------------------
-    static enum NodeAction {
+   private boolean              displayingFsn = true;
+   private I_ConfigAceFrame     aceFrameConfig;
+   private ActivityPanel        activity;
+   private RelAssertionType     assertionType;
+   private JButton              fsnPreferredButton;
+   private String               helperName;
+   private TaxonomyModel        model;
+   private TaxonomyNodeRenderer renderer;
+   private JButton              statedInferredButton;
+   private TaxonomyTree         tree;
 
-        CHILDREN_CHANGED, ADDED_AS_PARENT, DISPLAY_CHANGED
-    }
+   //~--- constant enums ------------------------------------------------------
 
-    //~--- constructors --------------------------------------------------------
-    public TaxonomyHelper(I_ConfigAceFrame config, String helperName) {
-        super();
-        this.aceFrameConfig = config;
-        this.assertionType = config.getRelAssertionType();
-        Ts.get().addTermChangeListener(this);
-        this.helperName = helperName;
-        this.aceFrameConfig.addPropertyChangeListener(this);
-    }
+   static enum NodeAction { CHILDREN_CHANGED, ADDED_AS_PARENT, DISPLAY_CHANGED }
 
-    //~--- methods -------------------------------------------------------------
-    public synchronized void addMouseListener(MouseListener ml) {
-        tree.addMouseListener(ml);
-    }
+   //~--- constructors --------------------------------------------------------
 
-    public void addTreeSelectionListener(TreeSelectionListener tsl) {
-        tree.addTreeSelectionListener(tsl);
-    }
+   public TaxonomyHelper(I_ConfigAceFrame config, String helperName) {
+      super();
+      this.aceFrameConfig = config;
+      this.assertionType  = config.getRelAssertionType();
+      Ts.get().addTermChangeListener(this);
+      this.helperName = helperName;
+      this.aceFrameConfig.addPropertyChangeListener(this);
+   }
 
-    @Override
-    public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-        ChangeWorker changeWorker = new ChangeWorker(sequence, changedXrefs, changedComponents);
+   //~--- methods -------------------------------------------------------------
 
-        FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
-    }
+   public synchronized void addMouseListener(MouseListener ml) {
+      tree.addMouseListener(ml);
+   }
 
-    public void handleDisplayChange() {
-        ChangeDisplayWorker changeDisplayWorker = new ChangeDisplayWorker();
+   public void addTreeSelectionListener(TreeSelectionListener tsl) {
+      tree.addTreeSelectionListener(tsl);
+   }
 
-        FutureHelper.addFuture(ACE.threadPool.submit(changeDisplayWorker));
-    }
+   @Override
+   public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
+      ChangeWorker changeWorker = new ChangeWorker(sequence, changedXrefs, changedComponents);
 
-    protected void collapseTree(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
-        TaxonomyNode node = handleCollapse(evt, aceFrameConfig);
-    }
+      FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+   }
 
-    protected void expandTree(TreeExpansionEvent evt) {
-        TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
-    }
+   protected void collapseTree(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
+      TaxonomyNode node = handleCollapse(evt, aceFrameConfig);
+   }
 
-    private TaxonomyNode handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
-        TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
+   protected void expandTree(TreeExpansionEvent evt) {
+      TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
+   }
 
-        return node;
-    }
+   private TaxonomyNode handleCollapse(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
+      TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
 
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("roots")) {
-            updateNewModel(evt.getPropertyName());
-        } else if ("viewPositions".equals(evt.getPropertyName())
-                || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
-                || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
-                || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
-                || "updateHierarchyView".equals(evt.getPropertyName())) {
-            updateHierarchyView(evt.getPropertyName());
-        }
-    }
+      return node;
+   }
 
-    public void removeTreeSelectionListener(TreeSelectionListener tsl) {
-        tree.removeTreeSelectionListener(tsl);
-    }
+   public void handleDisplayChange() {
+      ChangeDisplayWorker changeDisplayWorker = new ChangeDisplayWorker();
 
-    @Override
-    public String toString() {
-        return helperName;
-    }
+      FutureHelper.addFuture(ACE.threadPool.submit(changeDisplayWorker));
+   }
 
-    protected void treeSelectionChanged(TreeSelectionEvent evt) {
-        TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
+   private void handleRelTypeChange() {
+      ViewCoordinate vc = model.ts.getViewCoordinate();
 
-        if ((node != null) && !(node instanceof RootNode)) {
-            try {
-                aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getCnid()));
-            } catch (IOException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            }
-        } else {
-            aceFrameConfig.setHierarchySelection(null);
-        }
-    }
+      switch (assertionType) {
+      case INFERRED :
+         assertionType = RelAssertionType.INFERRED_THEN_STATED;
+         statedInferredButton.setIcon(inferredThenStatedView);
+         statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+         vc.setRelAssertionType(assertionType);
+         model.ts = Ts.get().getSnapshot(vc);
+         updateHierarchyView("changed from stated to inferred then stated");
 
-    public void updateHierarchyView(String propChangeName) {
-        RootNode root = model.getRoot();
-        int childCount = root.getChildren().size();
+         break;
 
-        for (int i = 0; i < childCount; i++) {
-            InternalNode childNode = (InternalNode) model.getChild(root, i);
+      case INFERRED_THEN_STATED :
+         assertionType = RelAssertionType.STATED;
+         statedInferredButton.setIcon(statedView);
+         statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+         vc.setRelAssertionType(assertionType);
+         model.ts = Ts.get().getSnapshot(vc);
+         updateHierarchyView("changed from inferred to stated");
 
-            model.nodeFactory.removeDescendents(childNode);
+         break;
 
-            TreePath tp = new TreePath(NodePath.getTreePath(model, childNode));
+      case STATED :
+         assertionType = RelAssertionType.INFERRED;
+         statedInferredButton.setIcon(inferredView);
+         statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+         vc.setRelAssertionType(assertionType);
+         model.ts = Ts.get().getSnapshot(vc);
+         updateHierarchyView("changed from stated to inferred");
 
-            tree.collapseRow(i);
-            tree.collapsePath(tp);
-        }
-    }
+         break;
+      }
+   }
 
-    public void updateNewModel(String propChangeName) {
-        try {
-            model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
-                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
-        } catch (IOException ex) {
+   @Override
+   public void propertyChange(PropertyChangeEvent evt) {
+      if (evt.getPropertyName().equals("roots")) {
+         updateNewModel(evt.getPropertyName());
+      } else if ("viewPositions".equals(evt.getPropertyName())
+                 || "showPathInfoInTaxonomy".equals(evt.getPropertyName())
+                 || "showRefsetInfoInTaxonomy".equals(evt.getPropertyName())
+                 || "showViewerImagesInTaxonomy".equals(evt.getPropertyName())
+                 || "updateHierarchyView".equals(evt.getPropertyName())) {
+         updateHierarchyView(evt.getPropertyName());
+      }
+   }
+
+   public void removeTreeSelectionListener(TreeSelectionListener tsl) {
+      tree.removeTreeSelectionListener(tsl);
+   }
+
+   @Override
+   public String toString() {
+      return helperName;
+   }
+
+   protected void treeSelectionChanged(TreeSelectionEvent evt) {
+      TaxonomyNode node = (TaxonomyNode) evt.getPath().getLastPathComponent();
+
+      if ((node != null) &&!(node instanceof RootNode)) {
+         try {
+            aceFrameConfig.setHierarchySelection((I_GetConceptData) Ts.get().getConcept(node.getCnid()));
+         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
-    }
+         }
+      } else {
+         aceFrameConfig.setHierarchySelection(null);
+      }
+   }
 
-    //~--- get methods ---------------------------------------------------------
-    public RelAssertionType getAssertionType() {
-        return assertionType;
-    }
+   public void updateHierarchyView(String propChangeName) {
+      RootNode root       = model.getRoot();
+      int      childCount = root.getChildren().size();
 
-    public JScrollPane getHierarchyPanel() throws IOException, Exception {
-        if (tree != null) {
-            for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
-                tree.removeTreeExpansionListener(tel);
+      for (int i = 0; i < childCount; i++) {
+         InternalNode childNode = (InternalNode) model.getChild(root, i);
+
+         model.nodeFactory.removeDescendents(childNode);
+
+         TreePath tp = new TreePath(NodePath.getTreePath(model, childNode));
+
+         tree.collapseRow(i);
+         tree.collapsePath(tp);
+      }
+   }
+
+   public void updateNewModel(String propChangeName) {
+      try {
+         model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
+                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+      } catch (IOException ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      } catch (Exception ex) {
+         AceLog.getAppLog().alertAndLogException(ex);
+      }
+   }
+
+   //~--- get methods ---------------------------------------------------------
+
+   public RelAssertionType getAssertionType() {
+      return assertionType;
+   }
+
+   public JScrollPane getHierarchyPanel() throws IOException, Exception {
+      if (tree != null) {
+         for (TreeExpansionListener tel : tree.getTreeExpansionListeners()) {
+            tree.removeTreeExpansionListener(tel);
+         }
+
+         for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
+            tree.removeTreeSelectionListener(tsl);
+         }
+
+         for (TreeWillExpandListener twel : tree.getTreeWillExpandListeners()) {
+            tree.removeTreeWillExpandListener(twel);
+         }
+      }
+
+      tree     = new TaxonomyTree(aceFrameConfig, this);
+      renderer = new TaxonomyNodeRenderer(aceFrameConfig, this);
+      model    = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
+                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+      tree.putClientProperty("JTree.lineStyle", "None");
+      tree.setLargeModel(true);
+
+      // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+      tree.setTransferHandler(new TerminologyTransferHandler(tree));
+
+      // tree.setDragEnabled(true);
+      ToolTipManager.sharedInstance().registerComponent(tree);
+      tree.setCellRenderer(renderer);
+      tree.setRootVisible(false);
+      tree.setShowsRootHandles(true);
+      model.addTreeWillExpandListener(tree);
+      tree.addTreeSelectionListener(new TreeSelectionListener() {
+         @Override
+         public void valueChanged(TreeSelectionEvent evt) {
+            treeSelectionChanged(evt);
+         }
+      });
+
+      JScrollPane treeView = new JScrollPane(tree);
+
+      treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+      // treeView.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+      tree.setScroller(treeView);
+
+      for (int i = 0; i < tree.getRowCount(); i++) {
+         TreePath     path = tree.getPathForRow(i);
+         TaxonomyNode node = (TaxonomyNode) path.getLastPathComponent();
+      }
+
+      statedInferredButton = new JButton(new AbstractAction("", statedView) {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            handleRelTypeChange();
+         }
+      });
+
+      switch (assertionType) {
+      case INFERRED :
+         statedInferredButton.setIcon(inferredView);
+         statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
+
+         break;
+
+      case INFERRED_THEN_STATED :
+         statedInferredButton.setIcon(inferredThenStatedView);
+         statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
+
+         break;
+
+      case STATED :
+         statedInferredButton.setIcon(inferredView);
+         statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
+
+         break;
+      }
+
+      statedInferredButton.setSelected(true);
+      statedInferredButton.setPreferredSize(new Dimension(20, 16));
+      statedInferredButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      statedInferredButton.setOpaque(false);
+      statedInferredButton.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
+      fsnPreferredButton = new JButton(new AbstractAction("", fsnDisplay) {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            if (displayingFsn) {
+               renderer.setTypeToRender(DescTypeToRender.PREFERRED);
+               displayingFsn = false;
+               fsnPreferredButton.setIcon(preferredDisplay);
+               fsnPreferredButton.setToolTipText("displaying preferred term, toggle to show fsn");
+               updateHierarchyView("changedToPreferred");
+            } else {
+               renderer.setTypeToRender(DescTypeToRender.FSN);
+               displayingFsn = true;
+               fsnPreferredButton.setIcon(fsnDisplay);
+               fsnPreferredButton.setToolTipText("displaying fsn, toggle to show preferred term");
+               updateHierarchyView("changedToFsn");
             }
 
-            for (TreeSelectionListener tsl : tree.getTreeSelectionListeners()) {
-                tree.removeTreeSelectionListener(tsl);
-            }
+            TaxonomyNode parent = (TaxonomyNode) tree.getModel().getRoot();
 
-            for (TreeWillExpandListener twel : tree.getTreeWillExpandListeners()) {
-                tree.removeTreeWillExpandListener(twel);
-            }
-        }
+            handleDisplayChange();
+         }
+      });
 
-        tree = new TaxonomyTree(aceFrameConfig, this);
-        renderer = new TaxonomyNodeRenderer(aceFrameConfig, this);
-        model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
-                new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
-        tree.putClientProperty("JTree.lineStyle", "None");
-        tree.setLargeModel(true);
+      JPanel             buttonPanel = new JPanel(new GridBagLayout());
+      GridBagConstraints c           = new GridBagConstraints();
 
-        // tree.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        tree.setTransferHandler(new TerminologyTransferHandler(tree));
+      c.anchor  = GridBagConstraints.WEST;
+      c.gridx   = 0;
+      c.gridy   = 0;
+      c.fill    = GridBagConstraints.NONE;
+      c.weightx = 0;
+      c.weighty = 0;
+      buttonPanel.setOpaque(false);
+      buttonPanel.add(statedInferredButton, c);
+      c.gridx++;
+      buttonPanel.add(fsnPreferredButton, c);
+      treeView.setColumnHeaderView(buttonPanel);
+      c.gridx++;
+      c.weightx = 1;
 
-        // tree.setDragEnabled(true);
-        ToolTipManager.sharedInstance().registerComponent(tree);
-        tree.setCellRenderer(renderer);
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        model.addTreeWillExpandListener(tree);
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
+      JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString());
 
-            @Override
-            public void valueChanged(TreeSelectionEvent evt) {
-                treeSelectionChanged(evt);
-            }
-        });
+      buttonPanel.add(view, c);
 
-        JScrollPane treeView = new JScrollPane(tree);
+      return treeView;
+   }
 
-        treeView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+   NodeFactory getNodeFactory() {
+      return model.nodeFactory;
+   }
 
-        // treeView.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-        tree.setScroller(treeView);
+   public NodeStore getNodeStore() {
+      return model.getNodeStore();
+   }
 
-        for (int i = 0; i < tree.getRowCount(); i++) {
-            TreePath path = tree.getPathForRow(i);
-            TaxonomyNode node = (TaxonomyNode) path.getLastPathComponent();
-        }
+   public TaxonomyNodeRenderer getRenderer() {
+      return renderer;
+   }
 
-        statedInferredButton = new JButton(new AbstractAction("", statedView) {
+   public TaxonomyTree getTree() {
+      return tree;
+   }
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ViewCoordinate vc = model.ts.getViewCoordinate();
+   public ActivityPanel getTreeActivityPanel() {
+      return activity;
+   }
 
-                switch (assertionType) {
-                    case INFERRED:
-                        assertionType = RelAssertionType.INFERRED_THEN_STATED;
-                        statedInferredButton.setIcon(inferredThenStatedView);
-                        statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
-                        vc.setRelAssertionType(assertionType);
-                        model.ts = Ts.get().getSnapshot(vc);
-                        updateHierarchyView("changed from stated to inferred then stated");
+   public ViewCoordinate getViewCoordinate() {
+      return this.aceFrameConfig.getViewCoordinate();
+   }
 
-                        break;
+   //~--- set methods ---------------------------------------------------------
 
-                    case INFERRED_THEN_STATED:
-                        assertionType = RelAssertionType.STATED;
-                        statedInferredButton.setIcon(statedView);
-                        statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
-                        vc.setRelAssertionType(assertionType);
-                        model.ts = Ts.get().getSnapshot(vc);
-                        updateHierarchyView("changed from inferred to stated");
+   public void setTreeActivityPanel(ActivityPanel activity) {
+      this.activity = activity;
+   }
 
-                        break;
-
-                    case STATED:
-                        assertionType = RelAssertionType.INFERRED;
-                        statedInferredButton.setIcon(inferredView);
-                        statedInferredButton.setToolTipText(
-                                "showing inferred, toggle to show inferred then stated...");
-                        vc.setRelAssertionType(assertionType);
-                        model.ts = Ts.get().getSnapshot(vc);
-                        updateHierarchyView("changed from stated to inferred");
-
-                        break;
-                }
-            }
-        });
-
-        switch (assertionType) {
-            case INFERRED:
-                statedInferredButton.setIcon(inferredView);
-                statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
-
-                break;
-
-            case INFERRED_THEN_STATED:
-                statedInferredButton.setIcon(inferredThenStatedView);
-                statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
-
-                break;
-
-            case STATED:
-                statedInferredButton.setIcon(inferredView);
-                statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
-
-                break;
-        }
-
-        statedInferredButton.setSelected(true);
-        statedInferredButton.setPreferredSize(new Dimension(20, 16));
-        statedInferredButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        statedInferredButton.setOpaque(false);
-        statedInferredButton.setBorder(BorderFactory.createEmptyBorder(0, 15, 0, 15));
-
-        fsnPreferredButton = new JButton(new AbstractAction("", fsnDisplay) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (displayingFsn) {
-                    renderer.setTypeToRender(DescTypeToRender.PREFERRED);
-                    displayingFsn = false;
-                    fsnPreferredButton.setIcon(preferredDisplay);
-                    fsnPreferredButton.setToolTipText("displaying preferred term, toggle to show fsn");
-                    updateHierarchyView("changedToPreferred");
-                } else {
-                    renderer.setTypeToRender(DescTypeToRender.FSN);
-                    displayingFsn = true;
-                    fsnPreferredButton.setIcon(fsnDisplay);
-                    fsnPreferredButton.setToolTipText("displaying fsn, toggle to show preferred term");
-                    updateHierarchyView("changedToFsn");
-                }
-                TaxonomyNode parent = (TaxonomyNode) tree.getModel().getRoot();
-                handleDisplayChange();
-            }
-        });
-
-        JPanel buttonPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.anchor = GridBagConstraints.WEST;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.fill = GridBagConstraints.NONE;
-        c.weightx = 0;
-        c.weighty = 0;
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(statedInferredButton, c);
-        c.gridx++;
-        buttonPanel.add(fsnPreferredButton, c);
-        treeView.setColumnHeaderView(buttonPanel);
-        c.gridx++;
-        c.weightx = 1;
-
-        JLabel view = new JLabel(aceFrameConfig.getViewPositionSetReadOnly().toString());
-
-        buttonPanel.add(view, c);
-
-        return treeView;
-    }
-
-    NodeFactory getNodeFactory() {
-        return model.nodeFactory;
-    }
-
-    public NodeStore getNodeStore() {
-        return model.getNodeStore();
-    }
-
-    public TaxonomyNodeRenderer getRenderer() {
-        return renderer;
-    }
-
-    public TaxonomyTree getTree() {
-        return tree;
-    }
-
-    public ActivityPanel getTreeActivityPanel() {
-        return activity;
-    }
-
-    public ViewCoordinate getViewCoordinate() {
-        return this.aceFrameConfig.getViewCoordinate();
-    }
-
-    //~--- set methods ---------------------------------------------------------
-    public void setTreeActivityPanel(ActivityPanel activity) {
-        this.activity = activity;
-    }
-
-    ;
+   ;
 
    //~--- inner classes -------------------------------------------------------
 
+   protected class ChangeDisplayWorker extends SwingWorker<List<TaxonomyNode>, NodeChangeRecord> {
+      List<Long> nodesToChange = new ArrayList<Long>();
+
+      //~--- constructors -----------------------------------------------------
+
+      protected ChangeDisplayWorker() {}
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      protected List<TaxonomyNode> doInBackground() throws Exception {
+         List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
+         IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
+         TerminologyStoreDI ts                 = Ts.get();
+
+         for (Entry<Long, TaxonomyNode> entry : model.getNodeStore().nodeMap.entrySet()) {
+            TaxonomyNode oldNode = entry.getValue();
+
+            if (oldNode.getCnid() != Integer.MAX_VALUE) {
+               TaxonomyNode newNode =
+                  model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
+                                             oldNode.getParentNid(),
+                                             model.getNodeStore().get(oldNode.parentNodeId));
+
+               if (oldNode.childrenAreSet()) {
+                  CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
+
+                  latch.await();
+               }
+
+               NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.DISPLAY_CHANGED, oldNode,
+                                               newNode);
+
+               publish(changeRec);
+               contentChangedList.add(newNode);
+            }
+         }
+
+         return contentChangedList;
+      }
+
+      @Override
+      protected void done() {
+         try {
+            List<TaxonomyNode> contentChangedList = get();
+
+            for (TaxonomyNode node : contentChangedList) {
+               model.valueForPathChanged(NodePath.getTreePath(model, node), node);
+            }
+         } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
+
+      @Override
+      protected void process(List<NodeChangeRecord> chunks) {
+         for (NodeChangeRecord nodeChangeRec : chunks) {
+            switch (nodeChangeRec.action) {
+            case DISPLAY_CHANGED :
+               int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
+
+               for (int i = 0; i < removedNodeIndices.length; i++) {
+                  removedNodeIndices[i] = i;
+               }
+
+               model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
+               model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
+
+               break;
+
+            default :
+               throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
+            }
+         }
+      }
+
+      private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
+                                       IdentifierSet changedConcepts)
+              throws IOException {
+         int              cnid    = ts.getConceptNidForNid(changedComponentNid);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
+
+         if (!nodeIds.isEmpty()) {
+            changedConcepts.setMember(cnid);
+            nodesToChange.addAll(nodeIds);
+         }
+      }
+
+      @Override
+      public String toString() {
+         return helperName + " change display worker";
+      }
+   }
+
+
    protected class ChangeWorker extends SwingWorker<List<TaxonomyNode>, NodeChangeRecord> {
+      List<Long>   nodesToChange = new ArrayList<Long>();
+      Set<Integer> changedComponents;
+      Set<Integer> changedXrefs;
+      long         sequence;
 
-        List<Long> nodesToChange = new ArrayList<Long>();
-        Set<Integer> changedComponents;
-        Set<Integer> changedXrefs;
-        long sequence;
+      //~--- constructors -----------------------------------------------------
 
-        //~--- constructors -----------------------------------------------------
-        public ChangeWorker(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-            this.sequence = sequence;
-            this.changedXrefs = changedXrefs;
-            this.changedComponents = changedComponents;
-        }
+      public ChangeWorker(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
+         this.sequence          = sequence;
+         this.changedXrefs      = changedXrefs;
+         this.changedComponents = changedComponents;
+      }
 
-        //~--- methods ----------------------------------------------------------
-        @Override
-        protected List<TaxonomyNode> doInBackground() throws Exception {
-            List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
-            IdentifierSet changedConcepts = (IdentifierSet) Terms.get().getEmptyIdSet();
-            TerminologyStoreDI ts = Ts.get();
+      //~--- methods ----------------------------------------------------------
 
-            for (int changedComponentNid : changedComponents) {
-                processComponentNid(ts, changedComponentNid, changedConcepts);
+      @Override
+      protected List<TaxonomyNode> doInBackground() throws Exception {
+         List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
+         IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
+         TerminologyStoreDI ts                 = Ts.get();
+
+         for (int changedComponentNid : changedComponents) {
+            processComponentNid(ts, changedComponentNid, changedConcepts);
+         }
+
+         for (int changedComponentNid : changedXrefs) {
+            processComponentNid(ts, changedComponentNid, changedConcepts);
+         }
+
+         for (Long nodeId : nodesToChange) {
+            TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
+            TaxonomyNode newNode = model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
+                                      oldNode.getParentNid(), model.getNodeStore().get(oldNode.parentNodeId));
+            boolean childrenChanged = false;
+
+            if (oldNode.childrenAreSet()) {
+               CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
+
+               latch.await();
             }
 
-            for (int changedComponentNid : changedXrefs) {
-                processComponentNid(ts, changedComponentNid, changedConcepts);
+            boolean contentChanged = !newNode.getText().equals(oldNode.getText());
+            boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
+                                     ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
+
+            if (parentsChanged) {
+
+               //
             }
 
-            for (Long nodeId : nodesToChange) {
-                TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
-                TaxonomyNode newNode = model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
-                        oldNode.getParentNid(), model.getNodeStore().get(oldNode.parentNodeId));
-                boolean childrenChanged = false;
+            if (childrenChanged) {
+               NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
+                                               newNode);
 
-                if (oldNode.childrenAreSet()) {
-                    CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
+               publish(changeRec);
 
-                    latch.await();
-                }
-
-                boolean contentChanged = !newNode.getText().equals(oldNode.getText());
-                boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
-                        || !newNode.getExtraParents().equals(oldNode.getExtraParents());
-
-                if (parentsChanged) {
-                    //
-                }
-
-                if (childrenChanged) {
-                    NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
-                            newNode);
-
-                    publish(changeRec);
-
-                    //
-                }
-
-                if (contentChanged) {
-                    contentChangedList.add(newNode);
-                }
+               //
             }
 
-            return contentChangedList;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                List<TaxonomyNode> contentChangedList = get();
-
-                for (TaxonomyNode node : contentChangedList) {
-                    model.valueForPathChanged(NodePath.getTreePath(model, node), node);
-                }
-            } catch (Exception ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
+            if (contentChanged) {
+               contentChangedList.add(newNode);
             }
-        }
+         }
 
-        @Override
-        protected void process(List<NodeChangeRecord> chunks) {
-            for (NodeChangeRecord nodeChangeRec : chunks) {
-                switch (nodeChangeRec.action) {
-                    case ADDED_AS_PARENT:
-                        break;
+         return contentChangedList;
+      }
 
-                    case CHILDREN_CHANGED:
-                        int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
+      @Override
+      protected void done() {
+         try {
+            List<TaxonomyNode> contentChangedList = get();
 
-                        for (int i = 0; i < removedNodeIndices.length; i++) {
-                            removedNodeIndices[i] = i;
-                        }
-
-                        model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
-                        model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
-
-                        break;
-
-                    default:
-                        throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
-                }
+            for (TaxonomyNode node : contentChangedList) {
+               model.valueForPathChanged(NodePath.getTreePath(model, node), node);
             }
-        }
+         } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
+      }
 
-        private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
-                IdentifierSet changedConcepts)
-                throws IOException {
-            int cnid = ts.getConceptNidForNid(changedComponentNid);
+      @Override
+      protected void process(List<NodeChangeRecord> chunks) {
+         for (NodeChangeRecord nodeChangeRec : chunks) {
+            switch (nodeChangeRec.action) {
+            case ADDED_AS_PARENT :
+               break;
 
-            if (cnid > Integer.MIN_VALUE) {
-                Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
+            case CHILDREN_CHANGED :
+               int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
 
-                if (!nodeIds.isEmpty()) {
-                    changedConcepts.setMember(cnid);
-                    nodesToChange.addAll(nodeIds);
-                }
+               for (int i = 0; i < removedNodeIndices.length; i++) {
+                  removedNodeIndices[i] = i;
+               }
+
+               model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
+               model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
+
+               break;
+
+            default :
+               throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
             }
-        }
+         }
+      }
 
-        @Override
-        public String toString() {
-            return helperName + " change worker";
-        }
-    }
-   
-       protected class ChangeDisplayWorker extends SwingWorker<List<TaxonomyNode>, NodeChangeRecord> {
+      private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
+                                       IdentifierSet changedConcepts)
+              throws IOException {
+         int cnid = ts.getConceptNidForNid(changedComponentNid);
 
-        List<Long> nodesToChange = new ArrayList<Long>();
-
-        //~--- constructors -----------------------------------------------------
-        protected ChangeDisplayWorker() {
-        }
-
-        //~--- methods ----------------------------------------------------------
-        @Override
-        protected List<TaxonomyNode> doInBackground() throws Exception {
-            List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
-            IdentifierSet changedConcepts = (IdentifierSet) Terms.get().getEmptyIdSet();
-            TerminologyStoreDI ts = Ts.get();
-
-            for (Entry<Long, TaxonomyNode> entry : model.getNodeStore().nodeMap.entrySet()) {
-
-                TaxonomyNode oldNode = entry.getValue();
-                if (oldNode.getCnid() != Integer.MAX_VALUE) {
-                    TaxonomyNode newNode = model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
-                            oldNode.getParentNid(), model.getNodeStore().get(oldNode.parentNodeId));
-
-                    if (oldNode.childrenAreSet()) {
-                        CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
-
-                        latch.await();
-                    }
-                    NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.DISPLAY_CHANGED, oldNode,
-                            newNode);
-
-                    publish(changeRec);
-                    contentChangedList.add(newNode);
-                }
-            }
-
-            return contentChangedList;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                List<TaxonomyNode> contentChangedList = get();
-
-                for (TaxonomyNode node : contentChangedList) {
-                    model.valueForPathChanged(NodePath.getTreePath(model, node), node);
-                }
-            } catch (Exception ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            }
-        }
-
-        @Override
-        protected void process(List<NodeChangeRecord> chunks) {
-            for (NodeChangeRecord nodeChangeRec : chunks) {
-                switch (nodeChangeRec.action) {
-                    case DISPLAY_CHANGED:
-                        int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
-
-                        for (int i = 0; i < removedNodeIndices.length; i++) {
-                            removedNodeIndices[i] = i;
-                        }
-                        model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
-                        model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
-
-                        break;
-
-                    default:
-                        throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
-                }
-            }
-        }
-
-        private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
-                IdentifierSet changedConcepts)
-                throws IOException {
-            int cnid = ts.getConceptNidForNid(changedComponentNid);
+         if (cnid > Integer.MIN_VALUE) {
             Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
 
             if (!nodeIds.isEmpty()) {
-                changedConcepts.setMember(cnid);
-                nodesToChange.addAll(nodeIds);
+               changedConcepts.setMember(cnid);
+               nodesToChange.addAll(nodeIds);
             }
-        }
+         }
+      }
 
-        @Override
-        public String toString() {
-            return helperName + " change display worker";
-        }
-    }
+      @Override
+      public String toString() {
+         return helperName + " change worker";
+      }
+   }
 
-    private static class NodeChangeRecord {
 
-        NodeAction action;
-        TaxonomyNode newNode;
-        TaxonomyNode oldNode;
+   private static class NodeChangeRecord {
+      NodeAction   action;
+      TaxonomyNode newNode;
+      TaxonomyNode oldNode;
 
-        //~--- constructors -----------------------------------------------------
-        public NodeChangeRecord(NodeAction action, TaxonomyNode oldNode, TaxonomyNode newNode) {
-            this.action = action;
-            this.oldNode = oldNode;
-            this.newNode = newNode;
-        }
-    }
+      //~--- constructors -----------------------------------------------------
+
+      public NodeChangeRecord(NodeAction action, TaxonomyNode oldNode, TaxonomyNode newNode) {
+         this.action  = action;
+         this.oldNode = oldNode;
+         this.newNode = newNode;
+      }
+   }
 }
