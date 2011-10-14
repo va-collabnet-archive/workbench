@@ -156,9 +156,20 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		int parentConceptNid = Terms.get().uuidToNative(UUID.fromString(parent));
 		int subtypeConceptNid = Terms.get().uuidToNative(UUID.fromString(subtype));
 		if (RulesLibrary.myStaticIsACache == null) { 
-			ConceptVersionBI parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
-			ConceptVersionBI subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
-			result = subtypeConcept.isKindOf(parentConcept);
+			ConceptVersionBI parentConcept = null;
+			ConceptVersionBI subtypeConcept= null;
+			try {
+				parentConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), parentConceptNid);
+				subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
+			} catch (java.lang.AssertionError e) {
+				System.out.println("Error retrieving concepts in iParentOf: " + parent + ", " + subtype);
+				System.out.println(e.getMessage());
+			}
+			if (parentConcept ==  null || subtypeConcept == null) {
+				result = false;
+			} else {
+				result = subtypeConcept.isKindOf(parentConcept);
+			}
 		} else {
 			//System.out.println("Using rules library isa cache!");
 			result = RulesLibrary.myStaticIsACache.isKindOf(subtypeConceptNid, parentConceptNid);
