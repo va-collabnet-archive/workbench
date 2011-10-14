@@ -10,14 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.ihtsdo.rf2.impl.RF2IDImpl;
-import org.ihtsdo.rf2.postexport.FileSorter;
-import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst;
-import org.ihtsdo.rf2.postexport.SnapshotGenerator;
 
 
 public class RF2RelsIDRetrieveImpl {
