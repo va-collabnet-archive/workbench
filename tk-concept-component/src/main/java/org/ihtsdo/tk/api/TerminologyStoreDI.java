@@ -39,6 +39,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    ComponentChroncileBI<?> getComponent(Collection<UUID> uuids) throws IOException;
 
+   ComponentChroncileBI<?> getComponent(ComponentContainerBI cc) throws IOException;
+
    ComponentChroncileBI<?> getComponent(int nid) throws IOException;
 
    ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
@@ -53,6 +55,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
            throws IOException, ContraditionException;
 
    ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
+
+   ConceptChronicleBI getConcept(ConceptContainerBI cc) throws IOException;
 
    ConceptChronicleBI getConcept(int cNid) throws IOException;
 

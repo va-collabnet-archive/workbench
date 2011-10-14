@@ -27,6 +27,7 @@ import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.db.change.LastChange;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -252,6 +253,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
    }
 
    @Override
+   public ComponentChroncileBI<?> getComponent(ComponentContainerBI cc) throws IOException {
+      return getComponent(cc.getNid());
+   }
+
+   @Override
    public ComponentChroncileBI<?> getComponent(int nid) throws IOException {
       return (ComponentChroncileBI<?>) Bdb.getComponent(nid);
    }
@@ -288,6 +294,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
    @Override
    public ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException {
       return getConcept(Bdb.uuidsToNid(uuids));
+   }
+
+   @Override
+   public ConceptChronicleBI getConcept(ConceptContainerBI cc) throws IOException {
+      return getConcept(cc.getCnid());
    }
 
    @Override
