@@ -14,6 +14,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -58,7 +59,29 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 	   		private WfHxLuceneWriter(Set<I_ExtendByRef> uncommittedWfMemberIds) {
 	   			try {
 	   				reader = new WorkflowHistoryRefsetReader();
-		   			wfExtensionsToUpdate = uncommittedWfMemberIds;
+
+		        	// tmp fix hook
+	   				Set<I_ExtendByRef> wfExtensionsToIterate = new HashSet<I_ExtendByRef>(uncommittedWfMemberIds);
+		        	
+	   				for (Object rowObj : wfExtensionsToIterate) {
+   						I_ExtendByRef row = (I_ExtendByRef)rowObj;
+   						UUID uid = null;
+   						try {
+   							uid = Terms.get().nidToUuid(row.getComponentNid());
+   							Object refComp = Ts.get().getComponent(row.getComponentNid());
+   						} catch (Exception e){ 
+			        		uncommittedWfMemberIds.remove(rowObj);
+			        		if (uid != null) {
+	   							AceLog.getAppLog().log(Level.WARNING, ("Unable to add workflow history into Lucene due to bad refCompUid: " + uid));
+			        		} if (rowObj != null) {
+	   							AceLog.getAppLog().log(Level.WARNING, ("Unable to add workflow history into Lucene due to bad row: " + rowObj.toString()));
+			        		} else {
+	   							AceLog.getAppLog().log(Level.WARNING, ("Unable to add workflow history into Lucene due to bad row"));
+			        		}
+   						}
+	   				}
+
+					wfExtensionsToUpdate = uncommittedWfMemberIds;	
 	   			} catch (Exception e) {
 	   				AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset with error: " + e.getMessage());
 	   			}
@@ -95,15 +118,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 	   					}
 	   				}
 	   			} catch (Exception e) {
-	   				StringBuffer str = new StringBuffer();
-	   				
-	   				for (I_ExtendByRef id : wfExtensionsToUpdate) {
-	   					if (id != null) {
-	   						str.append(" " + id.getPrimUuid());
-	   					}
-	   				}
-
-	   				AceLog.getAppLog().log(Level.WARNING, "Failed in adding following Workflow Member UUID's to refset:" + str.toString(), e);
+	   				AceLog.getAppLog().log(Level.WARNING, "Failed in adding following workflow row:" + wfExtensionsToUpdate.toString());
 	   			}
 
 	   			luceneWriterPermit.release();

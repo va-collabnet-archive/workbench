@@ -104,6 +104,7 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.hash.Hashcode;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -120,6 +121,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
    public static ReferenceType                                refType      = ReferenceType.WEAK;
@@ -656,7 +658,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                        Ts.get().getConceptNidForNid(cc.getNid())));
             }
          } else {
-            cantResolve.add(er);
+	        	// tmp fix hook
+	        	if (!er.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid()) &&
+        	 		!er.getComponentUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+        		 cantResolve.add(er);
+        	 } else {
+                 AceLog.getAppLog().log(Level.WARNING, ("Unable to add to workflow history refset bad changes set member due to bad refCompUid: " + er.getComponentUuid()));
+        	 }
          }
       }
 
