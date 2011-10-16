@@ -674,7 +674,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
               throws IOException {
          int cnid = ts.getConceptNidForNid(changedComponentNid);
 
-         if ((cnid > Integer.MIN_VALUE) && (model != null)) {
+         if ((cnid > Integer.MIN_VALUE) && (cnid < Integer.MAX_VALUE) && (model != null)) {
             Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
 
             if (!nodeIds.isEmpty()) {
