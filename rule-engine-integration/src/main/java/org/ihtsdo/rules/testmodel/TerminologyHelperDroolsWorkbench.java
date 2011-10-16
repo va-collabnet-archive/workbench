@@ -49,6 +49,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	private Map<String,I_GetConceptData> validSemtags;
 	private Map<String,Set<String>> semtagParents;
 	private List<String> domains;
+	public static Map<String,UUID> uuidsMap = new HashMap<String,UUID>();
 
 	public TerminologyHelperDroolsWorkbench(){
 		super();
@@ -136,8 +137,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_GetConceptData refsetConcept = tf.getConcept(UUID.fromString(refsetUUID));
-			I_GetConceptData concept = tf.getConcept(UUID.fromString(conceptUUID));
+			I_GetConceptData refsetConcept = tf.getConcept(uuidFromString(refsetUUID));
+			I_GetConceptData concept = tf.getConcept(uuidFromString(conceptUUID));
 			if (refsetConcept != null && concept != null) {
 				result = RulesLibrary.isIncludedInRefsetSpec(refsetConcept, 
 						concept, config);
@@ -153,8 +154,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isParentOf(String parent, String subtype) throws Exception {
 		boolean result = false;
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		int parentConceptNid = Terms.get().uuidToNative(UUID.fromString(parent));
-		int subtypeConceptNid = Terms.get().uuidToNative(UUID.fromString(subtype));
+		int parentConceptNid = Terms.get().uuidToNative(uuidFromString(parent));
+		int subtypeConceptNid = Terms.get().uuidToNative(uuidFromString(subtype));
 		if (RulesLibrary.myStaticIsACache == null) { 
 			ConceptVersionBI parentConcept = null;
 			ConceptVersionBI subtypeConcept= null;
@@ -193,7 +194,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			String originalSemTag = "";
 			String potentialMatchSemtag = "";
 
-			I_GetConceptData originalConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			I_GetConceptData originalConcept = Terms.get().getConcept(uuidFromString(conceptUuid));
 			I_DescriptionTuple originalFsn = null;
 
 			for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
@@ -275,7 +276,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-			int sourceConceptNid = tf.uuidToNative(UUID.fromString(conceptUuid));
+			int sourceConceptNid = tf.uuidToNative(uuidFromString(conceptUuid));
 			String workingSearchString = new String();
 			workingSearchString = fsn.trim();
 			Pattern p = Pattern.compile("[\\s\\(]");
@@ -323,7 +324,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUUID));
+			I_GetConceptData concept = Terms.get().getConcept(uuidFromString(conceptUUID));
 			int status = concept.getConceptAttributeTuples(null, config.getViewPositionSetReadOnly(), 
 					config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
@@ -364,11 +365,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			int fsnTypeNid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 			int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 
-			I_GetConceptData testedConcept = termFactory.getConcept(UUID.fromString(conceptUuid));
+			I_GetConceptData testedConcept = termFactory.getConcept(uuidFromString(conceptUuid));
 			List<I_GetConceptData> parents = new ArrayList<I_GetConceptData>();
 
 			I_IntSet allowedTypes = termFactory.newIntSet();
-			ConceptSpec spec = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+			ConceptSpec spec = new ConceptSpec("Is a (attribute)", uuidFromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
 			allowedTypes.add(termFactory.uuidToNative(spec.getLenient().getPrimUuid()));
 
 			for (I_RelTuple loopTuple : testedConcept.getSourceRelTuples(config.getAllowedStatus(), 
@@ -437,9 +438,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 		if (conceptUuid != null) {
 			try {
-				I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+				I_GetConceptData concept = Terms.get().getConcept(uuidFromString(conceptUuid));
 				I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-				ConceptSpec spec = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+				ConceptSpec spec = new ConceptSpec("Is a (attribute)", uuidFromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
 				int isaType = spec.getLenient().getNid();
 				I_IntSet allowedrels = Terms.get().newIntSet();
 				allowedrels.add(isaType);
@@ -489,11 +490,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		boolean result = false;
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			I_GetConceptData concept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			I_GetConceptData concept = Terms.get().getConcept(uuidFromString(conceptUuid));
 			List<? extends DescriptionVersionBI> descriptionsList = concept.getDescriptionTuples(config.getAllowedStatus(), 
 					null, config.getViewPositionSetReadOnly(), 
 					config.getPrecedence(), config.getConflictResolutionStrategy());
-			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
+			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", uuidFromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 			for (DescriptionVersionBI loopDescription : descriptionsList) {
 				Collection<? extends RefexVersionBI<?>> currentAnnotations = loopDescription.getChronicle().getCurrentAnnotations(config.getViewCoordinate());
 				for (RefexVersionBI<?> annotation : currentAnnotations) {
@@ -517,7 +518,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isTargetOfHistoricalRelationships(String conceptUuid) {
 		boolean result = false;
 		try {
-			I_GetConceptData oldStyleConcept = Terms.get().getConcept(UUID.fromString(conceptUuid));
+			I_GetConceptData oldStyleConcept = Terms.get().getConcept(uuidFromString(conceptUuid));
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			int historical = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
 			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
@@ -549,7 +550,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			I_TermFactory tf = Terms.get();
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-			I_GetConceptData focusConcept = tf.getConcept(UUID.fromString(conceptUuid));
+			I_GetConceptData focusConcept = tf.getConcept(uuidFromString(conceptUuid));
 			List<String> currentSemtags = new ArrayList<String>();
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
 					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
@@ -571,6 +572,17 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	private UUID uuidFromString(String string) {
+		UUID uuid = TerminologyHelperDroolsWorkbench.uuidsMap.get(string);
+		
+		if (uuid == null) {
+			uuid = UUID.fromString(string);
+			TerminologyHelperDroolsWorkbench.uuidsMap.put(string, uuid);
+		}
+		
+		return uuid;
 	}
 
 }
