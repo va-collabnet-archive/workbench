@@ -44,7 +44,7 @@ public class TaxonomyViewSettings extends ArenaComponentSettings {
    @Override
    public JComponent makeComponent(I_ConfigAceFrame config) {
       if (view == null) {
-         TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config, "Arena taxonomy");
+         TaxonomyHelper hierarchicalTreeHelper = new TaxonomyHelper(config, "Arena taxonomy", null);
 
          try {
             view = hierarchicalTreeHelper.getHierarchyPanel();

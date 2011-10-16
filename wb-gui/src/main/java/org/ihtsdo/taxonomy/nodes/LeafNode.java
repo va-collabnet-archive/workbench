@@ -14,9 +14,6 @@ import java.util.Collection;
  * @author kec
  */
 public class LeafNode extends TaxonomyNode {
-
-   //~--- constructors --------------------------------------------------------
-
    public LeafNode(int cnid, int parentNid, long parentNodeId) {
       super(cnid, parentNid, parentNodeId);
    }
@@ -55,7 +52,6 @@ public class LeafNode extends TaxonomyNode {
       return this;
    }
 
-
    @Override
    public boolean hasExtraParents() {
       return false;
@@ -66,16 +62,16 @@ public class LeafNode extends TaxonomyNode {
       return true;
    }
 
+   @Override
+   public boolean isSecondaryParentOpened() {
+      return false;
+   }
+
    //~--- set methods ---------------------------------------------------------
 
-    @Override
-    public boolean isSecondaryParentOpened() {
-        return false;
-    }
+   @Override
+   public void setSecondaryParentOpened(boolean secondaryParentOpened) {
 
-    @Override
-    public void setSecondaryParentOpened(boolean secondaryParentOpened) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
- 
+      //
+   }
 }

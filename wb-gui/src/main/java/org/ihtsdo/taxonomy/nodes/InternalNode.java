@@ -100,6 +100,7 @@ public class InternalNode extends TaxonomyNode {
 
    @Override
    public void setSecondaryParentOpened(boolean secondaryParentOpened) {
-      throw new UnsupportedOperationException("Not supported yet.");
+
+      //
    }
 }

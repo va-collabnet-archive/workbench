@@ -30,10 +30,25 @@ public interface ComponentBI {
 
    int getConceptNid();
 
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz) throws IOException;
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz, int refexNid)
+           throws IOException;
+
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz) throws IOException;
+
+   Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException;
 
    Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz) throws IOException;
 
+   /**
+    *
+    * @param xyz
+    * @param refsetNid
+    * @return
+    * @throws IOException
+    * @deprecated use getCurrentRefexMembers
+    */
+   @Deprecated
    Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException;
 
@@ -47,9 +62,23 @@ public interface ComponentBI {
     */
    UUID getPrimUuid();
 
+   Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException;
+
    Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException;
 
+   /**
+    *
+    * @param refsetNid
+    * @return
+    * @throws IOException
+    * @deprecated use getRefexMembers
+    */
+   @Deprecated
    Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException;
 
    List<UUID> getUUIDs();
+
+   boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException;
+
+   boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException;
 }

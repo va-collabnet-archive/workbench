@@ -7,7 +7,7 @@ package org.ihtsdo.taxonomy.nodes;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.taxonomy.TaxonomyModel;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.NodeIcon;
 import org.ihtsdo.tk.api.ConceptContainerBI;
 import org.ihtsdo.tk.hash.Hashcode;

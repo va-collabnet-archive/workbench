@@ -9,7 +9,7 @@ import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concurrent.future.FutureHelper;
-import org.ihtsdo.taxonomy.PathExpander;
+import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 

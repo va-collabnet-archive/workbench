@@ -309,10 +309,13 @@ public class ViewCoordinate {
    }
 
    public Collection<IsaCoordinate> getIsaCoordinates() {
-       List<IsaCoordinate> isaCoordinates = new ArrayList<IsaCoordinate>(positionSet.size());
-       for (PositionBI p: positionSet) {
-           isaCoordinates.add(new IsaCoordinate(p, allowedStatusNids, isaTypeNids, precedence, contradictionManager, classifierNid, relAssertionType));
-       }
+      List<IsaCoordinate> isaCoordinates = new ArrayList<IsaCoordinate>(positionSet.size());
+
+      for (PositionBI p : positionSet) {
+         isaCoordinates.add(new IsaCoordinate(p, allowedStatusNids, isaTypeNids, precedence,
+                 contradictionManager, classifierNid, relAssertionType));
+      }
+
       return isaCoordinates;
    }
 
@@ -387,6 +390,3 @@ public class ViewCoordinate {
       this.relAssertionType      = relAssertionType;
    }
 }
-
-
-//~ Formatted by Jindent --- http://www.jindent.com

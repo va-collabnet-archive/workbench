@@ -352,9 +352,27 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
            throws IOException {
-      return concept.getCurrentAnnotations(xyz);
+      return concept.getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      return concept.getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(int refsetNid) throws IOException {
+      return concept.getCurrentRefexMembers(vc, refsetNid);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      return concept.getCurrentRefexMembers(xyz, refsetNid);
    }
 
    @Override
@@ -365,7 +383,18 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      return concept.getCurrentRefexes(xyz, refsetNid);
+      return concept.getCurrentRefexMembers(xyz, refsetNid);
+   }
+
+   @Override
+   public RefexChronicleBI<?> getCurrentRefsetMemberForComponent(int componentNid) throws IOException {
+      return concept.getCurrentRefsetMemberForComponent(vc, componentNid);
+   }
+
+   @Override
+   public RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+           throws IOException {
+      return concept.getCurrentRefsetMemberForComponent(vc, componentNid);
    }
 
    @Override
@@ -560,6 +589,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      return concept.getRefexMembers(refsetNid);
+   }
+
+   @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
       return concept.getRefexes();
    }
@@ -567,6 +601,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
       return concept.getRefexes(refsetNid);
+   }
+
+   @Override
+   public RefexChronicleBI<?> getRefsetMemberForComponent(int componentNid) throws IOException {
+      return concept.getRefsetMemberForComponent(componentNid);
    }
 
    @Override
@@ -1011,6 +1050,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
+   public boolean hasAnnotationMemberActive(int refsetNid) throws IOException {
+      return concept.hasCurrentAnnotationMember(vc, refsetNid);
+   }
+
+   @Override
    public boolean hasChildren() throws IOException, ContraditionException {
       Collection<? extends RelationshipVersionBI> children = this.getRelsIncomingActive();
 
@@ -1019,6 +1063,21 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       }
 
       return true;
+   }
+
+   @Override
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return concept.hasCurrentAnnotationMember(xyz, refsetNid);
+   }
+
+   @Override
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return concept.hasCurrentRefexMember(xyz, refsetNid);
+   }
+
+   @Override
+   public boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException {
+      return concept.hasCurrentRefsetMemberForComponent(vc, componentNid);
    }
 
    @Override
@@ -1049,6 +1108,16 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
       }
 
       return history;
+   }
+
+   @Override
+   public boolean hasRefexMemberActive(int refsetNid) throws IOException {
+      return concept.hasCurrentRefexMember(vc, refsetNid);
+   }
+
+   @Override
+   public boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException {
+      return concept.hasCurrentRefsetMemberForComponent(vc, componentNid);
    }
 
    @Override

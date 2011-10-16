@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.ihtsdo.taxonomy;
+package org.ihtsdo.taxonomy.path;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -11,6 +11,7 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -58,15 +59,15 @@ public class PathSegmentExpander extends SwingWorker<Integer, Object> {
             PathSegmentExpander nextSegmentExpander = new PathSegmentExpander(factory, path, newIndex);
 
             FutureHelper.addFuture(NodeFactory.pathExpanderExecutors.submit(nextSegmentExpander));
-            factory.tree.expandPath(path.getParentPath());
+            factory.getTree().expandPath(path.getParentPath());
          } else {
-            int row = factory.tree.getRowForPath(path);
+            int row = factory.getTree().getRowForPath(path);
 
-            row = Math.min(row + 15, factory.tree.getRowCount());
-            factory.tree.scrollRowToVisible(row);
-            factory.tree.expandPath(path.getParentPath());
-            factory.tree.setSelectionPath(path);
-            factory.tree.scrollPathToVisible(path);
+            row = Math.min(row + 15, factory.getTree().getRowCount());
+            factory.getTree().scrollRowToVisible(row);
+            factory.getTree().expandPath(path.getParentPath());
+            factory.getTree().setSelectionPath(path);
+            factory.getTree().scrollPathToVisible(path);
          }
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);

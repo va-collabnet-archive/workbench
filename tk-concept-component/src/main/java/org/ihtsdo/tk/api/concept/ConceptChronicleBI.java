@@ -1,7 +1,6 @@
 package org.ihtsdo.tk.api.concept;
 
-import java.io.IOException;
-import java.util.Collection;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -17,50 +16,63 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
 import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 
-public interface ConceptChronicleBI extends
-        ComponentChroncileBI<ConceptVersionBI> {
+//~--- JDK imports ------------------------------------------------------------
 
-    ConAttrChronicleBI getConAttrs() throws IOException;
+import java.io.IOException;
 
-    Collection<? extends DescriptionChronicleBI> getDescs() throws IOException;
+import java.util.Collection;
 
-    Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException;
+public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionBI> {
+   void cancel() throws IOException;
 
-    Collection<? extends RelationshipChronicleBI> getRelsIncoming() throws IOException;
-
-    Collection<? extends MediaChronicleBI> getMedia() throws IOException;
-
-    Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc) throws IOException, ContraditionException;
-
-    boolean isAnnotationStyleRefex() throws IOException;
-
-    void setAnnotationStyleRefex(boolean annotationSyleRefex);
-
-    Collection<? extends RefexChronicleBI<?>> getRefsetMembers()
-            throws IOException;
-
-    Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc)
-            throws IOException;
-    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+   boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
+                  ChangeSetGenerationThreadingPolicy changeSetWriterThreading)
            throws IOException;
 
-    boolean commit(ChangeSetGenerationPolicy changeSetPolicy,
-            ChangeSetGenerationThreadingPolicy changeSetWriterThreading) throws IOException;
-
-    void cancel() throws IOException;    
-    
-    FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
-    
-    long getLastModificationSequence();
-    
    /**
-    * Returns a longer - more complete - string representation of the chronicle. 
+    * Returns a longer - more complete - string representation of the chronicle.
     * Useful for diagnostic purposes.
     *
     * @return
     */
    String toLongString();
-   
-   
 
+   //~--- get methods ---------------------------------------------------------
+
+   ConAttrChronicleBI getConAttrs() throws IOException;
+
+   RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+           throws IOException;
+
+   Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException;
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
+           throws IOException;
+
+   Collection<? extends DescriptionChronicleBI> getDescs() throws IOException;
+
+   long getLastModificationSequence();
+
+   Collection<? extends MediaChronicleBI> getMedia() throws IOException;
+
+   RefexChronicleBI<?> getRefsetMemberForComponent(int componentNid) throws IOException;
+
+   Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException;
+
+   Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
+           throws IOException, ContraditionException;
+
+   Collection<? extends RelationshipChronicleBI> getRelsIncoming() throws IOException;
+
+   Collection<? extends RelationshipChronicleBI> getRelsOutgoing() throws IOException;
+
+   FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc);
+
+   boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException;
+
+   boolean isAnnotationStyleRefex() throws IOException;
+
+   //~--- set methods ---------------------------------------------------------
+
+   void setAnnotationStyleRefex(boolean annotationSyleRefex);
 }

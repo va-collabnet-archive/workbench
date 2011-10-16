@@ -3,10 +3,11 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.ihtsdo.taxonomy;
+package org.ihtsdo.taxonomy.model;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 
@@ -31,14 +32,14 @@ public class NodePath {
 
       idList.addLast(node.nodeId);
 
-      TaxonomyNode parentNode = model.nodeStore.get(node.parentNodeId);
+      TaxonomyNode parentNode = model.getNodeStore().get(node.parentNodeId);
 
       while (parentNode != null) {
          idList.addLast(parentNode.nodeId);
 
-         if ((model.nodeStore.get(parentNode.parentNodeId) != null)
-                 && (parentNode.nodeId != model.nodeStore.get(parentNode.parentNodeId).nodeId)) {
-            parentNode = model.nodeStore.get(parentNode.parentNodeId);
+         if ((model.getNodeStore().get(parentNode.parentNodeId) != null)
+                 && (parentNode.nodeId != model.getNodeStore().get(parentNode.parentNodeId).nodeId)) {
+            parentNode = model.getNodeStore().get(parentNode.parentNodeId);
          } else {
             parentNode = null;
          }
@@ -49,7 +50,7 @@ public class NodePath {
       Iterator<Long> descItr = idList.descendingIterator();
 
       while (descItr.hasNext()) {
-         nodes[index++] = model.nodeStore.get(descItr.next());
+         nodes[index++] = model.getNodeStore().get(descItr.next());
       }
 
       return new TreePath(nodes);

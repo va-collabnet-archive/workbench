@@ -18,6 +18,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.ExpandNodeSwingWorker;
 import org.dwfa.tapi.TerminologyException;
 
+import org.ihtsdo.taxonomy.model.NodeFactory;
+import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
+import org.ihtsdo.tk.Ts;
+
 import sun.awt.dnd.SunDragSourceContextPeer;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -61,8 +65,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
-import org.ihtsdo.tk.Ts;
 
 /**
  *
@@ -154,6 +156,10 @@ public class TaxonomyTree extends JTree {
       return lastPropagationId;
    }
 
+   public NodeFactory getNodeFactory() {
+      return helper.getNodeFactory();
+   }
+
    public JScrollPane getScroller() {
       return scroller;
    }
@@ -163,10 +169,6 @@ public class TaxonomyTree extends JTree {
    public void setScroller(JScrollPane scroller) {
       this.scroller = scroller;
    }
-
-    NodeFactory getNodeFactory() {
-        return helper.getNodeFactory();
-    }
 
    //~--- inner classes -------------------------------------------------------
 
@@ -189,11 +191,10 @@ public class TaxonomyTree extends JTree {
 
          if (selRow != -1) {
             try {
-               TaxonomyNode node        = (TaxonomyNode) path.getLastPathComponent();
-               I_GetConceptData       obj         = (I_GetConceptData) Ts.get().getConcept(node.getCnid());
-               Image                  dragImage   = getDragImage(obj);
-               Point                  imageOffset = new Point(-10,
-                                                       -(dragImage.getHeight(TaxonomyTree.this) + 1));
+               TaxonomyNode     node        = (TaxonomyNode) path.getLastPathComponent();
+               I_GetConceptData obj         = (I_GetConceptData) Ts.get().getConcept(node.getCnid());
+               Image            dragImage   = getDragImage(obj);
+               Point            imageOffset = new Point(-10, -(dragImage.getHeight(TaxonomyTree.this) + 1));
 
                try {
                   dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(obj),

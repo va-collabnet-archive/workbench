@@ -1,25 +1,21 @@
+
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.ihtsdo.taxonomy;
 
-import java.awt.Rectangle;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
+//~--- non-JDK imports --------------------------------------------------------
+
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.tree.I_RenderAndFocusOnBean;
 import org.dwfa.tapi.TerminologyException;
+
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNodeRoot;
@@ -29,11 +25,26 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
 /**
  *
  * @author kec
  */
-public class TaxonomyMouseListener  extends MouseAdapter {
+public class TaxonomyMouseListener extends MouseAdapter {
    private TaxonomyHelper helper;
 
    //~--- constructors --------------------------------------------------------
@@ -51,11 +62,10 @@ public class TaxonomyMouseListener  extends MouseAdapter {
          for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {
                TaxonomyNode extraParentNode = null;
-               long[] nodesToCompare = new long[node.getNodesToCompare().length + 1];
+               long[]       nodesToCompare  = new long[node.getNodesToCompare().length + 1];
 
                System.arraycopy(node.getNodesToCompare(), 0, nodesToCompare, 0,
                                 node.getNodesToCompare().length);
-               
                nodesToCompare[node.getNodesToCompare().length] = Long.MAX_VALUE;
 
                if (parent.getRelsOutgoingActiveIsa().isEmpty()) {
@@ -66,7 +76,7 @@ public class TaxonomyMouseListener  extends MouseAdapter {
                           node.parentNodeId, nodesToCompare);
                }
 
-                helper.getNodeStore().add(extraParentNode);
+               helper.getNodeStore().add(extraParentNode);
                extraParentNode.setParentDepth(node.getParentDepth() + 1);
                helper.getRenderer().setupTaxonomyNode(extraParentNode, parent);
                node.addExtraParent(extraParentNode);
@@ -75,19 +85,6 @@ public class TaxonomyMouseListener  extends MouseAdapter {
       }
    }
 
-      private JPopupMenu makePopup(MouseEvent e, ConceptChronicleBI selectedConcept)
-           throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
-      JPopupMenu popup        = new JPopupMenu();
-      JMenuItem  noActionItem = new JMenuItem("");
-
-      popup.add(noActionItem);
-
-       popup.addSeparator();
-      ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
-              ACE.getAceConfig().getActiveConfig().getWorker());
-
-      return popup;
-   }
    private void makeAndShowPopup(MouseEvent e, ConceptChronicleBI selectedConcept) {
       JPopupMenu popup;
 
@@ -97,6 +94,19 @@ public class TaxonomyMouseListener  extends MouseAdapter {
       } catch (Exception e1) {
          AceLog.getAppLog().alertAndLogException(e1);
       }
+   }
+
+   private JPopupMenu makePopup(MouseEvent e, ConceptChronicleBI selectedConcept)
+           throws FileNotFoundException, IOException, ClassNotFoundException, TerminologyException {
+      JPopupMenu popup        = new JPopupMenu();
+      JMenuItem  noActionItem = new JMenuItem("");
+
+      popup.add(noActionItem);
+      popup.addSeparator();
+      ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
+              ACE.getAceConfig().getActiveConfig().getWorker());
+
+      return popup;
    }
 
    @Override
@@ -199,7 +209,10 @@ public class TaxonomyMouseListener  extends MouseAdapter {
          if (addNodes) {
             try {
                addAllParentsAsExtra(nodeConcept, node);
-               parentNode.getChildren().addAll(node.getExtraParents());
+
+               if (node.getExtraParents() != null) {
+                  parentNode.getChildren().addAll(node.getExtraParents());
+               }
             } catch (Exception e) {
                AceLog.getAppLog().alertAndLogException(e);
             }
@@ -216,12 +229,11 @@ public class TaxonomyMouseListener  extends MouseAdapter {
          TaxonomyNode parentNode = model.getParent(node);
 
          for (Long extraParentNodeId : node.getExtraParents()) {
-            removeAllExtraParents(model, model.nodeStore.get(extraParentNodeId));
+            removeAllExtraParents(model, model.getNodeStore().get(extraParentNodeId));
             parentNode.getChildren().remove(extraParentNodeId);
          }
 
          model.treeStructureChanged(NodePath.getTreePath(model, node));
       }
    }
-
 }

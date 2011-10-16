@@ -36,6 +36,8 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -595,6 +597,12 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
          return getStatusNid();
       }
 
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
+              throws IOException {
+         return ConceptAttributes.this.getCurrentRefexMembers(xyz, refsetNid);
+      }
+
       public ConAttrAnalogBI<ConceptAttributesRevision> getCv() {
          return (ConAttrAnalogBI<ConceptAttributesRevision>) cv;
       }
@@ -607,6 +615,11 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
       @Override
       public ConceptAttributes getPrimordialVersion() {
          return ConceptAttributes.this;
+      }
+
+      @Override
+      public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
@@ -627,6 +640,11 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
       @Override
       public Collection<ConceptAttributes.Version> getVersions(ViewCoordinate c) {
          return ConceptAttributes.this.getVersions(c);
+      }
+
+      @Override
+      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override

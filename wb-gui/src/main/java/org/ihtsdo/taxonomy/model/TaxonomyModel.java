@@ -3,12 +3,15 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.ihtsdo.taxonomy;
+package org.ihtsdo.taxonomy.model;
 
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.dwfa.ace.log.AceLog;
 
+import org.ihtsdo.taxonomy.NodeStore;
+import org.ihtsdo.taxonomy.TaxonomyNodeRenderer;
+import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.taxonomy.nodes.LeafNode;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
@@ -48,10 +51,11 @@ public class TaxonomyModel implements TreeModel {
 
    //~--- constructors --------------------------------------------------------
 
-   public TaxonomyModel(ViewCoordinate vc, NidListBI roots, TaxonomyNodeRenderer renderer, JTree tree)
+   public TaxonomyModel(ViewCoordinate vc, NidListBI roots, TaxonomyNodeRenderer renderer, JTree tree,
+                        ChildNodeFilterBI childNodeFilter)
            throws IOException, Exception {
       ts          = Ts.get().getSnapshot(vc);
-      nodeFactory = new NodeFactory(this, renderer, tree);
+      nodeFactory = new NodeFactory(this, renderer, tree, childNodeFilter);
       rootNode    = new RootNode(nodeFactory.getNodeComparator());
       nodeStore.add(rootNode);
 
@@ -82,7 +86,7 @@ public class TaxonomyModel implements TreeModel {
       }
    }
 
-   void nodesWereInserted(TaxonomyNode parentNode, int[] newNodeIndices) {
+   public void nodesWereInserted(TaxonomyNode parentNode, int[] newNodeIndices) {
       int      cCount      = newNodeIndices.length;
       Object[] newChildren = new Object[cCount];
 
@@ -117,7 +121,7 @@ public class TaxonomyModel implements TreeModel {
       }
    }
 
-   void unLink() {
+   public void unLink() {
       nodeFactory.unLink();
       listeners.clear();
    }
@@ -214,6 +218,10 @@ public class TaxonomyModel implements TreeModel {
       return null;
    }
 
+   public NodeFactory getNodeFactory() {
+      return nodeFactory;
+   }
+
    public static long getNodeId(int cnid, int parentNid) {
       long nodeId = cnid;
 
@@ -273,6 +281,10 @@ public class TaxonomyModel implements TreeModel {
       return rootNode;
    }
 
+   public TerminologySnapshotDI getTs() {
+      return ts;
+   }
+
    @Override
    public boolean isLeaf(Object node) {
       if (node instanceof LeafNode) {
@@ -286,5 +298,11 @@ public class TaxonomyModel implements TreeModel {
       }
 
       return false;
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   public void setTs(TerminologySnapshotDI snapshot) {
+      this.ts = snapshot;
    }
 }

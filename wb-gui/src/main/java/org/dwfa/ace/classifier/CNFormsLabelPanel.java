@@ -165,7 +165,6 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.anchor = GridBagConstraints.NORTHWEST;    // Place
 
       // CNFormsLabelPanel
-
       // TOP ROW
       c.gridy     = 0;      // first row
       c.gridx     = 0;      // reset at west side of row
@@ -1433,9 +1432,22 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
               throws IOException {
-         return core.getCurrentAnnotations(xyz);
+         return core.getCurrentAnnotationMembers(xyz);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+              int refexNid)
+              throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+              throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
@@ -1513,6 +1525,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
+      public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
       public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
@@ -1572,6 +1589,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       @Override
       public Collection<? extends ConAttrVersionBI> getVersions(ViewCoordinate c) {
          return core.getVersions(c);
+      }
+
+      @Override
+      public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override
@@ -1913,7 +1940,20 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+              throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+              int refexNid)
+              throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
               throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
@@ -2014,6 +2054,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
       @Override
       public RelVersion getPrimordialVersion() {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
          throw new UnsupportedOperationException("Not supported yet.");
       }
 
@@ -2133,6 +2178,16 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       @Override
       public Collection<? extends RelationshipVersionBI> getVersions(ViewCoordinate c) {
          return fixedPart.getVersions(c);
+      }
+
+      @Override
+      public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
+
+      @Override
+      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         throw new UnsupportedOperationException("Not supported yet.");
       }
 
       @Override

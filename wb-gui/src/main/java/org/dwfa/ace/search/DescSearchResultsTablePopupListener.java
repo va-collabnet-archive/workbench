@@ -42,7 +42,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.taxonomy.PathExpander;
+import org.ihtsdo.taxonomy.path.PathExpander;
 
 //~--- JDK imports ------------------------------------------------------------
 

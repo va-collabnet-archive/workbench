@@ -295,9 +295,22 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
            throws IOException {
-      return primordialComponent.getCurrentAnnotations(xyz);
+      return primordialComponent.getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      return primordialComponent.getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      return primordialComponent.getCurrentRefexMembers(xyz, refsetNid);
    }
 
    @Override
@@ -357,6 +370,11 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
    }
 
    @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      return primordialComponent.getRefexMembers(refsetNid);
+   }
+
+   @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
       return primordialComponent.getRefexes();
    }
@@ -411,6 +429,16 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
 
    public final C getVersioned() {
       return primordialComponent;
+   }
+
+   @Override
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return primordialComponent.hasCurrentAnnotationMember(xyz, refsetNid);
+   }
+
+   @Override
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return primordialComponent.hasCurrentRefexMember(xyz, refsetNid);
    }
 
    @Override
