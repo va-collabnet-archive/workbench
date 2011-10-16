@@ -1365,7 +1365,6 @@ public class RefsetSpecPanel extends JPanel {
             get();
             bottomTabs.setComponentAt(0, refsetHierarcyPanel);
             bottomTabs.setComponentAt(1, refsetAndParentOnlyHierarchicalPanel);
-            setRefsetInSpecEditor(getRefsetInSpecEditor());
          } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }

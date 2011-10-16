@@ -224,13 +224,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       topPanel.add(label, c);
       c.weightx = 0.0;
       c.gridx++;
-
-      JButton addSPecMetaData =
-         new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_new.png")));
-
-      addSPecMetaData.addActionListener(new AddSpecMetadaListener());
-      addSPecMetaData.setToolTipText("Add metadata to enable refset specification for this concept.");
-      topPanel.add(addSPecMetaData, c);
+      fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
+      historyButton                   =
+         new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
+      historyButton.setSelected(false);
+      historyButton.addActionListener(fixedToggleChangeActionListener);
+      historyButton.setToolTipText("show/hide the history records");
+      topPanel.add(historyButton, c);
       c.gridx++;
       componentHistoryButton = new JButton(ConceptPanel.HISTORY_ICON);
       componentHistoryButton.addActionListener(new ShowHistoryListener());
@@ -239,7 +239,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       topPanel.add(componentHistoryButton, c);
       c.gridx = 0;
       c.gridy++;
-      c.gridwidth = 3;
+      c.gridwidth = 5;
       c.fill      = GridBagConstraints.HORIZONTAL;
 
       JComponent toggleBar = getToggleBar();
@@ -301,6 +301,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       pcs.firePropertyChange(propertyName, oldValue, newValue);
    }
 
+   @Override
    public void propertyChange(PropertyChangeEvent evt) {
       if (evt.getPropertyName().equals("viewPositions")) {
          fixedToggleChangeActionListener.actionPerformed(null);
@@ -514,10 +515,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       return 10;
    }
 
+   @Override
    public boolean getShowHistory() {
       return historyButton.isSelected();
    }
 
+   @Override
    public boolean getShowRefsets() {
       throw new UnsupportedOperationException();
    }
@@ -584,6 +587,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       return content;
    }
 
+   @Override
    public I_AmTermComponent getTermComponent() {
       I_AmTermComponent returnValue = tempComponent;
 
@@ -607,45 +611,28 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       leftTogglePane = new JPanel(new GridBagLayout());
       toggleBar.add(leftTogglePane, outer);
 
-      JPanel rightTogglePane = new JPanel(new FlowLayout());
-
-      fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
-      historyButton                   =
-         new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));
-      historyButton.setSelected(false);
-      historyButton.addActionListener(fixedToggleChangeActionListener);
-      historyButton.setToolTipText("show/hide the history records");
-
       GridBagConstraints inner = new GridBagConstraints();
 
       inner.anchor     = GridBagConstraints.WEST;
       inner.gridx      = 0;
-      inner.gridy      = 0;
+      inner.gridy      = 3;
       inner.fill       = GridBagConstraints.NONE;
       inner.weightx    = 0;
       inner.weighty    = 0;
       inner.gridheight = 2;    // make button use 2 rows
       inner.insets     = new Insets(0, 0, 0, 10);
-      leftTogglePane.add(historyButton, inner);
+
+      JButton addSPecMetaData =
+         new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/paperclip_new.png")));
+
+      addSPecMetaData.addActionListener(new AddSpecMetadaListener());
+      addSPecMetaData.setToolTipText("Add metadata to enable refset specification for this concept.");
+      leftTogglePane.add(addSPecMetaData, inner);
+      inner.gridx      = 0;
+      inner.gridy      = 0;
       inner.gridheight = 1;
       inner.insets     = new Insets(0, 0, 0, 0);
-      inner.gridx++;
-      inner.anchor = GridBagConstraints.EAST;
-
-      JLabel refsetStatusLabel = new JLabel("refset status: ");
-
-      leftTogglePane.add(refsetStatusLabel, inner);
-      inner.gridy++;
-
-      JLabel computeTypeLabel = new JLabel("compute type: ");
-
-      leftTogglePane.add(computeTypeLabel, inner);
-      inner.gridy++;
-
-      JLabel computeStatusLabel = new JLabel("compute status: ");
-
-      leftTogglePane.add(computeStatusLabel, inner);
-      inner.gridy++;
+      inner.anchor     = GridBagConstraints.EAST;
 
       JLabel memberCountLabel = new JLabel("member count at last compute: ");
 
@@ -655,6 +642,21 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       JLabel lastComputeTimeLabel = new JLabel("time of last compute: ");
 
       leftTogglePane.add(lastComputeTimeLabel, inner);
+      inner.gridy++;
+
+      JLabel computeStatusLabel = new JLabel("compute status: ");
+
+      leftTogglePane.add(computeStatusLabel, inner);
+      inner.gridy++;
+
+      JLabel computeTypeLabel = new JLabel("compute type: ");
+
+      leftTogglePane.add(computeTypeLabel, inner);
+      inner.gridy++;
+
+      JLabel refsetStatusLabel = new JLabel("refset status: ");
+
+      leftTogglePane.add(refsetStatusLabel, inner);
       inner.anchor = GridBagConstraints.WEST;
       inner.gridx++;
       inner.gridy--;
@@ -681,25 +683,30 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       toggleBar.add(new JPanel(), outer);
 
       File   componentPluginDir = new File(ace.getPluginRoot() + File.separator + "refsetspec");
-      File[] plugins            = componentPluginDir.listFiles(new FilenameFilter() {
+      File[] pluginFiles        = componentPluginDir.listFiles(new FilenameFilter() {
+         @Override
          public boolean accept(File arg0, String fileName) {
             return fileName.toLowerCase().endsWith(".bp");
          }
       });
 
-      if (plugins != null) {
+      if (pluginFiles != null) {
          outer.weightx = 0.0;
          outer.weighty = 0.0;
          outer.fill    = GridBagConstraints.NONE;
+         outer.anchor  = GridBagConstraints.SOUTHEAST;
          outer.gridx++;
+
+         JPanel rightTogglePane = new JPanel(new FlowLayout());
+
          toggleBar.add(rightTogglePane, outer);
 
-         boolean      exceptions       = false;
-         StringBuffer exceptionMessage = new StringBuffer();
+         boolean       exceptions       = false;
+         StringBuilder exceptionMessage = new StringBuilder();
 
          exceptionMessage.append("<html>Exception(s) reading the following plugin(s): <p><p>");
 
-         for (File f : plugins) {
+         for (File f : pluginFiles) {
             try {
                FileInputStream     fis = new FileInputStream(f);
                BufferedInputStream bis = new BufferedInputStream(fis);
@@ -726,7 +733,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                }
             } catch (Throwable e) {
                exceptions = true;
-               exceptionMessage.append("Exception reading plugin: " + f.getAbsolutePath() + "<p>");
+               exceptionMessage.append("Exception reading plugin: ").append(f.getAbsolutePath()).append(
+                   "<p>");
                AceLog.getAppLog().log(Level.SEVERE, "Exception reading: " + f.getAbsolutePath(), e);
             }
          }
@@ -742,6 +750,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       return toggleBar;
    }
 
+   @Override
    public boolean getToggleState(TOGGLES toggle) {
       org.dwfa.ace.api.I_PluginToConceptPanel plugin = pluginMap.get(toggle);
 
@@ -1268,7 +1277,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
             // Set concept bean
             // Set config
-
             worker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), getConfig());
             bp.writeAttachment(ProcessAttachmentKeys.I_GET_CONCEPT_DATA.name(), label.getTermComponent());
             worker.writeAttachment(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name(), RefsetSpecEditor.this);
