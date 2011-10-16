@@ -308,6 +308,18 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       return primordialComponent.getCurrentRefexMembers(xyz, refsetNid);

@@ -365,6 +365,18 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(int refsetNid) throws IOException {
       return concept.getCurrentRefexMembers(vc, refsetNid);
    }

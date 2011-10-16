@@ -30,10 +30,32 @@ public interface ComponentBI {
 
    int getConceptNid();
 
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz) throws IOException;
+
    Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz, int refexNid)
            throws IOException;
 
-   Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz) throws IOException;
+   /**
+    *
+    * @param xyz
+    * @return
+    * @throws IOException
+    * @deprecated use getCurrentAnnotationMembers
+    */
+   @Deprecated
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz) throws IOException;
+
+   /**
+    *
+    * @param xyz
+    * @param refexNid
+    * @return
+    * @throws IOException
+    * @deprecated use getCurrentAnnotationMembers
+    */
+   @Deprecated
+   Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException;
 
    Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
            throws IOException;

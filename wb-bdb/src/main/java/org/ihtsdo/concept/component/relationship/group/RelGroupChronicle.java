@@ -130,6 +130,18 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");

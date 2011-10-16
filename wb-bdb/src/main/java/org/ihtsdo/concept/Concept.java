@@ -658,13 +658,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                        Ts.get().getConceptNidForNid(cc.getNid())));
             }
          } else {
-	        	// tmp fix hook
-	        	if (!er.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid()) &&
-        	 		!er.getComponentUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
-        		 cantResolve.add(er);
-        	 } else {
-                 AceLog.getAppLog().log(Level.WARNING, ("Unable to add to workflow history refset bad changes set member due to bad refCompUid: " + er.getComponentUuid()));
-        	 }
+
+            // tmp fix hook
+            if (!er.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())
+                    &&!er.getComponentUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+               cantResolve.add(er);
+            } else {
+               AceLog.getAppLog().log(
+                   Level.WARNING,
+                   ("Unable to add to workflow history refset bad changes set member due to bad refCompUid: "
+                    + er.getComponentUuid()));
+            }
          }
       }
 
@@ -1064,6 +1068,18 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       }
 
       return Collections.EMPTY_LIST;
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
    }
 
    @Override

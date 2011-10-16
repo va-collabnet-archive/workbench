@@ -1250,6 +1250,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       Collection<? extends RefexChronicleBI<?>> refexes      = getRefexes(refsetNid);
@@ -2362,6 +2374,18 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
               int refexNid)
               throws IOException {
          return ConceptComponent.this.getCurrentAnnotationMembers(xyz, refexNid);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+              throws IOException {
+         return getCurrentAnnotationMembers(xyz);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+              throws IOException {
+         return getCurrentAnnotationMembers(xyz, refexNid);
       }
 
       @Override

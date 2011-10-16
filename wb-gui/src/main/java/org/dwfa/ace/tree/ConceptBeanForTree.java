@@ -302,6 +302,16 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       return bean.getCurrentAnnotationMembers(xyz, refexNid);
    }
 
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return bean.getCurrentAnnotations(xyz);
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return bean.getCurrentAnnotations(xyz, refexNid);
+   }
+
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       return bean.getCurrentRefexMembers(xyz, refsetNid);
