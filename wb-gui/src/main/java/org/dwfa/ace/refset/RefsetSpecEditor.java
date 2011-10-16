@@ -333,6 +333,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
    }
 
    public void refresh() {
+      updatePanel();
+
       if (commentTableModel != null) {
          commentTableModel.fireTableDataChanged();
       }
@@ -352,6 +354,155 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
    public void unlink() {
       throw new UnsupportedOperationException();
+   }
+
+   public void updatePanel() {
+      I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
+
+      if (refset != null) {
+         RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
+
+         refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
+         computeTypeValueLabel.setText(spec.getComputeTypeString());
+
+         try {
+            boolean needsCompute = spec.needsCompute();
+
+            if (needsCompute) {
+               Long lastComputeTime = spec.getLastComputeTime();
+
+               if (lastComputeTime == null) {
+                  computeStatusValueLabel.setText("never computed");
+                  computeStatusValueLabel.setForeground(Color.red);
+               } else {
+                  computeStatusValueLabel.setText("modified since last compute");
+                  computeStatusValueLabel.setForeground(Color.red);
+               }
+            } else {
+               Long lastComputeTime = spec.getLastComputeTime();
+
+               if (lastComputeTime == null) {
+                  computeStatusValueLabel.setText("never  computed");
+                  computeStatusValueLabel.setForeground(Color.black);
+               } else {
+                  computeStatusValueLabel.setText("unmodified since last compute");
+                  computeStatusValueLabel.setForeground(Color.black);
+               }
+            }
+         } catch (Exception e) {
+            e.printStackTrace();
+            computeStatusValueLabel.setText("Unknown");
+            computeStatusValueLabel.setForeground(Color.red);
+            computeStatusValueLabel.setBorder(null);
+         }
+
+         try {
+            Long lastComputeTime = spec.getLastComputeTime();
+
+            if (lastComputeTime == null) {
+               lastComputeTimeValueLabel.setText("never");
+            } else {
+               lastComputeTimeValueLabel.setText("" + new Date(lastComputeTime));
+            }
+         } catch (Exception e) {
+            lastComputeTimeValueLabel.setText("Error fetching last compute time");
+            e.printStackTrace();
+         }
+
+         try {
+            Collection<? extends I_ExtendByRef> extensions =
+               Terms.get().getRefsetExtensionMembers(refset.getConceptNid());
+            int              count  = 0;
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(ace.getAceFrameConfig());
+
+            for (I_ExtendByRef ext : extensions) {
+               List<? extends I_ExtendByRefVersion> tuples =
+                  ext.getTuples(helper.getCurrentStatusIntSet(),
+                                ace.getAceFrameConfig().getViewPositionSetReadOnly(),
+                                ace.getAceFrameConfig().getPrecedence(),
+                                ace.getAceFrameConfig().getConflictResolutionStrategy());
+               I_ExtendByRefVersion latestTuple = null;
+
+               for (I_ExtendByRefVersion currentTuple : tuples) {
+                  if ((latestTuple == null) || (latestTuple.getVersion() > currentTuple.getVersion())) {
+                     latestTuple = currentTuple;
+                  }
+               }
+
+               if (latestTuple != null) {
+                  if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
+                     if (latestTuple.getRefsetId() == refset.getConceptNid()) {
+                        if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
+                           count++;
+                        }
+                     }
+                  }
+               }
+            }
+
+            memberCountValueLabel.setText("" + count);
+         } catch (Exception e) {
+            memberCountValueLabel.setText("Error computing member count");
+            e.printStackTrace();
+         }
+
+         if (leftTogglePane != null) {
+            leftTogglePane.validate();
+
+            if (leftTogglePane.getParent() != null) {
+               leftTogglePane.getParent().validate();
+            }
+         }
+      }
+
+      refsetSpecConcept = null;
+      tempComponent     = label.getTermComponent();
+
+      if (label.getTermComponent() != null) {
+         ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
+
+         if (tabHistoryList.size() == 0) {
+            tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+         } else if ((tabHistoryList.size() > 0)
+                    && (label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
+            tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
+         }
+
+         while (tabHistoryList.size() > 20) {
+            tabHistoryList.removeLast();
+         }
+      }
+
+      updateSpecTree(false);
+      commentTableModel.fireTableDataChanged();
+
+      if (treeHelper.getRenderer() != null) {
+         treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
+                 null, null));
+         treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView",
+                 null, null));
+         treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this,
+                 "highlightConflictsInTaxonomyView", null, null));
+         treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showViewerImagesInTaxonomy",
+                 null, null));
+         treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null, null));
+      } else {
+         AceLog.getAppLog().info("treeHelper.getRenderer() == null");
+      }
+
+      if (refsetTree.getRenderer() != null) {
+         refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
+                 null, null));
+         refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "variableHeightTaxonomyView",
+                 null, null));
+         refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this,
+                 "highlightConflictsInTaxonomyView", null, null));
+         refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "showViewerImagesInTaxonomy",
+                 null, null));
+         refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null, null));
+      } else {
+         AceLog.getAppLog().info("treeHelper.getRenderer() == null");
+      }
    }
 
    public synchronized void updateSpecTree(boolean clearSelection) {
@@ -663,20 +814,20 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
       inner.gridy--;
       inner.gridy--;
       inner.gridy--;
-      refsetStatusValueLabel = new JLabel("");
-      leftTogglePane.add(refsetStatusValueLabel, inner);
-      inner.gridy++;
-      computeTypeValueLabel = new JLabel("");
-      leftTogglePane.add(computeTypeValueLabel, inner);
-      inner.gridy++;
-      computeStatusValueLabel = new JLabel("");
-      leftTogglePane.add(computeStatusValueLabel, inner);
-      inner.gridy++;
       memberCountValueLabel = new JLabel("");
       leftTogglePane.add(memberCountValueLabel, inner);
       inner.gridy++;
       lastComputeTimeValueLabel = new JLabel("");
       leftTogglePane.add(lastComputeTimeValueLabel, inner);
+      inner.gridy++;
+      computeStatusValueLabel = new JLabel("");
+      leftTogglePane.add(computeStatusValueLabel, inner);
+      inner.gridy++;
+      computeTypeValueLabel = new JLabel("");
+      leftTogglePane.add(computeTypeValueLabel, inner);
+      inner.gridy++;
+      refsetStatusValueLabel = new JLabel("");
+      leftTogglePane.add(refsetStatusValueLabel, inner);
       outer.gridx++;
       outer.weightx = 1.0;
       outer.fill    = GridBagConstraints.HORIZONTAL;
@@ -1058,6 +1209,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
 
    private class FixedToggleChangeActionListener implements ActionListener, PropertyChangeListener {
+      @Override
       public void actionPerformed(ActionEvent e) {
          perform();
       }
@@ -1078,6 +1230,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
          }
       }
 
+      @Override
       public void propertyChange(PropertyChangeEvent arg0) {
          perform();
       }
@@ -1085,158 +1238,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
 
    private class LabelListener implements PropertyChangeListener {
+      @Override
       public void propertyChange(PropertyChangeEvent evt) {
-         I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
-
-         if (refset != null) {
-            RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
-
-            refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
-            computeTypeValueLabel.setText(spec.getComputeTypeString());
-
-            try {
-               boolean needsCompute = spec.needsCompute();
-
-               if (needsCompute) {
-                  Long lastComputeTime = spec.getLastComputeTime();
-
-                  if (lastComputeTime == null) {
-                     computeStatusValueLabel.setText("never computed");
-                     computeStatusValueLabel.setForeground(Color.red);
-                  } else {
-                     computeStatusValueLabel.setText("modified since last compute");
-                     computeStatusValueLabel.setForeground(Color.red);
-                  }
-               } else {
-                  Long lastComputeTime = spec.getLastComputeTime();
-
-                  if (lastComputeTime == null) {
-                     computeStatusValueLabel.setText("never  computed");
-                     computeStatusValueLabel.setForeground(Color.black);
-                  } else {
-                     computeStatusValueLabel.setText("unmodified since last compute");
-                     computeStatusValueLabel.setForeground(Color.black);
-                  }
-               }
-            } catch (Exception e) {
-               e.printStackTrace();
-               computeStatusValueLabel.setText("Unknown");
-               computeStatusValueLabel.setForeground(Color.black);
-               computeStatusValueLabel.setBorder(null);
-            }
-
-            try {
-               Long lastComputeTime = spec.getLastComputeTime();
-
-               if (lastComputeTime == null) {
-                  lastComputeTimeValueLabel.setText("never");
-               } else {
-                  lastComputeTimeValueLabel.setText("" + new Date(lastComputeTime));
-               }
-            } catch (Exception e) {
-               lastComputeTimeValueLabel.setText("Error fetching last compute time");
-               e.printStackTrace();
-            }
-
-            try {
-               Collection<? extends I_ExtendByRef> extensions =
-                  Terms.get().getRefsetExtensionMembers(refset.getConceptNid());
-               int              count  = 0;
-               I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(ace.getAceFrameConfig());
-
-               for (I_ExtendByRef ext : extensions) {
-                  List<? extends I_ExtendByRefVersion> tuples =
-                     ext.getTuples(helper.getCurrentStatusIntSet(),
-                                   ace.getAceFrameConfig().getViewPositionSetReadOnly(),
-                                   ace.getAceFrameConfig().getPrecedence(),
-                                   ace.getAceFrameConfig().getConflictResolutionStrategy());
-                  I_ExtendByRefVersion latestTuple = null;
-
-                  for (I_ExtendByRefVersion currentTuple : tuples) {
-                     if ((latestTuple == null) || (latestTuple.getVersion() > currentTuple.getVersion())) {
-                        latestTuple = currentTuple;
-                     }
-                  }
-
-                  if (latestTuple != null) {
-                     if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
-                        if (latestTuple.getRefsetId() == refset.getConceptNid()) {
-                           if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
-                              count++;
-                           }
-                        }
-                     }
-                  }
-               }
-
-               memberCountValueLabel.setText("" + count);
-            } catch (Exception e) {
-               memberCountValueLabel.setText("Error computing member count");
-               e.printStackTrace();
-            }
-
-            if (leftTogglePane != null) {
-               leftTogglePane.validate();
-
-               if (leftTogglePane.getParent() != null) {
-                  leftTogglePane.getParent().validate();
-               }
-            }
-         }
-
-         refsetSpecConcept = null;
-         tempComponent     = label.getTermComponent();
-
-         if (label.getTermComponent() != null) {
-            ace.getAceFrameConfig().setLastViewed((I_GetConceptData) label.getTermComponent());
-
-            if (tabHistoryList.size() == 0) {
-               tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
-            } else if ((tabHistoryList.size() > 0)
-                       && (label.getTermComponent().equals(tabHistoryList.getFirst()) == false)) {
-               tabHistoryList.addFirst((I_GetConceptData) label.getTermComponent());
-            }
-
-            while (tabHistoryList.size() > 20) {
-               tabHistoryList.removeLast();
-            }
-         }
-
-         updateSpecTree(false);
-         commentTableModel.fireTableDataChanged();
-
-         if (treeHelper.getRenderer() != null) {
-            treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
-                    null, null));
-            treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "variableHeightTaxonomyView", null, null));
-            treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "highlightConflictsInTaxonomyView", null, null));
-            treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "showViewerImagesInTaxonomy", null, null));
-            treeHelper.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null,
-                    null));
-         } else {
-            AceLog.getAppLog().info("treeHelper.getRenderer() == null");
-         }
-
-         if (refsetTree.getRenderer() != null) {
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "showRefsetInfoInTaxonomy",
-                    null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "variableHeightTaxonomyView", null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "highlightConflictsInTaxonomyView", null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this,
-                    "showViewerImagesInTaxonomy", null, null));
-            refsetTree.getRenderer().propertyChange(new PropertyChangeEvent(this, "refsetsToShow", null,
-                    null));
-         } else {
-            AceLog.getAppLog().info("treeHelper.getRenderer() == null");
-         }
-
+         updatePanel();
          firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-         refsetSpecPanel.refresh();
       }
    }
 
