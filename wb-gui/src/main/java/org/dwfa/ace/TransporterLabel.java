@@ -39,6 +39,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 import javax.swing.Action;
@@ -49,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
@@ -60,21 +62,25 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
 
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.concurrent.future.FutureHelper;
 
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.taxonomy.path.PathExpander;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
 import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class TransporterLabel extends JLabel implements I_ContainTermComponent, ActionListener {
 
     private I_AmTermComponent termComponent;
-
     private ACE ace;
 
     private class MyFocusListener implements FocusListener {
@@ -86,7 +92,6 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
         public void focusLost(FocusEvent arg0) {
             setBorder(plainBorder);
         }
-
     }
 
     private class TermLabelDragSourceListener implements DragSourceListener {
@@ -128,25 +133,21 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
             Image dragImage = getDragImage();
             Point imageOffset = new Point(0, 0);
             try {
-				dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
-				    (I_GetConceptData) termComponent), dsl);
-			} catch (InvalidDnDOperationException e) {
+                dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, new ConceptTransferable(
+                        (I_GetConceptData) termComponent), dsl);
+            } catch (InvalidDnDOperationException e) {
                 AceLog.getAppLog().log(Level.WARNING, e.getMessage(), e);
                 AceLog.getAppLog().log(Level.INFO, "Resetting SunDragSourceContextPeer [5]");
                 SunDragSourceContextPeer.setDragDropInProgress(false);
-			}
+            }
         }
     }
-
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-
     Border focusBorder = BorderFactory.createLoweredBevelBorder();
-
     Border plainBorder = BorderFactory.createRaisedBevelBorder();
-
     JPopupMenu popup;
 
     public TransporterLabel(Icon image, ACE ace) {
@@ -174,12 +175,11 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
             public void mouseReleased(MouseEvent e) {
                 TransporterLabel.this.requestFocusInWindow();
             }
-
         });
         setTransferHandler(new TerminologyTransferHandler(this));
 
         DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
-            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
+                new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
         ActionMap map = this.getActionMap();
         map.put(TransferHandler.getCutAction().getValue(Action.NAME), TransferHandler.getCutAction());
@@ -222,7 +222,6 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
     public JToggleButton getToggle() {
         return null;
     }
-
     private boolean onByDefault = true;
 
     public boolean isOnByDefault() {
@@ -242,7 +241,6 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
 
     @Override
     public void setText(String text) {
-
     }
 
     @Override
@@ -268,14 +266,30 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Show in taxonomy")) {
             try {
-                PathExpander epl = new PathExpander(this.ace.getTree(), this.ace.getAceFrameConfig(),
-                    (ConceptChronicleBI) termComponent);
-                this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
-                FutureHelper.addFuture(ACE.threadPool.submit(epl));
+                I_IntSet roots = this.ace.getAceFrameConfig().getRoots();
+                ArrayList<Integer> possibleRoots = new ArrayList<Integer>();
+                possibleRoots.add(Terms.get().uuidToNative(Taxonomies.QUEUE_TYPE.getUuids()));
+                possibleRoots.add(Terms.get().uuidToNative(Taxonomies.REFSET_AUX.getUuids()));
+                possibleRoots.add(Terms.get().uuidToNative(Taxonomies.SNOMED.getUuids()));
+                possibleRoots.add(Terms.get().uuidToNative(Taxonomies.WB_AUX.getUuids()));
+
+                if (possibleRoots.contains(termComponent.getNid()) && !roots.contains(termComponent.getNid())) {
+                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "<html>Missing root: " + termComponent.toUserString()+
+                            "<br>Please add root to preferences before viewing in taxonomy.", "",
+                        JOptionPane.ERROR_MESSAGE);
+                } else {
+                    PathExpander epl = new PathExpander(this.ace.getTree(), this.ace.getAceFrameConfig(),
+                            (ConceptChronicleBI) termComponent);
+                    this.ace.getAceFrameConfig().setHierarchySelection((I_GetConceptData) termComponent);
+                    FutureHelper.addFuture(ACE.threadPool.submit(epl));
+                }
             } catch (IOException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
+            } catch (TerminologyException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
             }
-         } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
+        } else if (e.getActionCommand().equals("Put in Concept Tab L-1")) {
             I_HostConceptPlugins viewer = this.ace.getAceFrameConfig().getConceptViewer(5);
             viewer.setTermComponent(termComponent);
         } else if (e.getActionCommand().equals("Put in Concept Tab R-1")) {
@@ -297,8 +311,8 @@ public class TransporterLabel extends JLabel implements I_ContainTermComponent, 
         }
     }
 
-	@Override
-	public void unlink() {
-		// nothing to do...
-	}
+    @Override
+    public void unlink() {
+        // nothing to do...
+    }
 }
