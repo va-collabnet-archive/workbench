@@ -1326,7 +1326,7 @@ public class WorkflowHelper {
 		wfCapabilitiesAvailable = val;
 	}
 
-	public static boolean isWorkflowCapabilitiesAvailable() {
+	public static boolean isWorkflowCapabilityAvailable() {
 		return wfCapabilitiesAvailable;
 	}
 

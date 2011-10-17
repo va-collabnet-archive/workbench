@@ -28,6 +28,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * Read a binary change set, and apply the results of that change set to the
@@ -91,8 +92,10 @@ public class BinaryChangeSetRead extends AbstractMojo {
             }
             reader.read();
 
-            I_ReadChangeSet wfReader = termFactory.newWfHxLuceneChangeSetReader(new File(changeSetDir, changeSetFileName));
-            wfReader.read();
+            if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+            	I_ReadChangeSet wfReader = termFactory.newWfHxLuceneChangeSetReader(new File(changeSetDir, changeSetFileName));
+            	wfReader.read();
+            }
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }

@@ -26,6 +26,7 @@ import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -409,9 +410,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
                csr.read();
 
-               I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
+               if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+            	   I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
 
-               wcsr.read();
+            	   wcsr.read();
+               } 
             } finally {
                Terms.get().resumeChangeSetWriters();
             }

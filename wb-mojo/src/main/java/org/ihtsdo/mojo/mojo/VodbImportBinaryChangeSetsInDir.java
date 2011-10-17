@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.ihtsdo.mojo.maven.MojoUtil;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * 
@@ -89,8 +90,10 @@ public class VodbImportBinaryChangeSetsInDir extends AbstractMojo {
                     I_ReadChangeSet reader = termFactoryImpl.newBinaryChangeSetReader(csf);
                     reader.read();
 
-                    I_ReadChangeSet wfReader = termFactoryImpl.newWfHxLuceneChangeSetReader(csf);
-                    wfReader.read();
+                    if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+                    	I_ReadChangeSet wfReader = termFactoryImpl.newWfHxLuceneChangeSetReader(csf);
+                    	wfReader.read();
+                    }
                 }
             } else {
                 getLog().info("No change sets found.");

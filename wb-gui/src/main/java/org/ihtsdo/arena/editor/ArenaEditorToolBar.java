@@ -140,7 +140,7 @@ public class ArenaEditorToolBar extends JToolBar
 	        JTabbedPane tp = ace.getCdePanel().getConceptTabs();
 	        int index = tp.getSelectedIndex();
 			
-			if (WorkflowHelper.isWorkflowCapabilitiesAvailable() && isAutoApprovalAvailable(index, config.getViewCoordinate())) {
+			if (WorkflowHelper.isWorkflowCapabilityAvailable() && isAutoApprovalAvailable(index, config.getViewCoordinate())) {
 		        add(autoApproval);
 			}
 		} catch (Exception e) {
