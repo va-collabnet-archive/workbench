@@ -85,8 +85,6 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -277,40 +275,14 @@ public class RedoConcept extends PreviousNextOrCancel {
             if (returnCondition == Condition.CONTINUE) {
                 createBlueprintConcept();
                 //get rf1 or rf2 versions
-                if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    gbRefexConcept = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient();
-                    gbUuid = gbRefexConcept.getPrimUuid();
-                } else {
-                    gbRefexConcept = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient();
-                    gbUuid = gbRefexConcept.getPrimUuid();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    usRefexConcept = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient();
-                    usUuid = usRefexConcept.getPrimUuid();
-                } else {
-                    usRefexConcept = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient();
-                    usUuid = usRefexConcept.getPrimUuid();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid())) {
-                    acceptableConcept = SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient();
-                } else {
-                    acceptableConcept = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getLenient();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid())) {
-                    preferredConcept = SnomedMetadataRf2.PREFERRED_RF2.getLenient();
-                } else {
-                    preferredConcept = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid())) {
-                    fsnConcept = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient();
-                } else {
-                    fsnConcept = SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid())) {
-                    synConcept = SnomedMetadataRf2.SYNONYM_RF2.getLenient();
-                } else {
-                    synConcept = SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient();
-                }
+                gbRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                gbUuid = gbRefexConcept.getPrimUuid();
+                usRefexConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                usUuid = usRefexConcept.getPrimUuid();
+                acceptableConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+                preferredConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_PREFERRED_NID());
+                fsnConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
+                synConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
 
                 //create blueprints
                 if (lang.equals("en")) {

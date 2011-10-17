@@ -12,14 +12,9 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.Refsets;
-import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -28,8 +23,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
@@ -59,19 +52,9 @@ public class MakeAcceptableAction extends AbstractAction {
                     desc.getCurrentRefexes(vc);
 
             if (dialect.equals("en-us")) {
-                int evalRefsetNid = 0;
-                if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    evalRefsetNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
-                } else{
-                    evalRefsetNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
-                }
+                int evalRefsetNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
                 
-                int acceptabilityNid = 0;
-                if (Ts.get().hasUuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid())) {
-                    acceptabilityNid = SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid();
-                } else{
-                    acceptabilityNid = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getLenient().getNid();
-                }
+                int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
                 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
@@ -110,19 +93,9 @@ public class MakeAcceptableAction extends AbstractAction {
                     }
                 }
             } else if (dialect.equals("en-gb")) {
-                int evalRefsetNid = 0;
-                if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    evalRefsetNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
-                } else{
-                    evalRefsetNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
-                }
+                int evalRefsetNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
                 
-                int acceptabilityNid = 0;
-                if (Ts.get().hasUuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid())) {
-                    acceptabilityNid = SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid();
-                } else{
-                    acceptabilityNid = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getLenient().getNid();
-                }
+                int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
                 
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
