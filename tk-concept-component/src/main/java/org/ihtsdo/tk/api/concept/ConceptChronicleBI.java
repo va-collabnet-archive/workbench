@@ -46,6 +46,15 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
 
    Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc) throws IOException;
 
+   /**
+     * Retrieves tuples matching the specified view coordinate
+     * 
+     * @param cuttoffTime
+     *          cutoff time to match tuples, tuples with a time greater than
+     *          cutoff will no be returned
+     * @return List of matching tuples
+     * @throws TerminologyException
+     */
    public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cutoffTime)
            throws IOException;
 

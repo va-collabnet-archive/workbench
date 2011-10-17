@@ -77,7 +77,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
-     * @param time
+     * @param cuttoffTime
      *          cutoff time to match tuples, tuples with a time greater than
      *          cutoff will no be returned
      * @return List of matching tuples
@@ -85,7 +85,7 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      */
     public List<? extends I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
             PositionSetBI positions, Precedence precedencePolicy,
-            ContradictionManagerBI contradictionManager, long time)
+            ContradictionManagerBI contradictionManager, long cuttoffTime)
             throws IOException, TerminologyException;
 
     /**
@@ -131,14 +131,14 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
      * @param returnConflictResolvedLatestState
      *            indicates if all tuples or just the latest state using the
      *            current profile's conflict resolution strategy is required
-     * @param time
+     * @param cuttoffTime
      *          cutoff time to match tuples, tuples with a time greater than
      *          cutoff will no be returned
      * @return List of matching tuples
      */
     public List<? extends I_DescriptionTuple> getDescriptionTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positionSet, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
-            long time)
+            long cuttoffTime)
             throws IOException;
 
     /**
@@ -213,6 +213,22 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
     public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws IOException, TerminologyException;
+    /**
+     * Retrieves tuples matching the specified allowedStatuses and positions
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param positions
+     *            positions a tuple must be on to be returned
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @param cuttoffTime
+     *          cutoff time to match tuples, tuples with a time greater than
+     *          cutoff will no be returned
+     * @return List of matching tuples
+     * @throws TerminologyException
+     */
     
      public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
            PositionSetBI positions, Precedence precedencePolicy, 
@@ -224,6 +240,23 @@ public interface I_GetConceptData extends I_AmTermComponent, ConceptChronicleBI 
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
             int classifierNid, RelAssertionType relAssertionType)
             throws IOException, TerminologyException;
+    
+    /**
+     * Retrieves tuples matching the specified allowedStatuses and positions
+     * 
+     * @param allowedStatus
+     *            statuses tuples must match to be returned
+     * @param positions
+     *            positions a tuple must be on to be returned
+     * @param returnConflictResolvedLatestState
+     *            indicates if all tuples or just the latest state using the
+     *            current profile's conflict resolution strategy is required
+     * @param cuttoffTime
+     *          cutoff time to match tuples, tuples with a time greater than
+     *          cutoff will no be returned
+     * @return List of matching tuples
+     * @throws TerminologyException
+     */
     
      public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
