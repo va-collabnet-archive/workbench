@@ -19,19 +19,24 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.DescTypeToRender;
+import org.ihtsdo.taxonomy.model.ChildNodeFilterBI;
+import org.ihtsdo.taxonomy.model.NodeFactory;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
+import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 //~--- JDK imports ------------------------------------------------------------
 
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -50,8 +55,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -84,6 +87,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    private I_ConfigAceFrame     aceFrameConfig;
    private ActivityPanel        activity;
    private RelAssertionType     assertionType;
+   private ChildNodeFilterBI    childNodeFilter;
    private JButton              fsnPreferredButton;
    private String               helperName;
    private TaxonomyModel        model;
@@ -97,19 +101,22 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
    //~--- constructors --------------------------------------------------------
 
-   public TaxonomyHelper(I_ConfigAceFrame config, String helperName) {
+   public TaxonomyHelper(I_ConfigAceFrame config, String helperName, ChildNodeFilterBI childNodeFilter) {
       super();
       this.aceFrameConfig = config;
       this.assertionType  = config.getRelAssertionType();
       Ts.get().addTermChangeListener(this);
-      this.helperName = helperName;
+      this.helperName      = helperName;
+      this.childNodeFilter = childNodeFilter;
       this.aceFrameConfig.addPropertyChangeListener(this);
    }
 
    //~--- methods -------------------------------------------------------------
 
    public synchronized void addMouseListener(MouseListener ml) {
-      tree.addMouseListener(ml);
+      if (tree != null) {
+         tree.addMouseListener(ml);
+      }
    }
 
    public void addTreeSelectionListener(TreeSelectionListener tsl) {
@@ -136,7 +143,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                   PathExpander expander = new PathExpander(tree, aceFrameConfig,
                                              Ts.get().getConcept(selectedNode.getCnid()));
 
-                  model.nodeFactory.pathExpanderExecutors.execute(expander);
+                  model.getNodeFactory().pathExpanderExecutors.execute(expander);
                } catch (IOException ex) {
                   AceLog.getAppLog().alertAndLogException(ex);
                }
@@ -162,7 +169,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    }
 
    private void handleRelTypeChange() {
-      ViewCoordinate vc = model.ts.getViewCoordinate();
+      ViewCoordinate vc = model.getTs().getViewCoordinate();
 
       switch (assertionType) {
       case INFERRED :
@@ -170,7 +177,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setIcon(inferredThenStatedView);
          statedInferredButton.setToolTipText("showing inferred then stated, toggle to show stated...");
          vc.setRelAssertionType(assertionType);
-         model.ts = Ts.get().getSnapshot(vc);
+         model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from stated to inferred then stated");
 
          break;
@@ -180,7 +187,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setIcon(statedView);
          statedInferredButton.setToolTipText("showing stated, toggle to show inferred...");
          vc.setRelAssertionType(assertionType);
-         model.ts = Ts.get().getSnapshot(vc);
+         model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from inferred to stated");
 
          break;
@@ -190,7 +197,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          statedInferredButton.setIcon(inferredView);
          statedInferredButton.setToolTipText("showing inferred, toggle to show inferred then stated...");
          vc.setRelAssertionType(assertionType);
-         model.ts = Ts.get().getSnapshot(vc);
+         model.setTs(Ts.get().getSnapshot(vc));
          updateNewModel("changed from stated to inferred");
 
          break;
@@ -241,7 +248,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       for (int i = 0; i < childCount; i++) {
     	  TaxonomyNode childNode = (TaxonomyNode) model.getChild(root, i);
 
-         model.nodeFactory.removeDescendents(childNode);
+         model.getNodeFactory().removeDescendents(childNode);
 
          TreePath tp = new TreePath(NodePath.getTreePath(model, childNode));
 
@@ -256,7 +263,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       try {
          model.unLink();
          model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
-                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree,
+                                   childNodeFilter);
          model.addTreeWillExpandListener(tree);
          expandToLastSelection();
       } catch (IOException ex) {
@@ -290,7 +298,8 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       tree     = new TaxonomyTree(aceFrameConfig, this);
       renderer = new TaxonomyNodeRenderer(aceFrameConfig, this);
       model    = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
-                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree);
+                                   new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree,
+                                   childNodeFilter);
       tree.putClientProperty("JTree.lineStyle", "None");
       tree.setLargeModel(true);
 
@@ -398,13 +407,25 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
 
       view.setHorizontalAlignment(SwingConstants.LEFT);
       buttonPanel.add(view, c);
+      buttonPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0),
+              BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                 Color.LIGHT_GRAY), BorderFactory.createEmptyBorder(0, 0, 2, 0))));
       treeView.setColumnHeaderView(buttonPanel);
+
+      JPanel corner = new JPanel();
+
+      corner.setBackground(Color.WHITE);
+      corner.setOpaque(true);
+      corner.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0),
+              BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                 Color.LIGHT_GRAY), BorderFactory.createEmptyBorder(0, 0, 2, 0))));
+      treeView.setCorner(JScrollPane.UPPER_RIGHT_CORNER, corner);
 
       return treeView;
    }
 
    NodeFactory getNodeFactory() {
-      return model.nodeFactory;
+      return model.getNodeFactory();
    }
 
    public NodeStore getNodeStore() {
@@ -449,20 +470,18 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       @Override
       protected List<TaxonomyNode> doInBackground() throws Exception {
          List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
-         IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
-         TerminologyStoreDI ts                 = Ts.get();
 
          for (Entry<Long, TaxonomyNode> entry : model.getNodeStore().nodeMap.entrySet()) {
             TaxonomyNode oldNode = entry.getValue();
 
             if (oldNode.getCnid() != Integer.MAX_VALUE) {
                TaxonomyNode newNode =
-                  model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
-                                             oldNode.getParentNid(),
-                                             model.getNodeStore().get(oldNode.parentNodeId));
+                  model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getCnid()),
+                                                  oldNode.getParentNid(),
+                                                  model.getNodeStore().get(oldNode.parentNodeId));
 
                if (oldNode.childrenAreSet()) {
-                  CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
+                  CountDownLatch latch = model.getNodeFactory().makeChildNodes(newNode);
 
                   latch.await();
                }
@@ -554,46 +573,58 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
          IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
          TerminologyStoreDI ts                 = Ts.get();
 
-         for (int changedComponentNid : changedComponents) {
-            processComponentNid(ts, changedComponentNid, changedConcepts);
+         if (model == null) {
+            return contentChangedList;
          }
 
-         for (int changedComponentNid : changedXrefs) {
-            processComponentNid(ts, changedComponentNid, changedConcepts);
+         if (changedConcepts != null) {
+            for (int changedComponentNid : changedComponents) {
+               processComponentNid(ts, changedComponentNid, changedConcepts);
+            }
          }
 
-         for (Long nodeId : nodesToChange) {
-            TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
-            TaxonomyNode newNode = model.nodeFactory.makeNode(model.ts.getConceptVersion(oldNode.getCnid()),
-                                      oldNode.getParentNid(), model.getNodeStore().get(oldNode.parentNodeId));
-            boolean childrenChanged = false;
-
-            if (oldNode.childrenAreSet()) {
-               CountDownLatch latch = model.nodeFactory.makeChildNodes(newNode);
-
-               latch.await();
+         if (changedXrefs != null) {
+            for (int changedComponentNid : changedXrefs) {
+               processComponentNid(ts, changedComponentNid, changedConcepts);
             }
+         }
 
-            boolean contentChanged = !newNode.getText().equals(oldNode.getText());
-            boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
-                                     ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
+         if (model != null) {
+            for (Long nodeId : nodesToChange) {
+               TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
+               TaxonomyNode newNode =
+                  model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getCnid()),
+                                                  oldNode.getParentNid(),
+                                                  model.getNodeStore().get(oldNode.parentNodeId));
+               boolean childrenChanged = false;
 
-            if (parentsChanged) {
+               if (oldNode.childrenAreSet()) {
+                  CountDownLatch latch = model.getNodeFactory().makeChildNodes(newNode);
 
-               //
-            }
+                  latch.await();
+               }
 
-            if (childrenChanged) {
-               NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
-                                               newNode);
+               boolean contentChanged = !newNode.getText().equals(oldNode.getText());
+               boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
+                                        ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
 
-               publish(changeRec);
+               if (parentsChanged) {
 
-               //
-            }
+                  //
+               }
 
-            if (contentChanged) {
-               contentChangedList.add(newNode);
+               if (childrenChanged) {
+                  NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
+                                                  newNode);
+
+                  publish(changeRec);
+
+                  //
+               }
+
+               if (contentChanged) {
+                  contentChangedList.add(newNode);
+               }
             }
          }
 
@@ -643,7 +674,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
               throws IOException {
          int cnid = ts.getConceptNidForNid(changedComponentNid);
 
-         if (cnid > Integer.MIN_VALUE) {
+         if ((cnid > Integer.MIN_VALUE) && (cnid < Integer.MAX_VALUE) && (model != null)) {
             Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
 
             if (!nodeIds.isEmpty()) {

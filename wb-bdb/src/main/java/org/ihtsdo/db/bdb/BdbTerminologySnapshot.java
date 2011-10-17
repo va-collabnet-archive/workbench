@@ -3,13 +3,7 @@ package org.ihtsdo.db.bdb;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.concept.ConceptVersion;
-import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
-import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -111,6 +105,12 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
 
    @Override
+   public ComponentVersionBI getComponentVersion(ComponentContainerBI cc)
+           throws IOException, ContraditionException {
+      return getComponentVersion(cc.getNid());
+   }
+
+   @Override
    public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException {
       return store.getComponentVersion(vc, nid);
    }
@@ -128,6 +128,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    @Override
    public ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException {
       return new ConceptVersion(Bdb.getConcept(Bdb.uuidsToNid(uuids)), vc);
+   }
+
+   @Override
+   public ConceptVersionBI getConceptVersion(ConceptContainerBI cc) throws IOException {
+      return getConceptVersion(cc.getCnid());
    }
 
    @Override

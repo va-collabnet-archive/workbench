@@ -104,6 +104,7 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.hash.Hashcode;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -120,6 +121,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.logging.Level;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
    public static ReferenceType                                refType      = ReferenceType.WEAK;
@@ -656,7 +658,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                        Ts.get().getConceptNidForNid(cc.getNid())));
             }
          } else {
-            cantResolve.add(er);
+
+            // tmp fix hook
+            if (!er.getRefsetUuid().equals(WorkflowHelper.getWorkflowRefsetUid())
+                    &&!er.getComponentUuid().equals(WorkflowHelper.getWorkflowRefsetUid())) {
+               cantResolve.add(er);
+            } else {
+               AceLog.getAppLog().log(
+                   Level.WARNING,
+                   ("Unable to add to workflow history refset bad changes set member due to bad refCompUid: "
+                    + er.getComponentUuid()));
+            }
          }
       }
 
@@ -1042,9 +1054,42 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate vc)
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate vc)
            throws IOException {
-      return getConceptAttributes().getCurrentAnnotations(vc);
+      return getConceptAttributes().getCurrentAnnotationMembers(vc);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      if (getConceptAttributes() != null) {
+         return getConceptAttributes().getCurrentAnnotationMembers(xyz, refexNid);
+      }
+
+      return Collections.EMPTY_LIST;
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      if (getConceptAttributes() != null) {
+         return getConceptAttributes().getCurrentRefexMembers(xyz, refsetNid);
+      }
+
+      return new ArrayList<RefexVersionBI<?>>(0);
    }
 
    @Override
@@ -1057,13 +1102,26 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
+   @Deprecated
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      if (getConceptAttributes() != null) {
-         return getConceptAttributes().getCurrentRefexes(xyz, refsetNid);
+      return getCurrentRefexMembers(xyz, refsetNid);
+   }
+
+   @Override
+   public RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+           throws IOException {
+      if (isCanceled()) {
+         return null;
       }
 
-      return new ArrayList<RefexVersionBI<?>>(0);
+      RefexChronicleBI<?> member = getRefsetMemberForComponent(componentNid);
+
+      for (RefexVersionBI version : member.getVersions(vc)) {
+         return version;
+      }
+
+      return null;
    }
 
    @Override
@@ -1701,6 +1759,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      return getRefexes(refsetNid);
+   }
+
    private I_DescriptionTuple getRefexSpecifiedDesc(
            Collection<I_DescriptionTuple<DescriptionRevision>> descriptions, NidListBI typePrefOrder,
            NidListBI langRefexOrder, NidSetBI allowedStatus, PositionSetBI positionSet)
@@ -1753,6 +1816,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    public RefsetMember<?, ?> getRefsetMember(int memberNid) throws IOException {
       return data.getRefsetMember(memberNid);
+   }
+
+   @Override
+   public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException {
+      if (isCanceled()) {
+         return null;
+      }
+
+      return data.getRefsetMemberForComponent(componentNid);
    }
 
    @Override
@@ -2256,6 +2328,41 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
    private long getWriteVersion() {
       return data.getLastWrite();
+   }
+
+   @Override
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refexNid) throws IOException {
+      if (getConceptAttributes() != null) {
+         return getConceptAttributes().hasCurrentAnnotationMember(xyz, refexNid);
+      }
+
+      return false;
+   }
+
+   @Override
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      if (getConceptAttributes() != null) {
+         return getConceptAttributes().hasCurrentRefexMember(xyz, refsetNid);
+      }
+
+      return false;
+   }
+
+   @Override
+   public boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException {
+      if (isCanceled()) {
+         return false;
+      }
+
+      RefsetMember<?, ?> member = getRefsetMemberForComponent(componentNid);
+
+      if (member != null) {
+         for (RefexVersionBI v : member.getVersions(vc)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    public boolean hasExtensionsForComponent(int nid) throws IOException {

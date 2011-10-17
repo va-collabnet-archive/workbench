@@ -1,14 +1,15 @@
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+* To change this template, choose Tools | Templates
+* and open the template in the editor.
  */
 package org.ihtsdo.taxonomy.nodes;
 
 //~--- non-JDK imports --------------------------------------------------------
-import org.dwfa.ace.I_ImplementTaxonomyTreeNode;
-import org.ihtsdo.taxonomy.TaxonomyModel;
+
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.TaxonomyNodeRenderer.NodeIcon;
+import org.ihtsdo.tk.api.ConceptContainerBI;
 import org.ihtsdo.tk.hash.Hashcode;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -26,153 +27,159 @@ import java.util.List;
  *
  * @author kec
  */
-public abstract class TaxonomyNode implements I_ImplementTaxonomyTreeNode {
+public abstract class TaxonomyNode implements ConceptContainerBI {
+   static Collection<Long> empty = Collections.unmodifiableCollection(new ArrayList<Long>());
 
-    static Collection<Long> empty = Collections.unmodifiableCollection(new ArrayList<Long>());
-    //~--- fields --------------------------------------------------------------
-    String text = "-";
-    private final int hash;
-    private NodeIcon icon;
-    public final long nodeId;
-    protected long[] nodesToCompare;
-    public final long parentNodeId;
-    private List<Color> pathColors;
-    protected Comparable sortComparable;
+   //~--- fields --------------------------------------------------------------
 
-    //~--- constructors --------------------------------------------------------
-    public TaxonomyNode(int cnid, int parentNid, long parentNodeId) {
-        nodeId = TaxonomyModel.getNodeId(cnid, parentNid);
-        nodesToCompare = new long[]{nodeId, Long.MAX_VALUE};
-        assert nodeId != parentNodeId;
-        this.parentNodeId = parentNodeId;
-        hash = Hashcode.compute(cnid, parentNid);
-    }
+   String               text = "-";
+   private final int    hash;
+   private NodeIcon     icon;
+   public final long    nodeId;
+   protected long[]     nodesToCompare;
+   public final long    parentNodeId;
+   private List<Color>  pathColors;
+   protected Comparable sortComparable;
 
-    //~--- methods -------------------------------------------------------------
-    public abstract boolean addChild(TaxonomyNode child);
+   //~--- constructors --------------------------------------------------------
 
-    public abstract void addExtraParent(TaxonomyNode extraParent);
+   public TaxonomyNode(int cnid, int parentNid, long parentNodeId) {
+      nodeId         = TaxonomyModel.getNodeId(cnid, parentNid);
+      nodesToCompare = new long[] { nodeId, Long.MAX_VALUE };
+      assert nodeId != parentNodeId;
+      this.parentNodeId = parentNodeId;
+      hash              = Hashcode.compute(cnid, parentNid);
+   }
 
-    public abstract boolean childrenAreSet();
+   //~--- methods -------------------------------------------------------------
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TaxonomyNode) {
-            return this.nodeId == ((TaxonomyNode) obj).nodeId;
-        }
+   public abstract boolean addChild(TaxonomyNode child);
 
-        return false;
-    }
+   public abstract void addExtraParent(TaxonomyNode extraParent);
 
-    @Override
-    public int hashCode() {
-        return hash;
-    }
+   public abstract boolean childrenAreSet();
 
-    @Override
-    public String toString() {
-        return text;
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj instanceof TaxonomyNode) {
+         return this.nodeId == ((TaxonomyNode) obj).nodeId;
+      }
 
-    //~--- get methods ---------------------------------------------------------
-    public abstract Collection<Long> getChildren();
+      return false;
+   }
 
-    public int getCnid() {
-        return TaxonomyModel.getCnid(nodeId);
-    }
+   @Override
+   public int hashCode() {
+      return hash;
+   }
 
-    public abstract Collection<Long> getExtraParents();
+   @Override
+   public String toString() {
+      return text;
+   }
 
-    public abstract TaxonomyNode getFinalNode();
+   //~--- get methods ---------------------------------------------------------
 
-    public NodeIcon getIcon() {
-        return icon;
-    }
+   public abstract Collection<Long> getChildren();
 
-    public int getIndex(long childNodeId) {
-        int index = 0;
+   @Override
+   public int getCnid() {
+      return TaxonomyModel.getCnid(nodeId);
+   }
 
-        for (Long childNodeId2 : getChildren()) {
-            if (childNodeId2 == childNodeId) {
-                return index;
-            }
+   public abstract Collection<Long> getExtraParents();
 
-            index++;
-        }
+   public abstract TaxonomyNode getFinalNode();
 
-        return -1;
-    }
+   public NodeIcon getIcon() {
+      return icon;
+   }
 
-    public long getNodeId() {
-        return nodeId;
-    }
+   public int getIndex(long childNodeId) {
+      int index = 0;
 
-    public long[] getNodesToCompare() {
-        return nodesToCompare;
-    }
+      for (Long childNodeId2 : getChildren()) {
+         if (childNodeId2 == childNodeId) {
+            return index;
+         }
 
-    public int getParentDepth() {
-        return 0;
-    }
+         index++;
+      }
 
-    public int getParentNid() {
-        return TaxonomyModel.getParentNid(nodeId);
-    }
+      return -1;
+   }
 
-    public List<Color> getPathColors() throws IOException {
-        if (pathColors == null) {
-            return new ArrayList(0);
-        }
+   public long getNodeId() {
+      return nodeId;
+   }
 
-        return pathColors;
-    }
+   public long[] getNodesToCompare() {
+      return nodesToCompare;
+   }
 
-    public Comparable getSortComparable() {
-        return sortComparable;
-    }
+   public int getParentDepth() {
+      return 0;
+   }
 
-    public String getText() {
-        return text;
-    }
+   public int getParentNid() {
+      return TaxonomyModel.getParentNid(nodeId);
+   }
 
-    public abstract boolean hasExtraParents();
+   public List<Color> getPathColors() throws IOException {
+      if (pathColors == null) {
+         return new ArrayList(0);
+      }
 
-    public abstract boolean isLeaf();
+      return pathColors;
+   }
 
-    public boolean isSecondaryParentNode() {
-        return false;
-    }
+   public Comparable getSortComparable() {
+      return sortComparable;
+   }
 
-    public abstract boolean isSecondaryParentOpened();
+   public String getText() {
+      return text;
+   }
 
-    //~--- set methods ---------------------------------------------------------
-    public void setHasExtraParents(boolean b) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+   public abstract boolean hasExtraParents();
 
-    public void setIcon(NodeIcon icon) {
-        this.icon = icon;
-    }
+   public abstract boolean isLeaf();
 
-    public void setNodesToCompare(long[] nodesToCompare) {
-        this.nodesToCompare = nodesToCompare;
-    }
+   public boolean isSecondaryParentNode() {
+      return false;
+   }
 
-    public void setParentDepth(int depth) {
-        throw new UnsupportedOperationException();
-    }
+   public abstract boolean isSecondaryParentOpened();
 
-    public void setPathColors(List<Color> pathColors) throws IOException {
-        this.pathColors = pathColors;
-    }
+   //~--- set methods ---------------------------------------------------------
 
-    public abstract void setSecondaryParentOpened(boolean secondaryParentOpened);
+   public void setHasExtraParents(boolean b) {
+      throw new UnsupportedOperationException("Not yet implemented");
+   }
 
-    public void setSortComparable(Comparable sortComparable) {
-        this.sortComparable = sortComparable;
-    }
+   public void setIcon(NodeIcon icon) {
+      this.icon = icon;
+   }
 
-    public void setText(String text) {
-        this.text = text;
-    }
+   public void setNodesToCompare(long[] nodesToCompare) {
+      this.nodesToCompare = nodesToCompare;
+   }
+
+   public void setParentDepth(int depth) {
+      throw new UnsupportedOperationException();
+   }
+
+   public void setPathColors(List<Color> pathColors) throws IOException {
+      this.pathColors = pathColors;
+   }
+
+   public abstract void setSecondaryParentOpened(boolean secondaryParentOpened);
+
+   public void setSortComparable(Comparable sortComparable) {
+      this.sortComparable = sortComparable;
+   }
+
+   public void setText(String text) {
+      this.text = text;
+   }
 }

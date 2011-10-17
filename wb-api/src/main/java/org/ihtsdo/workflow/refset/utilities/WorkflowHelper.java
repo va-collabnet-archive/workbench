@@ -94,9 +94,10 @@ public class WorkflowHelper {
 	
 	private static UUID overrideActionUid = null;
 
-	private static int wfHistoryRefsetId = 0;
+	private static int wfHistoryRefsetNid = 0;
+	private static UUID wfHistoryRefsetUid = null;
 	private static boolean advancingWorkflowLock = false;
-	private static boolean wfCapabilitiesAvailable = false;
+	private static boolean wfCapabilitiesAvailable = true;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -1326,19 +1327,32 @@ public class WorkflowHelper {
 		return wfCapabilitiesAvailable;
 	}
 
+	public static UUID getWorkflowRefsetUid() {
+		if (wfHistoryRefsetUid == null) {
+			
+			try {
+				wfHistoryRefsetUid = RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid();
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.INFO, "Unable to access Workflow History Refset");
+			}
+		}
+
+		return wfHistoryRefsetUid;
+	}
+
 	public static int getWorkflowRefsetNid() {
-		if (wfHistoryRefsetId != 0) {
-			return wfHistoryRefsetId;
+		if (wfHistoryRefsetNid != 0) {
+			return wfHistoryRefsetNid;
 		} else {
 			if (Ts.get() != null) {
 				try {
 					if (Ts.get().hasUuid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids().iterator().next())) {
-						wfHistoryRefsetId = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
-
-				        return wfHistoryRefsetId;
+						wfHistoryRefsetNid = Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+						
+				        return wfHistoryRefsetNid;
 					}
 				} catch (Exception e) {
-					AceLog.getAppLog().log(Level.WARNING, "Unable to access Workflow History Refset UUID with error: ");
+					AceLog.getAppLog().log(Level.INFO, "Unable to access Workflow History Refset");
 				}
 			}
 		}

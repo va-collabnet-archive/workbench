@@ -11,6 +11,7 @@ import org.ihtsdo.tk.api.constraint.ConstraintCheckType;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
@@ -33,6 +34,10 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
    ConceptChronicleBI getChronicle();
 
    ConAttrVersionBI getConAttrsActive() throws IOException, ContraditionException;
+
+   Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(int refsetNid) throws IOException;
+
+   RefexChronicleBI<?> getCurrentRefsetMemberForComponent(int componentNid) throws IOException;
 
    /**
     *
@@ -126,10 +131,15 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
    ViewCoordinate getViewCoordinate();
 
+   boolean hasAnnotationMemberActive(int refsetNid) throws IOException;
+
    boolean hasChildren() throws IOException, ContraditionException;
 
-   // TODO to here
    boolean hasHistoricalRels() throws IOException, ContraditionException;
+
+   boolean hasRefexMemberActive(int refsetNid) throws IOException;
+
+   boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException;
 
    boolean isChildOf(ConceptVersionBI child) throws IOException;
 

@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.ihtsdo.taxonomy;
+package org.ihtsdo.taxonomy.path;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -11,6 +11,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.TaxonomyTree;
+import org.ihtsdo.taxonomy.model.NodeFactory;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -39,7 +43,7 @@ public class PathExpander implements Runnable {
       this.tree   = tree;
       this.model  = (TaxonomyModel) tree.getModel();
       this.config = config;
-      this.focus  = model.ts.getConceptVersion(concept.getNid());
+      this.focus  = model.getTs().getConceptVersion(concept.getNid());
    }
 
    //~--- methods -------------------------------------------------------------
@@ -63,12 +67,12 @@ public class PathExpander implements Runnable {
          TaxonomyNode parent = model.getRoot();
 
          for (int i = shortestPath.size() - 1; i > -1; i--) {
-            TaxonomyNode node = model.nodeFactory.makeNode(shortestPath.get(i), parent);
+            TaxonomyNode node = model.getNodeFactory().makeNode(shortestPath.get(i), parent);
 
             parent = node;
          }
 
-         TaxonomyNode        focusNode = model.nodeFactory.makeNode(focus.getNid(), parent);
+         TaxonomyNode        focusNode = model.getNodeFactory().makeNode(focus.getNid(), parent);
          PathSegmentExpander expander  = new PathSegmentExpander(tree.getNodeFactory(),
                                             NodePath.getTreePath(model, focusNode), 1);
 

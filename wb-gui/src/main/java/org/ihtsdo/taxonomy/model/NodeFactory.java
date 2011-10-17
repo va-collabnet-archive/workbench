@@ -3,7 +3,7 @@
 * To change this template, choose Tools | Templates
 * and open the template in the editor.
  */
-package org.ihtsdo.taxonomy;
+package org.ihtsdo.taxonomy.model;
 
 //~--- non-JDK imports --------------------------------------------------------
 
@@ -14,6 +14,8 @@ import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.concurrent.future.FutureHelper;
 import org.ihtsdo.helper.thread.NamedThreadFactory;
+import org.ihtsdo.taxonomy.CancelableBI;
+import org.ihtsdo.taxonomy.TaxonomyNodeRenderer;
 import org.ihtsdo.taxonomy.nodes.InternalNode;
 import org.ihtsdo.taxonomy.nodes.InternalNodeMultiParent;
 import org.ihtsdo.taxonomy.nodes.LeafNode;
@@ -75,6 +77,7 @@ public class NodeFactory {
 
    private ConcurrentSkipListMap<Long, MakeChildNodesWorker> childWorkerMap = new ConcurrentSkipListMap<Long,
                                                                                  MakeChildNodesWorker>();
+   private ChildNodeFilterBI     childNodeFilter;
    private NodeExpansionListener expansionListener;
    private TaxonomyModel         model;
    private NodeComparator        nodeComparator;
@@ -83,12 +86,14 @@ public class NodeFactory {
 
    //~--- constructors --------------------------------------------------------
 
-   public NodeFactory(TaxonomyModel model, TaxonomyNodeRenderer renderer, JTree tree) {
-      this.model          = model;
-      this.renderer       = renderer;
-      this.tree           = tree;
-      this.nodeComparator = new NodeComparator(model.nodeStore);
-      expansionListener   = new NodeExpansionListener(tree);
+   public NodeFactory(TaxonomyModel model, TaxonomyNodeRenderer renderer, JTree tree,
+                      ChildNodeFilterBI childNodeFilter) {
+      this.model           = model;
+      this.renderer        = renderer;
+      this.tree            = tree;
+      this.childNodeFilter = childNodeFilter;
+      this.nodeComparator  = new NodeComparator(model.nodeStore);
+      expansionListener    = new NodeExpansionListener(tree);
    }
 
    //~--- methods -------------------------------------------------------------
@@ -135,7 +140,7 @@ public class NodeFactory {
       MakeChildNodesWorker mcnw = childWorkerMap.get(parentNode.nodeId);
 
       if (mcnw == null) {
-         mcnw = new MakeChildNodesWorker(parentNode);
+         mcnw = new MakeChildNodesWorker(parentNode, childNodeFilter);
          childWorkerMap.put(parentNode.nodeId, mcnw);
          FutureHelper.addFuture(taxonomyExecutors.submit(mcnw));
       }
@@ -245,6 +250,10 @@ public class NodeFactory {
       return nodeComparator;
    }
 
+   public JTree getTree() {
+      return tree;
+   }
+
    //~--- set methods ---------------------------------------------------------
 
    private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
@@ -264,6 +273,7 @@ public class NodeFactory {
 
    private class ChildFinder implements ProcessUnfetchedConceptDataBI, Callable<Object> {
       LinkedBlockingQueue<TaxonomyNode> childNodes = new LinkedBlockingQueue<TaxonomyNode>();
+      ChildNodeFilterBI                 childFilter;
       IdentifierSet                     dataSet;
       ConceptVersionBI                  parent;
       TaxonomyNode                      parentNode;
@@ -271,15 +281,17 @@ public class NodeFactory {
 
       //~--- constructors -----------------------------------------------------
 
-      public ChildFinder(ConceptVersionBI parent, TaxonomyNode parentNode, CancelableBI worker)
+      public ChildFinder(ConceptVersionBI parent, TaxonomyNode parentNode, CancelableBI worker,
+                         ChildNodeFilterBI childFilter)
               throws IOException {
-         this.worker     = worker;
-         this.parent     = parent;
-         this.parentNode = parentNode;
-         dataSet         = (IdentifierSet) Terms.get().getEmptyIdSet();
+         this.worker      = worker;
+         this.parent      = parent;
+         this.parentNode  = parentNode;
+         this.dataSet     = (IdentifierSet) Terms.get().getEmptyIdSet();
+         this.childFilter = childFilter;
 
          for (int cnid : Ts.get().getPossibleChildren(parentNode.getCnid(), model.ts.getViewCoordinate())) {
-            dataSet.setMember(cnid);
+            this.dataSet.setMember(cnid);
          }
       }
 
@@ -312,10 +324,12 @@ public class NodeFactory {
 
       private void processPossibleChild(ConceptVersionBI possibleChild) throws Exception {
          if (possibleChild.isChildOf(parent)) {
-            TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
+            if ((childFilter == null) || childFilter.pass(parent, possibleChild)) {
+               TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
 
-            if (parentNode.addChild(childNode)) {
-               childNodes.put(childNode);
+               if (parentNode.addChild(childNode)) {
+                  childNodes.put(childNode);
+               }
             }
          }
       }
@@ -385,14 +399,16 @@ public class NodeFactory {
       Set<TaxonomyNode> childNodes = new HashSet<TaxonomyNode>();
       boolean           canceled   = false;
       CountDownLatch    latch      = new CountDownLatch(1);
+      ChildNodeFilterBI childFilter;
       TaxonomyNode      parentNode;
       TreePath          path;
 
       //~--- constructors -----------------------------------------------------
 
-      public MakeChildNodesWorker(TaxonomyNode parentNode) {
-         this.parentNode = parentNode;
-         this.path       = NodePath.getTreePath(model, parentNode);
+      public MakeChildNodesWorker(TaxonomyNode parentNode, ChildNodeFilterBI childFilter) {
+         this.parentNode  = parentNode;
+         this.childFilter = childFilter;
+         this.path        = NodePath.getTreePath(model, parentNode);
       }
 
       //~--- methods ----------------------------------------------------------
@@ -401,7 +417,7 @@ public class NodeFactory {
       protected Object doInBackground() throws Exception {
          try {
             ConceptVersionBI        parent         = model.ts.getConceptVersion(parentNode.getCnid());
-            ChildFinder             dataFinder     = new ChildFinder(parent, parentNode, this);
+            ChildFinder             dataFinder     = new ChildFinder(parent, parentNode, this, childFilter);
             Future<Object>          finderFuture   = childFinderExecutors.submit(dataFinder);
             long                    lastPublish    = System.currentTimeMillis();
             ArrayList<TaxonomyNode> nodesToPublish = new ArrayList<TaxonomyNode>();

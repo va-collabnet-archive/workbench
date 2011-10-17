@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +32,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -68,8 +66,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -77,7 +73,6 @@ import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.util.swing.GuiUtil;
@@ -88,14 +83,11 @@ import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 
 /**
  *
@@ -215,7 +207,7 @@ public class RedoConcept extends PreviousNextOrCancel {
                 if (desc.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
                     fsnText = desc.getText();
                     prefText = fsnText.substring(0, fsnText.indexOf("("));
-                    prefText.trim();
+                    prefText = prefText.trim();
                 }
             }
             tl = new TerminologyList(config);
@@ -228,7 +220,7 @@ public class RedoConcept extends PreviousNextOrCancel {
                 }
             }
             tl.setModel(model);
-            
+
             DoSwing swinger = new DoSwing(process);
             swinger.execute();
             new Thread(
@@ -247,7 +239,7 @@ public class RedoConcept extends PreviousNextOrCancel {
             synchronized (this) {
                 this.waitTillDone(worker.getLogger());
             }
-            
+
             //forget old concept
             Terms.get().forget(oldConcept);
 
@@ -635,6 +627,8 @@ public class RedoConcept extends PreviousNextOrCancel {
                 c.weightx = 0;
                 c.weighty = 1;
                 wizardPanel.add(new JPanel(), c);
+                fsn.requestFocusInWindow();
+                wizardPanel.repaint();
                 GuiUtil.tickle(wizardPanel);
                 addSpellingVarients(prefText, fsnText);
             } catch (InterruptedException ex) {
@@ -673,11 +667,11 @@ public class RedoConcept extends PreviousNextOrCancel {
             cont.validate();
             cont = cont.getParent();
         }
-        continueButton.requestFocusInWindow();
         wizardPanel.repaint();
     }
 
     public class CopyTextDocumentListener implements DocumentListener {
+
         int paren;
 
         @Override
@@ -685,6 +679,7 @@ public class RedoConcept extends PreviousNextOrCancel {
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.trim();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
@@ -693,6 +688,7 @@ public class RedoConcept extends PreviousNextOrCancel {
                 pref.setText(prefText);
             } else {
                 prefText = fsnText.substring(0, paren - 1);
+                prefText = prefText.trim();
                 pref.setText(prefText);
             }
 
@@ -705,6 +701,7 @@ public class RedoConcept extends PreviousNextOrCancel {
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.trim();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
@@ -713,6 +710,7 @@ public class RedoConcept extends PreviousNextOrCancel {
                 pref.setText(prefText);
             } else {
                 prefText = fsnText.substring(0, paren - 1);
+                prefText = prefText.trim();
                 pref.setText(prefText);
             }
 
@@ -725,6 +723,7 @@ public class RedoConcept extends PreviousNextOrCancel {
             fsnText = "";
             prefText = "";
             fsnText = fsn.extractText();
+            fsnText = fsnText.trim();
             fsnText = fsnText.replaceAll("[\\s]", " ");
             fsnText = fsnText.replaceAll("   *", " ");
             paren = fsnText.indexOf("(");
@@ -733,6 +732,7 @@ public class RedoConcept extends PreviousNextOrCancel {
                 pref.setText(prefText);
             } else {
                 prefText = fsnText.substring(0, paren - 1);
+                prefText = prefText.trim();
                 pref.setText(prefText);
             }
 

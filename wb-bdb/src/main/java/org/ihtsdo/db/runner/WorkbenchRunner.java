@@ -41,7 +41,7 @@ import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
-import org.ihtsdo.taxonomy.NodeFactory;
+import org.ihtsdo.taxonomy.model.NodeFactory;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;

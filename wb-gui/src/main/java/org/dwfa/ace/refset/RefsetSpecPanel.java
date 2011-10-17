@@ -60,7 +60,10 @@ import org.dwfa.vodb.types.Position;
 
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
+import org.ihtsdo.taxonomy.model.childfilters.OrCompositeChildFilter;
+import org.ihtsdo.taxonomy.model.childfilters.RefsetMemberChildFilter;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.PathBI;
 
@@ -85,20 +88,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -128,6 +122,7 @@ public class RefsetSpecPanel extends JPanel {
    private Set<Object>                      promotionTypes          = new HashSet<Object>();
    private JLabel                           filterLabel             = new JLabel("Filter view:");
    private Box                              snomedIdPanel           = new Box(BoxLayout.Y_AXIS);
+   private final ACE                        ace;
    private I_ConfigAceFrame                 aceFrameConfig;
    private JButton                          approveButton;
    private Box                              bottomPanelVerticalBox;
@@ -152,13 +147,14 @@ public class RefsetSpecPanel extends JPanel {
 
    public RefsetSpecPanel(ACE ace) throws Exception {
       super(new GridBagLayout());
+      this.ace       = ace;
       aceFrameConfig = ace.getAceFrameConfig();
       split          = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
       split.setOneTouchExpandable(true);
       hierarchicalTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
-              new IntSet(), false), "Refset hierarchy");
+              new IntSet(), false), "Refset hierarchy", null);
       refsetAndParentOnlyTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(ace.getAceFrameConfig(),
-              new IntSet(), true), " Refset parent-only hierarchy");
+              new IntSet(), true), " Refset parent-only hierarchy", null);
       bottomPanelVerticalBox = new Box(BoxLayout.Y_AXIS);
       bottomTabs             = new JTabbedPane();
       bottomTabs.addTab(HIERARCHICAL_VIEW, hierarchicalTreeHelper.getHierarchyPanel());
@@ -388,7 +384,10 @@ public class RefsetSpecPanel extends JPanel {
 
    public void refresh() {
       editor.refresh();
-      setRefsetInSpecEditor(getRefsetInSpecEditor());
+
+      RefreshSwingWorker worker = new RefreshSwingWorker();
+
+      ACE.threadPool.execute(worker);
    }
 
    private void refreshSnomedIdPanel() {
@@ -853,12 +852,10 @@ public class RefsetSpecPanel extends JPanel {
          if (latestPart != null) {
             return latestPart.getDenotation().toString();
          } else {
-            throw new TerminologyException("No SNOMED ID available");
+            throw new IOException("No SNOMED ID available");
          }
-      } catch (TerminologyException e) {
-         e.printStackTrace();
       } catch (IOException e) {
-         e.printStackTrace();
+         AceLog.getAppLog().alertAndLogException(e);
       }
 
       return "unknown";
@@ -1318,6 +1315,58 @@ public class RefsetSpecPanel extends JPanel {
             get();
          } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
+         }
+      }
+   }
+
+
+   private class RefreshSwingWorker extends SwingWorker<Object, Object> {
+      private JScrollPane refsetAndParentOnlyHierarchicalPanel;
+      private JScrollPane refsetHierarcyPanel;
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      protected Object doInBackground() throws Exception {
+         hierarchicalTreeHelper = new TaxonomyHelper(new RefsetSpecFrameConfig(aceFrameConfig, new IntSet(),
+                 false), "Refset hierarchy", null);
+         refsetHierarcyPanel = hierarchicalTreeHelper.getHierarchyPanel();
+         hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
+         hierarchicalTreeHelper.addMouseListener(new TreeMouseListener(ace));
+
+         OrCompositeChildFilter filter   = new OrCompositeChildFilter();
+         RefsetSpecFrameConfig  rsConfig = new RefsetSpecFrameConfig(aceFrameConfig, new IntSet(), true);
+
+         if (getRefsetInSpecEditor() != null) {
+            try {
+               for (int refsetNid : rsConfig.getRefsetsToShowInTaxonomy().getListArray()) {
+                  filter.getFilterList().add(
+                      new RefsetMemberChildFilter(
+                          Ts.get().getConceptVersion(aceFrameConfig.getViewCoordinate(), refsetNid)));
+               }
+            } catch (IOException ex) {
+               AceLog.getAppLog().alertAndLogException(ex);
+            }
+         }
+
+         refsetAndParentOnlyTreeHelper = new TaxonomyHelper(rsConfig, " Refset parent-only hierarchy",
+                 filter);
+         refsetAndParentOnlyHierarchicalPanel = refsetAndParentOnlyTreeHelper.getHierarchyPanel();
+         refsetAndParentOnlyTreeHelper.addMouseListener(
+             new TaxonomyMouseListener(refsetAndParentOnlyTreeHelper));
+         refsetAndParentOnlyTreeHelper.addMouseListener(new TreeMouseListener(ace));
+
+         return null;
+      }
+
+      @Override
+      protected void done() {
+         try {
+            get();
+            bottomTabs.setComponentAt(0, refsetHierarcyPanel);
+            bottomTabs.setComponentAt(1, refsetAndParentOnlyHierarchicalPanel);
+         } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
          }
       }
    }

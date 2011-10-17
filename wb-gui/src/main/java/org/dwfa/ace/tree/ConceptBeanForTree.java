@@ -291,9 +291,30 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+           throws IOException {
+      return bean.getCurrentAnnotationMembers(xyz);
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      return bean.getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
            throws IOException {
       return bean.getCurrentAnnotations(xyz);
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return bean.getCurrentAnnotations(xyz, refexNid);
+   }
+
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      return bean.getCurrentRefexMembers(xyz, refsetNid);
    }
 
    @Override
@@ -305,6 +326,12 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
       return bean.getCurrentRefexes(xyz, refsetNid);
+   }
+
+   @Override
+   public RefexVersionBI<?> getCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid)
+           throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
@@ -636,6 +663,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
       throw new UnsupportedOperationException("Not supported yet.");
    }
 
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      return bean.getRefexMembers(refsetNid);
+   }
+
    @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
       return bean.getRefexes();
@@ -644,6 +675,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
       return bean.getRefexes(refsetNid);
+   }
+
+   @Override
+   public RefexChronicleBI<?> getRefsetMemberForComponent(int componentNid) throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
@@ -819,6 +855,19 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    @Override
    public FoundContradictionVersions getVersionsInContradiction(ViewCoordinate vc) {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return bean.hasCurrentAnnotationMember(xyz, refsetNid);
+   }
+
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      return bean.hasCurrentRefexMember(xyz, refsetNid);
+   }
+
+   @Override
+   public boolean hasCurrentRefsetMemberForComponent(ViewCoordinate vc, int componentNid) throws IOException {
       throw new UnsupportedOperationException("Not supported yet.");
    }
 

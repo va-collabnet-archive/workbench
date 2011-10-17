@@ -88,24 +88,28 @@ public class RulesDeploymentPackageReferenceHelper {
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.addUncommittedNoChecks(rulesPackagesRefset);
 
-			termFactory.commit();
+			newConcept.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+					config.getDbConfig().getChangeSetWriterThreading().convert());
+			rulesPackagesRefset.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+					config.getDbConfig().getChangeSetWriterThreading().convert());
 			
-			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
-			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
-			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-			
-			newConcept.promote(config.getViewPositionSet().iterator().next(), 
-					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
-			
-			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(newConcept.getConceptNid())) {
-				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
-						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
-				termFactory.addUncommittedNoChecks(loopExtension);
-			}
-			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.addUncommittedNoChecks(rulesPackagesRefset);
-			termFactory.commit();
+//			I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
+//			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
+//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+//			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+//			
+//			newConcept.promote(config.getViewPositionSet().iterator().next(), 
+//					config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+//			
+//			for (I_ExtendByRef loopExtension : termFactory.getAllExtensionsForComponent(newConcept.getConceptNid())) {
+//				loopExtension.promote(config.getViewPositionSet().iterator().next(), 
+//						config.getPromotionPathSetReadOnly(), allowedStatusWithRetired, Precedence.TIME);
+//				termFactory.addUncommittedNoChecks(loopExtension);
+//			}
+//			newConcept.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+//					config.getDbConfig().getChangeSetWriterThreading().convert());
+//			rulesPackagesRefset.commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(),
+//					config.getDbConfig().getChangeSetWriterThreading().convert());
 
 			return rulesPackage;
 

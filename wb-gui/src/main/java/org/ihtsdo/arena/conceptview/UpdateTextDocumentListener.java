@@ -135,7 +135,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
                 update = false;
 
-                refexes = desc.getCurrentAnnotations(config.getViewCoordinate());
+                refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
                 int type = desc.getTypeNid();
                 int fsn = 0;
 

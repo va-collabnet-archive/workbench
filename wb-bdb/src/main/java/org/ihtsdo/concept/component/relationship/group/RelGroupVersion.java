@@ -203,9 +203,34 @@ public class RelGroupVersion implements RelGroupVersionBI {
    }
 
    @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+           throws IOException {
+      return rg.getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
            throws IOException {
-      return rg.getCurrentAnnotations(xyz);
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      return rg.getCurrentRefexMembers(xyz, refsetNid);
    }
 
    @Override
@@ -216,7 +241,7 @@ public class RelGroupVersion implements RelGroupVersionBI {
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      return rg.getCurrentRefexes(xyz, refsetNid);
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
    @Override
@@ -281,6 +306,11 @@ public class RelGroupVersion implements RelGroupVersionBI {
    }
 
    @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
       return rg.getRefexes();
    }
@@ -333,6 +363,16 @@ public class RelGroupVersion implements RelGroupVersionBI {
    @Override
    public Collection<? extends RelGroupVersionBI> getVersions(ViewCoordinate c) {
       return Arrays.asList(new RelGroupVersionBI[] { new RelGroupVersion(this, c) });
+   }
+
+   @Override
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
+
+   @Override
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
    public boolean isActive() throws IOException {

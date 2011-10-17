@@ -20,6 +20,8 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
 
    ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
 
+   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContraditionException;
+
    ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
 
    ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
@@ -27,6 +29,8 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
    ConceptVersionBI getConceptForNid(int nid) throws IOException;
 
    ConceptVersionBI getConceptVersion(Collection<UUID> uuids) throws IOException;
+
+   ConceptVersionBI getConceptVersion(ConceptContainerBI cc) throws IOException;
 
    ConceptVersionBI getConceptVersion(int cNid) throws IOException;
 

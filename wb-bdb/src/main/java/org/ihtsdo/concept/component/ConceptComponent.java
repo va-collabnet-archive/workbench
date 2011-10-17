@@ -278,10 +278,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       return returnValue;
    }
 
-   @Override
-   public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
-      IdentifierVersionLong v = new IdentifierVersionLong(statusNid, Terms.get().getAuthorNid(), pathNid,
-                                   time);
+   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec, long time) {
+      IdentifierVersionLong v = null;
+
+      for (int path : ec.getEditPaths()) {
+         v = new IdentifierVersionLong(statusNid, ec.getAuthorNid(), path, time);
+      }
 
       v.setAuthorityNid(authorityNid);
       v.setDenotation(longId);
@@ -289,12 +291,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       return addIdVersion(v);
    }
 
-   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec,
-                            long time) {
-      IdentifierVersionLong v = null;
-      for(int path : ec.getEditPaths()){
-          v = new IdentifierVersionLong(statusNid, ec.getAuthorNid(), path, time);
-      }
+   @Override
+   public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
+      IdentifierVersionLong v = new IdentifierVersionLong(statusNid, Terms.get().getAuthorNid(), pathNid,
+                                   time);
+
       v.setAuthorityNid(authorityNid);
       v.setDenotation(longId);
 
@@ -1212,7 +1213,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
            throws IOException {
       if (annotations == null) {
          return Collections.unmodifiableCollection(new ArrayList<RefexVersionBI<?>>());
@@ -1221,6 +1222,53 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       Collection<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>();
 
       for (RefexChronicleBI<?> refex : annotations) {
+         for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
+            returnValues.add(version);
+         }
+      }
+
+      return Collections.unmodifiableCollection(returnValues);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+           int refexNid)
+           throws IOException {
+      Collection<RefexVersionBI<?>> returnValues = new ArrayList<RefexVersionBI<?>>();
+
+      if (annotations != null) {
+         for (RefexChronicleBI<?> refex : annotations) {
+            if (refex.getCollectionNid() == refexNid) {
+               for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
+                  returnValues.add(version);
+               }
+            }
+         }
+      }
+
+      return Collections.unmodifiableCollection(returnValues);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+           throws IOException {
+      return getCurrentAnnotationMembers(xyz, refexNid);
+   }
+
+   @Override
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+           throws IOException {
+      Collection<? extends RefexChronicleBI<?>> refexes      = getRefexes(refsetNid);
+      List<RefexVersionBI<?>>                   returnValues =
+         new ArrayList<RefexVersionBI<?>>(refexes.size());
+
+      for (RefexChronicleBI<?> refex : refexes) {
          for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
             returnValues.add(version);
          }
@@ -1247,17 +1295,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    @Override
    public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
            throws IOException {
-      Collection<? extends RefexChronicleBI<?>> refexes      = getRefexes(refsetNid);
-      List<RefexVersionBI<?>>                   returnValues =
-         new ArrayList<RefexVersionBI<?>>(refexes.size());
-
-      for (RefexChronicleBI<?> refex : refexes) {
-         for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
-            returnValues.add(version);
-         }
-      }
-
-      return Collections.unmodifiableCollection(returnValues);
+      return getCurrentRefexMembers(xyz, refsetNid);
    }
 
    @Override
@@ -1442,6 +1480,20 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Override
+   public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+      Collection<? extends RefexChronicleBI<?>> r            = getRefexes();
+      List<RefexChronicleBI<?>>                 returnValues = new ArrayList<RefexChronicleBI<?>>(r.size());
+
+      for (RefexChronicleBI<?> rcbi : r) {
+         if (rcbi.getCollectionNid() == refsetNid) {
+            returnValues.add(rcbi);
+         }
+      }
+
+      return returnValues;
+   }
+
+   @Override
    public Collection<? extends RefexChronicleBI<?>> getRefexes() throws IOException {
       List<NidPairForRefset>    pairs        = Bdb.getRefsetPairs(nid);
       List<RefexChronicleBI<?>> returnValues = new ArrayList<RefexChronicleBI<?>>(pairs.size());
@@ -1480,17 +1532,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
    }
 
    @Override
+   @Deprecated
    public Collection<? extends RefexChronicleBI<?>> getRefexes(int refsetNid) throws IOException {
-      Collection<? extends RefexChronicleBI<?>> r            = getRefexes();
-      List<RefexChronicleBI<?>>                 returnValues = new ArrayList<RefexChronicleBI<?>>(r.size());
-
-      for (RefexChronicleBI<?> rcbi : r) {
-         if (rcbi.getCollectionNid() == refsetNid) {
-            returnValues.add(rcbi);
-         }
-      }
-
-      return returnValues;
+      return getRefexMembers(refsetNid);
    }
 
    public Set<Integer> getRefsetMemberSapNids() throws IOException {
@@ -1702,6 +1746,32 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
               authorityNids));
 
       return visibleIdParts;
+   }
+
+   @Override
+   public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      Collection<? extends RefexChronicleBI<?>> members = getCurrentAnnotationMembers(xyz, refsetNid);
+
+      for (RefexChronicleBI<?> refex : members) {
+         for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+      Collection<? extends RefexChronicleBI<?>> refexes = getRefexes(refsetNid);
+
+      for (RefexChronicleBI<?> refex : refexes) {
+         for (RefexVersionBI<?> version : refex.getVersions(xyz)) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    @Override
@@ -2147,11 +2217,6 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          super();
          this.cv = cv;
       }
-   public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec,
-                            long time) {
-      
-      return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, ec, time);
-   }
 
       //~--- methods ----------------------------------------------------------
 
@@ -2161,11 +2226,15 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          return ConceptComponent.this.addAnnotation(annotation);
       }
 
+      public boolean addLongId(Long longId, int authorityNid, int statusNid, EditCoordinate ec, long time) {
+         return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, ec, time);
+      }
+
       @Override
       public boolean addLongId(Long longId, int authorityNid, int statusNid, int pathNid, long time) {
          return ConceptComponent.this.addLongId(longId, authorityNid, statusNid, pathNid, time);
       }
-      
+
       @Override
       public boolean addMutableIdPart(I_IdPart srcId) {
          return ConceptComponent.this.addMutableIdPart(srcId);
@@ -2295,9 +2364,34 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz)
+              throws IOException {
+         return ConceptComponent.this.getCurrentAnnotationMembers(xyz);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotationMembers(ViewCoordinate xyz,
+              int refexNid)
+              throws IOException {
+         return ConceptComponent.this.getCurrentAnnotationMembers(xyz, refexNid);
+      }
+
+      @Override
       public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz)
               throws IOException {
-         return ConceptComponent.this.getCurrentAnnotations(xyz);
+         return getCurrentAnnotationMembers(xyz);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentAnnotations(ViewCoordinate xyz, int refexNid)
+              throws IOException {
+         return getCurrentAnnotationMembers(xyz, refexNid);
+      }
+
+      @Override
+      public Collection<? extends RefexVersionBI<?>> getCurrentRefexMembers(ViewCoordinate xyz, int refsetNid)
+              throws IOException {
+         return ConceptComponent.this.getCurrentRefexMembers(xyz, refsetNid);
       }
 
       @Override
@@ -2309,7 +2403,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Override
       public Collection<? extends RefexVersionBI<?>> getCurrentRefexes(ViewCoordinate xyz, int refsetNid)
               throws IOException {
-         return ConceptComponent.this.getCurrentRefexes(xyz, refsetNid);
+         return ConceptComponent.this.getCurrentRefexMembers(xyz, refsetNid);
       }
 
       @Override
@@ -2376,6 +2470,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Override
       public UUID getPrimUuid() {
          return new UUID(primordialMsb, primordialLsb);
+      }
+
+      @Override
+      public Collection<? extends RefexChronicleBI<?>> getRefexMembers(int refsetNid) throws IOException {
+         return ConceptComponent.this.getRefexMembers(refsetNid);
       }
 
       @Override
@@ -2449,6 +2548,16 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       @Override
       public List<? extends I_IdPart> getVisibleIds(PositionSet viewpointSet, int... authorityNids) {
          return ConceptComponent.this.getVisibleIds(viewpointSet, authorityNids);
+      }
+
+      @Override
+      public boolean hasCurrentAnnotationMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         return ConceptComponent.this.hasCurrentAnnotationMember(xyz, refsetNid);
+      }
+
+      @Override
+      public boolean hasCurrentRefexMember(ViewCoordinate xyz, int refsetNid) throws IOException {
+         return ConceptComponent.this.hasCurrentRefexMember(xyz, refsetNid);
       }
 
       @Override

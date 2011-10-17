@@ -7,7 +7,7 @@ package org.ihtsdo.taxonomy.nodes;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.taxonomy.TaxonomyModel;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
