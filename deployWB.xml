@@ -65,7 +65,7 @@
 		<osfamily property="os.family" />
 		<echo message="${os.family}" />
 		<echo message="task.execute.bl: ${task.execute.bl}"/>
-		<!-- <if>
+		<if>
 			<equals arg1="${task.execute.bl}" arg2="yes" />
 			<then>		
 				<antcall target="build-wb-lib"/>
@@ -95,7 +95,7 @@
 				
 				
 			</then>
-		</if> -->
+		</if>
 
 
 	</target>
@@ -121,8 +121,8 @@
 	
 	<target name="copy-wb-config" description="copy all new config files">	
 		<echo>"copy-wb-config Called"</echo>	
-		<copy file="${project.config.dir}/main.xml" tofile="${wb.config.dir}/main.xml" overwrite="true"/>
-		<copy file="${project.config.dir}/custom.properties" tofile="${wb.config.dir}/custom.properties" overwrite="true"/>
+		<!--<copy file="${project.config.dir}/main.xml" tofile="${wb.config.dir}/main.xml" overwrite="true"/>
+		<copy file="${project.config.dir}/custom.properties" tofile="${wb.config.dir}/custom.properties" overwrite="true"/> -->
 		<!-- Default WB config files??? -->
 	</target>
 	
