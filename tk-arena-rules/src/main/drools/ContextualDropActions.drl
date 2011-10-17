@@ -343,7 +343,6 @@ rule "rule 12.2" #rel group onto concept"
    $dropTarget: ConceptFact(context == Context.DROP_TARGET)
    $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
    		getRelGroup().getConceptNid() != $dropTarget.getConcept().getConceptNid())
-   RelationshipVersionBI(this.isStated() == true) from $dropObject.relGroup.currentRels
 
    then
    actions.add(new MoveRelGroupAction("move rel group", $dropObject, $dropTarget));
