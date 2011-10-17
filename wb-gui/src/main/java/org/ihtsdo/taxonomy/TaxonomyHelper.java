@@ -246,7 +246,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       int      childCount = root.getChildren().size();
 
       for (int i = 0; i < childCount; i++) {
-         InternalNode childNode = (InternalNode) model.getChild(root, i);
+         TaxonomyNode childNode = (TaxonomyNode) model.getChild(root, i);
 
          model.getNodeFactory().removeDescendents(childNode);
 
