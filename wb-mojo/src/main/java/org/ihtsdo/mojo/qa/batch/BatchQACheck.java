@@ -43,13 +43,17 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.DatabaseSetupConfig;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
@@ -161,7 +165,7 @@ public class BatchQACheck extends AbstractMojo {
 	 * @parameter
 	 */
 	private String pkgUrl;
-	
+
 	/**
 	 * UUIDs of rules to ignore.
 	 * 
@@ -203,13 +207,16 @@ public class BatchQACheck extends AbstractMojo {
 			executionUUID = UUID.randomUUID();
 			validateParamenters();
 			openDb();
+			if (config.getDbConfig() == null) {
+				setDbConfig();
+			}
 			RulesContextHelper contextHelper = new RulesContextHelper(config);
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
-			
+
 			for (RulesDeploymentPackageReference loopPkg : contextHelper.getPackagesForContext(context)) {
 				contextHelper.removePkgReferenceFromContext(loopPkg, context);
 			}
-			
+
 			if ((pkgName != null && !pkgName.isEmpty()) && ((pkgUrl != null && !pkgUrl.isEmpty()))) {
 				RulesDeploymentPackageReferenceHelper pkgHelper = new RulesDeploymentPackageReferenceHelper(config);
 				RulesDeploymentPackageReference pkgReference = pkgHelper.createNewRulesDeploymentPackage(pkgName, pkgUrl);
@@ -235,7 +242,7 @@ public class BatchQACheck extends AbstractMojo {
 	}
 
 	private void exportExecutionDescriptor(RulesContextHelper contextHelper) throws Exception {
-		
+
 		FileOutputStream ruleFos = new FileOutputStream(rulesOutput);
 		OutputStreamWriter ruleOsw = new OutputStreamWriter(ruleFos, "UTF-8");
 		PrintWriter rulePw = new PrintWriter(ruleOsw);
@@ -252,7 +259,7 @@ public class BatchQACheck extends AbstractMojo {
 			I_GetConceptData context = tf.getConcept(UUID.fromString(context_uuid));
 			contextHelper.getKnowledgeBaseForContext(context, config, true);
 
-		
+
 			// Create the execution XMLexecutionPw
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = dbf.newDocumentBuilder();
@@ -293,7 +300,7 @@ public class BatchQACheck extends AbstractMojo {
 					rulePw.print(loopPackage.getUrl() + "\t");
 					rulePw.print(ditaUid + "\t");
 					rulePw.print(ruleCode);
-//					rulePw.print(df.format(executionDate.getTime()));
+					//					rulePw.print(df.format(executionDate.getTime()));
 					rulePw.println();
 
 					// Generate XML components
@@ -371,7 +378,7 @@ public class BatchQACheck extends AbstractMojo {
 		findingPw.flush();
 		findingPw.close();
 		Long end = Calendar.getInstance().getTimeInMillis();
-		
+
 		FileOutputStream executionFos = new FileOutputStream(executionDetailsOutput);
 		OutputStreamWriter executionOsw = new OutputStreamWriter(executionFos, "UTF-8");
 		PrintWriter executionPw = new PrintWriter(executionOsw);
@@ -466,17 +473,27 @@ public class BatchQACheck extends AbstractMojo {
 		config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 		config.setRelAssertionType(RelAssertionType.INFERRED);
 
-		// I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
-		// newDbProfile.setUsername("username");
-		// newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-		// newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-		// newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-		// newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-		// config.setDbConfig(newDbProfile);
-
 		config.setPrecedence(Precedence.TIME);
 
 		return config;
+	}
+
+	private void setDbConfig() {
+		try {
+			BdbTermFactory tfb = (BdbTermFactory) tf;
+			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+			newDbProfile.setUsername("Batch-QA");
+			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+			config.setDbConfig(newDbProfile);
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
