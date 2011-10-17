@@ -1,6 +1,8 @@
 package org.ihtsdo.workflow.refset.utilities;
 
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -98,6 +100,7 @@ public class WorkflowHelper {
 	private static UUID wfHistoryRefsetUid = null;
 	private static boolean advancingWorkflowLock = false;
 	private static boolean wfCapabilitiesAvailable = true;
+	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -1358,6 +1361,30 @@ public class WorkflowHelper {
 		}
 
 		return 0;
+	}
+
+	public static BufferedWriter createLogFile(String filePath) throws IOException {
+		if (!logFiles.containsKey(filePath)) {
+			BufferedWriter logFile = new BufferedWriter(new FileWriter(filePath));
+			logFiles.put(filePath, logFile);
+		}
+		
+		return logFiles.get(filePath);
+	}
+
+	public static void closeLogFile(String filePath) {
+		try {
+			logFiles.get(filePath).flush();
+			logFiles.get(filePath).close();
+			logFiles.remove(filePath);
+		} catch (IOException e) {
+			AceLog.getAppLog().log(Level.INFO, "Error closing logfile: " + filePath);
+		}
+	}
+	public static void closeAllLogFiles() {
+		for (String filePath : logFiles.keySet()) {
+			closeLogFile(filePath);
+		}
 	}
 }
  
