@@ -262,10 +262,6 @@ public class BdbCommitManager {
       }
    }
 
-   private static void addUncommittedWfMemberId(I_ExtendByRef extension) {
-      uncommittedWfMemberIds.add(extension);
-   }
-
    public static void cancel() {
       lastCancel = Bdb.gVersion.incrementAndGet();
 
@@ -654,7 +650,7 @@ public class BdbCommitManager {
             c.modified();
             Bdb.getConceptDb().writeConcept(c);
 
-            if (uncommittedWfMemberIds.size() < 0) {
+            if (uncommittedWfMemberIds.size() > 0) {
                commitSet.setMember(wfHistoryRefsetId);
 
                Concept wfRefset = (Concept) Ts.get().getConcept(wfHistoryRefsetId);
@@ -987,6 +983,10 @@ public class BdbCommitManager {
          m.setStatusAtPositionNid(-1);
       }
 
+      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
+    	  uncommittedWfMemberIds.remove(extension);
+      }
+
       c.modified();
       Terms.get().addUncommittedNoChecks(c);
    }
@@ -1075,7 +1075,7 @@ public class BdbCommitManager {
    	  }
    	  
       if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
-    	  addUncommittedWfMemberId(extension);
+    	  uncommittedWfMemberIds.add(extension);
       }
    }
 
