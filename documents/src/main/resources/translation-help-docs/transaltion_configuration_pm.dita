@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation configuration</title>
+  <body>
+    <p>The <u>project manager</u> configures the main characteristics of the translation
+      configuration that will apply to the whole project. Furthermore, each user will be able to
+      configure a set of User's preferences but will not be able to change the prespecified
+      ctranslation configuration.</p>
+    <p>
+      <ul id="ul_kun_phc_hc">
+        <li>In the top menu, click Open > Project configuration:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/51_translation%20configuration_pm.PNG"/></p>
+    <p>
+      <ul>
+        <li>The list of projects will be displayed. The project manager should select one and press
+          OK:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/52_proj_conf_select_proj.PNG"/></p>
+    <p>
+      <ul>
+        <li>The translation preferences pane is displayed and, when a project is selected, the
+          project manager may define several translation preferences. Please, open the help hook in
+          each of the translation preferences windows for further details.</li>
+      </ul>
+    </p>
+  </body>
+</topic>

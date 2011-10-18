@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Project details</title>
+  <body>
+    <p>The right panel displays project details in different tabs, while the left panel displays a
+      tree view of your project and its components. You may access to them by selecting the tab of
+      your interest or by clicking the icon on the left.</p>
+    <p>Every new project is displayed under the Translation Projects folder on the left. In order to
+      create your translation worksets, their characteristics must be previously defined, i.e., any
+      exclusion refsets or linked refsets, the source language(s) and the target language. These may
+      be displayed by clicking the respective tabs on the right panel and will be individually
+      described.</p>
+    <p><image href="images/project_details_screen.PNG" id="image_xzl_rdz_mb"/></p>
+    <p><i>Exclusion Refsets tab</i>: In the Exclusion RefSet Tab you may define any group of
+      concepts you may want to use as exclusions in worksets of this project. Adding them here only
+      creates a shortcut to the refsets, the content will not be automatically excluded from the
+      worksets, that decision is made in a workset by workset basis.</p>
+    <p>In order to specify an exclusion refset, follow the steps described below:<ul
+        id="ul_cb287d28-a211-4e64-903e-f67aa411c209">
+        <li>Open the taxonomy tab, </li>
+        <li>select the refset you want to exclude from your translation project, </li>
+        <li>drag &amp; drop it into the Exclusion refset panel on the right, </li>
+        <li>press “Save”</li>
+      </ul></p>
+    <p><image href="images/project_exclusion_refset.PNG" id="image_dnl_udz_mb"/></p>
+    <p><i>Linked Refsets tab</i>: This is a refset repository where refsets related with the project
+      may be kept ‘at hand’</p>
+    <p>Linked refset window as described for the Exclusion Refsets.</p>
+    <p/>
+    <p><image href="images/project_linked_refset.PNG" id="image_uzb_wdz_mb"/></p>
+    <p><i>Source and Target Languages</i>: More than one source language may be specified; however,
+      only one target language is allowed, as the translation tool allows performing one translation
+      at a time for a given source language(s). If you want to change the selected target language,
+      you should just drag and drop the newly selected target language and it will be overwritten in
+      the target language window.<ul id="ul_a3a5f03c-2b88-4cda-9a60-9217bc37d648">
+        <li>Open the taxonomy tab,</li>
+        <li>select the language refset(s) you will specify as your source language (more than one
+          may be selected),</li>
+        <li>drag &amp; drop it into the Source language panel on the right.</li>
+        <li>Again on the taxonomy tab, select the language refset you will choose as your target
+          language.</li>
+        <li>Drag and drop it in the target language field at the bottom of the right panel.</li>
+        <li>Press “Save”</li>
+      </ul></p>
+    <p><image href="images/project_source_target_lang.PNG" id="image_cac_ydz_mb"/></p>
+  </body>
+</topic>

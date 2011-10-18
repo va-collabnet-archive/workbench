@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Archival queue</title>
+  <body>
+    <p>At present, the release manager role allows to see the Archival queue viewer and do not play
+      any active role in translation.</p>
+    <p/>
+    <p/>
+    <p>When the archival queue viewer is opened, the following screen is opened:</p>
+    <p><image href="images_transl/69_archival_queue_screen.PNG" id="image_ssf_nei_hc"/></p>
+    <p><b>No changes can be made at this point and translated worklist members are ready to be
+        released. This is the end of the translation workflow.</b></p>
+  </body>
+</topic>

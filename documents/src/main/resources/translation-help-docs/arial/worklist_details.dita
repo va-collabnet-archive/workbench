@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Worklist details</title>
+  <body>
+    <p>This 4-tabbed panel displays each worklist details, its members, its members statuses and a
+      reassignment functionality.</p>
+    <p>
+      <ul id="ul_f19b6b86-9bcd-4f43-94f1-4a9239ec2c9c">
+        <li>The worklist details tab shows the “Deliver assignment” button to deliver the concepts
+          to be translated to the translator’s inbox or whoever has been assigned, according to the
+          operating workflow.</li>
+        <li>The Members tab shows members is a list as well as the status of each worklist
+          member:</li>
+      </ul>
+    </p>
+    <p><image href="images/worklist_members_tab.PNG" id="image_msb_kiz_mb"/></p>
+    <p>
+      <ul id="ul_aae80c36-1387-4b16-a8e3-be89d8b41bc1">
+        <li>In this tab you may also see a worklist member history by double-clicking on the
+          selected concept. Alternatively, you may select a worklist member and then click the “View
+          member history” button:</li>
+      </ul>
+    </p>
+    <p><image href="images/worklist_members_and_history.PNG" id="image_ogc_miz_mb"/></p>
+    <p>
+      <ul id="ul_6b3eed24-5c80-409b-8d8a-6a2a56942568">
+        <li>A new window is displayed showing a table with the author of every change, the date and
+          time, the status of the concept at a given point, and any comments/issues related to this
+          concept.</li>
+        <li>The Status tab on the right panel will show the number of worklist items with a given
+          status and the worklist members with the selected status: </li>
+      </ul>
+    </p>
+    <p/>
+    <p><b><u>Worklist generation and assignment</u></b></p>
+    <p><b>REMEMBER! A worklist is a partition that has been assigned to a specified workflow and
+        will follow the steps (roles) of that workflow</b></p>
+    <p/>
+    <p>You have already created partitions from your worksets. Now you will have to assign them to a
+      user (translator, reviewer, etc.) and submit this worklist to him/her, following a
+      workflow:</p>
+    <p>
+      <ul id="ul_74602aca-7cf8-4b83-963b-3ce108d09ea0">
+        <li>Select a partition in the left panel. Its details will be displayed on the right
+          panel.</li>
+        <li>Click “Generate worklist” button. Alternatively, you may open the WorkLists tab and
+          click “Generate worklist” button there: </li>
+      </ul>
+    </p>
+    <p><image href="images/generate_worklist.PNG" id="image_blp_niz_mb"/></p>
+    <p>
+      <ul id="ul_fe48e9f6-852f-427c-b574-b6963dbb6020">
+        <li>You will have to define the worklist name, the workflow and the persons involved in that
+          workflow.</li>
+        <li>A message is displayed when the worklist has been created.</li>
+        <li>The new worklist will be displayed on the left under the selected partition. The
+          worklist members are displayed on the right pane, under the Members tab, with their
+          statuses (in this case, assigned):</li>
+      </ul>
+    </p>
+    <p><image href="images/worklist_members.PNG" id="image_hob_piz_mb"/></p>
+    <p>
+      <ul>
+        <li>The Status tab will show two windows: the one on the left will list the statuses of a
+          given worklist. By clicking on a status, the worklist members with the selected status
+          will be displayed on the right: </li>
+      </ul>
+    </p>
+    <p><image href="images/statuses_and_number_of_members.PNG" id="image_gwl_qiz_mb"/></p>
+    <p>
+      <ul>
+        <li>The worklist contains the concepts to be translated. Once they have been assigned to the
+          TSP translator (or whoever in the translation workflow) they must be submitted to his/her
+          inbox.</li>
+        <li>Select a worklist and click the ‘Deliver assignments’ button on the worklist details
+          panel.</li>
+        <li>A delivery message appears as soon as the worklist has been submitted to the inbox of
+          the specified person.</li>
+      </ul>
+    </p>
+    <p/>
+    <p>
+      <ul>
+        <li>Finally, the Reassign tab allows assigning concepts to another member of the translation
+          team:</li>
+      </ul>
+    </p>
+    <p><image href="images/reassignment_tab.PNG" id="image_bjt_riz_mb"/></p>
+    <p>
+      <ul>
+        <li>One or more concepts from a worklist may be selected and reassigned to another person by
+          clicking the “>” button, and then specifying the new destination. You must click “Send”
+          button to deliver the new assignment. Due to the workbench functionality, the
+          re-assignment option is actually a “request for re-assignment”: The Project manager has
+          created a worklist that has been assigned to the translator John, but he has now decided
+          to reassign a concept from this worklist to the TSP reviewer Jane. However, the item to be
+          reassigned is in John’s inbox:</li>
+      </ul>
+    </p>
+    <p><image href="images/john_inbox.PNG" id="image_lxe_tiz_mb"/></p>
+    <p>
+      <ul id="ul_2071268b-cd26-412f-9db6-1fb4d21ac3c1">
+        <li>In spite of having been reassigned to Jane, the concept will not be shown in her inbox
+          until it is “taken away” from John’s inbox:</li>
+      </ul>
+    </p>
+    <p><image href="images/jane_inbox.PNG" id="image_kmg_uiz_mb"/></p>
+    <p>
+      <ul id="ul_4d2e3ca1-dba3-4ee7-a6c1-695194f8270a">
+        <li> In order to do this, either the Project Manager or John must login as “John tsp t” and
+          open his Inbox. The reassigned concept will automatically disappear from John’s Inbox and
+          will be displayed in Jane’s: </li>
+      </ul>
+    </p>
+    <p><image href="images/john_to_jane_reassignment.PNG" id="image_ppi_viz_mb"/></p>
+    <p>
+      <ul id="ul_9c4c6616-7869-4558-a5d9-ef88bb547b59">
+        <li>In order to be reassigned, the first assigned member of the translation team must open
+          his/her inbox to effectively submit the reassigned worklist item(s) to the newly designed
+          recipient.</li>
+        <li>Only worklist items with status “Delivered” can be reassigned. Otherwise, a warning
+          message will be displayed indicating that the worklist item(s) cannot be reassigned:</li>
+      </ul>
+    </p>
+    <p><image href="images/reassignment_not_allowed.PNG" id="image_svo_wiz_mb"/></p>
+    <p>
+      <ul id="ul_92485993-af2a-4729-8641-40df9b2fdf41">
+        <li>A refresh button has been added to update the concepts included in a worklist, which may
+          have been changed since worklist creation.</li>
+      </ul>
+    </p>
+    <p/>
+    <p><b><u>"Assassin" process</u></b></p>
+    <p>
+      <ul id="ul_1c59092f-c433-44f5-9cb6-c5757ad2b45d">
+        <li>The re-assign tab also has an option for deleting members from delivered worklists.</li>
+        <li>As an example, the translator has a concept “Dislocation (morphologic abnormality) in
+          his/her inbox. You are the project manager and you decide that this concept should not be
+          translated for this release. Therefore, you may open the Re-assign tab in the worklist
+          details pane and select the option “Delete from queue” instead of selecting another person
+          in the workflow and click “Send” button.</li>
+      </ul>
+    </p>
+    <p><image href="images/delete_from_queue.PNG" id="image_bnt_xiz_mb"/></p>
+    <p>
+      <ul id="ul_6a74c253-6609-481d-9005-34e56803c958">
+        <li>The next time that the translator opens his/her inbox, “Dislocation (morphologic
+          abnormality)” will have been deleted from his/her worklist.</li>
+      </ul>
+    </p>
+    <p><image href="images/worklist_item_reassigned_in_inbox.PNG" id="image_cbg_cjz_mb"/></p>
+  </body>
+</topic>

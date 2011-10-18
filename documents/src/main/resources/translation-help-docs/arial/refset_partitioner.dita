@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Refset partitioner</title>
+  <body>
+    <p>Once you have selected a partition scheme in the left panel its details will be displayed on
+      the right panel. </p>
+    <p>If you click “Edit partitions” button on the bottom, the RefSetPartitioner is opened. </p>
+    <p><image href="images/edit_partitions.PNG" id="image_tjr_nez_mb"/></p>
+    <p>
+      <ul id="ul_0714474b-fadb-4620-8446-7455fdc28720">
+        <li>The refset partitioner has the following characteristics:</li>
+      </ul>
+    </p>
+    <p><image href="images/refset_partitioner_parts.PNG" id="image_cvb_qez_mb"/></p>
+    <p>A) Number of members</p>
+    <p>B) Members list in alphabetical order, and options for displaying them</p>
+    <p>C) Action buttons: </p>
+    <p> - ADD PARTITION to create new partitions</p>
+    <p> - SPLIT REMAINING MEMBERS to create adittional partitions with any remaining members after
+      new partitions have been created (explained in detail below).</p>
+    <p/>
+    <p>
+      <ul id="ul_27dfa26c-7217-4a5b-80e1-c589bc955d65">
+        <li>Click “Add partition” button to create a partition</li>
+        <li>You may choose to partition your workset according to different criteria: by number,
+          e.g, a partition including 20 concepts; by hierarchy, e.g. a partition including concepts
+          that are descendant of a given concept; by string match, e.g. a partition including
+          concepts with similar strings or dragging indiviual concepts into a new partition.
+          Examples of these are provided in the sections below.</li>
+        <li>Whenever you create a partition, you should define a partition name first.</li>
+      </ul>
+    </p>
+    <p><b><u>Partition creation: by hierarchy</u></b></p>
+    <p>
+      <ul id="ul_f98bcdcc-edce-47ac-82ce-779fcf9b5c88">
+        <li>This criterion will allow you to select the concepts that are descendant of a specified
+          parent concept.</li>
+        <li>Select “Is descendant of” option in the Partitioning selector combo box (Is descendant
+          of is preconfigured by default)</li>
+        <li>A parent concept must be included. In order to do this, you must drag and drop the
+          parent concept from the RefSet Partitioner members window into the Parent concept window.
+          (You may also open the taxonomy tab in the left panel, select the concept that will be the
+          parent of your partition and drag and drop it into the partition editor tab.)</li>
+      </ul>
+    </p>
+    <p><image href="images/partition_by_hierarchy.PNG" id="image_lez_rez_mb"/></p>
+    <p>
+      <ul id="ul_5edb752b-3625-455e-97a4-f42cc76abbb5">
+        <li>The SELECTED PARENT and ALL its descendants will be extracted from the workset.</li>
+        <li>You may select Preview to see the concepts listed according to your selection
+          criterion.</li>
+      </ul>
+    </p>
+    <p><image href="images/partitioning_by_hierarchy_preview.PNG" id="image_puy_tez_mb"/></p>
+    <p>
+      <ul id="ul_600a44ce-d495-49db-af02-fcd69dda81d7">
+        <li>Note: When clicking “Preview”, the concepts are listed. However, you must click “Save”
+          to create the partition (this apply to all criteria used for partitioning).</li>
+        <li>When the partition is created, it is displayed in the Refset Partitioner screen with the
+          number of members in brackets</li>
+        <li>You may click on the check-box to see the members</li>
+        <li>Notice that the list of workset members is now 125, because those included in the
+          partition have been removed from it. Once the partition is created you will see that these
+          concepts are no longer in your workset on the left and the number of remaining concepts to
+          be partitioned decreases with each subsequent partition, whichever the criterion used for
+          partition creation is.</li>
+      </ul>
+    </p>
+    <p><image href="images/partition_by_hierarchy_final.PNG" id="image_blh_wez_mb"/></p>
+    <p><b><u>Partition creation: by quantity</u></b></p>
+    <p>
+      <ul id="ul_2e65b573-f232-4a3f-828c-3489c1e5deba">
+        <li>This criterion will randomly extract the specified number of concepts from the
+          workset.</li>
+        <li>Select “Quantity” in the Partitioning combo box and define the number of concepts to be
+          included.</li>
+        <li>You may click “Preview” to see the selected concepts and then SAVE.</li>
+      </ul>
+    </p>
+    <p/>
+    <image href="images/partition_by_number.PNG" id="image_yqx_xez_mb"/>
+    <p>
+      <ul id="ul_b2ff7217-8b13-49b4-a694-d81ca4230c7e">
+        <li>When the partition is created, it is displayed in the Refset Partitioner screen with the
+          number of members in brackets</li>
+        <li>You may click the check-box to see the members.</li>
+      </ul>
+    </p>
+    <p/>
+    <p><b><u>Partition criterion: by string match</u></b></p>
+    <p>• The selection is made according to the identification of concepts that share similar
+      semantic structures.</p>
+    <p>
+      <ul id="ul_87acebef-7f43-4589-96c3-71e064d2d7ae">
+        <li>Select “String match” and define your string. Asterisks may be used as wildcards, so you
+          can write a word between asterisks and all the workset concepts including that word will
+          be retrieved. Click “Preview” to see your selection, then SAVE:</li>
+      </ul>
+    </p>
+    <p><image href="images/partition_by_string_match.PNG" id="image_gdr_zez_mb"/></p>
+    <p><b><u>Partition creation: by concept dropping</u></b></p>
+    <p>
+      <ul id="ul_2184b16c-d05d-40fd-bc4c-856f48fa0b55">
+        <li>With this option, concepts may be directly dragged and dropped from the worklist.</li>
+      </ul>
+    </p>
+    <p><image href="images/Partition_by_drag_and_drop.PNG" id="image_vul_bfz_mb"/></p>
+    <p>
+      <ul id="ul_2e8af9af-3f97-4af3-9e74-abd42a441826">
+        <li>Only one concept or several concepts (continuous or discontinuous in the list of
+          members) may be selected at a time.</li>
+      </ul>
+    </p>
+    <p><b><u>Splitting of remaining worklist members</u></b></p>
+    <p>You may split the remaining concepts into pre-specified proportions: </p>
+    <p/>
+    <image href="images/partition_split_remaining.PNG" id="image_ecd_dfz_mb"/>
+    <p>
+      <ul id="ul_77e4eaf2-f87f-4082-b0d9-b94cdf186504">
+        <li>Click the “Split remaining members”. The refset splitter is displayed on the right. Give
+          a name to the remaining partitions (in this case, BODY STRUCT BY SPLIT REMAINING) and
+          define your split pattern (the sum must be 100%).</li>
+        <li>Click “Calculate partitions” to display the number of concepts to be included. Click
+          SAVE.</li>
+      </ul>
+    </p>
+    <p><image href="images/partitions_calculate_partitions.PNG" id="image_nvz_efz_mb"/></p>
+    <p><b><u>Changes in already created partitions</u></b></p>
+    <p>You may display an already created partition, select a concept and drag it back to the RefSet
+      Partitioner. From there, you may drag it into another partition and/or into the original
+      one.</p>
+    <p><image href="images/changes_in_already_created_part.PNG" id="image_grg_hfz_mb"/></p>
+    <p><b><u>Creation of one partition from a whole workset</u></b></p>
+    <p>You may also create a single partition from the whole workset by clicking the ‘Create one
+      click partition’ button in the Workset details panel.</p>
+    <p><image href="images/one_click_partition.PNG" id="image_aup_lfz_mb"/></p>
+    <p>
+      <ul id="ul_cf84bb27-24b8-4243-9741-c3adafb6e221">
+        <li>The One click partition will have the same number of members as the workset.</li>
+        <li>You should specify a name for your partition first. </li>
+      </ul>
+    </p>
+    <p><image href="images/one_click_partition_name.PNG" id="image_tsd_nfz_mb"/></p>
+    <p>
+      <ul id="ul_e83ab22b-cf71-4c7b-81df-ba2459f4fdd0">
+        <li>The partition scheme and the one click partition are automatically generated. Opening
+          the ‘Members’ tab in the Partition details pane will show the list of members, as well as
+          their number:</li>
+      </ul>
+    </p>
+    <p><image href="images/one_click_partition_details.PNG" id="image_knm_ofz_mb"/>
+      <image href="images/one_click_partition_members.PNG" id="image_ekz_qfz_mb"/></p>
+  </body>
+</topic>

@@ -1,0 +1,4 @@
+fil = new Array();
+fil["0"]= "create_refset.html@@@Refset creation@@@Open the translation workbench, log-in as refset manager (peter refm in the testing bundle) and select the Refset Spec tab: Press the  refset creation request  button: A new window is opened requestin...";
+fil["1"]= "create_workset.html@@@Creation of worksets@@@A workset is a refset “frozen” in a point of time and associated to a project Specifying workset features Open the workset tab on the right panel and click “Create new workset”.  A new window is displ...";
+fil["2"]= "images_transl/specifiying_project_characteristics.html@@@Creation of projects@@@Open the Translation Workbench and select  Open  -->  Project Manager  from the upper left menu. The project manager tab will be displayed: The project managment screen will be opened with a left pane...";

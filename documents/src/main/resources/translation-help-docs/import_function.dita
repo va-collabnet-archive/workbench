@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Import function</title>
+  <body>
+    <p>The screen is similar to the one displayed for Export function. In this case you should click
+      the Select folder button to select the folder from which you will import a file. All files
+      imported should be .txt files.</p>
+    <p>In the example shown, we have selected to import a RF1 file.  Files ending with _SCTID.txt or
+      UUID.txt should have been chosen if RF2 were selected:</p>
+    <p/>
+    <p><image href="images_transl/128_import_select_file.PNG"/></p>
+    <p/>
+    <p>The user has the option to create a NEW concept refset: in thi case, you should specify a new
+      concept refset name and then click Import button:</p>
+    <p/>
+    <p><image href="images_transl/129_import_new_refset.PNG"/></p>
+    <p>If you decide to add your import to and existing concept refset, you should specify the
+      following:</p>
+    <p>
+      <ul id="ul_ucq_gem_ic">
+        <li>The refset where your selection will be added: drag and drop the chosen refset to the
+          ‘Add to Concept Refset’ window.</li>
+        <li>Specify whether your import will replace or not the content of the existing refset. If
+          the “Incremental” option remains unticked, your import will replace the content of the
+          existing refset:<ul id="ul_vwt_jem_ic">
+            <li>For this example, we will consider the refset “Body structure_2” , which has 642
+              members</li>
+          </ul></li>
+      </ul>
+    </p>
+    <p/>
+    <p><image href="images_transl/130_export_select_refset.PNG"/><image
+        href="images_transl/131_import_drag_and_drop.PNG"/></p>
+    <p>
+      <ul id="ul_jxl_ygm_ic">
+        <li>In this example you are importing the file TEST 2 (worklist)-ET 20101116165357.txt to
+          the refset “Body structure_2”. As you didn’t tick the Incremental option, the imported
+          file will replace the content of Body structure_2 refset.  </li>
+        <li>The Results window states that file TEST 2 (worklist)-ET 20101116165357.txt had 20
+          concepts that replaced 622 concepts of Body structure_2 refset.  However, the original
+          Body structure_2 refset had 642 members. Why only 622 concepts were changed? Because the
+          20 concepts of file TEST 2 (worklist)-ET 20101116165357.txt already were in the Body
+          structure_2 refset and therefore, they were not deleted.</li>
+      </ul>
+    </p>
+    <p/>
+    <p>Specify that your import will be added to an existing refset by clicking the “Incremental”
+        option:<ul id="ul_puq_ehm_ic">
+        <li>We will consider refset “REFSET FOR IMPORT", which has 35 members, but now we will tick
+          the incremental option.</li>
+      </ul></p>
+    <p><image href="images_transl/132_import_incremental_option_ticked.PNG"/></p>
+    <p>Now, your import will be added to the content of the existing refset, and you may verify this
+      after importing in the Refset Viewer: you will see that REFSET FOR IMPORT refset now has 55
+      members because the 20 concepts of TEST 2 (worklist)-ET 20101116165357.txt have been
+      added.</p>
+    <p/>
+    <p><image href="images_transl/133_import_refset_imported-incremental.PNG"/></p>
+    <p/>
+  </body>
+</topic>

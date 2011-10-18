@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>FSN generation strategy</title>
+  <body>
+    <p><image href="images_transl/55_proj_config_fsn_generation_config.PNG" id="image_poy_pnc_hc"
+        /><ul id="ul_zdk_qnc_hc">
+        <li>
+          <p>Defines the action to take when a preferred term is saved and there is no FSN for the
+            concept. The options to be selected are the following:<ul id="ul_hmq_vnc_hc">
+              <li><u>None</u>: no FSN is generated</li>
+            </ul></p>
+          <p>
+            <ul id="ul_blx_wnc_hc">
+              <li><u>Same as preferred</u>: generates a FSN in the target language, with the same
+                text as the target preferred term and the translated semantic tag. Translation of
+                the semantic tag hierarchy is a pre-requisite for semantic tag generation.</li>
+            </ul>
+          </p>
+          <p>
+            <ul id="ul_hfy_aoc_hc">
+              <li><u>Copy source language</u>: generates a new description in the target language,
+                with new IDs, identical to the source FSN.</li>
+            </ul>
+          </p>
+          <p>
+            <ul id="ul_ejh_doc_hc">
+              <li><u>Link source language</u>: includes the source language FSN in the target
+                language refset, as the new FSN, keeping the same identifiers.</li>
+            </ul>
+          </p>
+        </li>
+      </ul></p>
+  </body>
+</topic>

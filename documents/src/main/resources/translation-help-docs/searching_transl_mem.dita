@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Searching for translation memory</title>
+  <body>
+    <p>This tool allows the user to find out if a word or term has been included in the translation
+      memory:</p>
+    <p><image href="images_transl/83_select_search_transl_mem.PNG" id="image_ocd_pwi_hc"/></p>
+    <p/>
+    <p>Searching for translation memory is performed on the source language only, as it is a guide
+      for translation consistency.  In the example shown, the Translation Memory is stating that
+      previously translated concepts with descriptions containing “open fracture” had been
+      translated into Spanish as “fractura expuesta.” Therefore, any new concept to be translated
+      containing “open fracture” should be similarly translated.</p>
+    <p/>
+    <p><image href="images_transl/82_search_transl_memory.PNG" id="image_ocp_bwi_hc"/></p>
+    <p/>
+    <p>For example, if the new concept is “Open fracture of hand” the translation into Spanish
+      should be “Fractura expuesta de mano”.</p>
+    <p/>
+    <p>
+      <ul id="ul_yhy_qwi_hc">
+        <li>The search screen is opened al the bottom of the screen. Enter a search term and then
+          press "Search":</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/84_search_transl_mem_window.PNG" id="image_yfh_zwi_hc"/></p>
+    <p>Any available results will be displayed:</p>
+    <p/>
+    <p><image href="images_transl/85_transl_mem_results_found.PNG" id="image_efs_gxi_hc"/></p>
+    <p/>
+    <p>And they will be shown any time a concept containing the specified structure in the source
+      language is being translated:</p>
+    <p/>
+    <p><image href="images_transl/86_%20transl_mem_match_display.PNG" id="image_wvn_qxi_hc"/></p>
+  </body>
+</topic>

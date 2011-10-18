@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Reporting of translation progress</title>
+  <body>
+    <p>When the report panel is opened in the lower part of the screen, the user may choose any of
+      the following options:</p>
+    <p/>
+    <p><image href="images_transl/140_reporting.PNG"/></p>
+    <p/>
+    <p>The user must choose an item from the report list and click “Preview” button to select a
+      project in order to visualize the report:</p>
+    <p/>
+    <p><image href="images_transl/141_worklist_members_by_status.PNG"/></p>
+    <p/>
+    <p>The available worklists are displayed. A printable viewer is displayed showing the worklist
+      members by status, specifying source FSN and target PT (provided a translated one exists), and
+      showing totals for each status. </p>
+    <p/>
+    <p><image href="images_transl/142_worklist_status_table.PNG"/></p>
+    <p/>
+    <p>A pie chart view with a summary of all the workflow’s statuses and of the last user is also
+      displyed:</p>
+    <p/>
+    <p><image href="images_transl/143_worklist_status_pie_chart.PNG"/></p>
+    <p/>
+    <p>When the Excel format is chosen, the report will be displayed in an excel pivot table that
+      shows a Report Demo sheet listing Status, Worrklist chosen and Total numbers of each
+      status.</p>
+    <p>If data have changed since the last time the worklist was selected, press the refresh icon to
+      update them.</p>
+    <p/>
+    <p><image href="images_transl/144_excel_report_demo.PNG"/></p>
+    <p/>
+    <p>The other sheet of the Excel pivot table contains data displayed by status, term (either
+      source FSN and target preferred term), as well as the last user involved in the
+      translation:</p>
+    <p/>
+    <p><image href="images_transl/145_excel_report_data_sheet.PNG"/></p>
+    <p/>
+    <p>Clicking “CSV data” button will save a CSV (comma-separated values) file, a simple text
+      format for a database table, wherever the user indicates.</p>
+    <p/>
+    <p/>
+    <p>The following option summarizes the statuses of all the worklists in a given project:</p>
+    <p><image href="images_transl/146_proj_worklist_status_total.PNG"/></p>
+    <p/>
+    <p>All the project worklists are displayed, either as tables and as bar graphs, as well as a
+      workset summary and a project summary. Each of them displays the statuses of all the
+      worklists:</p>
+    <p/>
+    <p><b>A: Examples of worklist status totals:</b></p>
+    <p><image href="images_transl/147_worklists_by_status_ca_ft.PNG"/><image
+        href="images_transl/148_worklists_by_status_dk.PNG"/></p>
+    <p/>
+    <p><b>B: Example of Workset summary:</b></p>
+    <p/>
+    <p><image href="images_transl/149_workset_summary.PNG"/></p>
+    <p/>
+    <p><b>C: Example of Project summary:</b></p>
+    <p/>
+    <p><image href="images_transl/150_project_summary.PNG"/></p>
+    <p/>
+    <p>As with the  "Worklist members by status report", the same information may be presented in an
+      Excel pivot table and in csv format.</p>
+    <p/>
+    <p>The third option for reporting is the Project History Report:</p>
+    <p/>
+    <p><image href="images_transl/151_project_history_report.PNG"/></p>
+    <p/>
+    <p>In this case, a project must be selected, and then a start date and an end date should de
+      specified. The interval (days) indicates how often data are recorded.</p>
+    <p/>
+    <p/>
+    <p><image href="images_transl/152_project_history%20specifications.PNG"/></p>
+    <p/>
+    <p/>
+    <p>When the parameters have been defined an Excel table is opened showing the project in the
+      specified period, with the data obtained at the specified interval and the respective
+      changes.</p>
+    <p/>
+    <p>Finally, the last option for reporting is the "Accumulated status changes report", which
+      displays  the number of translation statuses per user and per date, for a given worklist,
+      workset and project. The information is displayed in an Excel pivot table containing the pivot
+      table proper (A) and the data sheet (B)</p>
+    <p/>
+    <p><b>(A)</b>
+      <image href="images_transl/154_accumulated_totals_pivot.PNG"/></p>
+    <p/>
+    <p><b>(B)</b>
+      <image href="images_transl/155_accumulated_totals_data_sheet.PNG"/></p>
+  </body>
+</topic>

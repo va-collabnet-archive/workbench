@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Indexing translation memory</title>
+  <body>
+    <p>When selecing this option, a window will be automatically displayed in the lower third of the
+      screen.</p>
+    <p>(<b>Note</b>: click <image href="images_transl/post_icon.PNG" id="image_gbx_ori_hc"/> if the
+      working window is not automatically displayed.</p>
+    <p/>
+    <p>
+      <ul id="ul_uni_uri_hc">
+        <li>Press the bar displayed on the bottom of this window:</li>
+      </ul>
+    </p>
+    <p><image href="images_transl/78_Select_indexing_transl_mem.PNG" id="image_nhd_osi_hc"/></p>
+    <p/>
+    <p>A window is opened asking you to select the file that will be indexed. It should be an Excel
+      file with two columns: Source and Target, where descriptions in the source and target
+      languages are entered.</p>
+    <p>Excel 2007 documents ( . xlsx) are recognized, as well as .xls files.</p>
+    <p/>
+    <p><image href="images_transl/79_transl_mem_excel.PNG" id="image_pgo_zsi_hc"/></p>
+    <p>Upon clicking the ‘Open file’ button, each row of the table is entered as a line. (An error
+      message will be displayed in case the process cannot be completed.)</p>
+    <p/>
+    <p><image href="images_transl/80_index_transl_mem.PNG" id="image_cmg_hti_hc"/></p>
+    <p>The translator will see any of these whenever he/she selects a concept that contains any of
+      the terms included in the Translation Memory in the middle window of the Translation help
+      tab:</p>
+    <p/>
+    <p><image href="images_transl/81_transl_memory_display.PNG" id="image_cei_rti_hc"/></p>
+  </body>
+</topic>

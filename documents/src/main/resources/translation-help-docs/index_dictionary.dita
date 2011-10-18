@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Index dictionary</title>
+  <body>
+    <p>In order to make searches in dictionaries or activate the spell checker for your
+      translations, dictionaries must be indexed first. </p>
+    <p><image href="images_transl/70_index_dictionary.PNG" id="image_oek_cgi_hc"/></p>
+    <p>The Index dictionary tool allows indexing dictionaries from different sources. Once you have
+      selected Index Dictionary option, the following window is opened in the lower part of the
+      screen:</p>
+    <p/>
+    <p><image href="images_transl/71_index_diction_options.PNG" id="image_nwf_kgi_hc"/></p>
+    <p>When “Index dictionary from text file” button is selected, an open file option is opened.
+      Every workflow bundle has a Dictionaries folder. You must open it and select a language, that
+      will be automatically indexed:</p>
+    <p/>
+    <p><image href="images_transl/72_index%20diction_files.PNG" id="image_azb_sgi_hc"/></p>
+    <p>Once you have ended indexation you may open <b>Search dictionary</b> tool.</p>
+  </body>
+</topic>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation memory window</title>
+  <body>
+    <p>This windows displays similar semantic structures that have been already translated in order
+      to maintain translation consistency.</p>
+    <p/>
+    <p><b>Hide / Show button</b> allows to collapse or display Similarity window according to user's
+      preferences.</p>
+    <p><image href="images_transl/93_translation%20memory_screen.PNG"/></p>
+    <p>Searching for translation memory is performed on the source language only, as it is a guide
+      for translation consistency.  In the example shown below, the Translation Memory is stating
+      that previously translated concepts with descriptions containing “open fracture” had been
+      translated into Spanish as “fractura expuesta.” Therefore, any new concept to be translated
+      containing “open fracture” should be similarly translated:</p>
+    <p><image href="images_transl/81_transl_memory_display.PNG"/></p>
+    <p>For example, if the new concept is “<i>Open fracture</i> of hand” the translation should be
+        “<i>Fractura expuesta</i> de mano”.</p>
+  </body>
+</topic>

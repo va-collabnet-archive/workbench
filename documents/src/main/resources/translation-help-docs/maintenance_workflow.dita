@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Maintenance workflows</title>
+  <body>
+    <p>In this tab, maintenance worklists are used to send any concept into a translation workflow
+      without the requirement of creating a new workset, e.g., in the case of an already translated
+      concept incidentally found thay may nedd correction.</p>
+    <p>Many different workflows can be configured.</p>
+    <p>This tool is intended for single concepts only and therefore, worklists of only one concept
+      will be generated.</p>
+    <p>You should introduce a name for your maintenance worklist and select a business process from
+      the Workflow Business Process file. Then click “Create new Worklist”. The list of available
+      workflows is configurable for each implementation and can grow according to needs:</p>
+    <p/>
+    <p><image href="images_transl/111_maintence_workflows.PNG" id="image_qkz_uvp_hc"/></p>
+    <p>
+      <ul id="ul_tjo_iwp_hc">
+        <li>
+          <p><b>NOTE</b>: When “<b>MaintenanceWorkflow.bp</b>” is chosen, only translator and
+            reviewer are involved: the translator corrects the concept, sends it to the reviewer and
+            then, the concept enters directly to the Archival queue upon reviewer’s approval.</p>
+          <p>When “<b>IsolatedEdit.bp</b>” is chosen, any person with permission may edit, correct
+            and submit the concept to the Archival queue</p>
+          <p>In this example, when “<b>Translation Workflow.bp</b>” is selected, the concept to be
+            changed will follow the standard translation workflow, but other business processes may
+            be configured according to the users needs.</p>
+        </li>
+      </ul>
+    </p>
+    <p/>
+    <p>The maintenance worklist automatically generated is displayed on the left panel:</p>
+    <p/>
+    <p><image href="images_transl/112_maintenance_wf_left_panel.PNG" id="image_drl_qwp_hc"/></p>
+    <p/>
+    <p>Now you must specify the concept that will be corrected. Go to the Taxonomy tab and right
+      click on the concept you will want to correct:</p>
+    <p/>
+    <p><image href="images_transl/113_maint_to_translate.PNG" id="image_hqe_yaq_hc"/></p>
+    <p/>
+    <p>A window showing the Project name and the name of the maintenance worklist is opened. Click
+      “&gt;” button to assign the new worklist:</p>
+    <p/>
+    <p><image href="images_transl/114_choose_maintenance_wl.PNG" id="image_axt_ibq_hc"/></p>
+    <p/>
+    <p>A confirmation message is shown:</p>
+    <p/>
+    <p><image href="images_transl/115_maintenance_confirmation_mess.PNG" id="image_cvo_qbq_hc"/></p>
+    <p/>
+    <p>Then, a new window is displayed, asking you to select the roles that will take part in the
+      process (A) and the execution options (B):</p>
+    <p/>
+    <p><b>(A)</b>
+      <image href="images_transl/116_maintenance_choose_roles.PNG" id="image_tli_tcq_hc"/></p>
+    <p><b>(B)</b><image href="images_transl/117_mainetnance_execution.PNG" id="image_ime_keq_hc"
+      /></p>
+    <p/>
+    <p>If you select to execute the process immediately, the translation interface is opened and you
+      may change the selected concept:</p>
+    <p/>
+    <p><image href="images_transl/118_maintenance_immediate.PNG" id="image_xlj_req_hc"/></p>
+    <p/>
+    <p>Once you have made the change and the correction process is complete, you may end your
+      correction by clicking “Approve” button.</p>
+    <p>A message indicating that item translation is complete and that it has been sent to the
+      Archival queue of the Release Manager es displayed.</p>
+    <p>The screen goes back to the Workset details pane upon clicking OK and the maintenance process
+      is completed.</p>
+    <p><b>NOTE:</b>
+      <b>Maintenance Workset, partitions and worklists are automatically generated for each project.
+        These are not meant to be maintained by the user; concepts will be added to this component
+        as needed. User changes are disabled for this workset:</b></p>
+    <p/>
+    <p><image href="images_transl/119_maintenance_disabled_functions.PNG" id="image_cpf_mfq_hc"
+      /></p>
+  </body>
+</topic>
