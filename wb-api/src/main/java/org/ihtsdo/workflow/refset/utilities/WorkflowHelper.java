@@ -132,6 +132,7 @@ public class WorkflowHelper {
 	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean, ViewCoordinate vc)
  	{
 		try {
+			UUID currentWfId = bean.getWorkflowId();
 			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
 			retireRow(bean);
@@ -141,8 +142,10 @@ public class WorkflowHelper {
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
 		    	// Retire original Row as previously retired original
-				retireRow(latestBean);
-	    	}	    	
+				if (currentWfId.equals(latestBean.getWorkflowId())) {
+					retireRow(latestBean);
+				}
+			}
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in retiring workflow history row: " + bean.toString() + "  with error: " + e.getMessage());
 		}

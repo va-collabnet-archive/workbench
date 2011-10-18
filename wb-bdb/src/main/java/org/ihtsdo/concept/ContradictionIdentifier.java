@@ -9,16 +9,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
@@ -39,6 +43,9 @@ import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.PositionForSet;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
@@ -55,6 +62,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
     private ConcurrentSkipListSet<PositionBI> viewPosMap = new ConcurrentSkipListSet<PositionBI>(new PositionBIComparator());
  	private ConcurrentSkipListSet<ComponentVersionBI> returnVersionCollection = new ConcurrentSkipListSet<ComponentVersionBI>(new ComponentVersionComparator());
+
+	private int currentStatusNid;
 	
     private class PositionBIComparator implements Comparator<PositionBI> { 
 		
@@ -100,6 +109,10 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	public ContradictionIdentifier(ViewCoordinate vc, boolean useCase) {
 		viewCoord = new AtomicReference<ViewCoordinate>(vc);
 		isReturnVersionsUseCase = new AtomicBoolean(useCase);
+		try {
+			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
+		} catch (Exception e) {
+		}
 	}
 	
 	// For a given concept, look at a set of components at a time.
@@ -166,6 +179,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		boolean isSingleEdit = false;
 		ContradictionResult result = ContradictionResult.NONE;
     	
+		// Handle WfHx Refset Contradictions
+		ContradictionResult automationResult = wfHxRefsetMembershipConflictAutomation(concept);
+	    
 		for (ComponentType type : ComponentType.values()) {
 			if (type != ComponentType.REFSET) 
 			{
@@ -540,14 +556,14 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					if (!comparer.hasSameAttributes(version))
 					{
 						if (!isNewComponent) {
-						if (!secondaryComparer.isInitialized())
-						{
-							secondaryComparer.initializeAttributes(version);
-						}
-						else if (!secondaryComparer.hasSameAttributes(version))
-						{
-							return false;
-						}
+							if (!secondaryComparer.isInitialized())
+							{
+								secondaryComparer.initializeAttributes(version);
+							}
+							else if (!secondaryComparer.hasSameAttributes(version))
+							{
+								return false;
+							}
 						} else {
 							return false;
 						}
@@ -819,10 +835,104 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
     }
 
-    private ContradictionResult refsetMembershipConflictFound(
-            Concept concept, 
-            Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, int componentNid) throws TerminologyException, IOException, ContraditionException 
-	{
+    private ContradictionResult wfHxRefsetMembershipConflictAutomation(Concept concept) throws TerminologyException, IOException, ContraditionException  {
+        ContradictionResult result = ContradictionResult.NONE;
+        ComponentVersionBI latestAdjudicatedVersion = null;
+        ComponentVersionBI latestOriginVersion = null;
+        Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
+        Set<ComponentVersionBI> developerVersions = new HashSet<ComponentVersionBI>();
+        
+        PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
+        List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(WorkflowHelper.getWorkflowRefsetNid(), concept.getConceptNid());
+
+	    for (I_ExtendByRef member : members) 
+	    {
+			int idx = member.getTuples().size() - 1;
+	    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
+	    	if (part.getStatusNid() != currentStatusNid) {
+	    		continue;
+	    	}
+	    	WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member);
+	    	// Identify Adjudication versions and find latest 
+	     	if (part.getPathNid() == viewPathNid.get()) {
+ 				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
+ 					latestAdjudicatedVersion = part;
+                }
+				continue;
+	        }
+
+			// Identify Origins versions and find latest
+			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
+ 				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
+ 					latestOriginVersion = part;
+	            }
+ 				continue;
+	        }
+	    }
+	    for (I_ExtendByRef member : members) 
+	    {
+	    	boolean putIntoMap = false;
+	    	Integer pathNidObj = null;
+
+			int idx = member.getTuples().size() - 1;
+	    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
+	    	if (part.getStatusNid() != currentStatusNid) {
+	    		continue;
+	    	}
+
+	    	WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member);
+	    	
+	    	if ((part.getPathNid() != viewPathNid.get()) &&
+				(part.getPathNid() != commonOriginPathNid.get()) &&
+				(!isOriginVersion(originPath, part))) 
+	    	{
+				// Identify Latest Developer version
+				putIntoMap = true;
+				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(part.getPathNid());
+
+				if (latestVersion != null) {
+					if (latestVersion.getTime() > part.getTime()) {
+						putIntoMap = false;
+					}
+				}
+
+				if ((latestAdjudicatedVersion != null) &&
+					(part.getTime() < latestAdjudicatedVersion.getTime())) {
+					putIntoMap = false;
+				}
+			}
+
+			if (putIntoMap) {
+				// Overwrite current latest version
+				latestDeveloperVersionMap.put(part.getPathNid(), part);
+            }
+	    }	 
+	    
+		if (!latestDeveloperVersionMap.isEmpty()) 
+		{
+
+			if (latestAdjudicatedVersion != null) { 
+				// if adjudication has been performed on componentId
+				result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
+			} else {
+				// if never had adjudication performed on componentId
+				result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
+			}
+
+        	if (result == ContradictionResult.CONTRADICTION) {
+        		// Take latest dev version and retire/duplicate version on adjudication path
+				automateWfHxAdjudication(developerVersions);
+            }
+    	}
+
+		return ContradictionResult.NONE;
+    }
+
+    
+	private ContradictionResult refsetMembershipConflictFound(
+        Concept concept, 
+        Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, int componentNid) throws TerminologyException, IOException, ContraditionException 
+    {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;
         boolean isContradiction = false;
@@ -835,97 +945,105 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	    PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
-
+        
+        
         for (I_ExtendByRef member : members) 
         {
- 			// Identify Adjudication versions and find latest 
-         	for (ComponentVersionBI part : member.getMutableParts()) {
-     			if (part.getPathNid() == viewPathNid.get()) {
-     				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
-     					latestAdjudicatedVersion = part;
-                    }
-                }
-            }
+            if (member.getRefsetId() != WorkflowHelper.getWorkflowRefsetNid()) {
+	 			// Identify Adjudication versions and find latest 
+	         	for (ComponentVersionBI part : member.getMutableParts()) {
+	     			if (part.getPathNid() == viewPathNid.get()) {
+	     				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
+	     					latestAdjudicatedVersion = part;
+	                    }
+	                } 
+	            }
+	
+				// Identify Origins versions and find latest
+	         	for (ComponentVersionBI part : member.getMutableParts()) {
+	    			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
+	     				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
+	     					latestOriginVersion = part;
+			            }
+			        }
+	     		}
+	
+	         	// Identify all developer edits and per path, get latest developer version
+	    	    for (ComponentVersionBI part : member.getMutableParts()) 
+	    	    {
+	    	    	boolean putIntoMap = false;
+	    	    	Integer pathNidObj = null;
+	
+	    	    	if ((part.getPathNid() != viewPathNid.get()) &&
+	    				(part.getPathNid() != commonOriginPathNid.get()) &&
+	    				(!isOriginVersion(originPath, part))) 
+	    	    	{
+	    				// Identify Latest Developer version
+	    				putIntoMap = true;
+	    				pathNidObj = new Integer(part.getPathNid());
+	    				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(pathNidObj);
+	
+	    				if (latestVersion != null) {
+	    					if (latestVersion.getTime() > part.getTime()) {
+	    						putIntoMap = false;
+	    					}
+	    				}
 
-			// Identify Origins versions and find latest
-         	for (ComponentVersionBI part : member.getMutableParts()) {
-    			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
-     				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
-     					latestOriginVersion = part;
+	    				if ((latestAdjudicatedVersion != null) &&
+	    					(part.getTime() < latestAdjudicatedVersion.getTime())) {
+	    					putIntoMap = false;
+	    				}
+		            }
+	
+	    			if (putIntoMap) {
+	    				// Overwrite current latest version
+	    				latestDeveloperVersionMap.put(pathNidObj, part);
 		            }
 		        }
-     		}
-
-         	// Identify all developer edits and per path, get latest developer version
-    	    for (ComponentVersionBI part : member.getMutableParts()) 
-    	    {
-    	    	boolean putIntoMap = false;
-    	    	Integer pathNidObj = null;
-
-    	    	if ((part.getPathNid() != viewPathNid.get()) &&
-    				(part.getPathNid() != commonOriginPathNid.get()) &&
-    				(!isOriginVersion(originPath, part))) 
-    	    	{
-    				// Identify Latest Developer version
-    				putIntoMap = true;
-    				pathNidObj = new Integer(part.getPathNid());
-    				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(pathNidObj);
-
-    				if (latestVersion != null) {
-    					if (latestVersion.getTime() > part.getTime()) {
-    						putIntoMap = false;
-    					}
-	                }
-	            }
-
-    			if (putIntoMap) {
-    				// Overwrite current latest version
-    				latestDeveloperVersionMap.put(pathNidObj, part);
-	            }
-	        }
-
-			if (!latestDeveloperVersionMap.isEmpty()) 
-			{
-				if (latestAdjudicatedVersion != null) { 
-					// if adjudication has been performed on componentId
-					result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
-				} else {
-					// if never had adjudication performed on componentId
-					result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
-	            }
 	
-	        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
-					isSingleEdit = true;
-					singleVersion= new AtomicReference<ComponentVersionBI>(developerVersions.iterator().next());
-	        	} else if (result == ContradictionResult.CONTRADICTION)	{
-		        	// Have potential contradiction, unless developers made same changes
-					ComponentVersionBI compareWithVersion = latestOriginVersion;
-					if (latestAdjudicatedVersion != null) {
-						compareWithVersion = latestAdjudicatedVersion;
-					}
-					
-					// Check if for given CompId, have multiple versions with same changes
-					if (!isContradictionWithSameValues(new RefsetAttributeComparer(), compareWithVersion, developerVersions)) 
-					{
-						// Concept contains contradiction.  No need to update positions as check complete for concept
-						isContradiction = true;
-						break;
-		            } else {
-						isDuplicateEdit = true;
-	                }
-	            }
-	
-	        	// Add Position to List
-	        	if (!isContradiction) {
-					boolean success = updateFoundPositionsForAllVersions(concept, foundPositionsMap, developerVersions.iterator(), member.getMemberId(), ComponentType.REFSET);
-					
-					if (!success) {
-						return ContradictionResult.ERROR;
-					}
-	        	}
+				if (!latestDeveloperVersionMap.isEmpty()) 
+				{
+					if (latestAdjudicatedVersion != null) { 
+						// if adjudication has been performed on componentId
+						result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
+					} else {
+						// if never had adjudication performed on componentId
+						result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
+		            }
+		
+		        	if (result == ContradictionResult.SINGLE_MODELER_CHANGE) {
+						isSingleEdit = true;
+						singleVersion= new AtomicReference<ComponentVersionBI>(developerVersions.iterator().next());
+		        	} else if (result == ContradictionResult.CONTRADICTION)	{
+			        	// Have potential contradiction, unless developers made same changes
+						ComponentVersionBI compareWithVersion = latestOriginVersion;
+						if (latestAdjudicatedVersion != null) {
+							compareWithVersion = latestAdjudicatedVersion;
+						}
+						
+						// Check if for given CompId, have multiple versions with same changes
+						if (!isContradictionWithSameValues(new RefsetAttributeComparer(), compareWithVersion, developerVersions)) 
+						{
+							// Concept contains contradiction.  No need to update positions as check complete for concept
+							isContradiction = true;
+							break;
+			            } else {
+							isDuplicateEdit = true;
+		                }
+		            }
+		
+		        	// Add Position to List
+		        	if (!isContradiction) {
+						boolean success = updateFoundPositionsForAllVersions(concept, foundPositionsMap, developerVersions.iterator(), member.getMemberId(), ComponentType.REFSET);
+						
+						if (!success) {
+							return ContradictionResult.ERROR;
+						}
+		        	}
+		        }
 	        }
         }
-
+        
         return identifyContradictionResult(isContradiction, isSingleEdit, isDuplicateEdit, false);
     }
 
@@ -1038,6 +1156,54 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	@Override
 	public Collection<? extends ComponentVersionBI> getReturnVersions() {
 		return returnVersionCollection;
+	}
+
+	private void automateWfHxAdjudication(Set<ComponentVersionBI> developerVersions) {
+		try {
+			WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
+
+			// Identify latest Dev Version
+			ComponentVersionBI latestVersion = null;
+			for (ComponentVersionBI version : developerVersions) {
+				if ((latestVersion == null) || (latestVersion.getTime() < version.getTime())) {
+					latestVersion = version;
+				}
+			}
+	
+			// Prepare Adjudication Changes
+			Set<PathBI> editPaths = Terms.get().getActiveAceFrameConfig().getEditingPathSet();
+			Set<PathBI> originalEditPaths = new HashSet<PathBI>();
+			
+			for (PathBI path : editPaths) {
+				originalEditPaths.add(path);
+			}
+			
+			editPaths.clear();
+			List<PathBI> paths = Terms.get().getPaths();
+			for (int i = 0; i < paths.size(); i++) {
+				I_GetConceptData path = Terms.get().getConcept(paths.get(i).getConceptNid());
+				if (path.getInitialText().equalsIgnoreCase("ajudication path")) {
+					editPaths.add(paths.get(i));
+					break;
+				}
+			}
+			// Retire latest Dev Version
+			WorkflowHelper.setAdvancingWorkflowLock(true);
+			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
+			WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+			
+			// Add latest Dev Version Bean on Adjudication Path
+			refsetWriter.updateWorkflowHistory(bean);
+			WorkflowHelper.setAdvancingWorkflowLock(false);
+			
+			// Revert Edit Path
+			editPaths.clear();
+			for (PathBI path: originalEditPaths) {
+				editPaths.add(path);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
 
