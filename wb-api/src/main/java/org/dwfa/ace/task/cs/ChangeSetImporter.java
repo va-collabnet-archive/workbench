@@ -38,6 +38,7 @@ import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public abstract class ChangeSetImporter implements ActionListener {
 
@@ -85,9 +86,10 @@ public abstract class ChangeSetImporter implements ActionListener {
                 }
                 readerSet.add(csr);
                 
-                I_ReadChangeSet wcsr = getChangeSetWfHxReader(csf);
-                wfHxReaderSet.add(wcsr);
-
+                if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+                	I_ReadChangeSet wcsr = getChangeSetWfHxReader(csf);
+                	wfHxReaderSet.add(wcsr);
+                }
                 logger.log(Level.INFO, "Adding reader: {0}\nThis has nextCommitTime() of : {1} ({2})", new Object[]{csf.getAbsolutePath(), csr.nextCommitTime(), new Date(csr.nextCommitTime())});
             }
 

@@ -29,18 +29,14 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.example.binding.WbDescType;
-import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
-import org.ihtsdo.tk.example.binding.CaseSensitive;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.CaseSensitive;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
@@ -140,31 +136,10 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 int fsn = 0;
 
                 //get rf1/rf2 concept
-                if (Ts.get().hasUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid())) {
-                    fsn = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
-                } else {
-                    fsn = WbDescType.FULLY_SPECIFIED.getLenient().getNid();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    gbConcept = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient();
-                } else {
-                    gbConcept = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                    usConcept = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient();
-                } else {
-                    usConcept = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getPrimUuid())) {
-                    prefNid = SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
-                } else {
-                    prefNid = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getNid();
-                }
-                if (Ts.get().hasUuid(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getPrimUuid())) {
-                    acceptNid = SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid();
-                } else {
-                    acceptNid = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getLenient().getNid();
-                }
+                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
                 //set initial word case sensitivity
                 String descText = text;

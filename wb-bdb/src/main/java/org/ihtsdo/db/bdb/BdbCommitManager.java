@@ -205,7 +205,9 @@ public class BdbCommitManager {
 
       addUncommitted(member.getEnclosingConcept());
 
-      handleWorkflowHistoryExtensions(extension);
+      if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+    	  handleWorkflowHistoryExtensions(extension);
+      }
    }
 
    public static void addUncommittedDescNid(int dNid) {

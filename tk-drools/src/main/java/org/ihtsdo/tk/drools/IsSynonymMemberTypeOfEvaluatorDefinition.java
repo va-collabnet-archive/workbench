@@ -31,7 +31,6 @@ import org.drools.rule.VariableRestriction.VariableContextEntry;
 import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -39,9 +38,7 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.spec.ValidationException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -114,20 +111,8 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
                 DescriptionVersionBI desc = fact.getComponent();
                 ViewCoordinate vc = fact.getVc();
                 ConceptSpec possibleType = null;
-                int evalRefsetNid = 0;
+                int evalRefsetNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
                 int typeNid = 0;
-
-                try {
-                    if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                        evalRefsetNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-                    } else if (Ts.get().hasUuid(SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getPrimUuid())) {
-                        evalRefsetNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
-                    } else {
-                        return false;
-                    }
-                } catch (ValidationException e) {
-                    //do nothing
-                }
 
                 if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
                     possibleType = (ConceptSpec) value2;

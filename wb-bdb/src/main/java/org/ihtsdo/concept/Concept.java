@@ -1014,14 +1014,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    @Override
    public List<I_ConceptAttributeTuple> getConceptAttributeTuples(NidSetBI allowedStatus,
            PositionSetBI positionSet, Precedence precedencePolicy,
-           ContradictionManagerBI contradictionManager, long time)
+           ContradictionManagerBI contradictionManager, long cuttoffTime)
            throws IOException, TerminologyException {
       List<I_ConceptAttributeTuple> returnTuples = new ArrayList<I_ConceptAttributeTuple>();
       ConceptAttributes             attr         = getConceptAttributes();
 
       if (attr != null) {
          attr.addTuples(allowedStatus, positionSet, returnTuples, precedencePolicy, contradictionManager,
-                        time);
+                        cuttoffTime);
       }
 
       return returnTuples;
@@ -1141,14 +1141,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    }
 
    @Override
-   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long time)
+   public Collection<? extends RefexVersionBI<?>> getCurrentRefsetMembers(ViewCoordinate vc, Long cuttoffTime)
            throws IOException {
       ConcurrentSkipListSet<RefsetMember<?, ?>> refsetMembers = getRefsetMembers();
       List<RefexVersionBI<?>>                   returnValues  =
          new ArrayList<RefexVersionBI<?>>(refsetMembers.size());
 
       for (RefsetMember refex : refsetMembers) {
-         for (Object o : refex.getVersions(vc, time)) {
+         for (Object o : refex.getVersions(vc, cuttoffTime)) {
             RefexVersionBI version = (RefexVersionBI) o;
 
             returnValues.add(version);
@@ -1297,14 +1297,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    @Override
    public List<I_DescriptionTuple<DescriptionRevision>> getDescriptionTuples(NidSetBI allowedStatus,
            NidSetBI allowedTypes, PositionSetBI positions, Precedence precedencePolicy,
-           ContradictionManagerBI contradictionManager, long time)
+           ContradictionManagerBI contradictionManager, long cuttoffTime)
            throws IOException {
       List<I_DescriptionTuple<DescriptionRevision>> returnDescriptions =
          new ArrayList<I_DescriptionTuple<DescriptionRevision>>();
 
       for (Description desc : getDescriptions()) {
          desc.addTuples(allowedStatus, allowedTypes, positions, returnDescriptions, precedencePolicy,
-                        contradictionManager, time);
+                        contradictionManager, cuttoffTime);
       }
 
       return returnDescriptions;

@@ -19,6 +19,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
@@ -100,7 +101,7 @@ public class PerformQA implements I_ProcessConcepts {
 			//destRels, config.getViewPositionSetReadOnly(), 
 			//config.getPrecedence(), config.getConflictResolutionStrategy())
 			long individualStart = Calendar.getInstance().getTimeInMillis();
-			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper);
+			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper, INFERRED_VIEW_ORIGIN.INFERRED);
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
 			// TRACERS

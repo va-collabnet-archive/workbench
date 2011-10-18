@@ -16,11 +16,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
@@ -40,8 +37,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class CloneAndRetireAction extends AbstractAction {
 
@@ -74,12 +69,7 @@ public class CloneAndRetireAction extends AbstractAction {
                 newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
                 TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                         config.getViewCoordinate());
-                int dosNid = 0;
-                if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                    dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-                } else {
-                    dosNid = Refsets.DEGREE_OF_SYNONYMY.getLenient().getNid();
-                }
+                int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
                 for (RefexVersionBI refex : oldRefexes) {
                     if (refex.getCollectionNid() != dosNid) { //not cloning degree of synonymy refeset membership
                         RefexCAB newSpec = new RefexCAB(
@@ -97,6 +87,7 @@ public class CloneAndRetireAction extends AbstractAction {
                         }
                     }
                 }
+                retireFromRefexes(component);
             }
             if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
@@ -148,32 +139,17 @@ public class CloneAndRetireAction extends AbstractAction {
         }
 
     }
-
-    private void retireFromRefexes(ComponentVersionBI analog) {
-        DescriptionVersionBI desc = (DescriptionVersionBI) analog;
+    
+    private void retireFromRefexes(ComponentVersionBI component) {
+        DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-            int usNid = 0;
-            int gbNid = 0;
-            int dosNid = 0;
-            if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
-            } else {
-                usNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
-            }
-            if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                gbNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
-            } else {
-                gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
-            }
-            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-            } else {
-                dosNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
-            }
+            int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
+            int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+            int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
                 if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
@@ -185,7 +161,7 @@ public class CloneAndRetireAction extends AbstractAction {
                                 ep.getConceptNid(),
                                 Long.MAX_VALUE);
                     }
-                    I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
+                    I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
                     Terms.get().addUncommitted(concept);
                 } else {
                     throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");

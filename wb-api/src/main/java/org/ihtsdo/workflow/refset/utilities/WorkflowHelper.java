@@ -1,6 +1,8 @@
 package org.ihtsdo.workflow.refset.utilities;
 
+import java.io.BufferedWriter;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -98,6 +100,7 @@ public class WorkflowHelper {
 	private static UUID wfHistoryRefsetUid = null;
 	private static boolean advancingWorkflowLock = false;
 	private static boolean wfCapabilitiesAvailable = true;
+	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -129,6 +132,7 @@ public class WorkflowHelper {
 	public static void retireWorkflowHistoryRow(WorkflowHistoryJavaBean bean, ViewCoordinate vc)
  	{
 		try {
+			UUID currentWfId = bean.getWorkflowId();
 			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
 			retireRow(bean);
@@ -138,8 +142,10 @@ public class WorkflowHelper {
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
 		    	// Retire original Row as previously retired original
-				retireRow(latestBean);
-	    	}	    	
+				if (currentWfId.equals(latestBean.getWorkflowId())) {
+					retireRow(latestBean);
+				}
+			}
 		} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Error in retiring workflow history row: " + bean.toString() + "  with error: " + e.getMessage());
 		}
@@ -1323,7 +1329,7 @@ public class WorkflowHelper {
 		wfCapabilitiesAvailable = val;
 	}
 
-	public static boolean isWorkflowCapabilitiesAvailable() {
+	public static boolean isWorkflowCapabilityAvailable() {
 		return wfCapabilitiesAvailable;
 	}
 
@@ -1358,6 +1364,30 @@ public class WorkflowHelper {
 		}
 
 		return 0;
+	}
+
+	public static BufferedWriter createLogFile(String filePath) throws IOException {
+		if (!logFiles.containsKey(filePath)) {
+			BufferedWriter logFile = new BufferedWriter(new FileWriter(filePath));
+			logFiles.put(filePath, logFile);
+		}
+		
+		return logFiles.get(filePath);
+	}
+
+	public static void closeLogFile(String filePath) {
+		try {
+			logFiles.get(filePath).flush();
+			logFiles.get(filePath).close();
+			logFiles.remove(filePath);
+		} catch (IOException e) {
+			AceLog.getAppLog().log(Level.INFO, "Error closing logfile: " + filePath);
+		}
+	}
+	public static void closeAllLogFiles() {
+		for (String filePath : logFiles.keySet()) {
+			closeLogFile(filePath);
+		}
 	}
 }
  

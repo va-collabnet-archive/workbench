@@ -12,9 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.arena.spec.SynonymyType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
@@ -29,7 +27,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -60,12 +57,7 @@ public class SetSynonymyAction extends AbstractAction {
             TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
-            int dosNid = 0;
-            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-            } else {
-                dosNid = Refsets.DEGREE_OF_SYNONYMY.getLenient().getNid();
-            }
+            int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
 
             if (currentSynonymy) {
                 Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);

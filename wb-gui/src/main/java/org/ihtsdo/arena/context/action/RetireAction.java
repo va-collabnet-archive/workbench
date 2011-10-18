@@ -13,7 +13,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -21,8 +20,6 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
 
@@ -82,24 +79,9 @@ public class RetireAction extends AbstractAction {
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
-            int usNid = 0;
-            int gbNid = 0;
-            int dosNid = 0;
-            if (Ts.get().hasUuid(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                usNid = SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid();
-            } else {
-                usNid = SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getLenient().getNid();
-            }
-            if (Ts.get().hasUuid(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getPrimUuid())) {
-                gbNid = SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid();
-            } else {
-                gbNid = SnomedMetadataRf1.GB_LANGUAGE_REFSET_RF1.getLenient().getNid();
-            }
-            if (Ts.get().hasUuid(SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getPrimUuid())) {
-                dosNid = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getLenient().getNid();
-            } else {
-                dosNid = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getLenient().getNid();
-            }
+            int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
+            int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+            int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
                 if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {

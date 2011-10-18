@@ -64,8 +64,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/status", type = BeanType.TASK_BEAN)})
@@ -260,12 +259,7 @@ public class CheckForTarget extends AbstractTask {
 
     private void testForRefersTo() {
         try {
-            ConceptChronicleBI refexConcept = null;
-            if (Ts.get().hasUuid(SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getPrimUuid())) {
-                refexConcept = SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient();
-            } else {
-                refexConcept = SnomedMetadataRf1.REFERS_TO_REFSET_RF1.getLenient();
-            }
+            ConceptChronicleBI refexConcept = Ts.get().getConcept(SnomedMetadataRfx.getREFERS_TO_REFEX_NID());
             //find if concept is member of Refers To refset
             Collection<? extends RefexCnidVersionBI<?>> refexMembers =
                     (Collection<? extends RefexCnidVersionBI<?>>) refexConcept.getCurrentRefsetMembers(tempVc);
