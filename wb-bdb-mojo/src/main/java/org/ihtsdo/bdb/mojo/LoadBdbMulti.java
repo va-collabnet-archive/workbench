@@ -21,7 +21,6 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -62,7 +61,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -404,7 +403,7 @@ public class LoadBdbMulti extends AbstractMojo {
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
                         textRefexSpec.with(RefexProperty.STATUS_NID, 
-                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+                                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         textRefexSpec.setMemberContentUuid();
 
                         RefexChronicleBI<?> textRefex = amender.constructIfNotCurrent(textRefexSpec);
@@ -414,7 +413,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);
                         variantRefexSpec.with(RefexProperty.STATUS_NID, 
-                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+                                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         variantRefexSpec.setMemberContentUuid();
                         amender.constructIfNotCurrent(variantRefexSpec);
 
@@ -484,7 +483,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         wordRefexSpec.with(RefexProperty.STRING1, word);
                         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
                         wordRefexSpec.with(RefexProperty.STATUS_NID, 
-                                SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+                                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         wordRefexSpec.setMemberContentUuid();
 
                         wordRefex = amender.constructIfNotCurrent(wordRefexSpec);
