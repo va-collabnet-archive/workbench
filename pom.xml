@@ -19,7 +19,7 @@
 		<releaseDate>20110131</releaseDate>
 		<outputFolder>export</outputFolder>
 		<!-- Application optional arguments -->
-		<rf2Format />
+		<rf2Format>false</rf2Format>
 		<invokeDrools />
 		<incrementalRelease />
 		<fromReleaseDate />
@@ -86,7 +86,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>id-generation-api</artifactId>
-			<version>2.6.0-trek-36</version>
+			<version>2.6.0-trek-37-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
