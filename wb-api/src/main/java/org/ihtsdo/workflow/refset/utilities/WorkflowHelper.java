@@ -776,8 +776,6 @@ public class WorkflowHelper {
 
 		        // Write Member
 				writer.addMember();
-				
-				Terms.get().addUncommitted(writer.getRefsetConcept());
         	}
     	}	
 	}
