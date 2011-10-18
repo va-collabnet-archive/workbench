@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.nhs.cfh.deploy</groupId>
 	<artifactId>wb-deploy</artifactId>
-	<version>${custom-ui.version}</version>
+	<version>1.00</version>
 	<packaging>pom</packaging>
 	<name>The NHS WorkBench Deploy</name>
 	<description>A Deployment build for the Workbench</description>
@@ -51,7 +51,7 @@
     <tika.version>0.4</tika.version>
     <org.drools.version>5.2.0.Final</org.drools.version>
     <org.mvel.version>2.1.0.drools2</org.mvel.version>
-    <wb-icons-version>1.0.7</wb-icons-version>
+    <wb-icons-version>1.0.8</wb-icons-version>
 
 		
 		
@@ -68,7 +68,7 @@
 			</activation>
 			<properties>
 				<custom-ui.version>0.0.1-SNAPSHOT</custom-ui.version>
-				<workbench.version>2.6.0-trek-38-SNAPSHOT</workbench.version>
+				<workbench.version>2.6.0-trek-39-SNAPSHOT</workbench.version>
 			</properties>
 		</profile>
 	</profiles>
