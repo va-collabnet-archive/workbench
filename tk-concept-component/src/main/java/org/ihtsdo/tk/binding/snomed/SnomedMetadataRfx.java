@@ -18,6 +18,7 @@ package org.ihtsdo.tk.binding.snomed;
 import java.io.IOException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
  *
@@ -49,11 +50,25 @@ public class SnomedMetadataRfx {
     private static int STATUS_LIMITED_NID;
     private static int STATUS_RETIRED_NID;
     private static int STATUS_INAPPROPRIATE_NID;
-    //REFEX NIDs
+    // REFEX NIDs
     private static int US_DIALECT_REFEX_NID;
     private static int GB_DIALECT_REFEX_NID;
     private static int SYNONYMY_REFEX_NID;
     private static int REFERS_TO_REFEX_NID;
+    // DESCRIPTION CONCEPTS
+    private static ConceptSpec DESC_PREFERRED;
+    private static ConceptSpec DESC_ACCEPTABLE;
+    // STATUS CONCEPTS
+    private static ConceptSpec STATUS_DUPLICATE;
+    private static ConceptSpec STATUS_AMBIGUOUS;
+    private static ConceptSpec STATUS_ERRONEOUS;
+    private static ConceptSpec STATUS_OUTDATED;
+    private static ConceptSpec STATUS_LIMITED;
+    //REFEX CONCEPTS
+    private static ConceptSpec REFEX_NON_HUMAN;
+    private static ConceptSpec REFEX_VTM;
+    private static ConceptSpec REFEX_VMP;
+    private static ConceptSpec REFEX_SYNONYMY;
 
     public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
@@ -68,21 +83,21 @@ public class SnomedMetadataRfx {
         }
         return DES_SYNONYM_PREFERRED_NAME_NID;
     }
-    
+
     public static int getDES_SYNONYM_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return DES_SYNONYM_NID;
     }
-    
+
     public static int getDESC_ACCEPTABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return ACCEPTABLE_NID;
     }
-    
+
     public static int getDESC_PREFERRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
@@ -180,40 +195,118 @@ public class SnomedMetadataRfx {
         }
         return STATUS_RETIRED_NID;
     }
-    
+
     public static int getSTATUS_INAPPROPRIATE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return STATUS_INAPPROPRIATE_NID;
     }
-    
+
     public static int getUS_DIALECT_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return US_DIALECT_REFEX_NID;
     }
-    
+
     public static int getGB_DIALECT_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return GB_DIALECT_REFEX_NID;
     }
-    
+
     public static int getSYNONYMY_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return SYNONYMY_REFEX_NID;
     }
-    
+
     public static int getREFERS_TO_REFEX_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return REFERS_TO_REFEX_NID;
+    }
+    // DESCRIPTION CONCEPTS
+    public static ConceptSpec getSTATUS_DUPLICATE() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_DUPLICATE;
+    }
+    // STATUS CONCEPTS
+    public static ConceptSpec getDESC_PREFERRED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return DESC_PREFERRED;
+    }
+    
+    public static ConceptSpec getDESC_ACCEPTABLE() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return DESC_ACCEPTABLE;
+    }
+    
+    public static ConceptSpec getSTATUS_AMBIGUOUS() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_AMBIGUOUS;
+    }
+
+    public static ConceptSpec getSTATUS_ERRONEOUS() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_ERRONEOUS;
+    }
+
+    public static ConceptSpec getSTATUS_OUTDATED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_OUTDATED;
+    }
+
+    public static ConceptSpec getSTATUS_LIMITED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_LIMITED;
+    }
+
+    // REFEX CONCEPTS
+    public static ConceptSpec getREFEX_NON_HUMAN() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REFEX_NON_HUMAN;
+    }
+
+    public static ConceptSpec getREFEX_VTM() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REFEX_VTM;
+    }
+
+    public static ConceptSpec getREFEX_VMP() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REFEX_VMP;
+    }
+
+    public static ConceptSpec getREFEX_SYNONYMY() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REFEX_SYNONYMY;
     }
 
     private static void setupSnoRf1Rf2() throws IOException {
@@ -267,7 +360,7 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
             STATUS_INAPPROPRIATE_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getUuids());
-            //REFEX
+            // REFEX
             US_DIALECT_REFEX_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.US_LANGUAGE_REFSET_RF1.getUuids());
             GB_DIALECT_REFEX_NID = tf.getNidForUuids(
@@ -276,6 +369,20 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1.getUuids());
             REFERS_TO_REFEX_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.REFERS_TO_REFSET_RF1.getUuids());
+            // DESCRIPTION CONCEPT
+            DESC_PREFERRED = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1;
+            DESC_ACCEPTABLE = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1;
+            // STATUS CONCEPT
+            STATUS_DUPLICATE = SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1;
+            STATUS_AMBIGUOUS = SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1;
+            STATUS_ERRONEOUS = SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1;
+            STATUS_OUTDATED = SnomedMetadataRf1.OUTDATED_INACTIVE_STATUS_RF1;
+            STATUS_LIMITED = SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1;
+            // REFEX CONCEPTS
+            REFEX_NON_HUMAN = SnomedMetadataRf1.NON_HUMAN_RF1;
+            REFEX_VTM = SnomedMetadataRf1.VTM_RF1;
+            REFEX_VMP = SnomedMetadataRf1.VMP_RF1;
+            REFEX_SYNONYMY = SnomedMetadataRf1.DEGREE_OF_SYNONYMY_REFSET_RF1;
 
         } else if (releaseFormat == 2) {
             // DESCRIPTIONS
@@ -325,6 +432,20 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2.getUuids());
             REFERS_TO_REFEX_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getUuids());
+            // DESCRIPTION CONCEPT
+            DESC_PREFERRED = SnomedMetadataRf2.PREFERRED_RF2;
+            DESC_ACCEPTABLE = SnomedMetadataRf2.ACCEPTABLE_RF2;
+            // STATUS CONCEPT
+            STATUS_DUPLICATE = SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2;
+            STATUS_AMBIGUOUS = SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2;
+            STATUS_ERRONEOUS = SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2;
+            STATUS_OUTDATED = SnomedMetadataRf2.OUTDATED_COMPONENT_RF2;
+            STATUS_LIMITED = SnomedMetadataRf2.LIMITED_COMPONENT_RF2;
+            //REFEX CONCEPTS
+            REFEX_NON_HUMAN = SnomedMetadataRf2.NON_HUMAN_RF2;
+            REFEX_VTM = SnomedMetadataRf2.VTM_RF2;
+            REFEX_VMP = SnomedMetadataRf2.VMP_RF2;
+            REFEX_SYNONYMY = SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2;
 
         } else {
             throw new IOException("SnomedMetadataRfx releaseFormat must equal 1 or 2.");
