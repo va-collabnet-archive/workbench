@@ -39,7 +39,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.IdUtil;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -63,7 +63,7 @@ public abstract class RF2IDImpl {
 	}
 
 	public String getTimeFormat() {
-		return ExportUtil.TIMEFORMAT;
+		return IdUtil.TIMEFORMAT;
 	}
 
 	
@@ -78,7 +78,7 @@ public abstract class RF2IDImpl {
 	
 
 	public I_ConfigAceFrame getAceConfig() {
-		return ExportUtil.getAceConfig();
+		return IdUtil.getAceConfig();
 	}
 
 	
@@ -94,16 +94,22 @@ public abstract class RF2IDImpl {
 	
 
 	public String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
-		return ExportUtil.getSctId(nid, pathNid);
+		return IdUtil.getSctId(nid, pathNid);
 	}
 
-	// get the description id for the given UUID
+	// get the sctid for the given UUID
 	public String getSCTId(Config config, UUID uuid) throws Exception {
-		return ExportUtil.getSCTId(config, uuid);
+		return IdUtil.getSCTId(config, uuid);
+	}
+	
+	
+	// get the sctid for the given UUID and namespace , partititonId
+	public String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws Exception {
+		return IdUtil.getSCTId(config, componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
 	}
 
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
-		return ExportUtil.getConceptId(concept, snomedCorePathNid);
+		return IdUtil.getConceptId(concept, snomedCorePathNid);
 	}
 
 	

@@ -287,12 +287,7 @@ public class IdUtil {
 				}
 			}
 		}
-
-		/*	
-	   if(conceptId.toString().equals("0")){
-			System.out.println("==conceptId==" + conceptId.toString());
-		}*/
-
+		
 		if (conceptId==null) return null;
 
 		return conceptId.toString();
