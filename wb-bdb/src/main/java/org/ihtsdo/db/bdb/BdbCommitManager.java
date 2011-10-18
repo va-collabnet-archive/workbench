@@ -474,13 +474,18 @@ public class BdbCommitManager {
                            uncommittedCNidsNoChecks.or(uncommittedCNids);
 
                            if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                              ChangeSetWriterHandler handler =
+                              /*ChangeSetWriterHandler handler =
                                  new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
                                                             sapNidsFromCommit, changeSetPolicy.convert(),
-                                                            changeSetWriterThreading, Svn.rwl);
+                                                            changeSetWriterThreading, Svn.rwl);*/
+                              
+                              ChangeSetWriterHandler handler =
+                                  new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
+                                                             sapNidsFromCommit, changeSetPolicy.convert(),
+                                                             changeSetWriterThreading);
 
                               changeSetWriterService.execute(handler);
-                              passedRelease = true;
+                             // passedRelease = true;
                            }
 
                            break;
@@ -547,6 +552,8 @@ public class BdbCommitManager {
       if (performCommit) {
          return true;
       }
+      
+      
 
       return false;
    }
