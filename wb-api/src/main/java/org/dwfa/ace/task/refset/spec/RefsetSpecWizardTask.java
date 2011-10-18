@@ -38,6 +38,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
 import org.dwfa.bpa.process.Condition;
@@ -266,7 +267,7 @@ public class RefsetSpecWizardTask extends AbstractTask {
         return map;
     }
 
-    public String getInbox(I_GetConceptData concept) throws TerminologyException, IOException {
+    public String getInbox(I_GetConceptData concept) throws TerminologyException, IOException, TaskFailedException {
         // find the inbox string using the concept's "user inbox" description
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -278,16 +279,13 @@ public class RefsetSpecWizardTask extends AbstractTask {
         int latestVersion = Integer.MIN_VALUE;
 
         I_IntSet activeStatuses = Terms.get().newIntSet();
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CURRENT.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()))
-            .getConceptNid());
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.CURRENT_UNREVIEWED.getUids()))
-            .getConceptNid());
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.LIMITED.getUids())).getConceptNid());
-        activeStatuses.add(Terms.get().getConcept((ArchitectonicAuxiliary.Concept.PENDING_MOVE.getUids()))
-            .getConceptNid());
-
+        try {
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            activeStatuses = helper.getCurrentStatusIntSet();
+        } catch (Exception ex) {
+            throw new TaskFailedException("Failed to get a refset spec helper");
+        }
+        
         List<? extends I_DescriptionTuple> descriptionResults =
                 concept.getDescriptionTuples(activeStatuses, allowedTypes, null, config.getPrecedence(), config
                     .getConflictResolutionStrategy());
