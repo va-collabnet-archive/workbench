@@ -1,11 +1,9 @@
 package org.ihtsdo.testmodel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
-
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import java.util.Map;
 
 public class DrDefiningRolesSet {
 	
@@ -62,16 +60,46 @@ public class DrDefiningRolesSet {
 	// GroupCondition options = 'any','ungrouped','same group'
 	public boolean checkCardinality(String typeUuid, int min, int max, String groupCondition) {
 		boolean result = false;
-		int counter = 0;
-		for (DrRelationship loopRel : relationships) {
-			if (loopRel.getTypeUuid().equals(typeUuid)) {
-				counter++;
-				//TODO:use groupCondition
+		if (groupCondition.equals("ungrouped")) {
+			int counter = 0;
+			for (DrRelationship loopRel : relationships) {
+				if (loopRel.getTypeUuid().equals(typeUuid) && loopRel.getRelGroup() == 0) {
+					counter++;
+				}
 			}
-		}
-		if (counter >= min && counter <= max) {
+			if (counter >= min && counter <= max) {
+				result = true;
+			}
+		} if (groupCondition.equals("same group")) {
 			result = true;
-		}
+			Map<Integer, Integer> countMap = new HashMap<Integer,Integer>();
+			for (DrRelationship loopRel : relationships) {
+				if (loopRel.getTypeUuid().equals(typeUuid)) {
+					int group = loopRel.getRelGroup();
+					if (countMap.containsKey(group)) {
+						countMap.put(group, countMap.get(group) + 1);
+					} else {
+						countMap.put(group, 1);
+					}
+				}
+			}
+			for (int group : countMap.keySet()) {
+				if (countMap.get(group) < min || countMap.get(group) > max) {
+					result = false;
+				}
+			}
+		} else { // "any" or unknown value
+			int counter = 0;
+			for (DrRelationship loopRel : relationships) {
+				if (loopRel.getTypeUuid().equals(typeUuid)) {
+					counter++;
+				}
+			}
+			if (counter >= min && counter <= max) {
+				result = true;
+			}
+		} 
+		
 		return result;
 	}
 
