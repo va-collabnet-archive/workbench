@@ -322,33 +322,21 @@ public class PositionMapper {
         }
         switch (precedencePolicy) {
             case PATH:
-                if (inConflict(part1.getSapNid(), part2.getSapNid())) {
-                    return RELATIVE_POSITION.CONTRADICTION;
-                } else if (positionDistance[part1.getSapNid()]
-                        > positionDistance[part2.getSapNid()]) {
-                    return RELATIVE_POSITION.BEFORE;
-                } else if (positionDistance[part1.getSapNid()]
-                        < positionDistance[part2.getSapNid()]) {
-                    return RELATIVE_POSITION.AFTER;
-                }
-                if (part1.getAuthorNid() != part2.getAuthorNid()) {
-                    return RELATIVE_POSITION.CONTRADICTION;
-                }
-                return RELATIVE_POSITION.EQUAL;
+                return pathBasedPolicy(part1, part2);
             case TIME:
-                if (part1.getTime() == part2.getTime()) {
-                    if (positionDistance[part1.getSapNid()]
-                            > positionDistance[part2.getSapNid()]) {
-                        return RELATIVE_POSITION.BEFORE;
-                    } else if (positionDistance[part1.getSapNid()]
-                            < positionDistance[part2.getSapNid()]) {
-                        return RELATIVE_POSITION.AFTER;
-                    }
-                    return RELATIVE_POSITION.CONTRADICTION;
-                } else if (part1.getTime() < part2.getTime()) {
-                    return RELATIVE_POSITION.BEFORE;
+                return timeBasedPolicy(part1, part2);
+            case MIXED:
+                RELATIVE_POSITION mixedPos;
+                RELATIVE_POSITION pathPos = pathBasedPolicy(part1, part2);
+                RELATIVE_POSITION timePos = timeBasedPolicy(part1, part2);
+                
+                if(!pathPos.equals(timePos)){
+                    mixedPos = RELATIVE_POSITION.CONTRADICTION;
+                }else {
+                    mixedPos = pathPos;
                 }
-                return RELATIVE_POSITION.AFTER;
+                
+                return mixedPos;
             default:
                 throw new RuntimeException("Can't handle policy: " + precedencePolicy);
         }
@@ -383,7 +371,28 @@ public class PositionMapper {
         }
         switch (precedencePolicy) {
             case PATH:
-                if (inConflict(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()), Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()))) {
+                return pathBasedPolicy(part1, part2);
+            case TIME:
+                return timeBasedPolicy(part1, part2);
+            case MIXED:
+                RELATIVE_POSITION mixedPos;
+                RELATIVE_POSITION pathPos = pathBasedPolicy(part1, part2);
+                RELATIVE_POSITION timePos = timeBasedPolicy(part1, part2);
+                
+                if(!pathPos.equals(timePos)){
+                    mixedPos = RELATIVE_POSITION.CONTRADICTION;
+                }else {
+                    mixedPos = pathPos;
+                }
+                
+                return mixedPos;
+            default:
+                throw new RuntimeException("Can't handle policy: " + precedencePolicy);
+        }
+    }
+    
+    private RELATIVE_POSITION pathBasedPolicy(I_IdPart part1, I_IdPart part2){
+        if (inConflict(Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()), Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime()))) {
                     return RELATIVE_POSITION.CONTRADICTION;
                 } else if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
                         > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
@@ -396,8 +405,26 @@ public class PositionMapper {
                     return RELATIVE_POSITION.CONTRADICTION;
                 }
                 return RELATIVE_POSITION.EQUAL;
-            case TIME:
-                if (part1.getTime() == part2.getTime()) {
+    }
+    
+    private <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION pathBasedPolicy (V part1, V part2){
+        if (inConflict(part1.getSapNid(), part2.getSapNid())) {
+                    return RELATIVE_POSITION.CONTRADICTION;
+                } else if (positionDistance[part1.getSapNid()]
+                        > positionDistance[part2.getSapNid()]) {
+                    return RELATIVE_POSITION.BEFORE;
+                } else if (positionDistance[part1.getSapNid()]
+                        < positionDistance[part2.getSapNid()]) {
+                    return RELATIVE_POSITION.AFTER;
+                }
+                if (part1.getAuthorNid() != part2.getAuthorNid()) {
+                    return RELATIVE_POSITION.CONTRADICTION;
+                }
+                return RELATIVE_POSITION.EQUAL;
+    }
+    
+    private RELATIVE_POSITION timeBasedPolicy(I_IdPart part1, I_IdPart part2){
+        if (part1.getTime() == part2.getTime()) {
                     if (positionDistance[Bdb.getSapNid(part1.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]
                             > positionDistance[Bdb.getSapNid(part2.getStatusNid(), part1.getAuthorNid(), part1.getPathNid(), part1.getTime())]) {
                         return RELATIVE_POSITION.BEFORE;
@@ -410,9 +437,22 @@ public class PositionMapper {
                     return RELATIVE_POSITION.BEFORE;
                 }
                 return RELATIVE_POSITION.AFTER;
-            default:
-                throw new RuntimeException("Can't handle policy: " + precedencePolicy);
-        }
+    }
+    
+    private <V extends ConceptComponent<?, ?>.Version> RELATIVE_POSITION timeBasedPolicy (V part1, V part2){
+        if (part1.getTime() == part2.getTime()) {
+                    if (positionDistance[part1.getSapNid()]
+                            > positionDistance[part2.getSapNid()]) {
+                        return RELATIVE_POSITION.BEFORE;
+                    } else if (positionDistance[part1.getSapNid()]
+                            < positionDistance[part2.getSapNid()]) {
+                        return RELATIVE_POSITION.AFTER;
+                    }
+                    return RELATIVE_POSITION.CONTRADICTION;
+                } else if (part1.getTime() < part2.getTime()) {
+                    return RELATIVE_POSITION.BEFORE;
+                }
+                return RELATIVE_POSITION.AFTER;
     }
     /**
      * A bit matrix of the combinations of position identifiers that are
