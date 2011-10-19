@@ -1,0 +1,12 @@
+package com.sample
+
+import org.ihtsdo.testmodel.*;
+ 
+ 
+rule "Has Descriptions"
+    when
+    	$c : DrConcept()
+    	$e : DrDescription(text matches ".*pain.*") from $c.descriptions
+    then
+        System.out.println("Concept "+$c.getPrimordialUuid()+". Description: "+$e.getText());
+end
