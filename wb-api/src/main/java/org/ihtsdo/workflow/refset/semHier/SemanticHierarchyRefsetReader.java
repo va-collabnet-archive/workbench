@@ -39,11 +39,11 @@ public  class SemanticHierarchyRefsetReader extends WorkflowRefsetReader
 		return Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMANTIC_PARENT_REL.getUids());
 	}
 
-	protected String getChildSemanticTag(String props) {
+	public String getChildSemanticTag(String props) {
 		return getProp("childSemanticArea", props);
 	}
 	
-	protected String getParentSemanticTag(String props) {
+	public String getParentSemanticTag(String props) {
 		return getProp("parentSemanticArea", props);
 	}
 }

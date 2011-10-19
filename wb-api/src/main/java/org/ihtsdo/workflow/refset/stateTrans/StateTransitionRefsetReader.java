@@ -41,35 +41,35 @@ public  class StateTransitionRefsetReader extends WorkflowRefsetReader
 	"</properties>"; 
 		
 	*/
-	protected I_GetConceptData getWorkflowType(String props) throws NumberFormatException, TerminologyException, IOException {
+	public I_GetConceptData getWorkflowType(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("workflowType", props);
 	}
 	
-	protected I_GetConceptData getInitialState(String props) throws NumberFormatException, TerminologyException, IOException {
+	public I_GetConceptData getInitialState(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("initialState", props);
 	}
 	
-	protected I_GetConceptData getAction(String props) throws NumberFormatException, TerminologyException, IOException {
+	public I_GetConceptData getAction(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("action", props);
 	}
 
-	protected I_GetConceptData getFinalState(String props) throws NumberFormatException, TerminologyException, IOException {
+	public I_GetConceptData getFinalState(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("finalState", props);
 	}
 	
-	protected UUID getWorkflowTypeUid(String props) throws NumberFormatException, TerminologyException, IOException {
+	public UUID getWorkflowTypeUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("workflowType", props);
 	}
 	
-	protected UUID getInitialStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
+	public UUID getInitialStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("initialState", props);
 	}
 	
-	protected UUID getActionUid(String props) throws NumberFormatException, TerminologyException, IOException {
+	public UUID getActionUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("action", props);
 	}
 
-	protected UUID getFinalStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
+	public UUID getFinalStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("finalState", props);
 	}
 }

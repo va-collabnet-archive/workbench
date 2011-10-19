@@ -19,11 +19,11 @@ public  class SemanticTagsRefsetReader extends WorkflowRefsetReader
 	}
 
 
-	protected String getSemanticTag(String props) throws NumberFormatException, TerminologyException, IOException {
+	public String getSemanticTag(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getProp("semTag", props);
 	}
 
-	protected String getSemanticTagUUID(String props) throws NumberFormatException, TerminologyException, IOException {
+	public String getSemanticTagUUID(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getProp("uuid", props);
 	}
 }
