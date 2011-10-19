@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_AmTuple;
@@ -208,7 +210,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     @Override
     public boolean execute(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException, TerminologyException {
+            PositionSetBI v2_is, Collection<I_ShowActivity> activities) throws IOException {
 
         boolean statementResult = getStatementResult(component,
                 version, v1_is, v2_is);
@@ -224,7 +226,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     public abstract boolean getStatementResult(I_AmTermComponent component,
             GROUPING_TYPE version, PositionSetBI v1Is,
-            PositionSetBI v2Is) throws IOException, TerminologyException;
+            PositionSetBI v2Is) throws IOException;
 
     protected boolean isComponentStatus(I_GetConceptData requiredStatus, List<I_AmTuple> tuples) {
 
@@ -286,7 +288,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
         }
     }
 
-    protected boolean componentIsMemberOf(int componentId) throws IOException, TerminologyException {
+    protected boolean componentIsMemberOf(int componentId) throws IOException {
         // get all extensions for this concept
         List<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(componentId);
 
@@ -409,14 +411,18 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected Set<? extends I_GetConceptData> getChildren(
             I_GetConceptData concept, PositionSetBI pos)
-            throws TerminologyException, IOException {
-        return concept.getDestRelOrigins(getCurrentStatuses(), getIsAIds(),
-                new PositionSetReadOnly(pos), config.getPrecedence(),
-                config.getConflictResolutionStrategy());
+            throws IOException {
+        try {
+            return concept.getDestRelOrigins(getCurrentStatuses(), getIsAIds(),
+                    new PositionSetReadOnly(pos), config.getPrecedence(),
+                    config.getConflictResolutionStrategy());
+        } catch (TerminologyException ex) {
+            throw new IOException(ex);
+        }
     }
 
     protected boolean conceptIsChildOf(I_GetConceptData c1,
-            I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
+            I_GetConceptData c2, PositionSetBI pos) throws
             IOException {
         for (I_GetConceptData child : getChildren(c2, pos)) {
             if (c1.getConceptNid() == child.getConceptNid()) {
@@ -428,7 +434,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     private HashSet<Integer> descendants = null;
 
     private void getDescendants(I_GetConceptData c2, PositionSetBI pos)
-            throws TerminologyException, IOException {
+            throws IOException {
         if (descendants.contains(new Integer(c2.getConceptNid()))) {
             return;
         }
@@ -439,7 +445,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     }
 
     protected boolean conceptIsDescendantOf(I_GetConceptData c1,
-            I_GetConceptData c2, PositionSetBI pos) throws TerminologyException,
+            I_GetConceptData c2, PositionSetBI pos) throws IOException,
             IOException {
         if (descendants == null) {
             descendants = new HashSet<Integer>();
@@ -449,14 +455,14 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     }
 
     protected PositionSetBI getVersion(GROUPING_TYPE version, PositionSetBI v1_is,
-            PositionSetBI v2_is) throws TerminologyException {
+            PositionSetBI v2_is) throws IOException {
         if (version == GROUPING_TYPE.V1) {
             return v1_is;
         }
         if (version == GROUPING_TYPE.V2) {
             return v2_is;
         }
-        throw new TerminologyException("Version error:" + version);
+        throw new IOException("Version error:" + version);
     }
 //	protected I_AmPart getVersion(List<I_AmPart> parts, PositionSetBI vn_is,
 //			boolean trace_p) throws TerminologyException {

@@ -52,14 +52,19 @@ public class DifferenceRelsSourceOrDestination extends AbstractDifferenceRels {
         }
     }
 
+    @Override
     protected List<I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
-    		PositionSetReadOnly viewSet) throws IOException, TerminologyException {
-        ArrayList<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
-        tuples.addAll(conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, frameConfig.getPrecedence(),
-            frameConfig.getConflictResolutionStrategy()));
-        tuples.addAll(conceptToTest.getDestRelTuples(frameConfig.getAllowedStatus(), null, viewSet, frameConfig.getPrecedence(),
-            frameConfig.getConflictResolutionStrategy()));
-        return tuples;
+    		PositionSetReadOnly viewSet) throws IOException {
+        try {
+            ArrayList<I_RelTuple> tuples = new ArrayList<I_RelTuple>();
+            tuples.addAll(conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, frameConfig.getPrecedence(),
+                    frameConfig.getConflictResolutionStrategy()));
+            tuples.addAll(conceptToTest.getDestRelTuples(frameConfig.getAllowedStatus(), null, viewSet, frameConfig.getPrecedence(),
+                    frameConfig.getConflictResolutionStrategy()));
+            return tuples;
+        } catch (TerminologyException terminologyException) {
+            throw new IOException(terminologyException);
+        } 
     }
 
 }

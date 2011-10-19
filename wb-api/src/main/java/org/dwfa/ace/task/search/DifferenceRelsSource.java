@@ -19,6 +19,8 @@ package org.dwfa.ace.task.search;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -51,10 +53,15 @@ public class DifferenceRelsSource extends AbstractDifferenceRels {
         }
     }
 
+    @Override
     protected List<? extends I_RelTuple> getTuplesToCompare(I_ConfigAceFrame frameConfig, I_GetConceptData conceptToTest,
-    		PositionSetReadOnly viewSet) throws IOException, TerminologyException {
-        return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, 
-            frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+    		PositionSetReadOnly viewSet) throws IOException {
+        try {
+            return conceptToTest.getSourceRelTuples(frameConfig.getAllowedStatus(), null, viewSet, 
+                frameConfig.getPrecedence(), frameConfig.getConflictResolutionStrategy());
+        } catch (TerminologyException terminologyException) {
+            throw new IOException(terminologyException);
+        } 
     }
 
 }

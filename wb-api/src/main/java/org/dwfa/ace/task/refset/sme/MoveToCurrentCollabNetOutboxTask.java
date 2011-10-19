@@ -110,7 +110,7 @@ public class MoveToCurrentCollabNetOutboxTask extends AbstractTask {
             String userName = config.getUsername();
 
             Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-            Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.OUTBOX_QUEUE.getUids()) };
+            Entry[] attrSetTemplates = new Entry[] { new TermEntry(QueueType.Concept.OUTBOX_QUEUE.getUids()) }; 
             ServiceTemplate template = new ServiceTemplate(null, serviceTypes, attrSetTemplates);
             ServiceItemFilter filter = null;
             ServiceItem[] matches = worker.lookup(template, 1, 100, filter, 30000, true);
