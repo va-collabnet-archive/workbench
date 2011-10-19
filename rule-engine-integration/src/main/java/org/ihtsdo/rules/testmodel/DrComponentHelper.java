@@ -1,6 +1,7 @@
 package org.ihtsdo.rules.testmodel;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -210,6 +211,9 @@ public class DrComponentHelper {
 
 			DrDefiningRolesSet modelersRolesSet = new DrDefiningRolesSet();
 			modelersRolesSet.setRolesSetType("Modelers");
+			
+			DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
+			modelersRolesSet.setRolesSetType("Defining");
 
 			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
 					null, 
@@ -252,7 +256,10 @@ public class DrComponentHelper {
 			concept.getDefiningRoleSets().add(statedRolesSet);
 			concept.getDefiningRoleSets().add(modelersRolesSet);
 			concept.getDefiningRoleSets().add(inferredRolesSet);
-
+			
+			definingFormRolesSet.setRelationships(new ArrayList<DrRelationship>());
+			definingFormRolesSet.getRelationships().addAll(concept.getOutgoingRelationships());
+			concept.getDefiningRoleSets().add(definingFormRolesSet);
 			//TODO: incoming rels is heavy on performance moved to helper method
 			//			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
 			//					null, 
