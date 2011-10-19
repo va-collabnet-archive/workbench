@@ -588,6 +588,10 @@ public class WorkflowHelper {
 	}
 
     public static boolean isBeginWorkflowAction(ConceptVersionBI actionConcept) {
+    	return isBeginWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isBeginWorkflowAction(UUID actionConcept) {
     	if (beginWorkflowActions  == null)
 		{
     		beginWorkflowActions = new HashSet<UUID>();
@@ -612,7 +616,7 @@ public class WorkflowHelper {
 		}
 
     	if (beginWorkflowActions != null && actionConcept != null) {
-    		return (beginWorkflowActions.contains(actionConcept.getPrimUuid()));
+    		return (beginWorkflowActions.contains(actionConcept));
     	} else {
     		return false;
     	}
