@@ -142,7 +142,7 @@ public class WorkflowHelper {
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
 		    	// Retire original Row as previously retired original
-				if (currentWfId.equals(latestBean.getWorkflowId())) {
+				if (latestBean != null && currentWfId.equals(latestBean.getWorkflowId())) {
 					retireRow(latestBean);
 				}
 			}
@@ -158,7 +158,7 @@ public class WorkflowHelper {
 		writer.setPathUid(bean.getPath());
 
 		// Always retire on current modeler regardless of bean's request 
-		writer.setModelerUid(getCurrentModeler().getPrimUuid());
+		writer.setModelerUid(bean.getModeler());
 
 		writer.setConceptUid(bean.getConcept());
 		writer.setFSN(bean.getFSN());
