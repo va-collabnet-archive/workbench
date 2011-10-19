@@ -11,6 +11,7 @@ import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
+import org.ihtsdo.taxonomy.TaxonomyTree;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -50,7 +51,7 @@ public class TaxonomyViewSettings extends ArenaComponentSettings {
             view = hierarchicalTreeHelper.getHierarchyPanel();
             hierarchicalTreeHelper.addMouseListener(new TaxonomyMouseListener(hierarchicalTreeHelper));
 
-            JTreeWithDragImage tree = (JTreeWithDragImage) view.getViewport().getView();
+            TaxonomyTree tree = (TaxonomyTree) view.getViewport().getView();
 
             tree.setFont(tree.getFont().deriveFont(getFontSize()));
          } catch (Exception e) {

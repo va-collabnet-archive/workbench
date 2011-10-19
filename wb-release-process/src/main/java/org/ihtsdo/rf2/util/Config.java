@@ -57,6 +57,13 @@ public class Config {
 	private String updateWbSctId;
 	
 	
+//Below Parameters are necessary for ID-Generation
+	private String namespaceId;
+	private String partitionId;
+	private String executionId;
+	private String moduleId;
+	private String releaseId;
+	private String componentType;
 	
 
 	@XmlTransient
@@ -186,7 +193,7 @@ public class Config {
 	}
 
 	public void setDefaults() {
-		this.setRf2Format("true");
+		this.setRf2Format("false");
 		this.setInvokeDroolRules("false");
 		this.setIncrementalRelease("false");
 		this.setFileExtension("txt");
@@ -249,4 +256,54 @@ public class Config {
 		this.updateWbSctId = updateWbSctId;
 	}
 
+	public String getNamespaceId() {
+		return namespaceId;
+	}
+
+	public void setNamespaceId(String namespaceId) {
+		this.namespaceId = namespaceId;
+	}
+
+	public String getPartitionId() {
+		return partitionId;
+	}
+
+	public void setPartitionId(String partitionId) {
+		this.partitionId = partitionId;
+	}
+
+	public String getExecutionId() {
+		return executionId;
+	}
+
+	public void setExecutionId(String executionId) {
+		this.executionId = executionId;
+	}
+
+	public String getModuleId() {
+		return moduleId;
+	}
+
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
+	}
+
+	public String getReleaseId() {
+		return releaseId;
+	}
+
+	public void setReleaseId(String releaseId) {
+		this.releaseId = releaseId;
+	}
+
+	public String getComponentType() {
+		return componentType;
+	}
+
+	public void setComponentType(String componentType) {
+		this.componentType = componentType;
+	}
+
+	
+	
 }

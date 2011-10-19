@@ -67,7 +67,7 @@ import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.helper.dialect.DialectHelper;
 
 import org.ihtsdo.tk.example.binding.Language;
-import org.ihtsdo.tk.example.binding.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.example.binding.Snomed;
 import org.ihtsdo.tk.example.binding.SnomedConstraints;
 import org.ihtsdo.tk.example.binding.SnomedRelType;
@@ -370,84 +370,40 @@ rule "rule 14" #historical rel template onto rel"
 		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget));
 end
 
-rule "rule 15" #pref acceptability GB Rf1
+rule "rule 15" #pref acceptability GB
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.PREF, 
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
-end
-
-rule "rule 15.1" #pref acceptability GB Rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRf2.PREFERRED_RF2, 
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb"));
 end
 
-rule "rule 16" #pref acceptibility US Rf1
+rule "rule 16.1" #pref acceptibility US
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.PREF, 
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
-end
-
-rule "rule 16.1" #pref acceptibility US Rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRf2.PREFERRED_RF2, 
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us"));
 end
 
-rule "rule 17" #acceptable acceptability GB rf1
+rule "rule 17.1" #acceptable acceptability GB
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.ACCEPTABLE, 
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
-	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
-		actions.add(new MakeNotAcceptableAction("GB Not Acceptable", $dropTarget, "en-gb"));
-end
-
-rule "rule 17.1" #acceptable acceptability GB rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRf2.ACCEPTABLE_RF2, 
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
 		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb"));
 end
 
-rule "rule 18" #aceptable acceptibility US Rf1
+rule "rule 18.1" #aceptable acceptibility US
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.ACCEPTABLE, 
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us"));
-		actions.add(new MakeNotAcceptableAction("US Not Acceptable", $dropTarget, "en-us"));
-end
-
-rule "rule 18.1" #aceptable acceptibility US Rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRf2.ACCEPTABLE_RF2, 
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
@@ -495,8 +451,8 @@ end
 rule "rule 22" #set degree of synonymy if not set rf1
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this not isMemberOf Refsets.DEGREE_OF_SYNONYMY,
-							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
+		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRfx.getREFEX_SYNONYMY(),
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -505,24 +461,11 @@ rule "rule 22" #set degree of synonymy if not set rf1
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false));
 end
 
-rule "rule 22.1" #set degree of synonymy if not set rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRf2.DEGREE_OF_SYNONYMY_RF2,
-							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
-							  context == Context.DROP_TARGET)
-		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-	then
-		actions.add(new SetSynonymyAction("synonymous", $dropTarget, SynonymyType.SYNONYM, false));
-		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, false));
-		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false));
-end
-
-rule "rule 23" #change synonymy from synonymous rf1
+rule "rule 23" #change synonymy from synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
-							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -530,23 +473,11 @@ rule "rule 23" #change synonymy from synonymous rf1
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
 end
 
-rule "rule 23.1" #change synonymy from synonymous rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
-							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
-							  context == Context.DROP_TARGET)
-		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-	then
-		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
-		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
-end
-
-rule "rule 24" #change synonymy from near synonymous rf1
+rule "rule 24" #change synonymy from near synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
-							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
@@ -554,41 +485,17 @@ rule "rule 24" #change synonymy from near synonymous rf1
 		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
 end
 
-rule "rule 24.1" #change synonymy from near synonymous rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
-							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
-							  context == Context.DROP_TARGET)
-		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-	then
-		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
-		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true));
-end
-
-rule "rule 25" #change synonymy from non synonymous rf1
+rule "rule 25" #change synonymy from non synonymous
 	when
                 ViewFact(getView() == View.STATED)
 		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
-							  getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
 							  context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
 		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
 end
-
-rule "rule 25.1" #change synonymy from non synonymous rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
-							  getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
-							  context == Context.DROP_TARGET)
-		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-	then
-		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true));
-		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true));
-end 
 
 rule "rule 26" #proceedure and decendants onto body structure
 
@@ -1095,22 +1002,12 @@ rule "rule 57" #change to non-case-sensitive
 		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget));
 end
 
-rule "rule 58" #retire inappropriate synonym rf1
+rule "rule 58" #retire inappropriate synonym
 	when
                 ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(getDesc().getTypeNid() == WbDescType.SYNONYM.lenient.nid,
+		$dropTarget: DescFact(getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
                                         context == Context.DROP_TARGET)
 		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
 	then
 		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings));
 end
-
-rule "rule 58.1" #retire inappropriate synonym rf2
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(getDesc().getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.lenient.nid,
-                                        context == Context.DROP_TARGET)
-		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
-	then
-		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings));
-end 

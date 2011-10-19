@@ -137,6 +137,13 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 		
 		String updateWbSctId = getConfig().isUpdateWbSctId();
 		
+		//check configuration contains files
+	
+		if ( getConfig().getRf2Files().size() == 0 ){
+			logger.info("No files specified in order to generate SCTID..");
+			System.exit(0);
+		}
+		
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 			
 			File file = new File(getConfig().getReleaseFolder() + File.separator + getConfig().getRf2Files().get(f).fileName);
@@ -144,8 +151,15 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
 			ArrayList<String> Key = getConfig().getRf2Files().get(f).key.keyOrdinals;
 		
-			// Creating SctIds			
-			logger.info("Creating SCTIds.....................");
+			String namespaceId = getConfig().getRf2Files().get(f).sctidparam.namespaceId;
+			String partitionId = getConfig().getRf2Files().get(f).sctidparam.partitionId;
+			String releaseId =  getConfig().getRf2Files().get(f).sctidparam.releaseId;
+			String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
+			String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
+			String componentType = getConfig().getRf2Files().get(f).sctidparam.componentType;
+			
+				// Creating SctIds			
+			logger.info("Creating SCTIds for ....................." + componentType);
 			
 			// open rf2 file and  check for uuid line then get sctid from webservice and update wherever applicable...
 			try {			
@@ -158,7 +172,7 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 				BufferedReader rf2FileReader = new BufferedReader(isr);
 			   
 				String lineRead = "";
-				String sctid="sctid";
+				String sctid="";
 				while ((lineRead = rf2FileReader.readLine()) != null) {		
 					String[] part= lineRead.split("\t");
 		 			for (int s = 0; s < Key.size(); s++) {
@@ -166,7 +180,8 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 				    		String uuid = part[Integer.parseInt(Key.get(s))];
 				    		sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid)); 
 			    			if(sctid.equals("0")){
-								sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
+			    				sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+								// sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
 							}
 			    			
 			    			if(updateWbSctId.equals("true")){

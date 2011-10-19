@@ -7,6 +7,7 @@ public class RF2IdentifierFile {
 	public String fileName;
 	public String sctIdFileName;
 	public Key key;
+	public SctIDParam sctidparam;
 	
 	public RF2IdentifierFile(){
 		

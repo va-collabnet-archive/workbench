@@ -99,7 +99,8 @@ public class WorkflowHelper {
 	private static int wfHistoryRefsetNid = 0;
 	private static UUID wfHistoryRefsetUid = null;
 	private static boolean advancingWorkflowLock = false;
-	private static boolean wfCapabilitiesAvailable = true;
+	private static boolean wfCapabilitiesAvailable = false;
+	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
@@ -142,7 +143,7 @@ public class WorkflowHelper {
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
 		    	// Retire original Row as previously retired original
-				if (currentWfId.equals(latestBean.getWorkflowId())) {
+				if (latestBean != null && currentWfId.equals(latestBean.getWorkflowId())) {
 					retireRow(latestBean);
 				}
 			}
@@ -158,7 +159,7 @@ public class WorkflowHelper {
 		writer.setPathUid(bean.getPath());
 
 		// Always retire on current modeler regardless of bean's request 
-		writer.setModelerUid(getCurrentModeler().getPrimUuid());
+		writer.setModelerUid(bean.getModeler());
 
 		writer.setConceptUid(bean.getConcept());
 		writer.setFSN(bean.getFSN());
@@ -587,6 +588,10 @@ public class WorkflowHelper {
 	}
 
     public static boolean isBeginWorkflowAction(ConceptVersionBI actionConcept) {
+    	return isBeginWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isBeginWorkflowAction(UUID actionConcept) {
     	if (beginWorkflowActions  == null)
 		{
     		beginWorkflowActions = new HashSet<UUID>();
@@ -611,7 +616,7 @@ public class WorkflowHelper {
 		}
 
     	if (beginWorkflowActions != null && actionConcept != null) {
-    		return (beginWorkflowActions.contains(actionConcept.getPrimUuid()));
+    		return (beginWorkflowActions.contains(actionConcept));
     	} else {
     		return false;
     	}
@@ -776,8 +781,6 @@ public class WorkflowHelper {
 
 		        // Write Member
 				writer.addMember();
-				
-				Terms.get().addUncommitted(writer.getRefsetConcept());
         	}
     	}	
 	}
@@ -1325,11 +1328,20 @@ public class WorkflowHelper {
 		return advancingWorkflowLock;
 	}
 
-	public static void setWorkflowCapabilitiesAvailable(boolean val) {
-		wfCapabilitiesAvailable = val;
-	}
-
 	public static boolean isWorkflowCapabilityAvailable() {
+		if (!wfCapabilitiesInitialized) {
+			try {
+				wfCapabilitiesInitialized = true;
+			
+				UUID testUid = ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid();
+		         if (Ts.get().getConcept(testUid) != null) {
+		        	 wfCapabilitiesAvailable = true;
+		         }
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
+			}
+		}
+
 		return wfCapabilitiesAvailable;
 	}
 

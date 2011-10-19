@@ -1160,8 +1160,21 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	private void automateWfHxAdjudication(Set<ComponentVersionBI> developerVersions) {
 		try {
+			boolean nonCommitFound = false;
+			
+			// If only Commits, it a contradiction, so add 3rd version of adj commit rather than
+			// retiring one or both commits and only then adding adj commit
+			for (ComponentVersionBI devVer : developerVersions) {
+				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean((I_ExtendByRefVersion)devVer);
+				
+				if (!WorkflowHelper.isBeginWorkflowAction(bean.getAction())) {
+					nonCommitFound = true;
+					break;
+				}
+			}
+			
 			WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
-
+			
 			// Identify latest Dev Version
 			ComponentVersionBI latestVersion = null;
 			for (ComponentVersionBI version : developerVersions) {
@@ -1187,19 +1200,31 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					break;
 				}
 			}
-			// Retire latest Dev Version
-			WorkflowHelper.setAdvancingWorkflowLock(true);
-			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
-			WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-			
-			// Add latest Dev Version Bean on Adjudication Path
-			refsetWriter.updateWorkflowHistory(bean);
-			WorkflowHelper.setAdvancingWorkflowLock(false);
-			
-			// Revert Edit Path
-			editPaths.clear();
-			for (PathBI path: originalEditPaths) {
-				editPaths.add(path);
+
+			if (!nonCommitFound) {
+				// Add latest Dev Version Bean on Adjudication Path
+				WorkflowHelper.setAdvancingWorkflowLock(true);
+				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
+				bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+				
+				refsetWriter.updateWorkflowHistory(bean);
+				WorkflowHelper.setAdvancingWorkflowLock(false);
+			} else {
+				// Retire latest Dev Version
+				WorkflowHelper.setAdvancingWorkflowLock(true);
+				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
+				WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+				bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+				
+				// Add latest Dev Version Bean on Adjudication Path
+				refsetWriter.updateWorkflowHistory(bean);
+				WorkflowHelper.setAdvancingWorkflowLock(false);
+				
+				// Revert Edit Path
+				editPaths.clear();
+				for (PathBI path: originalEditPaths) {
+					editPaths.add(path);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

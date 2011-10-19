@@ -219,9 +219,31 @@ public class IdUtil {
 		return sctId.toString();
 	}
 
+
+	//Get the sctid for the given UUID
+	public static String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		long sctId = 0L;
+
+		try {
+			sctId = idGen.getSCTID(componentUuid);
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSCTID for UUID : " + componentUuid + " returned NULL calling create to generate a new SCTID");
+			try {
+				sctId = idGen.createSCTID(componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
+			} catch (Exception cE) {
+				logger.error("Message : SCTID creation error for UUID :" + componentUuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + componentUuid, e);
+		}
+		return String.valueOf(sctId);
+	}
 	
 
-	// get the description id for the given UUID
+	// get the conceptid for the given UUID (Hardcoded values)
 	public static String getSCTId(Config config, UUID uuid) {
 		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
 		long sctId = 0L;
@@ -265,12 +287,7 @@ public class IdUtil {
 				}
 			}
 		}
-
-		/*	
-	   if(conceptId.toString().equals("0")){
-			System.out.println("==conceptId==" + conceptId.toString());
-		}*/
-
+		
 		if (conceptId==null) return null;
 
 		return conceptId.toString();
