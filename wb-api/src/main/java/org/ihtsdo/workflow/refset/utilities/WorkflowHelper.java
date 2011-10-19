@@ -99,7 +99,8 @@ public class WorkflowHelper {
 	private static int wfHistoryRefsetNid = 0;
 	private static UUID wfHistoryRefsetUid = null;
 	private static boolean advancingWorkflowLock = false;
-	private static boolean wfCapabilitiesAvailable = true;
+	private static boolean wfCapabilitiesAvailable = false;
+	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
@@ -1323,11 +1324,20 @@ public class WorkflowHelper {
 		return advancingWorkflowLock;
 	}
 
-	public static void setWorkflowCapabilitiesAvailable(boolean val) {
-		wfCapabilitiesAvailable = val;
-	}
-
 	public static boolean isWorkflowCapabilityAvailable() {
+		if (!wfCapabilitiesInitialized) {
+			try {
+				wfCapabilitiesInitialized = true;
+			
+				UUID testUid = ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid();
+		         if (Ts.get().getConcept(testUid) != null) {
+		        	 wfCapabilitiesAvailable = true;
+		         }
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
+			}
+		}
+
 		return wfCapabilitiesAvailable;
 	}
 

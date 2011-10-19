@@ -1921,19 +1921,12 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       searchPanel = new SearchPanel(aceFrameConfig, this);
       searchPanel.addComponentListener(new ResizePalettesListener());
 
-      try {
-         if (Ts.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid())
-                 != null) {
-            WorkflowHelper.setWorkflowCapabilitiesAvailable(true);
-            wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
-            wfSearchPanel.addComponentListener(new ResizePalettesListener());
-            wfSearchPanel.setMinimumSize(new Dimension(0, 0));
-         }
-      } catch (NoSuchFieldError e) {
-         AceLog.getAppLog().log(Level.INFO, "Workflow history is not present in this bundle");
-         WorkflowHelper.setWorkflowCapabilitiesAvailable(false);
+      if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+    	  wfSearchPanel = new WorkflowHistorySearchPanel(aceFrameConfig, this);
+    	  wfSearchPanel.addComponentListener(new ResizePalettesListener());
+    	  wfSearchPanel.setMinimumSize(new Dimension(0, 0));
       }
-
+  
       GridBagConstraints c = new GridBagConstraints();
 
       c.gridx     = 0;

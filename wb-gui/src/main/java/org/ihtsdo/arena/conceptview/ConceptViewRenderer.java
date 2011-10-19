@@ -496,9 +496,11 @@ public class ConceptViewRenderer extends JLayeredPane {
                         }
                     });
 
-                    if (settings.getConcept() != null) {
-                        conceptWorkflowPanel.add(overrideButton);
-                    }
+					if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+	                    if (settings.getConcept() != null) {
+	                        conceptWorkflowPanel.add(overrideButton);
+	                    }
+	                }
                 }
             }
 
@@ -562,7 +564,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                                         actionButton.setEnabled(false);
                                     }
 
-                                    conceptWorkflowPanel.add(actionButton);
+                					if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+                						conceptWorkflowPanel.add(actionButton);
+                					}
                                 }
                             }
                         }
@@ -613,7 +617,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 updateOopsButton(settings.getConcept());
                 if (settings.getConcept() != null) {
-                    conceptWorkflowPanel.add(oopsButton);
+					if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+						conceptWorkflowPanel.add(oopsButton);
+					}
                 }
             }
         });
@@ -653,15 +659,17 @@ public class ConceptViewRenderer extends JLayeredPane {
         });
 
         wfHxDetailsToggleButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
-        footerPanel.add(wfHxDetailsToggleButton, gbc);
-
+		if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+			footerPanel.add(wfHxDetailsToggleButton, gbc);
+		}
 
         gbc.gridx++;
 
     	workflowStatusLabel = new JLabel("");
     	setWorkflowStatusLabel(settings.getConcept());
-    	footerPanel.add(workflowStatusLabel, gbc);
-
+		if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+			footerPanel.add(workflowStatusLabel, gbc);
+		}
 
         gbc.gridx++;
 

@@ -983,7 +983,8 @@ public class BdbCommitManager {
          m.setStatusAtPositionNid(-1);
       }
 
-      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
+      if (WorkflowHelper.isWorkflowCapabilityAvailable() && 
+    	  wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
     	  uncommittedWfMemberIds.remove(extension);
       }
 
