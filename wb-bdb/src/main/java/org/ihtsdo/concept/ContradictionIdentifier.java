@@ -20,9 +20,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
@@ -30,6 +32,7 @@ import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.description.Description;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
@@ -39,12 +42,21 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.contradiction.ComponentType;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.contradiction.ContradictionResult;
 import org.ihtsdo.tk.contradiction.PositionForSet;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetReader;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetReader;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetReader;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetWriter;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetReader;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ContradictionIdentifier implements ContradictionIdentifierBI {
@@ -62,7 +74,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
     private ConcurrentSkipListSet<PositionBI> viewPosMap = new ConcurrentSkipListSet<PositionBI>(new PositionBIComparator());
  	private ConcurrentSkipListSet<ComponentVersionBI> returnVersionCollection = new ConcurrentSkipListSet<ComponentVersionBI>(new ComponentVersionComparator());
-
+ 	private ConcurrentSkipListSet<UUID> wfRefsetList = new ConcurrentSkipListSet<UUID>();
 	private int currentStatusNid;
 	
     private class PositionBIComparator implements Comparator<PositionBI> { 
@@ -109,6 +121,8 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	public ContradictionIdentifier(ViewCoordinate vc, boolean useCase) {
 		viewCoord = new AtomicReference<ViewCoordinate>(vc);
 		isReturnVersionsUseCase = new AtomicBoolean(useCase);
+		wfRefsetList.addAll(WorkflowHelper.getRefsetUidList());
+		
 		try {
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 		} catch (Exception e) {
@@ -123,7 +137,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;
         boolean isDuplicateNew = false;
-        
+
         Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap = new HashMap<PositionForSet, HashMap<Integer, ComponentVersionBI>>();
 
         for (PositionBI pos : viewCoord.get().getPositionSet())
@@ -301,7 +315,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 				latestAdjudicatedVersion = identifyLatestAdjudicationVersion(comp);
 				latestOriginVersion = identifyLatestOriginVersion(comp, originPath);
-			    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = identifyLatestDeveloperVersions(comp, originPath);
+			    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = identifyLatestDeveloperVersions(comp, originPath, latestAdjudicatedVersion);
 				
 				if (!latestDeveloperVersionMap.isEmpty()) {
 					if (latestAdjudicatedVersion != null) { 
@@ -490,7 +504,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
  		return latestOriginVersion;
  	}
 
-	private Map<Integer, ComponentVersionBI>  identifyLatestDeveloperVersions(ComponentChroncileBI<?> comp, PathBI originPath) throws IOException {
+	private Map<Integer, ComponentVersionBI>  identifyLatestDeveloperVersions(ComponentChroncileBI<?> comp, PathBI originPath, ComponentVersionBI latestAdjudicatedVersion) throws IOException {
 	    Map<Integer, ComponentVersionBI> latestDeveloperVersionMap = new HashMap<Integer, ComponentVersionBI>();
 
 	    for (ComponentVersionBI part : comp.getVersions()) {
@@ -511,6 +525,11 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						putIntoMap = false;
 					}
 				} 
+
+				if ((latestAdjudicatedVersion != null) &&
+					(part.getTime() < latestAdjudicatedVersion.getTime())) {
+					putIntoMap = false;
+				}
 			}
 						
 			if (putIntoMap) {
@@ -843,91 +862,91 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         Set<ComponentVersionBI> developerVersions = new HashSet<ComponentVersionBI>();
         
         PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
-        List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(WorkflowHelper.getWorkflowRefsetNid(), concept.getConceptNid());
 
-	    for (I_ExtendByRef member : members) 
-	    {
-			int idx = member.getTuples().size() - 1;
-	    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
-	    	if (part.getStatusNid() != currentStatusNid) {
-	    		continue;
-	    	}
-	    	WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member);
-	    	// Identify Adjudication versions and find latest 
-	     	if (part.getPathNid() == viewPathNid.get()) {
- 				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
- 					latestAdjudicatedVersion = part;
-                }
-				continue;
-	        }
+        for (UUID refSetUid : wfRefsetList) {
+	        List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(refSetUid), concept.getConceptNid());
+	
+		    for (I_ExtendByRef member : members) 
+		    {
+				int idx = member.getTuples().size() - 1;
+		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
+		    	if (part.getStatusNid() != currentStatusNid) {
+		    		continue;
+		    	}
 
-			// Identify Origins versions and find latest
-			if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
- 				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
- 					latestOriginVersion = part;
-	            }
- 				continue;
-	        }
-	    }
-	    for (I_ExtendByRef member : members) 
-	    {
-	    	boolean putIntoMap = false;
-	    	Integer pathNidObj = null;
-
-			int idx = member.getTuples().size() - 1;
-	    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
-	    	if (part.getStatusNid() != currentStatusNid) {
-	    		continue;
-	    	}
-
-	    	WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member);
-	    	
-	    	if ((part.getPathNid() != viewPathNid.get()) &&
-				(part.getPathNid() != commonOriginPathNid.get()) &&
-				(!isOriginVersion(originPath, part))) 
-	    	{
-				// Identify Latest Developer version
-				putIntoMap = true;
-				ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(part.getPathNid());
-
-				if (latestVersion != null) {
-					if (latestVersion.getTime() > part.getTime()) {
+		    	// Identify Adjudication versions and find latest 
+		     	if (part.getPathNid() == viewPathNid.get()) {
+	 				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
+	 					latestAdjudicatedVersion = part;
+	                }
+					continue;
+		        }
+	
+				// Identify Origins versions and find latest
+				if ((part.getPathNid() == commonOriginPathNid.get()) || (isOriginVersion(originPath, part))) {
+	 				if (latestOriginVersion  == null || part.getTime() > latestOriginVersion.getTime()) {
+	 					latestOriginVersion = part;
+		            }
+	 				continue;
+		        }
+		    }
+		    for (I_ExtendByRef member : members) 
+		    {
+		    	boolean putIntoMap = false;
+		    	Integer pathNidObj = null;
+	
+				int idx = member.getTuples().size() - 1;
+		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
+		    	if (part.getStatusNid() != currentStatusNid) {
+		    		continue;
+		    	}
+	
+		    	if ((part.getPathNid() != viewPathNid.get()) &&
+					(part.getPathNid() != commonOriginPathNid.get()) &&
+					(!isOriginVersion(originPath, part))) 
+		    	{
+					// Identify Latest Developer version
+					putIntoMap = true;
+					ComponentVersionBI latestVersion = latestDeveloperVersionMap.get(part.getPathNid());
+	
+					if (latestVersion != null) {
+						if (latestVersion.getTime() > part.getTime()) {
+							putIntoMap = false;
+						}
+					}
+	
+					if ((latestAdjudicatedVersion != null) &&
+						(part.getTime() < latestAdjudicatedVersion.getTime())) {
 						putIntoMap = false;
 					}
+				} 
+	
+				if (putIntoMap) {
+					// Overwrite current latest version
+					latestDeveloperVersionMap.put(part.getPathNid(), part);
+	            }
+		    }	 
+		    
+			if (!latestDeveloperVersionMap.isEmpty()) 
+			{
+	
+				if (latestAdjudicatedVersion != null) { 
+					// if adjudication has been performed on componentId
+					result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
+				} else {
+					// if never had adjudication performed on componentId
+					result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
 				}
-
-				if ((latestAdjudicatedVersion != null) &&
-					(part.getTime() < latestAdjudicatedVersion.getTime())) {
-					putIntoMap = false;
-				}
-			}
-
-			if (putIntoMap) {
-				// Overwrite current latest version
-				latestDeveloperVersionMap.put(part.getPathNid(), part);
-            }
-	    }	 
-	    
-		if (!latestDeveloperVersionMap.isEmpty()) 
-		{
-
-			if (latestAdjudicatedVersion != null) { 
-				// if adjudication has been performed on componentId
-				result = handleAdjudication(concept, ComponentType.REFSET, latestAdjudicatedVersion, latestOriginVersion, latestDeveloperVersionMap, developerVersions);
-			} else {
-				// if never had adjudication performed on componentId
-				result = handleNonAdjudication(latestDeveloperVersionMap, developerVersions);
-			}
-
-        	if (result == ContradictionResult.CONTRADICTION) {
-        		// Take latest dev version and retire/duplicate version on adjudication path
-				automateWfHxAdjudication(developerVersions);
-            }
-    	}
-
+	
+	        	if (result == ContradictionResult.CONTRADICTION) {
+	        		// Take latest dev version and retire/duplicate version on adjudication path
+					automateWfHxAdjudication(developerVersions, refSetUid);
+	            }
+	    	}
+	    }
+    	
 		return ContradictionResult.NONE;
     }
-
     
 	private ContradictionResult refsetMembershipConflictFound(
         Concept concept, 
@@ -945,12 +964,15 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	    PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
         List<? extends I_ExtendByRef> members = Terms.get().getAllExtensionsForComponent(componentNid);
+		boolean allreadyProcessed = false;
         
         
         for (I_ExtendByRef member : members) 
         {
-            if (member.getRefsetId() != WorkflowHelper.getWorkflowRefsetNid()) {
-	 			// Identify Adjudication versions and find latest 
+        	UUID id = Terms.get().nativeToUuid(member.getRefsetId()).get(0);
+        	
+        	if(!wfRefsetList.contains(id)) {
+        		// Identify Adjudication versions and find latest 
 	         	for (ComponentVersionBI part : member.getMutableParts()) {
 	     			if (part.getPathNid() == viewPathNid.get()) {
 	     				if (latestAdjudicatedVersion  == null || part.getTime() > latestAdjudicatedVersion.getTime()) {
@@ -1158,22 +1180,22 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return returnVersionCollection;
 	}
 
-	private void automateWfHxAdjudication(Set<ComponentVersionBI> developerVersions) {
+	private void automateWfHxAdjudication(Set<ComponentVersionBI> developerVersions, UUID refsetId) {
 		try {
 			boolean nonCommitFound = false;
 			
 			// If only Commits, it a contradiction, so add 3rd version of adj commit rather than
 			// retiring one or both commits and only then adding adj commit
-			for (ComponentVersionBI devVer : developerVersions) {
-				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean((I_ExtendByRefVersion)devVer);
-				
-				if (!WorkflowHelper.isBeginWorkflowAction(bean.getAction())) {
-					nonCommitFound = true;
-					break;
+			if (refsetId.equals(WorkflowHelper.getWorkflowRefsetUid())) {
+				for (ComponentVersionBI devVer : developerVersions) {
+					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean((I_ExtendByRefVersion)devVer);
+					
+					if (!WorkflowHelper.isBeginWorkflowAction(bean.getAction())) {
+						nonCommitFound = true;
+						break;
+					}
 				}
 			}
-			
-			WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
 			
 			// Identify latest Dev Version
 			ComponentVersionBI latestVersion = null;
@@ -1201,30 +1223,98 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				}
 			}
 
-			if (!nonCommitFound) {
-				// Add latest Dev Version Bean on Adjudication Path
-				WorkflowHelper.setAdvancingWorkflowLock(true);
-				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
-				bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
-				
-				refsetWriter.updateWorkflowHistory(bean);
-				WorkflowHelper.setAdvancingWorkflowLock(false);
-			} else {
-				// Retire latest Dev Version
-				WorkflowHelper.setAdvancingWorkflowLock(true);
-				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
-				WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-				bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
-				
-				// Add latest Dev Version Bean on Adjudication Path
-				refsetWriter.updateWorkflowHistory(bean);
-				WorkflowHelper.setAdvancingWorkflowLock(false);
-				
-				// Revert Edit Path
-				editPaths.clear();
-				for (PathBI path: originalEditPaths) {
-					editPaths.add(path);
+			BdbCommitManager.setCheckCreationDataEnabled(false);
+			
+			if (refsetId.equals(WorkflowHelper.getWorkflowRefsetUid())) {
+				WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
+				if (!nonCommitFound) {
+					// Add latest Dev Version Bean on Adjudication Path
+					WorkflowHelper.setAdvancingWorkflowLock(true);
+					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
+					bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+					
+					refsetWriter.updateWorkflowHistory(bean);
+					WorkflowHelper.setAdvancingWorkflowLock(false);
+				} else {
+					// Retire latest Dev Version
+					WorkflowHelper.setAdvancingWorkflowLock(true);
+					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
+					Collection<? extends RefexVersionBI<?>> mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					int cc = mem2Test.size();
+					
+					WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					cc = mem2Test.size();
+	
+					bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+					
+					// Add latest Dev Version Bean on Adjudication Path
+					refsetWriter.updateWorkflowHistory(bean);
+	
+					mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					cc = mem2Test.size();
+					WorkflowHelper.setAdvancingWorkflowLock(false);
+					
+					// Revert Edit Path
+					editPaths.clear();
+					for (PathBI path: originalEditPaths) {
+						editPaths.add(path);
+					}
 				}
+			} else {
+				
+				I_ExtendByRef refAdded = null;
+			
+				// Don't retire, just add Adj row as same as latest
+				if (refsetId.equals(RefsetAuxiliary.Concept.EDITOR_CATEGORY.getPrimoridalUid())) {
+					EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)latestVersion).getReferencedComponentNid()));
+
+					String s = ((I_ExtendByRefPartStr)latestVersion).getStringValue();
+					
+					EditorCategoryRefsetReader reader = new EditorCategoryRefsetReader();
+					writer.setCategory(reader.getEditorCategoryUid(s));
+					writer.setSemanticArea(reader.getSemanticTag(s));
+
+					writer.addMember();
+				} else if (refsetId.equals(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid())) {
+					StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
+					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)latestVersion).getReferencedComponentNid()));
+
+					String s = ((I_ExtendByRefPartStr)latestVersion).getStringValue();
+					
+					StateTransitionRefsetReader reader = new StateTransitionRefsetReader();
+					writer.setWorkflowType(ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE.getPrimoridalUid());
+					writer.setInitialState(reader.getInitialState(s));
+					writer.setAction(reader.getAction(s));
+					writer.setFinalState(reader.getFinalState(s));
+
+					writer.addMember();
+				} else if (refsetId.equals(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid())) {
+					SemanticHierarchyRefsetWriter writer = new SemanticHierarchyRefsetWriter();
+					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)latestVersion).getReferencedComponentNid()));
+
+					String s = ((I_ExtendByRefPartStr)latestVersion).getStringValue();
+					
+					SemanticHierarchyRefsetReader reader = new SemanticHierarchyRefsetReader();
+					writer.setChildSemanticArea(reader.getChildSemanticTag(s));
+					writer.setParentSemanticArea(reader.getParentSemanticTag(s));
+				
+					writer.addMember();
+				} else if (refsetId.equals(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid())) {
+					SemanticTagsRefsetWriter writer = new SemanticTagsRefsetWriter();
+					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)latestVersion).getReferencedComponentNid()));
+
+					String s = ((I_ExtendByRefPartStr)latestVersion).getStringValue();
+					
+					SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
+					writer.setSemanticTag(reader.getSemanticTag(s));
+
+					writer.addMember();
+				}
+				
+				Terms.get().commit();
+				BdbCommitManager.setCheckCreationDataEnabled(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

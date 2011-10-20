@@ -102,6 +102,7 @@ public class WorkflowHelper {
 	private static boolean wfCapabilitiesAvailable = false;
 	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
+	private static HashSet<UUID> wfRefsetUidList = null;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -176,9 +177,11 @@ public class WorkflowHelper {
 		writer.setAutoApproved(bean.getAutoApproved());
 		writer.setOverride(bean.getOverridden());
 		
-        writer.retireMember();
-		Terms.get().addUncommitted(writer.getRefsetConcept());
-		Terms.get().commit();
+		I_ExtendByRef ref = writer.retireMember();
+
+		if (ref != null && !Terms.get().commit()) {
+			Terms.get().forget(ref);
+		}
 	}
 
 	public static void updateModelers(ViewCoordinate vc) 
@@ -1400,6 +1403,23 @@ public class WorkflowHelper {
 		for (String filePath : logFiles.keySet()) {
 			closeLogFile(filePath);
 		}
+	}
+
+	public static Collection<? extends UUID> getRefsetUidList() {
+		if (wfRefsetUidList  == null) {			
+			try {
+				wfRefsetUidList = new HashSet<UUID>();
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.EDITOR_CATEGORY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid());
+			} catch (Exception e) {
+	
+			}
+		}
+		
+		return wfRefsetUidList;
 	}
 }
  

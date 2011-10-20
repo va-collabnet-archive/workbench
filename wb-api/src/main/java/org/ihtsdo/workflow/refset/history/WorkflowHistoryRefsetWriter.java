@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -358,8 +359,10 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
         
         setEffectiveTime(Long.MAX_VALUE);
 
-        addMember();
-        Terms.get().addUncommitted(this.getRefsetConcept());
-        Terms.get().commit();
+		I_ExtendByRef ref = addMember();
+
+		if (ref != null && !Terms.get().commit()) {
+			Terms.get().forget(ref);
+		}
 	}
 }
