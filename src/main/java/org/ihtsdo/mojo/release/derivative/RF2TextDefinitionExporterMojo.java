@@ -53,6 +53,93 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 	
+	//Below Parameters are necessary for ID-Generation
+
+	/**
+	 * updateWbSctId
+	 * 
+	 * @parameter default-value="false"
+	 * 
+	 */
+	private String updateWbSctId;
+	
+	
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
+	
+	
+	
+	
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter default-value="0"
+	 * 
+	 */
+	private String namespaceId;
+	
+	/**
+	 * partitionId
+	 * 
+	 * @parameter default-value="00"
+	 * 
+	 */
+	private String partitionId;
+	
+	/**
+	 * executionId
+	 * 
+	 * @parameter default-value="Daily-build"
+	 * 
+	 */
+	private String executionId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="Core Component"
+	 * 
+	 */
+	private String moduleId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="20110131"
+	 * 
+	 */
+	private String releaseId;
+	
+	/**
+	 * componentType
+	 * 
+	 * @parameter default-value="Concept"
+	 * 
+	 */
+	private String componentType;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -79,6 +166,19 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setRf2Format(rF2Format);
+			
+			//Below Parameters are necessary for ID-Generation
+			config.setUpdateWbSctId(updateWbSctId);
+			config.setNamespaceId(namespaceId);
+			config.setPartitionId(partitionId);
+			config.setExecutionId(executionId);
+			config.setModuleId(moduleId);
+			config.setReleaseId(releaseId);
+			config.setComponentType(componentType);			
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
+			
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
 
