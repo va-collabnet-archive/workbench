@@ -84,7 +84,68 @@ public class ConfigMojo extends AbstractMojo {
 	private String password;
 	
 	
+	//Below Parameters are necessary for ID-Generation
+	
+	
+	
 
+	/**
+	 * updateWbSctId
+	 * 
+	 * @parameter default-value="false"
+	 * 
+	 */
+	private String updateWbSctId;
+	
+	
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter default-value="0"
+	 * 
+	 */
+	private String namespaceId;
+	
+	/**
+	 * partitionId
+	 * 
+	 * @parameter default-value="00"
+	 * 
+	 */
+	private String partitionId;
+	
+	/**
+	 * executionId
+	 * 
+	 * @parameter default-value="Daily-build"
+	 * 
+	 */
+	private String executionId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="Core Component"
+	 * 
+	 */
+	private String moduleId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="20110131"
+	 * 
+	 */
+	private String releaseId;
+	
+	/**
+	 * componentType
+	 * 
+	 * @parameter default-value="Concept"
+	 * 
+	 */
+	private String componentType;
+	
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -96,7 +157,7 @@ public class ConfigMojo extends AbstractMojo {
 		config.setReleaseDate(releaseDate);
 		config.setOutputFolderName(exportFolder);
 		
-		// set these for tesdefiniton
+		// set these for text-definiton
 		config.setEndPoint(endpointURL);
 		config.setUsername(username);
 		config.setPassword(password);
@@ -107,6 +168,16 @@ public class ConfigMojo extends AbstractMojo {
 		config.setIncrementalRelease(incrementalRelease);
 		config.setFileExtension(fileExtension);
 		config.setFlushCount(flushCount);
+		
+		//Below Parameters are necessary for ID-Generation
+		config.setUpdateWbSctId(updateWbSctId);
+		config.setNamespaceId(namespaceId);
+		config.setPartitionId(partitionId);
+		config.setExecutionId(executionId);
+		config.setModuleId(moduleId);
+		config.setReleaseId(releaseId);
+		config.setComponentType(componentType);
+		
 	}
 
 }

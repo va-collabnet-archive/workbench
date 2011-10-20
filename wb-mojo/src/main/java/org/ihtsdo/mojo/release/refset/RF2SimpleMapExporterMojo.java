@@ -44,6 +44,32 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+	
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -63,7 +89,12 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-
+			
+			//Below Parameters are necessary for ID-Generation
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
+			
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init();
 			//Exports snomedid , ctv3id and icdo map
