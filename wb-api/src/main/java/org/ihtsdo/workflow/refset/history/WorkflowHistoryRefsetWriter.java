@@ -339,7 +339,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			"</properties>"; 
 	}
 	
-	public void updateWorkflowHistory(WorkflowHistoryJavaBean update) throws Exception
+	public  I_ExtendByRef updateWorkflowHistory(WorkflowHistoryJavaBean update) throws Exception
 	{
 		setConceptUid(update.getConcept());
     	setWorkflowUid(update.getWorkflowId());
@@ -360,9 +360,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
         setEffectiveTime(Long.MAX_VALUE);
 
 		I_ExtendByRef ref = addMember();
-
-		if (ref != null && !Terms.get().commit()) {
-			Terms.get().forget(ref);
-		}
+		
+		return ref;
 	}
 }

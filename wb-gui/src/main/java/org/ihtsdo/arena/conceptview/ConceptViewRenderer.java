@@ -487,6 +487,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                                     	WorkflowHelper.setAdvancingWorkflowLock(true);
                                         writer.updateWorkflowHistory(bean);
+                    	                Terms.get().commit();
                                     	WorkflowHelper.setAdvancingWorkflowLock(false);
                                     }
                                 }
@@ -604,6 +605,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                                 	WorkflowHelper.setAdvancingWorkflowLock(true);
                                     WorkflowHelper.retireWorkflowHistoryRow(latestWfHxJavaBean, viewCoord);
+                                    Terms.get().commit();
                                 	WorkflowHelper.setAdvancingWorkflowLock(false);
 
                                     workflowToggleButton.doClick();

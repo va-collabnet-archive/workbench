@@ -90,7 +90,9 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         if (currentCount == cNids.cardinality()) {
         	AceLog.getAppLog().log(Level.INFO, "Have completed Contradiction Identification Successfully");
 
-        	revertEditPath();
+            Terms.get().commit();
+
+            revertEditPath();
         	revertUncommitted();
         }
     }

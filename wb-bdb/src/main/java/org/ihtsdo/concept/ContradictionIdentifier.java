@@ -1205,8 +1205,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					latestVersion = version;
 				}
 			}
-	
-			BdbCommitManager.setCheckCreationDataEnabled(false);
 			
 			if (refsetId.equals(WorkflowHelper.getWorkflowRefsetUid())) {
 				WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
@@ -1281,9 +1279,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 					writer.addMember();
 				}
-				
-				Terms.get().commit();
-				BdbCommitManager.setCheckCreationDataEnabled(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

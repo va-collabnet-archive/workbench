@@ -137,9 +137,9 @@ public class WorkflowHelper {
 			UUID currentWfId = bean.getWorkflowId();
 			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
-			retireRow(bean);
+			I_ExtendByRef ref = retireRow(bean);
 
-			if (precedingCommitExists) {
+			if (ref != null && precedingCommitExists) {
 				// Just retired preceding commit
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
@@ -153,7 +153,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	private static void retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+	private static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
 		WorkflowHistoryRefsetWriter writer;
 		writer = new WorkflowHistoryRefsetWriter();
 
@@ -179,9 +179,7 @@ public class WorkflowHelper {
 		
 		I_ExtendByRef ref = writer.retireMember();
 
-		if (ref != null && !Terms.get().commit()) {
-			Terms.get().forget(ref);
-		}
+		return ref;
 	}
 
 	public static void updateModelers(ViewCoordinate vc) 
