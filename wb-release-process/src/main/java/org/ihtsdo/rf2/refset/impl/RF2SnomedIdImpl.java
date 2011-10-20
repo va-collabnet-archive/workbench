@@ -1,6 +1,9 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -41,7 +44,6 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			String refsetId = I_Constants.SNOMED_REFSET_ID;
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			String mapTarget_Core = getSnomedId(concept, getSnomedCorePathNid());
-
 			String mapTarget_Aux = getSnomedId(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
 			
@@ -53,6 +55,16 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			if (referencedComponentId==null || referencedComponentId.equals("")){
 				referencedComponentId=concept.getUids().iterator().next().toString();
 			}
+			
+			if(mapTarget.equals("") || mapTarget.equals(null) ){	
+				if(referencedComponentId.contains("-")){	
+					String parentSnomedId = getParentSnomedId(concept);
+					System.out.println("referencedComponentId " + referencedComponentId );
+					System.out.println("parentSnomedId " + parentSnomedId );
+					mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
+				}
+			}
+			
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
 			writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
 		} catch (TerminologyException e) {
@@ -65,6 +77,31 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			logger.error("Exceptions in exportIncremental SnomedIdRefset: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	private String getParentSnomedId(I_GetConceptData concept) throws Exception{		
+		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
+		parents = getParentLocal(parents, concept); // check size
+		Iterator iter = parents.iterator();		
+		String parentSnomedId="";
+		boolean findParentSnomedId = true;
+		
+		while (iter.hasNext()) {
+			if(findParentSnomedId){
+				I_GetConceptData parentConcept = (I_GetConceptData) iter.next();
+				parentSnomedId = getSnomedId(parentConcept, getSnomedCorePathNid());	
+				if(!(parentSnomedId.equals("") && parentSnomedId.equals(null))){
+					findParentSnomedId = false;
+				}
+			}
+		}
+		
+		if(findParentSnomedId){
+			parentSnomedId="C-D1619"; //Default Value
+		}
+		
+		
+		return parentSnomedId;
 	}
 
 	private void writeRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String mapTarget) throws IOException {

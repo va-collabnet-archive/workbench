@@ -48,7 +48,6 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			
 			String mapTarget_Core = getCtv3Id(concept, getSnomedCorePathNid());
-		
 			String mapTarget_Aux = getCtv3Id(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
 			String mapTarget="";
 			
@@ -57,11 +56,18 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 			}else if(!(mapTarget_Aux.equals("") && mapTarget_Aux.equals(null))){
 				mapTarget = mapTarget_Aux;
 			}
-		
-			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
+					
 			if (referencedComponentId==null || referencedComponentId.equals("")){
 				referencedComponentId=concept.getUids().iterator().next().toString();
 			}
+			
+			if(mapTarget.equals("") || mapTarget.equals(null) ){
+				if(referencedComponentId.contains("-")){	
+					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
+				}
+			}
+			
+			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
 			writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
 		} catch (TerminologyException e) {
 			logger.error("TerminologyException: " + e.getMessage());
@@ -77,7 +83,6 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 	}
 
 	private void writeRF2TypeLine(UUID uuid, String effectiveTime, String simpleMapRefsetActive, String moduleId, String refsetId, String referencedComponentId, String mapTarget) throws IOException {
-
 		WriteUtil.write(getConfig(), uuid + "\t" + effectiveTime + "\t" + I_Constants.SIMPLE_MAP_REFSET_ACTIVE + "\t" + moduleId + "\t" + refsetId + "\t" + referencedComponentId + "\t" + mapTarget);
 		WriteUtil.write(getConfig(), "\r\n");
 

@@ -54,7 +54,7 @@ public class RF2TextDefinitionFactory extends RF2AbstractFactory {
 		
 			
 			closeExportFileWriter();
-
+			logger.info("Finished Textdefinition Snapshot Export...");
 		} catch (MalformedURLException e) {
 			logger.error("Message :", e);
 		} catch (IOException e) {

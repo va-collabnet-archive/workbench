@@ -25,8 +25,6 @@ import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.impl.RF2IDImpl;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.ExportUtil;
-import org.ihtsdo.rf2.util.IdUtil;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
@@ -178,16 +176,18 @@ public class RF2IdGeneratorImpl extends RF2IDImpl {
 		 			for (int s = 0; s < Key.size(); s++) {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){					    			
 				    		String uuid = part[Integer.parseInt(Key.get(s))];
-				    		sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid)); 
-			    			if(sctid.equals("0")){
-			    				sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
-								// sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
+				    		try {
+								sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+								if(sctid.equals("0")){
+				    				sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+									// sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
+								}
+							} catch (NumberFormatException e) {
+								logger.error("NumberFormatException" +e);
+							} catch (Exception e) {
+								logger.error("Exception" +e);
 							}
-			    			
-			    			if(updateWbSctId.equals("true")){
-								//insert sctid in the workbench using uuid
-								
-							}							
+							
 							lineRead =lineRead.replace(part[Integer.parseInt(Key.get(s))], sctid);				    	
 						 }
 					}

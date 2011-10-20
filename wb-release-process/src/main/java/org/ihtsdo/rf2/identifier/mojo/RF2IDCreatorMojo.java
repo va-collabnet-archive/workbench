@@ -126,7 +126,7 @@ public class RF2IDCreatorMojo extends ReleaseConfigMojo {
 	private String password;
 
 	
-
+	//This mojo needs to be used only for replacing sctid with existing uuid
 	public void execute() throws MojoExecutionException {			
 		Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/idGenerator.xml");
 		// set all the values passed via mojo
