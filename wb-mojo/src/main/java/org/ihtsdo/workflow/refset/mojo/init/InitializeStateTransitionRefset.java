@@ -73,7 +73,6 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
 	        	}
 	        }
 
-        	Terms.get().addUncommitted(writer.getRefsetConcept());
         	return true;
     	} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into state transition refset: " + line);
