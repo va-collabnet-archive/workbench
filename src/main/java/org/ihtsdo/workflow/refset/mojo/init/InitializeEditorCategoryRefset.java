@@ -76,8 +76,6 @@ public class InitializeEditorCategoryRefset implements I_InitializeWorkflowRefse
     			}
             }
 
-        	Terms.get().addUncommitted(writer.getRefsetConcept());
-
         	return true;
     	} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into editor category refset: " + line);

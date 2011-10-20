@@ -61,8 +61,7 @@ public class InitializeSemanticHierarchyRefset implements I_InitializeWorkflowRe
 				}
 	        }
 	
-	    	Terms.get().addUncommitted(writer.getRefsetConcept());
-	    	return true;
+        	return true;
     	} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into semantic hierarchy refset: " + line);
     		return false;
