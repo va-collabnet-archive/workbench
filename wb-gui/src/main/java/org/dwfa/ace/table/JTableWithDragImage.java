@@ -52,11 +52,13 @@ import javax.swing.table.TableModel;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.DescriptionTransferable;
+import org.dwfa.ace.dnd.RelationshipTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.ConceptAttributeTableModel.CONCEPT_FIELD;
 import org.dwfa.ace.table.ConceptAttributeTableModel.StringWithConceptTuple;
@@ -80,6 +82,7 @@ import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptT
 import sun.awt.dnd.SunDragSourceContextPeer;
 
 public class JTableWithDragImage extends JTable {
+
     /**
      * 
      */
@@ -155,7 +158,7 @@ public class JTableWithDragImage extends JTable {
                 } else if (StringWithExtTuple.class.isAssignableFrom(obj.getClass())) {
                     return transferableFromSWExtT(obj, column);
                 } else if (WorkflowStringWithConceptTuple.class.isAssignableFrom(obj.getClass())) {
-                	return transferableFromWFExtT(obj, column);
+                    return transferableFromWFExtT(obj, column);
                 }
             } else if (ImageWithImageTuple.class.isAssignableFrom(obj.getClass())) {
                 return transferableFromIWImgT(obj);
@@ -172,58 +175,60 @@ public class JTableWithDragImage extends JTable {
             if (ReflexiveRefsetFieldData.class.isAssignableFrom(columnIdentifier.getClass())) {
                 ReflexiveRefsetFieldData fieldData = (ReflexiveRefsetFieldData) columnIdentifier;
                 switch (fieldData.getType()) {
-                case COMPONENT_IDENTIFIER:
-                case CONCEPT_IDENTIFIER:
-                    Object component = Terms.get().getComponent(swextt.getId());
-                    if (component == null) {
-                        return new StringSelection("null component for: " + obj + " version: " + swextt.getTuple());
-                    }
-                    if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
-                        return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
-                    }
-                    if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
-                        return new DescriptionTransferable(Terms.get().getDescription(swextt.getId()));
-                    }
-                    throw new UnsupportedOperationException("Component: " + component);
-                case STRING:
-                    return new StringSelection(swextt.getCellText());
-                case TIME:
-                    return new StringSelection(swextt.getCellText());
-                default:
-                    throw new UnsupportedOperationException("Can't handle fieldDataType: " + fieldData.getType());
+                    case COMPONENT_IDENTIFIER:
+                    case CONCEPT_IDENTIFIER:
+                        Object component = Terms.get().getComponent(swextt.getId());
+                        if (component == null) {
+                            return new StringSelection("null component for: " + obj + " version: " + swextt.getTuple());
+                        }
+                        if (I_GetConceptData.class.isAssignableFrom(component.getClass())) {
+                            return new ConceptTransferable(Terms.get().getConcept(swextt.getId()));
+                        }
+                        if (I_DescriptionVersioned.class.isAssignableFrom(component.getClass())) {
+                            return new DescriptionTransferable(Terms.get().getDescription(swextt.getId()));
+                        }
+                        if (I_RelVersioned.class.isAssignableFrom(component.getClass())) {
+                            return new RelationshipTransferable(Terms.get().getRelationship(swextt.getId()));
+                        }
+                        throw new UnsupportedOperationException("Component: " + component);
+                    case STRING:
+                        return new StringSelection(swextt.getCellText());
+                    case TIME:
+                        return new StringSelection(swextt.getCellText());
+                    default:
+                        throw new UnsupportedOperationException("Can't handle fieldDataType: " + fieldData.getType());
                 }
 
             } else if (REFSET_FIELDS.class.isAssignableFrom(columnIdentifier.getClass())) {
                 REFSET_FIELDS field = (REFSET_FIELDS) columnIdentifier;
                 switch (field) {
-                // All extensions
-                case REFSET_ID:
-                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getRefsetId()));
-                case MEMBER_ID:
-                    throw new UnsupportedOperationException();
-                case COMPONENT_ID:
-                    throw new UnsupportedOperationException();
-                case STATUS:
-                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getStatusId()));
-                case VERSION:
-                    return new StringSelection(swextt.getCellText());
-                case PATH:
-                    return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getPathId()));
-                case BOOLEAN_VALUE:
-                    return new StringSelection(swextt.getCellText());
-                case CONCEPT_ID:
-                    return new ConceptTransferable(Terms.get().getConcept(((I_ExtendByRefPartCid) swextt.getTuple()
-                        .getMutablePart()).getC1id()));
-                case INTEGER_VALUE:
-                    return new StringSelection(swextt.getCellText());
-                case STRING_VALUE:
-                    return new StringSelection(swextt.getCellText());
-                default:
-                    throw new UnsupportedOperationException("Can't handle field: " + field);
+                    // All extensions
+                    case REFSET_ID:
+                        return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getRefsetId()));
+                    case MEMBER_ID:
+                        throw new UnsupportedOperationException();
+                    case COMPONENT_ID:
+                        throw new UnsupportedOperationException();
+                    case STATUS:
+                        return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getStatusId()));
+                    case VERSION:
+                        return new StringSelection(swextt.getCellText());
+                    case PATH:
+                        return new ConceptTransferable(Terms.get().getConcept(swextt.getTuple().getPathId()));
+                    case BOOLEAN_VALUE:
+                        return new StringSelection(swextt.getCellText());
+                    case CONCEPT_ID:
+                        return new ConceptTransferable(Terms.get().getConcept(((I_ExtendByRefPartCid) swextt.getTuple().getMutablePart()).getC1id()));
+                    case INTEGER_VALUE:
+                        return new StringSelection(swextt.getCellText());
+                    case STRING_VALUE:
+                        return new StringSelection(swextt.getCellText());
+                    default:
+                        throw new UnsupportedOperationException("Can't handle field: " + field);
                 }
             }
-            throw new UnsupportedOperationException("Can't handle columnIdentifier: " + columnIdentifier + 
-            		" of class: " + columnIdentifier.getClass());
+            throw new UnsupportedOperationException("Can't handle columnIdentifier: " + columnIdentifier
+                    + " of class: " + columnIdentifier.getClass());
 
         }
 
@@ -232,18 +237,18 @@ public class JTableWithDragImage extends JTable {
 
             ID_FIELD field = (ID_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case LOCAL_ID:
-                throw new UnsupportedOperationException();
-            case EXT_ID:
-                return new StringSelection(seidt.getTuple().getDenotation().toString());
-            case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getStatusId()));
-            case VERSION:
-                return new StringSelection(ThinVersionHelper.format(seidt.getTuple().getVersion()));
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getPathId()));
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                case LOCAL_ID:
+                    throw new UnsupportedOperationException();
+                case EXT_ID:
+                    return new StringSelection(seidt.getTuple().getDenotation().toString());
+                case STATUS:
+                    return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getStatusId()));
+                case VERSION:
+                    return new StringSelection(ThinVersionHelper.format(seidt.getTuple().getVersion()));
+                case PATH:
+                    return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getPathId()));
+                default:
+                    throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
@@ -252,28 +257,28 @@ public class JTableWithDragImage extends JTable {
 
             REL_FIELD field = (REL_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case REL_ID:
-                throw new UnsupportedOperationException();
-            case SOURCE_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC1Id()));
-            case REL_TYPE:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getTypeId()));
-            case DEST_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC2Id()));
-            case GROUP:
-                return new StringSelection(Integer.toString(swrt.tuple.getGroup()));
-            case REFINABILITY:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getRefinabilityId()));
-            case CHARACTERISTIC:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getCharacteristicId()));
-            case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getStatusId()));
-            case VERSION:
-                return new StringSelection(ThinVersionHelper.format(swrt.getTuple().getVersion()));
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getPathId()));
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                case REL_ID:
+                    throw new UnsupportedOperationException();
+                case SOURCE_ID:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC1Id()));
+                case REL_TYPE:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getTypeId()));
+                case DEST_ID:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getC2Id()));
+                case GROUP:
+                    return new StringSelection(Integer.toString(swrt.tuple.getGroup()));
+                case REFINABILITY:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getRefinabilityId()));
+                case CHARACTERISTIC:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getCharacteristicId()));
+                case STATUS:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getStatusId()));
+                case VERSION:
+                    return new StringSelection(ThinVersionHelper.format(swrt.getTuple().getVersion()));
+                case PATH:
+                    return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getPathId()));
+                default:
+                    throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
@@ -282,26 +287,26 @@ public class JTableWithDragImage extends JTable {
 
             DESC_FIELD field = (DESC_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case DESC_ID:
-                throw new UnsupportedOperationException();
-            case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptNid()));
-            case TEXT:
-                return new DescriptionTransferable(swdt.tuple);
-            case LANG:
-                return new StringSelection(swdt.tuple.getLang());
-            case CASE_FIXED:
-                return new StringSelection(swdt.getCellText());
-            case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getStatusId()));
-            case TYPE:
-                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getTypeId()));
-            case VERSION:
-                return new StringSelection(ThinVersionHelper.format(swdt.getTuple().getVersion()));
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getPathId()));
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                case DESC_ID:
+                    throw new UnsupportedOperationException();
+                case CON_ID:
+                    return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getConceptNid()));
+                case TEXT:
+                    return new DescriptionTransferable(swdt.tuple);
+                case LANG:
+                    return new StringSelection(swdt.tuple.getLang());
+                case CASE_FIXED:
+                    return new StringSelection(swdt.getCellText());
+                case STATUS:
+                    return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getStatusId()));
+                case TYPE:
+                    return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getTypeId()));
+                case VERSION:
+                    return new StringSelection(ThinVersionHelper.format(swdt.getTuple().getVersion()));
+                case PATH:
+                    return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getPathId()));
+                default:
+                    throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
@@ -309,76 +314,76 @@ public class JTableWithDragImage extends JTable {
             StringWithConceptTuple swct = (StringWithConceptTuple) obj;
             CONCEPT_FIELD field = (CONCEPT_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getNid()));
-            case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getStatusId()));
-            case DEFINED:
-                return new StringSelection(swct.getCellText());
-            case VERSION:
-                return new StringSelection(ThinVersionHelper.format(swct.getTuple().getVersion()));
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getPathId()));
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                case CON_ID:
+                    return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getNid()));
+                case STATUS:
+                    return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getStatusId()));
+                case DEFINED:
+                    return new StringSelection(swct.getCellText());
+                case VERSION:
+                    return new StringSelection(ThinVersionHelper.format(swct.getTuple().getVersion()));
+                case PATH:
+                    return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getPathId()));
+                default:
+                    throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
         private Transferable transferableFromWFExtT(Object obj, int column) throws TerminologyException, IOException {
-        	WorkflowStringWithConceptTuple wfct = (WorkflowStringWithConceptTuple) obj;
+            WorkflowStringWithConceptTuple wfct = (WorkflowStringWithConceptTuple) obj;
             WORKFLOW_FIELD field = (WORKFLOW_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case FSN:
-                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
+                case FSN:
+                    return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
 //            case ACTION:
 //                return new StringSelection(wfct.getCellText());
-            case STATE:
-                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
-            case EDITOR:
-                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
+                case STATE:
+                    return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
+                case EDITOR:
+                    return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
 //            case PATH:
 //                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
-            case TIMESTAMP:
-                return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
-            default:
-                throw new UnsupportedOperationException("Cana't handle field: " + field);
+                case TIMESTAMP:
+                    return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
+                default:
+                    throw new UnsupportedOperationException("Cana't handle field: " + field);
             }
         }
 
         private Transferable transferableFromIWImgT(Object obj) throws IOException {
             ImageWithImageTuple iwit = (ImageWithImageTuple) obj;
             return new StringSelection("<img src='ace:" + Terms.get().nativeToUuid(iwit.tuple.getNid())
-                + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptNid()) + "'>");
+                    + "$" + Terms.get().nativeToUuid(iwit.tuple.getConceptNid()) + "'>");
         }
 
         private Transferable transferableFromSWImgT(Object obj, int column) throws IOException, TerminologyException {
             StringWithImageTuple swit = (StringWithImageTuple) obj;
             IMAGE_FIELD field = (IMAGE_FIELD) getColumnModel().getColumn(column).getIdentifier();
             switch (field) {
-            case IMAGE_ID:
-                return new StringSelection("<img src='ace:"
-                    + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
-                    + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
-            case CON_ID:
-                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptNid()));
-            case DESC:
-                return new StringSelection(swit.getTuple().getTextDescription());
-            case IMAGE:
-                return new StringSelection("<img src='ace:"
-                    + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
-                    + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
-            case FORMAT:
-                return new StringSelection(swit.getTuple().getFormat());
-            case STATUS:
-                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getStatusId()));
-            case TYPE:
-                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getTypeId()));
-            case VERSION:
-                return new StringSelection(ThinVersionHelper.format(swit.getTuple().getVersion()));
-            case PATH:
-                return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getPathId()));
-            default:
-                throw new UnsupportedOperationException("Can't handle field: " + field);
+                case IMAGE_ID:
+                    return new StringSelection("<img src='ace:"
+                            + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
+                            + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
+                case CON_ID:
+                    return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getConceptNid()));
+                case DESC:
+                    return new StringSelection(swit.getTuple().getTextDescription());
+                case IMAGE:
+                    return new StringSelection("<img src='ace:"
+                            + Terms.get().nativeToUuid(swit.getTuple().getNid()) + "$"
+                            + Terms.get().nativeToUuid(swit.getTuple().getConceptNid()) + "'>");
+                case FORMAT:
+                    return new StringSelection(swit.getTuple().getFormat());
+                case STATUS:
+                    return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getStatusId()));
+                case TYPE:
+                    return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getTypeId()));
+                case VERSION:
+                    return new StringSelection(ThinVersionHelper.format(swit.getTuple().getVersion()));
+                case PATH:
+                    return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getPathId()));
+                default:
+                    throw new UnsupportedOperationException("Can't handle field: " + field);
             }
         }
 
@@ -407,7 +412,7 @@ public class JTableWithDragImage extends JTable {
             dragLabel.paint(og);
             og.dispose();
             FilteredImageSource fis = new FilteredImageSource(dragImage.getSource(),
-                TermLabelMaker.getTransparentFilter());
+                    TermLabelMaker.getTransparentFilter());
             dragImage = Toolkit.getDefaultToolkit().createImage(fis);
             return dragImage;
         }
@@ -416,26 +421,25 @@ public class JTableWithDragImage extends JTable {
     public JTableWithDragImage(TableModel dm) {
         super(dm);
         DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY,
-            new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
+                new DragGestureListenerWithImage(new TermLabelDragSourceListener()));
 
         InputMap imap = this.getInputMap();
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCutAction().getValue(Action.NAME));
+                TransferHandler.getCutAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getCopyAction().getValue(Action.NAME));
+                TransferHandler.getCopyAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()),
-            TransferHandler.getPasteAction().getValue(Action.NAME));
+                TransferHandler.getPasteAction().getValue(Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK), TransferHandler.getCutAction().getValue(
-            Action.NAME));
+                Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK), TransferHandler.getCopyAction().getValue(
-            Action.NAME));
+                Action.NAME));
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK), TransferHandler.getPasteAction().getValue(
-            Action.NAME));
+                Action.NAME));
 
         ActionMap map = this.getActionMap();
         map.put("cut", new AceTransferAction("cut"));
         map.put("copy", new AceTransferAction("copy"));
         map.put("paste", new AceTransferAction("paste"));
     }
-
 }

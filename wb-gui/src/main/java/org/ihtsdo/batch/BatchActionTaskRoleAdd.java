@@ -70,8 +70,13 @@ public class BatchActionTaskRoleAdd extends BatchActionTask {
         List<UUID> roleUuids = ts.getUuidsForNid(roleNid);
         List<UUID> valueUuids = ts.getUuidsForNid(valueNid);
         if (roleUuids.size() > 0 && valueUuids.size() > 0) {
+            TkRelType relChType = TkRelType.STATED_ROLE;
+            if (HISTORIC_ROLE_TYPES.contains(roleNid)) {
+                relChType = TkRelType.HISTORIC;
+            }
+
             RelCAB relSpec = new RelCAB(c.getPrimUuid(), roleUuids.get(0), valueUuids.get(0),
-                    0, TkRelType.STATED_ROLE);
+                    0, relChType);
             tsSnapshot.construct(relSpec);
 
             BatchActionEventReporter.add(new BatchActionEvent(c,

@@ -64,10 +64,16 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
         Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : rels) {
             if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueOldNid) {
-                rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), rvbi.getPathNid(), Long.MAX_VALUE);
+                for (int editPath : ec.getEditPaths()) {
+                    rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
+                }
 
+                TkRelType relChType = TkRelType.STATED_HIERARCHY;
+                if (HISTORIC_ROLE_TYPES.contains(rvbi.getTypeNid())) {
+                    relChType = TkRelType.HISTORIC;
+                }
                 RelCAB rc = new RelCAB(rvbi.getOriginNid(), rvbi.getTypeNid(), valueNewNid, rvbi.getGroup(),
-                        TkRelType.STATED_HIERARCHY);
+                        relChType);
                 tsSnapshot.construct(rc);
 
                 BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.ROLE_REPLACE_VALUE,

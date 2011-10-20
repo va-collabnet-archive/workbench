@@ -56,6 +56,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -527,6 +528,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 }
                             } catch (Exception e) {
                                 value = "No description available.";
+                                if (I_RelVersioned.class.isAssignableFrom(tf.getComponent(id).getClass())) {
+                                    I_RelVersioned rel = tf.getRelationship(id);
+                                    value = tf.getConcept(rel.getC1Id()).getInitialText() + ":"
+                                            + tf.getConcept(rel.getTypeNid()).getInitialText() + ":"
+                                            + tf.getConcept(rel.getC2Id()).getInitialText();
+                                }
                             }
                         }
 

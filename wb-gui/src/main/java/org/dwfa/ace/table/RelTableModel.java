@@ -63,6 +63,7 @@ import org.dwfa.ace.timer.UpdateAlertsTimer;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
+import org.ihtsdo.descriptionlogic.DescriptionLogic;
 
 public abstract class RelTableModel extends AbstractTableModel implements PropertyChangeListener, I_DoConceptDrop {
 
@@ -353,7 +354,11 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
                     return new StringWithRelTuple(Integer.toString(rel.getTypeNid()), rel, inConflict);
                 case DEST_ID:
                     if (referencedConcepts.containsKey(rel.getC2Id())) {
-                        return new StringWithRelTuple(getPrefText(rel.getC2Id()), rel, inConflict);
+                        if (DescriptionLogic.isNegatedRel(rel, config.getViewCoordinate())) {
+                            return new StringWithRelTuple("NOT! " + getPrefText(rel.getC2Id()), rel, inConflict);
+                        } else {
+                            return new StringWithRelTuple(getPrefText(rel.getC2Id()), rel, inConflict);
+                        }
                     }
                     return new StringWithRelTuple(Integer.toString(rel.getC2Id()), rel, inConflict);
                 case GROUP:
@@ -528,7 +533,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
             }
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
-        } 
+        }
         fireTableDataChanged();
     }
 

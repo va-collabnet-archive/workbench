@@ -41,7 +41,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 public class Rf2_RefsetId {
 
     public static final String SUBSETMEMBER_ID_NAMESPACE_UUID_TYPE1 = "b7d13800-e38d-11df-bccf-0800200c9a66";
-    public static final String SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
+    public static final String REFSET_ID_NAMESPACE_UUID_TYPE1 = "d0b3c9c0-e395-11df-bccf-0800200c9a66";
     public static final String SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 = "e1cff9e0-e395-11df-bccf-0800200c9a66";
     public static final String HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1 =
             "22928260-08d8-11e0-81e0-0800200c9a66";
@@ -58,8 +58,13 @@ public class Rf2_RefsetId {
             String refsetFsName, String refsetParentUuid)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         this.refsetSctIdOriginal = refsetSctIdOriginal;
-        this.refsetUuidStr = Type5UuidFactory.get(SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
-                + Long.toString(refsetSctIdOriginal)).toString();
+        if (this.refsetSctIdOriginal < Long.MAX_VALUE) {
+            this.refsetUuidStr = Type5UuidFactory.get(REFSET_ID_NAMESPACE_UUID_TYPE1
+                    + Long.toString(refsetSctIdOriginal)).toString();
+        } else {
+            this.refsetUuidStr = Type5UuidFactory.get(REFSET_ID_NAMESPACE_UUID_TYPE1
+                    + refsetFsName).toString();
+        }
         this.refsetDate = refsetDate;
         this.refsetPathUuidStr = refsetPathUuidStr;
         this.refsetPrefTerm = refsetPrefTerm;
@@ -67,7 +72,11 @@ public class Rf2_RefsetId {
         this.refsetParentUuid = refsetParentUuid;
     }
 
-    static void saveRefsetConcept(String arfDir, List<Rf2_RefsetId> subsetIds)
+    public String getRefsetUuidStr() {
+        return refsetUuidStr;
+    }
+
+    public static void saveRefsetConcept(String arfDir, List<Rf2_RefsetId> subsetIds)
             throws MojoFailureException {
 
         try {
@@ -104,23 +113,25 @@ public class Rf2_RefsetId {
                 concepts.append(sid.refsetPathUuidStr); //path uuid
                 concepts.append("\n");
 
-                ids.append(sid.refsetUuidStr); // refset concept uuid
-                ids.append("\t");
-                //source uuid
-                ids.append(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString());
-                ids.append("\t");
-                ids.append(Long.toString(sid.refsetSctIdOriginal)); //source id
-                ids.append("\t");
-                ids.append(uuidCurrentStr); //status uuid
-                ids.append("\t");
-                ids.append(effectiveDate); // effective date
-                ids.append("\t");
-                ids.append(sid.refsetPathUuidStr); //path uuid
-                ids.append("\n");
+                if (sid.refsetSctIdOriginal < Long.MAX_VALUE) {
+                    ids.append(sid.refsetUuidStr); // refset concept uuid
+                    ids.append("\t");
+                    //source uuid
+                    ids.append(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid().toString());
+                    ids.append("\t");
+                    ids.append(Long.toString(sid.refsetSctIdOriginal)); //source id
+                    ids.append("\t");
+                    ids.append(uuidCurrentStr); //status uuid
+                    ids.append("\t");
+                    ids.append(effectiveDate); // effective date
+                    ids.append("\t");
+                    ids.append(sid.refsetPathUuidStr); //path uuid
+                    ids.append("\n");
+                }
 
                 if (sid.refsetFsName != null) {
                     descriptions.append(Type5UuidFactory.get(
-                            SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
+                            REFSET_ID_NAMESPACE_UUID_TYPE1
                             + "Subset Fully Specified Name"
                             + sid.refsetFsName).toString()); // description uuid
                     descriptions.append("\t");
@@ -144,7 +155,7 @@ public class Rf2_RefsetId {
 
                 if (sid.refsetPrefTerm != null) {
                     descriptions.append(Type5UuidFactory.get(
-                            SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Subset Preferred Name"
+                            REFSET_ID_NAMESPACE_UUID_TYPE1 + "Subset Preferred Name"
                             + sid.refsetPrefTerm).toString()); // description uuid
                     descriptions.append("\t");
                     descriptions.append(ArchitectonicAuxiliary.Concept.ACTIVE.getPrimoridalUid().toString()); // status uuid
@@ -165,9 +176,15 @@ public class Rf2_RefsetId {
                     descriptions.append("\n");
                 }
 
-                relationships.append(Type5UuidFactory.get(
-                        SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship"
-                        + sid.refsetSctIdOriginal).toString()); // relationship uuid
+                if (sid.refsetSctIdOriginal < Long.MAX_VALUE) {
+                    relationships.append(Type5UuidFactory.get(
+                            REFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship"
+                            + sid.refsetSctIdOriginal).toString()); // relationship uuid
+                } else {
+                    relationships.append(Type5UuidFactory.get(
+                            REFSET_ID_NAMESPACE_UUID_TYPE1 + "Relationship"
+                            + sid.refsetUuidStr).toString()); // relationship uuid
+                }
                 relationships.append("\t");
                 relationships.append(uuidCurrentStr); // status uuid
                 relationships.append("\t");

@@ -29,6 +29,7 @@ import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -168,7 +169,8 @@ public class BatchActionTaskParentReplaceUI extends javax.swing.JPanel implement
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts)
+            throws IOException {
 
         // MOVE FROM
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();

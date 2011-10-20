@@ -20,8 +20,10 @@ import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import org.dwfa.ace.ACE;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -88,7 +90,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
             }
         });
 
-        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Add", "Role, Replace Value", "Role, Retire" }));
+        jComboTaskType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parent, Add New", "Parent, Replace", "Parent, Retire", "Refset, Add Member", "Refset, Move Member", "Refset, Replace Value", "Refset, Retire Member", "Role, Add", "Role, Replace Value", "Role, Retire", "Logic, Disjoin Concepts", "Logic, Remove Concept Disjoins", "Logic, Negate Relationship Value" }));
         jComboTaskType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 actionSelectTaskType(evt);
@@ -99,7 +101,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         jPanelTaskDetail.setLayout(jPanelTaskDetailLayout);
         jPanelTaskDetailLayout.setHorizontalGroup(
             jPanelTaskDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 350, Short.MAX_VALUE)
+            .addGap(0, 353, Short.MAX_VALUE)
         );
         jPanelTaskDetailLayout.setVerticalGroup(
             jPanelTaskDetailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,6 +196,24 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                     taskDetailUI = new BatchActionTaskRoleRetireUI();
                 }
                 break;
+            case 10: // LOGIC_DISJOIN_CONCEPTS
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_DISJOIN_CONCEPTS) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_DISJOIN_CONCEPTS;
+                    taskDetailUI = new BatchActionTaskLogicDisjoinAddUI(editor.ace.aceFrameConfig);
+                }
+                break;
+            case 11: // LOGIC_RETIRE_DISJOIN_CONCEPTS
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_RETIRE_DISJOIN_CONCEPTS) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_RETIRE_DISJOIN_CONCEPTS;
+                taskDetailUI = new BatchActionTaskLogicDisjoinRetireUI();
+                }
+                break;
+            case 12: // LOGIC_NEGATE_RELATIONSHIP_VALUE
+                if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE) != 0) {
+                    actionTaskType = BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE;
+                    taskDetailUI = new BatchActionTaskLogicNegateRelValueUI();
+                }
+                break;
             default:
                 ; // NOTHING TO DO
         }
@@ -227,8 +247,9 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelTaskDetail;
     // End of variables declaration//GEN-END:variables
 
-    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws Exception {
-        return taskDetailUI.getTask(ec, vc);
+    BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts)
+            throws Exception {
+        return taskDetailUI.getTask(ec, vc, concepts);
     }
 
     void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets,

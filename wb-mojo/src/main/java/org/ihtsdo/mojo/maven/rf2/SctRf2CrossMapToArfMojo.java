@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,13 +147,13 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
             throw new MojoFailureException(
                     "RF2/ARF SctRf2CrossMapToArfMojo UnsupportedEncodingException error", ex);
         } catch (TerminologyException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo Terminology error", ex);
         } catch (ParseException ex) {
             Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo parse error", ex);
         } catch (IOException ex) {
-            Logger.getLogger(SctRf2ToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SctRf2CrossMapToArfMojo.class.getName()).log(Level.SEVERE, null, ex);
             throw new MojoFailureException("RF2/ARF SctRf2CrossMapToArfMojo file error", ex);
         }
         getLog().info("::: END SctRf2CrossMapToArfMojo");

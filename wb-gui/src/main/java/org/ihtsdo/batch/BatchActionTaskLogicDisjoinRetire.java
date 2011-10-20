@@ -31,7 +31,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
  * BatchActionTaskRefsetRetireMember
  * 
  */
-public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
+public class BatchActionTaskLogicDisjoinRetire extends BatchActionTask {
 
     // REFSET MEMBER
     private int collectionNid;
@@ -39,7 +39,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
     private TK_REFSET_TYPE refsetType;
     private Object matchValue;
 
-    public BatchActionTaskRefsetRetireMember() {
+    public BatchActionTaskLogicDisjoinRetire() {
         this.collectionNid = Integer.MAX_VALUE;
         this.matchValue = null;
     }

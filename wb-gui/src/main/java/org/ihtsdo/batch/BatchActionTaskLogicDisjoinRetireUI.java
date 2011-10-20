@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.batch;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -34,14 +33,16 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  *
  * @author marc
  */
-public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements I_BatchActionTask {
+public class BatchActionTaskLogicDisjoinRetireUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
 
-    /** Creates new form BatchActionTaskParentRetireUI */
-    public BatchActionTaskParentRetireUI() {
+    /** Creates new form BatchActionTaskRefsetRetireMemberUI */
+    public BatchActionTaskLogicDisjoinRetireUI() {
         initComponents();
-        this.task = new BatchActionTaskParentRetire();
+
+        // TASK
+        this.task = new BatchActionTaskRefsetRetireMember();
     }
 
     /** This method is called from within the constructor to
@@ -53,13 +54,20 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBoxExistingParents = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        jComboBoxExistingRefsets = new javax.swing.JComboBox();
 
-        jComboBoxExistingParents.setModel(jComboBoxExistingParents.getModel());
-        jComboBoxExistingParents.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
+        setPreferredSize(new java.awt.Dimension(218, 80));
 
-        jLabel1.setText("Retire As Parent:");
+        jLabel1.setText("Disjoin:");
+
+        jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
+        jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+        jComboBoxExistingRefsets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingRefsetsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -68,17 +76,22 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBoxExistingParents, 0, 126, Short.MAX_VALUE))
+                .addComponent(jComboBoxExistingRefsets, 0, 147, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(jComboBoxExistingParents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(jLabel1))
+                .addComponent(jLabel1)
+                .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBoxExistingParents;
+    private javax.swing.JComboBox jComboBoxExistingRefsets;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
@@ -89,23 +102,23 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
 
     @Override // I_BatchActionTask
     public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
-        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        RelationshipVersionBI selectedItem = (RelationshipVersionBI) dcbm.getSelectedItem();
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
+        ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
         // Sort existing parents by name.
-        Comparator<RelationshipVersionBI> cmp = new Comparator<RelationshipVersionBI>() {
+        Comparator<ComponentVersionBI> cmp = new Comparator<ComponentVersionBI>() {
 
             @Override // Comparator
-            public int compare(RelationshipVersionBI o1, RelationshipVersionBI o2) {
+            public int compare(ComponentVersionBI o1, ComponentVersionBI o2) {
                 return o1.toUserString().compareToIgnoreCase(o2.toUserString());
             }
         };
 
         // Add exitings parents to JComboBox model.
-        Collections.sort(existingParents, cmp);
+        Collections.sort(existingRefsets, cmp);
         dcbm.removeAllElements();
-        for (RelationshipVersionBI relationshipVersionBI : existingParents) {
-            dcbm.addElement(relationshipVersionBI);
+        for (ComponentVersionBI componentVersionBI : existingRefsets) {
+            dcbm.addElement(componentVersionBI);
         }
 
         if (dcbm.getSize() == 0) {
@@ -117,7 +130,7 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             // Search by nid
             int selectedIdx = -1;
             for (int i = 0; i < dcbm.getSize(); i++) {
-                RelationshipVersionBI cvbi = (RelationshipVersionBI) dcbm.getElementAt(i);
+                ComponentVersionBI cvbi = (ComponentVersionBI) dcbm.getElementAt(i);
                 if (cvbi.getNid() == selectedItem.getNid()) {
                     selectedIdx = i;
                     selectedItem = cvbi;
@@ -128,33 +141,34 @@ public class BatchActionTaskParentRetireUI extends javax.swing.JPanel implements
             if (selectedIdx >= 0) {
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
-                jComboBoxExistingParents.setSelectedIndex(selectedIdx);
+                jComboBoxExistingRefsets.setSelectedIndex(selectedIdx);
             } else {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
-                jComboBoxExistingParents.setSelectedIndex(0);
+                jComboBoxExistingRefsets.setSelectedIndex(0);
             }
         }
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts)
-            throws IOException {
-        // RETIRE PARENT
-        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingParents.getModel();
-        RelationshipVersionBI fromParentBI = (RelationshipVersionBI) dcbm.getSelectedItem();
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
+        // referenced component provided at execution time
 
-        if (fromParentBI != null) {
-            int nidLinkage = fromParentBI.getTypeNid();
-            int nidParent = fromParentBI.getDestinationNid();
-
-            ((BatchActionTaskParentRetire) task).setSelectedRoleTypeNid(nidLinkage);
-            ((BatchActionTaskParentRetire) task).setSelectedDestNid(nidParent);
-            return task;
+        // SET REFSET EXITING COLLECTION NID
+        DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
+        ComponentVersionBI refsetBI = (ComponentVersionBI) dcbm.getSelectedItem();
+        if (refsetBI != null) {
+            int refsetNid = refsetBI.getNid();
+            ((BatchActionTaskRefsetRetireMember) task).setCollectionNid(refsetNid);
         } else {
-            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.PARENT_RETIRE,
-                    BatchActionEventType.TASK_INVALID, "value not set"));
+            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.REFSET_RETIRE_MEMBER,
+                    BatchActionEventType.TASK_INVALID, "no selected refset"));
             return null;
         }
+
+        ((BatchActionTaskRefsetRetireMember) task).setRefsetType(null);
+        ((BatchActionTaskRefsetRetireMember) task).setMatchValue(null);
+        return task;
+
     }
 }

@@ -26,6 +26,7 @@ import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -156,7 +157,8 @@ public class BatchActionTaskParentAddNewUI extends javax.swing.JPanel implements
     }
 
     @Override // I_BatchActionTask
-    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+    public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts)
+            throws IOException {
 
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
         ConceptVersionBI fromParentLinkageBI = (ConceptVersionBI) dcbm.getSelectedItem();

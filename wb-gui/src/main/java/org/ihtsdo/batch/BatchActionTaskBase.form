@@ -74,7 +74,7 @@
     <Component class="javax.swing.JComboBox" name="jComboTaskType">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="10">
+          <StringArray count="13">
             <StringItem index="0" value="Parent, Add New"/>
             <StringItem index="1" value="Parent, Replace"/>
             <StringItem index="2" value="Parent, Retire"/>
@@ -85,6 +85,9 @@
             <StringItem index="7" value="Role, Add"/>
             <StringItem index="8" value="Role, Replace Value"/>
             <StringItem index="9" value="Role, Retire"/>
+            <StringItem index="10" value="Logic, Disjoin Concepts"/>
+            <StringItem index="11" value="Logic, Remove Concept Disjoins"/>
+            <StringItem index="12" value="Logic, Negate Relationship Value"/>
           </StringArray>
         </Property>
       </Properties>
@@ -97,7 +100,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="350" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="353" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">

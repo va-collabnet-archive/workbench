@@ -16,15 +16,18 @@
  */
 package org.ihtsdo.batch;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JPanel;
-import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
+import org.ihtsdo.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -35,20 +38,18 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  *
  * @author marc
  */
-public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implements I_BatchActionTask {
+public class BatchActionTaskLogicNegateRelValueUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
 
-    /** Creates new form BatchActionTaskRoleReplaceValueUI */
-    public BatchActionTaskRoleReplaceValueUI() {
+    /** Creates new form BatchActionTaskLogicNegateRelValueUI */
+    public BatchActionTaskLogicNegateRelValueUI() {
         initComponents();
-        this.task = new BatchActionTaskRoleReplaceValue();
+        this.task = new BatchActionTaskLogicNegateRelValue();
 
         // Setup DnD Panel
         ValueDndNidUI tmp = new ValueDndNidUI("New Role Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
-        layout.replace(jPanelDndRoleValueNew, tmp.getPanel());
-        jPanelDndRoleValueNew = tmp.getPanel();
     }
 
     /** This method is called from within the constructor to
@@ -61,7 +62,6 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     private void initComponents() {
 
         jComboBoxExistingRoles = new javax.swing.JComboBox();
-        jPanelDndRoleValueNew = new javax.swing.JPanel();
         jLabelExistingRole = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(218, 67));
@@ -74,20 +74,7 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
             }
         });
 
-        jPanelDndRoleValueNew.setBorder(javax.swing.BorderFactory.createTitledBorder("New Role Value:"));
-
-        javax.swing.GroupLayout jPanelDndRoleValueNewLayout = new javax.swing.GroupLayout(jPanelDndRoleValueNew);
-        jPanelDndRoleValueNew.setLayout(jPanelDndRoleValueNewLayout);
-        jPanelDndRoleValueNewLayout.setHorizontalGroup(
-            jPanelDndRoleValueNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 206, Short.MAX_VALUE)
-        );
-        jPanelDndRoleValueNewLayout.setVerticalGroup(
-            jPanelDndRoleValueNewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 38, Short.MAX_VALUE)
-        );
-
-        jLabelExistingRole.setText("Existing Role:");
+        jLabelExistingRole.setText("Negate Value:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -97,16 +84,12 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
                 .addComponent(jLabelExistingRole)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBoxExistingRoles, 0, 127, Short.MAX_VALUE))
-            .addComponent(jPanelDndRoleValueNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBoxExistingRoles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelExistingRole))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelDndRoleValueNew, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jComboBoxExistingRoles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabelExistingRole))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -116,7 +99,6 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRoles;
     private javax.swing.JLabel jLabelExistingRole;
-    private javax.swing.JPanel jPanelDndRoleValueNew;
     // End of variables declaration//GEN-END:variables
 
     @Override // I_BatchActionTask
@@ -176,34 +158,34 @@ public class BatchActionTaskRoleReplaceValueUI extends javax.swing.JPanel implem
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
-
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRoles.getModel();
-        RelationshipVersionBI oldRoleValueBI = (RelationshipVersionBI) dcbm.getSelectedItem();
+        RelationshipVersionBI roleValueBI = (RelationshipVersionBI) dcbm.getSelectedItem();
 
-        if (oldRoleValueBI != null) {
-            // SET OLD ROLE TYPE
-            int oldRoleTypeNid = oldRoleValueBI.getTypeNid();
-            ((BatchActionTaskRoleReplaceValue) task).setRoleNid(oldRoleTypeNid);
-            // SET OLD ROLE VALUE
-            int oldValueNid = oldRoleValueBI.getDestinationNid();
-            ((BatchActionTaskRoleReplaceValue) task).setValueOldNid(oldValueNid);
+        if (roleValueBI != null) {
+            // SET ROLE TYPE
+            int roleTypeNid = roleValueBI.getTypeNid();
+            ((BatchActionTaskLogicNegateRelValue) task).setRoleNid(roleTypeNid);
+            // SET ROLE VALUE
+            int valueNid = roleValueBI.getDestinationNid();
+            ((BatchActionTaskLogicNegateRelValue) task).setValueNid(valueNid);
+            // SET ROLE GROUP
+            ((BatchActionTaskLogicNegateRelValue) task).setRoleGroup(-1);
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null,
-                    BatchActionTaskType.ROLE_REPLACE_VALUE,
-                    BatchActionEventType.TASK_INVALID,
-                    "no selected role"));
+                    BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE,
+                    BatchActionEventType.TASK_INVALID, "no selected role"));
             return null;
         }
-
-        // SET NEW ROLE VALUE
-        I_AmTermComponent termRoleValue = ((ValueDndNidUI) jPanelDndRoleValueNew).getTermComponent();
-        if (termRoleValue != null) {
-            ((BatchActionTaskRoleReplaceValue) task).setValueNewNid(termRoleValue.getNid());
-        } else {
+        try {
+            // SET NEGATION REFSET NID
+            ((BatchActionTaskLogicNegateRelValue) task).setCollectionNid(
+                    DescriptionLogic.getNegationRefsetNid());
+        } catch (IOException ex) {
+            Logger.getLogger(BatchActionTaskLogicNegateRelValueUI.class.getName()).
+                    log(Level.SEVERE, null, ex);
             BatchActionEventReporter.add(new BatchActionEvent(null,
-                    BatchActionTaskType.ROLE_REPLACE_VALUE,
-                    BatchActionEventType.TASK_INVALID,
-                    "new value not set"));
+                    BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE,
+                    BatchActionEventType.TASK_INVALID, "error setting nedation refset collection nid"));
             return null;
         }
 

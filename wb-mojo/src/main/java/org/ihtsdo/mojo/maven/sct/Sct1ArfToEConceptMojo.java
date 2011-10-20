@@ -307,6 +307,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      */
     private String outputDirectory;
     /**
+     * Output file name.
+     *
+     * @parameter expression="sctSiEConcepts"
+     * @required
+     */
+    private String outputFileName;
+    /**
      * 
      * @parameter
      * @required
@@ -954,7 +961,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         fNameStep6Rel = tDir + scratchDirectory + FILE_SEPARATOR + "step6_relationships.ser";
         fNameStep6RelDest = tDir + scratchDirectory + FILE_SEPARATOR + "step6_rel_dest.ser";
 
-        fNameStep7ECon = tDir + outDir + FILE_SEPARATOR + "sctSiEConcepts.jbin";
+        fNameStep7ECon = tDir + outDir + FILE_SEPARATOR + outputFileName + ".jbin";
 
         zAuthorMap = new HashMap<String, Integer>();
         zAuthorList = new ArrayList<String>();
