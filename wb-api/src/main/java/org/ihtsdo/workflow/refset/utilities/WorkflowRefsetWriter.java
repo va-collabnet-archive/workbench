@@ -44,8 +44,10 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
 				ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
 			
-				Terms.get().addUncommitted(ref);
-			} 
+				if (ref != null) {
+					Terms.get().addUncommittedNoChecks(ref);
+				}
+			}
 		} catch (Exception io) {
         	AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with error: " + io.getMessage());
 		}
@@ -67,7 +69,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 				if (ref != null) {
 					helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
 					
-					Terms.get().addUncommitted(ref);
+					Terms.get().addUncommittedNoChecks(ref);
 				}
 			}
 		} catch (Exception io) {
@@ -76,10 +78,5 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 		
 		fields.cleanValues();
 		return ref;
-	}
-	
-	public void commit() throws Exception {
-        Terms.get().addUncommitted(refsetConcept);
-        Terms.get().commit();		
 	}
 }
