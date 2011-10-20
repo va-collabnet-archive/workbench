@@ -33,6 +33,11 @@ public class RF2StatedRelationshipFactory extends RF2AbstractFactory {
 
 			ExportUtil.getTermFactory().iterateConcepts(iterator);
 
+			logger.info("==========Total number of metadata stated relationship records======" + iterator.getMetaDataCount());
+			
+			logger.info("==========Total number of duplicated records======" + iterator.getDupRecord());
+
+			
 			closeExportFileWriter();
 
 			logger.info("Finished Stated Relationship Snapshot Export...");

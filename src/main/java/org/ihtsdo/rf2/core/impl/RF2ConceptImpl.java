@@ -1,8 +1,11 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -50,11 +53,17 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		String active = "";
 		String moduleId = I_Constants.CORE_MODULE_ID;
 		String definitionStatusId = "";
-
+		String updateWbSctId = "false";
+		
 		try {
 			/*if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
 				boolean bstop=true;
 			}*/
+			
+			if(!getConfig().isUpdateWbSctId().equals(null)){
+				updateWbSctId = getConfig().isUpdateWbSctId();
+			}
+		
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
@@ -82,23 +91,46 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 				} else {
 					active = "0";
 				}
-				if(active.equals("1")){
-					moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());					
-					if(moduleId.equals(I_Constants.META_MOULE_ID)){
-						incrementMetaDataCount();
-					}
-				}
-		
+				
 				if ((conceptid==null || conceptid.equals("") || conceptid.equals("0"))){
 					conceptid=concept.getUUIDs().iterator().next().toString();
 				}
 				
-			if(getConfig().getRf2Format().equals("false") ){
-				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);
-			}else{			
-				writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);
-				//writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
-			}
+				if(active.equals("1")){
+					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
+					moduleId = computeModuleId(concept);					
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){
+						System.out.println("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
+						incrementMetaDataCount();
+					}
+				}
+				
+				if (conceptid.contains("-") && updateWbSctId.equals("true")){
+						try {
+							//DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+							DateFormat df = new SimpleDateFormat("yyyyMMdd");
+							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
+							
+							//get conceptId by calling webservice 
+							String wbSctId = getSCTId(getConfig(), UUID.fromString(conceptid));
+							if(wbSctId.equals("0")){
+								 wbSctId = getSCTId(getConfig(), UUID.fromString(conceptid));
+							}
+							
+							//insert conceptId in the workbench database 
+							insertSctId(concept.getNid() , getConfig(), wbSctId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
+						} catch (NumberFormatException e) {
+							logger.error("NumberFormatException" +e);
+						} catch (Exception e) {
+							logger.error("Exception" +e);
+						}
+					}
+				
+				if(getConfig().getRf2Format().equals("false") ){
+					writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);
+				}else{
+					writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId);
+				}
 				
 			}
 		} catch (IOException e) {
