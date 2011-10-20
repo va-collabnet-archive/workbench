@@ -123,6 +123,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		isReturnVersionsUseCase = new AtomicBoolean(useCase);
 		wfRefsetList.addAll(WorkflowHelper.getRefsetUidList());
 		
+
 		try {
 			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
 		} catch (Exception e) {
@@ -1205,24 +1206,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				}
 			}
 	
-			// Prepare Adjudication Changes
-			Set<PathBI> editPaths = Terms.get().getActiveAceFrameConfig().getEditingPathSet();
-			Set<PathBI> originalEditPaths = new HashSet<PathBI>();
-			
-			for (PathBI path : editPaths) {
-				originalEditPaths.add(path);
-			}
-			
-			editPaths.clear();
-			List<PathBI> paths = Terms.get().getPaths();
-			for (int i = 0; i < paths.size(); i++) {
-				I_GetConceptData path = Terms.get().getConcept(paths.get(i).getConceptNid());
-				if (path.getInitialText().equalsIgnoreCase("ajudication path")) {
-					editPaths.add(paths.get(i));
-					break;
-				}
-			}
-
 			BdbCommitManager.setCheckCreationDataEnabled(false);
 			
 			if (refsetId.equals(WorkflowHelper.getWorkflowRefsetUid())) {
@@ -1231,7 +1214,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					// Add latest Dev Version Bean on Adjudication Path
 					WorkflowHelper.setAdvancingWorkflowLock(true);
 					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
-					bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+					bean.setPath(Terms.get().getActiveAceFrameConfig().getEditingPathSetReadOnly().iterator().next().getUUIDs().get(0));
 					
 					refsetWriter.updateWorkflowHistory(bean);
 					WorkflowHelper.setAdvancingWorkflowLock(false);
@@ -1239,27 +1222,13 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					// Retire latest Dev Version
 					WorkflowHelper.setAdvancingWorkflowLock(true);
 					WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(((I_ExtendByRefVersion)latestVersion));
-					Collection<? extends RefexVersionBI<?>> mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-					int cc = mem2Test.size();
 					
 					WorkflowHelper.retireWorkflowHistoryRow(bean, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-					mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-					cc = mem2Test.size();
-	
-					bean.setPath(editPaths.iterator().next().getUUIDs().get(0));
+					bean.setPath(Terms.get().getActiveAceFrameConfig().getEditingPathSetReadOnly().iterator().next().getUUIDs().get(0));
 					
 					// Add latest Dev Version Bean on Adjudication Path
 					refsetWriter.updateWorkflowHistory(bean);
-	
-					mem2Test = Terms.get().getConcept(bean.getConcept()).getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-					cc = mem2Test.size();
 					WorkflowHelper.setAdvancingWorkflowLock(false);
-					
-					// Revert Edit Path
-					editPaths.clear();
-					for (PathBI path: originalEditPaths) {
-						editPaths.add(path);
-					}
 				}
 			} else {
 				
