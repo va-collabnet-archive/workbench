@@ -25,11 +25,11 @@ public class SemanticTagsRefsetWriter extends WorkflowRefsetWriter
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
-		setReferencedComponentId(uid);
+		fields.setReferencedComponentUid(uid);
 	}
 	
 	public UUID getReferencedComponentUid() {
-		return getReferencedComponentUid();
+		return fields.getReferencedComponentUid();
 	}
 
 	public void setSemanticTag(String semTag) {
