@@ -1,18 +1,19 @@
 package org.ihtsdo.workflow; 
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 
@@ -44,20 +45,19 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		WorkflowHistoryJavaBean lastBean = null;
 		
 		try {
-			for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(getRefsetNid(), conceptNid)) {
+			I_GetConceptData con = Terms.get().getConcept(conceptNid);
+			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), refsetNid);
+			for (RefexVersionBI<?> m : members ) {
 				
-				int idx = row.getTuples().size() - 1;
-				if (idx >= 0) {
-					if (row.getTuples().get(idx).getStatusNid() == currentStatusNid) {
-						WorkflowHistoryJavaBean currentBean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-						
-						if (currentBean.getWorkflowId().equals(workflowId) &&
-							currentTime < currentBean.getWorkflowTime()) {
-							currentTime = currentBean.getWorkflowTime();
-							lastBean = currentBean; 
-						}
-					}
-				}			
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				WorkflowHistoryJavaBean currentBean = WorkflowHelper.populateWorkflowHistoryJavaBean(m.getNid(), con.getPrimUuid(), 
+																									 member.getStr1(), new Long(m.getTime()));
+				
+				if (currentBean.getWorkflowId().equals(workflowId) &&
+					currentTime < currentBean.getWorkflowTime()) {
+					currentTime = currentBean.getWorkflowTime();
+					lastBean = currentBean; 
+				}
 			}
 			
 			// Return Latest Bean of Workflow Set
