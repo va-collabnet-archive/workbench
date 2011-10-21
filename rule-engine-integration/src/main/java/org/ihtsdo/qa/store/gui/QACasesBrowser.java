@@ -246,7 +246,11 @@ public class QACasesBrowser extends JPanel {
 			conceptNameTextField.setText("");
 			showFilters = false;
 			filterButton.setText("Show filters");
+			filter = new HashMap<QACasesReportColumn, Object>();
 			// updateTable1();
+			startLine = 0;
+			totalLines = 0;
+			finalLine = 0;
 			updatePageCounters();
 		}
 	}
