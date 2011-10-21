@@ -233,8 +233,11 @@ public class ArenaEditorToolBar extends JToolBar
     }
 
 	private boolean isAutoApprovalAvailable(int index, ViewCoordinate viewCoord) throws Exception {
-		EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
-		
-		return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.getCurrentModeler(), viewCoord);
-	}
+		if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+			EditorCategoryRefsetSearcher categegorySearcher = new EditorCategoryRefsetSearcher();
+			
+			return categegorySearcher.isAutomaticApprovalAvailable(WorkflowHelper.getCurrentModeler(), viewCoord);
+		}
+
+		return false;
 }
