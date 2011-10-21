@@ -26,7 +26,6 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -107,7 +106,15 @@ public class WorkflowHelper {
 	private static HashSet<UUID> wfRefsetUidList = null;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
-		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
+		if (modelers == null) {
+			updateModelers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		}
+		
+		if (modelers != null) {
+			return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
+		} 
+			
+		return null;
 	}
 	
 	public static String identifyPrefTerm(int conceptNid, ViewCoordinate vc)  {
