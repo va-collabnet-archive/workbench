@@ -62,7 +62,12 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 			}
 			
 			if(mapTarget.equals("") || mapTarget.equals(null) ){
-				if(referencedComponentId.contains("-")){	
+				if(referencedComponentId.contains("-")){
+					//get conceptId by calling web service if exist otherwise create
+					String wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
+					if(wsConceptId.equals("0")){
+						wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
+					}
 					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
 				}
 			}

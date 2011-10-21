@@ -112,13 +112,37 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
 							
 							//get conceptId by calling webservice 
-							String wbSctId = getSCTId(getConfig(), UUID.fromString(conceptid));
-							if(wbSctId.equals("0")){
-								 wbSctId = getSCTId(getConfig(), UUID.fromString(conceptid));
+							String wsConceptId = getSCTId(getConfig(), UUID.fromString(conceptid));
+							if(wsConceptId.equals("0")){
+								wsConceptId = getSCTId(getConfig(), UUID.fromString(conceptid));
 							}
 							
 							//insert conceptId in the workbench database 
-							insertSctId(concept.getNid() , getConfig(), wbSctId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
+							boolean insertConceptId = insertSctId(concept.getNid() , getConfig(), wsConceptId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
+							if(insertConceptId){
+								//get ctv3Id by calling webservice 
+								String wsCtv3Id = getCTV3ID(getConfig(), UUID.fromString(conceptid));
+								
+								if(wsCtv3Id.equals("0")){
+									wsCtv3Id = getCTV3ID(getConfig(), UUID.fromString(conceptid));
+								}
+								//insert ctv3id if conceptId inserted Successfully
+								boolean insertCtv3Id = insertCtv3Id(concept.getNid() , getConfig(), wsCtv3Id , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
+								
+								//get snomedId by calling webservice 
+								String parentSnomedId = getParentSnomedId(concept);
+								String wsSnomedId = getSNOMEDID(getConfig(), UUID.fromString(conceptid), parentSnomedId);
+								
+								if(wsSnomedId.equals("0")){
+									wsSnomedId = getSNOMEDID(getConfig(), UUID.fromString(conceptid), parentSnomedId);
+								}
+								
+								if(insertCtv3Id){
+									//insert snomedid if conceptId & Ctv3Id inserted Successfully
+									insertSnomedId(concept.getNid() , getConfig(), wsSnomedId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
+									//System.out.println("==Id insertion finish==" + insertSnomedId);
+								}
+							}
 						} catch (NumberFormatException e) {
 							logger.error("NumberFormatException" +e);
 						} catch (Exception e) {
@@ -156,5 +180,6 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		WriteUtil.write(getConfig(), conceptid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + definitionStatusId + "\t" + authorName);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
+	
 
 }
