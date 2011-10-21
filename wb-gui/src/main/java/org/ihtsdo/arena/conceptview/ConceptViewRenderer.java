@@ -623,8 +623,9 @@ public class ConceptViewRenderer extends JLayeredPane {
                                 	setWorkflowStatusLabel(settings.getConcept());
                                 	wfHxDetails.regenerateWfPanel(settings.getConcept(), true);
 
-                                	Terms.get().commit();
                                     workflowToggleButton.doClick();
+
+                                    Terms.get().commit();
                                     updateOopsButton(settings.getConcept());
                                 	WorkflowHelper.setAdvancingWorkflowLock(false);
                                 }
