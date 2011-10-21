@@ -1,12 +1,11 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.ihtsdo.taxonomy.model;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
@@ -62,501 +61,484 @@ import javax.swing.tree.TreePath;
  * @author kec
  */
 public class NodeFactory {
-   private static final ThreadGroup nodeFactoryThreadGroup = new ThreadGroup("NodeFactory ");
-   public static ExecutorService    taxonomyExecutors      =
-      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(nodeFactoryThreadGroup, "Taxonomy "));
-   public static ExecutorService pathExpanderExecutors =
-      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(nodeFactoryThreadGroup, "PathExpander "));
-   public static ExecutorService childFinderExecutors =
-      Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
-                                   new NamedThreadFactory(nodeFactoryThreadGroup, "ChildFinder "));
 
-   //~--- fields --------------------------------------------------------------
+    private static final ThreadGroup nodeFactoryThreadGroup = new ThreadGroup("NodeFactory ");
+    public static ExecutorService taxonomyExecutors =
+            Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+            new NamedThreadFactory(nodeFactoryThreadGroup, "Taxonomy "));
+    public static ExecutorService pathExpanderExecutors =
+            Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+            new NamedThreadFactory(nodeFactoryThreadGroup, "PathExpander "));
+    public static ExecutorService childFinderExecutors =
+            Executors.newFixedThreadPool(Math.max(4, Runtime.getRuntime().availableProcessors() + 1),
+            new NamedThreadFactory(nodeFactoryThreadGroup, "ChildFinder "));
+    //~--- fields --------------------------------------------------------------
+    private ConcurrentSkipListMap<Long, MakeChildNodesWorker> childWorkerMap = new ConcurrentSkipListMap<Long, MakeChildNodesWorker>();
+    private ChildNodeFilterBI childNodeFilter;
+    private NodeExpansionListener expansionListener;
+    private TaxonomyModel model;
+    private NodeComparator nodeComparator;
+    private TaxonomyNodeRenderer renderer;
+    protected JTree tree;
 
-   private ConcurrentSkipListMap<Long, MakeChildNodesWorker> childWorkerMap = new ConcurrentSkipListMap<Long,
-                                                                                 MakeChildNodesWorker>();
-   private ChildNodeFilterBI     childNodeFilter;
-   private NodeExpansionListener expansionListener;
-   private TaxonomyModel         model;
-   private NodeComparator        nodeComparator;
-   private TaxonomyNodeRenderer  renderer;
-   protected JTree               tree;
+    //~--- constructors --------------------------------------------------------
+    public NodeFactory(TaxonomyModel model, TaxonomyNodeRenderer renderer, JTree tree,
+            ChildNodeFilterBI childNodeFilter) {
+        this.model = model;
+        this.renderer = renderer;
+        this.tree = tree;
+        this.childNodeFilter = childNodeFilter;
+        this.nodeComparator = new NodeComparator(model.nodeStore);
+        expansionListener = new NodeExpansionListener(tree);
+    }
 
-   //~--- constructors --------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    public void addNodeExpansionListener(JTree tree) {
+        tree.addTreeExpansionListener(expansionListener);
+        tree.addTreeWillExpandListener(expansionListener);
+    }
 
-   public NodeFactory(TaxonomyModel model, TaxonomyNodeRenderer renderer, JTree tree,
-                      ChildNodeFilterBI childNodeFilter) {
-      this.model           = model;
-      this.renderer        = renderer;
-      this.tree            = tree;
-      this.childNodeFilter = childNodeFilter;
-      this.nodeComparator  = new NodeComparator(model.nodeStore);
-      expansionListener    = new NodeExpansionListener(tree);
-   }
+    public static void close() {
+        try {
+            pathExpanderExecutors.shutdown();
+            pathExpanderExecutors.awaitTermination(2, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-   //~--- methods -------------------------------------------------------------
+        try {
+            taxonomyExecutors.shutdown();
+            taxonomyExecutors.awaitTermination(2, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-   public void addNodeExpansionListener(JTree tree) {
-      tree.addTreeExpansionListener(expansionListener);
-      tree.addTreeWillExpandListener(expansionListener);
-   }
+        try {
+            childFinderExecutors.shutdown();
+            childFinderExecutors.awaitTermination(2, TimeUnit.MINUTES);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-   public static void close() {
-      try {
-         pathExpanderExecutors.shutdown();
-         pathExpanderExecutors.awaitTermination(2, TimeUnit.MINUTES);
-      } catch (InterruptedException ex) {
-         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
-      }
+    public void collapseNode(TaxonomyNode node) {
+        CollapseHandler ch = new CollapseHandler(NodePath.getTreePath(model, node));
 
-      try {
-         taxonomyExecutors.shutdown();
-         taxonomyExecutors.awaitTermination(2, TimeUnit.MINUTES);
-      } catch (InterruptedException ex) {
-         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
-      }
+        FutureHelper.addFuture(taxonomyExecutors.submit(ch));
+    }
 
-      try {
-         childFinderExecutors.shutdown();
-         childFinderExecutors.awaitTermination(2, TimeUnit.MINUTES);
-      } catch (InterruptedException ex) {
-         Logger.getLogger(NodeFactory.class.getName()).log(Level.SEVERE, null, ex);
-      }
-   }
+    public CountDownLatch makeChildNodes(TaxonomyNode parentNode) throws IOException, Exception {
 
-   public void collapseNode(TaxonomyNode node) {
-      CollapseHandler ch = new CollapseHandler(NodePath.getTreePath(model, node));
+        if (parentNode == null || parentNode.isSecondaryParentNode()) {
+            return new CountDownLatch(0);
+        }
 
-      FutureHelper.addFuture(taxonomyExecutors.submit(ch));
-   }
+        MakeChildNodesWorker mcnw = childWorkerMap.get(parentNode.nodeId);
 
-   public CountDownLatch makeChildNodes(TaxonomyNode parentNode) throws IOException, Exception {
-       
-      if (parentNode == null || parentNode.isSecondaryParentNode()) {
-         return new CountDownLatch(0);
-      }
+        if (mcnw == null) {
+            mcnw = new MakeChildNodesWorker(parentNode, childNodeFilter);
+            childWorkerMap.put(parentNode.nodeId, mcnw);
+            FutureHelper.addFuture(taxonomyExecutors.submit(mcnw));
+        }
 
-      MakeChildNodesWorker mcnw = childWorkerMap.get(parentNode.nodeId);
+        return mcnw.latch;
+    }
 
-      if (mcnw == null) {
-         mcnw = new MakeChildNodesWorker(parentNode, childNodeFilter);
-         childWorkerMap.put(parentNode.nodeId, mcnw);
-         FutureHelper.addFuture(taxonomyExecutors.submit(mcnw));
-      }
+    public TaxonomyNode makeNode(int nid, TaxonomyNode parentNode) throws IOException, Exception {
+        if (model.nodeStore.containsKey(TaxonomyModel.getNodeId(nid, parentNode.getCnid()))) {
+            return model.nodeStore.get(TaxonomyModel.getNodeId(nid, parentNode.getCnid()));
+        }
 
-      return mcnw.latch;
-   }
+        ConceptVersionBI nodeConcept = model.ts.getConceptVersion(nid);
+        TaxonomyNode node = makeNodeFromScratch(nodeConcept, parentNode);
 
-   public TaxonomyNode makeNode(int nid, TaxonomyNode parentNode) throws IOException, Exception {
-      if (model.nodeStore.containsKey(TaxonomyModel.getNodeId(nid, parentNode.getCnid()))) {
-         return model.nodeStore.get(TaxonomyModel.getNodeId(nid, parentNode.getCnid()));
-      }
+        parentNode.addChild(node);
 
-      ConceptVersionBI nodeConcept = model.ts.getConceptVersion(nid);
-      TaxonomyNode     node        = makeNodeFromScratch(nodeConcept, parentNode);
+        return node;
+    }
 
-      parentNode.addChild(node);
+    public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
+            throws ContraditionException, IOException {
+        if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
+            boolean multiParent = false;
 
-      return node;
-   }
+            for (RelationshipVersionBI isaRel : nodeConcept.getRelsOutgoingActiveIsa()) {
+                if (isaRel == null || parentNode == null) {
+                    continue;
+                } else if (isaRel.getDestinationNid() != parentNode.getCnid()) {
+                    multiParent = true;
 
-   public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
-           throws ContraditionException, IOException {
-      if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
-         boolean multiParent = false;
-
-         for (RelationshipVersionBI isaRel : nodeConcept.getRelsOutgoingActiveIsa()) {
-            if (isaRel.getDestinationNid() != parentNode.getCnid()) {
-               multiParent = true;
-
-               break;
-            }
-         }
-
-         if (multiParent) {
-            LeafNodeMultiParent node = new LeafNodeMultiParent(nodeConcept.getNid(), parentCnid,
-                                          parentNode.nodeId);
-
-            renderer.setupTaxonomyNode(node, nodeConcept);
-            model.nodeStore.add(node);
-
-            return node;
-         } else {
-            LeafNode node = new LeafNode(nodeConcept.getNid(), parentCnid, parentNode.nodeId);
-
-            renderer.setupTaxonomyNode(node, nodeConcept);
-            model.nodeStore.add(node);
-
-            return node;
-         }
-      }
-
-      InternalNodeMultiParent node = new InternalNodeMultiParent(nodeConcept.getNid(), parentCnid,
-                                        parentNode.nodeId, nodeComparator);
-
-      node.setIsLeaf(nodeConcept.isLeaf());
-      setExtraParents(nodeConcept, node);
-      renderer.setupTaxonomyNode(node, nodeConcept);
-      model.nodeStore.add(node);
-
-      // makeChildNodes(node);
-      return node;
-   }
-
-   private TaxonomyNode makeNodeFromScratch(ConceptVersionBI nodeConcept, TaxonomyNode parentNode)
-           throws Exception, IOException, ContraditionException {
-      Long         nodeId       = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getCnid());
-      TaxonomyNode existingNode = model.nodeStore.get(nodeId);
-
-      if (existingNode != null) {
-         return existingNode;
-      }
-
-      return makeNode(nodeConcept, parentNode.getCnid(), parentNode);
-   }
-
-   public void removeDescendents(TaxonomyNode parent) {
-      if (!parent.isLeaf()) {
-         ((InternalNode) parent).setChildrenAreSet(false);
-
-         for (Long nodeId : parent.getChildren()) {
-            MakeChildNodesWorker worker = childWorkerMap.remove(nodeId);
-
-            if (worker != null) {
-               worker.canceled = true;
+                    break;
+                }
             }
 
-            TaxonomyNode childNode = model.nodeStore.get(nodeId);
+            if (multiParent) {
+                LeafNodeMultiParent node = new LeafNodeMultiParent(nodeConcept.getNid(), parentCnid,
+                        parentNode.nodeId);
 
-            if ((childNode != null) && (childNode.nodeId != parent.nodeId)) {
-               removeDescendents(childNode);
-               model.nodeStore.remove(nodeId);
-            }
-         }
+                renderer.setupTaxonomyNode(node, nodeConcept);
+                model.nodeStore.add(node);
 
-         ((InternalNode) parent).clearChildren();
-      }
-   }
-
-   void unLink() {
-      tree.removeTreeExpansionListener(expansionListener);
-      tree.removeTreeWillExpandListener(expansionListener);
-   }
-
-   //~--- get methods ---------------------------------------------------------
-
-   public NodeComparator getNodeComparator() {
-      return nodeComparator;
-   }
-
-   public JTree getTree() {
-      return tree;
-   }
-
-   //~--- set methods ---------------------------------------------------------
-
-   private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
-           throws ContraditionException, IOException {
-      if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
-         for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
-            if (parent.getNid() != node.getParentNid()) {
-               node.setHasExtraParents(true);
-
-               return;
-            }
-         }
-      }
-   }
-
-   //~--- inner classes -------------------------------------------------------
-
-   private class ChildFinder implements ProcessUnfetchedConceptDataBI, Callable<Object> {
-      LinkedBlockingQueue<TaxonomyNode> childNodes = new LinkedBlockingQueue<TaxonomyNode>();
-      ChildNodeFilterBI                 childFilter;
-      IdentifierSet                     dataSet;
-      ConceptVersionBI                  parent;
-      TaxonomyNode                      parentNode;
-      CancelableBI                      worker;
-
-      //~--- constructors -----------------------------------------------------
-
-      public ChildFinder(ConceptVersionBI parent, TaxonomyNode parentNode, CancelableBI worker,
-                         ChildNodeFilterBI childFilter)
-              throws IOException {
-         this.worker      = worker;
-         this.parent      = parent;
-         this.parentNode  = parentNode;
-         this.dataSet     = (IdentifierSet) Terms.get().getEmptyIdSet();
-         this.childFilter = childFilter;
-
-         for (int cnid : Ts.get().getPossibleChildren(parentNode.getCnid(), model.ts.getViewCoordinate())) {
-            this.dataSet.setMember(cnid);
-         }
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      public Object call() throws Exception {
-         try {
-            if (dataSet.cardinality() < 24) {
-               I_IterateIds itr = dataSet.iterator();
-
-               while (itr.next()) {
-                  processPossibleChild(model.ts.getConceptVersion(itr.nid()));
-               }
+                return node;
             } else {
-               Ts.get().iterateConceptDataInParallel(this);
+                LeafNode node = new LeafNode(nodeConcept.getNid(), parentCnid, parentNode.nodeId);
+
+                renderer.setupTaxonomyNode(node, nodeConcept);
+                model.nodeStore.add(node);
+
+                return node;
+            }
+        }
+
+        InternalNodeMultiParent node = new InternalNodeMultiParent(nodeConcept.getNid(), parentCnid,
+                parentNode.nodeId, nodeComparator);
+
+        node.setIsLeaf(nodeConcept.isLeaf());
+        setExtraParents(nodeConcept, node);
+        renderer.setupTaxonomyNode(node, nodeConcept);
+        model.nodeStore.add(node);
+
+        // makeChildNodes(node);
+        return node;
+    }
+
+    private TaxonomyNode makeNodeFromScratch(ConceptVersionBI nodeConcept, TaxonomyNode parentNode)
+            throws Exception, IOException, ContraditionException {
+        Long nodeId = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getCnid());
+        TaxonomyNode existingNode = model.nodeStore.get(nodeId);
+
+        if (existingNode != null) {
+            return existingNode;
+        }
+
+        return makeNode(nodeConcept, parentNode.getCnid(), parentNode);
+    }
+
+    public void removeDescendents(TaxonomyNode parent) {
+        if (!parent.isLeaf()) {
+            ((InternalNode) parent).setChildrenAreSet(false);
+
+            for (Long nodeId : parent.getChildren()) {
+                MakeChildNodesWorker worker = childWorkerMap.remove(nodeId);
+
+                if (worker != null) {
+                    worker.canceled = true;
+                }
+
+                TaxonomyNode childNode = model.nodeStore.get(nodeId);
+
+                if ((childNode != null) && (childNode.nodeId != parent.nodeId)) {
+                    removeDescendents(childNode);
+                    model.nodeStore.remove(nodeId);
+                }
             }
 
-            return null;
-         } finally {
-            dataSet = null;
-            childNodes.put(parentNode);
-         }
-      }
+            ((InternalNode) parent).clearChildren();
+        }
+    }
 
-      @Override
-      public boolean continueWork() {
-         return !worker.isCanceled();
-      }
+    void unLink() {
+        tree.removeTreeExpansionListener(expansionListener);
+        tree.removeTreeWillExpandListener(expansionListener);
+    }
 
-      private void processPossibleChild(ConceptVersionBI possibleChild) throws Exception {
-         if (possibleChild.isChildOf(parent)) {
-            if ((childFilter == null) || childFilter.pass(parent, possibleChild)) {
-               TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
+    //~--- get methods ---------------------------------------------------------
+    public NodeComparator getNodeComparator() {
+        return nodeComparator;
+    }
 
-               if (parentNode.addChild(childNode)) {
-                  childNodes.put(childNode);
-               }
+    public JTree getTree() {
+        return tree;
+    }
+
+    //~--- set methods ---------------------------------------------------------
+    private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
+            throws ContraditionException, IOException {
+        if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
+            for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
+                if (parent.getNid() != node.getParentNid()) {
+                    node.setHasExtraParents(true);
+
+                    return;
+                }
             }
-         }
-      }
+        }
+    }
 
-      @Override
-      public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
-         if (dataSet.isMember(cNid)) {
-            ConceptVersionBI possibleChild = fetcher.fetch(model.ts.getViewCoordinate());
+    //~--- inner classes -------------------------------------------------------
+    private class ChildFinder implements ProcessUnfetchedConceptDataBI, Callable<Object> {
 
-            processPossibleChild(possibleChild);
-         }
-      }
+        LinkedBlockingQueue<TaxonomyNode> childNodes = new LinkedBlockingQueue<TaxonomyNode>();
+        ChildNodeFilterBI childFilter;
+        IdentifierSet dataSet;
+        ConceptVersionBI parent;
+        TaxonomyNode parentNode;
+        CancelableBI worker;
 
-      //~--- get methods ------------------------------------------------------
+        //~--- constructors -----------------------------------------------------
+        public ChildFinder(ConceptVersionBI parent, TaxonomyNode parentNode, CancelableBI worker,
+                ChildNodeFilterBI childFilter)
+                throws IOException {
+            this.worker = worker;
+            this.parent = parent;
+            this.parentNode = parentNode;
+            this.dataSet = (IdentifierSet) Terms.get().getEmptyIdSet();
+            this.childFilter = childFilter;
 
-      @Override
-      public NidBitSetBI getNidSet() throws IOException {
-         return dataSet;
-      }
-   }
-
-
-   private class CollapseHandler extends SwingWorker<TreePath, Object> {
-      TreePath path;
-
-      //~--- constructors -----------------------------------------------------
-
-      public CollapseHandler(TreePath path) {
-         this.path = path;
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      protected TreePath doInBackground() throws Exception {
-         TaxonomyNode collapsingNode       = (TaxonomyNode) path.getLastPathComponent();
-         TaxonomyNode latestCollapsingNode = model.nodeStore.get(collapsingNode.nodeId);
-
-         if (latestCollapsingNode == null) {
-            latestCollapsingNode = collapsingNode;
-         }
-
-         for (Long nodeId : latestCollapsingNode.getChildren()) {
-            TaxonomyNode childNode = model.nodeStore.get(nodeId);
-
-            if ((childNode != null) &&!childNode.getChildren().isEmpty()) {
-               removeDescendents(childNode);
+            for (int cnid : Ts.get().getPossibleChildren(parentNode.getCnid(), model.ts.getViewCoordinate())) {
+                this.dataSet.setMember(cnid);
             }
-         }
+        }
 
-         return NodePath.getTreePath(model, latestCollapsingNode);
-      }
-
-      @Override
-      protected void done() {
-         try {
-            model.treeStructureChanged(get());
-         } catch (Throwable ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
-   }
-
-
-   private class MakeChildNodesWorker extends SwingWorker<Object, List<TaxonomyNode>>
-           implements CancelableBI {
-      Set<TaxonomyNode> childNodes = new HashSet<TaxonomyNode>();
-      boolean           canceled   = false;
-      CountDownLatch    latch      = new CountDownLatch(1);
-      ChildNodeFilterBI childFilter;
-      TaxonomyNode      parentNode;
-      TreePath          path;
-
-      //~--- constructors -----------------------------------------------------
-
-      public MakeChildNodesWorker(TaxonomyNode parentNode, ChildNodeFilterBI childFilter) {
-         this.parentNode  = parentNode;
-         this.childFilter = childFilter;
-         this.path        = NodePath.getTreePath(model, parentNode);
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      protected Object doInBackground() throws Exception {
-         try {
-            ConceptVersionBI        parent         = model.ts.getConceptVersion(parentNode.getCnid());
-            ChildFinder             dataFinder     = new ChildFinder(parent, parentNode, this, childFilter);
-            Future<Object>          finderFuture   = childFinderExecutors.submit(dataFinder);
-            long                    lastPublish    = System.currentTimeMillis();
-            ArrayList<TaxonomyNode> nodesToPublish = new ArrayList<TaxonomyNode>();
-
-            if (canceled) {
-               return null;
-            }
-
-            TaxonomyNode childNode = dataFinder.childNodes.take();
-
-            while (childNode.getNodeId() != parentNode.nodeId) {
-               nodesToPublish.add(childNode);
-
-               long time             = System.currentTimeMillis();
-               long timeSincePublish = time - lastPublish;
-
-               if (timeSincePublish > 250) {
-                  lastPublish = time;
-                  publish(nodesToPublish);
-                  nodesToPublish = new ArrayList<TaxonomyNode>(nodesToPublish.size());
-               }
-
-               if (canceled) {
-                  return null;
-               }
-
-               childNode = dataFinder.childNodes.take();
-            }
-
-            if (nodesToPublish.size() > 0) {
-               publish(nodesToPublish);
-            }
-
-            finderFuture.get();
-
-            if (parentNode instanceof InternalNode) {
-               ((InternalNode) parentNode).setChildrenAreSet(true);
-            }
-
-            model.nodeStore.add(parentNode.getFinalNode());
-
-            return null;
-         } finally {
-            childWorkerMap.remove(parentNode.nodeId, this);
-         }
-      }
-
-      @Override
-      protected void done() {
-         try {
-            get();
-         } catch (Throwable ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } finally {
-            childWorkerMap.remove(parentNode.nodeId, this);
-            latch.countDown();
-         }
-      }
-
-      @Override
-      protected void process(List<List<TaxonomyNode>> chunks) {
-         if (tree.isExpanded(path)) {
-            model.treeStructureChanged(path);
-         }
-      }
-
-      //~--- get methods ------------------------------------------------------
-
-      @Override
-      public boolean isCanceled() {
-         return canceled;
-      }
-
-      //~--- set methods ------------------------------------------------------
-
-      @Override
-      public void setCanceled(boolean canceled) {
-         this.canceled = canceled;
-         latch.countDown();
-      }
-   }
-
-
-   protected class NodeExpansionListener implements TreeWillExpandListener, TreeExpansionListener {
-      JTree tree;
-
-      //~--- constructors -----------------------------------------------------
-
-      public NodeExpansionListener(JTree tree) {
-         this.tree = tree;
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      public void treeCollapsed(TreeExpansionEvent event) {
-         CollapseHandler ch = new CollapseHandler(event.getPath());
-
-         FutureHelper.addFuture(taxonomyExecutors.submit(ch));
-      }
-
-      @Override
-      public void treeExpanded(TreeExpansionEvent event) {
-
-         // System.out.println("expanded: " + event.getPath());
-      }
-
-      @Override
-      public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
-
-         // System.out.println("will collapse: " + event.getPath());
-      }
-
-      @Override
-      public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
-         TreePath     path                = event.getPath();
-         TaxonomyNode expansionNode       = (TaxonomyNode) path.getLastPathComponent();
-         TaxonomyNode latestExpansionNode = model.nodeStore.get(expansionNode.nodeId);
-
-         if (!childWorkerMap.containsKey(expansionNode.nodeId)) {
+        //~--- methods ----------------------------------------------------------
+        @Override
+        public Object call() throws Exception {
             try {
-               makeChildNodes(latestExpansionNode);
-            } catch (Exception ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            }
-         } else {
-            MakeChildNodesWorker worker = childWorkerMap.get(expansionNode.nodeId);
+                if (dataSet.cardinality() < 24) {
+                    I_IterateIds itr = dataSet.iterator();
 
-            if (worker.canceled) {
-               childWorkerMap.remove(expansionNode.nodeId);
+                    while (itr.next()) {
+                        processPossibleChild(model.ts.getConceptVersion(itr.nid()));
+                    }
+                } else {
+                    Ts.get().iterateConceptDataInParallel(this);
+                }
 
-               try {
-                  makeChildNodes(latestExpansionNode);
-               } catch (Exception ex) {
-                  AceLog.getAppLog().alertAndLogException(ex);
-               }
+                return null;
+            } finally {
+                dataSet = null;
+                childNodes.put(parentNode);
             }
-         }
-      }
-   }
+        }
+
+        @Override
+        public boolean continueWork() {
+            return !worker.isCanceled();
+        }
+
+        private void processPossibleChild(ConceptVersionBI possibleChild) throws Exception {
+            if (possibleChild.isChildOf(parent)) {
+                if ((childFilter == null) || childFilter.pass(parent, possibleChild)) {
+                    TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
+
+                    if (parentNode.addChild(childNode)) {
+                        childNodes.put(childNode);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+            if (dataSet.isMember(cNid)) {
+                ConceptVersionBI possibleChild = fetcher.fetch(model.ts.getViewCoordinate());
+
+                processPossibleChild(possibleChild);
+            }
+        }
+
+        //~--- get methods ------------------------------------------------------
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            return dataSet;
+        }
+    }
+
+    private class CollapseHandler extends SwingWorker<TreePath, Object> {
+
+        TreePath path;
+
+        //~--- constructors -----------------------------------------------------
+        public CollapseHandler(TreePath path) {
+            this.path = path;
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @Override
+        protected TreePath doInBackground() throws Exception {
+            TaxonomyNode collapsingNode = (TaxonomyNode) path.getLastPathComponent();
+            TaxonomyNode latestCollapsingNode = model.nodeStore.get(collapsingNode.nodeId);
+
+            if (latestCollapsingNode == null) {
+                latestCollapsingNode = collapsingNode;
+            }
+
+            for (Long nodeId : latestCollapsingNode.getChildren()) {
+                TaxonomyNode childNode = model.nodeStore.get(nodeId);
+
+                if ((childNode != null) && !childNode.getChildren().isEmpty()) {
+                    removeDescendents(childNode);
+                }
+            }
+
+            return NodePath.getTreePath(model, latestCollapsingNode);
+        }
+
+        @Override
+        protected void done() {
+            try {
+                model.treeStructureChanged(get());
+            } catch (Throwable ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+
+    private class MakeChildNodesWorker extends SwingWorker<Object, List<TaxonomyNode>>
+            implements CancelableBI {
+
+        Set<TaxonomyNode> childNodes = new HashSet<TaxonomyNode>();
+        boolean canceled = false;
+        CountDownLatch latch = new CountDownLatch(1);
+        ChildNodeFilterBI childFilter;
+        TaxonomyNode parentNode;
+        TreePath path;
+
+        //~--- constructors -----------------------------------------------------
+        public MakeChildNodesWorker(TaxonomyNode parentNode, ChildNodeFilterBI childFilter) {
+            this.parentNode = parentNode;
+            this.childFilter = childFilter;
+            this.path = NodePath.getTreePath(model, parentNode);
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @Override
+        protected Object doInBackground() throws Exception {
+            try {
+                ConceptVersionBI parent = model.ts.getConceptVersion(parentNode.getCnid());
+                ChildFinder dataFinder = new ChildFinder(parent, parentNode, this, childFilter);
+                Future<Object> finderFuture = childFinderExecutors.submit(dataFinder);
+                long lastPublish = System.currentTimeMillis();
+                ArrayList<TaxonomyNode> nodesToPublish = new ArrayList<TaxonomyNode>();
+
+                if (canceled) {
+                    return null;
+                }
+
+                TaxonomyNode childNode = dataFinder.childNodes.take();
+
+                while (childNode.getNodeId() != parentNode.nodeId) {
+                    nodesToPublish.add(childNode);
+
+                    long time = System.currentTimeMillis();
+                    long timeSincePublish = time - lastPublish;
+
+                    if (timeSincePublish > 250) {
+                        lastPublish = time;
+                        publish(nodesToPublish);
+                        nodesToPublish = new ArrayList<TaxonomyNode>(nodesToPublish.size());
+                    }
+
+                    if (canceled) {
+                        return null;
+                    }
+
+                    childNode = dataFinder.childNodes.take();
+                }
+
+                if (nodesToPublish.size() > 0) {
+                    publish(nodesToPublish);
+                }
+
+                finderFuture.get();
+
+                if (parentNode instanceof InternalNode) {
+                    ((InternalNode) parentNode).setChildrenAreSet(true);
+                }
+
+                model.nodeStore.add(parentNode.getFinalNode());
+
+                return null;
+            } finally {
+                childWorkerMap.remove(parentNode.nodeId, this);
+            }
+        }
+
+        @Override
+        protected void done() {
+            try {
+                get();
+            } catch (Throwable ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } finally {
+                childWorkerMap.remove(parentNode.nodeId, this);
+                latch.countDown();
+            }
+        }
+
+        @Override
+        protected void process(List<List<TaxonomyNode>> chunks) {
+            if (tree.isExpanded(path)) {
+                model.treeStructureChanged(path);
+            }
+        }
+
+        //~--- get methods ------------------------------------------------------
+        @Override
+        public boolean isCanceled() {
+            return canceled;
+        }
+
+        //~--- set methods ------------------------------------------------------
+        @Override
+        public void setCanceled(boolean canceled) {
+            this.canceled = canceled;
+            latch.countDown();
+        }
+    }
+
+    protected class NodeExpansionListener implements TreeWillExpandListener, TreeExpansionListener {
+
+        JTree tree;
+
+        //~--- constructors -----------------------------------------------------
+        public NodeExpansionListener(JTree tree) {
+            this.tree = tree;
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @Override
+        public void treeCollapsed(TreeExpansionEvent event) {
+            CollapseHandler ch = new CollapseHandler(event.getPath());
+
+            FutureHelper.addFuture(taxonomyExecutors.submit(ch));
+        }
+
+        @Override
+        public void treeExpanded(TreeExpansionEvent event) {
+            // System.out.println("expanded: " + event.getPath());
+        }
+
+        @Override
+        public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+            // System.out.println("will collapse: " + event.getPath());
+        }
+
+        @Override
+        public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+            TreePath path = event.getPath();
+            TaxonomyNode expansionNode = (TaxonomyNode) path.getLastPathComponent();
+            TaxonomyNode latestExpansionNode = model.nodeStore.get(expansionNode.nodeId);
+
+            if (!childWorkerMap.containsKey(expansionNode.nodeId)) {
+                try {
+                    makeChildNodes(latestExpansionNode);
+                } catch (Exception ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            } else {
+                MakeChildNodesWorker worker = childWorkerMap.get(expansionNode.nodeId);
+
+                if (worker.canceled) {
+                    childWorkerMap.remove(expansionNode.nodeId);
+
+                    try {
+                        makeChildNodes(latestExpansionNode);
+                    } catch (Exception ex) {
+                        AceLog.getAppLog().alertAndLogException(ex);
+                    }
+                }
+            }
+        }
+    }
 }
