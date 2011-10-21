@@ -22,22 +22,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionSetBI;
@@ -79,127 +76,127 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     public boolean getStatementResult(I_AmTermComponent component, GROUPING_TYPE version, PositionSetBI v1_is,
-			PositionSetBI v2_is) throws IOException, TerminologyException {
+			PositionSetBI v2_is) throws IOException {
 
         I_RelVersioned relVersioned = (I_RelVersioned) component;
         I_RelTuple relTuple = relVersioned.getLastTuple();
 
 		if (version != null || v1_is != null || v2_is != null) {
 			if (version == null)
-                throw new TerminologyException("Not in scope of V1 or V2: " + tokenEnum + " " + relTuple);
+                throw new IOException("Not in scope of V1 or V2: " + tokenEnum + " " + relTuple);
 			if (v1_is == null)
-                throw new TerminologyException("Need to set V1 IS: " + tokenEnum + " " + relTuple);
+                throw new IOException("Need to set V1 IS: " + tokenEnum + " " + relTuple);
 			if (v2_is == null)
-                throw new TerminologyException("Need to set V2 IS: " + tokenEnum + " " + relTuple);
+                throw new IOException("Need to set V2 IS: " + tokenEnum + " " + relTuple);
 		}
         switch (tokenEnum) {
         case REL_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relIs(relTuple);
         case REL_RESTRICTION_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relRestrictionIs(relTuple);
         case REL_IS_MEMBER_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relIsMemberOf(relTuple);
         case REL_STATUS_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIs(relTuple);
         case REL_STATUS_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsKindOf(relTuple);
         case REL_STATUS_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsChildOf(relTuple);
         case REL_STATUS_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relStatusIsDescendentOf(relTuple);
         case REL_TYPE_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIs(relTuple);
         case REL_TYPE_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsKindOf(relTuple);
         case REL_TYPE_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsChildOf(relTuple);
         case REL_TYPE_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relTypeIsDescendentOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIs(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsKindOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsChildOf(relTuple);
         case REL_LOGICAL_QUANTIFIER_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relLogicalQuantifierIsDescendentOf(relTuple);
         case REL_CHARACTERISTIC_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIs(relTuple);
         case REL_CHARACTERISTIC_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsKindOf(relTuple);
         case REL_CHARACTERISTIC_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsChildOf(relTuple);
         case REL_CHARACTERISTIC_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relCharIsDescendentOf(relTuple);
         case REL_REFINABILITY_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIs(relTuple);
         case REL_REFINABILITY_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsKindOf(relTuple);
         case REL_REFINABILITY_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsChildOf(relTuple);
         case REL_REFINABILITY_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relRefinabilityIsDescendentOf(relTuple);
         case REL_DESTINATION_IS:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIs(relTuple);
         case REL_DESTINATION_IS_KIND_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsKindOf(relTuple);
         case REL_DESTINATION_IS_CHILD_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsChildOf(relTuple);
         case REL_DESTINATION_IS_DESCENDENT_OF:
 			if (version != null)
-                throw new TerminologyException(tokenEnum + ": Unsupported operation for version scope.");
+                throw new IOException(tokenEnum + ": Unsupported operation for version scope.");
             return relDestinationIsDescendentOf(relTuple);
 		case ADDED_RELATIONSHIP:
 			return addedRelationship(relVersioned, version, v1_is, v2_is);
@@ -220,7 +217,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     @Override
     public I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled {
         I_ShowActivity activity = null;
         long startTime = System.currentTimeMillis();
         this.activities = activities;
@@ -236,7 +233,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
                     termFactory.getRefsetExtensionMembers(((I_GetConceptData) queryConstraint).getConceptNid());
             Set<I_GetConceptData> refsetMembers = new HashSet<I_GetConceptData>();
             for (I_ExtendByRef ext : refsetExtensions) {
-                refsetMembers.add(termFactory.getConcept(ext.getComponentId()));
+            try {
+                refsetMembers.add(termFactory.getConcept(ext.getComponentNid()));
+            } catch (TerminologyException terminologyException) {
+            throw new IOException(terminologyException);
+        } 
             }
             I_RepresentIdSet refsetMemberSet = termFactory.getIdSetfromTermCollection(refsetMembers);
             if (isNegated()) {
@@ -300,22 +301,22 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     @Override
     public I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
-        throw new TerminologyException("Get possible descriptions in rel statement unsupported operation.");
+            Collection<I_ShowActivity> activities) throws IOException {
+        throw new IOException("Get possible descriptions in rel statement unsupported operation.");
     }
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
-        throw new TerminologyException("Get possible relationships in rel statement unsupported operation.");
+            Collection<I_ShowActivity> activities) throws IOException {
+        throw new IOException("Get possible relationships in rel statement unsupported operation.");
     }
 
-    private boolean relRefinabilityIsDescendentOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relRefinabilityIsDescendentOf(I_RelTuple relTuple) throws IOException {
         return relRefinabilityIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
     }
 
     private boolean relRefinabilityIsDescendentOf(I_GetConceptData requiredRefinability, I_RelTuple relTuple)
-            throws TerminologyException, IOException {
+            throws IOException {
 
         try {
 
@@ -335,11 +336,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relRefinabilityIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relRefinabilityIsChildOf(I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -356,11 +357,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relRefinabilityIsKindOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relRefinabilityIsKindOf(I_RelTuple relTuple) throws IOException {
         if (relRefinabilityIs(relTuple)) {
             return true;
         }
@@ -377,12 +378,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relTuple.getRefinabilityId() == requiredRefinability.getConceptNid();
     }
 
-    private boolean relCharIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relCharIsDescendentOf(I_RelTuple relTuple) throws IOException {
         return relCharIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
     }
 
-    private boolean relCharIsDescendentOf(I_GetConceptData requiredCharType, I_RelTuple relTuple) throws IOException,
-            TerminologyException {
+    private boolean relCharIsDescendentOf(I_GetConceptData requiredCharType, I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -398,13 +398,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
 
         return false;
     }
 
-    private boolean relCharIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relCharIsChildOf(I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -421,11 +421,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relCharIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relCharIsKindOf(I_RelTuple relTuple) throws IOException {
 
         if (relCharIs(relTuple)) {
             return true;
@@ -443,7 +443,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relTuple.getCharacteristicId() == requiredCharType.getConceptNid();
     }
 
-    private boolean relIsMemberOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relIsMemberOf(I_RelTuple relTuple) throws IOException {
         return componentIsMemberOf(relTuple.getRelId());
     }
 
@@ -455,7 +455,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relTuple.getTypeId() == requiredRelType.getConceptNid();
     }
 
-    private boolean relTypeIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relTypeIsKindOf(I_RelTuple relTuple) throws IOException {
 
         if (relTypeIs(relTuple)) {
             return true;
@@ -464,7 +464,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relTypeIsDescendentOf(relTuple);
     }
 
-    private boolean relTypeIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relTypeIsChildOf(I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -481,16 +481,15 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relTypeIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relTypeIsDescendentOf(I_RelTuple relTuple) throws IOException {
         return relTypeIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
     }
 
-    private boolean relTypeIsDescendentOf(I_GetConceptData requiredRelType, I_RelTuple relTuple) throws IOException,
-            TerminologyException {
+    private boolean relTypeIsDescendentOf(I_GetConceptData requiredRelType, I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -508,16 +507,16 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relStatusIsDescendentOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relStatusIsDescendentOf(I_RelTuple relTuple) throws IOException {
         return relStatusIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
     }
 
     private boolean relStatusIsDescendentOf(I_GetConceptData requiredStatus, I_RelTuple relTuple)
-            throws TerminologyException, IOException {
+            throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -535,11 +534,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relStatusIsChildOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relStatusIsChildOf(I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -554,13 +553,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
 
         return false;
     }
 
-    private boolean relStatusIsKindOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relStatusIsKindOf(I_RelTuple relTuple) throws IOException {
         if (relStatusIs(relTuple)) {
             return true;
         }
@@ -576,32 +575,32 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return componentStatusIs(requiredStatus, relTuple);
     }
 
-    private boolean relIs(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relIs(I_RelTuple relTuple) throws IOException {
         I_RelTuple queryConstraintRel = (I_RelTuple) queryConstraint;
         return relTuple.equals(queryConstraintRel);
     }
 
-    private boolean relRestrictionIs(I_RelTuple relTuple) throws IOException, TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel restriction is"); // TODO unimplemented
+    private boolean relRestrictionIs(I_RelTuple relTuple) throws IOException {
+        throw new IOException("Unimplemented query : rel restriction is"); // TODO unimplemented
     }
 
-    private boolean relLogicalQuantifierIsDescendentOf(I_RelTuple relTuple) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel logical quantifier is descendent");
+    private boolean relLogicalQuantifierIsDescendentOf(I_RelTuple relTuple) throws IOException {
+        throw new IOException("Unimplemented query : rel logical quantifier is descendent");
         // unimplemented TODO
     }
 
-    private boolean relLogicalQuantifierIsChildOf(I_RelTuple relTuple) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel logical quantifier is child of");
+    private boolean relLogicalQuantifierIsChildOf(I_RelTuple relTuple) throws IOException {
+        throw new IOException("Unimplemented query : rel logical quantifier is child of");
         // unimplemented TODO
     }
 
-    private boolean relLogicalQuantifierIsKindOf(I_RelTuple relTuple) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel logical quantifier is kind of");
+    private boolean relLogicalQuantifierIsKindOf(I_RelTuple relTuple) throws IOException {
+        throw new IOException("Unimplemented query : rel logical quantifier is kind of");
         // unimplemented TODO
     }
 
-    private boolean relLogicalQuantifierIs(I_RelTuple relTuple) throws TerminologyException {
-        throw new TerminologyException("Unimplemented query : rel logical quantifier is");
+    private boolean relLogicalQuantifierIs(I_RelTuple relTuple) throws IOException {
+        throw new IOException("Unimplemented query : rel logical quantifier is");
         // unimplemented TODO
     }
 
@@ -613,7 +612,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relTuple.getC2Id() == requiredDestination.getConceptNid();
     }
 
-    private boolean relDestinationIsKindOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relDestinationIsKindOf(I_RelTuple relTuple) throws IOException {
 
         if (relDestinationIs(relTuple)) {
             return true;
@@ -622,7 +621,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         return relDestinationIsDescendentOf(relTuple);
     }
 
-    private boolean relDestinationIsChildOf(I_RelTuple relTuple) throws TerminologyException, IOException {
+    private boolean relDestinationIsChildOf(I_RelTuple relTuple) throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -639,16 +638,16 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
-    private boolean relDestinationIsDescendentOf(I_RelTuple relTuple) throws IOException, TerminologyException {
+    private boolean relDestinationIsDescendentOf(I_RelTuple relTuple) throws IOException {
         return relDestinationIsDescendentOf((I_GetConceptData) queryConstraint, relTuple);
     }
 
     private boolean relDestinationIsDescendentOf(I_GetConceptData requiredDestination, I_RelTuple relTuple)
-            throws IOException, TerminologyException {
+            throws IOException {
         try {
 
             Set<? extends I_GetConceptData> children =
@@ -667,12 +666,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
             return false;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new TerminologyException(e.getMessage());
+            throw new IOException(e.getMessage());
         }
     }
 
 	private I_RelTuple getVersion(I_RelVersioned descriptionBeingTested,
-			PositionSetBI vn_is) throws TerminologyException {
+			PositionSetBI vn_is) throws IOException {
 		try {
 			// ArrayList<I_AmPart> parts = new ArrayList<I_AmPart>(
 			// descriptionBeingTested.getMutableParts());
@@ -686,27 +685,27 @@ public class RelationshipStatement extends RefsetSpecStatement {
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean addedRelationship(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
 			return (a1 == null && a2 != null);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean changedRelationshipCharacteristic(
 			I_RelVersioned relBeingTested, GROUPING_TYPE version,
 			PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
@@ -716,14 +715,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
 							.getTime()) && a1.getCharacteristicId() != a2
 					.getCharacteristicId());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean changedRelationshipGroup(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
@@ -732,15 +730,14 @@ public class RelationshipStatement extends RefsetSpecStatement {
 					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
 							.getTime()) && a1.getGroup() != a2.getGroup());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean changedRelationshipRefinability(
 			I_RelVersioned relBeingTested, GROUPING_TYPE version,
 			PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
@@ -750,14 +747,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
 							.getTime()) && a1.getRefinabilityId() != a2
 					.getRefinabilityId());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean changedRelationshipStatus(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
@@ -767,14 +763,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
 							.getTime()) && a1.getStatusNid() != a2
 					.getStatusNid());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 
 	private boolean changedRelationshipType(I_RelVersioned relBeingTested,
 			GROUPING_TYPE version, PositionSetBI v1_is, PositionSetBI v2_is)
-			throws TerminologyException, IOException {
+			throws IOException {
 		try {
 			I_RelTuple a1 = getVersion(relBeingTested, v1_is);
 			I_RelTuple a2 = getVersion(relBeingTested, v2_is);
@@ -783,8 +778,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 					&& !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2
 							.getTime()) && a1.getTypeNid() != a2.getTypeNid());
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new TerminologyException(e.getMessage());
+			throw new IOException(e.getMessage());
 		}
 	}
 

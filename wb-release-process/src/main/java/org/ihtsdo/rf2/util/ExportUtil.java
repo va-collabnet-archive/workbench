@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -32,11 +33,24 @@ import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.db.bdb.BdbTermFactory;
+import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.spec.ConceptSpec;
 
 //import org.ihtsdo.tk.api.Precedence;
 
@@ -128,7 +142,87 @@ public class ExportUtil {
 			logger.error(e.getMessage()); 
 		}
 	}
+	
+	
+	
+	//Remove this method not require
+	public static void insertConceptId(I_GetConceptData concept , Config config, String wsSctId , int pathNid , int statusNid , long effectiveDate) throws IOException {
+		try {	
+				I_Identify i_Identify = concept.getIdentifier();
+				List<? extends I_IdVersion> i_IdentifyList = i_Identify.getIdVersions();		
+				if (i_IdentifyList.size() > 0) {
+					for (int j = 0; j < i_IdentifyList.size(); j++) {
+						I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(j);
+						Object denotion = (Object) i_IdVersion.getDenotation(); // Actual value for identifier
+						System.out.println("====initial===" +denotion.toString());
+					}							
+				} 
+				boolean flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, effectiveDate);
+				System.out.println("===sctid inserted===" + flag);
+			
+				//getTermFactory().addUncommitted(concept);
+				//getTermFactory().commit();
+				
+				I_Identify i_Identify_after = concept.getIdentifier();
+				List<? extends I_IdVersion> i_IdentifyAfterList = i_Identify_after.getIdVersions();
+			
+				if (i_IdentifyAfterList.size() > 0) {
+					for (int j = 0; j < i_IdentifyAfterList.size(); j++) {
+						I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyAfterList.get(j);
+						Object denotion = (Object) i_IdVersion.getDenotation(); // Actual value for identifier
+						System.out.println("====final==="+denotion.toString());
+					}							
+				}
+				
+			} catch (NumberFormatException e) {
+					logger.error("NumberFormatException" +e);
+			} catch (TerminologyException e) {
+				logger.error("TerminologyException" +e);
+			} catch (IOException e) {
+				logger.error("IOException" +e);
+			} catch (Exception e) {
+				logger.error("Exception" +e);
+			}		
+	}
+	
+	
+	public static void insertSctId(int componentNid , Config config, String wsSctId , int pathNid , int statusNid , long effectiveDate) throws IOException {
+		try {	
+				I_Identify i_Identify = getTermFactory().getId(componentNid);
+				if (getAceConfig() == null) {
+				   createAceConfig();
+				}
+				  
+				boolean flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, effectiveDate);
+				System.out.println("===Sctid added successfully===" + flag);
+			
+				//getTermFactory().addUncommitted(concept);
+				//getTermFactory().commit();
+				
+				I_Identify i_Identify_after = getTermFactory().getId(componentNid);
+				List<? extends I_IdVersion> i_IdentifyAfterList = i_Identify_after.getIdVersions();
+			
+				if (i_IdentifyAfterList.size() > 0) {
+					for (int j = 0; j < i_IdentifyAfterList.size(); j++) {
+						I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyAfterList.get(j);
+						Object denotion = (Object) i_IdVersion.getDenotation(); // Actual value for identifier
+						System.out.println("====Id List==="+denotion.toString());
+					}							
+				}
+			} catch (NumberFormatException e) {
+					logger.error("NumberFormatException" +e);
+			} catch (TerminologyException e) {
+				logger.error("TerminologyException" +e);
+			} catch (IOException e) {
+				logger.error("IOException" +e);
+			} catch (Exception e) {
+				logger.error("Exception" +e);
+			}		
+	}
 
+		
+	
+	
 
 	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
 		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
@@ -249,6 +343,32 @@ public class ExportUtil {
 		}
 		return descendants;
 	}
+	
+	
+	public static  Set<I_GetConceptData> getParentLocal(Set<I_GetConceptData> parent, I_GetConceptData concept) {
+		try {
+			I_TermFactory termFactory = Terms.get();
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			I_IntSet allowedDestRelTypes =  termFactory.newIntSet();
+			//will have to check if this is sufficient
+			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			
+			Set<I_GetConceptData> parentSet = new HashSet<I_GetConceptData>();
+			parentSet.addAll(concept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, 
+					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
+			parent.addAll(parentSet);
+			System.out.println(parentSet.size());
+			for (I_GetConceptData loopConcept : parentSet) {
+				System.out.println("==Found any parent==" + loopConcept.getInitialText());
+				parent = getParentLocal(parent, loopConcept);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return parent;
+	}
 
 	public static void createTermFactory(Database db) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 
@@ -278,60 +398,63 @@ public class ExportUtil {
 			// termFactory.convertToThinVersion(df.parse(test_time).getTime())));
 
 			// Added inferred promotion template to catch the context relationships
-			aceConfig.addViewPosition(getTermFactory().newPosition(getTermFactory().getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
-			aceConfig.addEditingPath(getTermFactory().getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
+			aceConfig.addViewPosition(getTermFactory().newPosition(getTermFactory().getPath(new UUID[] { UUID.fromString("b4f0899d-39db-5c3d-ae03-2bac05433162") }), Integer.MAX_VALUE)); //b4f0899d-39db-5c3d-ae03-2bac05433162
+			aceConfig.addEditingPath(getTermFactory().getPath(new UUID[] { UUID.fromString("b4f0899d-39db-5c3d-ae03-2bac05433162") })); //b4f0899d-39db-5c3d-ae03-2bac05433162
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-			aceConfig.getDescTypes().add(getNid("00791270-77c9-32b6-b34f-d932569bd2bf"));//Fully specified name	
-
+			aceConfig.getDescTypes().add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());//Fully specified name	
+	
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
-
-			aceConfig.getDescTypes().add(getNid("8bfba944-3965-3946-9bcb-1e80a5da63a2"));
+			aceConfig.getDescTypes().add(SnomedMetadataRfx.getDES_SYNONYM_NID());
+		    
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.localize().getNid());
-			aceConfig.getDescTypes().add(getNid("700546a3-09c7-3fc2-9eb9-53d318659a09"));
-
+			
+			ConceptSpec definition = new ConceptSpec("Definition (core metadata concept)", UUID.fromString("700546a3-09c7-3fc2-9eb9-53d318659a09"));
+			aceConfig.getDescTypes().add(getNid(definition.getLenient().getUUIDs().get(0).toString()));
+			
 			aceConfig.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			aceConfig.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.localize().getNid());
-			aceConfig.getDestRelTypes().add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-
-			aceConfig.getDestRelTypes().add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
-			//aceConfig.setDefaultStatus(getTermFactory().getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid())));
-			aceConfig.setDefaultStatus(getTermFactory().getConcept(getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"))); // Current
-
-			getAceConfig().getAllowedStatus().add(getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f")); // Current
-			getAceConfig().getAllowedStatus().add(getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724")); //Retired
-			getAceConfig().getAllowedStatus().add(getNid("6cc3df26-661e-33cd-a93d-1c9e797c90e3")); //Concept non-current (foundation metadata concept)
-			getAceConfig().getAllowedStatus().add(getNid("9906317a-f50f-30f6-8b59-a751ae1cdeb9")); //Pending
-			getAceConfig().getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
-			getAceConfig().getAllowedStatus().add( getNid("0d1278d5-3718-36de-91fd-7c6c8d2d2521")); //Limited	900000000000486000
-			getAceConfig().getAllowedStatus().add(getNid("eab9334c-8269-344e-9db6-9189f991566e")); //Outdated	900000000000483008
-			getAceConfig().getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
-			getAceConfig().getAllowedStatus().add(getNid("95028943-b11c-3509-b1c0-c4ae16aaad5c")); //Component Moved elsewhere	900000000000487009
-			getAceConfig().getAllowedStatus().add(getNid("dde90dcf-8749-32ff-bdaa-4e5d17e505f2")); //Erroneous component (foundation metadata concept)	900000000000485001
-			getAceConfig().getAllowedStatus().add(getNid("8c852b81-6246-34b5-b882-81627aa404e4"));  //Ambiguous component (foundation metadata concept)	900000000000484002
-			getAceConfig().getAllowedStatus().add(getNid("16500683-0760-3aa5-8ed7-9cb98562e755"));  //Dups	900000000000482003
-			getAceConfig().getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			getAceConfig().getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			getAceConfig().getAllowedStatus().add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-
+			
+			ConceptSpec isa = new ConceptSpec("Is a (attribute)", UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+			aceConfig.getDescTypes().add(getNid(isa.getLenient().getUUIDs().get(0).toString()));
+			aceConfig.setDefaultStatus(getTermFactory().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID())); // Current
+		
+			aceConfig.getAllowedStatus().add(SnomedMetadataRfx.getSTATUS_CURRENT_NID()); // Current
+			aceConfig.getAllowedStatus().add(getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724")); //Retired
+			aceConfig.getAllowedStatus().add(getNid("6cc3df26-661e-33cd-a93d-1c9e797c90e3")); //Concept non-current (foundation metadata concept)
+			aceConfig.getAllowedStatus().add(getNid("9906317a-f50f-30f6-8b59-a751ae1cdeb9")); //Pending
+			aceConfig.getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
+			aceConfig.getAllowedStatus().add( getNid("0d1278d5-3718-36de-91fd-7c6c8d2d2521")); //Limited	900000000000486000
+			aceConfig.getAllowedStatus().add(getNid("eab9334c-8269-344e-9db6-9189f991566e")); //Outdated	900000000000483008
+			aceConfig.getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
+			aceConfig.getAllowedStatus().add(getNid("95028943-b11c-3509-b1c0-c4ae16aaad5c")); //Component Moved elsewhere	900000000000487009
+			aceConfig.getAllowedStatus().add(getNid("dde90dcf-8749-32ff-bdaa-4e5d17e505f2")); //Erroneous component (foundation metadata concept)	900000000000485001
+			aceConfig.getAllowedStatus().add(getNid("8c852b81-6246-34b5-b882-81627aa404e4"));  //Ambiguous component (foundation metadata concept)	900000000000484002
+			aceConfig.getAllowedStatus().add(getNid("16500683-0760-3aa5-8ed7-9cb98562e755"));  //Dups	900000000000482003
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			
 			aceConfig.setPrecedence(Precedence.TIME);
-
-		} catch (IOException e) {
-			e.printStackTrace();
+			BdbTermFactory tfb = (BdbTermFactory) getTermFactory();
+			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+			newDbProfile.setUsername("Batch-QA");
+			newDbProfile.setUserConcept(getTermFactory().getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+			aceConfig.setDbConfig(newDbProfile);
+		
 		} catch (TerminologyException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-
-		// I_ConfigAceDb newDbProfile = tf.newAceDbConfig();
-		// newDbProfile.setUsername("username");
-		// newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-		// newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-		// newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-		// newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-		// config.setDbConfig(newDbProfile);
-
 	}
 
+	
+	
 
 	public static String getMetaModuleID(I_GetConceptData snomedConcept) {
 		if (metaConceptList.isEmpty()) {
@@ -500,7 +623,7 @@ public class ExportUtil {
 		int inappropriateId_Term_Aux = ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid();
 
 		int retId = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006
-		int curId = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); //Active value	900000000000545005
+		int curId = SnomedMetadataRfx.getSTATUS_CURRENT_NID(); //Active value	900000000000545005
 		int conRetId = getNid("6cc3df26-661e-33cd-a93d-1c9e797c90e3"); //Concept non-current (foundation metadata concept)	900000000000495008
 		int dupId = getNid("16500683-0760-3aa5-8ed7-9cb98562e755"); //Dups	900000000000482003
 		int outdatedId = getNid("eab9334c-8269-344e-9db6-9189f991566e"); //Outdated	900000000000483008
@@ -773,7 +896,7 @@ public class ExportUtil {
 	public static int inappropriateId ;
 	static{
 		try {
-			activeId = getTermFactory().uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
+			activeId = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
 			inactId =  getTermFactory().uuidToNative(UUID.fromString("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"));
 			conRetId = getTermFactory().uuidToNative(UUID.fromString("6cc3df26-661e-33cd-a93d-1c9e797c90e3"));
 			retId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
@@ -813,7 +936,7 @@ public class ExportUtil {
 		int ambiguousId_Term_Aux = ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid();
 
 		int retId = getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724"); //Inactive value	900000000000546006
-		int curId = getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"); //Active value	900000000000545005
+		int curId = SnomedMetadataRfx.getSTATUS_CURRENT_NID(); //Active value	900000000000545005
 		int pendId = getNid("9906317a-f50f-30f6-8b59-a751ae1cdeb9"); //Pending	900000000000492006	
 		int inappropriateId = getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6"); //In-appropriate	900000000000494007
 		int limId = getNid("0d1278d5-3718-36de-91fd-7c6c8d2d2521"); //Limited	900000000000486000
@@ -871,6 +994,40 @@ public class ExportUtil {
 		}
 		return statusType;
 	}
+	
+	// get the snomedID for the given UUID 
+	public static String getSNOMEDID(Config config, UUID uuid, String parentSnomedId) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		String snomedId = null;
+
+		try {
+			System.out.println("=====isnide getSNOMEDID===");
+			snomedId = idGen.getSNOMEDID(uuid);
+		
+			if(snomedId.equals("") || snomedId.equals(null)){	}
+			else
+				System.out.println("=====SnomedId already exist in the ID repository===" + snomedId);
+			
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSnomedID for UUID : " + uuid + " returned NULL calling to generate a new SnomedId");
+			try {
+				System.out.println("===Creating SnomedId");
+				snomedId = idGen.createSNOMEDID(uuid, parentSnomedId);
+				System.out.println("===SnomedId Created Successfully" + snomedId);
+			} catch (Exception cE) {
+				logger.error("Message : SnomedId creation error for UUID :" + uuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + uuid, e);
+		}
+		return snomedId;
+	}
+	
+	
+	
+	
 
 	public static String getSnomedId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String snomedId = "";
@@ -891,6 +1048,8 @@ public class ExportUtil {
 
 		return snomedId.toString();
 	}
+	
+	
 
 	public static String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String ctv3Id = ""; // ConceptId
@@ -912,6 +1071,36 @@ public class ExportUtil {
 		}
 		return ctv3Id.toString();
 	}
+	
+	
+	// get the Ctv3Id for the given UUID
+	public static String getCTV3ID(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		String ctv3Id = null;
+
+		try {
+			System.out.println("=====Isnide getCTV3ID===");
+			ctv3Id = idGen.getCTV3ID(uuid);
+			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
+			else
+				System.out.println("====Ctv3Id already exist in the ID repository===" + ctv3Id);
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSnomedID for UUID : " + uuid + " returned NULL calling to generate a new SnomedId");
+			try {
+				System.out.println("===Creating Ctv3Id");
+				ctv3Id = idGen.createCTV3ID(uuid);
+				System.out.println("===Ctv3Id Created Successfully" + ctv3Id);
+			} catch (Exception cE) {
+				logger.error("Message : Ctv3Id creation error for UUID :" + uuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + uuid, e);
+		}
+		return ctv3Id;
+	}
+	
 
 	public static boolean IsConceptInActive(I_GetConceptData concept, String effectiveTimeRelStr) throws ParseException, TerminologyException, IOException {
 		String conceptStatus = "";
@@ -1139,29 +1328,62 @@ public class ExportUtil {
 
 	}
 
-	// get the description id for the given UUID
-	public static String getSCTId(Config config, UUID uuid) {
+	//Get the sctid for the given UUID
+	public static String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		long sctId = 0L;
 
-		//		final IdAssignmentImpl idGen = null; // new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
-		//		long descId = 0L;
-		//
-		//		try {
-		//			descId = idGen.getSCTID(uuid);
-		//		} catch (NullPointerException e) {
-		//			// there is no SCTID so we are getting NULL
-		//			if (logger.isDebugEnabled())
-		//				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
-		//
-		//			try {
-		//				descId = idGen.createSCTID(uuid, 0, "01", "20110131", "TEST EXECUTION", "12345");
-		//			} catch (Exception cE) {
-		//				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
-		//			}
-		//		} catch (Exception e) {
-		//			logger.error("Message : " + uuid, e);
-		//		}
-		//		return String.valueOf(descId);
-		return "0";
+		try {
+			sctId = idGen.getSCTID(componentUuid);
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSCTID for UUID : " + componentUuid + " returned NULL calling create to generate a new SCTID");
+			try {
+				sctId = idGen.createSCTID(componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
+			} catch (Exception cE) {
+				logger.error("Message : SCTID creation error for UUID :" + componentUuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + componentUuid, e);
+		}
+		return String.valueOf(sctId);
+	}
+	
+
+	// get the conceptid for the given UUID (Hardcoded values)
+	public static String getSCTId(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		long sctId = 0L;
+		String namespaceId = "0";
+		String partitionId = "00";
+		String releaseId = "20121031";
+		String executionId = "Daily Build";
+		String sctModuleId = "Core Component";
+		
+		try {
+			sctId = idGen.getSCTID(uuid);
+		} catch (NullPointerException e) {
+			// there is no SCTID so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
+			try {
+					if(!config.getNamespaceId().equals(null))
+					{
+						namespaceId = config.getNamespaceId();
+						partitionId = config.getPartitionId();
+						releaseId	= config.getReleaseId();
+						executionId = config.getExecutionId();
+						sctModuleId = config.getModuleId();
+					}	
+					sctId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
+			} catch (Exception cE) {
+				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
+			}
+		} catch (Exception e) {
+			logger.error("Message : " + uuid, e);
+		}
+		return String.valueOf(sctId);
 	}
 
 	public static String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
@@ -1210,7 +1432,7 @@ public class ExportUtil {
 			int symId_Term_Aux = ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid();
 			int textDefId_Term_Aux = ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.localize().getNid();
 			int ptId = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid();
-			int fsnId =getNid("00791270-77c9-32b6-b34f-d932569bd2bf"); //Fully specified name	
+			int fsnId =SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID(); //Fully specified name	
 			int symId = getNid("8bfba944-3965-3946-9bcb-1e80a5da63a2"); //Synonym
 			int textDefId = getNid("700546a3-09c7-3fc2-9eb9-53d318659a09"); //Definition
 
@@ -1441,15 +1663,15 @@ public class ExportUtil {
 
 			//getAceConfig().addEditingPath(getTermFactory().getPath(new UUID[] {UUID.fromString(I_Constants.SNOMED_CORE_PATH_UID)}));
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-			aceConfig.getDescTypes().add(getNid("00791270-77c9-32b6-b34f-d932569bd2bf"));//Fully specified name	
+			aceConfig.getDescTypes().add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());//Fully specified name	
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
 			aceConfig.getDescTypes().add(getNid("8bfba944-3965-3946-9bcb-1e80a5da63a2"));
 			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.localize().getNid());
 			aceConfig.getDescTypes().add(getNid("700546a3-09c7-3fc2-9eb9-53d318659a09"));
 
-			aceConfig.setDefaultStatus(getTermFactory().getConcept(getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f"))); // Current
-			aceConfig.getAllowedStatus().add(getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f")); // Current
+			aceConfig.setDefaultStatus(getTermFactory().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID())); // Current
+			aceConfig.getAllowedStatus().add(SnomedMetadataRfx.getSTATUS_CURRENT_NID()); // Current
 			aceConfig.getAllowedStatus().add(getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724")); //Retired
 			aceConfig.getAllowedStatus().add(getNid("6cc3df26-661e-33cd-a93d-1c9e797c90e3")); //Concept non-current (foundation metadata concept)
 			aceConfig.getAllowedStatus().add(getNid("9906317a-f50f-30f6-8b59-a751ae1cdeb9")); //Pending
@@ -1495,6 +1717,76 @@ public class ExportUtil {
 
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	public static Set<I_GetConceptData> getParent(Set<I_GetConceptData> parent, I_GetConceptData concept) {
+		try {
+			
+			//PositionSetReadOnly o = aceConfig.getViewPositionSetReadOnly();
+			aceConfig.addViewPosition(getTermFactory().newPosition(getTermFactory().getPath(new UUID[] { UUID.fromString("2b2035dd-9419-56e2-a472-636e8545742c") }), Integer.MAX_VALUE));
+			aceConfig.addEditingPath(getTermFactory().getPath(new UUID[] {UUID.fromString("2b2035dd-9419-56e2-a472-636e8545742c")}));
+
+			//getAceConfig().addEditingPath(getTermFactory().getPath(new UUID[] {UUID.fromString(I_Constants.SNOMED_CORE_PATH_UID)}));
+			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+			aceConfig.getDescTypes().add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());//Fully specified name	
+			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
+			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
+			aceConfig.getDescTypes().add(getNid("8bfba944-3965-3946-9bcb-1e80a5da63a2"));
+			aceConfig.getDescTypes().add(ArchitectonicAuxiliary.Concept.TEXT_DEFINITION_TYPE.localize().getNid());
+			aceConfig.getDescTypes().add(getNid("700546a3-09c7-3fc2-9eb9-53d318659a09"));
+
+			aceConfig.setDefaultStatus(getTermFactory().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID())); // Current
+			aceConfig.getAllowedStatus().add(SnomedMetadataRfx.getSTATUS_CURRENT_NID()); // Current
+			aceConfig.getAllowedStatus().add(getNid("a5daba09-7feb-37f0-8d6d-c3cadfc7f724")); //Retired
+			aceConfig.getAllowedStatus().add(getNid("6cc3df26-661e-33cd-a93d-1c9e797c90e3")); //Concept non-current (foundation metadata concept)
+			aceConfig.getAllowedStatus().add(getNid("9906317a-f50f-30f6-8b59-a751ae1cdeb9")); //Pending
+			aceConfig.getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
+			aceConfig.getAllowedStatus().add( getNid("0d1278d5-3718-36de-91fd-7c6c8d2d2521")); //Limited	900000000000486000
+			aceConfig.getAllowedStatus().add(getNid("eab9334c-8269-344e-9db6-9189f991566e")); //Outdated	900000000000483008
+			aceConfig.getAllowedStatus().add(getNid("bcb2ccda-d62a-3fc8-b158-10ad673823b6")); //In-appropriate	900000000000494007
+			aceConfig.getAllowedStatus().add(getNid("95028943-b11c-3509-b1c0-c4ae16aaad5c")); //Component Moved elsewhere	900000000000487009
+			aceConfig.getAllowedStatus().add(getNid("dde90dcf-8749-32ff-bdaa-4e5d17e505f2")); //Erroneous component (foundation metadata concept)	900000000000485001
+			aceConfig.getAllowedStatus().add(getNid("8c852b81-6246-34b5-b882-81627aa404e4"));  //Ambiguous component (foundation metadata concept)	900000000000484002
+			aceConfig.getAllowedStatus().add(getNid("16500683-0760-3aa5-8ed7-9cb98562e755"));  //Dups	900000000000482003
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			aceConfig.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+
+			aceConfig.setPrecedence(Precedence.TIME);
+
+			I_IntSet allowedDestRelTypes = getTermFactory().newIntSet();
+			Collection<UUID> uids = new ArrayList<UUID>();
+			UUID uuid = UUID.fromString(I_Constants.IS_A_UID);
+			uids.add(uuid);
+			//uids.add(UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66"));
+			allowedDestRelTypes.add(getTermFactory().uuidToNative(uids));	
+
+			Set<I_GetConceptData> parentSet = new HashSet<I_GetConceptData>();
+
+			Set<? extends I_GetConceptData> testObj = concept.getSourceRelTargets(aceConfig.getAllowedStatus(), aceConfig.getDestRelTypes(), aceConfig.getViewPositionSetReadOnly(), aceConfig
+					.getPrecedence(), aceConfig.getConflictResolutionStrategy());
+			parentSet.addAll(testObj);
+			parent.addAll(parentSet);
+			
+			
+			/*for (I_GetConceptData loopConcept : childrenSet) {
+				descendants = getParent(descendants, loopConcept);
+			}*/
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return parent;
+
+	}
 
 	public static String getCharacteristicTypeId(String characteristicType) {
 

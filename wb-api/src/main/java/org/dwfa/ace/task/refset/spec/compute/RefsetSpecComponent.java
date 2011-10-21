@@ -28,6 +28,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.GROUPING_TYPE;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PositionSetBI;
 
@@ -72,11 +73,11 @@ public abstract class RefsetSpecComponent {
 			TerminologyException;
 
     public abstract I_RepresentIdSet getPossibleConcepts(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled;
 
     public abstract I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled;
 
     public abstract I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException;
+            Collection<I_ShowActivity> activities) throws IOException, ComputationCanceled;
 }

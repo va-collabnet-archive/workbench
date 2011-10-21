@@ -25,7 +25,7 @@ public class RF2RelationshipFactory extends RF2AbstractFactory {
 
 	public void export() throws IOException, Exception {
 
-		logger.info("Started Relationship Snapshot Export...");
+		logger.info("Started Inferred Relationship Snapshot Export...");
 
 		try {
 
@@ -33,9 +33,14 @@ public class RF2RelationshipFactory extends RF2AbstractFactory {
 
 			ExportUtil.getTermFactory().iterateConcepts(iterator);
 
+			logger.info("==========Total number of metadata inferred relationship records======" + iterator.getMetaDataCount());
+			
+			logger.info("==========Total number of duplicated records======" + iterator.getDupRecord());
+
+			
 			closeExportFileWriter();
 
-			logger.info("Finished Relationship Snapshot Export...");
+			logger.info("Finished Inferred Relationship Snapshot Export...");
 
 		} catch (IOException e) {
 			logger.error(e.getMessage());

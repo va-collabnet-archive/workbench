@@ -117,9 +117,9 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 
              	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2], vc));
              	writer.addMember();
-             };
+             }
 
- 	        tf.addUncommitted(writer.getRefsetConcept());
+             Terms.get().commit();
          } catch (Exception e) {
         	 AceLog.getAppLog().log(Level.WARNING, line, e);
  		}

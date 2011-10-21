@@ -53,6 +53,94 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String rF2Format;
+	
+	
+	
+	
+	//Below Parameters are necessary for ID-Generation
+
+	/**
+	 * updateWbSctId
+	 * 
+	 * @parameter default-value="false"
+	 * 
+	 */
+	private String updateWbSctId;
+	
+	
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
+	
+	
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter default-value="0"
+	 * 
+	 */
+	private String namespaceId;
+	
+	/**
+	 * partitionId
+	 * 
+	 * @parameter default-value="00"
+	 * 
+	 */
+	private String partitionId;
+	
+	/**
+	 * executionId
+	 * 
+	 * @parameter default-value="Daily-build"
+	 * 
+	 */
+	private String executionId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="Core Concept Component"
+	 * 
+	 */
+	private String moduleId;
+	
+	/**
+	 * releaseId
+	 * 
+	 * @parameter default-value="20110131"
+	 * 
+	 */
+	private String releaseId;
+	
+	/**
+	 * componentType
+	 * 
+	 * @parameter default-value="Concept"
+	 * 
+	 */
+	private String componentType;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -62,7 +150,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
 			else
 			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/conceptqa.xml");
-			
+				
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			
@@ -76,6 +164,20 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 
+			
+			
+			//Below Parameters are necessary for ID-Generation
+			config.setUpdateWbSctId(updateWbSctId);
+			config.setNamespaceId(namespaceId);
+			config.setPartitionId(partitionId);
+			config.setExecutionId(executionId);
+			config.setModuleId(moduleId);
+			config.setReleaseId(releaseId);
+			config.setComponentType(componentType);			
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
+			
 			// initialize meta hierarchy
 			ExportUtil.init();
 
@@ -87,6 +189,14 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			e.getMessage();
 			throw new MojoExecutionException(e.getMessage());
 		}
+	}
+
+	public String getrF2Format() {
+		return rF2Format;
+	}
+
+	public void setrF2Format(String rF2Format) {
+		this.rF2Format = rF2Format;
 	}
 
 	public File getTargetDirectory() {

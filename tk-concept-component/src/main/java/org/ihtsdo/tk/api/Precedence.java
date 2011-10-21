@@ -7,7 +7,11 @@ public enum Precedence {
     PATH("path precedence","<html>If two versions are both on route to the destination, " +
     		"but one version is on a path that is closer to the destination, " +
     		"the version on the closer path has higher precedence.<br><br>If two versions " +
-        	"are on the same path, the version with the later time has higher precedence.");
+        	"are on the same path, the version with the later time has higher precedence."),
+    MIXED("mixed precedence","<html>Returns a conflict if time based " +
+    		"precendence and path base precendence have different views." +
+    		"The conflict is resolved using the conflict resolution " +
+        	"policy.");
     
     private String label;
     private String description;

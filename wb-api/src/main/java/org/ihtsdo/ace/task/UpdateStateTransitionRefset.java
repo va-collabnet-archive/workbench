@@ -109,37 +109,36 @@ public class UpdateStateTransitionRefset extends AbstractTask {
         String line = null;
         ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         
-    	while ((line = inputFile.readLine()) != null)
-        {
-    		if (line.trim().length() == 0) {
-    			continue;
-    		}
+    	try {
+	    	while ((line = inputFile.readLine()) != null)
+	        {
+	    		if (line.trim().length() == 0) {
+	    			continue;
+	    		}
+	
+	        	String[] columns = line.split(",");
+	
+	        	//Get rid of "User permission"
+	        	columns[0] = (String) columns[0].subSequence("Workflow state transition (".length(), columns[0].length());
+	        	//remove ")"
+	        	columns[3] = columns[3].trim();
+	        	columns[3] = columns[3].substring(0, columns[3].length() - 1);
+	
+	        	int i = 0;
+	        	for (String c : columns) {
+	        		columns[i++] = c.split("=")[1].trim();
+	        	}
+	
+	        	////////columns//////////
+	        	//0: Workflow user role
+	        	//1: Initial workflow state
+	        	//2: Workflow action
+	        	//3: Final workflow state
+	
+	
+	        	if (line.trim().length() == 0)
+	        		continue;
 
-        	String[] columns = line.split(",");
-
-        	//Get rid of "User permission"
-        	columns[0] = (String) columns[0].subSequence("Workflow state transition (".length(), columns[0].length());
-        	//remove ")"
-        	columns[3] = columns[3].trim();
-        	columns[3] = columns[3].substring(0, columns[3].length() - 1);
-
-        	int i = 0;
-        	for (String c : columns) {
-        		columns[i++] = c.split("=")[1].trim();
-        	}
-
-        	////////columns//////////
-        	//0: Workflow user role
-        	//1: Initial workflow state
-        	//2: Workflow action
-        	//3: Final workflow state
-
-
-        	if (line.trim().length() == 0)
-        		continue;
-
-
-        	try {
         		String  category = columns[0];
         		if (category.contains("Any")) {
         			category = category.replace("Any", "All");
@@ -151,12 +150,14 @@ public class UpdateStateTransitionRefset extends AbstractTask {
 	        	writer.setFinalState(WorkflowHelper.lookupState(columns[3], vc));
 	
 	        	writer.addMember();
-        	} catch (Exception e) {
-        		AceLog.getAppLog().log(Level.WARNING, line, e);
-        	}
-        };
 
-        Terms.get().addUncommitted(writer.getRefsetConcept());
+        	}
+
+	    	Terms.get().commit();
+    	} catch (Exception e) {
+    		AceLog.getAppLog().log(Level.WARNING, line, e);
+        }
+
     }
      public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

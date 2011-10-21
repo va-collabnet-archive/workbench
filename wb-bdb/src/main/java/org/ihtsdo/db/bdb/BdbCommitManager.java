@@ -75,6 +75,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -103,7 +104,6 @@ public class BdbCommitManager {
    private static I_RepresentIdSet            uncommittedCNids         = new IdentifierSet();
    private static boolean                     performCreationTests     = true;
    private static boolean                     performCommitTests       = true;
-   private static boolean                     performCommit            = false;
    private static Semaphore                   luceneWriterPermit       = new Semaphore(PERMIT_COUNT);
    private static AtomicReference<Concept>    lastUncommitted          = new AtomicReference<Concept>();
    private static long                        lastDoUpdate             = Long.MIN_VALUE;
@@ -206,7 +206,7 @@ public class BdbCommitManager {
       addUncommitted(member.getEnclosingConcept());
 
       if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-    	  handleWorkflowHistoryExtensions(extension);
+         handleWorkflowHistoryExtensions(extension);
       }
    }
 
@@ -338,13 +338,13 @@ public class BdbCommitManager {
       Svn.rwl.acquireUninterruptibly();
 
       boolean passedRelease = false;
+      boolean performCommit = true;
 
       try {
          synchronized (uncommittedCNids) {
             synchronized (uncommittedCNidsNoChecks) {
                synchronized (uncommittedWfMemberIds) {
                   flushUncommitted();
-                  performCommit = true;
 
                   int errorCount   = 0;
                   int warningCount = 0;
@@ -397,16 +397,10 @@ public class BdbCommitManager {
                            performCommit = selection == JOptionPane.YES_OPTION;
                         } else {
                            try {
-                              SwingUtilities.invokeAndWait(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                    int selection = JOptionPane.showConfirmDialog(new JFrame(),
-                                                       "Do you want to continue with commit?",
-                                                       "Warnings Detected", JOptionPane.YES_NO_OPTION);
+                              AskToContinue asker = new AskToContinue();
 
-                                    performCommit = selection == JOptionPane.YES_OPTION;
-                                 }
-                              });
+                              SwingUtilities.invokeAndWait(asker);
+                              performCommit = asker.continueWithCommit;
                            } catch (InvocationTargetException e) {
                               AceLog.getAppLog().alertAndLogException(e);
                               performCommit = false;
@@ -507,18 +501,20 @@ public class BdbCommitManager {
                      luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
                      if (uncommittedWfMemberIds.size() > 0) {
-	                     Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
-	
-	                     wfMembersToCommit.addAll(uncommittedWfMemberIds);
-	                     
-	                     Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
-	                     if (luceneWriter != null) {
-	                    	 luceneWriterService.execute(luceneWriter);
-	                     }
+                        Set<I_ExtendByRef> wfMembersToCommit =
+                           uncommittedWfMemberIds.getClass().newInstance();
 
-	                     uncommittedWfMemberIds.clear();
+                        wfMembersToCommit.addAll(uncommittedWfMemberIds);
+
+                        Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+
+                        if (luceneWriter != null) {
+                           luceneWriterService.execute(luceneWriter);
+                        }
+
+                        uncommittedWfMemberIds.clear();
                      }
-                     
+
                      dataCheckMap.clear();
                   }
                }
@@ -529,14 +525,6 @@ public class BdbCommitManager {
             Bdb.sync();
             BdbCommitSequence.nextSequence();
          }
-      } catch (IOException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
-      } catch (InterruptedException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
-      } catch (ExecutionException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
-      } catch (TerminologyException e1) {
-         AceLog.getAppLog().alertAndLogException(e1);
       } catch (Exception e1) {
          AceLog.getAppLog().alertAndLogException(e1);
       } finally {
@@ -571,15 +559,14 @@ public class BdbCommitManager {
 
       Svn.rwl.acquireUninterruptibly();
 
+      boolean performCommit = true;
+
       try {
          AceLog.getAppLog().info("Committing concept: " + c.toUserString() + " UUID: "
                                  + Ts.get().getUuidsForNid(c.getNid()).toString());
 
-         int errorCount   = 0;
-         int warningCount = 0;
-
-         performCommit = true;
-
+         int                               errorCount        = 0;
+         int                               warningCount      = 0;
          Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
 
          dataCheckMap.put(c, warningsAndErrors);
@@ -617,16 +604,10 @@ public class BdbCommitManager {
                   performCommit = selection == JOptionPane.YES_OPTION;
                } else {
                   try {
-                     SwingUtilities.invokeAndWait(new Runnable() {
-                        @Override
-                        public void run() {
-                           int selection = JOptionPane.showConfirmDialog(new JFrame(),
-                                              "Do you want to continue with commit?", "Warnings Detected",
-                                              JOptionPane.YES_NO_OPTION);
+                     AskToContinue asker = new AskToContinue();
 
-                           performCommit = selection == JOptionPane.YES_OPTION;
-                        }
-                     });
+                     SwingUtilities.invokeAndWait(asker);
+                     performCommit = asker.continueWithCommit;
                   } catch (InvocationTargetException e) {
                      AceLog.getAppLog().alertAndLogException(e);
                      performCommit = false;
@@ -710,17 +691,19 @@ public class BdbCommitManager {
             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
             if (uncommittedWfMemberIds.size() > 0) {
-                Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
+               Set<I_ExtendByRef> wfMembersToCommit = uncommittedWfMemberIds.getClass().newInstance();
 
-                wfMembersToCommit.addAll(uncommittedWfMemberIds);
+               wfMembersToCommit.addAll(uncommittedWfMemberIds);
 
-                Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
-                if (luceneWriter != null) {
-               	 	luceneWriterService.execute(luceneWriter);
-                }
-                
-                uncommittedWfMemberIds.clear();
+               Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+
+               if (luceneWriter != null) {
+                  luceneWriterService.execute(luceneWriter);
+               }
+
+               uncommittedWfMemberIds.clear();
             }
+
             dataCheckMap.remove(c);
          }
       } catch (Exception e1) {
@@ -990,9 +973,9 @@ public class BdbCommitManager {
          m.setStatusAtPositionNid(-1);
       }
 
-      if (WorkflowHelper.isWorkflowCapabilityAvailable() && 
-    	  wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
-    	  uncommittedWfMemberIds.remove(extension);
+      if (WorkflowHelper.isWorkflowCapabilityAvailable() && (wfHistoryRefsetId != 0)
+              && (wfHistoryRefsetId == extension.getRefsetId())) {
+         uncommittedWfMemberIds.remove(extension);
       }
 
       c.modified();
@@ -1079,11 +1062,11 @@ public class BdbCommitManager {
 
    private static void handleWorkflowHistoryExtensions(I_ExtendByRef extension) {
       if (wfHistoryRefsetId == 0) {
-    	  wfHistoryRefsetId = WorkflowHelper.getWorkflowRefsetNid();
-   	  }
-   	  
-      if (wfHistoryRefsetId  != 0 && wfHistoryRefsetId == extension.getRefsetId()) {
-    	  uncommittedWfMemberIds.add(extension);
+         wfHistoryRefsetId = WorkflowHelper.getWorkflowRefsetNid();
+      }
+
+      if ((wfHistoryRefsetId != 0) && (wfHistoryRefsetId == extension.getRefsetId())) {
+         uncommittedWfMemberIds.add(extension);
       }
    }
 
@@ -1366,6 +1349,21 @@ public class BdbCommitManager {
    }
 
    //~--- inner classes -------------------------------------------------------
+
+   public static class AskToContinue implements Runnable {
+      private boolean continueWithCommit;
+
+      //~--- methods ----------------------------------------------------------
+
+      @Override
+      public void run() {
+         int selection = JOptionPane.showConfirmDialog(new JFrame(), "Do you want to continue with commit?",
+                            "Warnings Detected", JOptionPane.YES_NO_OPTION);
+
+         continueWithCommit = selection == JOptionPane.YES_OPTION;
+      }
+   }
+
 
    private static class ConceptWriter implements Runnable {
       private Concept c;

@@ -22,6 +22,11 @@ import java.util.UUID;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.dwfa.ace.commitlog.CommitLog;
+import org.dwfa.ace.config.AceConfig;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 
 /**
  * Set up changeset read/writing in the database.
@@ -34,46 +39,47 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 
 public class BinaryChangeSetWriterOpen extends AbstractMojo {
-    /**
-     * The change set directory
-     * 
-     * @parameter
-     *            expression="${project.build.directory}/generated-resources/changesets/"
-     * 
-     * @required
-     */
-    File changeSetDir;
+	/**
+	 * The change set directory
+	 * 
+	 * @parameter
+	 *            expression="${project.build.directory}/generated-resources/changesets/"
+	 * 
+	 * @required
+	 */
+	File changeSetDir;
 
-    /**
-     * The change set file name
-     * 
-     * @parameter
-     */
-    String changeSetFileName = UUID.randomUUID() + ".eccs";
+	/**
+	 * The change set file name
+	 * 
+	 * @parameter
+	 */
+	String changeSetFileName = UUID.randomUUID() + ".eccs";
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        try {
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		try {
 
-            if (changeSetFileName == null) {
-                changeSetFileName = UUID.randomUUID() + ".eccs";
-            }
-            if (!changeSetFileName.endsWith(".eccs")) {
-                String firstPart = changeSetFileName.substring(0, changeSetFileName.lastIndexOf('.'));
-                changeSetFileName = firstPart.concat(".eccs");
-            }
+//			if (changeSetFileName == null) {
+//				changeSetFileName = UUID.randomUUID() + ".eccs";
+//			}
+//			if (!changeSetFileName.endsWith(".eccs")) {
+//				String firstPart = changeSetFileName.substring(0, changeSetFileName.lastIndexOf('.'));
+//				changeSetFileName = firstPart.concat(".eccs");
+//			}
 
-            // AceConfig.config.setChangeSetWriterFileName(changeSetFileName);
-            // AceConfig.config.setChangeSetRoot(changeSetDir);
+			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername()
+					+ ".eccs", new EConceptChangeSetWriter(new File(AceConfig.config
+							.getChangeSetRoot(), AceConfig.config
+							.getChangeSetWriterFileName()), new File(AceConfig.config.getChangeSetRoot(), "."
+									+ AceConfig.config.getChangeSetWriterFileName()), ChangeSetGenerationPolicy
+									.INCREMENTAL, true));
 
-            // ChangeSetWriterHandler.addWriter(new EConceptChangeSetWriter(new
-            // File(AceConfig.config.getChangeSetRoot(),
-            // AceConfig.config.getChangeSetWriterFileName()), new File(AceConfig.config.getChangeSetRoot(), "."
-            // + AceConfig.config.getChangeSetWriterFileName()), ChangeSetPolicy.MUTABLE_ONLY, true));
-            // ChangeSetWriterHandler.addWriter(new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
-            // "commitLog.xls"), new File(AceConfig.config.getChangeSetRoot(), "." + "commitLog.xls")));
-
-        } catch (Exception e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
-    }
+			ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls",
+					new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
+					"commitLog.xls"), new File(AceConfig.config.getChangeSetRoot(),
+							"." + "commitLog.xls")));
+		} catch (Exception e) {
+			throw new MojoExecutionException(e.getLocalizedMessage(), e);
+		}
+	}
 }

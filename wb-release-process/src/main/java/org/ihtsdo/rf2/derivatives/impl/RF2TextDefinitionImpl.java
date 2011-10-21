@@ -1,8 +1,11 @@
 package org.ihtsdo.rf2.derivatives.impl;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_DescriptionTuple;
@@ -52,7 +55,12 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 		String caseSignificanceId = "";
 		String typeId = "";
 		String moduleId="";
+		String updateWbSctId = "false";
 		try {
+			
+			if(!getConfig().isUpdateWbSctId().equals(null)){
+				updateWbSctId = getConfig().isUpdateWbSctId();
+			}
 			
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
@@ -92,8 +100,11 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					else
 						active = "0";
 					
-					moduleId = getConceptMetaModuleID(concept , effectiveTime);
-					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
+					moduleId = computeModuleId(concept);	
+					//moduleId = getConceptMetaModuleID(concept , effectiveTime);
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){				
+						incrementMetaDataCount();
+					}
 					
 					if (conceptid==null || conceptid.equals("") || conceptid.equals("0") ){
 						conceptid=concept.getUids().iterator().next().toString();
@@ -103,20 +114,37 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						descriptionid=description.getUUIDs().iterator().next().toString();
 					}
 					
+					if (descriptionid.contains("-") && updateWbSctId.equals("true")){
+						try {
+							DateFormat df = new SimpleDateFormat("yyyyMMdd");
+							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
+							
+							//get text descriptionId by calling web service 
+							String wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
+							if(wbSctId.equals("0")){
+								 wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
+							}
+							
+							//insert textdescriptionId in the workbench database 
+							insertSctId(description.getDescId() , getConfig(), wbSctId , description.getPathNid() , description.getStatusNid() , effectiveDate);
+						} catch (NumberFormatException e) {
+							logger.error("NumberFormatException" +e);
+						} catch (Exception e) {
+							logger.error("Exception" +e);
+						}
+					}
+					
+					
+					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Text-definition: " + description.getUUIDs().iterator().next().toString());
 					}else if(getConfig().getRf2Format().equals("false") ){
 						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
 					}else{
-						/*getConfig().getBw().write(
-							descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
-							+ caseSignificanceId);
-						getConfig().getBw().write("\r\n");
-						*/
-						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
-						//writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
 					}
+					
 				}
 			}
 		} catch (IOException e) {

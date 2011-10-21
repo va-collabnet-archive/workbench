@@ -11,7 +11,8 @@ import org.ihtsdo.tk.api.Precedence;
 public enum PRECEDENCE {
     
     TIME(Precedence.TIME),
-    PATH(Precedence.PATH);
+    PATH(Precedence.PATH),
+    MIXED(Precedence.MIXED);
     
     private Precedence tkp;
     
@@ -38,6 +39,8 @@ public enum PRECEDENCE {
 			return PATH;
 		case TIME:
 			return TIME;
+                case MIXED:
+			return MIXED;
 		default:
 			throw new RuntimeException("can't handle " + p);
 		}

@@ -33,8 +33,8 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
  		}
 	}
 	
-	public boolean addMember() {
-		boolean retVal = true;
+	public I_ExtendByRef addMember() {
+		I_ExtendByRef ref = null;
 		
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
@@ -42,42 +42,41 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
 
-				I_ExtendByRef ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+				ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
 			
-				Terms.get().addUncommitted(ref);
-			} 
+				if (ref != null) {
+					Terms.get().addUncommittedNoChecks(ref);
+				}
+			}
 		} catch (Exception io) {
         	AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with error: " + io.getMessage());
-        	retVal = false;
 		}
 
 		fields.cleanValues();
-		return retVal;
+		return ref;
 	}
 
-	public boolean retireMember()  {
-		boolean retVal = false;
+	public I_ExtendByRef retireMember()  {
+		I_ExtendByRef ref = null;
+
 		try {
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 
 			if (fields.valuesExist()) {
 				propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-				I_ExtendByRef ref = helper.getRefsetExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+				ref = helper.getRefsetExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
 
-				retVal = helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
-				
-				Terms.get().addUncommitted(ref);
+				if (ref != null) {
+					helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+					
+					Terms.get().addUncommittedNoChecks(ref);
+				}
 			}
 		} catch (Exception io) {
 			AceLog.getAppLog().log(Level.WARNING, "Failed to retire member with error: " + io.getMessage());
 		}
 		
 		fields.cleanValues();
-		return retVal;
-	}
-	
-	public void commit() throws Exception {
-        Terms.get().addUncommitted(refsetConcept);
-        Terms.get().commit();		
+		return ref;
 	}
 }

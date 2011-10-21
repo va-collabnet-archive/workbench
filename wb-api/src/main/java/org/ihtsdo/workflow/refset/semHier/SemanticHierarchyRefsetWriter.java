@@ -27,11 +27,11 @@ public class SemanticHierarchyRefsetWriter extends WorkflowRefsetWriter {
 	}
 	
 	public void setReferencedComponentId(UUID uid) {
-		setReferencedComponentId(uid);
+		fields.setReferencedComponentUid(uid);
 	}
 		
 	public UUID getReferencedComponentUid() {
-		return getReferencedComponentUid();
+		return fields.getReferencedComponentUid();
 	}
 
 	public void setParentSemanticArea(String area) {

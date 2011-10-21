@@ -32,7 +32,7 @@ import org.dwfa.util.bean.Spec;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
+ 
 @BeanList(specs = { @Spec(
    directory = "tasks/refset/spec",
    type      = BeanType.TASK_BEAN
@@ -65,7 +65,11 @@ public class ConceptIs extends AddStructuralQueryToRefsetSpec {
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   protected int getStructuralQueryTokenId() throws IOException, TerminologyException {
-      return RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid();
+   protected int getStructuralQueryTokenId() throws IOException {
+        try {
+            return RefsetAuxiliary.Concept.CONCEPT_IS.localize().getNid();
+        } catch (TerminologyException ex) {
+            throw new IOException(ex);
+        }
    }
 }

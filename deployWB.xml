@@ -111,7 +111,7 @@
 	
 	<target name="build-wb-profiles" description="delete all eccs files from profiles">	
 		<echo> "build-wb-profiles Called"</echo>	
-		<delete failonerror="true">
+		<delete failonerror="false">
 			<fileset dir="${wb.profiles.dir}" includes="**/*.eccs"/>
 			<fileset dir="${wb.profiles.dir}" includes="**/*.cswe"/>
 			<fileset dir="${wb.profiles.dir}" includes="**/*.cswc"/>

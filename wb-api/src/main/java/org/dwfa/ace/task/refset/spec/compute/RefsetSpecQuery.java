@@ -295,7 +295,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     @Override
     public I_RepresentIdSet getPossibleConcepts(final I_RepresentIdSet parentPossibleConcepts,
             Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+            throws IOException, ComputationCanceled {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
@@ -419,7 +419,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     activity.complete();
                     activity.setProgressInfoLower("Spec is invalid - dangling "
                             + groupingType + ".");
-                    throw new TerminologyException("Spec is invalid - dangling "
+                    throw new IOException("Spec is invalid - dangling "
                             + groupingType + ".\n" + this.toString());
                 }
 
@@ -439,7 +439,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 }
                 break;
             default:
-                throw new TerminologyException("Unknown grouping type.");
+                throw new IOException("Unknown grouping type.");
         }
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
@@ -875,7 +875,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     @Override
     public I_RepresentIdSet getPossibleDescriptions(I_RepresentIdSet parentPossibleDescriptions,
             Collection<I_ShowActivity> activities)
-            throws TerminologyException, IOException, ComputationCanceled {
+            throws IOException, ComputationCanceled {
 
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -946,23 +946,23 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case CONCEPT_CONTAINS_DESC:
                 activity.complete();
                 activity.setProgressInfoLower("Concept-contains-desc is not supported within a description refset calculation.");
-                throw new TerminologyException("Concept-contains-desc is not supported within a description refset calculation.");
+                throw new IOException("Concept-contains-desc is not supported within a description refset calculation.");
             case NOT_CONCEPT_CONTAINS_DESC:
                 activity.complete();
                 activity.setProgressInfoLower("NOT Concept-contains-desc is not supported within a description refset calculation.");
-                throw new TerminologyException(
+                throw new IOException(
                         "NOT Concept-contains-desc is not supported within a description refset calculation.");
             case CONCEPT_CONTAINS_REL:
                 activity.complete();
                 activity.setProgressInfoLower("Concept-contains-rel is not supported within a description refset calculation.");
-                throw new TerminologyException("Concept-contains-rel is not supported within a description refset calculation.");
+                throw new IOException("Concept-contains-rel is not supported within a description refset calculation.");
             case NOT_CONCEPT_CONTAINS_REL:
                 activity.complete();
                 activity.setProgressInfoLower("NOT Concept-contains-rel is not supported within a description refset calculation.");
-                throw new TerminologyException(
+                throw new IOException(
                         "NOT Concept-contains-rel is not supported within a description refset calculation.");
             default:
-                throw new TerminologyException("Unknown grouping type.");
+                throw new IOException("Unknown grouping type.");
         }
         long elapsedTime = System.currentTimeMillis() - startTime;
         long minutes = elapsedTime / 60000;
@@ -988,8 +988,8 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     @Override
     public I_RepresentIdSet getPossibleRelationships(I_RepresentIdSet parentPossibleConcepts,
-            Collection<I_ShowActivity> activities) throws TerminologyException, IOException {
-        throw new TerminologyException("Get possible relationships unimplemented.");
+            Collection<I_ShowActivity> activities) throws IOException {
+        throw new IOException("Get possible relationships unimplemented.");
     }
 
     public class StopActionListener implements ActionListener {

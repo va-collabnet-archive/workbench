@@ -49,7 +49,10 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 		return getReferencedComponentUid();
 	}
 
-	
+	public void setWorkflowType(UUID uid) {
+		((StateTransitionRSFields)fields).setWorkflowType(uid);
+	}
+
 	
 	public void setWorkflowType(I_GetConceptData type) {
 		((StateTransitionRSFields)fields).setWorkflowType(type.getPrimUuid());

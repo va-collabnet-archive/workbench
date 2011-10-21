@@ -40,6 +40,8 @@ import org.ihtsdo.tk.api.ConceptContainerBI;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @BeanList(specs = { @Spec(
    directory = "tasks/refset/spec",
@@ -68,46 +70,54 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
 
    //~--- get methods ---------------------------------------------------------
 
-   protected int getRefsetPartTypeId() throws IOException, TerminologyException {
-      int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid();
+   protected int getRefsetPartTypeId() throws IOException {
+        try {
+            int typeId = RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION.localize().getNid();
 
-      return typeId;
+            return typeId;
+        } catch (TerminologyException terminologyException) {
+            throw new IOException(terminologyException);
+        } 
    }
 
    @Override
    protected RefsetPropertyMap getRefsetPropertyMap(I_TermFactory tf, I_ConfigAceFrame configFrame)
-           throws IOException, TerminologyException {
-      RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID_CID);
+           throws IOException {
+        try {
+            RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID_CID_CID);
 
-      if (getClauseIsTrue()) {
-         refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
-      } else {
-         refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
-      }
+            if (getClauseIsTrue()) {
+               refsetMap.put(REFSET_PROPERTY.CID_ONE, trueNid);
+            } else {
+               refsetMap.put(REFSET_PROPERTY.CID_ONE, falseNid);
+            }
 
-      refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
-      refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
+            refsetMap.put(REFSET_PROPERTY.CID_TWO, getStructuralQueryTokenId());
+            refsetMap.put(REFSET_PROPERTY.STATUS, configFrame.getDefaultStatus().getNid());
 
-      if (getStructuralQueryTokenId() == RefsetAuxiliary.Concept.DESC_IS.localize().getNid()) {
-         if (c3Description == null) {
-            refsetMap.put(
-                REFSET_PROPERTY.CID_THREE,
-                configFrame.getHierarchySelection().getDescriptions().iterator().next().getDescId());
-         } else {
-            refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getDescId());
-         }
-      } else {
-         if (c3Description == null) {
-            ConceptContainerBI node =
-               (ConceptContainerBI) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
+            if (getStructuralQueryTokenId() == RefsetAuxiliary.Concept.DESC_IS.localize().getNid()) {
+               if (c3Description == null) {
+                  refsetMap.put(
+                      REFSET_PROPERTY.CID_THREE,
+                      configFrame.getHierarchySelection().getDescriptions().iterator().next().getDescId());
+               } else {
+                  refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getDescId());
+               }
+            } else {
+               if (c3Description == null) {
+                  ConceptContainerBI node =
+                     (ConceptContainerBI) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
 
-            refsetMap.put(REFSET_PROPERTY.CID_THREE, node.getCnid());
-         } else {
-            refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getConceptNid());
-         }
-      }
+                  refsetMap.put(REFSET_PROPERTY.CID_THREE, node.getCnid());
+               } else {
+                  refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getConceptNid());
+               }
+            }
 
-      return refsetMap;
+            return refsetMap;
+        } catch (TerminologyException terminologyException) {
+            throw new IOException(terminologyException);
+        } 
    }
 
    protected int getStructuralQueryTokenId() throws IOException, TerminologyException {

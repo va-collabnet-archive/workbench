@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -62,6 +63,7 @@ public class AdvanceWorkflow extends AbstractTask {
     			{
     				WorkflowHelper.setAdvancingWorkflowLock(true);
     				writer.updateWorkflowHistory(bean);
+	                Terms.get().commit();
     				WorkflowHelper.setAdvancingWorkflowLock(false);
     				
         	        return Condition.CONTINUE;

@@ -66,7 +66,6 @@ public class InitializeSemanticTagsRefset implements I_InitializeWorkflowRefset 
     			}
 	        }
 
-	    	Terms.get().addUncommitted(writer.getRefsetConcept());
 	    	return true;
     	} catch (Exception e) {
         	AceLog.getAppLog().log(Level.WARNING, "Unable to import this row into semantic tag refset: " + line);

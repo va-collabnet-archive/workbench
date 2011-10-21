@@ -50,7 +50,7 @@
 	<column>
 		<name>modifierId</name>
 		<description></description>
-		<delimiter>\r\n</delimiter>
+		<delimiter>\t</delimiter>
 	</column>
 	<column>
 		<name>authorName</name>

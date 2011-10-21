@@ -35,7 +35,7 @@ public  class EditorCategoryRefsetReader extends WorkflowRefsetReader
 *
 */
 
-	protected String getSemanticTag(String props) {
+	public String getSemanticTag(String props) {
 		String key = "semanticArea";
 		return getProp(key, props);
 	}
@@ -44,7 +44,7 @@ public  class EditorCategoryRefsetReader extends WorkflowRefsetReader
 		return getConcept("editorCategory", props);
 	}
 	
-	public UUID getEditorCategoryuID(String props) throws NumberFormatException, TerminologyException, IOException {
+	public UUID getEditorCategoryUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("editorCategory", props);
 	}
 }

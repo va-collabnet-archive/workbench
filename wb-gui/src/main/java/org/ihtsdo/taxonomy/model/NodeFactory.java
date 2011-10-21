@@ -133,7 +133,8 @@ public class NodeFactory {
    }
 
    public CountDownLatch makeChildNodes(TaxonomyNode parentNode) throws IOException, Exception {
-      if (parentNode.isSecondaryParentNode()) {
+       
+      if (parentNode == null || parentNode.isSecondaryParentNode()) {
          return new CountDownLatch(0);
       }
 

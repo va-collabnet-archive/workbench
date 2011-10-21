@@ -41,6 +41,8 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -102,6 +104,7 @@ public class WorkflowHelper {
 	private static boolean wfCapabilitiesAvailable = false;
 	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
+	private static HashSet<UUID> wfRefsetUidList = null;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
@@ -136,9 +139,9 @@ public class WorkflowHelper {
 			UUID currentWfId = bean.getWorkflowId();
 			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
-			retireRow(bean);
+			I_ExtendByRef ref = retireRow(bean);
 
-			if (precedingCommitExists) {
+			if (ref != null && precedingCommitExists) {
 				// Just retired preceding commit
 		    	WorkflowHistoryJavaBean latestBean = getLatestWfHxJavaBeanForConcept(Terms.get().getConcept(bean.getConcept()));
 
@@ -152,7 +155,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	private static void retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+	private static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
 		WorkflowHistoryRefsetWriter writer;
 		writer = new WorkflowHistoryRefsetWriter();
 
@@ -176,9 +179,9 @@ public class WorkflowHelper {
 		writer.setAutoApproved(bean.getAutoApproved());
 		writer.setOverride(bean.getOverridden());
 		
-        writer.retireMember();
-		Terms.get().addUncommitted(writer.getRefsetConcept());
-		Terms.get().commit();
+		I_ExtendByRef ref = writer.retireMember();
+
+		return ref;
 	}
 
 	public static void updateModelers(ViewCoordinate vc) 
@@ -1039,29 +1042,24 @@ public class WorkflowHelper {
 			
 			long latestTimestamp = 0;
 			String currentWorkflowId = null;
-	
-			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
+				
+			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
 			
-			for (I_ExtendByRef row : members) {
-				int idx = row.getTuples().size() - 1;
-				if (idx >= 0) {
-					int statusNid = row.getTuples().get(idx).getStatusNid();
-					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
-						if (!ignoredWorkflows.contains(reader.getWorkflowId(((I_ExtendByRefPartStr)row).getStringValue()))) {
-							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
-							
-							if (latestTimestamp == 0 || 
-								(latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId().toString()))) {
-								returnSet.clear();
-								ignoredWorkflows.add(currentWorkflowId);
-								
-								currentWorkflowId = bean.getWorkflowId().toString();
-								latestTimestamp = bean.getWorkflowTime();
-							} 				
-							
-							returnSet.add(bean);
-						}
-					}
+			for (RefexVersionBI<?> m : members) {
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				if (!ignoredWorkflows.contains(reader.getWorkflowId(member.getStr1()))) {
+					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), con.getPrimUuid(), member.getStr1(), member.getTime());
+					
+					if (latestTimestamp == 0 || 
+						(latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId().toString()))) {
+						returnSet.clear();
+						ignoredWorkflows.add(currentWorkflowId);
+						
+						currentWorkflowId = bean.getWorkflowId().toString();
+						latestTimestamp = bean.getWorkflowTime();
+					} 				
+					
+					returnSet.add(bean);
 				}
 			}
 		}
@@ -1080,17 +1078,15 @@ public class WorkflowHelper {
 		if (con != null && workflowId != null) {
 			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
 	
-			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), con.getConceptNid());
+			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
 			
-			for (I_ExtendByRef row : members) {
-				int idx = row.getTuples().size() - 1;
-				if (idx >= 0) {
-					int statusNid = row.getTuples().get(idx).getStatusNid();
-					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
-						if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue())))) {
-							returnSet.add(populateWorkflowHistoryJavaBean(row));
-						}
-					}
+			for (RefexVersionBI<?> m : members) {
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(member.getStr1())))) {
+					returnSet.add(populateWorkflowHistoryJavaBean(member.getNid(), 
+																  Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																  member.getStr1(),
+																  member.getTime()));
 				}
 			}
 		}
@@ -1104,9 +1100,19 @@ public class WorkflowHelper {
 		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
 		int counter = 0;
 		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-		for (I_ExtendByRef row : Terms.get().getRefsetExtensionsForComponent(reader.getRefsetNid(), Terms.get().uuidToNative(uuid))) 
-		{
-			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(row);
+
+
+		I_GetConceptData con = Terms.get().getConcept(uuid);
+		Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
+		
+		for (RefexVersionBI<?> m : members) {
+			RefexStrVersionBI member = (RefexStrVersionBI) m;
+		
+			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
+																		   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																		   member.getStr1(),
+																		   member.getTime());
+			
 			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
 			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
 		}
@@ -1151,19 +1157,15 @@ public class WorkflowHelper {
 		}
 		
 		try {
-			List<? extends I_ExtendByRef> members = 
-					Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getUids()), 
-																concept.getConceptNid());
+			Collection<? extends RefexVersionBI<?>> members = concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
 			
-			for (I_ExtendByRef row : members) {
-				int idx = row.getTuples().size() - 1;
-	
-				if (idx >= 0) {
-					int statusNid = row.getTuples().get(idx).getStatusNid();
-					if ((statusNid == activeNidRf1 || statusNid == activeNidRf2)) {
-						retSet.add(populateWorkflowHistoryJavaBean(row));
-					}
-				}
+			for (RefexVersionBI<?> m : members) {
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
+																  			   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																  			   member.getStr1(),
+																  			   member.getTime());
+				retSet.add(bean);
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Cannot access Workflow History Refset members with error: " + e.getMessage());
@@ -1226,8 +1228,7 @@ public class WorkflowHelper {
 		return bean;
 	}
 
-	public static boolean isActiveAction(
-			Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID action) 
+	public static boolean isActiveAction(Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions, UUID action) 
 	{
 			for (WorkflowHistoryJavaBeanBI bean : possibleActions)
 			{
@@ -1400,6 +1401,23 @@ public class WorkflowHelper {
 		for (String filePath : logFiles.keySet()) {
 			closeLogFile(filePath);
 		}
+	}
+
+	public static Collection<? extends UUID> getRefsetUidList() {
+		if (wfRefsetUidList  == null) {			
+			try {
+				wfRefsetUidList = new HashSet<UUID>();
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.EDITOR_CATEGORY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid());
+				wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid());
+			} catch (Exception e) {
+	
+			}
+		}
+		
+		return wfRefsetUidList;
 	}
 }
  
