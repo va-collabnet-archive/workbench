@@ -240,4 +240,5 @@ public class ArenaEditorToolBar extends JToolBar
 		}
 
 		return false;
+	}
 }
