@@ -865,32 +865,15 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
         PathBI originPath = Terms.get().getPath(commonOriginPathNid.get());
 
         for (UUID refSetUid : wfRefsetList) {
-        	I_ExtendByRef member;
-        	Set<I_ExtendByRef> memberSet = new HashSet<I_ExtendByRef>();
-        	
-        	if (refSetUid.equals(WorkflowHelper.getWorkflowRefsetUid())) {
-				Collection<? extends RefexVersionBI<?>> members = concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), Terms.get().uuidToNative(refSetUid));
-				for (RefexVersionBI<?> m : members) {
-					member = (I_ExtendByRef) m;
-					memberSet.add(member);
-				}
-        	} else {
-		        List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(refSetUid), concept.getConceptNid());
-		
-			    for (int i = 0; i < members.size(); i++) {
-					int idx = members.get(i).getTuples().size() - 1;
-			    	I_ExtendByRefPart part = members.get(i).getMutableParts().get(idx);
-			    	if (part.getStatusNid() != currentStatusNid) {
-			    		continue;
-			    	}
-			    	
-			    	memberSet.add(members.get(i));
-			    }
-        	}
-        	
-        	for (I_ExtendByRef m : memberSet) {
-				int idx = m.getTuples().size() - 1;
-		    	I_ExtendByRefPart part = m.getMutableParts().get(idx);
+	        List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(Terms.get().uuidToNative(refSetUid), concept.getConceptNid());
+	
+		    for (I_ExtendByRef member : members) 
+		    {
+				int idx = member.getTuples().size() - 1;
+		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
+		    	if (part.getStatusNid() != currentStatusNid) {
+		    		continue;
+		    	}
 
 		    	// Identify Adjudication versions and find latest 
 		     	if (part.getPathNid() == viewPathNid.get()) {
@@ -908,12 +891,13 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	 				continue;
 		        }
 		    }
-        	for (I_ExtendByRef m : memberSet) {
+		    for (I_ExtendByRef member : members) 
+		    {
 		    	boolean putIntoMap = false;
 		    	Integer pathNidObj = null;
 	
-				int idx = m.getTuples().size() - 1;
-		    	I_ExtendByRefPart part = m.getMutableParts().get(idx);
+				int idx = member.getTuples().size() - 1;
+		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
 		    	if (part.getStatusNid() != currentStatusNid) {
 		    		continue;
 		    	}
