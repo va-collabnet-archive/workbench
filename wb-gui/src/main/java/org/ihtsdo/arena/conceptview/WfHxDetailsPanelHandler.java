@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.WfHxDetailsPanel;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 
 
 public class WfHxDetailsPanelHandler {
@@ -36,7 +37,7 @@ public class WfHxDetailsPanelHandler {
 	            	I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {
 	                I_GetConceptData con = (I_GetConceptData) termComponent;
 	
-	                regenerateWfPanel(con);
+	                regenerateWfPanel(con, false);
 	            }
             }
         }
@@ -105,21 +106,46 @@ public class WfHxDetailsPanelHandler {
 	    }
     }	    
 
-    protected void regenerateWfPanel(I_GetConceptData concept) {
-    	if (((WfHxDetailsPanel)detailsPanel).isNewHtmlCodeRequired(concept)) {
+    protected boolean regenerateWfPanel(I_GetConceptData concept, boolean newHtmlCodeRquired) {
+    	boolean wfPanelDetailsUpdated = false;
+    	
+    	if (newHtmlCodeRquired || ((WfHxDetailsPanel)detailsPanel).isNewHtmlCodeRequired(concept)) {
         	JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
             layers.remove(detailsPanel);
 
             conceptSettings.getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
     		
             createNewWfPanel();
+            wfPanelDetailsUpdated = true;
+
+            setWfHxLocation();
+            conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
     	}
 
-    	setWfHxLocation();
-        conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+        return wfPanelDetailsUpdated;
     }
 
     public boolean isWfHxDetailsCurrenltyDisplayed() {
     	return currentlyDisplayed;
     }
+    
+	public void regenerateWfData(WorkflowHistoryJavaBeanBI bean) {
+		if (isWfHxDetailsCurrenltyDisplayed()) {
+			JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
+	        layers.remove(detailsPanel);
+	
+	        conceptSettings.getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+	
+	        createRegeneratedWfPanel(bean);
+	
+	    	setWfHxLocation();
+	        conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+		}
+	}
+	
+	private void createRegeneratedWfPanel(WorkflowHistoryJavaBeanBI bean) {
+        detailsPanel = new WfHxDetailsPanel(conceptSettings, viewCoord, bean);
+        detailsPanel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.GRAY));
+        detailsPanel.setOpaque(true);
+	}
 }

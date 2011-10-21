@@ -320,7 +320,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
       }
    }
 
-   public void regenerateWfPanel(I_GetConceptData con) {}
+   public void regenerateWfPanel(I_GetConceptData con, boolean newHtmlCodeRquired) {}
 
    @Override
    protected void setupSubtypes() {

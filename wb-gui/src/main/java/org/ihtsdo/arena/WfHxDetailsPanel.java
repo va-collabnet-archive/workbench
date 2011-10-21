@@ -23,6 +23,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -50,7 +51,7 @@ public class WfHxDetailsPanel extends JPanel {
 
 		// Create Table
     	generateWfHxTable();
-    	setupTablePanel();
+    	setupTablePanel(false);
     	
     	// Create & add Pane ScrollPane 
     	JScrollPane scrollPane = new JScrollPane(table);
@@ -58,7 +59,22 @@ public class WfHxDetailsPanel extends JPanel {
     	add(scrollPane);
 	}
 
-	private void setupTablePanel() {
+	public WfHxDetailsPanel(ConceptViewSettings settings, ViewCoordinate vc, WorkflowHistoryJavaBeanBI bean) {
+		super(new GridLayout(1,1));
+		currentConcept = settings.getConcept();
+		viewCoord = vc;
+
+		// Create Table
+		regenerateWfPanelData(bean);
+    	setupTablePanel(true);
+    	
+    	// Create & add Pane ScrollPane 
+    	JScrollPane scrollPane = new JScrollPane(table);
+    	scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	add(scrollPane);
+	}
+
+	private void setupTablePanel(boolean extraRow) {
     	TableColumn column = null;
     	table.setFillsViewportHeight(true);
 
@@ -91,6 +107,10 @@ public class WfHxDetailsPanel extends JPanel {
     	/* Calculate Preferred tableHeight */
     	// for # rows of data + header
     	int totalRows = getRowCount() + 1; 
+    	
+    	if (extraRow) {
+    		totalRows++;
+    	}
     	
     	// size of rows
     	int rowHeight = table.getRowHeight() * totalRows;
@@ -214,5 +234,68 @@ public class WfHxDetailsPanel extends JPanel {
 
 	public int getRowCount() { 
 		return conceptWfBeans.size();
+	}
+
+	public void regenerateWfPanelData(WorkflowHistoryJavaBeanBI bean) {
+        int counter = 0;
+        boolean colorA = true;
+        UUID currentWfUid = UUID.randomUUID();
+        newWfUidIndices = new ArrayList<Boolean>();
+
+        try {
+			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+
+			conceptWfBeans = WorkflowHelper.getAllWorkflowHistory(currentConcept);
+	        Object[][] data = new Object[conceptWfBeans.size() + 1][];
+
+			for (WorkflowHistoryJavaBean existingBean : conceptWfBeans) {
+	        	String[] row = new String[4];
+	        	
+	        	String action = reader.processMetaForDisplay(Terms.get().getConcept(existingBean.getAction()), viewCoord);
+	    		String state = reader.processMetaForDisplay(Terms.get().getConcept(existingBean.getState()), viewCoord);
+	    		String modeler = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(existingBean.getModeler()), viewCoord);
+	    		String time = WorkflowHelper.format.format(new Date(existingBean.getWorkflowTime()));
+	    		
+	    		row[0] = action;
+	    		row[1] = state;
+	    		row[2] = modeler;
+	    		row[3] = time;
+	    		
+	    		data[counter++] = row;
+	        
+	    		if (!existingBean.getWorkflowId().equals(currentWfUid)) {
+	    			currentWfUid = existingBean.getWorkflowId();
+	    			
+	    			// new Wf Uid, flip color boolean
+	    			colorA = !colorA;
+	    		}
+
+    			newWfUidIndices.add(colorA);
+			}
+	        
+			// latest Bean
+        	String[] row = new String[4];
+
+        	String action = reader.processMetaForDisplay(Terms.get().getConcept(bean.getAction()), viewCoord);
+    		String state = reader.processMetaForDisplay(Terms.get().getConcept(bean.getState()), viewCoord);
+    		String modeler = WorkflowHelper.identifyPrefTerm(Terms.get().uuidToNative(bean.getModeler()), viewCoord);
+    		String time = WorkflowHelper.format.format(new Date(bean.getWorkflowTime()));
+
+    		row[0] = action;
+    		row[1] = state;
+    		row[2] = modeler;
+    		row[3] = time;
+
+    		data[counter++] = row;
+    		
+    		// Must be same wf Id as usage is AdvanceWorkflow only
+			newWfUidIndices.add(colorA);
+			
+			// Create Table and set concept-specific fields
+	        table = new JTable(data, columnNames);
+	        currentLatestTimestamp = conceptWfBeans.last().getWorkflowTime();
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Cannot create WfHx Details Panel Table");
+		}
 	}
 }
