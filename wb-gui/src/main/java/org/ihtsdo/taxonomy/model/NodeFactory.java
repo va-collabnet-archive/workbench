@@ -321,7 +321,7 @@ public class NodeFactory {
                 if ((childFilter == null) || childFilter.pass(parent, possibleChild)) {
                     TaxonomyNode childNode = makeNodeFromScratch(possibleChild, parentNode);
 
-                    if (parentNode.addChild(childNode)) {
+                    if (parentNode.addChild(childNode) && childNode != null) {
                         childNodes.put(childNode);
                     }
                 }
