@@ -259,11 +259,12 @@ public class RulesLibrary {
 								DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
 										UUID.fromString(dtemplate.getComponentUuid()));
 								DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
-								if (dtemplate.getText() != null) {
+								if ( dSpec!= null && dtemplate.getText() != null) {
 									dSpec.setDescText(dtemplate.getText());
+									//TODO: implement other properties
+									results.getWbTemplates().put(dSpec, description.getNid());
 								}
-								//TODO: implement other properties
-								results.getWbTemplates().put(dSpec, description.getNid());
+								
 							}
 						}
 
