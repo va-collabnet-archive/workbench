@@ -2,17 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.ihtsdo.arena.contradiction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -23,6 +26,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.contradiction.ContradictionConceptProcessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -31,28 +35,26 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  *
  * @author kec
  */
+public class ContradictionFinderSwingWorker
+        extends SwingWorker<Set<Integer>, Integer> {
 
-public class ContradictionFinderSwingWorker 
-	extends SwingWorker<Set<Integer>, Integer> {
-    
-	private TerminologyListModel conflicts;
+    private TerminologyListModel conflicts;
     private final I_ShowActivity actvityPanel;
-	private ViewCoordinate viewCoord;
-	private ContradictionEditorFrame frame;
+    private ViewCoordinate viewCoord;
+    private ContradictionEditorFrame frame;
     ContradictionFinderStopActionListener stopListener = new ContradictionFinderStopActionListener();
-
     private int contradictionsFoundCount;
-    
     private boolean continueWork;
-	private CountDownLatch completeLatch;
-	private ContradictionConceptProcessor ccp;
-	private Locale locale;
-	private double numberConceptsToProcess;
+    private CountDownLatch completeLatch;
+    private ContradictionConceptProcessor ccp;
+    private Locale locale;
+    private double numberConceptsToProcess;
 
-	/* ContradictionUpdator */
+    /* ContradictionUpdator */
     private class ContradictionUpdator implements ActionListener {
+
         Timer updateTimer;
-        
+
         public ContradictionUpdator() {
             super();
             updateTimer = new Timer(100, this);
@@ -65,33 +67,31 @@ public class ContradictionFinderSwingWorker
             }
 //            updateMatches();
         }
-
     }
 
     /* ContradictionFinderStopActionListener */
-	private class ContradictionFinderStopActionListener implements ActionListener {
-	
-		public void actionPerformed(ActionEvent e) {
-	        continueWork = false;
-	        AceLog.getAppLog().info("Search canceled by user");
+    private class ContradictionFinderStopActionListener implements ActionListener {
+
+        public void actionPerformed(ActionEvent e) {
+            continueWork = false;
+            AceLog.getAppLog().info("Search canceled by user");
             frame.setProgressInfo("Search canceled.  Ready to run again.");
-	        frame.setProgressIndeterminate(false);
-	        frame.setProgressValue(0);
-	        frame.enableStopButton(false);
-	        if (completeLatch != null) {
-	            while (completeLatch.getCount() > 0) {
-	                completeLatch.countDown();
-	            }
-	        }
-	    }
-	}
+            frame.setProgressIndeterminate(false);
+            frame.setProgressValue(0);
+            frame.enableStopButton(false);
+            if (completeLatch != null) {
+                while (completeLatch.getCount() > 0) {
+                    completeLatch.countDown();
+                }
+            }
+        }
+    }
 
     /* LuceneWfHxProgressUpdator */
     public class ContradictionProgressUpdator implements I_UpdateProgress {
+
         Timer updateTimer;
-
         boolean firstUpdate = true;
-
         private Integer hits = null;
 
         public ContradictionProgressUpdator() {
@@ -99,10 +99,10 @@ public class ContradictionFinderSwingWorker
             updateTimer = new Timer(100, this);
             updateTimer.start();
         }
-       
+
         public void actionPerformed(ActionEvent e) {
             if (continueWork) {
-            	// If running
+                // If running
                 if (firstUpdate) {
                     if (hits == null) {
                         frame.setProgressIndeterminate(true);
@@ -110,7 +110,7 @@ public class ContradictionFinderSwingWorker
                     frame.setProgressMaximum(contradictionsFoundCount);
                     firstUpdate = false;
                 }
-                
+
                 if (completeLatch != null) {
                     if (hits != null) {
                         frame.setProgressIndeterminate(false);
@@ -120,18 +120,18 @@ public class ContradictionFinderSwingWorker
                 } else {
                     AceLog.getAppLog().info("completeLatch is null");
                 }
-                
+
                 int numberFound = ccp.getNumberContradictionsFound().get();
                 String percentageStr = new String(" with " + createPercentage() + " concepts processed");
                 String progressStr;
-                
+
                 if (numberFound == 0) {
-                	progressStr = "None found" + percentageStr;
+                    progressStr = "None found" + percentageStr;
                 } else {
-                	progressStr = numberFound + " found" + percentageStr;
+                    progressStr = numberFound + " found" + percentageStr;
                 }
-                
-            	frame.setProgressInfo(progressStr);
+
+                frame.setProgressInfo(progressStr);
 
                 if (hits != null && completeLatch.getCount() == 0) {
                     normalCompletion();
@@ -142,18 +142,17 @@ public class ContradictionFinderSwingWorker
         }
 
         private String createPercentage() {
-            int numberProcessed = ccp.getNumberConceptsProcessed().get();								
+            int numberProcessed = ccp.getNumberConceptsProcessed().get();
 
             NumberFormat percentFormatter;
- 
-        	percentFormatter = NumberFormat.getPercentInstance(locale);
-        	String percentOut = percentFormatter.format(new Double(numberProcessed / numberConceptsToProcess));
-        	
-        	return percentOut;
+
+            percentFormatter = NumberFormat.getPercentInstance(locale);
+            String percentOut = percentFormatter.format(new Double(numberProcessed / numberConceptsToProcess));
+
+            return percentOut;
         }
 
-
-		public void setIndeterminate(boolean value) {
+        public void setIndeterminate(boolean value) {
             frame.setProgressIndeterminate(value);
         }
 
@@ -165,12 +164,12 @@ public class ContradictionFinderSwingWorker
                 firstUpdate = false;
             }
             frame.setProgressValue(0);
-            
+
             int numberFound = ccp.getNumberContradictionsFound().get();
             if (numberFound == 0) {
-            	frame.setProgressInfo("No Contradictions Detected");
+                frame.setProgressInfo("No Contradictions Detected");
             } else {
-            	frame.setProgressInfo("Finished having detected" + numberFound + " Contradictions");
+                frame.setProgressInfo("Finished having detected" + numberFound + " Contradictions");
             }
         }
 
@@ -187,16 +186,14 @@ public class ContradictionFinderSwingWorker
         public boolean continueWork() {
             return continueWork;
         }
-
     }
 
-    
     /*
      * ContradictionFinderSwingWorker Class Methods
      */
     public ContradictionFinderSwingWorker(ContradictionEditorFrame editorFrame, ViewCoordinate vc) {
         this.frame = editorFrame;
-        this.conflicts =  (TerminologyListModel) frame.getBatchConceptList().getModel();
+        this.conflicts = (TerminologyListModel) frame.getBatchConceptList().getModel();
         this.viewCoord = vc;
         this.actvityPanel = Terms.get().newActivityPanel(true, null, "Identifying conflicts", true);
 
@@ -206,8 +203,8 @@ public class ContradictionFinderSwingWorker
 
     @Override
     protected Set<Integer> doInBackground() throws Exception {
-    	
-    	// Setup Listeners
+
+        // Setup Listeners
         contradictionsFoundCount = Integer.MAX_VALUE;
         numberConceptsToProcess = Terms.get().getConceptCount();
         ContradictionProgressUpdator updator = new ContradictionProgressUpdator();
@@ -231,13 +228,13 @@ public class ContradictionFinderSwingWorker
 
         // Iterate in Parallel
         Ts.get().iterateConceptDataInParallel(ccp);
-      
+
         // Done, get results
         Set<Integer> returnSet = new HashSet<Integer>();
         returnSet.addAll(ccp.getResults().getConflictingNids());
         returnSet.addAll(ccp.getResults().getDuplicateNewNids());
         returnSet.addAll(ccp.getResults().getDuplicateEditNids());
-        
+
         // Update Listeners
         continueWork = false;
         updator.setHits(returnSet.size());
@@ -255,17 +252,15 @@ public class ContradictionFinderSwingWorker
         return returnSet;
     }
 
-
     @Override
     protected void done() {
         try {
             Set<Integer> conflictingNids = get();
             conflictingNids.removeAll(conflicts.getNidsInList());
-            for (Integer cnid: conflictingNids) {
-                conflicts.addElement((I_GetConceptData) 
-                        Ts.get().getConcept(cnid));
+            for (Integer cnid : conflictingNids) {
+                conflicts.addElement((I_GetConceptData) Ts.get().getConcept(cnid));
             }
-            
+
             if (continueWork) {
                 continueWork = false;
                 get();
@@ -276,25 +271,32 @@ public class ContradictionFinderSwingWorker
             frame.enableStopButton(false);
             frame.setProgressValue(0);
 
-            
+
             int numberFound = ccp.getNumberContradictionsFound().get();
             if (numberFound == 0) {
-            	frame.setProgressInfo("Finished with no contradictions detected");
+                frame.setProgressInfo("Finished with no contradictions detected");
             } else if (numberFound == 1) {
-            	frame.setProgressInfo("Finished with " + numberFound + " contradiction detected");
+                frame.setProgressInfo("Finished with " + numberFound + " contradiction detected");
             } else {
-            	frame.setProgressInfo("Finished with " + numberFound + " contradictions detected");
+                frame.setProgressInfo("Finished with " + numberFound + " contradictions detected");
             }
 
             actvityPanel.complete();
-        } catch (Exception ex) {
+        } catch (InterruptedException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (ExecutionException ex) {
+            if (ex.getCause() instanceof ComputationCanceled) {
+                // Nothing to do
+            } else {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        } catch (ComputationCanceled ex) {
+            // Nothing to do
         }
     }
-    
+
     public void updateMatches() {
-
     }
-
-
 }

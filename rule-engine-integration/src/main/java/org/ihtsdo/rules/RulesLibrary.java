@@ -302,7 +302,7 @@ public class RulesLibrary {
 				try {
 					activity.complete();
 				} catch (ComputationCanceled e1) {
-					e1.printStackTrace();
+					// Nothing to do
 				}
 				e.printStackTrace();
 			}
@@ -319,7 +319,7 @@ public class RulesLibrary {
 			try {
 				activity.complete();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 			config.setStatusMessage("");
 		}
@@ -652,7 +652,7 @@ public class RulesLibrary {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();
@@ -719,7 +719,7 @@ public class RulesLibrary {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();

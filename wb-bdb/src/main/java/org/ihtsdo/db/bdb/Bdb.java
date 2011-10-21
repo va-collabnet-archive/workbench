@@ -520,7 +520,7 @@ public class Bdb {
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (ComputationCanceled e) {
-                AceLog.getAppLog().alertAndLogException(e);
+                // Nothing to do 
             }
         }
     }

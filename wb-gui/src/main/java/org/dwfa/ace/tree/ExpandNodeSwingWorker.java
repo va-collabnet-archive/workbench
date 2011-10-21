@@ -602,7 +602,7 @@ public class ExpandNodeSwingWorker extends SwingWorker<Object> implements Action
                activity.complete();
             } catch (ComputationCanceled e1) {
 
-               // ;
+               // Nothing to do
             }
 
             updateTimer.stop();

@@ -293,7 +293,7 @@ public class GetSearchCriterionFromWorkflowDetailsPanelAndSearch extends
 				try {
                     activity.complete();
                 } catch (ComputationCanceled e1) {
-                   // canceled;
+                   // Nothing to do
                 }
 				updateTimer.stop();
 			}
