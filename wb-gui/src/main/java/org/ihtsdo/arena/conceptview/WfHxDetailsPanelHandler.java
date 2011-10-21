@@ -109,17 +109,19 @@ public class WfHxDetailsPanelHandler {
     protected boolean regenerateWfPanel(I_GetConceptData concept, boolean newHtmlCodeRquired) {
     	boolean wfPanelDetailsUpdated = false;
     	
-    	if (newHtmlCodeRquired || ((WfHxDetailsPanel)detailsPanel).isNewHtmlCodeRequired(concept)) {
-        	JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
-            layers.remove(detailsPanel);
-
-            conceptSettings.getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
-    		
-            createNewWfPanel();
-            wfPanelDetailsUpdated = true;
-
-            setWfHxLocation();
-            conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+    	if (detailsPanel != null) {
+	    	if (newHtmlCodeRquired || ((WfHxDetailsPanel)detailsPanel).isNewHtmlCodeRequired(concept)) {
+	        	JLayeredPane layers = conceptPanelRenderer.getRootPane().getLayeredPane();
+	            layers.remove(detailsPanel);
+	
+	            conceptSettings.getHost().removePropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+	    		
+	            createNewWfPanel();
+	            wfPanelDetailsUpdated = true;
+	
+	            setWfHxLocation();
+	            conceptSettings.getHost().addPropertyChangeListener(I_HostConceptPlugins.TERM_COMPONENT, currentListener);
+	    	}
     	}
 
         return wfPanelDetailsUpdated;
