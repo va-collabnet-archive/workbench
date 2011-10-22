@@ -218,6 +218,10 @@ public class BdbCommitManager {
       RefsetMember<?, ?> member = (RefsetMember<?, ?>) extension;
 
       addUncommittedNoChecks(member.getEnclosingConcept());
+
+      if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+          handleWorkflowHistoryExtensions(extension);
+       }
    }
 
    public static void addUncommittedNoChecks(I_GetConceptData concept) {
