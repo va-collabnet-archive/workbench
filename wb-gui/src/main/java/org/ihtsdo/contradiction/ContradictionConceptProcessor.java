@@ -45,7 +45,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         actvityPanel.setIndeterminate(false);
         
         this.activityMonitor = actvityPanel;
-        initEditPath();
+        detector.setAdjudicationPath(initEditPath());
         
         storeUncommitted();
      }
@@ -126,7 +126,7 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         return true;
     }
 
-    private void initEditPath() {
+    private PathBI initEditPath() {
     	try {
 			// Prepare Adjudication Changes
 			Set<PathBI> editPaths = Terms.get().getActiveAceFrameConfig().getEditingPathSet();
@@ -137,13 +137,14 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
 				I_GetConceptData path = Terms.get().getConcept(paths.get(i).getConceptNid());
 				if (path.getInitialText().equalsIgnoreCase("ajudication path") && 
 					!path.equals(Terms.get().getActiveAceFrameConfig().getEditingPathSet().iterator().next())) {
-					Terms.get().getActiveAceFrameConfig().replaceEditingPath(origPath.get(), paths.get(i));
-					break;
+					return paths.get(i);
 				}
 			}
 		} catch (Exception e) {
 			
 		}
+		
+		return null;
     }
 
     private void revertEditPath() {
