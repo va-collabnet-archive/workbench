@@ -633,6 +633,10 @@ public class WorkflowHelper {
     }
     
     public static boolean isCommitWorkflowAction(ConceptVersionBI actionConcept) {
+    	return isCommitWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isCommitWorkflowAction(UUID actionConcept) {
     	if (commitWorkflowActions  == null)
 		{
     		commitWorkflowActions = new HashSet<UUID>();
@@ -655,14 +659,17 @@ public class WorkflowHelper {
 		}
 
     	if (commitWorkflowActions != null && actionConcept != null) {
-    		return (commitWorkflowActions.contains(actionConcept.getPrimUuid()));
+    		return (commitWorkflowActions.contains(actionConcept));
     	} else {
     		return false;
     	}
     }
     
     public static boolean isEndWorkflowAction(ConceptVersionBI actionConcept) {
-		
+    	return isEndWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isEndWorkflowAction(UUID actionConcept) {
     	if (endWorkflowActionUid  == null && actionConcept != null)
 		{
 			try
@@ -685,7 +692,7 @@ public class WorkflowHelper {
 		}
 
     	if (endWorkflowActionUid != null && actionConcept != null) {
-    		return (endWorkflowActionUid.equals(actionConcept.getPrimUuid()));
+    		return (endWorkflowActionUid.equals(actionConcept));
     	} else {
     		return false;
     	}
@@ -904,6 +911,10 @@ public class WorkflowHelper {
     }
 
 	public static boolean isEndWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+		return isEndWorkflowState(stateConcept.getPrimUuid());
+	}
+	
+	public static boolean isEndWorkflowState(UUID stateConcept) throws IOException, TerminologyException {
     	if (endWorkflowStateUid  == null)
 		{
     		// TODO: Remove hardcode and add to metadata
@@ -911,13 +922,17 @@ public class WorkflowHelper {
 		}
 
     	if (endWorkflowStateUid != null && stateConcept != null) {
-    		return (endWorkflowStateUid.equals(stateConcept.getPrimUuid()));
+    		return (endWorkflowStateUid.equals(stateConcept));
     	} else {
     		return false;
     	}
     }
     	
 	public static boolean isBeginWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+		return isBeginWorkflowState(stateConcept.getPrimUuid());
+	}
+	
+	public static boolean isBeginWorkflowState(UUID stateConcept) throws IOException, TerminologyException {
     	if (beginWorkflowStateUids  == null)
 		{
     		beginWorkflowStateUids = new HashSet<UUID>();
@@ -940,7 +955,7 @@ public class WorkflowHelper {
 		}
 
     	if (beginWorkflowStateUids != null && stateConcept != null) {
-    		return (beginWorkflowStateUids.contains(stateConcept.getPrimUuid()));
+    		return (beginWorkflowStateUids.contains(stateConcept));
     	} else {
     		return false;
     	}
