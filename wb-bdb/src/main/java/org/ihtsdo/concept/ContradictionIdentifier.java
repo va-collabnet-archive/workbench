@@ -1344,7 +1344,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					bean.setPath(Terms.get().getActiveAceFrameConfig().getEditingPathSetReadOnly().iterator().next().getUUIDs().get(0));
 					
 					// Add latest Dev Version Bean on Adjudication Path
-					refsetWriter.updateWorkflowHistory(bean);
+					refsetWriter.updateWorkflowHistory(bean, bean.getModeler(), bean.getWorkflowTime());
 					WorkflowHelper.setAdvancingWorkflowLock(false);
 				}
 			} else {
