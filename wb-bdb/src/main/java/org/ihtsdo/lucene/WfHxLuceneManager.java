@@ -62,8 +62,10 @@ public class WfHxLuceneManager extends LuceneManager {
 							lastBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(con, bean.getWorkflowId());
 				            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
 	
-				            wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(bean, vals));
-						} catch (TerminologyException e) {
+				            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
+				            	wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, vals));
+				            }
+			            } catch (TerminologyException e) {
 						    AceLog.getAppLog().log(Level.WARNING, "Failed adding WfId: " + bean.getWorkflowId() + " for concept: " + bean.getFSN() + " to lucene index");
 						}
 					
