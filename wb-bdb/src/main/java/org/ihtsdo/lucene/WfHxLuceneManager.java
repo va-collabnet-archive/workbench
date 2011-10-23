@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -67,6 +68,16 @@ public class WfHxLuceneManager extends LuceneManager {
 		wfHxSearcher = null;
     }
 
+	public static boolean refsetMemberIdExists(UUID memberId) throws CorruptIndexException, IOException, ParseException {
+        
+		WfHxQueryParser wfHxParser = new WfHxQueryParser(true, true);
+		Query wfQuery = wfHxParser.getRefsetMemberIdQuery(memberId.toString());
+        
+        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+		
+		return result.topDocs.totalHits != 0;
+	}
+	
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
         
