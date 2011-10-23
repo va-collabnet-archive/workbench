@@ -54,7 +54,7 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		return null;
 	}
 
-	public TreeSet<WorkflowHistoryJavaBean> getAllHistoryForWorkflowId(Concept concept, UUID wfId) {
+	public TreeSet<WorkflowHistoryJavaBean> getAllHistoryForWorkflowId(I_GetConceptData concept, UUID wfId) {
 		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
 
 		try {

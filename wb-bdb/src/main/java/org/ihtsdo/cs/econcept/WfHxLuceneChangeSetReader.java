@@ -21,7 +21,6 @@ import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
 import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
@@ -33,6 +32,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -43,48 +43,29 @@ import com.sleepycat.je.DatabaseException;
  * @author Jesse Efron
  */
 public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
-
-    /**
-	 *
-	 */
     private static final long serialVersionUID = 1L;
 
     private File changeSetFile;
-
     private File csreFile;
-    private transient FileWriter csreOut;
     private File csrcFile;
+    private DataInputStream dataStream;
+    private transient FileWriter csreOut;
     private transient FileWriter csrcOut;
 
     private I_Count counter;
 
-    private DataInputStream dataStream;
-
     private int count = 0;
-
     private int conceptCount = 0;
-
     private int unvalidated = 0;
-
-    private boolean initialized = false;
-
     private Long nextCommit;
-    private String nextCommitStr;
     private boolean noCommit = false;
-
-    public boolean isNoCommit() {
-        return noCommit;
-    }
-
-    public void setNoCommit(boolean noCommit) {
-        this.noCommit = noCommit;
-    }
-
-    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
-
+    private boolean initialized = false;
+    private String nextCommitStr;
+	private final String wfPropertySuffix = "-WF";
 	private UUID workflowHistoryRefsetUid;
 
-	private final String wfPropertySuffix = "-WF";
+    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
+	private static HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefsetAbstractMember<?>>();
 
 	public WfHxLuceneChangeSetReader() {
         super();
@@ -99,16 +80,20 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public long nextCommitTime() throws IOException, ClassNotFoundException {
         lazyInit();
-        if (nextCommit == null) {
-            try {
-                nextCommit = dataStream.readLong();
-                assert nextCommit != Long.MAX_VALUE;
-                nextCommitStr = TimeHelper.getFileDateFormat().format(new Date(nextCommit));
-            } catch (EOFException e) {
-                AceLog.getAppLog().info("No next commit time for file: " + changeSetFile);
-                nextCommit = Long.MAX_VALUE;
-                nextCommitStr = "end of time";
-            }
+        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
+        	return Long.MAX_VALUE; 
+        } else {
+        	if (nextCommit == null) {
+	            try {
+	                nextCommit = dataStream.readLong();
+	                assert nextCommit != Long.MAX_VALUE;
+	                nextCommitStr = TimeHelper.getFileDateFormat().format(new Date(nextCommit));
+	            } catch (EOFException e) {
+	                AceLog.getAppLog().info("No next commit time for file: " + changeSetFile);
+	                nextCommit = Long.MAX_VALUE;
+	                nextCommitStr = "end of time";
+	            }
+	        }
         }
         return nextCommit;
     }
@@ -121,6 +106,12 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
                 "Reading from log " + changeSetFile.getName() + " until " +
                 TimeHelper.getFileDateFormat().format(new Date(endTime)));
         }
+        
+        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
+        	updateLuceneIndex();
+        	return;
+        } 
+        
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 EConcept eConcept = new EConcept(dataStream);
@@ -183,7 +174,9 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
             }
         }
         Concept.resolveUnresolvedAnnotations();
-        try {
+
+
+   		try {
             if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                 AceLog.getEditLog().fine("Committing time branches: " + values);
             }
@@ -199,44 +192,6 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public void read() throws IOException, ClassNotFoundException {
         readUntil(Long.MAX_VALUE);
-    }
-
-
-    private void updateWfHxLuceneIndex(EConcept eConcept, long time, Set<TimePathId> values) throws IOException,
-            ClassNotFoundException {
-        if (!noCommit) {
-	        try {
-	            assert time != Long.MAX_VALUE;
-                Set<I_ExtendByRef> wfMembersToCommit = new HashSet<I_ExtendByRef>();
-
-                if (eConcept.getRefsetMembers() != null) {
-            		for (TkRefsetAbstractMember<?>  member : eConcept.getRefsetMembers()) {
-            			if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
- 
-                            int memberId = Terms.get().uuidToNative(member.getUuids());
-            				try {
-	                            Object unknownClass = Terms.get().getExtension(memberId);
-	                            I_ExtendByRef ref = (I_ExtendByRef)unknownClass;
-	                            wfMembersToCommit.add(ref);
-            				} catch (Exception e) {
-            		            AceLog.getAppLog().log(Level.WARNING, "Failed getting extension with memberId: " + memberId);
-            			    }
-            			}
-            		}
-
-            		if (wfMembersToCommit.size() > 0) {
-            			Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
-		                if (luceneWriter != null) {
-		                	luceneWriter.run();
-		                }
-            		}
-        		}
-	        } catch (Exception e) {
-	            AceLog.getEditLog().severe(
-	                "Error committing bean in change set: " + changeSetFile + "\nUniversalAceBean:  \n" + eConcept);
-	            throw new ToIoException(e);
-	        }
-        }
     }
 
     private void lazyInit() throws FileNotFoundException, IOException, ClassNotFoundException {
@@ -314,4 +269,51 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
         return 0;
     }
 
+   	public boolean isNoCommit() {
+       	return noCommit;
+   	}
+
+   	public void setNoCommit(boolean noCommit) {
+   		this.noCommit = noCommit;
+   	}
+
+
+   	private void updateLuceneIndex() {
+		if (wfMembersToCommit.size() > 0) {
+			try {
+				Runnable  luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithEConcept(wfMembersToCommit);
+				if (luceneWriter != null) {
+	   				luceneWriter.run();
+	            }        
+			} catch (InterruptedException e) {
+		        AceLog.getAppLog().log(Level.WARNING, "Failed to generate WfHx Lucene Index on Change Set Import");
+			}
+		}
+	}
+
+   	private void updateWfHxLuceneIndex(EConcept eConcept, long time, Set<TimePathId> values) throws IOException, ClassNotFoundException {
+	   try {
+	       assert time != Long.MAX_VALUE;
+
+	       if (eConcept.getRefsetMembers() != null) {
+		   		for (TkRefsetAbstractMember<?>  member : eConcept.getRefsetMembers()) {
+		   			if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
+		   				try {
+		       				if (!WorkflowHelper.getLuceneChangeSetStorage().contains(member.getPrimordialComponentUuid()))	
+		       				{
+		       					wfMembersToCommit.add(member);
+		       					WorkflowHelper.getLuceneChangeSetStorage().add(member.getPrimordialComponentUuid());
+		       				}
+		   				} catch (Exception e) {
+		   		            AceLog.getAppLog().log(Level.WARNING, "Failed getting extension with memberId: " + member.getPrimordialComponentUuid());
+		   			    }
+		   			}
+		   		}
+	       	}
+	   } catch (Exception e) {
+	       AceLog.getEditLog().severe(
+	           "Error committing bean in change set: " + changeSetFile + "\nUniversalAceBean:  \n" + eConcept);
+	       throw new ToIoException(e);
+	   }
+    }
 }

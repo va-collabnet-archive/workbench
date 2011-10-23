@@ -101,6 +101,8 @@ public class WorkflowHelper {
 	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	private static HashSet<UUID> wfRefsetUidList = null;
+	private static HashSet<UUID> luceneChangeSetImportStorageSet;
+	private static HashSet<UUID> luceneChangeSetWFIdImportStorageSet;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
 		if (modelers == null) {
@@ -1420,6 +1422,32 @@ public class WorkflowHelper {
 		}
 		
 		return wfRefsetUidList;
+	}
+
+	public static HashSet<UUID> getLuceneChangeSetStorage() {
+		if (luceneChangeSetImportStorageSet == null) {
+			luceneChangeSetImportStorageSet = new HashSet<UUID>();
+		}
+		
+		return luceneChangeSetImportStorageSet;
+	}
+
+	public static HashSet<UUID> getLuceneChangeWfIdSetStorage() {
+		if (luceneChangeSetWFIdImportStorageSet == null) {
+			luceneChangeSetWFIdImportStorageSet = new HashSet<UUID>();
+		}
+		
+		return luceneChangeSetWFIdImportStorageSet;
+	}
+
+	public static void clearChangeSetStorage() {
+		if (luceneChangeSetImportStorageSet != null) {
+		luceneChangeSetImportStorageSet.clear();
+		} 
+		
+		if (luceneChangeSetWFIdImportStorageSet != null) {
+			luceneChangeSetWFIdImportStorageSet.clear();
+		}
 	}
 }
  

@@ -103,6 +103,12 @@ public abstract class ChangeSetImporter implements ActionListener {
                 readNext(readerSet);
             }
 
+            if (commitAfterImport) {
+                Terms.get().commit();
+            }
+
+            /* For Wf History */
+			// Read all changesets
             activity.setValue(0);
             while (wfHxReaderSet.size() > 0 && continueImport) {
                 activity.setValue(max - avaibleBytes(wfHxReaderSet));
@@ -110,9 +116,19 @@ public abstract class ChangeSetImporter implements ActionListener {
                 readNext(wfHxReaderSet);
             }
 
-            if (commitAfterImport) {
-                Terms.get().commit();
-            }
+			// Send emptyFile change set to signify that done importing, and time to process Lucene Index
+            File csf = new File("emptyFile");
+            csf.createNewFile();
+            I_ReadChangeSet csr = getChangeSetWfHxReader(csf);
+            wfHxReaderSet = getSortedReaderSet();
+			wfHxReaderSet.add(csr);
+
+            readNext(wfHxReaderSet);
+
+            WorkflowHelper.clearChangeSetStorage();
+            csf.delete();
+            /* End For Wf History */
+            
             activity.setIndeterminate(false);
             long elapsed = System.currentTimeMillis() - start;
             String elapsedString = TimeUtil.getElapsedTimeString(elapsed);

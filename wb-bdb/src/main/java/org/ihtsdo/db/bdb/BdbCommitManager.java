@@ -505,7 +505,7 @@ public class BdbCommitManager {
 
                         wfMembersToCommit.addAll(uncommittedWfMemberIds);
 
-                        Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+                        Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(wfMembersToCommit);
 
                         if (luceneWriter != null) {
                            luceneWriterService.execute(luceneWriter);
@@ -692,7 +692,7 @@ public class BdbCommitManager {
 
                wfMembersToCommit.addAll(uncommittedWfMemberIds);
 
-               Runnable luceneWriter = WfHxLuceneWriterAccessor.getInstance(wfMembersToCommit);
+               Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(wfMembersToCommit);
 
                if (luceneWriter != null) {
                   luceneWriterService.execute(luceneWriter);

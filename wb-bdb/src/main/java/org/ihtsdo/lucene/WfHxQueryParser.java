@@ -55,6 +55,11 @@ public class WfHxQueryParser {
 		standardQuery = createStandardQuery();
 	}
 
+	public WfHxQueryParser(boolean inProg, boolean compWf) {
+		this.wfInProgress = inProg;
+		this.completedWf = compWf;
+	}
+
 	private BooleanQuery createStandardQuery() {
 		BooleanQuery booleanQuery = new BooleanQuery();
 
