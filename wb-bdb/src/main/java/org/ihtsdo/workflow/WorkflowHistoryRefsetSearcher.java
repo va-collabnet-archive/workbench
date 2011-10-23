@@ -1,7 +1,6 @@
 package org.ihtsdo.workflow; 
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -9,11 +8,8 @@ import java.util.logging.Level;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
@@ -25,16 +21,9 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 */
 public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 
-	private int currentStatusNid = 0;
-
 	public WorkflowHistoryRefsetSearcher() throws TerminologyException, IOException
 	{
 		super(workflowHistoryConcept);
-		try { 
-			currentStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid());
-		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error creating Workflow History Refset Searcher with error: " + e.getMessage());
-		}
 	}
 
 	public boolean isInitialized() {
@@ -47,17 +36,12 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		
 		try {
 			I_GetConceptData con = Terms.get().getConcept(conceptNid);
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), refsetNid);
-			for (RefexVersionBI<?> m : members ) {
-				
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				WorkflowHistoryJavaBean currentBean = WorkflowHelper.populateWorkflowHistoryJavaBean(m.getNid(), con.getPrimUuid(), 
-																									 member.getStr1(), new Long(m.getTime()));
-				
-				if (currentBean.getWorkflowId().equals(workflowId) &&
-					currentTime < currentBean.getWorkflowTime()) {
-					currentTime = currentBean.getWorkflowTime();
-					lastBean = currentBean; 
+			TreeSet<WorkflowHistoryJavaBean> beans = WorkflowHelper.getWfHxMembersAsBeans(con);
+			for (WorkflowHistoryJavaBean bean : beans ) {
+				if (bean.getWorkflowId().equals(workflowId) &&
+					currentTime < bean.getWorkflowTime()) {
+					currentTime = bean.getWorkflowTime();
+					lastBean = bean; 
 				}
 			}
 			
@@ -74,13 +58,8 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
 
 		try {
-			Collection<? extends RefexVersionBI<?>> members = concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), refsetNid);
-			for (RefexVersionBI<?> m : members ) {
-				
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(member.getNid(), concept.getPrimUuid(), 
-																							  member.getStr1(), new Long(member.getTime()));
-		
+			TreeSet<WorkflowHistoryJavaBean> beans = WorkflowHelper.getWfHxMembersAsBeans(concept);
+			for (WorkflowHistoryJavaBean bean : beans) {
 				if (bean.getWorkflowId().equals(wfId)) {
 					retSet.add(bean);
 				}

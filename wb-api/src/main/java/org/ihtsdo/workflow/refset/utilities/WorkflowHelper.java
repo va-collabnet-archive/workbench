@@ -1,11 +1,8 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,8 +29,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
@@ -1048,34 +1045,21 @@ public class WorkflowHelper {
 		}
 	}
 
-	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) 
-		throws IOException, TerminologyException 
+	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) throws IOException, TerminologyException 
 	{
-		if (activeNidRf1 == 0) {
-			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
-			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
-		}
-
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null) {
-			Set<String> ignoredWorkflows = new HashSet<String>();
-			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-			
+			Set<String> processedIds = new HashSet<String>();
 			long latestTimestamp = 0;
 			String currentWorkflowId = null;
-				
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
 			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (!ignoredWorkflows.contains(reader.getWorkflowId(member.getStr1()))) {
-					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), con.getPrimUuid(), member.getStr1(), member.getTime());
-					
+			for (WorkflowHistoryJavaBean bean : getWfHxMembersAsBeans(con)) {
+				if (!processedIds.contains(bean.getWorkflowId())) {
 					if (latestTimestamp == 0 || 
 						(latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId().toString()))) {
 						returnSet.clear();
-						ignoredWorkflows.add(currentWorkflowId);
+						processedIds.add(currentWorkflowId);
 						
 						currentWorkflowId = bean.getWorkflowId().toString();
 						latestTimestamp = bean.getWorkflowTime();
@@ -1096,19 +1080,13 @@ public class WorkflowHelper {
 			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
 		}
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
-
+  
 		if (con != null && workflowId != null) {
-			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-	
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
-			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(member.getStr1())))) {
-					returnSet.add(populateWorkflowHistoryJavaBean(member.getNid(), 
-																  Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																  member.getStr1(),
-																  member.getTime()));
+			TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(con);
+
+			for (WorkflowHistoryJavaBean bean : members) {
+				if (workflowId.equals(bean.getWorkflowId())) {
+					returnSet.add(bean);
 				}
 			}
 		}
@@ -1117,35 +1095,48 @@ public class WorkflowHelper {
 	}
 
 	 
-	public static void listWorkflowHistory(UUID uuid) throws NumberFormatException, IOException, TerminologyException 
-	{
-		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
-		int counter = 0;
-		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+	public static TreeSet<WorkflowHistoryJavaBean> getWfHxMembersAsBeans(I_GetConceptData con) throws IOException, TerminologyException {
+		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
 
+		if (Terms.get().getActiveAceFrameConfig() == null) {
+			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
 
-		I_GetConceptData con = Terms.get().getConcept(uuid);
-		Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
+			for (I_ExtendByRef m : members) {
+				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(m);
+				retSet.add(bean);
+			}
+		} else {
+			ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(vc, getWorkflowRefsetNid());
 		
-		for (RefexVersionBI<?> m : members) {
-			RefexStrVersionBI member = (RefexStrVersionBI) m;
-		
-			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																		   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																		   member.getStr1(),
-																		   member.getTime());
+			for (RefexVersionBI m : members) {
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
+																			   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																			   member.getStr1(),
+																			   member.getTime());
 			
-			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
-			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
+				retSet.add(bean);
+			}
 		}
-		outputFile.flush();
-		outputFile.close();
+		
+		return retSet;
+	}
+
+	public static void listWorkflowHistory(UUID conceptId) throws NumberFormatException, IOException, TerminologyException 
+	{
+		int counter = 0;
+
+		TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(Terms.get().getConcept(conceptId));
+		
+		for (WorkflowHistoryJavaBean bean : members) {
+			System.out.println("\n\nBean #: " + counter + " = " + bean.toString());
+		}
 	}
 
 	public static Object getOverrideAction() {
 	   	if (overrideActionUid   == null)
 		{
-    		// TODO: Remove hardcode and add to metadata
 	   		try {
 				overrideActionUid = ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid();
 			} catch (Exception e) {
@@ -1179,16 +1170,7 @@ public class WorkflowHelper {
 		}
 		
 		try {
-			Collection<? extends RefexVersionBI<?>> members = concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
-			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																  			   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																  			   member.getStr1(),
-																  			   member.getTime());
-				retSet.add(bean);
-			}
+			retSet = getWfHxMembersAsBeans(concept);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Cannot access Workflow History Refset members with error: " + e.getMessage());
 		}
@@ -1273,8 +1255,6 @@ public class WorkflowHelper {
 	}
 
 	public static Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContraditionException {
-		
-		EditorCategoryRefsetSearcher searcher = null;		
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
 		
 		try {
