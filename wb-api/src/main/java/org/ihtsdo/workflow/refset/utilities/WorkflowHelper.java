@@ -25,6 +25,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
@@ -1099,13 +1100,17 @@ public class WorkflowHelper {
 	 
 	public static TreeSet<WorkflowHistoryJavaBean> getWfHxMembersAsBeans(I_GetConceptData con) throws IOException, TerminologyException {
 		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
+        int    currentStatusNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
 
 		if (Terms.get().getActiveAceFrameConfig() == null) {
 			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
 
-			for (I_ExtendByRef m : members) {
-				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(m);
-				retSet.add(bean);
+			for (I_ExtendByRef member : members) {
+				I_ExtendByRefPart part = member.getMutableParts().get(member.getTuples().size() - 1);
+		    	if (part.getStatusNid() == currentStatusNid) {
+					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
+					retSet.add(bean);
+				}
 			}
 		} else {
 			ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
@@ -1113,12 +1118,14 @@ public class WorkflowHelper {
 		
 			for (RefexVersionBI m : members) {
 				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																			   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																			   member.getStr1(),
-																			   member.getTime());
-			
-				retSet.add(bean);
+				if (member.getStatusNid() == currentStatusNid) {
+					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
+																				   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																				   member.getStr1(),
+																				   member.getTime());
+				
+					retSet.add(bean);
+				}
 			}
 		}
 		
