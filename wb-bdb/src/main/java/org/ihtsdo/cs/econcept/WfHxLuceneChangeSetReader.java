@@ -101,16 +101,23 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public void readUntil(long endTime) throws IOException, ClassNotFoundException {
         HashSet<TimePathId> values = new HashSet<TimePathId>();
+        
+        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
+            AceLog.getEditLog().info(
+                    "Done importing change sets for workflow.  Now processing workflow lucene index." +
+                    TimeHelper.getFileDateFormat().format(new Date(endTime)));
+        	updateLuceneIndex();
+            AceLog.getEditLog().info(
+                    "Done processing workflow lucene index." +
+                    TimeHelper.getFileDateFormat().format(new Date(endTime)));
+        	return;
+        } 
+
         if (AceLog.getEditLog().isLoggable(Level.INFO)) {
             AceLog.getEditLog().info(
                 "Reading from log " + changeSetFile.getName() + " until " +
                 TimeHelper.getFileDateFormat().format(new Date(endTime)));
         }
-        
-        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
-        	updateLuceneIndex();
-        	return;
-        } 
         
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
