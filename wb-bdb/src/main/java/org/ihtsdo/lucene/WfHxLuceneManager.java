@@ -37,8 +37,14 @@ public class WfHxLuceneManager extends LuceneManager {
 
 	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws IOException, TerminologyException {
         if (wfHxWriter == null) {
-		    wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-		    wfHxWriter.setUseCompoundFile(true);
+        	
+        	if (runningLuceneDirFile.exists()) {
+        		wfHxLuceneDir = setupWriter(runningLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	} else {
+        		wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	}
+        	
+        	wfHxWriter.setUseCompoundFile(true);
 		    wfHxWriter.setMergeFactor(15);
 		    wfHxWriter.setMaxMergeDocs(Integer.MAX_VALUE);
 		    wfHxWriter.setMaxBufferedDocs(1000);
@@ -59,7 +65,12 @@ public class WfHxLuceneManager extends LuceneManager {
 						Set<WorkflowHistoryJavaBean> wfIdBeans = searcher.getAllHistoryForWorkflowId(con, bean.getWorkflowId());
 						WorkflowHistoryJavaBean lastBean;
 						try {
-							lastBean = WorkflowHelper.getLatestWfHxJavaBeanForConcept(con, bean.getWorkflowId());
+							lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
+							
+							if (lastBean == null) {
+								lastBean = bean;
+							}
+							
 				            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
 	
 				            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
@@ -123,7 +134,15 @@ public class WfHxLuceneManager extends LuceneManager {
 		beansToAdd.addAll(latestWorkflow);
 	}
 	
-	public static void writeUnwrittenWorkflows(ViewCoordinate vc) throws IOException, TerminologyException {
-		writeToLuceneNoLock(beansToAdd, vc);
+	public static void addToLuceneNoWrite(WorkflowHistoryJavaBean latestWorkflow) {
+		if (beansToAdd == null) {
+			beansToAdd = new HashSet<WorkflowHistoryJavaBean>();
+		}
+		
+		beansToAdd.add(latestWorkflow);
+	}
+
+	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
+		writeToLuceneNoLock(beansToAdd, null);
 	}
 }

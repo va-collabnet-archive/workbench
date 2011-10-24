@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -85,14 +86,10 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
-                
-                if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-                	I_ReadChangeSet wcsr = getChangeSetWfHxReader(csf);
-                	wfHxReaderSet.add(wcsr);
-                }
                 logger.log(Level.INFO, "Adding reader: {0}\nThis has nextCommitTime() of : {1} ({2})", new Object[]{csf.getAbsolutePath(), csr.nextCommitTime(), new Date(csr.nextCommitTime())});
             }
 
+        	List<File> importedFileList = new LinkedList<File>();
             int max = avaibleBytes(readerSet);
             activity.setMaximum(max);
             activity.setValue(0);
@@ -100,34 +97,20 @@ public abstract class ChangeSetImporter implements ActionListener {
             while (readerSet.size() > 0 && continueImport) {
                 activity.setValue(max - avaibleBytes(readerSet));
                 activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
-                readNext(readerSet);
+
+                File potentialImportCSFile = readerSet.first().getChangeSetFile();
+                if (readNext(readerSet) > 0) {
+					importedFileList.add(potentialImportCSFile);                
+                }
             }
 
             if (commitAfterImport) {
                 Terms.get().commit();
             }
 
-            /* For Wf History */
-			// Read all changesets
-            activity.setValue(0);
-            while (wfHxReaderSet.size() > 0 && continueImport) {
-                activity.setValue(max - avaibleBytes(wfHxReaderSet));
-                activity.setProgressInfoLower(wfHxReaderSet.first().getChangeSetFile().getName());
-                readNext(wfHxReaderSet);
+            if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+            	createWfHxLuceneIndex(activity, importedFileList);
             }
-
-			// Send emptyFile change set to signify that done importing, and time to process Lucene Index
-            File csf = new File("emptyFile");
-            csf.createNewFile();
-            I_ReadChangeSet csr = getChangeSetWfHxReader(csf);
-            wfHxReaderSet = getSortedReaderSet();
-			wfHxReaderSet.add(csr);
-
-            readNext(wfHxReaderSet);
-
-            WorkflowHelper.clearChangeSetStorage();
-            csf.delete();
-            /* End For Wf History */
             
             activity.setIndeterminate(false);
             long elapsed = System.currentTimeMillis() - start;
@@ -139,7 +122,55 @@ public abstract class ChangeSetImporter implements ActionListener {
         }
     }
 
-    public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException,
+    private void createWfHxLuceneIndex(I_ShowActivity activity, List<File> changeSetFiles) throws IOException, ClassNotFoundException {
+        if (changeSetFiles.size() == 0) {
+	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+	            AceLog.getEditLog().info("Workflow history lucene index already updated with all changes");
+	        }
+        } else {
+            TreeSet<I_ReadChangeSet> wfHxReaderSet = getSortedReaderSet();
+	        for (File csf : changeSetFiles) {
+	        	I_ReadChangeSet wcsr = getChangeSetWfHxReader(csf);
+	        	wfHxReaderSet.add(wcsr);
+	        }
+
+	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+	            AceLog.getEditLog().info("Importing for updating workflow history lucene index");
+	        }
+	        
+			// Read all changesets
+	        activity.setValue(0);
+	        int filesToImport = wfHxReaderSet.size();
+	        int counter = 0;
+	        while (wfHxReaderSet.size() > 0 && continueImport) {
+	            activity.setValue(filesToImport - counter++);
+	            readNext(wfHxReaderSet);
+	        }
+	
+	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+	            AceLog.getEditLog().info("Processing imported change sets to generate index");
+	        }
+	
+	        // Send emptyFile change set to signify that done importing, and time to process Lucene Index
+	        File csf = new File("emptyFile");
+	        csf.createNewFile();
+	
+	        I_ReadChangeSet csr = getChangeSetWfHxReader(csf);
+	        TreeSet<I_ReadChangeSet> finalizeWfHxLuceneIndexReaderSet = getSortedReaderSet();
+	        finalizeWfHxLuceneIndexReaderSet.add(csr);
+	
+	        readNext(finalizeWfHxLuceneIndexReaderSet);
+	
+	        WorkflowHelper.clearChangeSetStorage();
+	        csf.delete();
+	
+	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
+	            AceLog.getEditLog().info("Update of workflow history lucene index complete");
+	        }
+		}
+    }
+    
+	public int avaibleBytes(TreeSet<I_ReadChangeSet> readerSet) throws FileNotFoundException, IOException,
             ClassNotFoundException {
         int available = 0;
         for (I_ReadChangeSet reader : readerSet) {
@@ -176,9 +207,9 @@ public abstract class ChangeSetImporter implements ActionListener {
         return readerSet;
     }
 
-    public static void readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
+    public static int readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
         if (readerSet.isEmpty()) {
-            return;
+            return 0;
         }
         I_TermFactory tf = Terms.get();
         if (tf.getTransactional()) {
@@ -222,6 +253,8 @@ public abstract class ChangeSetImporter implements ActionListener {
         if (tf.getTransactional()) {
             tf.commitTransaction();
         }
+        
+        return first.getConceptsImported();
     }
 
     public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix) {

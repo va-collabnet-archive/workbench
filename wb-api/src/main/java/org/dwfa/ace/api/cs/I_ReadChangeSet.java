@@ -86,4 +86,5 @@ public interface I_ReadChangeSet extends Serializable {
 
     public int availableBytes() throws FileNotFoundException, IOException, ClassNotFoundException;
 
+    public int getConceptsImported();
 }

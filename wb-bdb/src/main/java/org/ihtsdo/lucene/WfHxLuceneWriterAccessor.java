@@ -11,9 +11,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -117,21 +114,18 @@ public  class WfHxLuceneWriterAccessor {
    							wfIdsProcessed.add(bean.getWorkflowId());
    							
    							I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
-   							SortedSet<WorkflowHistoryJavaBean> latestWorkflow = WorkflowHelper.getLatestWfHxForConcept(con, bean.getWorkflowId());
+   							WorkflowHistoryJavaBean latestWorkflow = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
 
+   							if (latestWorkflow == null) {
+   								latestWorkflow = bean;
+   							}
+   							
    							WfHxLuceneManager.addToLuceneNoWrite(latestWorkflow);
    						}
    					}
    				}
    				
-   				ViewCoordinate vc;
-   				if (Terms.get().getActiveAceFrameConfig() != null) {
-   					vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-   				} else {
-   					vc = Terms.get().newAceFrameConfig().getViewCoordinate();
-   				}
-   				
-   				WfHxLuceneManager.writeUnwrittenWorkflows(vc);
+   				WfHxLuceneManager.writeUnwrittenWorkflows();
    				wfExtensionsToUpdate.clear();
    				WorkflowHelper.getLuceneChangeWfIdSetStorage().clear();
    				WorkflowHelper.getLuceneChangeWfIdSetStorage().addAll(wfIdsProcessed);

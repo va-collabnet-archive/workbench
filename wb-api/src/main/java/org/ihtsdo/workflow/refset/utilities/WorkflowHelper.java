@@ -1026,9 +1026,9 @@ public class WorkflowHelper {
 		return "";
 	}
 
-	public static WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException 
+	public static WorkflowHistoryJavaBean getLatestWfHxJavaBeanForWorkflowId(I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException 
 	{
-		SortedSet<WorkflowHistoryJavaBean> wfSet = getLatestWfHxForConcept(con, workflowId);
+		SortedSet<WorkflowHistoryJavaBean> wfSet = getWfHxForWorkflowId(con, workflowId);
 		
 		if (wfSet != null) {
 			return wfSet.last();
@@ -1076,12 +1076,8 @@ public class WorkflowHelper {
 		return returnSet;
 	}
 
-	public static SortedSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
+	public static SortedSet<WorkflowHistoryJavaBean> getWfHxForWorkflowId(
 			I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException {
-		if (activeNidRf1 == 0) {
-			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
-			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
-		}
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
   
 		if (con != null && workflowId != null) {
@@ -1100,14 +1096,19 @@ public class WorkflowHelper {
 	 
 	public static TreeSet<WorkflowHistoryJavaBean> getWfHxMembersAsBeans(I_GetConceptData con) throws IOException, TerminologyException {
 		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
-        int    currentStatusNid = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+
+		if (activeNidRf1 == 0) {
+			activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+			activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+		}		
 
 		if (Terms.get().getActiveAceFrameConfig() == null) {
 			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
 
 			for (I_ExtendByRef member : members) {
 				I_ExtendByRefPart part = member.getMutableParts().get(member.getTuples().size() - 1);
-		    	if (part.getStatusNid() == currentStatusNid) {
+				if (part.getStatusNid() == activeNidRf1 ||
+					part.getStatusNid() == activeNidRf2) {
 					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
 					retSet.add(bean);
 				}
@@ -1118,7 +1119,8 @@ public class WorkflowHelper {
 		
 			for (RefexVersionBI m : members) {
 				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (member.getStatusNid() == currentStatusNid) {
+				if (member.getStatusNid() == activeNidRf1 ||
+					member.getStatusNid() == activeNidRf2) {
 					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
 																				   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
 																				   member.getStr1(),

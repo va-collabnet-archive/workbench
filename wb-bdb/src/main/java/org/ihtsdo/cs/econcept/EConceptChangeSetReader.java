@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
@@ -287,4 +286,8 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         return 0;
     }
 
+	@Override
+	public int getConceptsImported() {
+		return conceptCount;
+	}
 }
