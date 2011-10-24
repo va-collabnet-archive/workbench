@@ -7,6 +7,7 @@ import java.util.Collection;
 import org.ihtsdo.concept.Concept;
 
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -134,7 +135,7 @@ rule "rule 4.2" #CANCEL concept onto same concept
    when
          ViewFact(getView() == View.STATED)
          $dropTarget: ComponentFact(context == Context.DROP_TARGET)
-         $dropObject: ComponentFact(((ComponentVersionBI)this.component).getChronicle().isUncommitted() == true,
+         $dropObject: ComponentFact(((ComponentVersionBI)this.component).getTime() == Long.MAX_VALUE,
                 context == Context.DROP_OBJECT, component == $dropTarget.component)
          not $refex: RefexFact(context == Context.DROP_TARGET)
          not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
