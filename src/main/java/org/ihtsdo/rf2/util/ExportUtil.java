@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -35,20 +36,18 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
+import org.dwfa.ace.commitlog.CommitLog;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
-import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -172,12 +171,30 @@ public class ExportUtil {
 				if (getAceConfig() == null) {
 				   createAceConfig();
 				}
+				
+				/*ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername()
+						+ ".eccs", new EConceptChangeSetWriter(new File(AceConfig.config
+								.getChangeSetRoot(), AceConfig.config
+								.getChangeSetWriterFileName()), new File(AceConfig.config.getChangeSetRoot(), "."
+										+ AceConfig.config.getChangeSetWriterFileName()), ChangeSetGenerationPolicy
+										.INCREMENTAL, true));
+
+				ChangeSetWriterHandler.addWriter(AceConfig.config.getUsername() + ".commitLog.xls",
+						new CommitLog(new File(AceConfig.config.getChangeSetRoot(),
+						"commitLog.xls"), new File(AceConfig.config.getChangeSetRoot(),
+								"." + "commitLog.xls")));	*/			
 				  
 				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, effectiveDate);
-			
-				//getTermFactory().addUncommitted(concept);
-				//getTermFactory().commit();
+				I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
+				//getTermFactory().addUncommitted(commitedConcept);
+				//getTermFactory().commit();				
 				
+				/* try {
+						getTermFactory().closeChangeSets();
+			        } catch (Exception e) {
+			            throw new MojoExecutionException(e.getLocalizedMessage(), e);
+			        }*/
+			        
 			} catch (NumberFormatException e) {
 				logger.error("NumberFormatException" +e);
 			} catch (TerminologyException e) {
@@ -203,8 +220,8 @@ public class ExportUtil {
 				  
 					flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
 						statusNid, pathNid, effectiveDate);
-			
-					//getTermFactory().addUncommitted(concept);
+					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
+					//getTermFactory().addUncommitted(commitedConcept);
 					//getTermFactory().commit();
 				
 			} catch (NumberFormatException e) {
@@ -230,7 +247,8 @@ public class ExportUtil {
 					flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(),
 							statusNid, pathNid, effectiveDate);
 			
-					//getTermFactory().addUncommitted(concept);
+					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
+					//getTermFactory().addUncommitted(commitedConcept);
 					//getTermFactory().commit();
 				
 					/*	I_Identify i_Identify_after = getTermFactory().getId(componentNid);
