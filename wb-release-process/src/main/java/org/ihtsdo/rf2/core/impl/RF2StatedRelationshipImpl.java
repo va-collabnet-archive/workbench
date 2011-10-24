@@ -151,13 +151,12 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						//moduleId = getConceptMetaModuleID(sourceConcept,getDateFormat().format(new Date(rel.getFixedPart().getTime())));
 					}
 					
-					if(moduleId.equals(I_Constants.META_MOULE_ID)){				
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
+						logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
-					}
-					
+					}					
 
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-
 					int relationshipGroup = rel.getGroup();
 
 					if (sourceId==null || sourceId.equals("")){
@@ -180,26 +179,25 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					
 					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
 						relationshipId=rel.getUUIDs().iterator().next().toString();
-					}
-					
-					if (relationshipId.contains("-") && updateWbSctId.equals("true")){
-						//insert relationshipId in the workbench using uuid
-						try {
-							DateFormat df = new SimpleDateFormat("yyyyMMdd");
-							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
-							
-							//get relationshipId by calling web-service 
-							String wbSctId = getSCTId(getConfig(), UUID.fromString(relationshipId));
-							if(wbSctId.equals("0")){
-								 wbSctId = getSCTId(getConfig(), UUID.fromString(relationshipId));
+						if (relationshipId.contains("-") && updateWbSctId.equals("true")){
+							//insert relationshipId in the workbench using uuid
+							try {
+								DateFormat df = new SimpleDateFormat("yyyyMMdd");
+								long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
+								
+								//get relationshipId by calling web-service 
+								String wbSctId = getSCTId(getConfig(), UUID.fromString(relationshipId));
+								if(wbSctId.equals("0")){
+									 wbSctId = getSCTId(getConfig(), UUID.fromString(relationshipId));
+								}
+								relationshipId=wbSctId;
+								//insert relationshipId in the workbench database 
+								insertSctId(rel.getNid() , getConfig(), wbSctId , rel.getPathNid() , rel.getStatusNid() , effectiveDate);
+							} catch (NumberFormatException e) {
+								logger.error("NumberFormatException" +e);
+							} catch (Exception e) {
+								logger.error("Exception" +e);
 							}
-							
-							//insert relationshipId in the workbench database 
-							insertSctId(rel.getNid() , getConfig(), wbSctId , rel.getPathNid() , rel.getStatusNid() , effectiveDate);
-						} catch (NumberFormatException e) {
-							logger.error("NumberFormatException" +e);
-						} catch (Exception e) {
-							logger.error("Exception" +e);
 						}
 					}
 					
@@ -216,14 +214,15 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					}
 				}
 			}
+		}catch (NullPointerException ne) {
+			logger.error("NullPointerException: " + ne.getMessage());
+			logger.error(" NullPointerException " + sourceId);
 		} catch (IOException e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
 			logger.error("IOExceptions: " + e.getMessage());
-			e.printStackTrace();
+			logger.error("IOExceptions: " + sourceId);
 		} catch (Exception e) {
-			logger.error("======failing for the sourceId=====" + sourceId);
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("Exceptions in exportStatedRelationship: " + e.getMessage());
+			logger.error("Exceptions in exportStatedRelationship: " +sourceId);
 		}
 
 	}
