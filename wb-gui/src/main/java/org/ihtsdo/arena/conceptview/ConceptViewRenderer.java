@@ -801,7 +801,11 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 if (capWorkflow) {
                 	setWorkflowStatusLabel(concept);
-                	wfHxDetails.regenerateWfPanel(concept, false);
+                	if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                		wfHxDetails.regenerateWfPanel(concept, false);
+                	} else {
+                		wfHxDetailsToggleButton.setSelected(false);
+                	}
                 }
             }
 
