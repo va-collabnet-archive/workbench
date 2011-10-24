@@ -179,6 +179,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         public void ancestorRemoved(AncestorEvent event) {
             settings.hideNavigator();
             wfHxDetails.hideWfHxDetailsPanel();
+            setWorkflowStatusLabel();
         }
 
         @Override
@@ -820,11 +821,12 @@ public class ConceptViewRenderer extends JLayeredPane {
                 commitButton.setVisible(false);
                 
 
-               if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
                 	if (wfHxDetails.regenerateWfPanel(settings.getConcept(), false)) {
-                    	setWorkflowStatusLabel(settings.getConcept());
                 	}
                 }
+               
+                setWorkflowStatusLabel(settings.getConcept());
             }
         }
     }
@@ -846,6 +848,9 @@ public class ConceptViewRenderer extends JLayeredPane {
     		AceLog.getAppLog().log(Level.WARNING, "Error in identifying wf display values for arena");
         }
 		
+	}
+	private void setWorkflowStatusLabel() {
+		workflowStatusLabel.setText("");
 	}
 	
 	private void setWorkflowStatusLabel(I_GetConceptData concept) {
