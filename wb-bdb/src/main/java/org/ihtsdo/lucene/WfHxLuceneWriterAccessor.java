@@ -113,14 +113,7 @@ public  class WfHxLuceneWriterAccessor {
    						{
    							wfIdsProcessed.add(bean.getWorkflowId());
    							
-   							I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
-   							WorkflowHistoryJavaBean latestWorkflow = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
-
-   							if (latestWorkflow == null) {
-   								latestWorkflow = bean;
-   							}
-   							
-   							WfHxLuceneManager.addToLuceneNoWrite(latestWorkflow);
+   							WfHxLuceneManager.addToLuceneNoWrite(bean);
    						}
    					}
    				}

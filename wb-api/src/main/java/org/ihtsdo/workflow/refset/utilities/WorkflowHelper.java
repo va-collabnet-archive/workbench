@@ -1030,10 +1030,10 @@ public class WorkflowHelper {
 	{
 		SortedSet<WorkflowHistoryJavaBean> wfSet = getWfHxForWorkflowId(con, workflowId);
 		
-		if (wfSet != null) {
-			return wfSet.last();
-		} else {
+		if (wfSet == null || wfSet.size() == 0) {
 			return null;
+		} else {
+			return wfSet.last();
 		}
 	}
 

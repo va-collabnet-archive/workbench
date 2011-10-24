@@ -137,7 +137,6 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
                 throw new IOException(e);
             }
         }
-        Concept.resolveUnresolvedAnnotations();
     }
 
    @Override
