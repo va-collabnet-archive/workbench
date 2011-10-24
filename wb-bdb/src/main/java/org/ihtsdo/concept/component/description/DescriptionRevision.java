@@ -176,7 +176,7 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
 
       DescriptionRevision newR;
 
-      newR = new DescriptionRevision(this.primordialComponent, statusNid, authorNid, pathNid, time,
+      newR = new DescriptionRevision(this, statusNid, authorNid, pathNid, time,
                                      this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 

@@ -120,7 +120,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
       ConceptAttributesRevision newR;
 
-      newR = new ConceptAttributesRevision(this.primordialComponent, statusNid, authorNid, pathNid, time,
+      newR = new ConceptAttributesRevision(this, statusNid, authorNid, pathNid, time,
               this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 
