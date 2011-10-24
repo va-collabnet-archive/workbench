@@ -2,6 +2,8 @@ package org.ihtsdo.tk.dto.concept.component.description;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -28,6 +30,14 @@ public class TkDescriptionRevision extends TkRevision implements I_DescribeExter
 
    public TkDescriptionRevision() {
       super();
+   }
+
+   public TkDescriptionRevision(DescriptionVersionBI another) throws IOException {
+      super(another);
+      this.initialCaseSignificant = another.isInitialCaseSignificant();
+      this.lang                   = another.getLang();
+      this.text                   = another.getText();
+      this.typeUuid               = Ts.get().getUuidPrimordialForNid(another.getTypeNid());
    }
 
    public TkDescriptionRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -35,9 +35,12 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberAnalogBI;
 
-public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> {
-   private static VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version> computer =
+public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> 
+    implements RefexMemberAnalogBI<MembershipRevision> {
+   
+    private static VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version> computer =
       new VersionComputer<RefsetMember<MembershipRevision, MembershipMember>.Version>();
 
    //~--- constructors --------------------------------------------------------

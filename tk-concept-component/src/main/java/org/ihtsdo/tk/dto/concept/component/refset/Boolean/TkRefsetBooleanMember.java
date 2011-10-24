@@ -5,6 +5,8 @@ package org.ihtsdo.tk.dto.concept.component.refset.Boolean;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -15,10 +17,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBooleanRevision> {
    public static final long serialVersionUID = 1;
@@ -31,6 +30,26 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
 
    public TkRefsetBooleanMember() {
       super();
+   }
+
+   public TkRefsetBooleanMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      Collection<? extends RefexBooleanVersionBI> refexes   = another.getVersions();
+      int                                         partCount = refexes.size();
+      Iterator<? extends RefexBooleanVersionBI>   itr       = refexes.iterator();
+      RefexBooleanVersionBI                       rv        = itr.next();
+
+      this.booleanValue = rv.getBoolean1();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetBooleanRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            rv = itr.next();
+            revisions.add(new TkRefsetBooleanRevision(rv));
+         }
+      }
    }
 
    public TkRefsetBooleanMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

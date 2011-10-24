@@ -2,6 +2,8 @@ package org.ihtsdo.tk.dto.concept.component.media;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -25,6 +27,12 @@ public class TkMediaRevision extends TkRevision {
 
    public TkMediaRevision() {
       super();
+   }
+
+   public TkMediaRevision(MediaVersionBI another) throws IOException {
+      super(another);
+      this.textDescription = another.getTextDescription();
+      this.typeUuid        = Ts.get().getUuidPrimordialForNid(another.getTypeNid());
    }
 
    public TkMediaRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

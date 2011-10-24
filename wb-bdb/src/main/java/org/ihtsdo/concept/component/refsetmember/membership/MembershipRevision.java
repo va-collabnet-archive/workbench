@@ -27,8 +27,10 @@ import org.ihtsdo.tk.dto.concept.component.refset.member.TkRefsetRevision;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberAnalogBI;
 
-public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> {
+public class MembershipRevision extends RefsetRevision<MembershipRevision, MembershipMember> 
+    implements RefexMemberAnalogBI<MembershipRevision> {
    public MembershipRevision() {
       super();
    }

@@ -5,8 +5,10 @@ package org.ihtsdo.tk.dto.concept.component.relationship;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_RelateExternally;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 
@@ -16,10 +18,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRelationship extends TkComponent<TkRelationshipRevision> implements I_RelateExternally {
    public static final long serialVersionUID = 1;
@@ -37,6 +36,35 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
 
    public TkRelationship() {
       super();
+   }
+
+   public TkRelationship(RelationshipChronicleBI rel) throws IOException {
+      super(rel.getPrimordialVersion());
+
+      Collection<? extends RelationshipVersionBI> rels      = rel.getVersions();
+      int                                         partCount = rels.size();
+      Iterator<? extends RelationshipVersionBI>   relItr    = rels.iterator();
+      TerminologyStoreDI                          ts        = Ts.get();
+      RelationshipVersionBI                       rv        = relItr.next();
+
+      c1Uuid             = ts.getUuidPrimordialForNid(rv.getConceptNid());
+      c2Uuid             = ts.getUuidPrimordialForNid(rv.getDestinationNid());
+      characteristicUuid = ts.getUuidPrimordialForNid(rv.getCharacteristicNid());
+      refinabilityUuid   = ts.getUuidPrimordialForNid(rv.getRefinabilityNid());
+      relGroup           = rv.getGroup();
+      typeUuid           = ts.getUuidPrimordialForNid(rv.getTypeNid());
+      pathUuid           = ts.getUuidPrimordialForNid(rv.getPathNid());
+      statusUuid         = ts.getUuidPrimordialForNid(rv.getStatusNid());
+      time               = rv.getTime();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRelationshipRevision>(partCount - 1);
+
+         while (relItr.hasNext()) {
+            rv = relItr.next();
+            revisions.add(new TkRelationshipRevision(rv));
+         }
+      }
    }
 
    public TkRelationship(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

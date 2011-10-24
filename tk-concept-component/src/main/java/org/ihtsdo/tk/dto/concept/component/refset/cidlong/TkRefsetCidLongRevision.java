@@ -2,6 +2,9 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidlong;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -25,6 +28,15 @@ public class TkRefsetCidLongRevision extends TkRevision {
 
    public TkRefsetCidLongRevision() {
       super();
+   }
+
+   public TkRefsetCidLongRevision(RefexCnidLongVersionBI another) throws IOException {
+      super(another);
+
+      TerminologyStoreDI ts = Ts.get();
+
+      this.c1Uuid    = ts.getUuidPrimordialForNid(another.getCnid1());
+      this.longValue = another.getLong1();
    }
 
    public TkRefsetCidLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

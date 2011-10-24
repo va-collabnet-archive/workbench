@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.Boolean;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -24,6 +25,11 @@ public class TkRefsetBooleanRevision extends TkRevision {
 
    public TkRefsetBooleanRevision() {
       super();
+   }
+
+   public TkRefsetBooleanRevision(RefexBooleanVersionBI another) throws IOException {
+      super(another);
+      this.booleanValue = another.getBoolean1();
    }
 
    public TkRefsetBooleanRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

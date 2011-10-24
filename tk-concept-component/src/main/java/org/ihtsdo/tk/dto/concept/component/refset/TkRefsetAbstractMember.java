@@ -33,6 +33,12 @@ public abstract class TkRefsetAbstractMember<V extends TkRevision> extends TkCom
       super();
    }
 
+   public TkRefsetAbstractMember(RefexVersionBI another) throws IOException {
+      super(another);
+      this.componentUuid = Ts.get().getComponent(another.getReferencedComponentNid()).getPrimUuid();
+      this.refsetUuid    = Ts.get().getComponent(another.getCollectionNid()).getPrimUuid();
+   }
+
    public TkRefsetAbstractMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);

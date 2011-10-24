@@ -13,6 +13,9 @@ import java.io.IOException;
 
 import java.util.Map;
 import java.util.UUID;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 
 public class TkRefsetCidStrRevision extends TkRevision {
    public static final long serialVersionUID = 1;
@@ -27,6 +30,15 @@ public class TkRefsetCidStrRevision extends TkRevision {
    public TkRefsetCidStrRevision() {
       super();
    }
+   public TkRefsetCidStrRevision(RefexCnidStrVersionBI another) throws IOException {
+      super(another);
+
+      TerminologyStoreDI ts = Ts.get();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(another.getCnid1());
+      this.strValue = another.getStr1();
+   }
+
 
    public TkRefsetCidStrRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();

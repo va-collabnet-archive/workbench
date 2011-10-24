@@ -5,7 +5,10 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidcid;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
@@ -16,10 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRefsetCidCidMember extends TkRefsetAbstractMember<TkRefsetCidCidRevision> {
    public static final long serialVersionUID = 1;
@@ -33,6 +33,28 @@ public class TkRefsetCidCidMember extends TkRefsetAbstractMember<TkRefsetCidCidR
 
    public TkRefsetCidCidMember() {
       super();
+   }
+
+   public TkRefsetCidCidMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      TerminologyStoreDI                           ts        = Ts.get();
+      Collection<? extends RefexCnidCnidVersionBI> rels      = another.getVersions();
+      int                                          partCount = rels.size();
+      Iterator<? extends RefexCnidCnidVersionBI>   relItr    = rels.iterator();
+      RefexCnidCnidVersionBI                       rv        = relItr.next();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+      this.c2Uuid = ts.getUuidPrimordialForNid(rv.getCnid2());
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetCidCidRevision>(partCount - 1);
+
+         while (relItr.hasNext()) {
+            rv = relItr.next();
+            revisions.add(new TkRefsetCidCidRevision(rv));
+         }
+      }
    }
 
    public TkRefsetCidCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -599,6 +599,7 @@ public class Bdb {
                 xref.close();
                 mutable.bdbEnv.sync();
                 mutable.bdbEnv.close();
+                sapNidCache.clear();
                 activity.setProgressInfoLower("11/11: Shutdown complete");
             } catch (DatabaseException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -616,6 +617,7 @@ public class Bdb {
         statusAtPositionDb = null;
         conceptDb = null;
         propDb = null;
+        Concept.reset();
         AceLog.getAppLog().info("bdb close finished.");
     }
 

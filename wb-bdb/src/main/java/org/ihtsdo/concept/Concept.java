@@ -125,39 +125,19 @@ import java.util.logging.Level;
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
    public static ReferenceType                                refType      = ReferenceType.WEAK;
-   public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM =
-      new ConcurrentReferenceHashMap<Integer, Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
-                                     ConcurrentReferenceHashMap.ReferenceType.WEAK);
-   public static ConcurrentReferenceHashMap<Integer, Object> componentsCRHM =
-      new ConcurrentReferenceHashMap<Integer, Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
-                                     ConcurrentReferenceHashMap.ReferenceType.WEAK);
-   private static List<TkRefsetAbstractMember<?>> unresolvedAnnotations =
-      new ArrayList<TkRefsetAbstractMember<?>>();
-   private static int          fsXmlDescNid = Integer.MIN_VALUE;
-   private static int          fsDescNid    = Integer.MIN_VALUE;
-   private static final NidSet rf1LangRefexNidSet;
-   private static final NidSet rf2LangRefexNidSet;
+   private static int                                         fsXmlDescNid = Integer.MIN_VALUE;
+   private static int                                         fsDescNid    = Integer.MIN_VALUE;
+   public static ConcurrentReferenceHashMap<Integer, Object>  componentsCRHM;
+   public static ConcurrentReferenceHashMap<Integer, Concept> conceptsCRHM;
+   private static NidSet                                      rf1LangRefexNidSet;
+   private static NidSet                                      rf2LangRefexNidSet;
+   private static List<TkRefsetAbstractMember<?>>             unresolvedAnnotations;
 
    //~--- static initializers -------------------------------------------------
 
    static {
       Bdb.addMemoryMonitorListener(new ConceptLowMemoryListener());
-   }
-
-   static {
-      rf1LangRefexNidSet = new NidSet();
-      rf1LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
-      rf1LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
-      rf1LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
-   }
-
-   static {
-      rf2LangRefexNidSet = new NidSet();
-      rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF2.getNid());
-      rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF2.getNid());
-      rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
-      rf2LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
-      rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
+      init();
    }
 
    //~--- fields --------------------------------------------------------------
@@ -364,6 +344,31 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    @Override
    public int hashCode() {
       return hashCode;
+   }
+   public static void reset() {
+       init();
+   }
+   private static void init() {
+      
+      conceptsCRHM = new ConcurrentReferenceHashMap<Integer,
+              Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
+                       ConcurrentReferenceHashMap.ReferenceType.WEAK);
+      componentsCRHM = new ConcurrentReferenceHashMap<Integer,
+              Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
+                      ConcurrentReferenceHashMap.ReferenceType.WEAK);
+      unresolvedAnnotations = new ArrayList<TkRefsetAbstractMember<?>>();
+      fsXmlDescNid          = Integer.MIN_VALUE;
+      fsDescNid             = Integer.MIN_VALUE;
+      rf1LangRefexNidSet    = new NidSet();
+      rf1LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+      rf1LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+      rf1LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
+      rf2LangRefexNidSet = new NidSet();
+      rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF2.getNid());
+      rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF2.getNid());
+      rf2LangRefexNidSet.add(ReferenceConcepts.FULLY_SPECIFIED_RF1.getNid());
+      rf2LangRefexNidSet.add(ReferenceConcepts.PREFERRED_RF1.getNid());
+      rf2LangRefexNidSet.add(ReferenceConcepts.SYNONYM_RF1.getNid());
    }
 
    @Override

@@ -5,6 +5,8 @@ package org.ihtsdo.tk.dto.concept.component.refset.Long;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -16,10 +18,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevision> {
    public static final long serialVersionUID = 1;
@@ -32,6 +31,26 @@ public class TkRefsetLongMember extends TkRefsetAbstractMember<TkRefsetLongRevis
 
    public TkRefsetLongMember() {
       super();
+   }
+
+   public TkRefsetLongMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      Collection<? extends RefexLongVersionBI> refexes   = another.getVersions();
+      int                                      partCount = refexes.size();
+      Iterator<? extends RefexLongVersionBI>   itr       = refexes.iterator();
+      RefexLongVersionBI                       rv        = itr.next();
+
+      this.longValue = rv.getLong1();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetLongRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            rv = itr.next();
+            revisions.add(new TkRefsetLongRevision(rv));
+         }
+      }
    }
 
    public TkRefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

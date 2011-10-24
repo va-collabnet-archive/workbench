@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.integer;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -24,6 +25,11 @@ public class TkRefsetIntRevision extends TkRevision {
 
    public TkRefsetIntRevision() {
       super();
+   }
+
+   public TkRefsetIntRevision(RefexIntVersionBI another) throws IOException {
+      super(another);
+      this.intValue = another.getInt1();
    }
 
    public TkRefsetIntRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

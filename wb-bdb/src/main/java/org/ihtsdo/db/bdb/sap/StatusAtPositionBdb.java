@@ -1,7 +1,6 @@
 package org.ihtsdo.db.bdb.sap;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
@@ -47,620 +46,624 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class StatusAtPositionBdb extends ComponentBdb {
-   private static final int                                     MIN_ARRAY_SIZE      = 100;
-   private static int                                           initialPosition     = -1;
-   private static PositionArrayBinder                           positionArrayBinder =
-      new PositionArrayBinder();
-   private static ConcurrentHashMap<PositionBI, PositionMapper> mapperCache         =
-      new ConcurrentHashMap<PositionBI, PositionMapper>();
-   private static Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
-      new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
-   private static CountDownLatch setupLatch = new CountDownLatch(1);
-   private static AtomicInteger  misses     = new AtomicInteger(0);
-   private static AtomicInteger  hits       = new AtomicInteger(0);
-   private static Set<Integer>   currentPaths;
-   private static PositionArrays mutableArray;
-   private static PositionArrays readOnlyArray;
 
-   //~--- fields --------------------------------------------------------------
+    private static final int MIN_ARRAY_SIZE = 100;
+    private static int initialPosition = -1;
+    private static PositionArrayBinder positionArrayBinder =
+            new PositionArrayBinder();
+    private static ConcurrentHashMap<PositionBI, PositionMapper> mapperCache =
+            new ConcurrentHashMap<PositionBI, PositionMapper>();
+    private static Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
+            new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
+    private static CountDownLatch setupLatch = new CountDownLatch(1);
+    private static AtomicInteger misses = new AtomicInteger(0);
+    private static AtomicInteger hits = new AtomicInteger(0);
+    private static Set<Integer> currentPaths;
+    private static PositionArrays mutableArray;
+    private static PositionArrays readOnlyArray;
+    //~--- fields --------------------------------------------------------------
+    private Semaphore expandPermit = new Semaphore(1);
+    /**
+     * TODO future optimization is to use a map that uses an index to the
+     * <code>PositionArrays</code> rather than duplicating the key data.
+     */
+    private SapToIntHashMap sapToIntMap;
+    private AtomicInteger sequence;
+
+    //~--- constructors --------------------------------------------------------
+    public StatusAtPositionBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
+        super(readOnlyBdbEnv, mutableBdbEnv);
+    }
+
+    //~--- methods -------------------------------------------------------------
+    public void cancelAfterCommit(NidSetBI commitSapNids) throws IOException {
+        synchronized (uncomittedStatusPathEntries) {
+            int min = Integer.MAX_VALUE;
 
-   private Semaphore expandPermit = new Semaphore(1);
-
-   /**
-    * TODO future optimization is to use a map that uses an index to the
-    * <code>PositionArrays</code> rather than duplicating the key data.
-    */
-   private SapToIntHashMap sapToIntMap;
-   private AtomicInteger   sequence;
-
-   //~--- constructors --------------------------------------------------------
-
-   public StatusAtPositionBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
-      super(readOnlyBdbEnv, mutableBdbEnv);
-   }
-
-   //~--- methods -------------------------------------------------------------
-
-   public void cancelAfterCommit(NidSetBI commitSapNids) throws IOException {
-      synchronized (uncomittedStatusPathEntries) {
-         int min = Integer.MAX_VALUE;
-
-         expandPermit.acquireUninterruptibly();
-
-         try {
-            for (int sapNid : commitSapNids.getSetValues()) {
-               min = Math.min(min, sapNid);
-            }
-
-            for (int sapNid : uncomittedStatusPathEntries.values()) {
-               min = Math.min(min, sapNid);
-            }
-
-            for (int i = min; i < sequence.get(); i++) {
-               mutableArray.commitTimes[getMutableIndex(i)] = Long.MIN_VALUE;
-               sapToIntMap.put(getStatusNid(i), getAuthorNid(i), getPathNid(i), Long.MIN_VALUE, i);
-            }
-
-            uncomittedStatusPathEntries.clear();
-            mapperCache.clear();
-         } finally {
-            expandPermit.release();
-         }
-      }
-
-      sync();
-   }
-
-   private void checkTimeAndAdd(long startTime, long endTime, IntSet specifiedSapNids, int sapNid) {
-      long time = getTime(sapNid);
-
-      if ((time >= startTime) && (time <= endTime)) {
-         specifiedSapNids.add(sapNid);
-      }
-   }
-
-   public void clearMapperCache() {
-      mapperCache.clear();
-   }
-
-   @Override
-   public void close() {
-      try {
-         this.sync();
-      } catch (IOException e) {
-         AceLog.getAppLog().alertAndLogException(e);
-      }
-
-      super.close();
-   }
-
-   public IntSet commit(long time) throws IOException {
-      IntSet committedSapNids = new IntSet();
-
-      synchronized (uncomittedStatusPathEntries) {
-         expandPermit.acquireUninterruptibly();
-
-         try {
-            for (int sapNid : uncomittedStatusPathEntries.values()) {
-               mutableArray.commitTimes[getMutableIndex(sapNid)] = time;
-               sapToIntMap.put(getStatusNid(sapNid), getAuthorNid(sapNid), getPathNid(sapNid), time, sapNid);
-               committedSapNids.add(sapNid);
-            }
-
-            uncomittedStatusPathEntries.clear();
-            mapperCache.clear();
-         } finally {
-            expandPermit.release();
-         }
-      }
-
-      sync();
-
-      return committedSapNids;
-   }
-
-   @Override
-   protected void init() throws IOException {
-      preloadBoth();
-      sequence = new AtomicInteger(Integer.MIN_VALUE + 1);
-
-      DatabaseEntry theKey = new DatabaseEntry();
-
-      IntegerBinding.intToEntry(0, theKey);
-
-      DatabaseEntry theData = new DatabaseEntry();
-
-      try {
-         if (readOnly.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
-            readOnlyArray = positionArrayBinder.entryToObject(theData);
-         } else {
-            readOnlyArray = new PositionArrays();
-         }
-
-         if (mutable.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
-            mutableArray = positionArrayBinder.entryToObject(theData);
-         } else {
-            mutableArray = new PositionArrays();
-         }
-
-         int size         = getPositionCount();
-         int readOnlySize = readOnlyArray.getSize();
-         int mutableSize  = mutableArray.getSize();
-
-         sequence.set(Math.max(size, 1));
-         sapToIntMap = new SapToIntHashMap(sequence.get());
-
-         for (int i = 0; i < readOnlySize; i++) {
-            if (readOnlyArray.commitTimes[i] != 0) {
-               sapToIntMap.put(readOnlyArray.statusNids[i], readOnlyArray.authorNids[i],
-                               readOnlyArray.pathNids[i], readOnlyArray.commitTimes[i], i);
-            }
-         }
-
-         closeReadOnly();
-
-         for (int i = 0; i < mutableSize; i++) {
-            int mutableIndex = i + readOnlySize;
-
-            assert i < mutableArray.commitTimes.length :
-                   " mutableIndex: " + mutableIndex + " commitTimes.length: "
-                   + mutableArray.commitTimes.length;
-            assert i < mutableArray.statusNids.length :
-                   " mutableIndex: " + mutableIndex + " statusNids.length: " + mutableArray.statusNids.length;
-            assert i < mutableArray.pathNids.length :
-                   " mutableIndex: " + mutableIndex + " pathNids.length: " + mutableArray.pathNids.length;
-
-            if (mutableArray.commitTimes[i] != 0) {
-               sapToIntMap.put(mutableArray.statusNids[i], mutableArray.authorNids[i],
-                               mutableArray.pathNids[i], mutableArray.commitTimes[i], mutableIndex);
-            }
-         }
-
-         if (size == 0) {
-            initialPosition = 1;
-         } else if ((readOnlyArray.size > 0) && (readOnlyArray.pathNids[0] == 0)) {
-            initialPosition = 1;
-         } else if ((readOnlyArray.size == 0) && (mutableArray.pathNids[0] == 0)) {
-            initialPosition = 1;
-         } else {
-            initialPosition = 0;
-         }
-
-         setupLatch.countDown();
-      } catch (DatabaseException e) {
-         throw new IOException(e);
-      }
-   }
-
-   public static void reportStats() {
-      float hitStat = hits.get();
-      float misStat = misses.get();
-      float percent = hitStat / (misStat + hitStat);
-
-      System.out.println("hits: " + (int) hitStat + " misses: " + (int) misStat);
-      System.out.println("hit %: " + percent);
-   }
-
-   public static void reset() {
-      hits.set(0);
-      misses.set(0);
-      currentPaths = null;
-   }
-
-   @Override
-   public void sync() throws IOException {
-      expandPermit.acquireUninterruptibly();
-
-      try {
-         DatabaseEntry valueEntry = new DatabaseEntry();
-
-         positionArrayBinder.objectToEntry(mutableArray, valueEntry);
-
-         DatabaseEntry theKey = new DatabaseEntry();
-
-         IntegerBinding.intToEntry(0, theKey);
-         mutable.put(null, theKey, valueEntry);
-         super.sync();
-      } finally {
-         expandPermit.release();
-      }
-   }
-
-   /**
-    * TODO make this trim algorithm more intelligent.
-    */
-   private static void trimCache() {
-      boolean continueTrim = mapperCache.size() > 1;
-      long    now          = System.currentTimeMillis();
-
-      while (continueTrim) {
-         Entry<PositionBI, PositionMapper> looser = null;
-
-         for (Entry<PositionBI, PositionMapper> entry : mapperCache.entrySet()) {
-            if (looser == null) {
-               looser = entry;
-            } else {
-               if (looser.getValue().getLastRequestTime() > entry.getValue().getLastRequestTime()) {
-                  looser = entry;
-               } else if (looser.getValue().getLastRequestTime() == entry.getValue().getLastRequestTime()) {
-                  if (looser.getValue().getQueryCount() > entry.getValue().getQueryCount()) {
-                     looser = entry;
-                  }
-               }
-            }
-         }
-
-         if (now - looser.getValue().getLastRequestTime() > 1000) {
-            mapperCache.remove(looser.getKey());
-            continueTrim = mapperCache.size() > 1;
-         } else {
-            continueTrim = false;
-         }
-      }
-   }
-
-   //~--- get methods ---------------------------------------------------------
-
-   public int getAuthorNid(int sapNid) {
-      if (sapNid < 0) {
-         return Integer.MIN_VALUE;
-      }
-
-      if (sapNid < readOnlyArray.getSize()) {
-         return readOnlyArray.authorNids[sapNid];
-      } else {
-         return mutableArray.authorNids[getMutableIndex(sapNid)];
-      }
-   }
-
-   public static Set<Integer> getCurrentPaths() {
-      try {
-         currentPaths = Bdb.getPathManager().getPathNids();
-
-         return currentPaths;
-      } catch (IOException e) {
-         throw new RuntimeException(e);
-      }
-   }
-
-   @Override
-   protected String getDbName() {
-      return "positionDb";
-   }
-
-   public static int getInitialPosition() {
-      try {
-         setupLatch.await();
-      } catch (InterruptedException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-
-      return initialPosition;
-   }
-
-   public PositionMapper getMapper(PositionBI position) {
-      PositionMapper pm = mapperCache.get(position);
-
-      if (pm != null) {
-         return pm;
-      }
-
-      pm = new PositionMapper(position);
-
-      PositionMapper existing = mapperCache.putIfAbsent(position, pm);
-
-      if (existing != null) {
-         pm = existing;
-      } else {
-         pm.queueForSetup();
-      }
-
-      trimCache();
-
-      return pm;
-   }
-
-   private int getMutableIndex(int index) {
-      return index - readOnlyArray.getSize();
-   }
-
-   public int getPathNid(int index) {
-      if (index < 0) {
-         return Integer.MIN_VALUE;
-      }
-
-      if (index < readOnlyArray.getSize()) {
-         return readOnlyArray.pathNids[index];
-      } else {
-         return mutableArray.pathNids[getMutableIndex(index)];
-      }
-   }
-
-   public PositionBI getPosition(int sapNid)
-           throws IOException, PathNotExistsException, TerminologyException {
-      int  pathNid = -1;
-      long time    = -1;
-      int  status  = -1;
-      int  author  = -1;
-
-      if (sapNid < readOnlyArray.getSize()) {
-         pathNid = readOnlyArray.pathNids[sapNid];
-         time    = readOnlyArray.commitTimes[sapNid];
-         status  = readOnlyArray.statusNids[sapNid];
-         author  = readOnlyArray.authorNids[sapNid];
-      } else {
-         int mutableIndex = getMutableIndex(sapNid);
-
-         pathNid = mutableArray.pathNids[mutableIndex];
-         time    = mutableArray.commitTimes[mutableIndex];
-         status  = mutableArray.statusNids[mutableIndex];
-         author  = mutableArray.authorNids[mutableIndex];
-      }
-
-      if (pathNid == 0) {
-         AceLog.getAppLog().severe("readOnly: " + (sapNid < readOnlyArray.getSize()) + " pathNid == 0 "
-                                   + "sapNid == " + sapNid + " time: " + time + " status == " + status
-                                   + " author: " + author);
-      }
-
-      PathBI path = Bdb.getPathManager().get(pathNid);
-
-      return new Position(time, path);
-   }
-
-   public int getPositionCount() {
-      return readOnlyArray.getSize() + mutableArray.getSize();
-   }
-
-   public int getReadOnlyMax() {
-      return readOnlyArray.size - 1;
-   }
-
-   public int getSapNid(StatusAuthorPosition tsp) {
-      return getSapNid(tsp.getStatusNid(), tsp.getAuthorNid(), tsp.getPathNid(), tsp.getTime());
-   }
-
-   public int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
-      if (time == Long.MAX_VALUE) {
-         UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, pathNid);
-
-         if (uncomittedStatusPathEntries.containsKey(usp)) {
-            return uncomittedStatusPathEntries.get(usp);
-         } else {
             expandPermit.acquireUninterruptibly();
 
             try {
-               if (uncomittedStatusPathEntries.containsKey(usp)) {
-                  return uncomittedStatusPathEntries.get(usp);
-               }
+                for (int sapNid : commitSapNids.getSetValues()) {
+                    min = Math.min(min, sapNid);
+                }
 
-               int statusAtPositionNid = sequence.getAndIncrement();
+                for (int sapNid : uncomittedStatusPathEntries.values()) {
+                    min = Math.min(min, sapNid);
+                }
 
-               mapperCache.clear();
-               mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
-               mutableArray.statusNids[getMutableIndex(statusAtPositionNid)]  = statusNid;
-               mutableArray.authorNids[getMutableIndex(statusAtPositionNid)]  = authorNid;
-               mutableArray.pathNids[getMutableIndex(statusAtPositionNid)]    = pathNid;
-               mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
-               uncomittedStatusPathEntries.put(usp, statusAtPositionNid);
-               hits.incrementAndGet();
+                for (int i = min; i < sequence.get(); i++) {
+                    mutableArray.commitTimes[getMutableIndex(i)] = Long.MIN_VALUE;
+                    sapToIntMap.put(getStatusNid(i), getAuthorNid(i), getPathNid(i), Long.MIN_VALUE, i);
+                }
 
-               return statusAtPositionNid;
+                uncomittedStatusPathEntries.clear();
+                mapperCache.clear();
             } finally {
-               expandPermit.release();
+                expandPermit.release();
             }
-         }
-      }
+        }
 
-      if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
-         hits.incrementAndGet();
+        sync();
+    }
 
-         return sapToIntMap.get(statusNid, authorNid, pathNid, time);
-      }
+    private void checkTimeAndAdd(long startTime, long endTime, IntSet specifiedSapNids, int sapNid) {
+        long time = getTime(sapNid);
 
-      expandPermit.acquireUninterruptibly();
+        if ((time >= startTime) && (time <= endTime)) {
+            specifiedSapNids.add(sapNid);
+        }
+    }
 
-      try {
+    public void clearMapperCache() {
+        mapperCache.clear();
+    }
 
-         // Try one last time...
-         if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
+    @Override
+    public void close() {
+        try {
+            this.sync();
+        } catch (IOException e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+
+        super.close();
+        initialPosition = -1;
+        positionArrayBinder =
+                new PositionArrayBinder();
+        mapperCache =
+                new ConcurrentHashMap<PositionBI, PositionMapper>();
+        uncomittedStatusPathEntries =
+                new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
+        setupLatch = new CountDownLatch(1);
+        misses = new AtomicInteger(0);
+        hits = new AtomicInteger(0);
+        currentPaths = null;
+        mutableArray = null;
+        readOnlyArray = null;
+    }
+
+    public IntSet commit(long time) throws IOException {
+        IntSet committedSapNids = new IntSet();
+
+        synchronized (uncomittedStatusPathEntries) {
+            expandPermit.acquireUninterruptibly();
+
+            try {
+                for (int sapNid : uncomittedStatusPathEntries.values()) {
+                    mutableArray.commitTimes[getMutableIndex(sapNid)] = time;
+                    sapToIntMap.put(getStatusNid(sapNid), getAuthorNid(sapNid), getPathNid(sapNid), time, sapNid);
+                    committedSapNids.add(sapNid);
+                }
+
+                uncomittedStatusPathEntries.clear();
+                mapperCache.clear();
+            } finally {
+                expandPermit.release();
+            }
+        }
+
+        sync();
+
+        return committedSapNids;
+    }
+
+    @Override
+    protected void init() throws IOException {
+        preloadBoth();
+        sequence = new AtomicInteger(Integer.MIN_VALUE + 1);
+
+        DatabaseEntry theKey = new DatabaseEntry();
+
+        IntegerBinding.intToEntry(0, theKey);
+
+        DatabaseEntry theData = new DatabaseEntry();
+
+        try {
+            if (readOnly.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+                readOnlyArray = positionArrayBinder.entryToObject(theData);
+            } else {
+                readOnlyArray = new PositionArrays();
+            }
+
+            if (mutable.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
+                mutableArray = positionArrayBinder.entryToObject(theData);
+            } else {
+                mutableArray = new PositionArrays();
+            }
+
+            int size = getPositionCount();
+            int readOnlySize = readOnlyArray.getSize();
+            int mutableSize = mutableArray.getSize();
+
+            sequence.set(Math.max(size, 1));
+            sapToIntMap = new SapToIntHashMap(sequence.get());
+
+            for (int i = 0; i < readOnlySize; i++) {
+                if (readOnlyArray.commitTimes[i] != 0) {
+                    sapToIntMap.put(readOnlyArray.statusNids[i], readOnlyArray.authorNids[i],
+                            readOnlyArray.pathNids[i], readOnlyArray.commitTimes[i], i);
+                }
+            }
+
+            closeReadOnly();
+
+            for (int i = 0; i < mutableSize; i++) {
+                int mutableIndex = i + readOnlySize;
+
+                assert i < mutableArray.commitTimes.length :
+                        " mutableIndex: " + mutableIndex + " commitTimes.length: "
+                        + mutableArray.commitTimes.length;
+                assert i < mutableArray.statusNids.length :
+                        " mutableIndex: " + mutableIndex + " statusNids.length: " + mutableArray.statusNids.length;
+                assert i < mutableArray.pathNids.length :
+                        " mutableIndex: " + mutableIndex + " pathNids.length: " + mutableArray.pathNids.length;
+
+                if (mutableArray.commitTimes[i] != 0) {
+                    sapToIntMap.put(mutableArray.statusNids[i], mutableArray.authorNids[i],
+                            mutableArray.pathNids[i], mutableArray.commitTimes[i], mutableIndex);
+                }
+            }
+
+            if (size == 0) {
+                initialPosition = 1;
+            } else if ((readOnlyArray.size > 0) && (readOnlyArray.pathNids[0] == 0)) {
+                initialPosition = 1;
+            } else if ((readOnlyArray.size == 0) && (mutableArray.pathNids[0] == 0)) {
+                initialPosition = 1;
+            } else {
+                initialPosition = 0;
+            }
+
+            setupLatch.countDown();
+        } catch (DatabaseException e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static void reportStats() {
+        float hitStat = hits.get();
+        float misStat = misses.get();
+        float percent = hitStat / (misStat + hitStat);
+
+        System.out.println("hits: " + (int) hitStat + " misses: " + (int) misStat);
+        System.out.println("hit %: " + percent);
+    }
+
+    public static void reset() {
+        hits.set(0);
+        misses.set(0);
+        currentPaths = null;
+    }
+
+    @Override
+    public void sync() throws IOException {
+        expandPermit.acquireUninterruptibly();
+
+        try {
+            DatabaseEntry valueEntry = new DatabaseEntry();
+
+            positionArrayBinder.objectToEntry(mutableArray, valueEntry);
+
+            DatabaseEntry theKey = new DatabaseEntry();
+
+            IntegerBinding.intToEntry(0, theKey);
+            mutable.put(null, theKey, valueEntry);
+            super.sync();
+        } finally {
+            expandPermit.release();
+        }
+    }
+
+    /**
+    * TODO make this trim algorithm more intelligent.
+    */
+    private static void trimCache() {
+        boolean continueTrim = mapperCache.size() > 1;
+        long now = System.currentTimeMillis();
+
+        while (continueTrim) {
+            Entry<PositionBI, PositionMapper> looser = null;
+
+            for (Entry<PositionBI, PositionMapper> entry : mapperCache.entrySet()) {
+                if (looser == null) {
+                    looser = entry;
+                } else {
+                    if (looser.getValue().getLastRequestTime() > entry.getValue().getLastRequestTime()) {
+                        looser = entry;
+                    } else if (looser.getValue().getLastRequestTime() == entry.getValue().getLastRequestTime()) {
+                        if (looser.getValue().getQueryCount() > entry.getValue().getQueryCount()) {
+                            looser = entry;
+                        }
+                    }
+                }
+            }
+
+            if (now - looser.getValue().getLastRequestTime() > 1000) {
+                mapperCache.remove(looser.getKey());
+                continueTrim = mapperCache.size() > 1;
+            } else {
+                continueTrim = false;
+            }
+        }
+    }
+
+    //~--- get methods ---------------------------------------------------------
+    public int getAuthorNid(int sapNid) {
+        if (sapNid < 0) {
+            return Integer.MIN_VALUE;
+        }
+
+        if (sapNid < readOnlyArray.getSize()) {
+            return readOnlyArray.authorNids[sapNid];
+        } else {
+            return mutableArray.authorNids[getMutableIndex(sapNid)];
+        }
+    }
+
+    public static Set<Integer> getCurrentPaths() {
+        try {
+            currentPaths = Bdb.getPathManager().getPathNids();
+
+            return currentPaths;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected String getDbName() {
+        return "positionDb";
+    }
+
+    public static int getInitialPosition() {
+        try {
+            setupLatch.await();
+        } catch (InterruptedException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+
+        return initialPosition;
+    }
+
+    public PositionMapper getMapper(PositionBI position) {
+        PositionMapper pm = mapperCache.get(position);
+
+        if (pm != null) {
+            return pm;
+        }
+
+        pm = new PositionMapper(position);
+
+        PositionMapper existing = mapperCache.putIfAbsent(position, pm);
+
+        if (existing != null) {
+            pm = existing;
+        } else {
+            pm.queueForSetup();
+        }
+
+        trimCache();
+
+        return pm;
+    }
+
+    private int getMutableIndex(int index) {
+        return index - readOnlyArray.getSize();
+    }
+
+    public int getPathNid(int index) {
+        if (index < 0) {
+            return Integer.MIN_VALUE;
+        }
+
+        if (index < readOnlyArray.getSize()) {
+            return readOnlyArray.pathNids[index];
+        } else {
+            return mutableArray.pathNids[getMutableIndex(index)];
+        }
+    }
+
+    public PositionBI getPosition(int sapNid)
+            throws IOException, PathNotExistsException, TerminologyException {
+        int pathNid = -1;
+        long time = -1;
+        int status = -1;
+        int author = -1;
+
+        if (sapNid < readOnlyArray.getSize()) {
+            pathNid = readOnlyArray.pathNids[sapNid];
+            time = readOnlyArray.commitTimes[sapNid];
+            status = readOnlyArray.statusNids[sapNid];
+            author = readOnlyArray.authorNids[sapNid];
+        } else {
+            int mutableIndex = getMutableIndex(sapNid);
+
+            pathNid = mutableArray.pathNids[mutableIndex];
+            time = mutableArray.commitTimes[mutableIndex];
+            status = mutableArray.statusNids[mutableIndex];
+            author = mutableArray.authorNids[mutableIndex];
+        }
+
+        if (pathNid == 0) {
+            AceLog.getAppLog().severe("readOnly: " + (sapNid < readOnlyArray.getSize()) + " pathNid == 0 "
+                    + "sapNid == " + sapNid + " time: " + time + " status == " + status
+                    + " author: " + author);
+        }
+
+        PathBI path = Bdb.getPathManager().get(pathNid);
+
+        return new Position(time, path);
+    }
+
+    public int getPositionCount() {
+        return readOnlyArray.getSize() + mutableArray.getSize();
+    }
+
+    public int getReadOnlyMax() {
+        return readOnlyArray.size - 1;
+    }
+
+    public int getSapNid(StatusAuthorPosition tsp) {
+        return getSapNid(tsp.getStatusNid(), tsp.getAuthorNid(), tsp.getPathNid(), tsp.getTime());
+    }
+
+    public int getSapNid(int statusNid, int authorNid, int pathNid, long time) {
+        if (time == Long.MAX_VALUE) {
+            UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, pathNid);
+
+            if (uncomittedStatusPathEntries.containsKey(usp)) {
+                return uncomittedStatusPathEntries.get(usp);
+            } else {
+                expandPermit.acquireUninterruptibly();
+
+                try {
+                    if (uncomittedStatusPathEntries.containsKey(usp)) {
+                        return uncomittedStatusPathEntries.get(usp);
+                    }
+
+                    int statusAtPositionNid = sequence.getAndIncrement();
+
+                    mapperCache.clear();
+                    mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
+                    mutableArray.statusNids[getMutableIndex(statusAtPositionNid)] = statusNid;
+                    mutableArray.authorNids[getMutableIndex(statusAtPositionNid)] = authorNid;
+                    mutableArray.pathNids[getMutableIndex(statusAtPositionNid)] = pathNid;
+                    mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
+                    uncomittedStatusPathEntries.put(usp, statusAtPositionNid);
+                    hits.incrementAndGet();
+
+                    return statusAtPositionNid;
+                } finally {
+                    expandPermit.release();
+                }
+            }
+        }
+
+        if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
             hits.incrementAndGet();
 
             return sapToIntMap.get(statusNid, authorNid, pathNid, time);
-         }
+        }
 
-         int statusAtPositionNid = sequence.getAndIncrement();
+        expandPermit.acquireUninterruptibly();
 
-         mapperCache.clear();
-         sapToIntMap.put(statusNid, authorNid, pathNid, time, statusAtPositionNid);
-         mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
-         mutableArray.statusNids[getMutableIndex(statusAtPositionNid)]  = statusNid;
-         mutableArray.authorNids[getMutableIndex(statusAtPositionNid)]  = authorNid;
-         mutableArray.pathNids[getMutableIndex(statusAtPositionNid)]    = pathNid;
-         mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
-         misses.incrementAndGet();
+        try {
 
-         return statusAtPositionNid;
-      } catch (Throwable e) {
-         throw new RuntimeException(e);
-      } finally {
-         expandPermit.release();
-      }
-   }
+            // Try one last time...
+            if (sapToIntMap.containsKey(statusNid, authorNid, pathNid, time)) {
+                hits.incrementAndGet();
 
-   public IntSet getSpecifiedSapNids(IntSet pathIds, long startTime, long endTime) {
-      IntSet              specifiedSapNids = new IntSet();
-      Collection<Integer> values           = sapToIntMap.values();
-
-      if ((pathIds != null) && (pathIds.size() > 0)) {
-         for (int sapNid : values) {
-            if (pathIds.contains(getPathNid(sapNid))) {
-               checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+                return sapToIntMap.get(statusNid, authorNid, pathNid, time);
             }
-         }
-      } else {
-         for (int sapNid : values) {
-            checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
-         }
-      }
 
-      return specifiedSapNids;
-   }
+            int statusAtPositionNid = sequence.getAndIncrement();
 
-   public int getStatusNid(int index) {
-      if (index < 0) {
-         return Integer.MIN_VALUE;
-      }
+            mapperCache.clear();
+            sapToIntMap.put(statusNid, authorNid, pathNid, time, statusAtPositionNid);
+            mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
+            mutableArray.statusNids[getMutableIndex(statusAtPositionNid)] = statusNid;
+            mutableArray.authorNids[getMutableIndex(statusAtPositionNid)] = authorNid;
+            mutableArray.pathNids[getMutableIndex(statusAtPositionNid)] = pathNid;
+            mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
+            misses.incrementAndGet();
 
-      if (index < readOnlyArray.getSize()) {
-         return readOnlyArray.statusNids[index];
-      } else {
-         return mutableArray.statusNids[getMutableIndex(index)];
-      }
-   }
+            return statusAtPositionNid;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        } finally {
+            expandPermit.release();
+        }
+    }
 
-   public long getTime(int index) {
-      if (index == Integer.MAX_VALUE) {
-         throw new RuntimeException("index == Integer.MAX_VALUE");
-      }
+    public IntSet getSpecifiedSapNids(IntSet pathIds, long startTime, long endTime) {
+        IntSet specifiedSapNids = new IntSet();
+        Collection<Integer> values = sapToIntMap.values();
 
-      if (index < 0) {
-         return Long.MIN_VALUE;
-      }
+        if ((pathIds != null) && (pathIds.size() > 0)) {
+            for (int sapNid : values) {
+                if (pathIds.contains(getPathNid(sapNid))) {
+                    checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+                }
+            }
+        } else {
+            for (int sapNid : values) {
+                checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+            }
+        }
 
-      if (index < readOnlyArray.getSize()) {
-         return readOnlyArray.commitTimes[index];
-      } else {
-         return mutableArray.commitTimes[getMutableIndex(index)];
-      }
-   }
+        return specifiedSapNids;
+    }
 
-   public List<TimePathId> getTimePathList() {
-      HashSet<TimePathId> returnValues = new HashSet<TimePathId>();
-      Collection<Integer> values       = sapToIntMap.values();
+    public int getStatusNid(int index) {
+        if (index < 0) {
+            return Integer.MIN_VALUE;
+        }
 
-      for (int sapNid : values) {
-         returnValues.add(new TimePathId(getVersion(sapNid), getPathNid(sapNid)));
-      }
+        if (index < readOnlyArray.getSize()) {
+            return readOnlyArray.statusNids[index];
+        } else {
+            return mutableArray.statusNids[getMutableIndex(index)];
+        }
+    }
 
-      return new ArrayList<TimePathId>(returnValues);
-   }
+    public long getTime(int index) {
+        if (index == Integer.MAX_VALUE) {
+            throw new RuntimeException("index == Integer.MAX_VALUE");
+        }
 
-   public int getVersion(int index) {
-      if (index < 0) {
-         return Integer.MIN_VALUE;
-      }
+        if (index < 0) {
+            return Long.MIN_VALUE;
+        }
 
-      if (index < readOnlyArray.getSize()) {
-         return ThinVersionHelper.convert(readOnlyArray.commitTimes[index]);
-      } else {
-         return ThinVersionHelper.convert(mutableArray.commitTimes[getMutableIndex(index)]);
-      }
-   }
+        if (index < readOnlyArray.getSize()) {
+            return readOnlyArray.commitTimes[index];
+        } else {
+            return mutableArray.commitTimes[getMutableIndex(index)];
+        }
+    }
 
-   //~--- inner classes -------------------------------------------------------
+    public List<TimePathId> getTimePathList() {
+        HashSet<TimePathId> returnValues = new HashSet<TimePathId>();
+        Collection<Integer> values = sapToIntMap.values();
 
-   private static class PositionArrayBinder extends TupleBinding<PositionArrays> {
-      @Override
-      public PositionArrays entryToObject(TupleInput input) {
-         int            size   = input.readInt();
-         int            length = input.readInt();
-         PositionArrays pa     = new PositionArrays(length);
+        for (int sapNid : values) {
+            returnValues.add(new TimePathId(getVersion(sapNid), getPathNid(sapNid)));
+        }
 
-         for (int i = 0; i < length; i++) {
-            pa.statusNids[i]  = input.readInt();
-            pa.authorNids[i]  = input.readInt();
-            pa.pathNids[i]    = input.readInt();
-            pa.commitTimes[i] = input.readLong();
-         }
+        return new ArrayList<TimePathId>(returnValues);
+    }
 
-         pa.size = size;
+    public int getVersion(int index) {
+        if (index < 0) {
+            return Integer.MIN_VALUE;
+        }
 
-         return pa;
-      }
+        if (index < readOnlyArray.getSize()) {
+            return ThinVersionHelper.convert(readOnlyArray.commitTimes[index]);
+        } else {
+            return ThinVersionHelper.convert(mutableArray.commitTimes[getMutableIndex(index)]);
+        }
+    }
 
-      @Override
-      public void objectToEntry(PositionArrays pa, TupleOutput output) {
-         output.writeInt(pa.size);
-         output.writeInt(pa.pathNids.length);
+    //~--- inner classes -------------------------------------------------------
+    private static class PositionArrayBinder extends TupleBinding<PositionArrays> {
 
-         for (int i = 0; i < pa.pathNids.length; i++) {
-            output.writeInt(pa.statusNids[i]);
-            output.writeInt(pa.authorNids[i]);
-            output.writeInt(pa.pathNids[i]);
-            output.writeLong(pa.commitTimes[i]);
-         }
-      }
-   }
+        @Override
+        public PositionArrays entryToObject(TupleInput input) {
+            int size = input.readInt();
+            int length = input.readInt();
+            PositionArrays pa = new PositionArrays(length);
 
+            for (int i = 0; i < length; i++) {
+                pa.statusNids[i] = input.readInt();
+                pa.authorNids[i] = input.readInt();
+                pa.pathNids[i] = input.readInt();
+                pa.commitTimes[i] = input.readLong();
+            }
 
-   private static class PositionArrays {
-      int    size = 0;
-      int[]  authorNids;
-      long[] commitTimes;
-      int[]  pathNids;
-      int[]  statusNids;
+            pa.size = size;
 
-      //~--- constructors -----------------------------------------------------
+            return pa;
+        }
 
-      public PositionArrays() {
-         statusNids  = new int[MIN_ARRAY_SIZE];
-         authorNids  = new int[MIN_ARRAY_SIZE];
-         pathNids    = new int[MIN_ARRAY_SIZE];
-         commitTimes = new long[MIN_ARRAY_SIZE];
-         this.size   = 0;
-      }
+        @Override
+        public void objectToEntry(PositionArrays pa, TupleOutput output) {
+            output.writeInt(pa.size);
+            output.writeInt(pa.pathNids.length);
 
-      public PositionArrays(int size) {
-         statusNids  = new int[size];
-         authorNids  = new int[size];
-         pathNids    = new int[size];
-         commitTimes = new long[size];
-         this.size   = size;
-      }
+            for (int i = 0; i < pa.pathNids.length; i++) {
+                output.writeInt(pa.statusNids[i]);
+                output.writeInt(pa.authorNids[i]);
+                output.writeInt(pa.pathNids[i]);
+                output.writeLong(pa.commitTimes[i]);
+            }
+        }
+    }
 
-      //~--- methods ----------------------------------------------------------
+    private static class PositionArrays {
 
-      private void ensureCapacity(int size) {
-         if (size > getCapacity()) {
-            int   newCapacity    = pathNids.length + MIN_ARRAY_SIZE;
-            int[] tempStatusNids = new int[newCapacity];
+        int size = 0;
+        int[] authorNids;
+        long[] commitTimes;
+        int[] pathNids;
+        int[] statusNids;
 
-            System.arraycopy(statusNids, 0, tempStatusNids, 0, statusNids.length);
-            statusNids = tempStatusNids;
+        //~--- constructors -----------------------------------------------------
+        public PositionArrays() {
+            statusNids = new int[MIN_ARRAY_SIZE];
+            authorNids = new int[MIN_ARRAY_SIZE];
+            pathNids = new int[MIN_ARRAY_SIZE];
+            commitTimes = new long[MIN_ARRAY_SIZE];
+            this.size = 0;
+        }
 
-            int[] tempAuthorhNids = new int[newCapacity];
+        public PositionArrays(int size) {
+            statusNids = new int[size];
+            authorNids = new int[size];
+            pathNids = new int[size];
+            commitTimes = new long[size];
+            this.size = size;
+        }
 
-            System.arraycopy(authorNids, 0, tempAuthorhNids, 0, authorNids.length);
-            authorNids = tempAuthorhNids;
+        //~--- methods ----------------------------------------------------------
+        private void ensureCapacity(int size) {
+            if (size > getCapacity()) {
+                int newCapacity = pathNids.length + MIN_ARRAY_SIZE;
+                int[] tempStatusNids = new int[newCapacity];
 
-            int[] tempPathNids = new int[newCapacity];
+                System.arraycopy(statusNids, 0, tempStatusNids, 0, statusNids.length);
+                statusNids = tempStatusNids;
 
-            System.arraycopy(pathNids, 0, tempPathNids, 0, pathNids.length);
-            pathNids = tempPathNids;
+                int[] tempAuthorhNids = new int[newCapacity];
 
-            long[] tempCommitTimes = new long[newCapacity];
+                System.arraycopy(authorNids, 0, tempAuthorhNids, 0, authorNids.length);
+                authorNids = tempAuthorhNids;
 
-            System.arraycopy(commitTimes, 0, tempCommitTimes, 0, commitTimes.length);
-            commitTimes = tempCommitTimes;
-         }
-      }
+                int[] tempPathNids = new int[newCapacity];
 
-      //~--- get methods ------------------------------------------------------
+                System.arraycopy(pathNids, 0, tempPathNids, 0, pathNids.length);
+                pathNids = tempPathNids;
 
-      private int getCapacity() {
-         return pathNids.length;
-      }
+                long[] tempCommitTimes = new long[newCapacity];
 
-      private int getSize() {
-         return size;
-      }
+                System.arraycopy(commitTimes, 0, tempCommitTimes, 0, commitTimes.length);
+                commitTimes = tempCommitTimes;
+            }
+        }
 
-      //~--- set methods ------------------------------------------------------
+        //~--- get methods ------------------------------------------------------
+        private int getCapacity() {
+            return pathNids.length;
+        }
 
-      private void setSize(int size) {
-         this.size = size;
-         ensureCapacity(size);
-      }
-   }
+        private int getSize() {
+            return size;
+        }
+
+        //~--- set methods ------------------------------------------------------
+        private void setSize(int size) {
+            this.size = size;
+            ensureCapacity(size);
+        }
+    }
 }

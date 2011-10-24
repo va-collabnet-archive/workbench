@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -25,6 +26,11 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
 
    public TkConceptAttributesRevision() {
       super();
+   }
+
+   public TkConceptAttributesRevision(ConAttrVersionBI another) throws IOException {
+      super(another);
+      this.defined = another.isDefined();
    }
 
    public TkConceptAttributesRevision(DataInput in, int dataVersion)
@@ -76,7 +82,8 @@ public class TkConceptAttributesRevision extends TkRevision implements I_Concept
    }
 
    @Override
-   public TkConceptAttributesRevision makeConversion(Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {
+   public TkConceptAttributesRevision makeConversion(Map<UUID, UUID> conversionMap, long offset,
+           boolean mapAll) {
       return new TkConceptAttributesRevision(this, conversionMap, offset, mapAll);
    }
 

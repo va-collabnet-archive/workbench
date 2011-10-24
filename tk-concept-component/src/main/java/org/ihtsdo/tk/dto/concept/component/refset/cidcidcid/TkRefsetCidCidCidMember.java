@@ -5,10 +5,15 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidcidcid;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -16,10 +21,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidCidCidRevision> {
    public static final long serialVersionUID = 1;
@@ -34,6 +36,29 @@ public class TkRefsetCidCidCidMember extends TkRefsetAbstractMember<TkRefsetCidC
 
    public TkRefsetCidCidCidMember() {
       super();
+   }
+
+   public TkRefsetCidCidCidMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      TerminologyStoreDI                               ts        = Ts.get();
+      Collection<? extends RefexCnidCnidCnidVersionBI> refexes   = another.getVersions();
+      int                                              partCount = refexes.size();
+      Iterator<? extends RefexCnidCnidCnidVersionBI>   itr       = refexes.iterator();
+      RefexCnidCnidCnidVersionBI                       rv        = itr.next();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+      this.c2Uuid = ts.getUuidPrimordialForNid(rv.getCnid2());
+      this.c3Uuid = ts.getUuidPrimordialForNid(rv.getCnid3());
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetCidCidCidRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            rv = itr.next();
+            revisions.add(new TkRefsetCidCidCidRevision(rv));
+         }
+      }
    }
 
    public TkRefsetCidCidCidMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

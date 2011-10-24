@@ -5,11 +5,11 @@ package org.ihtsdo.tk.dto.concept.component.media;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -17,10 +17,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkMedia extends TkComponent<TkMediaRevision> {
    public static final long serialVersionUID = 1;
@@ -37,6 +34,31 @@ public class TkMedia extends TkComponent<TkMediaRevision> {
 
    public TkMedia() {
       super();
+   }
+
+   public TkMedia(MediaChronicleBI another) throws IOException {
+      super(another.getPrimordialVersion());
+
+      Collection<? extends MediaVersionBI> media        = another.getVersions();
+      int                                  partCount    = media.size();
+      Iterator<? extends MediaVersionBI>   itr          = media.iterator();
+      TerminologyStoreDI                   ts           = Ts.get();
+      MediaVersionBI                       mediaVersion = itr.next();
+
+      this.conceptUuid     = ts.getUuidPrimordialForNid(mediaVersion.getConceptNid());
+      this.typeUuid        = ts.getUuidPrimordialForNid(mediaVersion.getTypeNid());
+      this.dataBytes       = mediaVersion.getMedia();
+      this.format          = mediaVersion.getFormat();
+      this.textDescription = mediaVersion.getTextDescription();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkMediaRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            mediaVersion = itr.next();
+            revisions.add(new TkMediaRevision(mediaVersion));
+         }
+      }
    }
 
    public TkMedia(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

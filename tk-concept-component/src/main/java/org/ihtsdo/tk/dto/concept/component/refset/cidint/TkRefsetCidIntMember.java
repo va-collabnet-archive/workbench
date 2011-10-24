@@ -17,10 +17,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntRevision> {
    public static final long serialVersionUID = 1;
@@ -31,6 +31,29 @@ public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntR
    public int  intValue;
 
    //~--- constructors --------------------------------------------------------
+
+   public TkRefsetCidIntMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      TerminologyStoreDI                               ts        = Ts.get();
+      Collection<? extends RefexCnidIntVersionBI> refexes      = another.getVersions();
+      int                                              partCount = refexes.size();
+      Iterator<? extends RefexCnidIntVersionBI>   relItr    = refexes.iterator();
+      RefexCnidIntVersionBI                       rv        = relItr.next();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(rv.getCnid1());
+      this.intValue = rv.getInt1();
+ 
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetCidIntRevision>(partCount - 1);
+
+         while (relItr.hasNext()) {
+            rv = relItr.next();
+            revisions.add(new TkRefsetCidIntRevision(rv));
+         }
+      }
+   }
+
 
    public TkRefsetCidIntMember() {
       super();

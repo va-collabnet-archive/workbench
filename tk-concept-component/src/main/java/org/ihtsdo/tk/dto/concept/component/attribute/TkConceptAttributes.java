@@ -2,9 +2,9 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
@@ -16,10 +16,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision>
         implements I_ConceptualizeExternally {
@@ -33,6 +30,25 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
 
    public TkConceptAttributes() {
       super();
+   }
+
+   public TkConceptAttributes(ConAttrChronicleBI another) throws IOException {
+      super(another.getPrimordialVersion());
+
+      Collection<? extends ConAttrVersionBI> versions = another.getVersions();
+      Iterator<? extends ConAttrVersionBI>   itr      = versions.iterator();
+      ConAttrVersionBI                       vers     = itr.next();
+
+      this.defined = vers.isDefined();
+
+      if (versions.size() > 1) {
+         revisions = new ArrayList<TkConceptAttributesRevision>(versions.size() - 1);
+
+         while (itr.hasNext()) {
+            vers = itr.next();
+            revisions.add(new TkConceptAttributesRevision(vers));
+         }
+      }
    }
 
    public TkConceptAttributes(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

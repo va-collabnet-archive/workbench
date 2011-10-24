@@ -5,7 +5,9 @@ package org.ihtsdo.tk.dto.concept.component.description;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.ext.I_DescribeExternally;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
@@ -17,10 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkDescription extends TkComponent<TkDescriptionRevision> implements I_DescribeExternally {
    public static final long serialVersionUID = 1;
@@ -37,6 +36,34 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
    public TkDescription() {
       super();
+   }
+
+   public TkDescription(DescriptionChronicleBI desc) throws IOException {
+      super(desc.getPrimordialVersion());
+
+      Collection<? extends DescriptionVersionBI> versions  = desc.getVersions();
+      Iterator<? extends DescriptionVersionBI>   itr       = versions.iterator();
+      TerminologyStoreDI                         ts        = Ts.get();
+      int                                        partCount = versions.size();
+      DescriptionVersionBI                       part      = itr.next();
+
+      conceptUuid            = ts.getUuidPrimordialForNid(desc.getConceptNid());
+      initialCaseSignificant = part.isInitialCaseSignificant();
+      lang                   = part.getLang();
+      text                   = part.getText();
+      typeUuid               = ts.getUuidPrimordialForNid(part.getTypeNid());
+      pathUuid               = ts.getUuidPrimordialForNid(part.getPathNid());
+      statusUuid             = ts.getUuidPrimordialForNid(part.getStatusNid());
+      time                   = part.getTime();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkDescriptionRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+             DescriptionVersionBI dv = itr.next();
+            revisions.add(new TkDescriptionRevision(dv));
+         }
+      }
    }
 
    public TkDescription(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
