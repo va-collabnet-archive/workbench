@@ -213,7 +213,7 @@ public class DrComponentHelper {
 			modelersRolesSet.setRolesSetType("Modelers");
 			
 			DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
-			modelersRolesSet.setRolesSetType("Defining");
+			definingFormRolesSet.setRolesSetType("Defining");
 
 			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
 					null, 
