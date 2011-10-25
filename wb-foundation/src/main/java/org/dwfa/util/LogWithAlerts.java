@@ -61,9 +61,6 @@ public class LogWithAlerts {
 
     public void alertAndLog(final Component parent, final Level level, final String message, final Throwable ex) {
         if (DwfaEnv.isHeadless() == false) {
-            if (SwingUtilities.isEventDispatchThread()) {
-                alertAndLogPrivate(getActiveFrame(parent), level, message, ex);
-            } else {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -71,7 +68,7 @@ public class LogWithAlerts {
                     }
 
                 });
-            }
+            
         } else {
             getLogger().log(level, message, ex);
         }
