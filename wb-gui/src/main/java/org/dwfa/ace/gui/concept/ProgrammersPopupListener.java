@@ -26,6 +26,8 @@ import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -106,7 +108,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 		IMPORT_CHANGE_SET("Import change set..."), 
 		TOGGLE_QA("Toggle QA"),
 		REINDEX_LUCENE("Recreate Lucene index"),
-		EXPORT_ACTIVE_ONLY("Export active only from view");
+		EXPORT_ACTIVE_ONLY("Export active only from view"),
+		PATCH_MSMITH("Patch msmith#80#");
 		//J+
 
       String menuText;
@@ -213,6 +216,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
       case EXPORT_ACTIVE_ONLY :
          exportActiveOnly();
+
+         break;
+
+      case PATCH_MSMITH :
+         patchMSmith();
 
          break;
 
@@ -411,10 +419,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                csr.read();
 
                if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-            	   I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
+                  I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
 
-            	   wcsr.read();
-               } 
+                  wcsr.read();
+               }
             } finally {
                Terms.get().resumeChangeSetWriters();
             }
@@ -446,6 +454,64 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
    @Override
    public void mouseReleased(MouseEvent e) {
       maybeShowPopup(e);
+   }
+
+   private void patchMSmith() {
+      try {
+         FileDialog dialog = new FileDialog(new Frame(), "Select change set file...");
+
+         dialog.setMode(FileDialog.LOAD);
+         dialog.setDirectory(System.getProperty("user.dir"));
+         dialog.setFilenameFilter(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+               return name.endsWith(".eccs");
+            }
+         });
+         dialog.setVisible(true);
+
+         if (dialog.getFile() != null) {
+            File                 csf           = new File(dialog.getDirectory(), dialog.getFile());
+            FileInputStream      fis           = new FileInputStream(csf);
+            BufferedInputStream  bis           = new BufferedInputStream(fis);
+            DataInputStream      dataStream    = new DataInputStream(bis);
+            File                 ocsf          = new File(dialog.getDirectory(), dialog.getFile() + ".fixed");
+            FileOutputStream     fos           = new FileOutputStream(ocsf);
+            BufferedOutputStream bos           = new BufferedOutputStream(fos);
+            DataOutputStream     dataOutStream = new DataOutputStream(bos);
+
+            try {
+               int count = 0;
+
+               while (dataStream.available() > 0) {
+                  long      nextCommit = dataStream.readLong();
+                  TkConcept eConcept   = new TkConcept(dataStream);
+
+                  if (eConcept.getPrimordialUuid().equals(
+                          UUID.fromString("629a6c24-1f0a-3941-90df-8a7103a98ec7"))) {
+                     for (TkRefsetAbstractMember member : eConcept.getRefsetMembers()) {
+                        if (member.getPrimordialComponentUuid().equals(
+                                UUID.fromString("bbde54c9-fc58-41e7-90b2-52f7029068e1"))) {
+                           member.setPrimordialComponentUuid(UUID.randomUUID());
+                        }
+                     }
+                  }
+
+                  dataOutStream.writeLong(nextCommit);
+                  eConcept.writeExternal(dataOutStream);
+                  count++;
+               }
+            } catch (EOFException ex) {
+
+               // Nothing to do...
+            } finally {
+               dataStream.close();
+               dataOutStream.close();
+            }
+         }
+      } catch (Exception ex) {
+         Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+      }
    }
 
    private void recreateLuceneIndex() {
