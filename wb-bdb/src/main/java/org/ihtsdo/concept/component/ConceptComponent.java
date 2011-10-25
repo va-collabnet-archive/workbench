@@ -83,13 +83,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
                    I_HandleFutureStatusAtPositionSetup {
-   private static boolean          fixAlert         = true;
+   private static AtomicBoolean          fixAlert         = new AtomicBoolean(true);
    private static AnnotationWriter annotationWriter = new AnnotationWriter();
 
    //~--- fields --------------------------------------------------------------
@@ -131,9 +132,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       } else if (cNid != this.enclosingConceptNid) {
          Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
 
-         if (fixAlert) {
+         if (fixAlert.compareAndSet(true, false)) {
             AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
-            fixAlert = false;
          }
 
          AceLog.getAppLog().warning("Datafix warning. cNid " + cNid + " "

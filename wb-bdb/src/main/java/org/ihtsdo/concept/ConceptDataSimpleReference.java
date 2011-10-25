@@ -52,7 +52,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -62,10 +61,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    private AtomicReference<AddSrcRelSet>                   srcRels    = new AtomicReference<AddSrcRelSet>();
    private AtomicReference<ConcurrentSkipListSet<Integer>> srcRelNids =
       new AtomicReference<ConcurrentSkipListSet<Integer>>();
-   Semaphore                                                               sourceRelSemaphore     =
-      new Semaphore(1);
-   Semaphore                                                               refsetMembersSemaphore =
-      new Semaphore(1);
+   ReentrantLock                                                               sourceRelLock     =
+      new ReentrantLock();
+   ReentrantLock                                                               refsetMembersLock =
+      new ReentrantLock();
    private AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>> refsetMembersMap       =
       new AtomicReference<ConcurrentHashMap<Integer, RefsetMember<?, ?>>>();
    private AtomicReference<AddMemberSet>                                   refsetMembers      =
@@ -77,15 +76,15 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    private ReentrantLock                                   memberMapLock  = new ReentrantLock();
    private AtomicReference<AddImageSet>                    images         =
       new AtomicReference<AddImageSet>();
-   Semaphore                                               imageSemaphore = new Semaphore(1);
+   ReentrantLock                                               imageLock = new ReentrantLock();
    private AtomicReference<ConcurrentSkipListSet<Integer>> imageNids      =
       new AtomicReference<ConcurrentSkipListSet<Integer>>();
    private AtomicReference<AddDescriptionSet>              descriptions  =
       new AtomicReference<AddDescriptionSet>();
-   Semaphore                                               descSemaphore = new Semaphore(1);
+   ReentrantLock                                               descLock = new ReentrantLock();
    private AtomicReference<ConcurrentSkipListSet<Integer>> descNids      =
       new AtomicReference<ConcurrentSkipListSet<Integer>>();
-   Semaphore       attrSemaphore = new Semaphore(1);
+   ReentrantLock       attrLock = new ReentrantLock();
    private Boolean annotationIndex;
    private Boolean annotationStyleRefset;
 
@@ -572,7 +571,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public ConceptAttributes getConceptAttributes() throws IOException {
       if (attributes.get() == null) {
-         attrSemaphore.acquireUninterruptibly();
+         attrLock.lock();
 
          try {
             if (attributes.get() == null) {
@@ -584,7 +583,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                }
             }
          } finally {
-            attrSemaphore.release();
+            attrLock.unlock();
          }
       }
 
@@ -629,7 +628,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public AddDescriptionSet getDescriptions() throws IOException {
       if (descriptions.get() == null) {
-         descSemaphore.acquireUninterruptibly();
+         descLock.lock();
 
          try {
             if (descriptions.get() == null) {
@@ -638,7 +637,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                                              OFFSETS.DESCRIPTIONS, enclosingConcept)));
             }
          } finally {
-            descSemaphore.release();
+            descLock.unlock();
          }
       }
 
@@ -672,7 +671,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public AddImageSet getImages() throws IOException {
       if (images.get() == null) {
-         imageSemaphore.acquireUninterruptibly();
+         imageLock.lock();
 
          try {
             if (images.get() == null) {
@@ -681,7 +680,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                                        enclosingConcept)));
             }
          } finally {
-            imageSemaphore.release();
+            imageLock.unlock();
          }
       }
 
@@ -917,7 +916,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       }
 
       if (refsetMembers.get() == null) {
-         refsetMembersSemaphore.acquireUninterruptibly();
+         refsetMembersLock.lock();
 
          try {
             if (refsetMembers.get() == null) {
@@ -926,7 +925,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                                               OFFSETS.REFSET_MEMBERS, enclosingConcept)));
             }
          } finally {
-            refsetMembersSemaphore.release();
+            refsetMembersLock.unlock();
          }
       }
 
@@ -943,7 +942,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    public AddSrcRelSet getSourceRels() throws IOException {
       if (srcRels.get() == null) {
-         sourceRelSemaphore.acquireUninterruptibly();
+         sourceRelLock.lock();
 
          try {
             if (srcRels.get() == null) {
@@ -952,7 +951,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                                         enclosingConcept)));
             }
          } finally {
-            sourceRelSemaphore.release();
+            sourceRelLock.unlock();
          }
       }
 
