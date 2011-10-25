@@ -12,6 +12,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -29,9 +31,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -271,6 +275,33 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 	@Override
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
+		SearchResult result = Terms.get().doLuceneSearch(fsn);
+		boolean unique = true;
+        if (result.topDocs.totalHits == 0) {
+        	unique = true;
+        } else {
+        	NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
+            search:
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+                int dnid = Integer.parseInt(doc.get("dnid"));
+
+                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                if (potential_fsn != null) {
+                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                        if (allowedStatusNids.contains(part_search.getStatusNid())
+                                && part_search.getText().equals(fsn)) {
+                            unique = false;
+                            break search;
+                        } 
+                    }
+                }
+            }
+        }
+        return !unique;
+	}
+	public boolean isFsnTextNotUniqueOld(String fsn, String conceptUuid, String langCode) throws Exception{
 		boolean result = false;
 		I_TermFactory tf = Terms.get();
 		try {
@@ -379,7 +410,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					RelAssertionType.STATED)) {
 				parents.add(Terms.get().getConcept(loopTuple.getC2Id()));
 			}
-			
+
 			Set<String> parentSemtags = new HashSet<String>();
 			for (I_GetConceptData loopParent : parents) {
 				for (I_DescriptionTuple loopDescription : loopParent.getDescriptionTuples(config.getAllowedStatus(), 
@@ -444,7 +475,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				int isaType = spec.getLenient().getNid();
 				I_IntSet allowedrels = Terms.get().newIntSet();
 				allowedrels.add(isaType);
-				
+
 				if (concept.getDestRelTuples(config.getAllowedStatus(), 
 						allowedrels, config.getViewPositionSetReadOnly(), 
 						config.getPrecedence(), config.getConflictResolutionStrategy(),
@@ -513,7 +544,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 	@Override
 	public boolean isTargetOfHistoricalRelationships(String conceptUuid) {
 		boolean result = false;
@@ -573,15 +604,15 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 		return result;
 	}
-	
+
 	private UUID uuidFromString(String string) {
 		UUID uuid = TerminologyHelperDroolsWorkbench.uuidsMap.get(string);
-		
+
 		if (uuid == null) {
 			uuid = UUID.fromString(string);
 			TerminologyHelperDroolsWorkbench.uuidsMap.put(string, uuid);
 		}
-		
+
 		return uuid;
 	}
 
