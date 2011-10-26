@@ -28,6 +28,7 @@
 	
 	<property name="task.execute.bl" value="yes" />
 	<property name="project.lib.dir" value="target" />
+	<property name="project.gen.res.dir" value="generated-resources" />
 	<property name="project.config.dir" value="./service-ui/TextFiles" />
 	
 	<property name="wb.dir" value="ext-lib" />
@@ -69,8 +70,9 @@
 			<equals arg1="${task.execute.bl}" arg2="yes" />
 			<then>		
 				<antcall target="build-wb-lib"/>
-				<antcall target="build-wb-profiles"/>
-				<antcall target="copy-wb-config"/>
+				<antcall target="build-wb-tasks"/>
+				<!-- <antcall target="build-wb-profiles"/>
+				<antcall target="copy-wb-config"/> -->
 				
 				<if>
 					<equals arg1="${zip.bl}" arg2="yes" />
@@ -105,9 +107,20 @@
 		<delete dir="${wb.lib.dir}" failonerror="true" />
 		<mkdir dir="${wb.lib.dir}" />
 		<copy todir="${wb.lib.dir}" failonerror="false">
-			<fileset dir="${project.lib.dir}" includes="**/*" />
+			<fileset dir="${project.lib.dir}" includes="**/*.jar" />
 		</copy>
 	</target>
+	
+	
+	
+	<target name="build-wb-tasks" description="rebuild the wb lib from target">
+		<echo> "build-wb-tasks Called"</echo>
+		<copy todir="${wb.dir}" failonerror="false">
+			<fileset dir="${project.lib.dir}/${project.gen.res.dir}" includes="**/*" />
+		</copy>
+	</target>
+	
+	
 	
 	<target name="build-wb-profiles" description="delete all eccs files from profiles">	
 		<echo> "build-wb-profiles Called"</echo>	
@@ -127,6 +140,8 @@
 	</target>
 	
 
+	
+	
 
 	
 	<!-- Zip up files and save to output.file-->

@@ -37,7 +37,7 @@
 		<!-- The path to the default Workbench instance. Values : FilePath -->
 		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/nhs-subset-editor-sa-bundle</AntDeployWorkBenchDeploy_Dir> -->
 		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/wb-bundle-test/wb-bundle</AntDeployWorkBenchDeploy_Dir> -->
-		<AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev</AntDeployWorkBenchDeploy_Dir> 
+		<AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\release</AntDeployWorkBenchDeploy_Dir> 
 		<!-- <AntDeployWorkBenchDeploy_Dir>D:\Data\Terminology\WB_Builds\trektest\editor-sync-1.0.1-SNAPSHOT-assembly</AntDeployWorkBenchDeploy_Dir>  -->
 		
 		<!-- Run workbench? Values :  yes or no -->
@@ -68,7 +68,7 @@
 			</activation>
 			<properties>
 				<custom-ui.version>0.0.1-SNAPSHOT</custom-ui.version>
-				<workbench.version>2.6.0-trek-39-SNAPSHOT</workbench.version>
+				<workbench.version>2.6.0-trek-41-SNAPSHOT</workbench.version>
 			</properties>
 		</profile>
 	</profiles>
@@ -239,7 +239,7 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>2.6.0-trek-43-SNAPSHOT</version>
+				<version>${workbench.version}</version>
 				<executions>
 					<execution>
 						<id>export-task-classes</id>
