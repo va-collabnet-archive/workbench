@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -130,7 +131,7 @@ public class LoadBdbMulti extends AbstractMojo {
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
     private int converterSize = 1;
-
+    
     @Override
     public void execute() throws MojoExecutionException {
         executeMojo(conceptsFileNames, generatedResources, berkeleyDir);
