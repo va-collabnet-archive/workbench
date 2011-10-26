@@ -24,6 +24,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
+import org.ihtsdo.tk.drools.facts.ConAttrFact;
 
 public class CancelAction extends AbstractAction {
 
@@ -32,6 +33,12 @@ public class CancelAction extends AbstractAction {
     ViewCoordinate vc;
 
     public CancelAction(String actionName, ComponentFact<ComponentVersionBI> fact, ViewCoordinate vc) {
+        super(actionName);
+        this.component = fact.getComponent();
+        this.vc = vc;
+    }
+    
+    public CancelAction(String actionName, ConAttrFact fact, ViewCoordinate vc) {
         super(actionName);
         this.component = fact.getComponent();
         this.vc = vc;

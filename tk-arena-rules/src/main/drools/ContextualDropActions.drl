@@ -144,6 +144,19 @@ rule "rule 4.2" #CANCEL concept onto same concept
       actions.add(new CancelAction("cancel", $dropObject, vc));
 end
 
+rule "rule 4.3" #CANCEL conAttr 
+
+   when
+         ViewFact(getView() == View.STATED)
+         $dropTarget: ConAttrFact(context == Context.DROP_TARGET)
+         $dropObject: ConAttrFact(((ComponentVersionBI)this.component).getTime() == Long.MAX_VALUE,
+                getConAttr().getPrimordialVersion().getTime() != Long.MAX_VALUE,
+                context == Context.DROP_OBJECT, component == $dropTarget.component)
+   then
+      actions.add(new CancelAction("cancel", $dropObject, vc));
+end
+
+
 rule "rule 5" #template onto concept
 
    when
