@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Editor mode</title>
+  <body>
+    <p><image href="images_transl/53_proj_config_editor_mode.PNG" id="image_vrs_wkc_hc"/></p>
+    <p>
+      <ul id="ul_ndp_xkc_hc">
+        <li>Full editor: allows any kind of translation work, adding or modifying FSNs, preferred
+          terms or synonyms</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_uhj_zkc_hc">
+        <li>Preferred term editor: enters automatically into preferred term editing mode, and all
+          other functions are disabled.</li>
+      </ul>
+    </p>
+    <p>
+      <ul id="ul_cpy_alc_hc">
+        <li>Synonyms editor: enters automatically into synonyms editor mode, and all other functions
+          are disabled.</li>
+      </ul>
+    </p>
+    <p><i><b>NOTE:</b> for this and all windows in this function, your specifications will be
+        applied upon clicking “Apply” button. Once you have specified all your preferences, you must
+        click Accept button.</i></p>
+  </body>
+</topic>

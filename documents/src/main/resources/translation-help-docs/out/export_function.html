@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="copyright" content="(C) Copyright 2005"/>
+<meta name="DC.rights.owner" content="(C) Copyright 2005"/>
+<meta name="DC.Type" content="topic"/>
+<meta name="DC.Title" content="Export function"/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="topic-1"/>
+<link rel="stylesheet" type="text/css" href="commonltr.css"/>
+<title>Export function</title>
+</head>
+<body id="topic-1"><a name="topic-1"><!-- --></a>
+
+
+  <h1 class="title topictitle1">Export function</h1>
+
+  <div class="body">
+    <p class="p">This function allows to export refsets, worksets, partitions and worklists in release format
+      1 (RF1) and release format 2 (RF2).</p>
+
+    <p class="p">Clicking one of the upper buttons will allow you to select the desired release format. Click
+      the upper button on the right to select the folder where your file will be placed, while the
+      lower button on the right allows selecting a file to log results.</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_hqn_ltq_hc"><!-- --></a><img class="image" id="topic-1__image_hqn_ltq_hc" src="images_transl/120_export_select_buttons.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">Drag and drop the refset concept to the Refset concept line.</p>
+
+    <p class="p">You may also select the file format (.txt or .csv):</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_yix_vtq_hc"><!-- --></a><img class="image" id="topic-1__image_yix_vtq_hc" src="images_transl/121_export_select_refset.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">Upon clicking Export button, the refset is exported according to your specifications and a
+      message appears as shown below. Also, the Results window will display a summary description of
+      the exported document.</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_ken_bfl_ic"><!-- --></a><img class="image" id="topic-1__image_ken_bfl_ic" src="images_transl/122_refset exported.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">In the example shown, you specified that a document with RF2 format would be exported. Two
+      tables were generated as .txt files: TEST 2 (worklist)-ET 20101116170445_SCTID.txt and TEST 2
+      (worklist)-ET 20101116170445_UUID.txt. </p>
+
+    <div class="p">The SCTID.txt file will show the following fields: <a name="topic-1__ul_oxa_gfl_ic"><!-- --></a><ul class="ul" id="topic-1__ul_oxa_gfl_ic">
+        <li class="li">an internal UUID, the effective time (date when the last component version was
+          generated, component status for RF2 (1 = active), </li>
+
+        <li class="li">the component path, </li>
+
+        <li class="li">workset UUID, and </li>
+
+        <li class="li">SCTID (which in this case is the Concept ID because the selected worklist is a concept
+          refset). </li>
+
+      </ul>
+</div>
+
+    <p class="p">The UUID.txt document is similar, except that the UUID is displayed as a component identifier
+      instead of SCTID.</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_ohu_hgl_ic"><!-- --></a><img class="image" id="topic-1__image_ohu_hgl_ic" src="images_transl/123_exported_sctid_txt.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">If you select .csv format for your export, the same information will be displayed in a .csv
+      table:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_fvd_whl_ic"><!-- --></a><img class="image" id="topic-1__image_fvd_whl_ic" src="images_transl/124_exported_csv_table.PNG"/></p>
+
+    <p class="p">The UUID.txt document is similar, except that the UUID is displayed as component identifier
+      instead of SCTID.</p>
+
+    <p class="p">When you select exporting a component with RF1 format, the same process must be followed.</p>
+
+    <p class="p">A .txt table is generated when you select .txt format option:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_cur_gil_ic"><!-- --></a><img class="image" id="topic-1__image_cur_gil_ic" src="images_transl/125_exported_rf1_txt_table.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">If you select .csv format for your export, the same information will be displayed in a .csv
+      table:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_tcg_yrl_ic"><!-- --></a><img class="image" id="topic-1__image_tcg_yrl_ic" src="images_transl/126_exported_ref1_csv_table.PNG"/></p>
+
+    <p class="p"/>
+
+    <p class="p">The exported files are placed in the specified folder:</p>
+
+    <p class="p"/>
+
+    <p class="p"><a name="topic-1__image_ybb_isl_ic"><!-- --></a><img class="image" id="topic-1__image_ybb_isl_ic" src="images_transl/127_exported_specified_folder.PNG"/></p>
+
+  </div>
+
+
+</body>
+</html>

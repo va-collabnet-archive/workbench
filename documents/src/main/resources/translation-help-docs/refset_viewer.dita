@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Refset viewer</title>
+  <body>
+    <p>The refset viewer allows seeing the members of a given refset.</p>
+    <p>When this tool is selected, the refset viewer is displayed in the lower third of the
+      screen:</p>
+    <p><image href="images_transl/64_refset_viewer.PNG" id="image_ihr_ted_hc"/></p>
+    <p>Select a refset, drag and drop it into the refset title box:</p>
+    <p/>
+    <p><image href="images_transl/65_refset_viewer_drag_and_drop.PNG" id="image_mjz_cfd_hc"/></p>
+    <p/>
+    <p>The refset members are displayed when the selected refset is dragged into the refset viewer
+      window. Also, the total number of refset members are displayed in brackets:</p>
+    <p/>
+    <image href="images_transl/66_refset_viewer_total_number.PNG" id="image_ice_lfd_hc"/>
+    <p>The window may be expanded/reduced by clicking the expand/reduce icons.</p>
+    <p/>
+    <p><image href="images_transl/67_refset_viewer_enlarged.PNG" id="image_lve_rkq_hc"/></p>
+  </body>
+</topic>

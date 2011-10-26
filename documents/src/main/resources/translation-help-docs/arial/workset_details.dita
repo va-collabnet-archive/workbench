@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Workset details</title>
+  <body>
+    <p><b>REMEMBER! A workset is a refset “frozen” in a point of time and associated to a
+        project.</b></p>
+    <p/>
+    <p><b><u>Creation if worksets</u></b></p>
+    <p>
+      <ul id="ul_35e20d17-5f93-4151-a8da-d150b9e3a41a">
+        <li>Open the worksets tab on the right panel and click “Create new workset”. A new window is
+          displayed in order to enter a new workset name. (You will not be able to create two
+          worksets with the same name, an alert message will be displayed).</li>
+        <li>Once you have entered a new workset name you should define the refset from which you
+          will obtain the concepts to be translated. Once again, the source refset and any
+          additional features may be displayed by clicking the respective tabs on the right
+          panel.</li>
+        <li>In order to create a workset, you should follow these steps:<ul
+            id="ul_6dc275b6-0b7a-4f44-81c7-cd362f10d8b0">
+            <li><i>Define your source refset:</i> Open the taxonomy tab on the left pane and select
+              the refset containing the concepts to the translated. Drag and drop it into the Source
+              Refset field in the right panel. Then click “save”:</li>
+          </ul></li>
+      </ul>
+    </p>
+    <p><image href="images/workset_source_refset.PNG" id="image_cvp_ijz_mb"/></p>
+    <p/>
+    <ul id="ul_ada8a351-0edd-44c3-a060-9e804e4f907a">
+      <li>You may also drag and drop refsets from the tree view in the left pane (e.g., if you had
+        specified a linked refset you may drag and drop it into the source refset window from the
+        linked refset folder.<p><image href="images/workset_drag_and_drop.PNG" id="image_qpx_jjz_mb"
+          /></p></li>
+      <li>
+        <p>Save your specifications. (If you have forgotten to save your source refset and try to
+          synchronize without saving, an error message will de shown.)</p>
+      </li>
+      <li><p>Upon saving the source refset, the list and the number of refset members is displayed.
+          However, if you open the Workset members tab, you will see that it is still empty:
+            </p><p><image href="images/workset_empty_members.PNG" id="image_msl_ljz_mb"/></p><p>The
+          list of workset members will only be shown after synchronizing the workset with the source
+          refset.</p><p>
+          <ul id="ul_cd58cbfc-9f41-4a7b-b38d-e489ff60cd0e">
+            <li><i>Define your exclusion refsets (if any):</i> Whenever you have a refset of
+              concepts that will not be translated, you should specify them as an exclusion refset
+              before synchronizing your refset. Any exclusion refset must be defined in the project.
+              Otherwise, the refset will not be excluded.</li>
+          </ul>
+        </p><p><image href="images/workset_exclusion_refset.PNG" id="image_mnm_pjz_mb"/></p>Then,
+        you must synchronize your workset with the source refset in order to ensure they are
+            identical.<p><b>NOTE: A refset is mutable and does not belong to the Translation
+            Process, but a Workset does. Therefore there is a need to keep one or more copies of a
+            set of data consistent with the refset created for the translation
+          process</b></p><p/><p>Click “Sync” button to synchronize your refset. A confirmation
+          message is displayed:</p><p><image href="images/workset_synchronization.PNG"
+            id="image_yve_tjz_mb"/></p><p>Once your workset has been synchronized, a message will be
+          displayed, and if you open the Members tab, now tou will see that the workset members list
+          is exactly as you specified in your source refset:</p><p><image
+            href="images/members_following_synch.PNG" id="image_icc_vjz_mb"/></p><p>But, what would
+          have happened if an Exclusion refset had been specified, as shown in the figure
+            below?</p><p><image href="images/workset_members_minus_exclusion.PNG"
+            id="image_ueb_xjz_mb"/></p><p>The Source refset has 734 members, and the Exclusion
+          refset, 505 (any refset details may be seen with the Refset Viewer). According to your
+          specification, you asked to create a workset with the source refset minus the exclusion
+          refset. Therefore, you will have the following Workset following
+            synchronization:</p><p><image href="images/workset_following_exclusion_refset.PNG"
+            id="image_wyh_ckz_mb"/></p></li>
+    </ul>
+  </body>
+</topic>

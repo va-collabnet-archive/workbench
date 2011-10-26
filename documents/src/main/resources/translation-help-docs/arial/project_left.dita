@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Project left panel</title>
+  <body>
+    <p>The left panel displays the different parts of your translation project in a tree view, each
+      of them identified by a distinct icon. Clicking on each icon will display the corresponding
+      details pane on the right.<ul id="ul_eff531e5-0332-422b-a35e-846703e1b31c">
+        <li>Select “Open Project Manager” from the upper left menu. The project manager tab is
+          displayed as a Translation Projects folder.</li>
+        <li>Double clicking will display the translation project tree.</li>
+        <li>Click the ‘Add project’ button to create a new project: </li>
+      </ul></p>
+    <p><image href="images/add_project.PNG" id="image_qvn_dez_mb"/></p>
+    <p>
+      <ul id="ul_d8a3e903-40fa-4f0f-b590-6ddc70304d77">
+        <li>A new window is displayed requesting to enter a new project name. Enter a new project
+          name and click "OK":</li>
+      </ul>
+    </p>
+    <p><image href="images/project_name.PNG" id="image_rqj_fez_mb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_6ea1d9c1-1a9f-495d-8d2e-a1ddc65218a3">
+        <li>The new project will be displayed under the Translation Projects folder on the left.
+        </li>
+      </ul>
+    </p>
+    <p><image href="images/project_left.PNG" id="image_xdm_iez_mb"/></p>
+    <p>
+      <ul id="ul_60ca04ec-47f5-4bd2-8032-9789e9f6f768">
+        <li>Now you must define its main characteristics. To do so, click your prject's name and go
+          to the details panel on the right.</li>
+      </ul>
+    </p>
+  </body>
+</topic>

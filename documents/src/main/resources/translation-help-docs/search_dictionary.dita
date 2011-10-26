@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Search dictionary</title>
+  <body>
+    <p>When you select this option, a text box is shown where the search term should be entered. </p>
+    <p>Once you have entered a earch text, press "Search" button.</p>
+    <p/>
+    <p><image href="images_transl/73_search_dictionary.PNG" id="image_wcx_vhi_hc"/></p>
+    <p>If the searched term is found an <b>OK</b> message is displayed, along with a set of
+      similarity suggestions.</p>
+    <p>When the search item is not included in the dictionary, a message “Not in dictionary” is
+      displayed:</p>
+    <p/>
+    <p><image href="images_transl/74_search_dict_not_found.PNG" id="image_wcj_uji_hc"/></p>
+  </body>
+</topic>

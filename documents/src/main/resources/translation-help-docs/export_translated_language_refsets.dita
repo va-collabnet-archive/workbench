@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Export translated language refsets</title>
+  <body>
+    <p>This tab allows exporting translated language refsets.</p>
+    <p/>
+    <p>The window on the left shows all the translatios statuses, while the one on the right will
+      display any concept statuses that will not be exported, e.g., translated status, rejected,
+      etc.</p>
+    <p/>
+    <p><image href="images_transl/134_export_translated_lang_refset_not_exported.PNG"/></p>
+    <p>Click the “>”or “&lt;” buttons to move the selected statuses from one side to another:</p>
+    <p/>
+    <p><image href="images_transl/135_export_transl_excluded.PNG"/></p>
+    <p>If your translation is not complete but you need to export a full concepts table for any
+      reason, you may tick the “Include not translated concepts ….” box to enable a drag and drop
+      function and drop a refset to complete your table:</p>
+    <p/>
+    <p><image href="images_transl/136_export_transl_lang_include_not_transl.PNG"/></p>
+    <p/>
+    <p>Then, you should specify a release date (YYYYMMDD) and choose a folder to export. If you need
+      to browse where will you place your export, click the button on the right. The log file name
+      should be left empty:</p>
+    <p/>
+    <p><image href="images_transl/137_release_date.PNG"/></p>
+    <p/>
+    <p>Then press the export bar. Exportation may take some time when the language refset is large.
+      A working bar is displayed during this process:</p>
+    <p/>
+    <p><image href="images_transl/138_working_bar.PNG"/></p>
+    <p>When the process ends, a message is displayed and you will be able to open your exported
+      files:</p>
+    <p/>
+    <p><image href="images_transl/139_refset_exported.PNG"/></p>
+  </body>
+</topic>

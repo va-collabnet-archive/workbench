@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Translation help window</title>
+  <body>
+    <p>This window is shown in a separate tab on the left pane for a better visualization. The help
+      window is divided in three sections:</p>
+    <p>
+      <ul id="ul_904c12bf-98e7-4096-96c6-96f42b298a97">
+        <li>An upper <b>Similarity</b> section that shows similar translations. An enlarged view is
+          displayed upon clicking “E[x]pand” button. The user may also choose to see FSNs, Preferred
+          terms or both. In the expanded view, a Status column has been added. Whenever a displayed
+          similarity match exists with a concept included in the current project, the status for
+          that concept in the translation workflow is also listed:</li>
+      </ul>
+    </p>
+    <p><image href="images/TRANSLATION_HELP_SIMILARITY.PNG" id="image_teu_rgz_mb"/></p>
+    <p/>
+    <p>If the user selects a similarity match by FSN, matching source and target FSN are sought. If
+      the target language has not translated FSNs, no similarity matches will be displayed (A). If
+      matching criteria are specified by preferred term the list of matches will be displayed (B).
+      Finally, if “Both” button is selected, matching will be sought for FSNs and PTs. If the target
+      language has no translated FSNs, the PTs will be shown twice (C). In case that target language
+      has used source FSNs, these will be displayed in the target FSN rows (not shown):</p>
+    <p>(A) Similarity matching by FSN Similarity matching by FSN:</p>
+    <p><image href="images/FSN_similarity_matching.PNG" id="image_kqy_sgz_mb"/></p>
+    <p>(B) Similarity matching by Preferred term:</p>
+    <p><image href="images/PT_%20similarity_matching.PNG" id="image_ipm_ugz_mb"/></p>
+    <p>(C) Similarity matching by FSN and Preferred term in a target language without translated
+      FSNs:</p>
+    <p><image href="images/BOTH_similarity_matching.PNG" id="image_lxq_vgz_mb"/></p>
+    <p/>
+    <p>When “Refine” box is ticked, a search option is opened, and any term is searched. In this
+      window, the user may write any word he/she wants to find for similarity in the source
+      language, and the results are displayed below:</p>
+    <p><image href="images/REFINE_similarity_search.PNG" id="image_llc_xgz_mb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_5d112112-51f7-4ac9-b16b-a76c32d9a65c">
+        <li>A middle <b>Translation memory</b> section, which displays similar semantic structures
+          that have already been translated, in order to maintain translation consistency:</li>
+      </ul>
+    </p>
+    <p><image href="images/Translation_memory.PNG" id="image_mhk_ygz_mb"/></p>
+    <p/>
+    <p>
+      <ul id="ul_ad513ffd-a157-4777-b805-1364ca49d16a">
+        <li>A lower Linguistic Guidelines section, where applicable linguistic rules are displayed.
+          Also, false cognates are presented in this section.</li>
+      </ul>
+    </p>
+    <p><image href="images/Editorial_guidelines.PNG" id="image_kyc_ahz_mb"/></p>
+  </body>
+</topic>

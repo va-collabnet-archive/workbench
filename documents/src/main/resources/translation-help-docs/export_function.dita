@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+  <title>Export function</title>
+  <body>
+    <p>This function allows to export refsets, worksets, partitions and worklists in release format
+      1 (RF1) and release format 2 (RF2).</p>
+    <p>Clicking one of the upper buttons will allow you to select the desired release format. Click
+      the upper button on the right to select the folder where your file will be placed, while the
+      lower button on the right allows selecting a file to log results.</p>
+    <p/>
+    <p><image href="images_transl/120_export_select_buttons.PNG" id="image_hqn_ltq_hc"/></p>
+    <p/>
+    <p>Drag and drop the refset concept to the Refset concept line.</p>
+    <p>You may also select the file format (.txt or .csv):</p>
+    <p/>
+    <p><image href="images_transl/121_export_select_refset.PNG" id="image_yix_vtq_hc"/></p>
+    <p/>
+    <p>Upon clicking Export button, the refset is exported according to your specifications and a
+      message appears as shown below. Also, the Results window will display a summary description of
+      the exported document.</p>
+    <p/>
+    <p><image href="images_transl/122_refset%20exported.PNG" id="image_ken_bfl_ic"/></p>
+    <p/>
+    <p>In the example shown, you specified that a document with RF2 format would be exported. Two
+      tables were generated as .txt files: TEST 2 (worklist)-ET 20101116170445_SCTID.txt and TEST 2
+      (worklist)-ET 20101116170445_UUID.txt. </p>
+    <p>The SCTID.txt file will show the following fields: <ul id="ul_oxa_gfl_ic">
+        <li>an internal UUID, the effective time (date when the last component version was
+          generated, component status for RF2 (1 = active), </li>
+        <li>the component path, </li>
+        <li>workset UUID, and </li>
+        <li>SCTID (which in this case is the Concept ID because the selected worklist is a concept
+          refset). </li>
+      </ul></p>
+    <p>The UUID.txt document is similar, except that the UUID is displayed as a component identifier
+      instead of SCTID.</p>
+    <p/>
+    <p><image href="images_transl/123_exported_sctid_txt.PNG" id="image_ohu_hgl_ic"/></p>
+    <p/>
+    <p>If you select .csv format for your export, the same information will be displayed in a .csv
+      table:</p>
+    <p/>
+    <p><image href="images_transl/124_exported_csv_table.PNG" id="image_fvd_whl_ic"/></p>
+    <p>The UUID.txt document is similar, except that the UUID is displayed as component identifier
+      instead of SCTID.</p>
+    <p>When you select exporting a component with RF1 format, the same process must be followed.</p>
+    <p>A .txt table is generated when you select .txt format option:</p>
+    <p/>
+    <p><image href="images_transl/125_exported_rf1_txt_table.PNG" id="image_cur_gil_ic"/></p>
+    <p/>
+    <p>If you select .csv format for your export, the same information will be displayed in a .csv
+      table:</p>
+    <p/>
+    <p><image href="images_transl/126_exported_ref1_csv_table.PNG" id="image_tcg_yrl_ic"/></p>
+    <p/>
+    <p>The exported files are placed in the specified folder:</p>
+    <p/>
+    <p><image href="images_transl/127_exported_specified_folder.PNG" id="image_ybb_isl_ic"/></p>
+  </body>
+</topic>
