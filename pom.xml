@@ -33,12 +33,12 @@
 
 	<distributionManagement>
 		<snapshotRepository>
-			<id>maestro_ihtsdo.wb-snapshots</id>
+			<id>maestro_cap.cap-snapshots</id>
 			<name>IHTSDO Snapshots Repository</name>
 			<url>http://mgr.servers.aceworkspace.net/apps/maestro_cap/archiva/repository/cap-snapshots/</url>
 		</snapshotRepository>
 		<repository>
-			<id>maestro_ihtsdo.wb-releases</id>
+			<id>maestro_cap.cap-releases</id>
 			<name>IHTSDO Releases Repository</name>
 			<url>http://mgr.servers.aceworkspace.net/apps/maestro_cap/archiva/repository/cap-releases/</url>
 		</repository>
