@@ -6,9 +6,9 @@
 		<version>1</version>
 	</parent>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</developerConnection>
-		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</url>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-bsas-test</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-bsas-test</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-bsas-test</url>
 	</scm>
 
 	<groupId>org.ihtsdo</groupId>
