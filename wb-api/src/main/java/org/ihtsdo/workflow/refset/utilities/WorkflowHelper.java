@@ -1348,10 +1348,12 @@ public class WorkflowHelper {
 				wfCapabilitiesInitialized = true;
 			
 				UUID testUid = ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid();
-		         if (Ts.get().getConcept(testUid) != null) {
+		         if (Ts.get().hasUuid(testUid)) {
 		        	 wfCapabilitiesAvailable = true;
 		         }
 			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
+			} catch (Error assertionCatch) {
 				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
 			}
 		}
