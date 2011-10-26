@@ -234,6 +234,26 @@
 			</resource> 
 		</resources> -->
 		<plugins>
+
+			<!-- Export the task beans -->
+			<plugin>
+				<groupId>org.ihtsdo</groupId>
+				<artifactId>wb-mojo</artifactId>
+				<version>2.6.0-trek-43-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>export-task-classes</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-beans</goal>
+						</goals>
+						<configuration>
+							<targetSubDir>generated-resources</targetSubDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
