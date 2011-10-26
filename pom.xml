@@ -35,12 +35,12 @@
 		<snapshotRepository>
 			<id>maestro_ihtsdo.wb-snapshots</id>
 			<name>IHTSDO Snapshots Repository</name>
-			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-snapshots/</url>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_cap/archiva/repository/cap-snapshots/</url>
 		</snapshotRepository>
 		<repository>
 			<id>maestro_ihtsdo.wb-releases</id>
 			<name>IHTSDO Releases Repository</name>
-			<url>http://mgr.servers.aceworkspace.net/apps/maestro_ihtsdo/archiva/repository/wb-releases/</url>
+			<url>http://mgr.servers.aceworkspace.net/apps/maestro_cap/archiva/repository/cap-releases/</url>
 		</repository>
 	</distributionManagement>
 	<build>
