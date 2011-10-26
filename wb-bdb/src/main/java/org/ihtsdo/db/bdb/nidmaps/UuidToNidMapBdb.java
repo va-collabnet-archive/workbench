@@ -1,17 +1,14 @@
 /*
  * Copyright 2011 International Health Terminology Standards Development Organisation.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.ihtsdo.db.bdb.nidmaps;
 
@@ -22,12 +19,14 @@ import com.sleepycat.je.OperationStatus;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.PrimordialId;
 import org.ihtsdo.concurrency.ConcurrencyLocks;
@@ -44,8 +43,9 @@ public class UuidToNidMapBdb extends ComponentBdb {
     private ConcurrencyLocks locks = new ConcurrencyLocks();
     private int maxGenOneSize = 10000;
     private int maxGenTwoSize = maxGenOneSize * 10;
-    private ConcurrentSkipListSet<Short> loadedDbKeys = 
+    private ConcurrentSkipListSet<Short> loadedDbKeys =
             new ConcurrentSkipListSet<Short>();
+    private ReentrantLock generationLock = new ReentrantLock();
 
     private int generate(UUID key) {
         // if can't find, then generate new...
@@ -70,15 +70,31 @@ public class UuidToNidMapBdb extends ComponentBdb {
         handleGenOnePut(key, nid);
     }
 
+    private void clearLoadedDbKeys() {
+        for (Short key : loadedDbKeys) {
+            locks.writeLock(key);
+            try {
+                loadedDbKeys.remove(key);
+            } finally {
+                locks.unlockWrite(key);
+            }
+        }
+    }
+
     private void handleGenOnePut(UUID key, int nid) {
         newGen1Puts.incrementAndGet();
         if (newGen1Puts.get() > maxGenOneSize) {
             int genOneSize = gen1UuidIntMap.size();
             if (genOneSize > maxGenOneSize) {
-                gen2UuidIntMap = gen1UuidIntMap;
-                loadedDbKeys.clear();
-                gen1UuidIntMap = new ConcurrentHashMap<UUID, Integer>();
-                newGen1Puts.set(0);
+                generationLock.lock();
+                try {
+                    gen2UuidIntMap = gen1UuidIntMap;
+                    clearLoadedDbKeys();
+                    gen1UuidIntMap = new ConcurrentHashMap<UUID, Integer>();
+                    newGen1Puts.set(0);
+                } finally {
+                    generationLock.unlock();
+                }
             } else {
                 newGen1Puts.set(genOneSize);
             }
@@ -91,9 +107,14 @@ public class UuidToNidMapBdb extends ComponentBdb {
         if (newGen2Puts.get() > maxGenTwoSize) {
             int genTwoSize = gen2UuidIntMap.size();
             if (genTwoSize > maxGenTwoSize) {
-                gen2UuidIntMap = new ConcurrentHashMap<UUID, Integer>();
-                newGen2Puts.set(0);
-                loadedDbKeys.clear();
+                generationLock.lock();
+                try {
+                    gen2UuidIntMap = new ConcurrentHashMap<UUID, Integer>();
+                    newGen2Puts.set(0);
+                    clearLoadedDbKeys();
+                } finally {
+                    generationLock.unlock();
+                }
             } else {
                 newGen2Puts.set(genTwoSize);
             }
@@ -168,10 +189,10 @@ public class UuidToNidMapBdb extends ComponentBdb {
                 AceLog.getAppLog().
                         warning("Memory low. Percent used: " + percentageUsed
                         + " UuidToNidMapBdb trying to recover memory. ");
-                loadedDbKeys.clear();
+
+                clearLoadedDbKeys();
                 gen2UuidIntMap.clear();
-                gen1UuidIntMap.clear();
-                loadedDbKeys.clear();
+                clearLoadedDbKeys();
                 Set<Short> setsToWrite = unwrittenUuidIntRecordMap.keySet();
                 for (Short set : setsToWrite) {
                     writeMutableKeySet(set);
@@ -186,7 +207,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
         });
     }
 
-    private int getNoGen(UUID key) {
+    private int getNoGen(UUID key, boolean force) {
         Integer nid = gen1UuidIntMap.get(key);
         if (nid != null) {
             return nid;
@@ -209,7 +230,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
             }
         }
         // get from database;
-        nid = getFromDb(key);
+        nid = getFromDb(key, force);
         if (nid != null) {
             handleGenOnePut(key, nid);
             return nid;
@@ -218,11 +239,14 @@ public class UuidToNidMapBdb extends ComponentBdb {
     }
 
     public int get(UUID key) {
-        int nid = getNoGen(key);
+
+
+        int nid = getNoGen(key, false);
         if (nid != Integer.MIN_VALUE) {
             return nid;
         }
-        return generate(key);
+        nid = generate(key);
+         return nid;
     }
 
     private void writeMutableKeySet(Short dbKey) {
@@ -270,30 +294,37 @@ public class UuidToNidMapBdb extends ComponentBdb {
         return new ConcurrentSkipListSet<UuidIntRecord>();
     }
 
-    private Integer getFromDb(UUID key) {
+    private Integer getFromDb(UUID key, boolean force) {
         Integer theNid = null;
         short dbKey = UuidIntRecord.getShortUuidHash(key);
-        if (loadedDbKeys.contains((Short) dbKey)) {
-            // Already loaded all from db...
-            return theNid;
-        }
-        for (UuidIntRecord entry : getReadOnlyKeySet(dbKey)) {
-            UUID theUuid = entry.getUuid();
-            if (theNid == null && key.equals(entry.getUuid())) {
-                theNid = entry.getNid();
+        if (!force) {
+            if (loadedDbKeys.contains((Short) dbKey)) {
+                // Already loaded all from db...
+                return theNid;
             }
-            newGen2Puts.incrementAndGet();
-            gen2UuidIntMap.put(theUuid, entry.getNid());
         }
-        for (UuidIntRecord entry : getMutableKeySet(dbKey)) {
-            UUID theUuid = entry.getUuid();
-            if (theNid == null && key.equals(entry.getUuid())) {
-                theNid = entry.getNid();
+        generationLock.lock();
+        try {
+            for (UuidIntRecord entry : getReadOnlyKeySet(dbKey)) {
+                UUID theUuid = entry.getUuid();
+                if (theNid == null && key.equals(entry.getUuid())) {
+                    theNid = entry.getNid();
+                }
+                newGen2Puts.incrementAndGet();
+                gen2UuidIntMap.put(theUuid, entry.getNid());
             }
-            newGen2Puts.incrementAndGet();
-            gen2UuidIntMap.put(theUuid, entry.getNid());
+            for (UuidIntRecord entry : getMutableKeySet(dbKey)) {
+                UUID theUuid = entry.getUuid();
+                if (theNid == null && key.equals(entry.getUuid())) {
+                    theNid = entry.getNid();
+                }
+                newGen2Puts.incrementAndGet();
+                gen2UuidIntMap.put(theUuid, entry.getNid());
+            }
+            loadedDbKeys.add((Short) dbKey);
+        } finally {
+            generationLock.unlock();
         }
-        loadedDbKeys.add((Short) dbKey);
         handleGenTwoPuts();
         return theNid;
     }
@@ -312,6 +343,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
     public void sync() throws IOException {
         Bdb.setProperty(ID_NEXT, Integer.toString(idSequence.sequence.get()));
         Set<Short> setsToWrite = unwrittenUuidIntRecordMap.keySet();
+        clearLoadedDbKeys();
         for (Short set : setsToWrite) {
             writeMutableKeySet(set);
         }
@@ -331,7 +363,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
     }
 
     public boolean hasUuid(UUID uuid) {
-        return getNoGen(uuid) != Integer.MIN_VALUE;
+        return getNoGen(uuid, false) != Integer.MIN_VALUE;
     }
 
     public void put(UUID uuid, int nid) {
@@ -340,7 +372,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
     public int uuidsToNid(Collection<UUID> uuids) {
         for (UUID uuid : uuids) {
-            int nid = getNoGen(uuid);
+            int nid = getNoGen(uuid, false);
             if (nid != Integer.MIN_VALUE) {
                 return nid;
             }

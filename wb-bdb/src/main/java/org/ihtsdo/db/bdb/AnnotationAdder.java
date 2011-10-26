@@ -16,8 +16,7 @@
 package org.ihtsdo.db.bdb;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.dwfa.ace.api.IdentifierSet;
@@ -52,8 +51,11 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
 
         TkRmComparator comparator = new TkRmComparator();
         int errors = 0;
+        Set<UUID> errorSet = new TreeSet<UUID>();
         for (TkRefsetAbstractMember<?> member : members) {
-            int cNid = Bdb.getConceptNid(Bdb.uuidToNid(member.getComponentUuid()));
+            UUID componentUuid = member.getComponentUuid();
+            int nid = Bdb.uuidToNid(componentUuid);
+            int cNid = Bdb.getConceptNid(nid);
             if (cNid + Integer.MIN_VALUE >= 0) {
                 conceptNids.setMember(cNid);
                 ConcurrentSkipListSet<TkRefsetAbstractMember<?>> set =
@@ -61,12 +63,17 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
                 membersForConcept.putIfAbsent(cNid, set);
                 membersForConcept.get(cNid).add(member);
             } else {
-                AceLog.getAppLog().warning("No concept for: " + member);
                 errors++;
+                errorSet.add(componentUuid);
+                int nid2 = Bdb.uuidToNid(member.getComponentUuid());
+                int cNid2 = Bdb.getConceptNid(nid);
+                AceLog.getAppLog().warning("No concept for: " + member);
             }
         }
         if (errors > 0) {
-                AceLog.getAppLog().warning(errors + " processing errors.");
+                AceLog.getAppLog().warning(errors + " processing errors.\n\nError set: " + 
+                        errorSet.size() + "\n" +
+                        errorSet);
         }
     }
 
