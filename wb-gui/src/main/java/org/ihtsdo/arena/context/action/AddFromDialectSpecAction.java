@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyConstructorBI;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
@@ -28,7 +27,6 @@ import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.DescriptionSpec;
-import org.ihtsdo.tk.example.binding.WbDescType;
 
 public class AddFromDialectSpecAction extends AbstractAction {
 
@@ -90,7 +88,7 @@ public class AddFromDialectSpecAction extends AbstractAction {
                 DescCAB descSpecPref = new DescCAB(
                         concept.getNid(),
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
-                        dialect,
+                        "en",
                         descSpec.getDescText(),
                         false);
                 newDesc = tc.constructIfNotCurrent(descSpecPref);
