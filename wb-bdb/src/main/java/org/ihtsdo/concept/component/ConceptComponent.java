@@ -2584,7 +2584,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       public boolean isBaselineGeneration() {
          return cv.isBaselineGeneration();
       }
-
+      
+      @Override
       public boolean isUncommitted() {
          return getTime() == Long.MAX_VALUE;
       }
