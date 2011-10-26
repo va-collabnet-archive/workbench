@@ -240,15 +240,14 @@ rule "missing Dialect description EN_US"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
-                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
+                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
+                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.descsActive
 	then 
-		for (DescriptionVersionBI $d : $c.getDescsActive()) {
-         if (DialectHelper.isMissingDescForDialect($d,
-              Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
-   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
-               Language.EN_US, $c.getViewCoordinate()), $c.getNid());
-         }
-		} 	
+                if (DialectHelper.isMissingDescForDialect($dv,
+                    Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+                           templates.put(DialectHelper.getDescriptionSpecForDialect($dv,
+                           Language.EN_US, $c.getViewCoordinate()), $c.getNid());
+                }
 end 
 
 rule "missing Dialect description EN_UK"
@@ -256,13 +255,12 @@ rule "missing Dialect description EN_UK"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
-                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID) from $c.descsActive
+                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
+                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.descsActive
 	then 
-		for (DescriptionVersionBI $d : $c.getDescsActive()) {
-         if (DialectHelper.isMissingDescForDialect($d,
-              Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
-   		    templates.put(DialectHelper.getDescriptionSpecForDialect($d,
-               Language.EN_UK, $c.getViewCoordinate()), $c.getNid());
-         }
-		} 	
+                if (DialectHelper.isMissingDescForDialect($dv,
+                    Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
+                           templates.put(DialectHelper.getDescriptionSpecForDialect($dv,
+                           Language.EN_UK, $c.getViewCoordinate()), $c.getNid());
+                }
 end
