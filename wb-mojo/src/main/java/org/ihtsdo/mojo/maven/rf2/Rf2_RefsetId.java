@@ -33,6 +33,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.dwfa.util.id.Type3UuidFactory;
 
 /**
  *
@@ -58,8 +59,13 @@ public class Rf2_RefsetId {
             String refsetFsName, String refsetParentUuid)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         this.refsetSctIdOriginal = refsetSctIdOriginal;
-        this.refsetUuidStr = Type5UuidFactory.get(SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
+        if (refsetSctIdOriginal==900000000000555555L){
+        	 this.refsetUuidStr =Type3UuidFactory.fromSNOMED(refsetSctIdOriginal).toString();
+            
+        }else{
+        	this.refsetUuidStr = Type5UuidFactory.get(SUBSETREFSET_ID_NAMESPACE_UUID_TYPE1
                 + Long.toString(refsetSctIdOriginal)).toString();
+        }
         this.refsetDate = refsetDate;
         this.refsetPathUuidStr = refsetPathUuidStr;
         this.refsetPrefTerm = refsetPrefTerm;
