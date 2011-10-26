@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
@@ -109,7 +110,25 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
 
             // :NYI: extended status implementation does not multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
-            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null); // hardcoded
+            
+            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray=new ArrayList<Rf2_RefsetCRecord[]>();
+            int arrayCont=0;
+            for (Rf2File rf2File :filesInStatus){
+            	rf2_RefsetCRecordArray.add( Rf2_RefsetCRecord.parseRefset(rf2File, null));
+            }
+            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray){
+            	arrayCont+=rf2_RefsetCRecordTmp.length;
+            }
+
+            Rf2_RefsetCRecord[] statusRecords=new Rf2_RefsetCRecord[arrayCont];
+            int index=0;
+            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray){
+            	for (int i=0;i<rf2_RefsetCRecordTmp.length;i++){
+            		statusRecords[index]=rf2_RefsetCRecordTmp[i];
+            		index++;
+            	}
+            }
+//            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null); // hardcoded
 
             // CONCEPT FILES: parse, write
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
