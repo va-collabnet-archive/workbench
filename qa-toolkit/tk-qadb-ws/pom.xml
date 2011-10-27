@@ -233,8 +233,8 @@
 							</fileSets>
 							<classesDirectory></classesDirectory>
 							<axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50002/axis2/axis2-admin</axis2AdminConsoleURL>
-							<axis2AdminUser>termmed</axis2AdminUser>
 							<axis2AdminPassword>termmed</axis2AdminPassword>
+							<axis2AdminUser>termmed</axis2AdminUser>
 						</configuration>
 					</plugin>
 				</plugins>
