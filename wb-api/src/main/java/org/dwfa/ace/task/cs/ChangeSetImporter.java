@@ -152,7 +152,7 @@ public abstract class ChangeSetImporter implements ActionListener {
 	        }
 	
 	        // Send emptyFile change set to signify that done importing, and time to process Lucene Index
-	        File csf = new File("emptyFile");
+	        File csf = new File("workflow//emptyFile");
 	        csf.createNewFile();
 	
 	        I_ReadChangeSet csr = getChangeSetWfHxReader(csf);
@@ -163,6 +163,7 @@ public abstract class ChangeSetImporter implements ActionListener {
 	
 	        WorkflowHelper.clearChangeSetStorage();
 	        csf.delete();
+	        
 	
 	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
 	            AceLog.getEditLog().info("Update of workflow history lucene index complete");
