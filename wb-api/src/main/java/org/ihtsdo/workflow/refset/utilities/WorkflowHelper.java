@@ -779,11 +779,8 @@ public class WorkflowHelper {
 	            	writer.setAutoApproved(true);
 
 	            	// Identify and overwrite Accept Action
-	            	UUID acceptActionUid = getAcceptAction();
-	            	writer.setActionUid(acceptActionUid);
-
 	            	// Identify and overwrite Next State
-	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid, vc);
+	            	UUID nextState = getApprovedState();
 					writer.setStateUid(nextState);
 	            } else
 	            	writer.setAutoApproved(false);
