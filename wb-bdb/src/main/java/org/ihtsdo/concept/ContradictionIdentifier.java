@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.contradiction.ComponentType;
@@ -422,18 +423,20 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					testingVersion = getCurrentVersion(concept, compType, version);
 				}
 
-				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Terms.get().getActiveAceFrameConfig().getPrecedence());
-
+				// Path preference not need as all based on adjudication path
+				// Must be after
+				RELATIVE_POSITION relPosition = conflictMapper.get().fastRelativePosition((Version)testingVersion, (Version)adjudicatorVersion, Precedence.TIME);
+				
 				if (relPosition != RELATIVE_POSITION.EQUAL) 
 				{
 					if (relPosition == RELATIVE_POSITION.CONTRADICTION) {
-						throw new TerminologyException("Can't be contra via adjud path");
+						throw new TerminologyException("Cannot reach here");
+						
 					}
-				
+
 					if (relPosition == RELATIVE_POSITION.BEFORE)
 					{
-						// TODO: To remove post testing ... then remove 2 BEFORE check below to only relSecondPosition != RELATIVE_POSITION.BEFORE
-						throw new TerminologyException("My first time here");
+						throw new TerminologyException("Must have failed in filtering pre-adjudication versions");
 					}
 
 					if (relPosition == RELATIVE_POSITION.AFTER) 
@@ -441,31 +444,13 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						if (isReturnVersionsUseCase.get()) {
 							returnVersionCollection.add(testingVersion);
 						}
-			/*
-			 * TODO: Unnecessary?			
-			 */
-//						// For Edge Case -- Time-based contradiction Idetifier
-//						RELATIVE_POSITION relSecondPosition = conflictMapper.fastRelativePosition((Version)adjudicatorVersion, (Version)testingVersion, Precedence.TIME);
-//
-//						if (relSecondPosition == RELATIVE_POSITION.CONTRADICTION) {
-//							throw new TerminologyException("Can't be contra via adjud path");
-//						}				
-//
-//						if (relSecondPosition != relPosition) 
-//						{
-							
-							if (!isSingleEdit) {
-								isSingleEdit = true;
-							} else {
-								isContradiction = true;
-							}
-//						}
 
-//						if (relPosition != RELATIVE_POSITION.BEFORE && relSecondPosition != RELATIVE_POSITION.BEFORE)
-//						{
-//							// Remove Pre-Adjudication Versions from Dev list
-//							foundPositionsVersions.remove(testingVersion);
-//						}
+						if (!isSingleEdit) {
+							isSingleEdit = true;
+						} else {
+							isContradiction = true;
+						}
+
 					}
 				} 
 			}
