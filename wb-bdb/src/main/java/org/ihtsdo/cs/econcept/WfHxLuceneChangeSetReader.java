@@ -57,6 +57,7 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
     private String nextCommitStr;
 	private final String wfPropertySuffix = "-WF";
 	private UUID workflowHistoryRefsetUid = WorkflowHelper.getWorkflowRefsetUid();
+	private static File  firstFileRead = null;
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
 	private static HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefsetAbstractMember<?>>();
@@ -68,29 +69,30 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public long nextCommitTime() throws IOException, ClassNotFoundException {
         lazyInit();
-        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
-        	return Long.MAX_VALUE; 
-        } else {
-        	if (nextCommit == null) {
-	            try {
-	                nextCommit = dataStream.readLong();
-	                assert nextCommit != Long.MAX_VALUE;
-	                nextCommitStr = TimeHelper.getFileDateFormat().format(new Date(nextCommit));
-	            } catch (EOFException e) {
-	                AceLog.getAppLog().info("No next commit time for file: " + changeSetFile);
-	                nextCommit = Long.MAX_VALUE;
-	                nextCommitStr = "end of time";
-	            }
-	        }
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+        	return Long.MAX_VALUE;
         }
-        return nextCommit;
+        
+    	if (nextCommit == null) {
+            try {
+                nextCommit = dataStream.readLong();
+                assert nextCommit != Long.MAX_VALUE;
+                nextCommitStr = TimeHelper.getFileDateFormat().format(new Date(nextCommit));
+            } catch (EOFException e) {
+                AceLog.getAppLog().info("No next commit time for file: " + changeSetFile);
+                nextCommit = Long.MAX_VALUE;
+                nextCommitStr = "end of time";
+            }
+        }
+
+    	return nextCommit;
     }
 
    @Override
     public void readUntil(long endTime) throws IOException, ClassNotFoundException {
         HashSet<TimePathId> values = new HashSet<TimePathId>();
-        
-        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
+
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
         	updateLuceneIndex();
         	return;
         } 
@@ -137,6 +139,12 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
                 throw new IOException(e);
             }
         }
+        
+        if (firstFileRead == null) {
+        	firstFileRead = changeSetFile;
+        }
+   		
+
     }
 
    @Override
@@ -192,9 +200,14 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public int availableBytes() throws FileNotFoundException, IOException, ClassNotFoundException {
         lazyInit();
-        if (dataStream != null) {
-            return dataStream.available();
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+        	return 0;
+        } else {
+	        if (dataStream != null) {
+	            return dataStream.available();
+	        }
         }
+        
         return 0;
     }
 

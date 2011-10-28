@@ -134,6 +134,8 @@ public abstract class ChangeSetImporter implements ActionListener {
 	        	wfHxReaderSet.add(wcsr);
 	        }
 
+	        I_ReadChangeSet firstFile = wfHxReaderSet.first();
+	        
 	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
 	            AceLog.getEditLog().info("Importing for updating workflow history lucene index");
 	        }
@@ -151,19 +153,15 @@ public abstract class ChangeSetImporter implements ActionListener {
 	            AceLog.getEditLog().info("Processing imported change sets to generate index");
 	        }
 	
-	        // Send emptyFile change set to signify that done importing, and time to process Lucene Index
-	        File csf = new File("workflow" + File.separatorChar + "emptyFile");
-	        csf.createNewFile();
-	
-	        I_ReadChangeSet csr = getChangeSetWfHxReader(csf);
-	        TreeSet<I_ReadChangeSet> finalizeWfHxLuceneIndexReaderSet = getSortedReaderSet();
-	        finalizeWfHxLuceneIndexReaderSet.add(csr);
-	
-	        readNext(finalizeWfHxLuceneIndexReaderSet);
-	
-	        WorkflowHelper.clearChangeSetStorage();
-	        csf.delete();
-	        
+	        // Send first change set file again to signify that done importing, and time to process Lucene Index
+	        if (firstFile != null) {
+		        TreeSet<I_ReadChangeSet> finalizeWfHxLuceneIndexReaderSet = getSortedReaderSet();
+		        finalizeWfHxLuceneIndexReaderSet.add(firstFile);
+		
+		        readNext(finalizeWfHxLuceneIndexReaderSet);
+		
+		        WorkflowHelper.clearChangeSetStorage();
+	        }
 	
 	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {
 	            AceLog.getEditLog().info("Update of workflow history lucene index complete");
