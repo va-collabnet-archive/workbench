@@ -48,7 +48,7 @@
 			<plugin>
 				<groupId>org.apache.axis2</groupId>
 				<artifactId>axis2-wsdl2code-maven-plugin</artifactId>
-				<version>${axis2.version}</version>
+				<version>1.5.2</version>
 				<executions>
 					<execution>
 						<phase>compile</phase>
