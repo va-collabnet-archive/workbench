@@ -442,7 +442,7 @@ public class QAStoreImpl implements QAStoreBI {
 			
 			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
 				newResult = new LinkedList<RulesReportLine>();
-				for(int i = startLine; i < startLine + pageLenght; i++){
+				for(int i = startLine; i < startLine + pageLenght && i < lines.size(); i++){
 					newResult.add(lines.get(i));
 				}
 			}
