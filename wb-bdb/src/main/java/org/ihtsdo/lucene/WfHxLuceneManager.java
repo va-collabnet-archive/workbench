@@ -30,8 +30,8 @@ public class WfHxLuceneManager extends LuceneManager {
 
 
     static final String wfLuceneFileSuffix = "lucene";
-	protected static File wfHxLuceneDirFile = new File("target/workflow/lucene");
-	protected static File runningLuceneDirFile = new File("workflow/lucene");
+	protected static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
+	protected static File runningLuceneDirFile = new File("workflow" + File.separatorChar + "lucene");
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 	public final static int matchLimit = 10000000;
 

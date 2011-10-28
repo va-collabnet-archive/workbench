@@ -152,7 +152,7 @@ public abstract class ChangeSetImporter implements ActionListener {
 	        }
 	
 	        // Send emptyFile change set to signify that done importing, and time to process Lucene Index
-	        File csf = new File("workflow//emptyFile");
+	        File csf = new File("workflow" + File.separatorChar + "emptyFile");
 	        csf.createNewFile();
 	
 	        I_ReadChangeSet csr = getChangeSetWfHxReader(csf);

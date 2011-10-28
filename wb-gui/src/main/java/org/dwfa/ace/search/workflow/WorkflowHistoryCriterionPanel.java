@@ -217,7 +217,7 @@ public class WorkflowHistoryCriterionPanel extends CriterionPanel {
 
     @SuppressWarnings("unchecked")
     public void setupWorkflowHistoryCriterionOptions(List<AbstractWorkflowHistorySearchTest> criterionOptions) {
-        File searchPluginFolder = new File("search/workflow");
+        File searchPluginFolder = new File("search" + File.separatorChar + "workflow");
         this.setCriterionOptions(new ArrayList<AbstractWorkflowHistorySearchTest>());
         
         if (criterionOptions == null || criterionOptions.isEmpty()) 

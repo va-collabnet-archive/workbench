@@ -90,7 +90,7 @@ public class UpdateStateTransitionRefset extends AbstractTask {
             WorkflowHelper.updateWorkflowStates(vc);
             WorkflowHelper.updateWorkflowActions(vc);
 
-        	File f = new File("workflow/workflowStateTransitions.txt");
+        	File f = new File("workflow" + File.separatorChar + "workflowStateTransitions.txt");
         	processTransitions(f, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPTS.getUids()));
 
 	        tf.addUncommitted(writer.getRefsetConcept());

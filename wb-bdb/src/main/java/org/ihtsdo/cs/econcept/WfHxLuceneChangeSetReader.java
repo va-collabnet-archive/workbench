@@ -68,7 +68,7 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    @Override
     public long nextCommitTime() throws IOException, ClassNotFoundException {
         lazyInit();
-        if (changeSetFile.getAbsolutePath().endsWith("workflow//emptyFile")) {
+        if (changeSetFile.getAbsolutePath().endsWith("emptyFile")) {
         	return Long.MAX_VALUE; 
         } else {
         	if (nextCommit == null) {
