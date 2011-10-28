@@ -219,7 +219,7 @@ public class QAStoreImpl implements QAStoreBI {
 			QACase param = new QACase();
 			param.setPathUuid(coordinate.getPathUuid());
 			param.setDatabaseUuid(coordinate.getDatabaseUuid());
-		
+
 			Date effectiveTime = sdf.parse(coordinate.getViewPointTime());
 			Calendar effectiveCal = new GregorianCalendar();
 			effectiveCal.setTime(effectiveTime);
@@ -244,7 +244,7 @@ public class QAStoreImpl implements QAStoreBI {
 			QACase param = new QACase();
 			param.setPathUuid(coordinate.getPathUuid());
 			param.setDatabaseUuid(coordinate.getDatabaseUuid());
-			
+
 			Date effectiveTime = sdf.parse(coordinate.getViewPointTime());
 			Calendar effectiveCal = new GregorianCalendar();
 			effectiveCal.setTime(effectiveTime);
@@ -318,13 +318,19 @@ public class QAStoreImpl implements QAStoreBI {
 	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		logger.debug("Getting rules report lines...");
 		List<RulesReportLine> lines = null;
+		LinkedList<RulesReportLine> newResult = null;
 		try {
 			RuleFilterCoords coords = new RuleFilterCoords();
 			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
 			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
 			coords.setViewPointTime(qaCoordinate.getViewPointTime());
-			coords.setStartLine(startLine-1);
-			coords.setPageLenght(pageLenght);
+			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
+				coords.setStartLine(0);
+				coords.setPageLenght(10000);
+			}else{
+				coords.setStartLine(startLine - 1);
+				coords.setPageLenght(pageLenght);
+			}
 			List<DispositionStatus> existingDispStatuses = getAllDispositionStatus();
 			if (filter != null) {
 				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
@@ -433,12 +439,22 @@ public class QAStoreImpl implements QAStoreBI {
 			}
 
 			sortLines(lines, sortBy);
+			
+			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
+				newResult = new LinkedList<RulesReportLine>();
+				for(int i = startLine; i < startLine + pageLenght; i++){
+					newResult.add(lines.get(i));
+				}
+			}
 			logger.debug("Total: " + lines.size());
 			logger.debug("Start Line: " + startLine);
 			logger.debug("End Line: " + (startLine + pageLenght));
 			logger.debug("Page Lenght: " + pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if(newResult!= null){
+			return newResult;
 		}
 		return lines;
 	}
@@ -491,7 +507,7 @@ public class QAStoreImpl implements QAStoreBI {
 
 	@Override
 	public void persistComment(QAComment comment) {
-		if(comment.getCommentUuid() == null){
+		if (comment.getCommentUuid() == null) {
 			sqlSession.update("org.ihtsdo.mybatis.gen.QACommentMapper.insertComment", comment);
 		}
 	}
@@ -554,20 +570,20 @@ public class QAStoreImpl implements QAStoreBI {
 		Integer totalLines = 0;
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
-			logger.debug("Rules report line size: " +  lines.size());
+			logger.debug("Rules report line size: " + lines.size());
 			totalLines = countRulesByCoords(qaCoordinate, sortBy, filter, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		logger.debug("lines " + lines);
-		logger.debug("sortBy " +  sortBy);
+		logger.debug("sortBy " + sortBy);
 		logger.debug("filter " + filter);
 		logger.debug("startLine " + startLine);
-		logger.debug("page size " + (startLine + lines.size() -1));
+		logger.debug("page size " + (startLine + lines.size() - 1));
 		logger.debug("total lines " + totalLines);
 		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
 	}
-	
+
 	private Integer countRulesByCoords(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		Integer result = 0;
 		try {
@@ -591,7 +607,7 @@ public class QAStoreImpl implements QAStoreBI {
 			}
 			result = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.RuleMapper.selectRulesCount", coords);
 			logger.debug("Rules amount: " + result);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return result;
@@ -618,7 +634,8 @@ public class QAStoreImpl implements QAStoreBI {
 		return lines;
 	}
 
-	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght, LinkedHashMap<Integer, Boolean> sortBy) {
+	public List<QACasesReportLine> getQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght,
+			LinkedHashMap<Integer, Boolean> sortBy) {
 		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 
 		RuleFilterCoords coords = new RuleFilterCoords();
@@ -626,10 +643,10 @@ public class QAStoreImpl implements QAStoreBI {
 		coords.setPathUuid(qaCoordinate.getPathUuid());
 		coords.setRuleUuid(ruleUuid);
 		coords.setViewPointTime(qaCoordinate.getViewPointTime());
-		coords.setStartLine(startLine-1);
+		coords.setStartLine(startLine - 1);
 		coords.setPageLenght(pageLenght);
 		coords.setSortBy(sortBy);
-		
+
 		getFilterCoords(filter, coords);
 
 		long queryStartTime = System.currentTimeMillis();
@@ -648,10 +665,10 @@ public class QAStoreImpl implements QAStoreBI {
 		if (filter != null && filter.containsKey(QACasesReportColumn.CONCEPT_NAME.getColumnNumber())) {
 			coords.setName("%" + filter.get(QACasesReportColumn.CONCEPT_NAME.getColumnNumber()).toString() + "%");
 		}
-		
-		if (filter != null && (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) 
-				|| filter.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
+
+		if (filter != null
+				&& (filter.containsKey(QACasesReportColumn.DISPOSITION.getColumnNumber()) || filter.containsKey(QACasesReportColumn.STATUS.getColumnNumber()) || filter
+						.containsKey(QACasesReportColumn.ASSIGNED_TO.getColumnNumber()))) {
 			Object dispoFilterValue = filter.get(QACasesReportColumn.DISPOSITION.getColumnNumber());
 			Object statusFilterValue = filter.get(QACasesReportColumn.STATUS.getColumnNumber());
 			Object assignedToFilter = filter.get(QACasesReportColumn.ASSIGNED_TO.getColumnNumber());
@@ -660,35 +677,36 @@ public class QAStoreImpl implements QAStoreBI {
 			}
 			if (statusFilterValue != null) {
 				Integer statusFilter = null;
-				if(statusFilterValue.toString().equals("Open")){
+				if (statusFilterValue.toString().equals("Open")) {
 					statusFilter = 1;
-				}else if(statusFilterValue.toString().equals("Close")){
+				} else if (statusFilterValue.toString().equals("Close")) {
 					statusFilter = 0;
 				}
 				coords.setStatusFilter(statusFilter);
 			}
-			if(assignedToFilter != null){
+			if (assignedToFilter != null) {
 				coords.setAssignedToFilter(assignedToFilter.toString());
 			}
 		}
 	}
+
 	public Integer countQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
-		
+
 		RuleFilterCoords coords = new RuleFilterCoords();
 		coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid());
 		coords.setPathUuid(qaCoordinate.getPathUuid());
 		coords.setRuleUuid(ruleUuid);
 		coords.setViewPointTime(qaCoordinate.getViewPointTime());
-		coords.setStartLine(startLine-1);
+		coords.setStartLine(startLine - 1);
 		coords.setPageLenght(pageLenght);
-		
+
 		getFilterCoords(filter, coords);
-		
+
 		long queryStartTime = System.currentTimeMillis();
 		Integer count = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.QACaseMapper.countRuleCases", coords);
 		long queryEndTime = System.currentTimeMillis();
 		logger.info("Rule cases counted in: " + ((queryEndTime - queryStartTime) / 1000) + " Seconds");
-		
+
 		return count;
 	}
 
@@ -723,23 +741,24 @@ public class QAStoreImpl implements QAStoreBI {
 			int pageLenght) {
 		long startTime = System.currentTimeMillis();
 		logger.info("Getting qa cases report lines by page...");
-		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght,sortBy);
-		Integer totalLines = countQACasesReportLines(qaCoordinate, ruleUuid, filter,startLine, pageLenght);
+		List<QACasesReportLine> lines = getQACasesReportLines(qaCoordinate, ruleUuid, filter, startLine, pageLenght, sortBy);
+		Integer totalLines = countQACasesReportLines(qaCoordinate, ruleUuid, filter, startLine, pageLenght);
 		logger.debug("############################## QA CASE REPORT PAGE");
 		logger.debug("Total Lines: " + totalLines);
 		logger.debug("Start Line: " + startLine);
 		logger.debug("Page Lenght: " + pageLenght);
-//		if (sortBy != null && !sortBy.isEmpty()) {
-//			logger.debug("************SORT BY**************");
-//			Set<Integer> keyset = sortBy.keySet();
-//			for (Integer integer : keyset) {
-//				logger.debug(integer + " " + sortBy.get(integer));
-//			}
-//			long sortStartTime = System.currentTimeMillis();
-//			Collections.sort(lines, new CaseReportLineComparator(sortBy));
-//			long sortEndTime = System.currentTimeMillis();
-//			logger.info("Sorting lines finished in: " + ((sortEndTime - sortStartTime) / 1000) + " Seconds");
-//		}
+		// if (sortBy != null && !sortBy.isEmpty()) {
+		// logger.debug("************SORT BY**************");
+		// Set<Integer> keyset = sortBy.keySet();
+		// for (Integer integer : keyset) {
+		// logger.debug(integer + " " + sortBy.get(integer));
+		// }
+		// long sortStartTime = System.currentTimeMillis();
+		// Collections.sort(lines, new CaseReportLineComparator(sortBy));
+		// long sortEndTime = System.currentTimeMillis();
+		// logger.info("Sorting lines finished in: " + ((sortEndTime -
+		// sortStartTime) / 1000) + " Seconds");
+		// }
 		logger.debug("Reduced Lines: " + lines.size());
 
 		QACasesReportPage result = new QACasesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
