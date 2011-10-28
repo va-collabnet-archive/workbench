@@ -1,11 +1,9 @@
-
 /**
  *
  */
 package org.dwfa.ace.gui.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.apache.lucene.queryParser.ParseException;
 
 import org.dwfa.ace.ACE;
@@ -25,7 +23,9 @@ import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -52,630 +52,764 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.*;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public class ProgrammersPopupListener extends MouseAdapter implements ActionListener, ClipboardOwner {
-   private static Map<String, MENU_OPTIONS> optionMap = new HashMap<String,
-                                                           MENU_OPTIONS>(MENU_OPTIONS.values().length);
 
-   //~--- static initializers -------------------------------------------------
+    private static Map<String, MENU_OPTIONS> optionMap = new HashMap<String, MENU_OPTIONS>(MENU_OPTIONS.values().length);
 
-   static {
-      for (MENU_OPTIONS option : MENU_OPTIONS.values()) {
-         optionMap.put(option.menuText, option);
-      }
-   }
+    //~--- static initializers -------------------------------------------------
+    static {
+        for (MENU_OPTIONS option : MENU_OPTIONS.values()) {
+            optionMap.put(option.menuText, option);
+        }
+    }
+    //~--- fields --------------------------------------------------------------
+    JPopupMenu popup = new JPopupMenu();
+    /**
+     *
+     */
+    private final ConceptPanel conceptPanel;
 
-   //~--- fields --------------------------------------------------------------
+    //~--- constructors --------------------------------------------------------
+    public ProgrammersPopupListener(ConceptPanel conceptPanel) {
+        for (MENU_OPTIONS option : MENU_OPTIONS.values()) {
+            option.addToMenu(popup, this);
+        }
 
-   JPopupMenu popup = new JPopupMenu();
+        this.conceptPanel = conceptPanel;
+    }
 
-   /**
-    *
-    */
-   private final ConceptPanel conceptPanel;
+    //~--- enums ---------------------------------------------------------------
+    private enum MENU_OPTIONS {
+        //J-
 
-   //~--- constructors --------------------------------------------------------
+        WRITE_LONG_FORM_TO_CLIPBOARD("Write long form to clipboard"),
+        SET_FROM_NID("Set from nid"),
+        ADD_TO_WATCH_LIST("Add to watch list"),
+        REMOVE_FROM_WATCH_LIST("Remove from watch list"),
+        GET_CONCEPT_ATTRIBUTES("Get concept attributes..."),
+        SET_CACHE_SIZE("Set cache size"),
+        SET_CACHE_PERCENT("Set cache percent"),
+        CHANGE_SET_TO_TEXT("Change set to text..."),
+        ALL_CHANGE_SET_TO_TEXT("All change sets in profiles to text"),
+        EXTRACT_CHANGE_SETS_FOR_CONCEPT("Extract change sets for concept..."),
+        EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS(
+        "Extract change sets for concept and assign new nids..."),
+        DTO_TO_TEXT("DTO to text..."),
+        IMPORT_CHANGE_SET("Import change set..."),
+        TOGGLE_QA("Toggle QA"),
+        REINDEX_LUCENE("Recreate Lucene index"),
+        EXPORT_ACTIVE_ONLY("Export active only from view"),
+        PATCH_MSMITH("Patch msmith#80#"),
+        CHECK_DUPS("Check for duplicate UUIDS");
+        //J+
+        String menuText;
 
-   public ProgrammersPopupListener(ConceptPanel conceptPanel) {
-      for (MENU_OPTIONS option : MENU_OPTIONS.values()) {
-         option.addToMenu(popup, this);
-      }
+        //~--- constructors -----------------------------------------------------
+        private MENU_OPTIONS(String menuText) {
+            this.menuText = menuText;
+        }
 
-      this.conceptPanel = conceptPanel;
-   }
+        //~--- methods ----------------------------------------------------------
+        public void addToMenu(JPopupMenu popup, ActionListener l) {
+            JMenuItem menuItem = new JMenuItem(menuText);
 
-   //~--- enums ---------------------------------------------------------------
+            menuItem.addActionListener(l);
+            popup.add(menuItem);
+        }
 
-   private enum MENU_OPTIONS {
-      //J-
-		WRITE_LONG_FORM_TO_CLIPBOARD("Write long form to clipboard"), 
-		SET_FROM_NID("Set from nid"),
-		ADD_TO_WATCH_LIST("Add to watch list"), 
-		REMOVE_FROM_WATCH_LIST("Remove from watch list"), 
-		GET_CONCEPT_ATTRIBUTES("Get concept attributes..."),
-		SET_CACHE_SIZE("Set cache size"), 
-		SET_CACHE_PERCENT("Set cache percent"),
-		CHANGE_SET_TO_TEXT("Change set to text..."),
-		ALL_CHANGE_SET_TO_TEXT("All change sets in profiles to text"), 
-		EXTRACT_CHANGE_SETS_FOR_CONCEPT("Extract change sets for concept..."),
-		EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS(
-		"Extract change sets for concept and assign new nids..."),
-		DTO_TO_TEXT("DTO to text..."),
-		IMPORT_CHANGE_SET("Import change set..."), 
-		TOGGLE_QA("Toggle QA"),
-		REINDEX_LUCENE("Recreate Lucene index"),
-		EXPORT_ACTIVE_ONLY("Export active only from view"),
-		PATCH_MSMITH("Patch msmith#80#");
-		//J+
+        //~--- get methods ------------------------------------------------------
+        public String getText() {
+            return this.menuText;
+        }
 
-      String menuText;
+        //~--- set methods ------------------------------------------------------
+        public void setText(String menuText) {
+            this.menuText = menuText;
+        }
+    }
 
-      //~--- constructors -----------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        switch (optionMap.get(e.getActionCommand())) {
+            case ADD_TO_WATCH_LIST:
+                addToWatch();
 
-      private MENU_OPTIONS(String menuText) {
-         this.menuText = menuText;
-      }
+                break;
 
-      //~--- methods ----------------------------------------------------------
+            case REMOVE_FROM_WATCH_LIST:
+                removeFromWatch();
 
-      public void addToMenu(JPopupMenu popup, ActionListener l) {
-         JMenuItem menuItem = new JMenuItem(menuText);
+                break;
 
-         menuItem.addActionListener(l);
-         popup.add(menuItem);
-      }
+            case SET_FROM_NID:
+                setFromNid();
 
-      //~--- get methods ------------------------------------------------------
+                break;
 
-      public String getText() {
-         return this.menuText;
-      }
+            case WRITE_LONG_FORM_TO_CLIPBOARD:
+                writeLongFormToClipboard();
 
-      //~--- set methods ------------------------------------------------------
+                break;
 
-      public void setText(String menuText) {
-         this.menuText = menuText;
-      }
-   }
+            case GET_CONCEPT_ATTRIBUTES:
+                getConceptAttributes();
 
-   //~--- methods -------------------------------------------------------------
+                break;
 
-   @Override
-   public void actionPerformed(ActionEvent e) {
-      switch (optionMap.get(e.getActionCommand())) {
-      case ADD_TO_WATCH_LIST :
-         addToWatch();
+            case SET_CACHE_PERCENT:
+                setCachePercent();
 
-         break;
+                break;
 
-      case REMOVE_FROM_WATCH_LIST :
-         removeFromWatch();
+            case SET_CACHE_SIZE:
+                setCacheSize();
 
-         break;
+                break;
 
-      case SET_FROM_NID :
-         setFromNid();
+            case CHANGE_SET_TO_TEXT:
+            case DTO_TO_TEXT:
+            case ALL_CHANGE_SET_TO_TEXT:
+                toText(optionMap.get(e.getActionCommand()));
 
-         break;
+                break;
 
-      case WRITE_LONG_FORM_TO_CLIPBOARD :
-         writeLongFormToClipboard();
+            case IMPORT_CHANGE_SET:
+                importEccs();
 
-         break;
+                break;
 
-      case GET_CONCEPT_ATTRIBUTES :
-         getConceptAttributes();
+            case TOGGLE_QA:
+                toggleQa();
 
-         break;
+                break;
 
-      case SET_CACHE_PERCENT :
-         setCachePercent();
+            case REINDEX_LUCENE:
+                recreateLuceneIndex();
 
-         break;
+                break;
 
-      case SET_CACHE_SIZE :
-         setCacheSize();
+            case EXTRACT_CHANGE_SETS_FOR_CONCEPT:
+                extractChangeSets();
 
-         break;
+                break;
 
-      case CHANGE_SET_TO_TEXT :
-      case DTO_TO_TEXT :
-      case ALL_CHANGE_SET_TO_TEXT :
-         toText(optionMap.get(e.getActionCommand()));
+            case EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS:
+                extractChangeSetsAndAssignNewNids();
 
-         break;
+                break;
 
-      case IMPORT_CHANGE_SET :
-         importEccs();
+            case EXPORT_ACTIVE_ONLY:
+                exportActiveOnly();
 
-         break;
+                break;
 
-      case TOGGLE_QA :
-         toggleQa();
+            case PATCH_MSMITH:
+                patchMSmith();
 
-         break;
+                break;
+            case CHECK_DUPS:
+                DupUuidFinder dupFinder;
+                try {
+                    AceLog.getAppLog().info("--Starting Check for Duplicates");
+                    dupFinder = new DupUuidFinder();
+                    Ts.get().iterateConceptDataInParallel(dupFinder);
+                    dupFinder.setPassTwo();
+                   Ts.get().iterateConceptDataInParallel(dupFinder);
+                    AceLog.getAppLog().info("--Finished Check for Duplicates");
+                } catch (Exception ex) {
+                    Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
-      case REINDEX_LUCENE :
-         recreateLuceneIndex();
+                break;
 
-         break;
+            default:
+                AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
+                        + optionMap.get(e.getActionCommand())));
+        }
+    }
 
-      case EXTRACT_CHANGE_SETS_FOR_CONCEPT :
-         extractChangeSets();
+    private void addToWatch() {
+        I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
 
-         break;
+        Terms.get().addToWatchList(igcd);
+    }
 
-      case EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS :
-         extractChangeSetsAndAssignNewNids();
+    public String askQuestion(String realm, String question, String defaultAnswer) {
+        return (String) JOptionPane.showInputDialog(this.conceptPanel, question, realm,
+                JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
+    }
 
-         break;
+    private boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
 
-      case EXPORT_ACTIVE_ONLY :
-         exportActiveOnly();
-
-         break;
-
-      case PATCH_MSMITH :
-         patchMSmith();
-
-         break;
-
-      default :
-         AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
-                 + optionMap.get(e.getActionCommand())));
-      }
-   }
-
-   private void addToWatch() {
-      I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
-
-      Terms.get().addToWatchList(igcd);
-   }
-
-   public String askQuestion(String realm, String question, String defaultAnswer) {
-      return (String) JOptionPane.showInputDialog(this.conceptPanel, question, realm,
-              JOptionPane.PLAIN_MESSAGE, null, null, defaultAnswer);
-   }
-
-   private boolean deleteDirectory(File path) {
-      if (path.exists()) {
-         File[] files = path.listFiles();
-
-         for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory()) {
-               deleteDirectory(files[i]);
-            } else {
-               files[i].delete();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].isDirectory()) {
+                    deleteDirectory(files[i]);
+                } else {
+                    files[i].delete();
+                }
             }
-         }
-      }
+        }
 
-      return (path.delete());
-   }
+        return (path.delete());
+    }
 
-   private void doExport(DataOutputStream out) {
-      try {
-         NidBitSetBI exclusionSet = Ts.get().getEmptyNidSet();
+    private void doExport(DataOutputStream out) {
+        try {
+            NidBitSetBI exclusionSet = Ts.get().getEmptyNidSet();
 
-         exclusionSet.setMember(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.localize().getNid());
-         exclusionSet.setMember(RefsetAuxiliary.Concept.WORKFLOW.localize().getNid());
-         exclusionSet.setMember(ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid());
-         exclusionSet.setMember(ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid());
+            exclusionSet.setMember(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.localize().getNid());
+            exclusionSet.setMember(RefsetAuxiliary.Concept.WORKFLOW.localize().getNid());
+            exclusionSet.setMember(ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid());
+            exclusionSet.setMember(ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid());
 
-         Map<UUID, UUID> conversionMap = new HashMap<UUID, UUID>() {
-            @Override
-            public UUID get(Object o) {
-               UUID returnUuid = super.get(o);
+            Map<UUID, UUID> conversionMap = new HashMap<UUID, UUID>() {
 
-               if (returnUuid == null) {
-                  returnUuid = (UUID) o;
-               }
+                @Override
+                public UUID get(Object o) {
+                    UUID returnUuid = super.get(o);
 
-               return returnUuid;
-            }
-         };
-         ActiveOnlyExport exporter = new ActiveOnlyExport(conceptPanel.getConfig().getViewCoordinate(),
-                                        exclusionSet, out, conversionMap);
+                    if (returnUuid == null) {
+                        returnUuid = (UUID) o;
+                    }
 
-         Ts.get().iterateConceptDataInSequence(exporter);
-      } catch (Exception ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      } finally {
-         try {
-            out.close();
-         } catch (IOException ex) {
+                    return returnUuid;
+                }
+            };
+            ActiveOnlyExport exporter = new ActiveOnlyExport(conceptPanel.getConfig().getViewCoordinate(),
+                    exclusionSet, out, conversionMap);
+
+            Ts.get().iterateConceptDataInSequence(exporter);
+        } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
-   }
-
-   private void exportActiveOnly() {
-      FileDialog dialog = new FileDialog(new Frame(), "Select name and location for Active Only Export...");
-
-      dialog.setMode(FileDialog.SAVE);
-      dialog.setDirectory(System.getProperty("user.dir"));
-      dialog.setFile("activeOnly.jbin");
-      dialog.setVisible(true);
-
-      if (dialog.getFile() != null) {
-         File outputFile = new File(dialog.getDirectory(), dialog.getFile());
-
-         outputFile.getParentFile().mkdirs();
-
-         try {
-            FileOutputStream     fos = new FileOutputStream(outputFile);
-            BufferedOutputStream bos = new BufferedOutputStream(fos);
-            DataOutputStream     out = new DataOutputStream(bos);
-
-            ACE.threadPool.execute(new RunnableImpl(out));
-         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-         }
-      }
-   }
-
-   private void extractChangeSets() {
-      File             rootFile       = new File("profiles");
-      String           prefix         = null;
-      String           suffix         = ".eccs";
-      List<File>       changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
-      I_GetConceptData igcd           = (I_GetConceptData) this.conceptPanel.getTermComponent();
-      FileDialog       dialog         = new FileDialog(new Frame(),
-                                           "Select name and location for new directory...");
-
-      dialog.setMode(FileDialog.SAVE);
-      dialog.setDirectory(System.getProperty("user.dir"));
-      dialog.setFile(igcd.toUserString() + " cs extract");
-
-      Set<UUID> concepts = new TreeSet<UUID>();
-
-      concepts.add(igcd.getPrimUuid());
-      dialog.setVisible(true);
-
-      if (dialog.getFile() != null) {
-         File csfd = new File(dialog.getDirectory(), dialog.getFile());
-
-         csfd.mkdir();
-
-         for (File csf : changeSetFiles) {
+        } finally {
             try {
-               File extractFile = new File(csfd, "ex-" + csf.getName());
-
-               DtoExtract.extract(csf, concepts, extractFile);
+                out.close();
             } catch (IOException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ClassNotFoundException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
+                AceLog.getAppLog().alertAndLogException(ex);
             }
-         }
-      }
-   }
+        }
+    }
 
-   private void extractChangeSetsAndAssignNewNids() {
-      File             rootFile       = new File("profiles");
-      String           prefix         = null;
-      String           suffix         = ".eccs";
-      List<File>       changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
-      I_GetConceptData igcd           = (I_GetConceptData) this.conceptPanel.getTermComponent();
-      FileDialog       dialog         =
-         new FileDialog(new Frame(), "Select name and location for new cs extract and map directory...");
+    private void exportActiveOnly() {
+        FileDialog dialog = new FileDialog(new Frame(), "Select name and location for Active Only Export...");
 
-      dialog.setMode(FileDialog.SAVE);
-      dialog.setDirectory(System.getProperty("user.dir"));
-      dialog.setFile(igcd.toUserString() + " cs extract and map");
+        dialog.setMode(FileDialog.SAVE);
+        dialog.setDirectory(System.getProperty("user.dir"));
+        dialog.setFile("activeOnly.jbin");
+        dialog.setVisible(true);
 
-      Set<UUID> concepts = new TreeSet<UUID>();
+        if (dialog.getFile() != null) {
+            File outputFile = new File(dialog.getDirectory(), dialog.getFile());
 
-      concepts.add(igcd.getPrimUuid());
-      dialog.setVisible(true);
-
-      if (dialog.getFile() != null) {
-         File csfd = new File(dialog.getDirectory(), dialog.getFile());
-
-         csfd.mkdir();
-
-         DtoExtract.DynamicMap map = new DtoExtract.DynamicMap();
-
-         for (File csf : changeSetFiles) {
-            try {
-               File extractFile = new File(csfd, "ex-newnid-" + csf.getName());
-
-               DtoExtract.extractChangeSetsAndAssignNewNids(csf, concepts, extractFile, map);
-            } catch (IOException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ClassNotFoundException ex) {
-               AceLog.getAppLog().alertAndLogException(ex);
-            }
-         }
-      }
-   }
-
-   private void importEccs() {
-      try {
-         FileDialog dialog = new FileDialog(new Frame(), "Select change set file...");
-
-         dialog.setMode(FileDialog.LOAD);
-         dialog.setDirectory(System.getProperty("user.dir"));
-         dialog.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-               return name.endsWith(".eccs");
-            }
-         });
-         dialog.setVisible(true);
-
-         if (dialog.getFile() != null) {
-            File csf = new File(dialog.getDirectory(), dialog.getFile());
+            outputFile.getParentFile().mkdirs();
 
             try {
-               Terms.get().suspendChangeSetWriters();
+                FileOutputStream fos = new FileOutputStream(outputFile);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                DataOutputStream out = new DataOutputStream(bos);
 
-               I_ReadChangeSet csr = Terms.get().newBinaryChangeSetReader(csf);
-
-               csr.read();
-
-               if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-                  I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
-
-                  wcsr.read();
-               }
-            } finally {
-               Terms.get().resumeChangeSetWriters();
+                ACE.threadPool.execute(new RunnableImpl(out));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
             }
-         }
-      } catch (Exception ex) {
-         Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-      }
-   }
+        }
+    }
 
-   @Override
-   public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    private void extractChangeSets() {
+        File rootFile = new File("profiles");
+        String prefix = null;
+        String suffix = ".eccs";
+        List<File> changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+        I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+        FileDialog dialog = new FileDialog(new Frame(),
+                "Select name and location for new directory...");
 
-      // nothing to do...
-   }
+        dialog.setMode(FileDialog.SAVE);
+        dialog.setDirectory(System.getProperty("user.dir"));
+        dialog.setFile(igcd.toUserString() + " cs extract");
 
-   private void maybeShowPopup(MouseEvent e) {
-      if (e.isPopupTrigger()) {
-         if (e.isAltDown() || e.isControlDown()) {
-            popup.show(e.getComponent(), e.getX(), e.getY());
-         }
-      }
-   }
+        Set<UUID> concepts = new TreeSet<UUID>();
 
-   @Override
-   public void mousePressed(MouseEvent e) {
-      maybeShowPopup(e);
-   }
+        concepts.add(igcd.getPrimUuid());
+        dialog.setVisible(true);
 
-   @Override
-   public void mouseReleased(MouseEvent e) {
-      maybeShowPopup(e);
-   }
+        if (dialog.getFile() != null) {
+            File csfd = new File(dialog.getDirectory(), dialog.getFile());
 
-   private void patchMSmith() {
-      try {
-         FileDialog dialog = new FileDialog(new Frame(), "Select change set file...");
-
-         dialog.setMode(FileDialog.LOAD);
-         dialog.setDirectory(System.getProperty("user.dir"));
-         dialog.setFilenameFilter(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-               return name.endsWith(".eccs");
-            }
-         });
-         dialog.setVisible(true);
-
-         if (dialog.getFile() != null) {
-            File                 csf           = new File(dialog.getDirectory(), dialog.getFile());
-            FileInputStream      fis           = new FileInputStream(csf);
-            BufferedInputStream  bis           = new BufferedInputStream(fis);
-            DataInputStream      dataStream    = new DataInputStream(bis);
-            File                 ocsf          = new File(dialog.getDirectory(), dialog.getFile() + ".fixed");
-            FileOutputStream     fos           = new FileOutputStream(ocsf);
-            BufferedOutputStream bos           = new BufferedOutputStream(fos);
-            DataOutputStream     dataOutStream = new DataOutputStream(bos);
-
-            try {
-               int count = 0;
-
-               while (dataStream.available() > 0) {
-                  long      nextCommit = dataStream.readLong();
-                  TkConcept eConcept   = new TkConcept(dataStream);
-
-                  if (eConcept.getPrimordialUuid().equals(
-                          UUID.fromString("629a6c24-1f0a-3941-90df-8a7103a98ec7"))) {
-                     for (TkRefsetAbstractMember member : eConcept.getRefsetMembers()) {
-                        if (member.getPrimordialComponentUuid().equals(
-                                UUID.fromString("bbde54c9-fc58-41e7-90b2-52f7029068e1"))) {
-                           member.setPrimordialComponentUuid(UUID.randomUUID());
-                        }
-                     }
-                  }
-
-                  dataOutStream.writeLong(nextCommit);
-                  eConcept.writeExternal(dataOutStream);
-                  count++;
-               }
-            } catch (EOFException ex) {
-
-               // Nothing to do...
-            } finally {
-               dataStream.close();
-               dataOutStream.close();
-            }
-         }
-      } catch (Exception ex) {
-         Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-      }
-   }
-
-   private void recreateLuceneIndex() {
-      AceLog.getAppLog().info("Deleting lindexes");
-      deleteDirectory(new File("berkeley-db/mutable/lucene"));
-      deleteDirectory(new File("berkeley-db/read-only/lucene"));
-
-      try {
-         Terms.get().doLuceneSearch("something");
-      } catch (IOException e) {
-         e.printStackTrace();
-      } catch (ParseException e) {
-         e.printStackTrace();
-      }
-
-      JOptionPane.showMessageDialog(null, "Descriptions Lucene indexes removed! Please restart Workbench.",
-                                    "Warning", JOptionPane.WARNING_MESSAGE);
-   }
-
-   private void removeFromWatch() {
-      I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
-
-      Terms.get().removeFromWatchList(igcd);
-   }
-
-   private void toText(MENU_OPTIONS option) {
-      try {
-         switch (option) {
-         case ALL_CHANGE_SET_TO_TEXT :
-            File       rootFile       = new File("profiles");
-            String     prefix         = null;
-            String     suffix         = ".eccs";
-            List<File> changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+            csfd.mkdir();
 
             for (File csf : changeSetFiles) {
-               DtoToText.convertChangeSet(csf);
+                try {
+                    File extractFile = new File(csfd, "ex-" + csf.getName());
+
+                    DtoExtract.extract(csf, concepts, extractFile);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ClassNotFoundException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
             }
+        }
+    }
 
-            break;
+    private void extractChangeSetsAndAssignNewNids() {
+        File rootFile = new File("profiles");
+        String prefix = null;
+        String suffix = ".eccs";
+        List<File> changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+        I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+        FileDialog dialog =
+                new FileDialog(new Frame(), "Select name and location for new cs extract and map directory...");
 
-         default :
-            JFileChooser fc        = new JFileChooser();
-            int          returnVal = fc.showOpenDialog(null);
+        dialog.setMode(FileDialog.SAVE);
+        dialog.setDirectory(System.getProperty("user.dir"));
+        dialog.setFile(igcd.toUserString() + " cs extract and map");
 
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-               switch (option) {
-               case CHANGE_SET_TO_TEXT :
-                  DtoToText.convertChangeSet(fc.getSelectedFile());
+        Set<UUID> concepts = new TreeSet<UUID>();
 
-                  break;
+        concepts.add(igcd.getPrimUuid());
+        dialog.setVisible(true);
 
-               case DTO_TO_TEXT :
-                  DtoToText.convertDto(fc.getSelectedFile());
+        if (dialog.getFile() != null) {
+            File csfd = new File(dialog.getDirectory(), dialog.getFile());
 
-                  break;
-               }
+            csfd.mkdir();
+
+            DtoExtract.DynamicMap map = new DtoExtract.DynamicMap();
+
+            for (File csf : changeSetFiles) {
+                try {
+                    File extractFile = new File(csfd, "ex-newnid-" + csf.getName());
+
+                    DtoExtract.extractChangeSetsAndAssignNewNids(csf, concepts, extractFile, map);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                } catch (ClassNotFoundException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
             }
-         }
-      } catch (IOException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      } catch (ClassNotFoundException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-   }
+        }
+    }
 
-   private void toggleQa() {
-      if (RulesLibrary.rulesDisabled == false) {
-         RulesLibrary.rulesDisabled = true;
-         JOptionPane.showMessageDialog(null, "QA is Disabled!.", "Warning", JOptionPane.WARNING_MESSAGE);
-      } else {
-         RulesLibrary.rulesDisabled = false;
-         JOptionPane.showMessageDialog(null, "QA is Enabled!.", "Warning", JOptionPane.WARNING_MESSAGE);
-      }
-   }
+    private void importEccs() {
+        try {
+            FileDialog dialog = new FileDialog(new Frame(), "Select change set file...");
 
-   private void writeLongFormToClipboard() {
-      I_GetConceptData igcd     = (I_GetConceptData) this.conceptPanel.getTermComponent();
-      Clipboard        clip     = Toolkit.getDefaultToolkit().getSystemClipboard();
-      StringSelection  contents = new StringSelection(igcd.toLongString());
+            dialog.setMode(FileDialog.LOAD);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setFilenameFilter(new FilenameFilter() {
 
-      clip.setContents(contents, this);
-   }
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".eccs");
+                }
+            });
+            dialog.setVisible(true);
 
-   //~--- get methods ---------------------------------------------------------
+            if (dialog.getFile() != null) {
+                File csf = new File(dialog.getDirectory(), dialog.getFile());
 
-   private void getConceptAttributes() {
-      try {
-         I_GetConceptData                        igcd    =
-            (I_GetConceptData) this.conceptPanel.getTermComponent();
-         I_ConceptAttributeVersioned             attr    = igcd.getConceptAttributes();
-         List<? extends I_ConceptAttributeTuple> tuples  = attr.getTuples();
-         List<? extends I_ConceptAttributeTuple> tuples2 =
-            attr.getTuples(conceptPanel.getConfig().getAllowedStatus(),
-                           conceptPanel.getConfig().getViewPositionSetReadOnly());
-         List<? extends I_ConceptAttributeTuple> tuples3 =
-            igcd.getConceptAttributeTuples(null, conceptPanel.getConfig().getViewPositionSetReadOnly(),
-                                           conceptPanel.getConfig().getPrecedence(),
-                                           conceptPanel.getConfig().getConflictResolutionStrategy());
-         List<? extends I_ConceptAttributeTuple> tuples4 =
-            igcd.getConceptAttributeTuples(null, conceptPanel.getConfig().getViewPositionSetReadOnly(),
-                                           conceptPanel.getConfig().getPrecedence(),
-                                           conceptPanel.getConfig().getConflictResolutionStrategy());
+                try {
+                    Terms.get().suspendChangeSetWriters();
 
-         AceLog.getAppLog().info("attr: " + attr);
-         AceLog.getAppLog().info("tuples 1: " + tuples);
-         AceLog.getAppLog().info("tuples 2: " + tuples2);
-         AceLog.getAppLog().info("tuples 3: " + tuples3);
-         AceLog.getAppLog().info("tuples 4: " + tuples4);
-      } catch (IOException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      } catch (TerminologyException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-   }
+                    I_ReadChangeSet csr = Terms.get().newBinaryChangeSetReader(csf);
 
-   //~--- set methods ---------------------------------------------------------
+                    csr.read();
 
-   private void setCachePercent() {
-      String percentString = askQuestion("Set bdb cache percent:", "Enter percent[1..99]:",
-                                         "" + Terms.get().getCachePercent());
+                    if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+                        I_ReadChangeSet wcsr = Terms.get().newWfHxLuceneChangeSetReader(csf);
 
-      if (percentString != null) {
-         Terms.get().setCachePercent(percentString);
-      }
-   }
+                        wcsr.read();
+                    }
+                } finally {
+                    Terms.get().resumeChangeSetWriters();
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-   private void setCacheSize() {
-      String sizeString = askQuestion("Set bdb cache size:", "Enter size[XXXXm|XXg]:",
-                                      "" + Terms.get().getCacheSize());
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+        // nothing to do...
+    }
 
-      if (sizeString != null) {
-         Terms.get().setCacheSize(sizeString);
-      }
-   }
+    private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            if (e.isAltDown() || e.isControlDown()) {
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
 
-   private void setFromNid() {
-      String nidString = askQuestion("Set panel to new concept:", "Enter nid:", "-2142075612");
-      int    nid       = Integer.parseInt(nidString);
+    @Override
+    public void mousePressed(MouseEvent e) {
+        maybeShowPopup(e);
+    }
 
-      try {
-         I_GetConceptData concept = Terms.get().getConceptForNid(nid);
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+    }
 
-         this.conceptPanel.setTermComponent(concept);
-      } catch (IOException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-   }
+    private void patchMSmith() {
+        try {
+            FileDialog dialog = new FileDialog(new Frame(), "Select change set file...");
 
-   //~--- inner classes -------------------------------------------------------
+            dialog.setMode(FileDialog.LOAD);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setFilenameFilter(new FilenameFilter() {
 
-   private class RunnableImpl implements Runnable {
-      private final DataOutputStream out;
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".eccs");
+                }
+            });
+            dialog.setVisible(true);
 
-      //~--- constructors -----------------------------------------------------
+            if (dialog.getFile() != null) {
+                File csf = new File(dialog.getDirectory(), dialog.getFile());
+                FileInputStream fis = new FileInputStream(csf);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                DataInputStream dataStream = new DataInputStream(bis);
+                File ocsf = new File(dialog.getDirectory(), dialog.getFile() + ".fixed");
+                FileOutputStream fos = new FileOutputStream(ocsf);
+                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                DataOutputStream dataOutStream = new DataOutputStream(bos);
 
-      public RunnableImpl(DataOutputStream out) {
-         this.out = out;
-      }
+                try {
+                    int count = 0;
 
-      //~--- methods ----------------------------------------------------------
+                    while (dataStream.available() > 0) {
+                        long nextCommit = dataStream.readLong();
+                        TkConcept eConcept = new TkConcept(dataStream);
 
-      @Override
-      public void run() {
-         doExport(out);
-      }
-   }
+                        if (eConcept.getPrimordialUuid().equals(
+                                UUID.fromString("629a6c24-1f0a-3941-90df-8a7103a98ec7"))) {
+                            for (TkRefsetAbstractMember member : eConcept.getRefsetMembers()) {
+                                if (member.getPrimordialComponentUuid().equals(
+                                        UUID.fromString("bbde54c9-fc58-41e7-90b2-52f7029068e1"))) {
+                                    member.setPrimordialComponentUuid(UUID.randomUUID());
+                                }
+                            }
+                        }
+
+                        dataOutStream.writeLong(nextCommit);
+                        eConcept.writeExternal(dataOutStream);
+                        count++;
+                    }
+                } catch (EOFException ex) {
+                    // Nothing to do...
+                } finally {
+                    dataStream.close();
+                    dataOutStream.close();
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void recreateLuceneIndex() {
+        AceLog.getAppLog().info("Deleting lindexes");
+        deleteDirectory(new File("berkeley-db/mutable/lucene"));
+        deleteDirectory(new File("berkeley-db/read-only/lucene"));
+
+        try {
+            Terms.get().doLuceneSearch("something");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        JOptionPane.showMessageDialog(null, "Descriptions Lucene indexes removed! Please restart Workbench.",
+                "Warning", JOptionPane.WARNING_MESSAGE);
+    }
+
+    private void removeFromWatch() {
+        I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+
+        Terms.get().removeFromWatchList(igcd);
+    }
+
+    private void toText(MENU_OPTIONS option) {
+        try {
+            switch (option) {
+                case ALL_CHANGE_SET_TO_TEXT:
+                    File rootFile = new File("profiles");
+                    String prefix = null;
+                    String suffix = ".eccs";
+                    List<File> changeSetFiles = FileIO.recursiveGetFiles(rootFile, prefix, suffix, true);
+
+                    for (File csf : changeSetFiles) {
+                        DtoToText.convertChangeSet(csf);
+                    }
+
+                    break;
+
+                default:
+                    JFileChooser fc = new JFileChooser();
+                    int returnVal = fc.showOpenDialog(null);
+
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        switch (option) {
+                            case CHANGE_SET_TO_TEXT:
+                                DtoToText.convertChangeSet(fc.getSelectedFile());
+
+                                break;
+
+                            case DTO_TO_TEXT:
+                                DtoToText.convertDto(fc.getSelectedFile());
+
+                                break;
+                        }
+                    }
+            }
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (ClassNotFoundException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    private void toggleQa() {
+        if (RulesLibrary.rulesDisabled == false) {
+            RulesLibrary.rulesDisabled = true;
+            JOptionPane.showMessageDialog(null, "QA is Disabled!.", "Warning", JOptionPane.WARNING_MESSAGE);
+        } else {
+            RulesLibrary.rulesDisabled = false;
+            JOptionPane.showMessageDialog(null, "QA is Enabled!.", "Warning", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void writeLongFormToClipboard() {
+        I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+        Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection contents = new StringSelection(igcd.toLongString());
+
+        clip.setContents(contents, this);
+    }
+
+    private static class DupUuidFinder implements ProcessUnfetchedConceptDataBI {
+
+        ConcurrentSkipListSet<UUID> allPrimUuid = new ConcurrentSkipListSet<UUID>();
+        ConcurrentSkipListSet<UUID> dupUuid = dupUuid = new ConcurrentSkipListSet<UUID>();
+        private final NidBitSetBI nidset;
+
+        private enum PASS {
+
+            PASS_ONE, PASS_TWO
+        };
+        private PASS pass = PASS.PASS_ONE;
+
+        public void setPassTwo() {
+            this.pass = PASS.PASS_TWO;
+        }
+
+        private DupUuidFinder() throws IOException {
+            nidset = Ts.get().getAllConceptNids();
+        }
+
+        private void processConcept(ConceptChronicleBI concept) {
+            try {
+
+                //add prim uuids to list
+                //concept attributtes
+                addToUuidList(concept.getConAttrs());
+                //descriptions
+                for (DescriptionChronicleBI desc : concept.getDescs()) {
+                    addToUuidList(desc);
+                }
+                //relationships
+                for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+                    addToUuidList(rel);
+                }
+                //media
+                for (MediaChronicleBI media : concept.getMedia()) {
+                    addToUuidList(media);
+                }
+                for (RefexChronicleBI refex : concept.getRefsetMembers()) {
+                    addToUuidList(refex);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        private void printDups(ConceptChronicleBI concept) {
+            try {
+                //see if duplicate and print info 
+                printIfDup(concept.getConAttrs());
+                //descriptions
+                for (DescriptionChronicleBI desc : concept.getDescs()) {
+                    printIfDup(desc);
+                }
+                //relationships
+                for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+                    printIfDup(rel);
+                }
+                //media
+                for (MediaChronicleBI media : concept.getMedia()) {
+                    printIfDup(media);
+                }
+                for (RefexChronicleBI refex : concept.getRefsetMembers()) {
+                    printIfDup(refex);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        private void addToUuidList(ComponentChroncileBI component) throws IOException {
+            UUID primUuid = component.getPrimUuid();
+            if (allPrimUuid.contains(primUuid)) {
+                dupUuid.add(primUuid);
+            } else {
+                allPrimUuid.add(primUuid);
+            }
+            for (ComponentChroncileBI annotation : component.getAnnotations()) {
+                addToUuidList(annotation);
+            }
+        }
+
+        private void printIfDup(ComponentChroncileBI component) throws IOException {
+            UUID primUuid = component.getPrimUuid();
+            if (dupUuid.contains(primUuid)) {
+                System.out.println(component);
+            }
+            for (ComponentChroncileBI annotation : component.getAnnotations()) {
+                printIfDup(annotation);
+            }
+        }
+            private static AtomicInteger count = new AtomicInteger(0);
+            private static AtomicInteger dots = new AtomicInteger(0);
+        @Override 
+        public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+            count.incrementAndGet();
+            if (count.get() % 1000 == 0) {
+                System.out.print(".");
+                dots.incrementAndGet();
+                if (dots.get() > 80) {
+                    dots.set(0);
+                    System.out.println();
+                }
+            }
+            switch (pass) {
+                case PASS_ONE:
+                    processConcept(fetcher.fetch());
+                    break;
+                case PASS_TWO:
+                    printDups(fetcher.fetch());
+                    break;
+            }
+        }
+
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            return nidset;
+        }
+
+        @Override
+        public boolean continueWork() {
+            return true;
+        }
+    }
+
+    //~--- get methods ---------------------------------------------------------
+    private void getConceptAttributes() {
+        try {
+            I_GetConceptData igcd =
+                    (I_GetConceptData) this.conceptPanel.getTermComponent();
+            I_ConceptAttributeVersioned attr = igcd.getConceptAttributes();
+            List<? extends I_ConceptAttributeTuple> tuples = attr.getTuples();
+            List<? extends I_ConceptAttributeTuple> tuples2 =
+                    attr.getTuples(conceptPanel.getConfig().getAllowedStatus(),
+                    conceptPanel.getConfig().getViewPositionSetReadOnly());
+            List<? extends I_ConceptAttributeTuple> tuples3 =
+                    igcd.getConceptAttributeTuples(null, conceptPanel.getConfig().getViewPositionSetReadOnly(),
+                    conceptPanel.getConfig().getPrecedence(),
+                    conceptPanel.getConfig().getConflictResolutionStrategy());
+            List<? extends I_ConceptAttributeTuple> tuples4 =
+                    igcd.getConceptAttributeTuples(null, conceptPanel.getConfig().getViewPositionSetReadOnly(),
+                    conceptPanel.getConfig().getPrecedence(),
+                    conceptPanel.getConfig().getConflictResolutionStrategy());
+
+            AceLog.getAppLog().info("attr: " + attr);
+            AceLog.getAppLog().info("tuples 1: " + tuples);
+            AceLog.getAppLog().info("tuples 2: " + tuples2);
+            AceLog.getAppLog().info("tuples 3: " + tuples3);
+            AceLog.getAppLog().info("tuples 4: " + tuples4);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (TerminologyException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    //~--- set methods ---------------------------------------------------------
+    private void setCachePercent() {
+        String percentString = askQuestion("Set bdb cache percent:", "Enter percent[1..99]:",
+                "" + Terms.get().getCachePercent());
+
+        if (percentString != null) {
+            Terms.get().setCachePercent(percentString);
+        }
+    }
+
+    private void setCacheSize() {
+        String sizeString = askQuestion("Set bdb cache size:", "Enter size[XXXXm|XXg]:",
+                "" + Terms.get().getCacheSize());
+
+        if (sizeString != null) {
+            Terms.get().setCacheSize(sizeString);
+        }
+    }
+
+    private void setFromNid() {
+        String nidString = askQuestion("Set panel to new concept:", "Enter nid:", "-2142075612");
+        int nid = Integer.parseInt(nidString);
+
+        try {
+            I_GetConceptData concept = Terms.get().getConceptForNid(nid);
+
+            this.conceptPanel.setTermComponent(concept);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    //~--- inner classes -------------------------------------------------------
+    private class RunnableImpl implements Runnable {
+
+        private final DataOutputStream out;
+
+        //~--- constructors -----------------------------------------------------
+        public RunnableImpl(DataOutputStream out) {
+            this.out = out;
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @Override
+        public void run() {
+            doExport(out);
+        }
+    }
 }
