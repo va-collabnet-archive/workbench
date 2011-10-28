@@ -54,7 +54,7 @@ end
 rule "abandon concept and restart"
 	when
 		$c: ConceptFact(getConcept() != null,
-                    getConcept().getConAttrsActive().getPrimordialVersion().getTime() == Long.MAX_VALUE) 
+                    ((ConAttrVersionBI)getConcept().getChronicle().getConAttrs().getPrimordialVersion()).getTime() == Long.MAX_VALUE) 
 	then
 		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end
