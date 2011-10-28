@@ -39,7 +39,6 @@ import org.ihtsdo.qadb.data.view.QACasesReportPage;
 import org.ihtsdo.qadb.data.view.RulesReportColumn;
 import org.ihtsdo.qadb.data.view.RulesReportLine;
 import org.ihtsdo.qadb.data.view.RulesReportPage;
-import org.ihtsdo.qadb.helper.CaseReportLineComparator;
 import org.ihtsdo.qadb.helper.MyBatisUtil;
 import org.ihtsdo.qadb.helper.RuleReportLineComparator;
 
@@ -674,7 +673,6 @@ public class QAStoreImpl implements QAStoreBI {
 		}
 	}
 	public Integer countQACasesReportLines(QACoordinate qaCoordinate, String ruleUuid, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
-		List<QACasesReportLine> lines = new ArrayList<QACasesReportLine>();
 		
 		RuleFilterCoords coords = new RuleFilterCoords();
 		coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid());
