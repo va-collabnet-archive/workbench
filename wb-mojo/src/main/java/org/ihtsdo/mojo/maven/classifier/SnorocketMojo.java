@@ -144,6 +144,7 @@ public class SnorocketMojo extends AbstractMojo {
     private static int isMANDATORY_REFINABILITY = Integer.MAX_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MAX_VALUE;
+    private static int isCh_INFERRED_CHARACTERISTIC = Integer.MAX_VALUE;
     private static int workbenchAuxPath = Integer.MAX_VALUE;
     private static int snorocketAuthorNid = Integer.MAX_VALUE;
     // NID SETS
@@ -873,7 +874,7 @@ public class SnorocketMojo extends AbstractMojo {
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId, rel_B.c2Id,
-                isCh_DEFINING_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
+        		isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
         // :!!!:TODO: [SnorocketMojo] move addUncommittedNoChecks() to more efficient location.
@@ -962,6 +963,7 @@ public class SnorocketMojo extends AbstractMojo {
             isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
             isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
             isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
+            isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
 
             snorocketAuthorNid =
                     tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
