@@ -404,13 +404,12 @@ public class QACasesBrowser extends JPanel {
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
 				if (conceptName.length() > 7) {
-					if (parentTabbedPanel.getTitleAt(i).equals(
-							conceptName.substring(0, 7) + "...")) {
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "... (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
 				} else {
-					if (parentTabbedPanel.getTitleAt(i).equals(conceptName)) {
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName  + " (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
@@ -428,11 +427,9 @@ public class QACasesBrowser extends JPanel {
 						rule, component, selectedCase, dispositionStatuses,
 						headerComponent, qaDatabase, store);
 				if (conceptName.length() > 7) {
-					parentTabbedPanel.addTab(conceptName.substring(0, 7)
-							+ "...", null, rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "... (" + rowData[tableModel.CONCEPT_UUID] + ")", null, rulesDetailsPanel, conceptName);
 				} else {
-					parentTabbedPanel.addTab(conceptName, null,
-							rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName + " (" + rowData[tableModel.CONCEPT_UUID] + ")", null, rulesDetailsPanel, conceptName);
 				}
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
 				parentTabbedPanel.setSelectedIndex(parentTabbedPanel
