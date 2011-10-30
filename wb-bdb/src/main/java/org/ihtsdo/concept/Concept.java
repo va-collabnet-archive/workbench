@@ -293,6 +293,40 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       data.diet();
    }
 
+   public static void disableComponentsCRHM() {
+      componentsCRHM = new ConcurrentReferenceHashMap<Integer,
+              Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
+                      ConcurrentReferenceHashMap.ReferenceType.WEAK) {
+         @Override
+         public Object put(Integer key, Object value) {
+            return null;
+         }
+         @Override
+         public void putAll(Map<? extends Integer, ? extends Object> m) {
+
+            // nothing to do;
+         }
+         @Override
+         public Object putIfAbsent(Integer key, Object value) {
+            return null;
+         }
+         @Override
+         public boolean replace(Integer key, Object oldValue, Object newValue) {
+            return false;
+         }
+         @Override
+         public Object replace(Integer key, Object value) {
+            return false;
+         }
+      };
+   }
+
+   public static void enableComponentsCRHM() {
+      componentsCRHM = new ConcurrentReferenceHashMap<Integer,
+              Object>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
+                      ConcurrentReferenceHashMap.ReferenceType.WEAK);
+   }
+
    @Override
    public boolean equals(Object obj) {
       if (obj == null) {
@@ -345,11 +379,8 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
    public int hashCode() {
       return hashCode;
    }
-   public static void reset() {
-       init();
-   }
+
    private static void init() {
-      
       conceptsCRHM = new ConcurrentReferenceHashMap<Integer,
               Concept>(ConcurrentReferenceHashMap.ReferenceType.STRONG,
                        ConcurrentReferenceHashMap.ReferenceType.WEAK);
@@ -634,6 +665,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       assert data.readyToWrite() : toLongString();
 
       return true;
+   }
+
+   public static void reset() {
+      init();
    }
 
    public void resetNidData() {
@@ -1465,6 +1500,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       }
 
       return data.getDestRels(allowedTypes);
+   }
+
+   @Override
+   public Concept getEnclosingConcept() {
+      return this;
    }
 
    public RefsetMember<?, ?> getExtension(int componentNid) throws IOException {

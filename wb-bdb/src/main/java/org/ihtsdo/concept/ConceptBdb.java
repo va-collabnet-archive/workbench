@@ -54,7 +54,7 @@ public class ConceptBdb extends ComponentBdb {
 
     @Override
     protected void init() throws IOException {
-        // nothing to do...
+       preloadBoth();
     }
 
     public List<UUID> getUuidsForConcept(int cNid) throws IOException {

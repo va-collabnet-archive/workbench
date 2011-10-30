@@ -27,14 +27,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -53,6 +49,8 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.bdb.UuidDupFinder;
+import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -130,7 +128,7 @@ public class LoadBdbMulti extends AbstractMojo {
             new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
-    private int converterSize = 1;
+    private int converterSize = runtimeConverterSize;
     
     @Override
     public void execute() throws MojoExecutionException {
@@ -148,8 +146,8 @@ public class LoadBdbMulti extends AbstractMojo {
             long startTime = System.currentTimeMillis();
             FileIO.recursiveDelete(new File(berkeleyDir, "mutable"));
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-//            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
-//                    berkeleyDir);
+            Bdb.selectJeProperties(berkeleyDir, 
+                    berkeleyDir);
 
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
@@ -162,7 +160,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
-				FileInputStream  fis = new FileInputStream(conceptsFile);
+		FileInputStream  fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
@@ -200,7 +198,20 @@ public class LoadBdbMulti extends AbstractMojo {
             while (conceptsProcessed.get() < conceptsRead.get()) {
                 Thread.sleep(1000);
             }
-
+            getLog().info("Testing for dup UUIDs.");
+            Concept.disableComponentsCRHM();
+            UuidDupFinder dupFinder = new UuidDupFinder();
+            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+            if (!dupFinder.getDupUuids().isEmpty()) {
+                dupFinder.writeDupFile();
+                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n" +
+                        dupFinder.getDupUuids() + "\n");
+                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                reporter.reportDupClasses();
+                
+            }
+            Concept.enableComponentsCRHM();
             if (annotationIndexes != null) {
                 for (ConceptDescriptor cd : annotationIndexes) {
                     Concept c = (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
@@ -304,11 +315,26 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("Finished db sync, starting generate lucene index.");
             createLuceneIndices();
             BdbCommitManager.commit();
-            getLog().info("Finished create index, starting close.");
+            getLog().info("Finished create index, testing for UUID dups.");
+            
+            dupFinder = new UuidDupFinder();
+            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+            if (!dupFinder.getDupUuids().isEmpty()) {
+                dupFinder.writeDupFile();
+                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n" +
+                        dupFinder.getDupUuids() + "\n");
+                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                reporter.reportDupClasses();
+                
+            }
+            getLog().info("Starting close.");
             Bdb.close();
             getLog().info("db closed");
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
-
+            if (!dupFinder.getDupUuids().isEmpty()) {
+                throw new Exception("Duplicate UUIDs found: " + dupFinder.getDupUuids().size());
+            }
             if (moveToReadOnly) {
                 File mutableFile = new File(berkeleyDir, "mutable");
                 FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));

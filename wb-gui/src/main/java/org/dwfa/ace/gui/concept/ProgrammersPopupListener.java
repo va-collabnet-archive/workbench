@@ -23,9 +23,7 @@ import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -52,18 +50,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.*;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
-import org.ihtsdo.tk.api.media.MediaChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public class ProgrammersPopupListener extends MouseAdapter implements ActionListener, ClipboardOwner {
 
@@ -112,8 +102,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         TOGGLE_QA("Toggle QA"),
         REINDEX_LUCENE("Recreate Lucene index"),
         EXPORT_ACTIVE_ONLY("Export active only from view"),
-        PATCH_MSMITH("Patch msmith#80#"),
-        CHECK_DUPS("Check for duplicate UUIDS");
+        PATCH_MSMITH("Patch msmith#80#");
         //J+
         String menuText;
 
@@ -221,20 +210,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                 patchMSmith();
 
                 break;
-            case CHECK_DUPS:
-                DupUuidFinder dupFinder;
-                try {
-                    AceLog.getAppLog().info("--Starting Check for Duplicates");
-                    dupFinder = new DupUuidFinder();
-                    Ts.get().iterateConceptDataInParallel(dupFinder);
-                    dupFinder.setPassTwo();
-                   Ts.get().iterateConceptDataInParallel(dupFinder);
-                    AceLog.getAppLog().info("--Finished Check for Duplicates");
-                } catch (Exception ex) {
-                    Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-                }
 
-                break;
 
             default:
                 AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
@@ -606,131 +582,6 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         StringSelection contents = new StringSelection(igcd.toLongString());
 
         clip.setContents(contents, this);
-    }
-
-    private static class DupUuidFinder implements ProcessUnfetchedConceptDataBI {
-
-        ConcurrentSkipListSet<UUID> allPrimUuid = new ConcurrentSkipListSet<UUID>();
-        ConcurrentSkipListSet<UUID> dupUuid = dupUuid = new ConcurrentSkipListSet<UUID>();
-        private final NidBitSetBI nidset;
-
-        private enum PASS {
-
-            PASS_ONE, PASS_TWO
-        };
-        private PASS pass = PASS.PASS_ONE;
-
-        public void setPassTwo() {
-            this.pass = PASS.PASS_TWO;
-        }
-
-        private DupUuidFinder() throws IOException {
-            nidset = Ts.get().getAllConceptNids();
-        }
-
-        private void processConcept(ConceptChronicleBI concept) {
-            try {
-
-                //add prim uuids to list
-                //concept attributtes
-                addToUuidList(concept.getConAttrs());
-                //descriptions
-                for (DescriptionChronicleBI desc : concept.getDescs()) {
-                    addToUuidList(desc);
-                }
-                //relationships
-                for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
-                    addToUuidList(rel);
-                }
-                //media
-                for (MediaChronicleBI media : concept.getMedia()) {
-                    addToUuidList(media);
-                }
-                for (RefexChronicleBI refex : concept.getRefsetMembers()) {
-                    addToUuidList(refex);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        private void printDups(ConceptChronicleBI concept) {
-            try {
-                //see if duplicate and print info 
-                printIfDup(concept.getConAttrs());
-                //descriptions
-                for (DescriptionChronicleBI desc : concept.getDescs()) {
-                    printIfDup(desc);
-                }
-                //relationships
-                for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
-                    printIfDup(rel);
-                }
-                //media
-                for (MediaChronicleBI media : concept.getMedia()) {
-                    printIfDup(media);
-                }
-                for (RefexChronicleBI refex : concept.getRefsetMembers()) {
-                    printIfDup(refex);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        private void addToUuidList(ComponentChroncileBI component) throws IOException {
-            UUID primUuid = component.getPrimUuid();
-            if (allPrimUuid.contains(primUuid)) {
-                dupUuid.add(primUuid);
-            } else {
-                allPrimUuid.add(primUuid);
-            }
-            for (ComponentChroncileBI annotation : component.getAnnotations()) {
-                addToUuidList(annotation);
-            }
-        }
-
-        private void printIfDup(ComponentChroncileBI component) throws IOException {
-            UUID primUuid = component.getPrimUuid();
-            if (dupUuid.contains(primUuid)) {
-                System.out.println(component);
-            }
-            for (ComponentChroncileBI annotation : component.getAnnotations()) {
-                printIfDup(annotation);
-            }
-        }
-            private static AtomicInteger count = new AtomicInteger(0);
-            private static AtomicInteger dots = new AtomicInteger(0);
-        @Override 
-        public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
-            count.incrementAndGet();
-            if (count.get() % 1000 == 0) {
-                System.out.print(".");
-                dots.incrementAndGet();
-                if (dots.get() > 80) {
-                    dots.set(0);
-                    System.out.println();
-                }
-            }
-            switch (pass) {
-                case PASS_ONE:
-                    processConcept(fetcher.fetch());
-                    break;
-                case PASS_TWO:
-                    printDups(fetcher.fetch());
-                    break;
-            }
-        }
-
-        @Override
-        public NidBitSetBI getNidSet() throws IOException {
-            return nidset;
-        }
-
-        @Override
-        public boolean continueWork() {
-            return true;
-        }
     }
 
     //~--- get methods ---------------------------------------------------------

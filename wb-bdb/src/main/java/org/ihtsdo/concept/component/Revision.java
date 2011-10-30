@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.concept.Concept;
 
 public abstract class Revision<V extends Revision<V, C>, C extends ConceptComponent<V, C>>
         implements I_AmPart<V>, I_HandleFutureStatusAtPositionSetup, AnalogBI {
@@ -565,4 +566,9 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
          modified();
       }
    }
+   
+   public Concept getEnclosingConcept() {
+        return primordialComponent.getEnclosingConcept();
+   }
+
 }

@@ -60,8 +60,8 @@ import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
+import org.ihtsdo.helper.io.FileIO;
 
 public class Bdb {
 
@@ -188,56 +188,62 @@ public class Bdb {
 
     public static void selectJeProperties(File configDir, File dbDir) throws IOException {
         long maxMem = Runtime.getRuntime().maxMemory();
+        if (!configDir.exists()) {
+            configDir.mkdirs();
+            for (HeapSize size: HeapSize.values()) {
+                FileIO.copyFile(size.getPropFile(configDir), new File(configDir, size.configFileName));
+            }
+        }
 
         File mutableDir = new File(dbDir, "mutable");
         File readOnlyDir = new File(dbDir, "read-only");
         mutableDir.mkdirs();
         if (maxMem > 8000000000L) {
             heapSize = HeapSize.HEAP_8000;
-            FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_8000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_8000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 6000000000L) {
             heapSize = HeapSize.HEAP_6000;
-            FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_6000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_6000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 4000000000L) {
             heapSize = HeapSize.HEAP_4000;
-            FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_4000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_4000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 2000000000) {
             heapSize = HeapSize.HEAP_2000;
-            FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_2000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_2000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 1400000000) {
             heapSize = HeapSize.HEAP_1400;
-            FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_1400.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_1400.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else {
             heapSize = HeapSize.HEAP_1200;
-            FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_1200.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_1200.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         }
@@ -273,6 +279,9 @@ public class Bdb {
             readOnly = new Bdb(readOnlyExists, readOnlyDir);
             inform(activity, "loading property database...");
             propDb = new PropertiesBdb(readOnly, mutable);
+
+            
+            
             inform(activity, "loading uuid to nid map database...");
             uuidsToNidMapDb = new UuidToNidMapBdb(readOnly, mutable);
 

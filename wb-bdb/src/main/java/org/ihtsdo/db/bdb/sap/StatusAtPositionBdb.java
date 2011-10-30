@@ -385,6 +385,9 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
     public PositionBI getPosition(int sapNid)
             throws IOException, PathNotExistsException, TerminologyException {
+        if (sapNid == -1) {
+            System.out.print("");
+        }
         int pathNid = -1;
         long time = -1;
         int status = -1;

@@ -46,6 +46,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
         implements I_RelVersioned<RelationshipRevision>, I_RelPart<RelationshipRevision>,
@@ -691,8 +692,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
    @Override
    public boolean hasExtensions() throws IOException {
-      return getEnclosingConcept().hasExtensionsForComponent(nid);
+      return ((Concept) getEnclosingConcept()).hasExtensionsForComponent(nid);
    }
+   
 
    @Override
    public boolean isInferred() {

@@ -86,11 +86,12 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
                    I_HandleFutureStatusAtPositionSetup {
-   private static AtomicBoolean          fixAlert         = new AtomicBoolean(true);
+   private static AtomicBoolean          fixAlert         = new AtomicBoolean(false);
    private static AnnotationWriter annotationWriter = new AnnotationWriter();
 
    //~--- fields --------------------------------------------------------------
@@ -133,15 +134,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
 
          if (fixAlert.compareAndSet(true, false)) {
-            AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
+            AceLog.getAppLog().alertAndLogException(new Exception("a. Datafix warning. See log for details."));
+         System.out.println("a-Datafix: cNid " + cNid + " "
+                                    + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + " incorrect for: "
+                                    + this.nid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(this.nid)
+                                    + " should have been: " + this.enclosingConceptNid
+                                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid));
          }
 
-         AceLog.getAppLog().warning("Datafix warning. cNid " + cNid + " "
-                                    + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + "\nincorrect for: "
-                                    + this.nid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(this.nid)
-                                    + "\nshould have been: " + this.enclosingConceptNid
-                                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid)
-                                    + "\nprocessing: " + this.toString());
       }
 
       assert nid != Integer.MAX_VALUE : "Processing nid: " + enclosingConceptNid;
@@ -162,13 +162,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
          Bdb.getNidCNidMap().setCNidForNid(this.enclosingConceptNid, this.nid);
       } else if (cNid != this.enclosingConceptNid) {
          Bdb.getNidCNidMap().resetCidForNid(this.enclosingConceptNid, this.nid);
-         AceLog.getAppLog().alertAndLogException(new Exception("Datafix warning. See log for details."));
-         AceLog.getAppLog().warning("Datafix warning. cNid " + cNid + " "
-                                    + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + "\nincorrect for: "
+         if (fixAlert.compareAndSet(true, false)) {
+            AceLog.getAppLog().alertAndLogException(new Exception("b. Datafix warning. See log for details."));
+         System.out.println("b-Datafix: cNid " + cNid + " "
+                                    + Bdb.getUuidsToNidMap().getUuidsForNid(cNid) + " incorrect for: "
                                     + this.nid + " " + Bdb.getUuidsToNidMap().getUuidsForNid(this.nid)
-                                    + "\nshould have been: " + this.enclosingConceptNid
-                                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid)
-                                    + "\nprocessing: " + this.toString());
+                                    + " should have been: " + this.enclosingConceptNid
+                                    + Bdb.getUuidsToNidMap().getUuidsForNid(this.enclosingConceptNid));
+         }
       }
 
       this.primordialSapNid = Bdb.getSapNid(eComponent);
@@ -2219,6 +2220,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
       }
 
       //~--- methods ----------------------------------------------------------
+    public Concept getEnclosingConcept() {
+        return ConceptComponent.this.getEnclosingConcept();
+    }
 
       @SuppressWarnings("rawtypes")
       @Override
