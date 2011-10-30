@@ -202,7 +202,10 @@ public class LoadBdbMulti extends AbstractMojo {
             Concept.disableComponentsCRHM();
             UuidDupFinder dupFinder = new UuidDupFinder();
             Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
-            if (!dupFinder.getDupUuids().isEmpty()) {
+            System.out.println();
+            if (dupFinder.getDupUuids().isEmpty()) {
+                getLog().info("No dup UUIDs found.");
+            } else {
                 dupFinder.writeDupFile();
                 getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n" +
                         dupFinder.getDupUuids() + "\n");
@@ -317,9 +320,13 @@ public class LoadBdbMulti extends AbstractMojo {
             BdbCommitManager.commit();
             getLog().info("Finished create index, testing for UUID dups.");
             
+            Concept.disableComponentsCRHM();
             dupFinder = new UuidDupFinder();
             Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
-            if (!dupFinder.getDupUuids().isEmpty()) {
+            System.out.println();
+            if (dupFinder.getDupUuids().isEmpty()) {
+                getLog().info("No dup UUIDs found.");
+            } else {
                 dupFinder.writeDupFile();
                 getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n" +
                         dupFinder.getDupUuids() + "\n");
@@ -328,6 +335,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 reporter.reportDupClasses();
                 
             }
+            Concept.enableComponentsCRHM();
             getLog().info("Starting close.");
             Bdb.close();
             getLog().info("db closed");
