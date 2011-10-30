@@ -213,7 +213,8 @@ public class ContradictionFinderSwingWorker
         frame.enableStopButton(true);
         frame.setProgressIndeterminate(true);
         frame.setProgressInfo("Starting the Contradiction Detector");
-
+        this.conflicts.clear();
+        
         completeLatch = new CountDownLatch(1);
         new ContradictionUpdator();
 
