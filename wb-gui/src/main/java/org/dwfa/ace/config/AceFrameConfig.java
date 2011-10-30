@@ -2593,6 +2593,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         changeSupport.firePropertyChange("visibleRefsets", null, visibleRefsets);
     }
 
+    @Override
     public boolean isRefsetInToggleVisible(REFSET_TYPES refsetType, TOGGLES toggle) {
         return visibleRefsets.contains(refsetType.name() + toggle.toString());
     }

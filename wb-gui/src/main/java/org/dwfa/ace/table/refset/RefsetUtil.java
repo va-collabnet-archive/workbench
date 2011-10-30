@@ -56,7 +56,7 @@ public class RefsetUtil {
         plugin.clearRefsetListeners();
         if (host.getShowRefsets()) {
             for (REFSET_TYPES extType : REFSET_TYPES.values()) {
-                if (((AceFrameConfig) host.getConfig()).isRefsetInToggleVisible(extType, toggle)) {
+                if (host.getConfig().isRefsetInToggleVisible(extType, toggle)) {
                     c.gridy++;
                     RefsetMemberTableModel refsetModel;
                     refsetModel = new RefsetMemberTableModel(host, 
