@@ -94,6 +94,7 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
 
         if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
         	updateLuceneIndex();
+        	firstFileRead = null;
         	return;
         } 
 
