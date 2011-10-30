@@ -73,8 +73,10 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
                 found.incrementAndGet();
             } else if (position.equals(ContradictionResult.DUPLICATE_EDIT)) {
                 results.addConflictingDuplicateEditConcepts(c.getConceptNid());
+                found.incrementAndGet();
 	        } else if (position.equals(ContradictionResult.DUPLICATE_NEW)) {
 	            results.addConflictingDuplicateNewConcepts(c.getConceptNid());
+                found.incrementAndGet();
 	        } else if (position.equals(ContradictionResult.ERROR)) {
 	        	AceLog.getAppLog().log(Level.WARNING, "Failure in detecting contradictions on concept: " + c.getPrimUuid());
 	        }
