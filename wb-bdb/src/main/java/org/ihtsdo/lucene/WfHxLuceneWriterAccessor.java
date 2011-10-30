@@ -33,12 +33,15 @@ public  class WfHxLuceneWriterAccessor {
 			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(ref);
 
 			// Only add to update once per WfId
-			if (!wfIdsSeen.contains(bean.getWorkflowId())) {
-				beansToAddToWf.add(bean);
-				wfIdsSeen.add(bean.getWorkflowId());
+			if (bean != null) {
+				if (!wfIdsSeen.contains(bean.getWorkflowId())) {
+					beansToAddToWf.add(bean);
+					wfIdsSeen.add(bean.getWorkflowId());
+				}
+			} else {
+	    		AceLog.getAppLog().log(Level.WARNING, "Failed to add WfHx to Lucene for: " + ref.toString());
 			}
 		}
-
 		luceneWriterPermit.acquire();
 
 		try {
@@ -64,12 +67,16 @@ public  class WfHxLuceneWriterAccessor {
 																							  member.getStrValue(), member.getTime());
 
 				// Only add to update once per WfId
-				if (!wfIdsSeen.contains(bean.getWorkflowId())) {
-					beansToAddToWf.add(bean);
-					wfIdsSeen.add(bean.getWorkflowId());
+				if (bean != null) {
+					if (!wfIdsSeen.contains(bean.getWorkflowId())) {
+						beansToAddToWf.add(bean);
+						wfIdsSeen.add(bean.getWorkflowId());
+					}
+				} else {
+		    		AceLog.getAppLog().log(Level.WARNING, "Failed to add WfHx to Lucene for RefComp: " + member.getComponentUuid() + " with values: " + member.getStrValue());
 				}
-			}
-
+    		}
+    	
     		// Only acquire if can access WfHx refset
 			luceneWriterPermit.acquire();
 
