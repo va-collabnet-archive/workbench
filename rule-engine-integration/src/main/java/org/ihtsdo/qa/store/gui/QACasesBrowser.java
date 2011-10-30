@@ -55,7 +55,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
-import org.ihtsdo.qa.store.gui.QACaseDetailsPanel;
 import org.ihtsdo.qa.store.model.DispositionStatus;
 import org.ihtsdo.qa.store.model.QACase;
 import org.ihtsdo.qa.store.model.QACoordinate;
@@ -427,13 +426,13 @@ public class QACasesBrowser extends JPanel {
 			String conceptName = rowData[tableModel.CONCEPT_NAME].toString();
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
-				if (conceptName.length() > 7 && parentTabbedPanel.getToolTipTextAt(i) != null) {
-					if (parentTabbedPanel.getToolTipTextAt(i).equals(conceptName.substring(0, 7) + " (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
+				if (conceptName.length() > 7) {
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
-				} else if (parentTabbedPanel.getToolTipTextAt(i) != null){
-					if (parentTabbedPanel.getToolTipTextAt(i).equals(conceptName  + " (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
+				} else {
+					if (parentTabbedPanel.getTitleAt(i).equals(conceptName)) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
@@ -442,22 +441,18 @@ public class QACasesBrowser extends JPanel {
 
 			if (!tabExists) {
 				Rule rule = resultsPanel.getRule();
-				TerminologyComponent component = getSelectedCaseComponent(UUID
-						.fromString(rowData[0].toString()));
+				TerminologyComponent component = getSelectedCaseComponent(UUID.fromString(rowData[0].toString()));
 
 				selectedCase = (QACase) rowData[tableModel.CASE];
 
-				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(
-						rule, component, selectedCase, dispositionStatuses,
-						headerComponent, qaDatabase, store);
+				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule, component, selectedCase, dispositionStatuses, headerComponent, qaDatabase, store);
 				if (conceptName.length() > 7) {
-					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName+ " (" + rowData[tableModel.CONCEPT_UUID] + ")");
+					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
 				} else {
-					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName+ " (" + rowData[tableModel.CONCEPT_UUID] + ")");
+					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName);
 				}
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
-				parentTabbedPanel.setSelectedIndex(parentTabbedPanel
-						.getTabCount() - 1);
+				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
 			}
 		}
 	}
