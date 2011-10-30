@@ -513,7 +513,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
          throw new ContraditionException(vForC.toString());
       }
 
-      return vForC.get(0);
+      if (!vForC.isEmpty()) {
+        return vForC.get(0);
+      }
+      return null;
    }
 
    protected abstract VersionComputer<RefsetMember<R, C>.Version> getVersionComputer();

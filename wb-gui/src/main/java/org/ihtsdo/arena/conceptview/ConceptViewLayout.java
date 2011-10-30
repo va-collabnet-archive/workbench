@@ -859,7 +859,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     return;
                 }
                 DescriptionAnalogBI thingToDrag = dc.getThingToDrag();
-                if (dc.getThingToDrag().isUncommitted()) {
+                if (thingToDrag.isUncommitted()) {
                     dc.setVisible(true);
                 }
             }
@@ -871,7 +871,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     return;
                 }
                 DescriptionAnalogBI thingToDrag = dc.getThingToDrag();
-                if (dc.getThingToDrag().isUncommitted()) {
+                if (thingToDrag.isUncommitted()) {
                     dc.setVisible(true);
                 }
             }
