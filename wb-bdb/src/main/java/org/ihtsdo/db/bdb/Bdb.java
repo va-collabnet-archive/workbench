@@ -188,12 +188,16 @@ public class Bdb {
 
     public static void selectJeProperties(File configDir, File dbDir) throws IOException {
         long maxMem = Runtime.getRuntime().maxMemory();
-        if (!configDir.exists()) {
-            configDir.mkdirs();
-            for (HeapSize size: HeapSize.values()) {
+        configDir.mkdirs();
+        File jePropOptionsDir = new File(configDir, "je-prop-options");
+        jePropOptionsDir.mkdirs();
+        for (HeapSize size : HeapSize.values()) {
+            File destFile =new File(configDir, size.configFileName);
+            if (!destFile.exists()) {
                 FileIO.copyFile(size.getPropFile(configDir), new File(configDir, size.configFileName));
             }
         }
+
 
         File mutableDir = new File(dbDir, "mutable");
         File readOnlyDir = new File(dbDir, "read-only");
@@ -280,8 +284,8 @@ public class Bdb {
             inform(activity, "loading property database...");
             propDb = new PropertiesBdb(readOnly, mutable);
 
-            
-            
+
+
             inform(activity, "loading uuid to nid map database...");
             uuidsToNidMapDb = new UuidToNidMapBdb(readOnly, mutable);
 
@@ -361,15 +365,12 @@ public class Bdb {
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
             /*
-            int primeForLockTable =
-            SieveForPrimeNumbers.largestPrime(
-            Runtime.getRuntime().availableProcessors() - 1);
-            
-            envConfig.setConfigParam("je.lock.nLockTables", 
-            Integer.toString(primeForLockTable));
-            envConfig.setConfigParam("je.log.faultReadSize", 
-            "4096");
-             * 
+             * int primeForLockTable = SieveForPrimeNumbers.largestPrime(
+             * Runtime.getRuntime().availableProcessors() - 1);
+             *
+             * envConfig.setConfigParam("je.lock.nLockTables", Integer.toString(primeForLockTable));
+             * envConfig.setConfigParam("je.log.faultReadSize", "4096");
+             *
              */
 
 
@@ -469,14 +470,11 @@ public class Bdb {
             activity.setProgressInfoUpper("Database sync to disk...");
 
             /*
-            try {
-            Concept pathOrigins = getConceptDb().getConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid());
-            if (pathOrigins != null) {
-            AceLog.getAppLog().info("Refset origins:\n\n" + pathOrigins.toLongString());
-            }
-            } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-            }
+             * try { Concept pathOrigins =
+             * getConceptDb().getConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid()); if
+             * (pathOrigins != null) { AceLog.getAppLog().info("Refset origins:\n\n" +
+             * pathOrigins.toLongString()); } } catch (Exception e) {
+             * AceLog.getAppLog().alertAndLogException(e); }
              */
 
             activity.setProgressInfoLower("Starting sync...");
