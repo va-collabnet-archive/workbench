@@ -935,6 +935,7 @@ public class QACasesBrowser extends JPanel {
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 			data = new Object[0][8];
+			System.gc();
 		}
 
 		public void addData(List<Object> row) {

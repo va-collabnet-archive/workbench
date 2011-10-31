@@ -965,6 +965,7 @@ public class QAResultsBrowser extends JPanel {
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 			data = new Object[0][ROW_DATA_SIZE];
+			System.gc();
 		}
 
 		public void addData(List<Object> row) {
