@@ -15,6 +15,7 @@
  */
 package org.intsdo.tk.drools.manager;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,6 +31,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseConfiguration;
 import org.drools.KnowledgeBaseFactory;
@@ -92,35 +96,32 @@ public class DroolsExecutionManager {
         this.kbFiles = kbFiles;
         kbKey = sanatizeKey(kbKey);
         drlPkgFile = new File(ruleDirectory, kbKey + ".kpkgs");
-
-        Semaphore s = new Semaphore(1);
-        Semaphore s2 = packageLocks.putIfAbsent(drlPkgFile.getCanonicalPath(), s);
-        if (s2 != null) {
-            s = s2;
-        }
-
+        
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         for (File f : this.kbFiles) {
             if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
-                s.acquireUninterruptibly();
+                lock.writeLock().lock();
                 if (!drlPkgFile.exists() || drlPkgFile.lastModified() < f.lastModified()) {
                     buildKb = true;
                     break;
                 } else {
-                    s.release();
+                    lock.writeLock().unlock();
                 }
             }
         }
 
         if (buildKb) {
             loadKnowledgePackages(kbFiles, extraEvaluators, drlPkgFile);
-            s.release();
+            lock.writeLock().unlock();
         } else {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(drlPkgFile));
             try {
                 kpkgs = (Collection<KnowledgePackage>) in.readObject();
             } catch (ClassNotFoundException e) {
                 throw new IOException(e);
-            } finally {
+            } catch (EOFException e) {
+                System.out.println("@@@@ End of file exception: " + drlPkgFile.toString());
+            }finally {
                 in.close();
             }
         }
