@@ -36,6 +36,9 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -76,7 +79,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				descendants = getDescendants(descendants, semtagsRoot);
 				for (I_GetConceptData semtagConcept : descendants) {
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-							config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
 						validSemtags.put(tuple.getText(), semtagConcept);
 					}
@@ -105,14 +108,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				descendants = getDescendants(descendants, semtagsRoot);
 				for (I_GetConceptData semtagConcept : descendants) {
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-							config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+							config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
 						if (tuple.getTypeNid() == preferred && !semtagParents.keySet().contains(tuple.getText())) {
 							Set<String> parents = new HashSet<String>();
 							parents.add(tuple.getText());
 							for (I_RelTuple relTuple : semtagConcept.getSourceRelTuples(
 									config.getAllowedStatus(), config.getDestRelTypes(), 
-									config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+									getMockViewSet(config), config.getPrecedence(), 
 									config.getConflictResolutionStrategy())) {
 								if (relTuple.getTypeNid() == isa) {
 									I_GetConceptData parent = tf.getConcept(relTuple.getDestinationNid());
@@ -202,7 +205,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			I_DescriptionTuple originalFsn = null;
 
 			for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
-					config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+					config.getDescTypes(), getMockViewSet(config), 
 					config.getPrecedence(), config.getConflictResolutionStrategy())) {
 				if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
 					originalFsn = loopDescription;
@@ -238,7 +241,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 										I_DescriptionTuple potentialMatchFsn = null;
 
 										for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
-												config.getDescTypes(), config.getViewPositionSetReadOnly(), 
+												config.getDescTypes(), getMockViewSet(config), 
 												config.getPrecedence(), config.getConflictResolutionStrategy())) {
 											if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
 												potentialMatchFsn = loopDescription;
@@ -356,7 +359,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		try {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData concept = Terms.get().getConcept(uuidFromString(conceptUUID));
-			int status = concept.getConceptAttributeTuples(null, config.getViewPositionSetReadOnly(), 
+			int status = concept.getConceptAttributeTuples(null, getMockViewSet(config), 
 					config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
 			if (status == ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid() ||
 					status == ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid() ||
@@ -404,7 +407,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			allowedTypes.add(termFactory.uuidToNative(spec.getLenient().getPrimUuid()));
 
 			for (I_RelTuple loopTuple : testedConcept.getSourceRelTuples(config.getAllowedStatus(), 
-					allowedTypes, config.getViewPositionSetReadOnly(), 
+					allowedTypes, getMockViewSet(config), 
 					config.getPrecedence(), config.getConflictResolutionStrategy(), 
 					config.getClassifierConcept().getConceptNid(), 
 					RelAssertionType.STATED)) {
@@ -414,7 +417,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			Set<String> parentSemtags = new HashSet<String>();
 			for (I_GetConceptData loopParent : parents) {
 				for (I_DescriptionTuple loopDescription : loopParent.getDescriptionTuples(config.getAllowedStatus(), 
-						null, config.getViewPositionSetReadOnly(), 
+						null, getMockViewSet(config), 
 						Precedence.PATH, config.getConflictResolutionStrategy())) {
 					if (loopDescription.getStatusNid() == activeNid &&
 							loopDescription.getTypeNid() == fsnTypeNid && 
@@ -451,7 +454,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
+					getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
 				descendants = getDescendants(descendants, loopConcept);
@@ -477,7 +480,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				allowedrels.add(isaType);
 
 				if (concept.getDestRelTuples(config.getAllowedStatus(), 
-						allowedrels, config.getViewPositionSetReadOnly(), 
+						allowedrels, getMockViewSet(config), 
 						config.getPrecedence(), config.getConflictResolutionStrategy(),
 						config.getClassifierConcept().getConceptNid(), RelAssertionType.STATED).size() > 0) {
 					result = true;
@@ -523,7 +526,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData concept = Terms.get().getConcept(uuidFromString(conceptUuid));
 			List<? extends DescriptionVersionBI> descriptionsList = concept.getDescriptionTuples(config.getAllowedStatus(), 
-					null, config.getViewPositionSetReadOnly(), 
+					null, getMockViewSet(config), 
 					config.getPrecedence(), config.getConflictResolutionStrategy());
 			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", uuidFromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 			for (DescriptionVersionBI loopDescription : descriptionsList) {
@@ -554,7 +557,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			int historical = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
 			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
 					null, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					getMockViewSet(config), config.getPrecedence(), 
 					config.getConflictResolutionStrategy())) {
 				if (relTuple.getCharacteristicNid() == historical) {
 					result = true;
@@ -584,7 +587,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			I_GetConceptData focusConcept = tf.getConcept(uuidFromString(conceptUuid));
 			List<String> currentSemtags = new ArrayList<String>();
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
-					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+					config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
 					config.getConflictResolutionStrategy())) {
 				if (tuple.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() 
 						&& tuple.getLang().equals("en")) {
@@ -614,6 +617,23 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		}
 
 		return uuid;
+	}
+	
+	private static PositionSet getMockViewSet(I_ConfigAceFrame config) {
+		I_TermFactory termFactory = Terms.get();
+		Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+		try {
+			for (PathBI loopPath : config.getEditingPathSet()) {
+				PositionBI pos = termFactory.newPosition(loopPath, Long.MAX_VALUE);
+				viewPositions.add(pos);
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		PositionSet mockViewSet = new PositionSet(viewPositions);
+		return mockViewSet;
 	}
 
 }

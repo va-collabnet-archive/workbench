@@ -346,5 +346,5 @@ public class DrComponentHelper {
 		}
 		return descriptionId.toString();
 	}
-
+	
 }
