@@ -59,6 +59,7 @@ import org.dwfa.ace.task.classify.SnoPathProcessStated;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
@@ -966,7 +967,7 @@ public class SnorocketMojo extends AbstractMojo {
             isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
 
             snorocketAuthorNid =
-                    tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
+                    tf.uuidToNative(Concept.SNOROCKET.getUids());
 
         } catch (TerminologyException e) {
             logger.info(e.toString());
@@ -1148,7 +1149,7 @@ public class SnorocketMojo extends AbstractMojo {
                 sb.append(cNid).append("\t");
                 sb.append(c.getInitialText());
             }
-         } catch (IOException e) {
+        } catch (IOException e) {
             logger.info(e.toString());
         } catch (TerminologyException e) {
             logger.info(e.toString());
