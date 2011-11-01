@@ -402,12 +402,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    @Override
    public I_HostConceptPlugins getHost() {
       if ((linkedTab != null) && (linkedTab != -1)) {
-         if (getConfig() != null) {
+            I_ConfigAceFrame hostConfig = getConfig();
+         if (hostConfig != null) {
             if (linkedTab == -2) {
-               return getConfig().getListConceptViewer();
+               return hostConfig.getListConceptViewer();
             }
 
-            return getConfig().getConceptViewer(linkedTab);
+            return hostConfig.getConceptViewer(linkedTab);
          }
       }
 
