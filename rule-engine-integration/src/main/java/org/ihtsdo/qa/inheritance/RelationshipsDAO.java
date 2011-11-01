@@ -17,6 +17,9 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.testmodel.DrRelationship;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -59,7 +62,7 @@ public class RelationshipsDAO {
 
 		public Set<? extends I_GetConceptData> getParents(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> parents = new HashSet<I_GetConceptData>();
-			parents =  concept.getSourceRelTargets(allowedStatus ,allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+			parents =  concept.getSourceRelTargets(allowedStatus ,allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy());
 
 			return parents;
 		}
@@ -68,62 +71,62 @@ public class RelationshipsDAO {
 
 			return concept.getSourceRelTuples(allowedStatus, 
 					allowedIsATypes, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					getMockViewSet(config), config.getPrecedence(), 
 					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 					RelAssertionType.STATED);
 		}
-		
+
 		public List<? extends I_RelTuple> getStatedAllRels(I_GetConceptData concept) throws IOException, TerminologyException {
-			
+
 			return concept.getSourceRelTuples(allowedStatus, 
 					null, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					getMockViewSet(config), config.getPrecedence(), 
 					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 					RelAssertionType.STATED);
 		}
 
 		public List<? extends I_RelTuple> getInferredRels(I_GetConceptData concept) throws IOException, TerminologyException {
-			
+
 			return concept.getSourceRelTuples(allowedStatus, 
 					null, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					getMockViewSet(config), config.getPrecedence(), 
 					config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), 
 					RelAssertionType.INFERRED);
 		}
-		
+
 		public List<I_RelTuple> getRelTuples(I_GetConceptData concept) throws IOException, TerminologyException{
 			List<I_RelTuple> result = new ArrayList<I_RelTuple>();
- 			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
-			
-                    try {
-                        List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
-                        int relGroup = 1;
-                        for (I_RelTuple[] i_RelTuples : roleGroups) {
-                            for (I_RelTuple i_RelTuple : i_RelTuples) {
-                                i_RelTuple.setGroup(relGroup);
-                                result.add(i_RelTuple);
-                            }
-                            relGroup++;
-                        }
-                        
-                        List<I_RelTuple> singles = inheritedRels.getSingleRoles();
-                        for (I_RelTuple i_RelTuple : singles) {
-                            i_RelTuple.setGroup(0);
-                            result.add(i_RelTuple);
-                        }
-                    } catch (PropertyVetoException e) {
-                        throw new TerminologyException(e);
-                    }
-			
+			InheritedRelationships inheritedRels = getInheritedRelationships(concept);
+
+			try {
+				List<I_RelTuple[]> roleGroups = inheritedRels.getRoleGroups();
+				int relGroup = 1;
+				for (I_RelTuple[] i_RelTuples : roleGroups) {
+					for (I_RelTuple i_RelTuple : i_RelTuples) {
+						i_RelTuple.setGroup(relGroup);
+						result.add(i_RelTuple);
+					}
+					relGroup++;
+				}
+
+				List<I_RelTuple> singles = inheritedRels.getSingleRoles();
+				for (I_RelTuple i_RelTuple : singles) {
+					i_RelTuple.setGroup(0);
+					result.add(i_RelTuple);
+				}
+			} catch (PropertyVetoException e) {
+				throw new TerminologyException(e);
+			}
+
 			return result;
-			
+
 		}
-		
+
 
 		public Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept) throws IOException, TerminologyException {
 			Set<? extends I_GetConceptData> children = new HashSet<I_GetConceptData>();
 
-			children =  concept.getDestRelOrigins(allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+			children =  concept.getDestRelOrigins(allowedStatus, allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy());
 
 			return children;
 		}
@@ -132,10 +135,10 @@ public class RelationshipsDAO {
 			if (concept1.getConceptNid()==concept2.getConceptNid()){
 				return TEST_RESULTS.CONCEPT1_EQUAL_CONCEPT2;
 			}
-			if (concept1.isParentOf(concept2,allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())){
+			if (concept1.isParentOf(concept2,allowedStatus, allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy())){
 				return TEST_RESULTS.CONCEPT1_ANCESTOROF_CONCEPT2;
 			}
-			if (concept2.isParentOf(concept1,allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())){
+			if (concept2.isParentOf(concept1,allowedStatus, allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy())){
 				return TEST_RESULTS.CONCEPT2_ANCESTOROF_CONCEPT1;
 			}
 			return TEST_RESULTS.CONCEPTS_DIFF_HIERARCHY;
@@ -419,7 +422,7 @@ public class RelationshipsDAO {
 		private void getRecursiveDefiningAttributes(I_GetConceptData concept,
 				List<I_RelTuple[]> allRoleGroups,List<I_RelTuple> allSingleRoles, Set<I_GetConceptData> parents) throws IOException, TerminologyException {
 
-			List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, config.getViewPositionSetReadOnly(),
+			List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(allowedStatus, allowedDestRelTypes, getMockViewSet(config),
 					config.getPrecedence(), config.getConflictResolutionStrategy(),config.getClassifierConcept().getNid(),RelAssertionType.STATED);
 
 			HashMap<Integer,List<I_RelTuple>> mapGroup= new HashMap<Integer,List<I_RelTuple>>() ;
@@ -469,7 +472,7 @@ public class RelationshipsDAO {
 				return true;
 			}
 			I_GetConceptData charactConcept = termFactory.getConcept(characteristicId);
-			if (stated.isParentOfOrEqualTo(charactConcept,allowedStatus, allowedIsATypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())){
+			if (stated.isParentOfOrEqualTo(charactConcept,allowedStatus, allowedIsATypes, getMockViewSet(config), config.getPrecedence(), config.getConflictResolutionStrategy())){
 				setDefChar.add(characteristicId);
 				return true;
 			}				
@@ -545,5 +548,22 @@ public class RelationshipsDAO {
 			}
 			return rels;
 
+		}
+
+		private static PositionSet getMockViewSet(I_ConfigAceFrame config) {
+			I_TermFactory termFactory = Terms.get();
+			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+			try {
+				for (PathBI loopPath : config.getEditingPathSet()) {
+					PositionBI pos = termFactory.newPosition(loopPath, Long.MAX_VALUE);
+					viewPositions.add(pos);
+				}
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			PositionSet mockViewSet = new PositionSet(viewPositions);
+			return mockViewSet;
 		}
 }
