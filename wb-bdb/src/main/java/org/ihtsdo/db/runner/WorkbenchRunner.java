@@ -106,11 +106,49 @@ public class WorkbenchRunner {
    public static File          wbConfigFile;
    public static Properties    wbProperties;
 
+ //TODO Switch?
+   boolean oldWay = false;
+   
    //~--- static initializers -------------------------------------------------
 
    static {
       DwfaEnv.setHeadless(false);
    }
+   
+   
+	public static UIAuthenticator auth = new UIAuthenticator();
+	//public static SvnPrompter prompt;
+	
+	private String authenticate(SvnPrompter prompt, String baseURL){
+		//String result = auth.authenticate(svnH);
+		//SvnPrompter prompt = new SvnPrompter();
+		String result = auth.authenticate(prompt, baseURL);
+		if(result != null){
+			if(result.equals(UIAuthenticator.ERR_NO_PROFILE_S)){
+			AceLog.getAppLog().info("Problem Authenticating . Problem was "+result);
+			}
+		}
+		userProfile = auth.getProfile();
+		if(userProfile == null){
+			//AceLog.getAppLog().info("up is null "+auth.getApm().getProfile().getAbsolutePath());
+			AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
+			//here
+		}
+		
+		/*if(result != null && result.length() > 0){
+			AceLog.getAppLog().info("authenticate Called result = "+result);
+		}
+		
+		else{
+			AceLog.getAppLog().info("authenticate Called everything OK prompt User = "+prompt.getUsername()+" pw = "+prompt.getPassword());
+			AceLog.getAppLog().info("authenticate Called profile = " +auth.getProfile().getName());
+			AceLog.getAppLog().info("authenticate debug here");
+		}*/
+		
+		return result;
+	}
+	
+
 
    //~--- constructors --------------------------------------------------------
 
@@ -247,8 +285,10 @@ public class WorkbenchRunner {
          boolean acePropertiesFileExists = wbPropertiesFile.exists();
 
          wbProperties = new Properties();
-
+         
+         if(oldWay){
          SvnPrompter prompter    = new SvnPrompter();
+         }
          boolean     initialized = false;
 
          if (acePropertiesFileExists) {
@@ -257,10 +297,23 @@ public class WorkbenchRunner {
          }
 
          SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class, jiniConfig);
+         
+         if(!oldWay){
+        	 String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
+ 			//AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
+ 			//TODO throw some sort of error if url is empty or null
+ 			String auth_e_msg = authenticate(Svn.getPrompter(),testSVNURL);
+ 		
+         }
 
          if ((acePropertiesFileExists == false) || (initialized == false)) {
             try {
+            	if(oldWay){
                svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
+            	}
+            	else{
+             boolean ok = svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, Svn.getPrompter());	
+            	}
             } catch (Exception ex) {
                AceLog.getAppLog().alertAndLogException(ex);
                System.exit(0);
@@ -276,8 +329,12 @@ public class WorkbenchRunner {
 
          if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
             Svn.setConnectedToSvn(true);
-            svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES),
-                    prompter);
+            if(oldWay){
+            svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES),prompter);
+            }
+            else{
+            	svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES), Svn.getPrompter());
+            }
          }
 
          if ((wbConfigFile == null) ||!wbConfigFile.exists()) {
@@ -379,6 +436,22 @@ public class WorkbenchRunner {
             svnHelper.doChangeSetImport();
          }
 
+         if(!oldWay){
+			if(userProfile == null){
+				
+				AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
+				auth.getApm().processProfiles();
+				userProfile = auth.getApm().getProfile();
+				
+				if(userProfile == null){
+					JOptionPane
+					.showMessageDialog(LogWithAlerts
+							.getActiveFrame(null),
+							"Unable to find a profile for user = "+auth.getApm().getUserName());
+					return;
+				}	
+				}
+         }
          if ((wbConfigFile != null) && wbConfigFile.exists() && wbPropertiesFile.exists()) {
 
             // Put up a dialog to select the configuration file...
@@ -402,9 +475,27 @@ public class WorkbenchRunner {
             try {
                AceConfig.config = (AceConfig) ois.readObject();
                AceConfig.config.setProfileFile(userProfile);
+               
+               if(oldWay){
                AceConfig.config.getUsername();
                prompter.setUsername(AceConfig.config.getUsername());
-               prompter.setPassword(profiler.getPassword());
+               prompter.setPassword(profiler.getPassword());}
+               else{
+				AceLog.getAppLog().info("AceConfig UserName = "+AceConfig.config.getUsername() +" prompt.getUsername() = "+Svn.getPrompter().getUsername());
+				
+				if(!Svn.getPrompter().getUsername().equalsIgnoreCase(AceConfig.config.getUsername())){
+					AceLog.getAppLog().info("AceConfig UserName not the same so setting"); 
+					AceConfig.config.setUsername(Svn.getPrompter().getUsername());
+					AceConfig.config.save();
+					
+					ObjectInputStream ois2 = new ObjectInputStream(
+							new BufferedInputStream(
+									new FileInputStream(userProfile)));
+					AceConfig.config = (AceConfig) ois2.readObject();
+					AceConfig.config.setProfileFile(userProfile);
+					AceLog.getAppLog().info("AceConfig UserName2 = "+AceConfig.config.getUsername());
+				} 
+               }
             } catch (Exception ex) {
                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                                              "Unable to open user file. Is it corrupt?");
@@ -468,7 +559,7 @@ public class WorkbenchRunner {
                afc.setMasterConfig(AceConfig.config);
 
                boolean login = true;
-
+if(oldWay){
                while (login) {
                   if (frameCount == 1) {
                      if (ace.getPassword().equals(prompter.getPassword())) {
@@ -518,6 +609,44 @@ public class WorkbenchRunner {
                      }
                   }
                }
+}
+else{
+	if (ace.isAdministrative()) {
+		successCount++;
+		AceLog.getAppLog().info("About to handleAdministrativeFrame"); 
+		handleAdministrativeFrame(Svn.getPrompter(), ace);
+	}
+	else{
+		successCount++;
+		//AceLog.getAppLog().info("Workbench runner 517 successCount = "+successCount); 
+		if (successCount == 1 && svnHelper != null) {
+			/*AceLog.getAppLog().info("Workbench runner 519 svnHelper.getSubversionMap().size = "+svnHelper.getSubversionMap().size()); 
+			for (String key : svnHelper.getSubversionMap().keySet()) {
+                SubversionData svd = svnHelper.getSubversionMap().get(key);
+                AceLog.getAppLog().info(" Printing svnHelper.getSubversionMap key = " + key+" SubversionData = "+svd);
+                }
+			
+			AceLog.getAppLog().info("Workbench runner 520 ace.getSubversionMap().size() 1 = "+ace.getSubversionMap().size()); 
+			for (String key : ace.getSubversionMap().keySet()) {
+                SubversionData svd = ace.getSubversionMap().get(key);
+                AceLog.getAppLog().info(" Printing ace key = " + key+" SubversionData = "+svd);
+                }*/
+			
+			ace.getSubversionMap().clear();
+			ace.getSubversionMap().putAll(svnHelper.getSubversionMap());
+			/*AceLog.getAppLog().info("Workbench runner 534 ace.getSubversionMap().size() = "+ace.getSubversionMap().size()); 
+			for (String key : ace.getSubversionMap().keySet()) {
+                SubversionData svd = ace.getSubversionMap().get(key);
+                AceLog.getAppLog().info(" Printing ace svnMap info key = " + key+" SubversionData = "+svd);
+                } */
+			
+		}
+		//AceLog.getAppLog().info("About to handleNormalFrame"); 
+		handleNormalFrame(ace);
+	}
+}
+               
+               
             }
          }
 
@@ -769,6 +898,7 @@ public class WorkbenchRunner {
       Dimension              d           = Toolkit.getDefaultToolkit().getScreenSize();
       private File           lastProfileDir;
       CountDownLatch         latch;
+      //TODO move into method
       private AceLoginDialog loginDialog;
       private String         password;
 
@@ -802,11 +932,12 @@ public class WorkbenchRunner {
                AceLog.getAppLog().alertAndLogException(e);
             }
          }
-
+         if(oldWay){
          loginDialog = new AceLoginDialog(parentFrame);
          loginDialog.setConnectToSvn(initializeFromSubversion);
          loginDialog.setLocation((d.width / 2) - (loginDialog.getWidth() / 2),
                                  (d.height / 2) - (loginDialog.getHeight() / 2));
+         }
          this.latch = latch;
       }
 
@@ -860,14 +991,15 @@ public class WorkbenchRunner {
       protected void finished() {
          super.finished();
 
+         
          try {
-
+        	 if(oldWay){
             // shows the AceLoginDialog
             userProfile = loginDialog.getUserProfile(lastProfileDir);
             password    = new String(loginDialog.getPassword());
             Svn.setConnectedToSvn(loginDialog.connectToSvn());
             wbProperties.setProperty("last-profile-dir", FileIO.getRelativePath(userProfile));
-
+        	 }
             if (newFrame) {
                OpenFrames.removeFrame(parentFrame);
                parentFrame.setVisible(false);
@@ -957,4 +1089,9 @@ public class WorkbenchRunner {
          AceLog.getAppLog().info("intervalRemoved: " + arg0);
       }
    }
+   
+	public static SvnPrompter getPrompt() {
+		return Svn.getPrompter();
+	}
+   
 }
