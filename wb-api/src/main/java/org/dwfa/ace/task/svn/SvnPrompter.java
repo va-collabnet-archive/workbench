@@ -27,6 +27,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.gui.SpringUtilities;
 import org.dwfa.util.LogWithAlerts;
 import org.tigris.subversion.javahl.PromptUserPassword3;
@@ -80,6 +81,12 @@ public class SvnPrompter implements PromptUserPassword3 {
     }
 
     public boolean prompt(String realm, String username, boolean maySave) {
+    	
+    	if((this.username != null && this.username.length() > 0) && (this.password != null && this.password.length() > 0)){
+    		return true;
+    	}
+    	
+    	AceLog.getAppLog().info("SvnPrompter prompt supplied UN = "+username +" set UN = "+this.username +" password = "+this.password);
         JPanel promptPane = new JPanel(new SpringLayout());
         promptPane.add(new JLabel("username:", JLabel.RIGHT));
         final JTextField userTextField = new JTextField(15);
