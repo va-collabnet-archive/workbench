@@ -343,7 +343,7 @@ public class GenerateScripts extends AbstractMojo {
             // write heap size
             writeLine(fw, String.format("-Xms%1$s", startHeap));
             writeLine(fw, String.format("-Xmx%1$s", maxHeap));
-            writeLine(fw, String.format("-XX:MaxPermSize=%1m$s", maxPermGen));
+            writeLine(fw, "-XX:MaxPermSize=" + maxPermGen + "m");
 
             // write OS X specific options
             if (isOSX()) {
