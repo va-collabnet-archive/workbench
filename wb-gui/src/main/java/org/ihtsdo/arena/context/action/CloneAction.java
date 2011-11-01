@@ -40,17 +40,18 @@ public class CloneAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
+    I_ConfigAceFrame config;
 
-    public CloneAction(String actionName, ComponentFact<ComponentVersionBI> fact) {
+    public CloneAction(String actionName, ComponentFact<ComponentVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
                 throw new UnsupportedOperationException();

@@ -41,11 +41,12 @@ public class AddFromDialectSpecAction extends AbstractAction {
     RefexChronicleBI<?> newRefex;
 
     public AddFromDialectSpecAction(String actionName,
-            ConceptFact concept, SpecFact<?> spec, String dialect) throws IOException {
+            ConceptFact concept, SpecFact<?> spec, String dialect, I_ConfigAceFrame config) throws IOException {
         super(actionName);
         this.concept = concept.getConcept();
         this.spec = spec;
         this.dialect = dialect;
+        this.config = config;
 
     }
 
@@ -64,10 +65,9 @@ public class AddFromDialectSpecAction extends AbstractAction {
 
     private void addDesc() throws TerminologyException, IOException {
         descSpec = ((DescSpecFact) spec).getDescSpec();
-        config = Terms.get().getActiveAceFrameConfig();
 
         try {
-            int type = Ts.get().getNidForUuids(descSpec.getDescTypeSpec().get(concept.getViewCoordinate()).getPrimUuid());
+            int type = Ts.get().getNidForUuids(descSpec.getDescTypeSpec().getLenient().getPrimUuid());
             int syn = SnomedMetadataRfx.getDES_SYNONYM_NID();
             int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
             int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();

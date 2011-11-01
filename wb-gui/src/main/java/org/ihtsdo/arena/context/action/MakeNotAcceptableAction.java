@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
@@ -33,19 +32,19 @@ public class MakeNotAcceptableAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     DescriptionVersionBI desc;
     String dialect;
+    I_ConfigAceFrame config;
 
-    public MakeNotAcceptableAction(String actionName, DescFact fact, String dialect) {
+    public MakeNotAcceptableAction(String actionName, DescFact fact, String dialect, I_ConfigAceFrame config) {
         super(actionName);
         this.desc = fact.getComponent();
         this.dialect = dialect;
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        I_ConfigAceFrame config;
         try {
             I_AmPart componentVersion;
-            config = Terms.get().getActiveAceFrameConfig();
             TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
@@ -133,8 +132,6 @@ public class MakeNotAcceptableAction extends AbstractAction {
             }
 
 
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {

@@ -26,73 +26,71 @@ import org.ihtsdo.tk.spec.RelSpec;
 
 public class AddToRelGroupAction extends AbstractAction {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    ComponentVersionBI component;
+    SpecFact<?> spec;
+    I_ConfigAceFrame config;
 
-	ComponentVersionBI component;
-	SpecFact<?> spec;
+    public AddToRelGroupAction(String actionName,
+            RelGroupFact relGroup, SpecFact<?> spec, I_ConfigAceFrame config) throws IOException {
+        super(actionName);
+        this.component = relGroup.getRelGroup();
+        this.spec = spec;
+        this.config = config;
+    }
 
-	public AddToRelGroupAction(String actionName, 
-			RelGroupFact relGroup, SpecFact<?> spec) throws IOException { //was concept fact
-		super(actionName);
-		this.component = relGroup.getRelGroup();//??
-		this.spec = spec;
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            if (RelSpecFact.class.isAssignableFrom(spec.getClass())) {
+                addRel();
+            } else if (DescSpecFact.class.isAssignableFrom(spec.getClass())) {
+                addDesc();
+            } else {
+                throw new Exception("Can't handle type: " + spec);
+            }
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			if (RelSpecFact.class.isAssignableFrom(spec.getClass())) {
-				addRel();
-			} else if (DescSpecFact.class.isAssignableFrom(spec.getClass())) {
-				addDesc();
-			} else {
-				throw new Exception("Can't handle type: " + spec);
-			}
-		} catch (Exception ex) {
-			AceLog.getAppLog().alertAndLogException(ex);
-		}
-	}
+    private void addDesc() throws TerminologyException, IOException {
+        DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
+        Terms.get().newDescription(UUID.randomUUID(), Terms.get().getConcept(component.getConceptNid()),
+                descSpec.getLangText(),
+                descSpec.getDescText(),
+                Terms.get().getConcept(descSpec.getDescTypeSpec().getLenient().getNid()),
+                config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
+    }
 
-	private void addDesc() throws TerminologyException, IOException {
-		DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		Terms.get().newDescription(UUID.randomUUID(),  Terms.get().getConcept(component.getConceptNid()), 
-				descSpec.getLangText(), 
-				descSpec.getDescText(), 
-				Terms.get().getConcept(descSpec.getDescTypeSpec().get(config.getViewCoordinate()).getNid()), 
-				config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
-		Terms.get().addUncommitted(Terms.get().getConcept(component.getConceptNid()));
-	}
-	
-	private void addRel() {
-		RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
-		try {
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			RelGroupChronicleBI group = (RelGroupChronicleBI) component;
-			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			I_GetConceptData originConcept = Terms.get().getConcept(component.getConceptNid());
-			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
-					originConcept, 
-					relSpec.getRelTypeSpec().get(config.getViewCoordinate()).getNid(), 
-					relSpec.getDestinationSpec().get(config.getViewCoordinate()).getNid(),
-					SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
-					SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(), 
-					group.getRelGroup(), //set to relGroup
-					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
-					config.getDbConfig().getUserConcept().getNid(),
-					pathItr.next().getConceptNid(), 
-		            Long.MAX_VALUE);
-			
-			while (pathItr.hasNext()) {
-				newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
-			}
-			Terms.get().addUncommitted(originConcept);
+    private void addRel() {
+        RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
+        try {
+            RelGroupChronicleBI group = (RelGroupChronicleBI) component;
+            Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
+            I_GetConceptData originConcept = Terms.get().getConcept(component.getConceptNid());
+            I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
+                    originConcept,
+                    relSpec.getRelTypeSpec().getLenient().getNid(),
+                    relSpec.getDestinationSpec().getLenient().getNid(),
+                    SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
+                    SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
+                    group.getRelGroup(), //set to relGroup
+                    SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+                    config.getDbConfig().getUserConcept().getNid(),
+                    pathItr.next().getConceptNid(),
+                    Long.MAX_VALUE);
 
-		} catch (TerminologyException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-	}
+            while (pathItr.hasNext()) {
+                newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
+            }
+            Terms.get().addUncommitted(originConcept);
 
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+    }
 }

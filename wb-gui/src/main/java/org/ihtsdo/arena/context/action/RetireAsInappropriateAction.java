@@ -59,16 +59,16 @@ public class RetireAsInappropriateAction extends AbstractAction {
     ConceptChronicleBI refexConcept;
     int refersToNid = 0;
 
-    public RetireAsInappropriateAction(String actionName, DescFact fact, ConceptViewSettings settings) {
+    public RetireAsInappropriateAction(String actionName, DescFact fact, ConceptViewSettings settings, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
         this.settings = settings;
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            config = Terms.get().getActiveAceFrameConfig();
             if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
                 wizard = settings.getView().getCvRenderer().getWizardPanel();
                 JPanel wizardPanel = wizard.getWizardPanel();
@@ -239,7 +239,6 @@ public class RetireAsInappropriateAction extends AbstractAction {
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
@@ -263,9 +262,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
+        } 
     }
 
     private void addToRefersToRefset(int nid) {

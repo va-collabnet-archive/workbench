@@ -10,8 +10,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
@@ -25,17 +23,17 @@ public class SetICSignificantAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     DescriptionVersionBI desc;
+    I_ConfigAceFrame config;
 
-    public SetICSignificantAction(String actionName, DescFact fact) {
+    public SetICSignificantAction(String actionName, DescFact fact, I_ConfigAceFrame config) {
         super(actionName);
         this.desc = fact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        I_ConfigAceFrame config;
         try {
-            config = Terms.get().getActiveAceFrameConfig();
             //get concept
             ConceptVersionBI descConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
             //get inital word of selected description
@@ -97,8 +95,6 @@ public class SetICSignificantAction extends AbstractAction {
                     }
                 }
             }
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {

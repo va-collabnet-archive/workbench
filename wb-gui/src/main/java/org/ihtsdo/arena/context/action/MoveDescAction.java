@@ -46,18 +46,19 @@ public class MoveDescAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ComponentVersionBI sourceComponent;
     ComponentVersionBI targetComponent;
+    I_ConfigAceFrame config;
 
-    public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+    public MoveDescAction(String actionName, DescFact sourceFact, ConceptFact destFact, I_ConfigAceFrame config) {
         super(actionName);
         this.sourceComponent = sourceFact.getComponent();
         this.targetComponent = destFact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 throw new UnsupportedOperationException();
@@ -157,7 +158,6 @@ public class MoveDescAction extends AbstractAction {
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
@@ -182,8 +182,6 @@ public class MoveDescAction extends AbstractAction {
                 }
             }
         } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }

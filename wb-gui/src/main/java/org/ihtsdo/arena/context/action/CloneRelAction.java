@@ -24,59 +24,59 @@ import org.ihtsdo.tk.drools.facts.RelFact;
 
 public class CloneRelAction extends AbstractAction {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    ComponentVersionBI component;
+    I_ConfigAceFrame config;
 
-	ComponentVersionBI component;
-	public CloneRelAction(String actionName, RelFact fact) {
-		super(actionName);
-		this.component = fact.getComponent();
-	}
+    public CloneRelAction(String actionName, RelFact fact, I_ConfigAceFrame config) {
+        super(actionName);
+        this.component = fact.getComponent();
+        this.config = config;
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
-				throw new UnsupportedOperationException();
-			}
-			if (ConceptVersionBI.class.isAssignableFrom(component.getClass())) {
-				throw new UnsupportedOperationException();
-			}
-			if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
-				DescriptionVersionBI desc = (DescriptionVersionBI) component;
-				Terms.get().newDescription(UUID.randomUUID(), concept, 
-						desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()), 
-						config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
-			}
-			if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
-				RelationshipVersionBI rel = (RelationshipVersionBI) component;
-				I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
-						rel.getTypeNid(), 
-						rel.getDestinationNid(), 
-						rel.getCharacteristicNid(), 
-						rel.getRefinabilityNid(), 
-						rel.getGroup(), 
-						rel.getStatusNid(), 
-						config.getDbConfig().getUserConcept().getNid(), 
-						pathItr.next().getConceptNid(), 
-						Long.MAX_VALUE);
-				
-				while (pathItr.hasNext()) {
-					newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), 
-							pathItr.next().getConceptNid(), Long.MAX_VALUE);
-				}
-			}
-			Terms.get().addUncommitted(concept);
-			
-			
-		} catch (TerminologyException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
+            Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
+            if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
+                throw new UnsupportedOperationException();
+            }
+            if (ConceptVersionBI.class.isAssignableFrom(component.getClass())) {
+                throw new UnsupportedOperationException();
+            }
+            if (DescriptionVersionBI.class.isAssignableFrom(component.getClass())) {
+                DescriptionVersionBI desc = (DescriptionVersionBI) component;
+                Terms.get().newDescription(UUID.randomUUID(), concept,
+                        desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
+                        config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
+            }
+            if (RelationshipVersionBI.class.isAssignableFrom(component.getClass())) {
+                RelationshipVersionBI rel = (RelationshipVersionBI) component;
+                I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
+                        rel.getTypeNid(),
+                        rel.getDestinationNid(),
+                        rel.getCharacteristicNid(),
+                        rel.getRefinabilityNid(),
+                        rel.getGroup(),
+                        rel.getStatusNid(),
+                        config.getDbConfig().getUserConcept().getNid(),
+                        pathItr.next().getConceptNid(),
+                        Long.MAX_VALUE);
 
-	}
+                while (pathItr.hasNext()) {
+                    newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(),
+                            pathItr.next().getConceptNid(), Long.MAX_VALUE);
+                }
+            }
+            Terms.get().addUncommitted(concept);
 
+
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+
+    }
 }

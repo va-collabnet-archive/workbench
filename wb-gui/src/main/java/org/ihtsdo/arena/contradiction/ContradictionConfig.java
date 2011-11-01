@@ -993,7 +993,8 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public Set<PathBI> getEditingPathSet() {
-        return config.getEditingPathSet();
+        Set<PathBI> editSet = getPromotionPathSet();
+        return editSet;
     }
 
     public I_IntList getEditStatusTypePopup() {

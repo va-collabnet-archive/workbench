@@ -42,18 +42,19 @@ public class CopyDescAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ComponentVersionBI sourceComponent;
     ComponentVersionBI targetComponent;
+    I_ConfigAceFrame config;
 
-    public CopyDescAction(String actionName, DescFact sourceFact, ConceptFact destFact) {
+    public CopyDescAction(String actionName, DescFact sourceFact, ConceptFact destFact, I_ConfigAceFrame config) {
         super(actionName);
         this.sourceComponent = sourceFact.getComponent();
         this.targetComponent = destFact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 throw new UnsupportedOperationException();

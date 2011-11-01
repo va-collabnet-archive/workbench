@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 
@@ -11,8 +10,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -27,18 +24,18 @@ public class SetDefinedAction extends AbstractAction {
     ComponentVersionBI component;
     AnalogBI analog;
     I_ConceptAttributePart newAnalogAttr;
+    I_ConfigAceFrame config;
 
-    public SetDefinedAction(String actionName, ComponentFact<ConAttrVersionBI> fact) {
+    public SetDefinedAction(String actionName, ComponentFact<ConAttrVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
+        this.config = config;
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
             if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart part = (I_AmPart) component;
                 I_ConceptAttributePart cPart = (I_ConceptAttributePart) part;

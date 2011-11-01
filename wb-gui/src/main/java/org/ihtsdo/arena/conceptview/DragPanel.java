@@ -226,6 +226,7 @@ public abstract class DragPanel<T extends Object> extends JPanel implements Tran
                globals.put("vc", coordinate);
                globals.put("actions", list);
                globals.put("cvSettings", getSettings());
+               globals.put("config", getSettings().getConfig());
 
                if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                   AceLog.getAppLog().fine("dropTarget: " + thingToDrag);

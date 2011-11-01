@@ -42,17 +42,18 @@ public class CloneAndRetireAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
+    I_ConfigAceFrame config;
 
-    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact) {
+    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
                 throw new UnsupportedOperationException();
@@ -143,7 +144,6 @@ public class CloneAndRetireAction extends AbstractAction {
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
@@ -169,8 +169,6 @@ public class CloneAndRetireAction extends AbstractAction {
             }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
+        } 
     }
 }

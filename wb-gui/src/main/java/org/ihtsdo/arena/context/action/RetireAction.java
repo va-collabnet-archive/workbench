@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -28,14 +27,12 @@ public class RetireAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
     ComponentVersionBI analog;
+    I_ConfigAceFrame config;
 
-    public RetireAction(String actionName, ComponentFact<ComponentVersionBI> fact) {
+    public RetireAction(String actionName, ComponentFact<ComponentVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
-        /*
-        putValue(LARGE_ICON_KEY,
-        new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/delete2.png")));
-         */
+        this.config = config;
     }
 
     @Override
@@ -43,7 +40,6 @@ public class RetireAction extends AbstractAction {
         try {
             if (I_AmPart.class.isAssignableFrom(component.getClass())) {
                 I_AmPart componentVersion = (I_AmPart) component;
-                I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
                 for (PathBI ep : config.getEditingPathSet()) {
                     analog = (ComponentVersionBI) componentVersion.makeAnalog(
                             SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
@@ -63,8 +59,6 @@ public class RetireAction extends AbstractAction {
                 I_GetConceptData concept = Terms.get().getConceptForNid(analog.getNid());
                 Terms.get().addUncommitted(concept);
             }
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }catch (PropertyVetoException e1) {
@@ -75,7 +69,6 @@ public class RetireAction extends AbstractAction {
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
@@ -100,8 +93,6 @@ public class RetireAction extends AbstractAction {
                 }
             }
         } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }

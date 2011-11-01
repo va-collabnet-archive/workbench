@@ -32,18 +32,19 @@ public class MoveToRelGroupAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ComponentVersionBI sourceComponent;
     ComponentVersionBI targetComponent;
+    I_ConfigAceFrame config;
 
-    public MoveToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact) {
+    public MoveToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact, I_ConfigAceFrame config) {
         super(actionName);
         this.sourceComponent = sourceFact.getComponent();
         this.targetComponent = destFact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
                 throw new UnsupportedOperationException();

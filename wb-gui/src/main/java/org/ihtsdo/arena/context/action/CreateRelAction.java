@@ -21,50 +21,48 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class CreateRelAction extends AbstractAction {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    ConceptVersionBI origin;
+    int relTypeNid;
+    int destNid;
+    I_ConfigAceFrame config;
 
-	ConceptVersionBI origin;
-	int relTypeNid;
-	int destNid;
+    public CreateRelAction(String actionName,
+            ConceptFact origin, ConceptSpec type, ConceptFact destination, I_ConfigAceFrame config) throws IOException {
+        super(actionName);
+        this.origin = origin.getConcept();
+        relTypeNid = type.getLenient().getNid();
+        destNid = destination.getConcept().getNid();
+        this.config = config;
+    }
 
-	public CreateRelAction(String actionName, 
-			ConceptFact origin, ConceptSpec type, ConceptFact destination) throws IOException {
-		super(actionName);
-		this.origin = origin.getConcept();
-		relTypeNid = type.get(this.origin.getViewCoordinate()).getNid();
-		destNid = destination.getConcept().getNid();
-	}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
+            I_GetConceptData originConcept = Terms.get().getConcept(origin.getNid());
+            I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
+                    originConcept,
+                    relTypeNid,
+                    destNid,
+                    SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(),
+                    SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
+                    0,
+                    SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+                    config.getDbConfig().getUserConcept().getNid(),
+                    pathItr.next().getConceptNid(),
+                    Long.MAX_VALUE);
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			
-			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			I_GetConceptData originConcept = Terms.get().getConcept(origin.getNid());
-			I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), 
-					originConcept, 
-					relTypeNid, 
-					destNid,
-                                        SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID(), 
-					SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
-					0, 
-					SnomedMetadataRfx.getSTATUS_CURRENT_NID(), 
-					config.getDbConfig().getUserConcept().getNid(),
-					pathItr.next().getConceptNid(), 
-		            Long.MAX_VALUE);
-			
-			while (pathItr.hasNext()) {
-				newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
-			}
-			Terms.get().addUncommitted(originConcept);
+            while (pathItr.hasNext()) {
+                newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
+            }
+            Terms.get().addUncommitted(originConcept);
 
-		} catch (TerminologyException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
 
-	}
-
+    }
 }
