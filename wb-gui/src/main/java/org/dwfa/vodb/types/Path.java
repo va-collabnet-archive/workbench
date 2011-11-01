@@ -198,7 +198,7 @@ public class Path implements PathBI, I_Path {
 
     public static void writePath(ObjectOutputStream out, PathBI p) throws IOException {
         List<UUID> uuids = Terms.get().nativeToUuid(p.getConceptNid());
-        if (uuids.size() > 0) {
+        if (uuids != null && uuids.size() > 0) {
             out.writeObject(Terms.get().nativeToUuid(p.getConceptNid()));
         } else {
             throw new IOException("no uuids for component: " + p);
