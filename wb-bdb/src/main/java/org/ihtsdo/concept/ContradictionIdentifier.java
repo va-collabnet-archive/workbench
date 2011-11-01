@@ -79,6 +79,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	private int currentStatusNid;
 
 	private PathBI adjudicationPath = null;
+
+	private int currentApprovedConceptNid = 0;
+	private long currentApprovedLastStamp = 0;
 	
     private class PositionBIComparator implements Comparator<PositionBI> { 
 		
@@ -515,9 +518,15 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 					}
 				} 
 
+				// Verify not before latest adjudicated version
 				if ((latestAdjudicatedVersion != null) &&
 					(part.getTime() < latestAdjudicatedVersion.getTime())) {
 					putIntoMap = false;
+				}
+				
+				// Verify not before last APPROVED WfHx state
+				if (putIntoMap) {
+					putIntoMap = isVersionMadePostApprovedWfState(part);
 				}
 			}
 						
@@ -904,10 +913,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 						}
 					}
 	
+					// Verify not before latest adjudicated version
 					if ((latestAdjudicatedVersion != null) &&
 						(part.getTime() < latestAdjudicatedVersion.getTime())) {
 						putIntoMap = false;
 					}
+
+					/**
+					  *  Note: Do not filter APPROVED for Workflow Refsets
+					  *
+    				  * if (putIntoMap) {
+    				  *		putIntoMap = isVersionMadePostApprovedWfState(part);
+    				  * }
+    				  **/				
 				} 
 	
 				if (putIntoMap) {
@@ -1103,11 +1121,17 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	    					}
 	    				}
 
+	    				// Verify not before latest adjudicated version
 	    				if ((latestAdjudicatedVersion != null) &&
 	    					(part.getTime() < latestAdjudicatedVersion.getTime())) {
 	    					putIntoMap = false;
 	    				}
-		            }
+
+	    				// Verify not before last APPROVED WfHx state
+	    				if (putIntoMap) {
+	    					putIntoMap = isVersionMadePostApprovedWfState(part);
+	    				}
+	    	    	}
 	
 	    			if (putIntoMap) {
 	    				// Overwrite current latest version
@@ -1394,5 +1418,19 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	@Override
 	public void setAdjudicationPath(PathBI path) {
 		adjudicationPath = path;
+	}
+
+	private boolean isVersionMadePostApprovedWfState(ComponentVersionBI part) {
+		if (currentApprovedConceptNid != part.getConceptNid()) {
+			currentApprovedConceptNid = part.getConceptNid();
+			currentApprovedLastStamp = WorkflowHelper.getLatestApprovedTimeStamp(part.getConceptNid());
+		}
+	
+		// If version is post latest APproved WF State, return true
+		if (part.getTime() > currentApprovedLastStamp) {
+			return true;
+		}
+		
+		return false;
 	}
 }

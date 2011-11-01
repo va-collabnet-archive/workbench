@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1456,6 +1457,27 @@ public class WorkflowHelper {
 		if (luceneChangeSetWFIdImportStorageSet != null) {
 			luceneChangeSetWFIdImportStorageSet.clear();
 		}
+	}
+
+	// Search for latest Approved State for Concept's WF
+	public static long getLatestApprovedTimeStamp(int conceptNid) {
+		try {
+			TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(Terms.get().getConcept(conceptNid));
+			Iterator itr = members.descendingIterator();
+
+			while (itr.hasNext()) {
+				WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean) itr.next();
+				if (bean.getState().equals(getApprovedState())) {
+					// Query in reverse order so return first visited Approved State's WF Timestamp 
+					return bean.getWorkflowTime();
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.INFO, "Unable to access Workflow History for concept: " + conceptNid);
+		}
+		
+		// No Workflow exists for concept or it exists without Approved State
+		return 0;
 	}
 }
  
