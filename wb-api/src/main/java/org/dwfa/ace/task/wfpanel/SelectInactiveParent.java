@@ -40,7 +40,6 @@ import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -189,7 +188,6 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
         @Override
         protected Boolean construct() throws Exception {
-            setup(process);
             return true;
         }
 
