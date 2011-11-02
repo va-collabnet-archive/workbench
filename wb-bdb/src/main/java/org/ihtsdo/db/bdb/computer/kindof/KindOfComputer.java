@@ -16,6 +16,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
@@ -89,6 +90,14 @@ public class KindOfComputer {
     @Deprecated
     public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
     	updateIsaCaches(c);
+    }
+    
+    public static void clearIsaCache() {
+    	isaCache.clear();
+    }
+    
+    public static void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI newIsaCache) throws IOException {
+    	isaCache.put(isaCoordinate, (IsaCache) newIsaCache);
     }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {

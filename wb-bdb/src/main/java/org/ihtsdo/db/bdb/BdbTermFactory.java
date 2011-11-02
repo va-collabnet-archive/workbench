@@ -2,16 +2,35 @@ package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import com.sleepycat.je.DatabaseException;
+import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.regex.Pattern;
+
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-
 import org.drools.KnowledgeBase;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.activity.ActivityPanel;
@@ -88,7 +107,6 @@ import org.dwfa.vodb.types.IntList;
 import org.dwfa.vodb.types.IntSet;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
-
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
@@ -154,34 +172,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
-//~--- JDK imports ------------------------------------------------------------
-
-import java.beans.PropertyVetoException;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.text.ParseException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
-
-import javax.swing.JComponent;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
+import com.sleepycat.je.DatabaseException;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
    private int                                         authorNid = Integer.MAX_VALUE;
@@ -1475,6 +1466,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       File homeFile = (File) envHome;
 
       Bdb.setup(homeFile.getAbsolutePath());
+   }
+   
+   //TODO: remove comment after full commit @Override
+   public void clearIsaCache() {
+	   KindOfComputer.clearIsaCache();
+   }
+   
+   //TODO: remove comment after full commit @Override
+   public void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI isaCache) throws IOException {
+	   KindOfComputer.setIsaCache(isaCoordinate, isaCache);
    }
 
    @Override
