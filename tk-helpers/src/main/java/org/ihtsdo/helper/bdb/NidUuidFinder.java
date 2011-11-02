@@ -20,19 +20,11 @@ package org.ihtsdo.helper.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
-import org.ihtsdo.tk.api.media.MediaChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -43,12 +35,10 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 /**
  *
@@ -78,19 +68,20 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    }
 
    private void processConcept(ConceptChronicleBI concept) throws IOException {
-      try{
-	     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(concept.getNid(), true);
-	     for (I_ExtendByRef extension : extensions) {
-	    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
-	     	try{
-	  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
-		  	}catch(Exception e){
-		  	    incorrectNids.add(part.getC1id());
-		  	}
-	     }
-	     }catch(Exception e){
-	    	//don't do anything , just ignore
-	     }
+// Incomplete. 
+//      try{
+//	     Collection<? extends RefexChronicleBI> extensions = concept.getRefexes();
+//	     for (RefexChronicleBI extension : extensions) {
+//	    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
+//	     	try{
+//	  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
+//		  	}catch(Exception e){
+//		  	    incorrectNids.add(part.getC1id());
+//		  	}
+//	     }
+//	     }catch(Exception e){
+//	    	//don't do anything , just ignore
+//	     }
    }
 
    @Override
