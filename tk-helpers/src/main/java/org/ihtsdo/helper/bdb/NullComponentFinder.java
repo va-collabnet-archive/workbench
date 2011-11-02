@@ -51,10 +51,10 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     private AtomicInteger count = new AtomicInteger(0);
-    private AtomicInteger dots = new AtomicInteger(0);
-    ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
-    ConcurrentSkipListSet<UUID> dupUuids = new ConcurrentSkipListSet<UUID>();
-    File dupsFile = new File("dups.oos");
+    private AtomicInteger dots = new AtomicInteger(0);    
+    ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
+    ConcurrentSkipListSet<Integer> nullComponent     = new ConcurrentSkipListSet<Integer>();
+    File nullComponentFile = new File("nullComponent.oos");
     private final NidBitSetBI nidset;
 
     //~--- constant enums ------------------------------------------------------
@@ -113,12 +113,14 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 			} catch (IOException e) {
 				AceLog.getAppLog().warning(e.getMessage());
 			}
+			
 			if (referencedComponent == null) {
 				AceLog.getAppLog().warning("No component for Nid: " + nid + ". Used in component with nid:" + component.getNid());
 			}
     	}
     	
     }
+   
 
     @Override
     public boolean continueWork() {
@@ -172,24 +174,24 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         processConcept(fetcher.fetch());
     }
 
-    public void writeDupFile() throws IOException { //TODO: implement for null components
+    public void writeNullComponentFile() throws IOException { //TODO: implement for null components
         count.set(0);
 
-        FileOutputStream fos = new FileOutputStream(dupsFile);
+        FileOutputStream fos = new FileOutputStream(nullComponentFile);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         ObjectOutputStream oos = new ObjectOutputStream(bos);
 
         try {
-            oos.writeObject(dupUuids);
+            oos.writeObject(nullComponent);
         } finally {
             oos.close();
         }
     }
 
-    //~--- get methods ---------------------------------------------------------
-    public ConcurrentSkipListSet<UUID> getDupUuids() {
-        return dupUuids;
-    }
+    //~--- get methods ---------------------------------------------------------    
+    public ConcurrentSkipListSet<Integer> getNullComponent() {
+ 	  return nullComponent;
+    } 
 
     @Override
     public NidBitSetBI getNidSet() throws IOException {
