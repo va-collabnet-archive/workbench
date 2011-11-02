@@ -116,6 +116,7 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 			
 			if (referencedComponent == null) {
 				AceLog.getAppLog().warning("No component for Nid: " + nid + ". Used in component with nid:" + component.getNid());
+				nullComponent.add(nid);
 			}
     	}
     	
