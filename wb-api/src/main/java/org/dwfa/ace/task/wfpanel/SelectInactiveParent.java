@@ -49,6 +49,7 @@ import org.ihtsdo.tk.example.binding.ConceptInactivationType;
 
 import org.ihtsdo.tk.api.WizardBI;
 import javax.swing.JPanel;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 
 //import org.ihtsdo.arena;
 @BeanList(specs = {
@@ -110,6 +111,7 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
         try {
             // Present the user interface in the Workflow panel
             wizard = (WizardBI) worker.readAttachement(WorkerAttachmentKeys.WIZARD_PANEL.name());
+            config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
             DoSwing swinger = new DoSwing(process);
             swinger.start();
