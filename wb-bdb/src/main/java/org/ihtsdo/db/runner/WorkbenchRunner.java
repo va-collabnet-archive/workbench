@@ -107,8 +107,8 @@ public class WorkbenchRunner {
    public static File          wbConfigFile;
    public static Properties    wbProperties;
 
- //TODO Switch?
-   boolean oldWay = false;
+  //TODO Switch?
+   static boolean oldWay = false;
    
    //~--- static initializers -------------------------------------------------
 
@@ -286,10 +286,10 @@ public class WorkbenchRunner {
          boolean acePropertiesFileExists = wbPropertiesFile.exists();
 
          wbProperties = new Properties();
-         
-         if(oldWay){
-         SvnPrompter prompter    = new SvnPrompter();
-         }
+         SvnPrompter prompter= new SvnPrompter();
+        /* if(oldWay){
+         prompter    = new SvnPrompter();
+         }*/
          boolean     initialized = false;
 
          if (acePropertiesFileExists) {
@@ -643,7 +643,11 @@ else{
 			
 		}
 		//AceLog.getAppLog().info("About to handleNormalFrame"); 
-		handleNormalFrame(ace);
+		//handleNormalFrame(ace);
+		HandleNormalFrame handler = new HandleNormalFrame(ace);
+
+        new Thread(handler, "Frame setup").start();
+		
 	}
 }
                

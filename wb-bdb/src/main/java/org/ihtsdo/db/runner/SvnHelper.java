@@ -291,7 +291,7 @@ public class SvnHelper {
         }
         try {
             SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
-            
+            Map<String, String> profileMap = new HashMap<String, String>();
             
     		String selectedPath = null;
     		String selectedProfile = prompter.getUsername();
@@ -306,7 +306,7 @@ public class SvnHelper {
             
             List<String> listing = Svn.list(svd);
             if (listing != null) {
-                Map<String, String> profileMap = new HashMap<String, String>();
+                
                 for (String item : listing) {
                     if (item.endsWith(".ace")) {
                         profileMap.put(item.substring(item.lastIndexOf("/") + 1).replace(".ace", ""), item);
