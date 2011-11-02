@@ -27,5 +27,10 @@
             <artifactId>tk-concept-component</artifactId>
             <version>${project.version}</version>
         </dependency>
-    </dependencies>
+        <dependency>
+			<groupId>org.ihtsdo</groupId>
+			<artifactId>wb-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 </project>    
