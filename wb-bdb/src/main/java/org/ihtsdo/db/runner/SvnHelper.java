@@ -2,6 +2,7 @@ package org.ihtsdo.db.runner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.tigris.subversion.javahl.ClientException;
 import org.tigris.subversion.javahl.Depth;
 import org.tigris.subversion.javahl.Revision;
+import org.tigris.subversion.javahl.SVNClientInterface;
 import org.tmatesoft.svn.core.SVNErrorCode;
 
 /**
@@ -110,13 +112,13 @@ public class SvnHelper {
                 Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
                 try {
                     if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-                        handleSvnProfileCheckout(aceProperties);
+                    	handleSvnProfileCheckout(aceProperties,prompter);
                     }
 
                     if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
                         for (String svnSpec : svnCheckoutOnStart) {
                             activity.setProgressInfoLower("Checkout: " + svnSpec.substring(0, svnSpec.indexOf('|')));
-                            handleSvnCheckout(changeLocations, svnSpec);
+                            handleSvnCheckout(changeLocations, svnSpec,prompter);
                         }
                     }
 
@@ -171,21 +173,34 @@ public class SvnHelper {
         }
     }
 
-    public void initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, SvnPrompter prompter)
+    public boolean initialSubversionOperationsAndChangeSetImport(File acePropertiesFile, SvnPrompter prompter)
             throws ConfigurationException, FileNotFoundException, IOException, TaskFailedException, ClientException {
 
+    	boolean ok = false;
         Properties wbProperties = new Properties();
+        if (acePropertiesFile.exists()) {
+			wbProperties.loadFromXML(new FileInputStream(acePropertiesFile));
+		}
         wbProperties.setProperty("initial-svn-checkout", "true");
+        
+		String pw = prompter.getPassword();
+		
+		if(pw == null || pw.length() == 0 ){
+			connectToSubversion = false;
+		}
+		else{
+			connectToSubversion = true;
+		}
 
         if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
                 || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
                 || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-            if (connectToSubversion == false) {
+            /*if (connectToSubversion == false) {
                 connectToSubversion =
                         (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
                         "Would you like to connect over the network to Subversion?", "Confirm network operation",
                         JOptionPane.YES_NO_OPTION));
-            }
+            } */
             Svn.setConnectedToSvn(connectToSubversion);
             try {
                 if (connectToSubversion) {
@@ -194,13 +209,13 @@ public class SvnHelper {
                     Svn.rwl.acquireUninterruptibly(Svn.SEMAPHORE_PERMITS);
                     try {
                         if (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0) {
-                            handleSvnProfileCheckout(wbProperties);
+                        	handleSvnProfileCheckout(wbProperties,prompter);
                         }
 
                         if (svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0) {
                             for (String svnSpec : svnCheckoutOnStart) {
                                 activity.setProgressInfoLower("Checkout: " + svnSpec);
-                                handleSvnCheckout(changeLocations, svnSpec);
+                                handleSvnCheckout(changeLocations, svnSpec,prompter);
                             }
                         }
 
@@ -218,6 +233,7 @@ public class SvnHelper {
                             activity.setProgressInfoLower(elapsed);
                             activity.complete();
                         } catch (ComputationCanceled e) {
+                        	ok = false;
                             throw new TaskFailedException(e);
                         }
                     }
@@ -227,6 +243,7 @@ public class SvnHelper {
                     wbProperties.storeToXML(new FileOutputStream(acePropertiesFile), null);
                 } else {
                     if (new File("profiles").exists() == false) {
+                    	ok = false;
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                                 "No profiles are available. Please re-run bundle and checkout profiles from Subversion.",
                                 "No profiles", JOptionPane.INFORMATION_MESSAGE);
@@ -237,6 +254,7 @@ public class SvnHelper {
                 }
             } catch (ClientException e) {
                 if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
+                	ok = false;
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "Unable to connect to Subversion - please check network connection and try again.",
                             "Unable to connect", JOptionPane.INFORMATION_MESSAGE);
@@ -253,10 +271,12 @@ public class SvnHelper {
         } else if (changeLocations.size() > 0) {
             doChangeSetImport();
         }
+        return ok;
     }
 
-    void handleSvnProfileCheckout(Properties aceProperties) throws ClientException, TaskFailedException {
-        if (new File("profiles").exists()) {
+    void handleSvnProfileCheckout(Properties aceProperties,SvnPrompter prompter) throws ClientException, TaskFailedException {
+    	Svn.setPrompter(prompter);
+    	if (new File("profiles").exists()) {
             if (aceProperties.getProperty("last-profile-dir") != null) {
                 // A checkout has previously completed. 
                 return;
@@ -271,6 +291,19 @@ public class SvnHelper {
         }
         try {
             SubversionData svd = new SubversionData(svnCheckoutProfileOnStart, null);
+            
+            
+    		String selectedPath = null;
+    		String selectedProfile = prompter.getUsername();
+    		AceLog.getAppLog().info("prompter UN = "+prompter.getUsername());
+    		
+    		if(profileMap.containsKey(selectedProfile)){
+    			AceLog.getAppLog().info("UN found in profileMap");
+    			selectedPath = profileMap.get(selectedProfile);
+    		}
+    		
+    		else{
+            
             List<String> listing = Svn.list(svd);
             if (listing != null) {
                 Map<String, String> profileMap = new HashMap<String, String>();
@@ -284,11 +317,12 @@ public class SvnHelper {
                 if (sortedProfiles.size() == 0) {
                     return;
                 }
-                String selectedProfile =
+                selectedProfile =
                         (String) SelectObjectDialog.showDialog(emptyFrame, emptyFrame, "Select profile to checkout:",
                         "Checkout profile:", sortedProfiles.toArray(), null, null);
 
-                String selectedPath = profileMap.get(selectedProfile);
+                selectedPath = profileMap.get(selectedProfile);
+            }
                 if (selectedPath == null) {
                     AceLog.getAppLog().info("### No profile selected - shutting down.");
                     connectToSubversion = false;
@@ -324,6 +358,8 @@ public class SvnHelper {
                 subversionMap.put(svnCheckoutData.getWorkingCopyStr(), svnCheckoutData);
                 aceProperties.setProperty("last-profile-dir", "profiles/" + selectedProfile);
 
+                
+    		if (!new File("profiles").exists()) {
                 String moduleName = svnCheckoutData.getRepositoryUrlStr();
                 String destPath = svnCheckoutData.getWorkingCopyStr();
                 Revision revision = Revision.HEAD;
@@ -334,7 +370,9 @@ public class SvnHelper {
                 Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
                         allowUnverObstructions);
                 changeLocations.add(new File(destPath));
+    		}
             }
+            
         } catch (ClientException e) {
             if (e.getAprError() != SVNErrorCode.CANCELLED.getCode()) {
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -350,9 +388,12 @@ public class SvnHelper {
                 System.exit(0);
             }
         }
+        
+        
+        
     }
 
-    private void handleSvnCheckout(List<File> changeLocations, String svnSpec) throws TaskFailedException, ClientException {
+    private void handleSvnCheckout(List<File> changeLocations, String svnSpec,SvnPrompter prompter) throws TaskFailedException, ClientException {
         AceLog.getAppLog().info("Got svn checkout spec: " + svnSpec);
         String[] specParts =
                 new String[]{svnSpec.substring(0, svnSpec.lastIndexOf("|")),
@@ -378,6 +419,7 @@ public class SvnHelper {
                 int depth = Depth.infinity;
                 boolean ignoreExternals = false;
                 boolean allowUnverObstructions = false;
+                Svn.setPrompter(prompter);
                 Svn.getSvnClient().checkout(moduleName, destPath, revision, pegRevision, depth, ignoreExternals,
                         allowUnverObstructions);
                 changeLocations.add(checkoutLocation);
@@ -491,4 +533,13 @@ public class SvnHelper {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
+    
+	public String getSvnCheckoutProfileOnStart() {
+		return svnCheckoutProfileOnStart;
+	}
+
+	public void setSvnCheckoutProfileOnStart(String svnCheckoutProfileOnStart) {
+		this.svnCheckoutProfileOnStart = svnCheckoutProfileOnStart;
+	}
+    
 }
