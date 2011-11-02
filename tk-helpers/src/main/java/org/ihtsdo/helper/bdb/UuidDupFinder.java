@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.ihtsdo.helper.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -39,9 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,113 +44,115 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author kec
  */
 public class UuidDupFinder implements ProcessUnfetchedConceptDataBI {
-   private AtomicInteger       count        = new AtomicInteger(0);
-   private AtomicInteger       dots         = new AtomicInteger(0);
-   ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
-   ConcurrentSkipListSet<UUID> dupUuids     = new ConcurrentSkipListSet<UUID>();
-   File                        dupsFile     = new File("dups.oos");
-   private final NidBitSetBI   nidset;
 
-   //~--- constant enums ------------------------------------------------------
+    private AtomicInteger count = new AtomicInteger(0);
+    private AtomicInteger dots = new AtomicInteger(0);
+    ConcurrentSkipListSet<UUID> allPrimUuids = new ConcurrentSkipListSet<UUID>();
+    ConcurrentSkipListSet<UUID> dupUuids = new ConcurrentSkipListSet<UUID>();
+    File dupsFile = new File("dups.oos");
+    private final NidBitSetBI nidset;
 
-   private enum PASS { PASS_ONE, PASS_TWO }
+    //~--- constant enums ------------------------------------------------------
+    private enum PASS {
 
-   //~--- constructors --------------------------------------------------------
+        PASS_ONE, PASS_TWO
+    }
 
-   public UuidDupFinder() throws IOException, ClassNotFoundException {
-      nidset = Ts.get().getAllConceptNids();
-   }
+    //~--- constructors --------------------------------------------------------
+    public UuidDupFinder() throws IOException, ClassNotFoundException {
+        nidset = Ts.get().getAllConceptNids();
+    }
 
-   //~--- methods -------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    private void addToUuidList(ComponentChroncileBI component) throws IOException {
+        if (component != null) {
+            UUID primUuid = component.getPrimUuid();
 
-   private void addToUuidList(ComponentChroncileBI component) throws IOException {
-      UUID primUuid = component.getPrimUuid();
+            if (allPrimUuids.contains(primUuid)) {
+                dupUuids.add(primUuid);
+            } else {
+                allPrimUuids.add(primUuid);
+            }
 
-      if (allPrimUuids.contains(primUuid)) {
-         dupUuids.add(primUuid);
-      } else {
-         allPrimUuids.add(primUuid);
-      }
+            for (ComponentChroncileBI annotation : component.getAnnotations()) {
+                addToUuidList(annotation);
+            }
+        }
+    }
 
-      for (ComponentChroncileBI annotation : component.getAnnotations()) {
-         addToUuidList(annotation);
-      }
-   }
+    @Override
+    public boolean continueWork() {
+        return true;
+    }
 
-   @Override
-   public boolean continueWork() {
-      return true;
-   }
+    private void processConcept(ConceptChronicleBI concept) throws IOException {
 
-   private void processConcept(ConceptChronicleBI concept) throws IOException {
+        // add prim uuids to list
+        // concept attributtes
+        addToUuidList(concept.getConAttrs());
 
-      // add prim uuids to list
-      // concept attributtes
-      addToUuidList(concept.getConAttrs());
+        // descriptions
+        for (DescriptionChronicleBI desc : concept.getDescs()) {
+            addToUuidList(desc);
+        }
 
-      // descriptions
-      for (DescriptionChronicleBI desc : concept.getDescs()) {
-         addToUuidList(desc);
-      }
+        // relationships
+        for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+            addToUuidList(rel);
+        }
 
-      // relationships
-      for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
-         addToUuidList(rel);
-      }
+        // media
+        for (MediaChronicleBI media : concept.getMedia()) {
+            addToUuidList(media);
+        }
 
-      // media
-      for (MediaChronicleBI media : concept.getMedia()) {
-         addToUuidList(media);
-      }
+        if (!concept.isAnnotationStyleRefex()) {
+            for (RefexChronicleBI refex : concept.getRefsetMembers()) {
+                addToUuidList(refex);
+            }
+        }
+    }
 
-      if (!concept.isAnnotationStyleRefex()) {
-         for (RefexChronicleBI refex : concept.getRefsetMembers()) {
-            addToUuidList(refex);
-         }
-      }
-   }
+    @Override
+    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+        count.incrementAndGet();
 
-   @Override
-   public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
-      count.incrementAndGet();
+        if (count.get() % 1000 == 0) {
+            System.out.print(".");
+            System.out.flush();
+            dots.incrementAndGet();
 
-      if (count.get() % 1000 == 0) {
-         System.out.print(".");
-         System.out.flush();
-         dots.incrementAndGet();
+            if (dots.get() > 80) {
+                dots.set(0);
+                System.out.println();
+                System.out.print(count.get() + ": ");
+            }
+        }
 
-         if (dots.get() > 80) {
-            dots.set(0);
-            System.out.println();
-            System.out.print(count.get() + ": ");
-         }
-      }
+        processConcept(fetcher.fetch());
+    }
 
-      processConcept(fetcher.fetch());
-   }
+    public void writeDupFile() throws IOException {
+        count.set(0);
 
-   public void writeDupFile() throws IOException {
-      count.set(0);
+        FileOutputStream fos = new FileOutputStream(dupsFile);
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-      FileOutputStream     fos = new FileOutputStream(dupsFile);
-      BufferedOutputStream bos = new BufferedOutputStream(fos);
-      ObjectOutputStream   oos = new ObjectOutputStream(bos);
+        try {
+            oos.writeObject(dupUuids);
+        } finally {
+            oos.close();
+        }
+    }
 
-      try {
-         oos.writeObject(dupUuids);
-      } finally {
-         oos.close();
-      }
-   }
+    //~--- get methods ---------------------------------------------------------
+    public ConcurrentSkipListSet<UUID> getDupUuids() {
+        return dupUuids;
+    }
 
-   //~--- get methods ---------------------------------------------------------
-
-   public ConcurrentSkipListSet<UUID> getDupUuids() {
-      return dupUuids;
-   }
-
-   @Override
-   public NidBitSetBI getNidSet() throws IOException {
-      return nidset;
-   }
+    @Override
+    public NidBitSetBI getNidSet() throws IOException {
+        return nidset;
+    }
 }
