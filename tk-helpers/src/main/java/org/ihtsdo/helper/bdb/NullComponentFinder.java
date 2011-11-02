@@ -74,28 +74,28 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         	if (component instanceof ConAttrChronicleBI) {
         		ConAttrChronicleBI attr = (ConAttrChronicleBI) component;
         		for (ConAttrVersionBI loopVersion : attr.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion());
+        			verifyNids(loopVersion.getAllNidsForVersion(), component);
             	}
         	} else if (component instanceof DescriptionChronicleBI) {
         		DescriptionChronicleBI desc = (DescriptionChronicleBI) component;
         		for (DescriptionVersionBI loopVersion : desc.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion());
+        			verifyNids(loopVersion.getAllNidsForVersion(), component);
             	}
         	} else if (component instanceof RelationshipChronicleBI) {
         		RelationshipChronicleBI rel = (RelationshipChronicleBI) component;
         		for (RelationshipVersionBI loopVersion : rel.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion());
+        			verifyNids(loopVersion.getAllNidsForVersion(), component);
             	}
         	} else if (component instanceof MediaChronicleBI) {
         		MediaChronicleBI media = (MediaChronicleBI) component;
         		for (MediaVersionBI loopVersion : media.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion());
+        			verifyNids(loopVersion.getAllNidsForVersion(), component);
             	}
         	}  else if (component instanceof RefexChronicleBI) {
         		RefexChronicleBI refex = (RefexChronicleBI) component;
         		for (Object loopVersion : refex.getVersions()) {
         			RefexVersionBI loopRefversion = (RefexVersionBI) loopVersion;
-        			verifyNids(loopRefversion.getAllNidsForVersion());
+        			verifyNids(loopRefversion.getAllNidsForVersion(), component);
             	}
         	}
 
@@ -105,16 +105,16 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
         }
     }
     
-    private void verifyNids(Set<Integer> nids) {
+    private void verifyNids(Set<Integer> nids, ComponentChroncileBI component) {
     	for (Integer nid : nids) {
-    		ComponentChroncileBI<?> component = null;
+    		ComponentChroncileBI<?> referencedComponent = null;
     		try {
-				component = Ts.get().getComponent(nid);
+				referencedComponent = Ts.get().getComponent(nid);
 			} catch (IOException e) {
 				AceLog.getAppLog().warning(e.getMessage());
 			}
-			if (component == null) {
-				AceLog.getAppLog().warning("No component for Nid: " + nid);
+			if (referencedComponent == null) {
+				AceLog.getAppLog().warning("No component for Nid: " + nid + ". Used in component with nid:" + component.getNid());
 			}
     	}
     	
