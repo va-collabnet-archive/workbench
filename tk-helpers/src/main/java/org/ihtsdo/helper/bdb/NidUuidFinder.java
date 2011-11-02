@@ -20,6 +20,9 @@ package org.ihtsdo.helper.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -35,6 +38,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,21 +72,20 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    }
 
    private void processConcept(ConceptChronicleBI concept) throws IOException {
-// Incomplete. 
-//      try{
-//	     Collection<? extends RefexChronicleBI> extensions = concept.getRefexes();
-//	     for (RefexChronicleBI extension : extensions) {
-//	    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
-//	     	try{
-//	  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
-//		  	}catch(Exception e){
-//		  	    incorrectNids.add(part.getC1id());
-//		  	}
-//	     }
-//	     }catch(Exception e){
-//	    	//don't do anything , just ignore
-//	     }
-   }
+      try{
+	     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(concept.getNid(), true);
+	     for (I_ExtendByRef extension : extensions) {
+	    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
+	     	try{
+	  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
+		  	}catch(Exception e){
+		  	    incorrectNids.add(part.getC1id());
+		  	}
+	     }
+	     }catch(Exception e){
+	    	//don't do anything , just ignore
+	     }
+  }
 
    @Override
    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
