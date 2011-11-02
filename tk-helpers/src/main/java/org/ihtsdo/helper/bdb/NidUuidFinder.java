@@ -20,14 +20,21 @@ package org.ihtsdo.helper.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -37,12 +44,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.media.MediaVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 
 /**
  *
@@ -54,6 +74,7 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
    ConcurrentSkipListSet<Integer> incorrectNids     = new ConcurrentSkipListSet<Integer>();
    File                           missingNidFile     = new File("incorrectNid.oos");
+   ViewCoordinate        vc;
    
    private final NidBitSetBI   nidset;
 
@@ -66,25 +87,123 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
       nidset = Ts.get().getAllConceptNids();
    }
    
+   //~--- methods -------------------------------------------------------------
+   private void addToNidList(ComponentChroncileBI component) throws IOException {
+	   
+	   if (component != null) {
+	   	  int primNid = component.getNid();
+	      String primUuid = component.getPrimUuid().toString();
+	     
+	      if(!primUuid.equals(null) && !primUuid.isEmpty()){
+	       allPrimNids.add(primNid);
+	      }else{
+	       incorrectNids.add(primNid);
+	      }
+	  
+	      for (ComponentChroncileBI annotation : component.getAnnotations()) {
+	       addToNidList(annotation);
+	      }
+	   }else{
+		   try{
+			   System.out.println("===do we have any null component"+component.toUserString());
+			   // For null component , add them in the map 
+			   incorrectNids.add(component.getNid());
+		   }catch(Exception e){
+			   //don't do anything , just continue
+		   }
+	   }
+	}
+   
    @Override
    public boolean continueWork() {
       return true;
    }
 
    private void processConcept(ConceptChronicleBI concept) throws IOException {
-      try{
-	     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(concept.getNid(), true);
-	     for (I_ExtendByRef extension : extensions) {
-	    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
-	     	try{
-	  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
-		  	}catch(Exception e){
-		  	    incorrectNids.add(part.getC1id());
-		  	}
-	     }
-	     }catch(Exception e){
-	    	//don't do anything , just ignore
-	     }
+           Collection<? extends ConceptVersionBI> conceptVersionBILst= concept.getVersions();
+		   if (conceptVersionBILst != null) {			   
+			   System.out.println(conceptVersionBILst.size());
+			   Iterator conceptVersionBIItr = conceptVersionBILst.iterator();       
+			   
+			   while (conceptVersionBIItr.hasNext()) {  
+				   ConceptVersionBI conceptVersionBI = (ConceptVersionBI) conceptVersionBIItr.next();
+				   System.out.println("===testing ===" + conceptVersionBI.toUserString());
+				   try {
+					   
+					 Collection<? extends DescriptionVersionBI> activeDescriptions = conceptVersionBI.getDescsActive();
+					 //Collection<? extends DescriptionVersionBI> allDescriptions = (Collection<? extends DescriptionVersionBI>) conceptVersionBI.getDescs();
+					 if (activeDescriptions != null) {
+				         for (DescriptionVersionBI d : activeDescriptions) {
+				            for (int nid : d.getAllNidsForVersion()) {
+				               if (Ts.get().getComponent(nid) == null) {
+				            	   System.out.println("Null component for desc: " + d);
+				            	   incorrectNids.add(nid);
+				               }
+				            }				            
+				         }
+				      }
+						 
+						 
+					 Collection<? extends RelationshipVersionBI> rels = conceptVersionBI.getRelsOutgoingActive();
+
+				      if (rels != null) {
+				         for (RelationshipVersionBI d : rels) {
+				            for (int nid : d.getAllNidsForVersion()) {
+				               if (Ts.get().getComponent(nid) == null){
+				            	   System.out.println("Null component for Rel: " + d);
+				            	   incorrectNids.add(nid);
+				               }
+				            }
+				         }
+				      }
+					   
+				      Collection<? extends RefexVersionBI<?>> activeRefsetMembers = conceptVersionBI.getRefsetMembersActive();
+				     //Collection<? extends RefexVersionBI<?>> allRefsetMembers = (Collection<? extends RefexVersionBI<?>>) conceptVersionBI.getRefsetMembers();
+						
+				     if (activeRefsetMembers != null) {
+				         for (RefexVersionBI d : activeRefsetMembers) {
+				            for (int nid : d.getAllNidsForVersion()) {
+				               if (Ts.get().getComponent(nid) == null){
+			                     System.out.println("Null component for Refset: " + d);
+			                     incorrectNids.add(nid);
+				               }
+				            }
+				         }
+				    }
+					
+					Collection<? extends MediaVersionBI> activeMedia = conceptVersionBI.getMediaActive();
+					//Collection<? extends MediaVersionBI> allMedia = (Collection<? extends MediaVersionBI>) conceptVersionBI.getMedia();
+				     if (activeMedia != null) {
+				         for (MediaVersionBI d : activeMedia) {
+				            for (int nid : d.getAllNidsForVersion()) {
+				               if (Ts.get().getComponent(nid) == null) {
+				            	   System.out.println("Null component for Media: " + d);
+				            	   incorrectNids.add(nid);
+				               }
+				            }
+				        }
+				     }
+				   } catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(e.getMessage());
+				   }
+			   }
+		   }
+		   
+		   // Original logic to check only for refset members
+	   		try{
+		     List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(concept.getNid(), true);
+			     for (I_ExtendByRef extension : extensions) {
+			    	I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) extension.getMutableParts().get(0);
+			     	try{
+			  	    	UUID c1Uuid  = Terms.get().nidToUuid(part.getC1id());
+				  	}catch(Exception e){
+				  	    incorrectNids.add(part.getC1id());
+				  	}
+			     }
+		   }catch(Exception e){
+		    	//don't do anything , just ignore
+		   }
   }
 
    @Override
@@ -102,7 +221,6 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
             System.out.print(count.get() + ": ");
          }
       }
-
       processConcept(fetcher.fetch());
    }
 
