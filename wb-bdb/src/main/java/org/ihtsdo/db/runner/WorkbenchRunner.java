@@ -17,6 +17,7 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.config.AceLoginDialog;
 import org.dwfa.ace.config.AceProtocols;
+import org.dwfa.ace.config.UIAuthenticator;
 import org.dwfa.ace.dnd.DragMonitor;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
