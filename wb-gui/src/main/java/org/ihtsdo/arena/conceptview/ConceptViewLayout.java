@@ -87,6 +87,7 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
 /**
  *
@@ -278,7 +279,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return null;
             }
-            
+
             updateUncommitted();
             coordinate = new ViewCoordinate(config.getViewCoordinate());
             coordinate.setRelAssertionType(RelAssertionType.STATED);
@@ -474,16 +475,35 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     if (cav == null) {
                         cav = (ConAttrAnalogBI) cv.getConAttrs().getVersion(coordinate.getVcWithAllStatusValues());
                     }
+                    DragPanelConceptAttributes cac;
+                    if (cav == null) {
+                        if (cv.getChronicle().getConAttrs() != null) {
+                            cav = (ConAttrAnalogBI) cv.getChronicle().getConAttrs().getPrimordialVersion();
+                            cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+                            ArrayList<Integer> sapsForConflict = new ArrayList<Integer>();
+                            for (ConAttrVersionBI v: cv.getChronicle().getConAttrs().getVersions()) {
+                                sapsForConflict.add(v.getSapNid());
+                            }
+                            cac.showConflicts(sapsForConflict);
+                            
+                            seperatorComponents.add(cac);
+                            cpe.addToggleComponent(cac);
+                        } else {
+                            cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+                        }
+                    } else {
+                        cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
+
+                        setShowConflicts(cav, cac);
+                        seperatorComponents.add(cac);
+                        cpe.addToggleComponent(cac);
+                    }
 
                     if (stop) {
                         return;
                     }
 
-                    DragPanelConceptAttributes cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
 
-                    setShowConflicts(cav, cac);
-                    seperatorComponents.add(cac);
-                    cpe.addToggleComponent(cac);
                     cpe.setAlertCount(0);
 
                     if ((cav == null) || (cav.getCurrentRefexes(coordinate) == null)) {
@@ -771,7 +791,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return;
             }
-            
+
             updateUncommitted();
 
             if (settings.isNavigatorSetup()) {

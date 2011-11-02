@@ -26,7 +26,9 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.io.FileIO;
@@ -121,6 +124,13 @@ public class LoadBdbMulti extends AbstractMojo {
      * @parameter
      */
     private List<ConceptDescriptor> annotationIndexes;
+    /**
+     * Watch concepts that will be printed to log when encountered.
+     * 
+     * @parameter
+     */
+    private String[] watchConceptUuids;
+
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
@@ -129,6 +139,7 @@ public class LoadBdbMulti extends AbstractMojo {
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
     private int converterSize = runtimeConverterSize;
+    ConcurrentSkipListSet<Object> watchSet = new ConcurrentSkipListSet<Object>();
     
     @Override
     public void execute() throws MojoExecutionException {
@@ -138,6 +149,11 @@ public class LoadBdbMulti extends AbstractMojo {
 
     void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
+        if (watchConceptUuids != null) {
+            for (String uuidStr: watchConceptUuids) {
+                watchSet.add(UUID.fromString(uuidStr));
+            }
+        }
         try {
             for (int i = 0; i < converterSize; i++) {
                 converters.put(new ConvertConcept());
@@ -557,6 +573,9 @@ public class LoadBdbMulti extends AbstractMojo {
         public void run() {
             if (nidCnidMap == null) {
                 nidCnidMap = Bdb.getNidCNidMap();
+            }
+            if (watchSet.contains(eConcept.getPrimordialUuid())) {
+                AceLog.getAppLog().info("Watch found: " + eConcept);
             }
             try {
                 newConcept = Concept.get(eConcept);
