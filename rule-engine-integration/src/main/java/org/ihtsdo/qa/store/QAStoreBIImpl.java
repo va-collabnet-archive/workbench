@@ -89,6 +89,7 @@ public class QAStoreBIImpl implements QAStoreBI {
 		QadbServiceStub service = null;
 		try {
 			service = new QadbServiceStub(url);
+
 			ComponentRequest componentRequest = new ComponentRequest();
 			componentRequest.setComponentUuid(componentUuid.toString());
 			ComponentResponse response = service.getComponent(componentRequest);
@@ -416,11 +417,12 @@ public class QAStoreBIImpl implements QAStoreBI {
 	}
 
 	@Override
-	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn, Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine,
-			int pageLenght) {
+	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<RulesReportColumn, Boolean> sortBy, HashMap<RulesReportColumn, Object> filter, int startLine, int pageLenght) {
 		RulesReportPage result = null;
+		QadbServiceStub service = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub(url);
+
+			service = new QadbServiceStub(url);
 
 			RulesReportLinesByPageRequest request = new RulesReportLinesByPageRequest();
 
@@ -484,11 +486,18 @@ public class QAStoreBIImpl implements QAStoreBI {
 			result.setLines(lines);
 
 		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if (service != null) {
+				try{
+					service._getServiceClient().cleanup();
+					service._getServiceClient().cleanupTransport();
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return result;
 	}
@@ -500,12 +509,13 @@ public class QAStoreBIImpl implements QAStoreBI {
 	}
 
 	@Override
-	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn, Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter,
-			int startLine, int pageLenght) {
+	public QACasesReportPage getQACasesReportLinesByPage(QACoordinate qaCoordinate, UUID ruleUuid, LinkedHashMap<QACasesReportColumn, Boolean> sortBy, HashMap<QACasesReportColumn, Object> filter, int startLine,
+			int pageLenght) {
 		QACasesReportPage reportPage = null;
+		QadbServiceStub service = null;
 		try {
-			QadbServiceStub service = new QadbServiceStub(url);
-
+			service = new QadbServiceStub(url);
+			
 			QACasesReportLinesByPageRequest request = new QACasesReportLinesByPageRequest();
 			IntStrKeyValue[] wsFilter = null;
 			if (filter != null && !filter.isEmpty()) {
@@ -547,6 +557,15 @@ public class QAStoreBIImpl implements QAStoreBI {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally {
+			if (service != null) {
+				try{
+					service._getServiceClient().cleanup();
+					service._getServiceClient().cleanupTransport();
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return reportPage;
 	}

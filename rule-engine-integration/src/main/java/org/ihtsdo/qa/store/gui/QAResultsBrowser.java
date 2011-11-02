@@ -332,7 +332,7 @@ public class QAResultsBrowser extends JPanel {
 			for (RulesReportLine line : lines) {
 				boolean lineApproved = true;
 				if (lineApproved) {
-					LinkedList<Object> row = new LinkedList<Object>();
+					List<Object> row = new ArrayList<Object>();
 					row.add(String.valueOf(line.getRule().getRuleCode()));
 					row.add(line.getRule());
 					Category rowCategory = new Category();
