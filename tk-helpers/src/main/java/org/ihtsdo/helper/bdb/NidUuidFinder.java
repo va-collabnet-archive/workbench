@@ -26,6 +26,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -89,29 +90,18 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    
    //~--- methods -------------------------------------------------------------
    private void addToNidList(ComponentChroncileBI component) throws IOException {
-	   
 	   if (component != null) {
-	   	  int primNid = component.getNid();
-	      String primUuid = component.getPrimUuid().toString();
-	     
-	      if(!primUuid.equals(null) && !primUuid.isEmpty()){
-	       allPrimNids.add(primNid);
-	      }else{
-	       incorrectNids.add(primNid);
-	      }
-	  
-	      for (ComponentChroncileBI annotation : component.getAnnotations()) {
-	       addToNidList(annotation);
-	      }
+		   ComponentVersionBI compBI= component.getPrimordialVersion();
+		   Set<Integer>  d = compBI.getAllNidsForVersion();
+		   for (int nid : d) {
+               if (Ts.get().getComponent(nid) == null) {
+            	   System.out.println("Null component for : " + d);
+            	   incorrectNids.add(nid);
+               }
+           }
 	   }else{
-		   try{
-			   System.out.println("===do we have any null component"+component.toUserString());
-			   // For null component , add them in the map 
-			   incorrectNids.add(component.getNid());
-		   }catch(Exception e){
-			   //don't do anything , just continue
-		   }
-	   }
+		   incorrectNids.add(component.getNid());
+	   } 
 	}
    
    @Override
@@ -120,16 +110,37 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    }
 
    private void processConcept(ConceptChronicleBI concept) throws IOException {
-           Collection<? extends ConceptVersionBI> conceptVersionBILst= concept.getVersions();
-		   if (conceptVersionBILst != null) {			   
-			   System.out.println(conceptVersionBILst.size());
-			   Iterator conceptVersionBIItr = conceptVersionBILst.iterator();       
-			   
-			   while (conceptVersionBIItr.hasNext()) {  
-				   ConceptVersionBI conceptVersionBI = (ConceptVersionBI) conceptVersionBIItr.next();
-				   System.out.println("===testing ===" + conceptVersionBI.toUserString());
+	   // concept attributtes
+       addToNidList(concept.getConAttrs());
+
+       // descriptions
+       for (DescriptionChronicleBI desc : concept.getDescs()) {
+    	   addToNidList(desc);
+       }
+
+       // relationships
+       for (RelationshipChronicleBI rel : concept.getRelsOutgoing()) {
+    	   addToNidList(rel);
+       }
+
+       // refset members
+       if (!concept.isAnnotationStyleRefex()) {
+           for (RefexChronicleBI refex : concept.getRefsetMembers()) {
+        	   addToNidList(refex);
+           }
+       }
+       
+       // media
+       for (MediaChronicleBI media : concept.getMedia()) {
+    	   addToNidList(media);
+       }
+
+      
+	   
+           /*Collection<? extends ConceptVersionBI> conceptVersionBILst= concept.getVersions();
+           if (conceptVersionBILst != null) {
+		         for (ConceptVersionBI conceptVersionBI : conceptVersionBILst) {
 				   try {
-					   
 					 Collection<? extends DescriptionVersionBI> activeDescriptions = conceptVersionBI.getDescsActive();
 					 //Collection<? extends DescriptionVersionBI> allDescriptions = (Collection<? extends DescriptionVersionBI>) conceptVersionBI.getDescs();
 					 if (activeDescriptions != null) {
@@ -141,8 +152,7 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
 				               }
 				            }				            
 				         }
-				      }
-						 
+				      } 
 						 
 					 Collection<? extends RelationshipVersionBI> rels = conceptVersionBI.getRelsOutgoingActive();
 
@@ -188,7 +198,7 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
 						System.out.println(e.getMessage());
 				   }
 			   }
-		   }
+		   }*/
 		   
 		   // Original logic to check only for refset members
 	   		try{
