@@ -30,6 +30,7 @@ import org.dwfa.ace.api.Terms;
 
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.helper.bdb.NullComponentFinder;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.mojo.maven.MojoUtil;
@@ -62,9 +63,27 @@ public class VodbClose extends AbstractMojo {
     @Override
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
+    	  
+    	  getLog().info("Testing for Null Components Started.");
+    	  
+    	  Concept.disableComponentsCRHM();
+    	  
+    	  NullComponentFinder nullComponentFinder = new NullComponentFinder();
+          Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+          System.out.println();
+          
+          if (nullComponentFinder.getNullComponent().isEmpty()) {
+        	  getLog().info("No Null component found.");
+          } else {
+        	  nullComponentFinder.writeNullComponentFile();
+         	 getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+                     + nullComponentFinder.getNullComponent() + "\n");      
+          }        
+          
+         getLog().info("Testing for Null Components Finsihed.");
+       
+         
          getLog().info("Testing for dup UUIDs.");
-         Concept.disableComponentsCRHM();
-
          UuidDupFinder dupFinder = new UuidDupFinder();
 
          Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
@@ -81,8 +100,8 @@ public class VodbClose extends AbstractMojo {
 
             Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
             reporter.reportDupClasses();
-         }
-
+         }        
+               
          Concept.enableComponentsCRHM();
 
          I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
