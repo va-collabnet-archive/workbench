@@ -75,8 +75,7 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
    ConcurrentSkipListSet<Integer> incorrectNids     = new ConcurrentSkipListSet<Integer>();
    File                           missingNidFile     = new File("incorrectNid.oos");
-   ViewCoordinate        vc;
-   
+      
    private final NidBitSetBI   nidset;
 
    //~--- constant enums ------------------------------------------------------
@@ -90,18 +89,26 @@ public class NidUuidFinder implements ProcessUnfetchedConceptDataBI {
    
    //~--- methods -------------------------------------------------------------
    private void addToNidList(ComponentChroncileBI component) throws IOException {
-	   if (component != null) {
-		   ComponentVersionBI compBI= component.getPrimordialVersion();
-		   Set<Integer>  d = compBI.getAllNidsForVersion();
-		   for (int nid : d) {
-               if (Ts.get().getComponent(nid) == null) {
-            	   System.out.println("Null component for : " + d);
-            	   incorrectNids.add(nid);
-               }
-           }
-	   }else{
-		   incorrectNids.add(component.getNid());
-	   } 
+	   try{
+		   if (component != null) {
+			   ComponentVersionBI compBI= component.getPrimordialVersion();
+			   Set<Integer>  d = compBI.getAllNidsForVersion();
+			   for (int nid : d) {
+	               if (Ts.get().getComponent(nid) == null) {
+	            	   //System.out.println("Null component for : " + nid);
+	            	   incorrectNids.add(nid);
+	               }
+	           }
+		   }else{
+			   incorrectNids.add(component.getNid());
+		   }
+	   } catch(NullPointerException ne){
+		   // just ignore
+		   //System.out.println("complete compnent is null");
+	   }catch(Exception e){
+		   // just ignore
+	   }
+	   
 	}
    
    @Override
