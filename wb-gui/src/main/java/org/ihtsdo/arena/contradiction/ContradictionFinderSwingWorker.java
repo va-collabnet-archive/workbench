@@ -12,10 +12,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 
@@ -30,6 +28,7 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.contradiction.ContradictionConceptProcessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  *
@@ -73,7 +72,16 @@ public class ContradictionFinderSwingWorker
     private class ContradictionFinderStopActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            continueWork = false;
+			continueWork = false;
+
+			if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+				try {
+					Terms.get().commit();
+				} catch (Exception ex) {
+		            AceLog.getAppLog().alertAndLogException(ex);
+				}
+			}
+
             AceLog.getAppLog().info("Search canceled by user");
             frame.setProgressInfo("Search canceled.  Ready to run again.");
             frame.setProgressIndeterminate(false);
@@ -257,6 +265,9 @@ public class ContradictionFinderSwingWorker
     protected void done() {
         try {
             Set<Integer> conflictingNids = get();
+			if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+				Terms.get().commit();
+			}	
             conflictingNids.removeAll(conflicts.getNidsInList());
             for (Integer cnid : conflictingNids) {
                 conflicts.addElement((I_GetConceptData) Ts.get().getConcept(cnid));
@@ -295,6 +306,8 @@ public class ContradictionFinderSwingWorker
             }
         } catch (ComputationCanceled ex) {
             // Nothing to do
+		} catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 

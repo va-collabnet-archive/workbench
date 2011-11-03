@@ -78,8 +78,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
  	private ConcurrentSkipListSet<UUID> wfRefsetList = new ConcurrentSkipListSet<UUID>();
 	private int currentStatusNid;
 
-	private PathBI adjudicationPath = null;
-
 	private int currentApprovedConceptNid = 0;
 	private long currentApprovedLastStamp = 0;
 	
@@ -1330,9 +1328,6 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 	private void automateWfAdjudication(ComponentVersionBI  version, UUID refsetId, boolean nonCommitFound) {
 		try {
-			PathBI origPath = Terms.get().getActiveAceFrameConfig().getEditingPathSetReadOnly().iterator().next();
-			Terms.get().getActiveAceFrameConfig().replaceEditingPath(origPath, adjudicationPath);
-			
 			if (refsetId.equals(WorkflowHelper.getWorkflowRefsetUid())) {
 				WorkflowHistoryRefsetWriter refsetWriter = new WorkflowHistoryRefsetWriter();
 				if (!nonCommitFound) {
@@ -1409,15 +1404,9 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 				}
 			}
 
-			Terms.get().getActiveAceFrameConfig().replaceEditingPath(adjudicationPath, origPath);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Couldn't not automate a wf adjudication on " + version.getPrimUuid() + " in refset: "  + refsetId + " with error: " + e.getMessage());
-		}
-	}
-
-	@Override
-	public void setAdjudicationPath(PathBI path) {
-		adjudicationPath = path;
+		} 
 	}
 
 	private boolean isVersionMadePostApprovedWfState(ComponentVersionBI part) {

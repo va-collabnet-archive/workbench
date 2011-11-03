@@ -1,21 +1,15 @@
 
 package org.ihtsdo.contradiction;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.IdentifierSet;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -30,7 +24,6 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
     private I_ShowActivity activityMonitor;
     private AtomicInteger count = new AtomicInteger();
     private AtomicInteger found = new AtomicInteger();
-	private AtomicReference<PathBI> origPath;
 
 	public ContradictionConceptProcessor(ViewCoordinate viewCoord, NidBitSetBI nidBitSetBI, I_ShowActivity actvityPanel) {
         // Via Task
@@ -45,9 +38,6 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         actvityPanel.setIndeterminate(false);
         
         this.activityMonitor = actvityPanel;
-        detector.setAdjudicationPath(initEditPath());
-        
-        storeUncommitted();
      }
 
 	@Override
@@ -86,15 +76,6 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
                 results.addNoneConflicting(c.getConceptNid());
             }
         }
-        
-        if (currentCount == cNids.cardinality()) {
-        	AceLog.getAppLog().log(Level.INFO, "Have completed Contradiction Identification Successfully");
-
-            Terms.get().commit();
-
-            revertEditPath();
-        	revertUncommitted();
-        }
     }
     
     public AtomicInteger getNumberContradictionsFound() {
@@ -125,45 +106,5 @@ public class ContradictionConceptProcessor implements ProcessUnfetchedConceptDat
         }
         return true;
     }
-
-    private PathBI initEditPath() {
-    	try {
-			// Prepare Adjudication Changes
-			Set<PathBI> editPaths = Terms.get().getActiveAceFrameConfig().getEditingPathSet();
-			origPath = new AtomicReference(editPaths.iterator().next());
-			
-			List<PathBI> paths = Terms.get().getPaths();
-			for (int i = 0; i < paths.size(); i++) {
-				I_GetConceptData path = Terms.get().getConcept(paths.get(i).getConceptNid());
-				if (path.getInitialText().equalsIgnoreCase("ajudication path") && 
-					!path.equals(Terms.get().getActiveAceFrameConfig().getEditingPathSet().iterator().next())) {
-					return paths.get(i);
-				}
-			}
-		} catch (Exception e) {
-			
-		}
-		
-		return null;
-    }
-
-    private void revertEditPath() {
-    	try {
-    		PathBI editPath = Terms.get().getActiveAceFrameConfig().getEditingPathSetReadOnly().iterator().next();
-			Terms.get().getActiveAceFrameConfig().replaceEditingPath(editPath, origPath.get());
-		} catch (Exception e) {
-			
-		}
-	}
-
-    private void storeUncommitted() {
-		// TODO Auto-generated method stub
-		
-	}
-
-    private void revertUncommitted() {
-		// TODO Auto-generated method stub
-		
-	}
 }
  
