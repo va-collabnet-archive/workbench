@@ -144,7 +144,7 @@ public class WorkbenchRunner {
                 isaCacheCreateOnStartUp = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                         "isaCacheCreateOnStartUp", Boolean.class, Boolean.TRUE);
                 persistIsaCache = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
-                        "persistIsaCache", Boolean.class, Boolean.TRUE);
+                        "persistIsaCache", Boolean.class, Boolean.FALSE);
                 EConceptChangeSetWriter.writeDebugFiles =
                         (Boolean) jiniConfig.getEntry(this.getClass().getName(), "writeDebugFiles", Boolean.class,
                         Boolean.FALSE);

@@ -579,8 +579,9 @@ public class Bdb {
                 for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
                     loopCache.getLatch().await();
                 }
-                activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
+                
                 if (KindOfComputer.persistIsaCache) {
+                	activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
                     KindOfComputer.persistIsaCache();
                 }
 
