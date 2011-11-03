@@ -989,7 +989,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public PathSetReadOnly getEditingPathSetReadOnly() {
-        return config.getEditingPathSetReadOnly();
+        return new PathSetReadOnly(getPromotionPathSet());
     }
 
     public Set<PathBI> getEditingPathSet() {
