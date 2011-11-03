@@ -16,6 +16,10 @@
  */
 package org.ihtsdo.tk.api.coordinate;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,7 +30,31 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 
-public class PositionSet implements PositionSetBI {
+public class PositionSet implements PositionSetBI, Serializable {
+  private static final int dataVersion = 1;
+
+   /**
+    *
+    */
+   private static final long serialVersionUID = 1L;
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
+
+      if (objDataVersion == 1) {
+          positions = (PositionBI[]) in.readObject();
+          pathNids = (NidSetBI) in.readObject();
+      }
+      else {
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+   }
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+      out.writeObject(positions);
+      out.writeObject(pathNids);
+   }
+
 
     PositionBI[] positions = new PositionBI[0];
     NidSetBI pathNids = new NidSet();

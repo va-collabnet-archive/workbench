@@ -388,9 +388,6 @@ public class NidCNidMapBdb extends ComponentBdb {
 
    public void setCNidForNid(int cNid, int nid) throws IOException {
       assert cNid != Integer.MAX_VALUE;
-      if (nid > -2142591666 || cNid > -2142591666) {
-          int value = 2 + 2;
-      }
 
       int mapIndex = (nid - Integer.MIN_VALUE) / NID_CNID_MAP_SIZE;
 

@@ -60,7 +60,9 @@ import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.io.FileIO;
 
 public class Bdb {
@@ -256,6 +258,8 @@ public class Bdb {
     }
 
     public static void setup(String dbRoot, ActivityPanel activity) {
+        sapNidCache = new ConcurrentHashMap<String, Integer>();
+        watchList = new ConcurrentHashMap<Integer, Integer>();
         try {
             closed = false;
             syncService = Executors.newFixedThreadPool(1,
@@ -295,6 +299,9 @@ public class Bdb {
             statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
             inform(activity, "loading concept database...");
             conceptDb = new ConceptBdb(readOnly, mutable);
+            
+           
+            
             inform(activity, "setting up term factory...");
 
             String versionString = getProperty(G_VERSION);
@@ -313,7 +320,12 @@ public class Bdb {
                 Ts.set(ts);
             }
             LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
-            inform(activity, "loading cross references...");
+
+            REFSET_TYPES.setupNids();
+            ReferenceConcepts.reset();
+            Concept.reset();
+
+             inform(activity, "loading cross references...");
             xref = new Xref(readOnly, mutable);
             //watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
 
@@ -329,6 +341,7 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
+
 //            watchList.put(Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")), 
 //                            Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")));
 
@@ -562,12 +575,13 @@ public class Bdb {
                         Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
                 activity.setStopButtonVisible(false);
 
-                activity.setProgressInfoLower("1/11: Stopping Isa Cache generation.");
-                for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
-                    loopCache.shutdown();
-                }
+                activity.setProgressInfoLower("1-a/11: Stopping Isa Cache generation.");
                 for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
                     loopCache.getLatch().await();
+                }
+                activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
+                if (KindOfComputer.persistIsaCache) {
+                    KindOfComputer.persistIsaCache();
                 }
 
                 activity.setProgressInfoLower("2/11: Starting sync using service.");
@@ -617,13 +631,19 @@ public class Bdb {
         if (readOnly != null && readOnly.bdbEnv != null) {
             readOnly.bdbEnv.close();
         }
-        mutable = null;
-        readOnly = null;
-        uuidsToNidMapDb = null;
-        nidCidMapDb = null;
-        statusAtPositionDb = null;
+        annotationConcepts = null;
         conceptDb = null;
+        mutable = null;
+        nidCidMapDb = null;
+        pathManager = null;
         propDb = null;
+        readOnly = null;
+        sapNidCache = null;
+        statusAtPositionDb = null;
+        uuidsToNidMapDb = null;
+        watchList = null;
+        xref = null;
+       
         Concept.reset();
         AceLog.getAppLog().info("bdb close finished.");
     }

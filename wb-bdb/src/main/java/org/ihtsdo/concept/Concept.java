@@ -842,7 +842,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
       Concept c = get(conceptNid);
 
       // return populateFromEConcept(eConcept, c);
-      return mergeWithEConcept(eConcept, c, false);
+       try {
+           return mergeWithEConcept(eConcept, c, false);
+       } catch (Throwable t) {
+           AceLog.getAppLog().severe("Cannot merge with eConcept: \n" + eConcept, t);
+       }
+       return null;
    }
 
    public static Concept get(int nid) throws IOException {

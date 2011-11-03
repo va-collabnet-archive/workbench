@@ -57,4 +57,10 @@ public enum ReferenceConcepts {
     public List<UUID> getUuids() {
         return uuids;
     }
+    
+    public static void reset() {
+        for (ReferenceConcepts c: ReferenceConcepts.values()) {
+            c.nid = Bdb.uuidsToNid(c.uuids);
+        }
+    }
 }

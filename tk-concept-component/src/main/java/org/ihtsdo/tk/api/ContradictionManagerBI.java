@@ -1,5 +1,6 @@
 package org.ihtsdo.tk.api;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  * "contradiction resolved view" of the component at that time point.
  */
 
-public interface ContradictionManagerBI {
+public interface ContradictionManagerBI extends Serializable {
     /**
      * Method to get the display name of this conflict resolution strategy.
      * Note that this is intended to be something meaningful to an end user

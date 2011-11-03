@@ -19,6 +19,7 @@ package org.dwfa.vodb.types;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,24 +32,45 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_Path;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAcePath;
 import org.dwfa.ace.utypes.UniversalAcePosition;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 
-public class Path implements PathBI, I_Path {
+public class Path implements PathBI, I_Path, Serializable {
+  private static final int dataVersion = 1;
+
+   /**
+    *
+    */
+   private static final long serialVersionUID = 1L;
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
+
+      if (objDataVersion == 1) {
+          conceptNid = in.readInt();
+          origins = (Set<PositionBI>) in.readObject();
+      }
+      else {
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+   }
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+      out.writeInt(conceptNid);
+      out.writeObject(origins);
+   }
 
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
     int conceptNid;
     Set<PositionBI> origins;
 

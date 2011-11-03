@@ -33,9 +33,10 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 
 import java.io.IOException;
 
+import java.io.Serializable;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class IdentifierSet implements I_RepresentIdSet {
+public class IdentifierSet implements I_RepresentIdSet, Serializable {
 
    // TODO Consider using an implementation that uses
    // AtomicLongArray rather than simply a long[]...

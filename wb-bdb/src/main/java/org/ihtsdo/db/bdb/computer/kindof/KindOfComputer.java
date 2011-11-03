@@ -1,6 +1,19 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -23,10 +36,11 @@ import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 
 public class KindOfComputer {
 
+    public static boolean persistIsaCache = false;
     private static int cacheLimit = 10;
     private static ConcurrentHashMap<KindOfSpec, KindOfCache> caches =
             new ConcurrentHashMap<KindOfSpec, KindOfCache>(10);
-    private static ConcurrentHashMap<IsaCoordinate, IsaCache> isaCache = new ConcurrentHashMap<IsaCoordinate, IsaCache>();
+    private static Map<IsaCoordinate, IsaCache> isaCache = new ConcurrentHashMap<IsaCoordinate, IsaCache>();
     protected static ExecutorService kindOfComputerService =
             Executors.newFixedThreadPool(1, new NamedThreadFactory(
             Bdb.dbdThreadGroup, "kind-of computer service"));
@@ -80,24 +94,24 @@ public class KindOfComputer {
             isaCache.remove(isaCoordinate);
         }
     }
-    
+
     public static void updateIsaCaches(ConceptChronicleBI c) throws Exception {
-        for (IsaCache isac: isaCache.values()) {
+        for (IsaCache isac : isaCache.values()) {
             isac.updateCache(c);
         }
     }
-    
+
     @Deprecated
     public static void updateIsaCachesUsingStatedView(ConceptChronicleBI c) throws Exception {
-    	updateIsaCaches(c);
+        updateIsaCaches(c);
     }
-    
+
     public static void clearIsaCache() {
-    	isaCache.clear();
+        isaCache.clear();
     }
-    
+
     public static void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI newIsaCache) throws IOException {
-    	isaCache.put(isaCoordinate, (IsaCache) newIsaCache);
+        isaCache.put(isaCoordinate, (IsaCache) newIsaCache);
     }
 
     public static IsaCache setupIsaCache(IsaCoordinate isaCoordinate) throws IOException {
@@ -132,19 +146,50 @@ public class KindOfComputer {
             isaCache.get(isaCoordinate).updateCache(Terms.get().getConcept(cNid));
         }
     }
-    
+
     public static void updateIsaCacheUsingStatedView(IsaCoordinate isaCoordinate, int cNid) throws Exception {
-    	if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
-    		isaCache.get(isaCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
-    	}
+        if (isaCache.get(isaCoordinate) != null && isaCache.get(isaCoordinate).isReady()) {
+            isaCache.get(isaCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
+        }
     }
 
     public static void persistIsaCache() throws Exception {
-        throw new UnsupportedOperationException();
+        writeIsaCacheToFile(new File("berkeley-db/isa-cache.oos"));
     }
 
-    public static void loadIsaCacheFromFile() throws Exception {
-        throw new UnsupportedOperationException();
+    public static void writeIsaCacheToFile(File cacheFile) throws IOException {
+        //use buffering
+        AceLog.getAppLog().info("writing is-a cache to file: " + cacheFile);
+        cacheFile.getParentFile().mkdirs();
+        OutputStream file = new FileOutputStream(cacheFile);
+        OutputStream buffer = new BufferedOutputStream(file);
+        ObjectOutput output = new ObjectOutputStream(buffer);
+        try {
+            output.writeObject(isaCache);
+        } finally {
+            output.close();
+        }
+    }
+
+    public static boolean loadIsaCacheFromFile(File cacheFile) throws Exception {
+        if (!cacheFile.exists()) {
+            AceLog.getAppLog().info("Is-a cache file does not exist: " + cacheFile);
+           return false;
+        }
+        AceLog.getAppLog().info("Writing is-a cache to file: " + cacheFile);
+        InputStream file = new FileInputStream(cacheFile);
+        InputStream buffer = new BufferedInputStream(file);
+        ObjectInput input = new ObjectInputStream(buffer);
+        try {
+            isaCache = loadIsaCacheFromStream(input);
+        } finally {
+            input.close();
+        }
+        return true;
+    }
+
+    public static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws Exception {
+        return (HashMap<IsaCoordinate, IsaCache>) ois.readObject();
     }
 
     private static boolean cachedIsKindOfWithDepth(

@@ -20,12 +20,13 @@ import org.ihtsdo.tk.hash.Hashcode;
 
 import java.io.IOException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class ViewCoordinate {
+public class ViewCoordinate implements Serializable {
    private long                   lastModSequence = Long.MIN_VALUE;
    private NidSetBI               allowedStatusNids;
    private int                    classifierNid;
