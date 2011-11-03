@@ -146,7 +146,10 @@ public class BdbCommitManager {
       }
 
       try {
-         KindOfComputer.updateIsaCachesUsingStatedView(igcd);
+    	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
+    	 for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
+    		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, igcd.getNid());
+    	 }
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }
@@ -231,7 +234,10 @@ public class BdbCommitManager {
       LastChange.touch(c);
 
       try {
-         KindOfComputer.updateIsaCachesUsingStatedView(c);
+    	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
+     	 for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
+     		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, c.getNid());
+     	 }
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }

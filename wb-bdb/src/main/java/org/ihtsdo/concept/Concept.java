@@ -552,6 +552,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
          }
       }
+      
+      try {
+     	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
+     	 for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
+     		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, c.getNid());
+     	 }
+       } catch (Exception ex) {
+          AceLog.getAppLog().alertAndLogException(ex);
+       }
 
       return c;
    }

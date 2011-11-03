@@ -733,7 +733,7 @@ public class WorkbenchRunner {
                 KindOfComputer.persistIsaCache = true;
                 // persisted
                 activityIsa.setProgressInfoLower("Reading is-a cache...");
-                if (!KindOfComputer.loadIsaCacheFromFile(new File("berkeley-db/isa-cache.oos"))) {
+                if (!KindOfComputer.loadIsaCacheFromFile(new File("berkeley-db/isa-cache.oos"), isaCoordinates)) {
                     activityIsa.setProgressInfoLower("Generating is-a cache...");
                     generateCache(isaCoordinates, latches);
                 }

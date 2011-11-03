@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -171,12 +170,12 @@ public class KindOfComputer {
         }
     }
 
-    public static boolean loadIsaCacheFromFile(File cacheFile) throws Exception {
+    public static boolean loadIsaCacheFromFile(File cacheFile, Collection<IsaCoordinate> isaCoordinates) throws Exception {
         if (!cacheFile.exists()) {
             AceLog.getAppLog().info("Is-a cache file does not exist: " + cacheFile);
            return false;
         }
-        AceLog.getAppLog().info("Writing is-a cache to file: " + cacheFile);
+        AceLog.getAppLog().info("Reading is-a cache from file: " + cacheFile);
         InputStream file = new FileInputStream(cacheFile);
         InputStream buffer = new BufferedInputStream(file);
         ObjectInput input = new ObjectInputStream(buffer);
@@ -185,7 +184,12 @@ public class KindOfComputer {
         } finally {
             input.close();
         }
-        return true;
+        cacheFile.delete();
+        if (isaCache.keySet().containsAll(isaCoordinates) && isaCoordinates.containsAll(isaCache.keySet())) {
+        	return true;
+        } else {
+        	return false;
+        }
     }
 
     public static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws Exception {
