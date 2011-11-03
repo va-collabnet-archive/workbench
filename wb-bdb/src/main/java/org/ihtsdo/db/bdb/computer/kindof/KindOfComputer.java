@@ -189,7 +189,7 @@ public class KindOfComputer {
     }
 
     public static Map<IsaCoordinate, IsaCache> loadIsaCacheFromStream(ObjectInput ois) throws Exception {
-        return (HashMap<IsaCoordinate, IsaCache>) ois.readObject();
+        return (Map<IsaCoordinate, IsaCache>) ois.readObject();
     }
 
     private static boolean cachedIsKindOfWithDepth(
