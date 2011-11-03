@@ -6,13 +6,13 @@ package org.ihtsdo.arena.contradiction;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
@@ -48,10 +48,9 @@ public class ContradictionFinderSwingWorker
     private ContradictionConceptProcessor ccp;
     private Locale locale;
     private double numberConceptsToProcess;
-
+    
     /* ContradictionUpdator */
     private class ContradictionUpdator implements ActionListener {
-
         Timer updateTimer;
 
         public ContradictionUpdator() {
@@ -64,40 +63,45 @@ public class ContradictionFinderSwingWorker
             if (continueWork == false) {
                 updateTimer.stop();
             }
-//            updateMatches();
         }
     }
 
     /* ContradictionFinderStopActionListener */
     private class ContradictionFinderStopActionListener implements ActionListener {
-
         public void actionPerformed(ActionEvent e) {
-			continueWork = false;
+            try {
+            	String displayString = "User has canceled Identification operation.";
+	            if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+	            	displayString = displayString + " Automated workflow refset adjudications still committed";
+	  	        	Terms.get().commit();
+	        	}
+            	
+	        	AceLog.getAppLog().log(Level.INFO, displayString);
+	            actvityPanel.setProgressInfoUpper(displayString);
 
-			if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-				try {
-					Terms.get().commit();
-				} catch (Exception ex) {
-		            AceLog.getAppLog().alertAndLogException(ex);
-				}
+	            continueWork = false;
+	            frame.setProgressInfo("Search canceled by user.  Ready to run again.");
+	            frame.setProgressIndeterminate(false);
+	            frame.setProgressValue(0);
+	            frame.enableStopButton(false);
+	            frame.removeStopActionListener(stopListener);
+	            
+	            if (completeLatch != null) {
+	                while (completeLatch.getCount() > 0) {
+	                    completeLatch.countDown();
+					} 
+	            }
+
+				actvityPanel.complete();
+			} catch (ComputationCanceled cc) {
+				// Nothing to do
+			} catch (Exception ex) {
+	            AceLog.getAppLog().alertAndLogException(ex);
 			}
-
-            AceLog.getAppLog().info("Search canceled by user");
-            frame.setProgressInfo("Search canceled.  Ready to run again.");
-            frame.setProgressIndeterminate(false);
-            frame.setProgressValue(0);
-            frame.enableStopButton(false);
-            if (completeLatch != null) {
-                while (completeLatch.getCount() > 0) {
-                    completeLatch.countDown();
-                }
-            }
         }
     }
 
-    /* LuceneWfHxProgressUpdator */
     public class ContradictionProgressUpdator implements I_UpdateProgress {
-
         Timer updateTimer;
         boolean firstUpdate = true;
         private Integer hits = null;
@@ -211,7 +215,6 @@ public class ContradictionFinderSwingWorker
 
     @Override
     protected Set<Integer> doInBackground() throws Exception {
-
         // Setup Listeners
         contradictionsFoundCount = Integer.MAX_VALUE;
         numberConceptsToProcess = Terms.get().getConceptCount();
@@ -228,7 +231,7 @@ public class ContradictionFinderSwingWorker
 
         // Create processor
         ccp = new ContradictionConceptProcessor(viewCoord, Ts.get().getAllConceptNids(), actvityPanel);
-
+        
         // About to start
         Stopwatch timer = new Stopwatch();
         timer.start();
@@ -250,12 +253,6 @@ public class ContradictionFinderSwingWorker
         updator.setIndeterminate(false);
         completeLatch = new CountDownLatch(returnSet.size());
 
-        frame.removeStopActionListener(stopListener);
-        frame.enableStopButton(false);
-        frame.setProgressValue(0);
-
-        actvityPanel.complete();
-
         timer.stop();
 
         return returnSet;
@@ -264,10 +261,11 @@ public class ContradictionFinderSwingWorker
     @Override
     protected void done() {
         try {
-            Set<Integer> conflictingNids = get();
 			if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
 				Terms.get().commit();
 			}	
+
+			Set<Integer> conflictingNids = get();
             conflictingNids.removeAll(conflicts.getNidsInList());
             for (Integer cnid : conflictingNids) {
                 conflicts.addElement((I_GetConceptData) Ts.get().getConcept(cnid));
@@ -277,7 +275,6 @@ public class ContradictionFinderSwingWorker
                 continueWork = false;
                 get();
             }
-//            updateMatches();
 
             frame.removeStopActionListener(stopListener);
             frame.enableStopButton(false);
@@ -285,32 +282,31 @@ public class ContradictionFinderSwingWorker
 
 
             int numberFound = ccp.getNumberContradictionsFound().get();
+            
+            String displayString;
             if (numberFound == 0) {
-                frame.setProgressInfo("Finished with no contradictions detected");
+        		displayString = "Finished with no contradictions detected";
             } else if (numberFound == 1) {
-                frame.setProgressInfo("Finished with " + numberFound + " contradiction detected");
+            	displayString = "Finished with " + numberFound + " contradiction detected";
             } else {
-                frame.setProgressInfo("Finished with " + numberFound + " contradictions detected");
+                displayString = "Finished with " + numberFound + " contradictions detected";
             }
 
+            frame.setProgressInfo(displayString);
+            actvityPanel.setProgressInfoUpper(displayString);
+	        AceLog.getAppLog().log(Level.INFO, displayString);
+            
             actvityPanel.complete();
-        } catch (InterruptedException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
         } catch (ExecutionException ex) {
             if (ex.getCause() instanceof ComputationCanceled) {
                 // Nothing to do
             } else {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-        } catch (ComputationCanceled ex) {
+        } catch (ComputationCanceled cc) {
             // Nothing to do
-		} catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        }
-    }
-
-    public void updateMatches() {
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+		}
     }
 }
