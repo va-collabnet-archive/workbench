@@ -866,7 +866,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 	
 		    for (I_ExtendByRef member : members) 
 		    {
-				int idx = member.getTuples().size() - 1;
+				int idx = member.getMutableParts().size() - 1;
 		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
 		    	if (part.getStatusNid() != currentStatusNid) {
 		    		continue;
@@ -893,7 +893,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		    	boolean putIntoMap = false;
 		    	Integer pathNidObj = null;
 	
-				int idx = member.getTuples().size() - 1;
+				int idx = member.getMutableParts().size() - 1;
 		    	I_ExtendByRefPart part = member.getMutableParts().get(idx);
 		    	if (part.getStatusNid() != currentStatusNid) {
 		    		continue;
