@@ -203,7 +203,7 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 												new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
 														newExtConceptPart.getC1id()), config);
 									} catch (NoSuchElementException e) {
-										System.out.println("No refset data in line: " + lines);
+										AceLog.getAppLog().info("No refset data in line: " + lines);
 									}
 
 								}
@@ -269,19 +269,19 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 							modified++;
 
 						} else {
-							System.out.println("Line skipped due to text not equal: " + lines);
+							AceLog.getAppLog().info("Line skipped due to text not equal: " + lines);
 							skipped++;
 						}
 
 					} else {
-						System.out.println("Line skipped due to id not found: " + lines);
+						AceLog.getAppLog().info("Line skipped due to id not found: " + lines);
 						skipped++;
 					}
 				} catch (StringIndexOutOfBoundsException e) {
-					System.out.println("Line skipped due to string index problem: " + lines);
+					AceLog.getAppLog().info("Line skipped due to string index problem: " + lines);
 					skipped++;
 				}  catch (ArrayIndexOutOfBoundsException e) {
-					System.out.println("Line skipped due to array index problem: " + lines);
+					AceLog.getAppLog().info("Line skipped due to array index problem: " + lines);
 					skipped++;
 				}
 			}
