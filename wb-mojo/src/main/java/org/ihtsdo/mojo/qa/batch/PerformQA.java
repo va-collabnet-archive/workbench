@@ -108,49 +108,49 @@ public class PerformQA implements I_ProcessConcepts {
 			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper, INFERRED_VIEW_ORIGIN.INFERRED);
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
-			String fsn = "";
-			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
-					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
-					config.getConflictResolutionStrategy())) {
-				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
-					fsn = loopTuple.getText();
-				}
-			}
-
-			if (uniqueFsnMap.containsKey(fsn)) {
-				if (!duplicatesSet.contains(loopConcept.getNid())) {
-					ResultsItem r1 = new ResultsItem();
-					r1.setErrorCode(4);
-					r1.setMessage("FSN Duplicated:" + fsn);
-					r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-					r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-					List<ResultsItem> r1List = new ArrayList<ResultsItem>();
-					r1List.add(r1);
-					ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
-					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-					tmpResults1.setResultsItems(r1List);
-					writeOutputFile(tmpResults1, loopConcept);
-					duplicatesSet.add(loopConcept.getNid());
-				}
-
-				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(fsn));
-				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
-					ResultsItem r2 = new ResultsItem();
-					r2.setErrorCode(4);
-					r2.setMessage("FSN Duplicated:" + fsn);
-					r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
-					r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-					List<ResultsItem> r2List = new ArrayList<ResultsItem>();
-					r2List.add(r2);
-					ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
-					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-					tmpResults2.setResultsItems(r2List);
-					writeOutputFile(tmpResults2, duplicateConcept);
-					duplicatesSet.add(duplicateConcept.getNid());
-				}
-			} else {
-				uniqueFsnMap.put(fsn, loopConcept.getNid());
-			}
+//			String fsn = "";
+//			for (I_DescriptionTuple loopTuple : loopConcept.getDescriptionTuples(config.getAllowedStatus(),
+//					config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+//					config.getConflictResolutionStrategy())) {
+//				if (loopTuple.getTypeNid() == fsnNid && loopTuple.getLang().equals("en")) {
+//					fsn = loopTuple.getText();
+//				}
+//			}
+//
+//			if (uniqueFsnMap.containsKey(fsn)) {
+//				if (!duplicatesSet.contains(loopConcept.getNid())) {
+//					ResultsItem r1 = new ResultsItem();
+//					r1.setErrorCode(4);
+//					r1.setMessage("FSN Duplicated:" + fsn);
+//					r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+//					r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+//					List<ResultsItem> r1List = new ArrayList<ResultsItem>();
+//					r1List.add(r1);
+//					ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
+//					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+//					tmpResults1.setResultsItems(r1List);
+//					writeOutputFile(tmpResults1, loopConcept);
+//					duplicatesSet.add(loopConcept.getNid());
+//				}
+//
+//				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(fsn));
+//				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
+//					ResultsItem r2 = new ResultsItem();
+//					r2.setErrorCode(4);
+//					r2.setMessage("FSN Duplicated:" + fsn);
+//					r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+//					r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+//					List<ResultsItem> r2List = new ArrayList<ResultsItem>();
+//					r2List.add(r2);
+//					ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
+//					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+//					tmpResults2.setResultsItems(r2List);
+//					writeOutputFile(tmpResults2, duplicateConcept);
+//					duplicatesSet.add(duplicateConcept.getNid());
+//				}
+//			} else {
+//				uniqueFsnMap.put(fsn, loopConcept.getNid());
+//			}
 
 			//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
 			if (individualElapsed > 6000) {
