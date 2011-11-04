@@ -732,6 +732,10 @@ public class WorkbenchRunner {
 
         if (isaCacheCreateOnStartUp) {
             if (!persistIsaCache) {
+            	File cacheFile = new File("berkeley-db/isa-cache.oos");
+            	if (cacheFile.exists()) {
+            		cacheFile.delete();
+            	}
                 activityIsa.setProgressInfoLower("Generating is-a cache...");
                 generateCache(isaCoordinates, latches);
             } else {
