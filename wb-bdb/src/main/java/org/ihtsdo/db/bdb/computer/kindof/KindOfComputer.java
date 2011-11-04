@@ -126,7 +126,7 @@ public class KindOfComputer {
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }
-            AceLog.getAppLog().info("Saving cache reference...");
+            //AceLog.getAppLog().info("Saving cache reference...");
             isaCache.put(isaCoordinate, tempIsaCache);
             return tempIsaCache;
         }
