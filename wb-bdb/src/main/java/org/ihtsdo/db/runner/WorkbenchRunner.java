@@ -108,12 +108,37 @@ public class WorkbenchRunner {
    public static Properties    wbProperties;
 
   //TODO Switch?
-   static boolean oldWay = false;
+   public static boolean SSO = false;
    
    //~--- static initializers -------------------------------------------------
 
-   static {
+   public static boolean isSSO() {
+	return SSO;
+}
+
+public static void setSSO(boolean sSO) {
+	SSO = sSO;
+}
+
+public static void setSSO(String[] svnUpdateAr) {
+	
+ if(svnUpdateAr != null && svnUpdateAr.length > 0){
+	 
+	 for (String s : svnUpdateAr) {
+		 if(s.endsWith("mutable")){
+			 AceLog.getAppLog().info("svnUpdateOnStart contains a mutable setting to SSO"); 
+			 SSO = true;
+		 }
+	 }
+	 
+ }
+	
+	
+}
+
+static {
       DwfaEnv.setHeadless(false);
+      
    }
    
    
@@ -152,6 +177,9 @@ public class WorkbenchRunner {
 
 
    //~--- constructors --------------------------------------------------------
+	
+	
+	
 
    public WorkbenchRunner(String[] args, LifeCycle lc) {
       try {
@@ -166,12 +194,19 @@ public class WorkbenchRunner {
          }
 
          if (jiniConfig != null) {
+        	 
+        	/*SSO =  (Boolean) jiniConfig.getEntry(this.getClass().getName(),
+                    "SSO", Boolean.class, Boolean.FALSE);
+        	System.out.println("is_SSO: " + SSO);*/
             wbConfigFile = (File) jiniConfig.getEntry(this.getClass().getName(), "wbConfigFile", File.class,
                     new File("config/wb.config"));
             initializeFromSubversion = (Boolean) jiniConfig.getEntry(this.getClass().getName(),
                     "initFromSubversion", Boolean.class, Boolean.FALSE);
             svnUpdateOnStart = (String[]) jiniConfig.getEntry(this.getClass().getName(), "svnUpdateOnStart",
                     String[].class, null);
+            
+            setSSO(svnUpdateOnStart);
+            System.out.println("is_SSO: " + SSO);
             DroolsExecutionManager.drools_dialect_java_compiler =
                (String) jiniConfig.getEntry(this.getClass().getName(), "drools_dialect_java_compiler",
                                             String.class, null);
@@ -299,7 +334,7 @@ public class WorkbenchRunner {
 
          SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class, jiniConfig);
          
-         if(!oldWay){
+         if(SSO){
         	 String testSVNURL = svnHelper.getSvnCheckoutProfileOnStart();
  			//AceLog.getAppLog().info("About to open the init svn dialog svnCheckoutProfileOnStart = "+testSVNURL);
  			//TODO throw some sort of error if url is empty or null
@@ -309,7 +344,7 @@ public class WorkbenchRunner {
 
          if ((acePropertiesFileExists == false) || (initialized == false)) {
             try {
-            	if(oldWay){
+            	if(!SSO){
                svnHelper.initialSubversionOperationsAndChangeSetImport(wbPropertiesFile, prompter);
             	}
             	else{
@@ -330,7 +365,7 @@ public class WorkbenchRunner {
 
          if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
             Svn.setConnectedToSvn(true);
-            if(oldWay){
+            if(!SSO){	
             svnHelper.initialSubversionOperationsAndChangeSetImport(new File("config", WB_PROPERTIES),prompter);
             }
             else{
@@ -437,7 +472,7 @@ public class WorkbenchRunner {
             svnHelper.doChangeSetImport();
          }
 
-         if(!oldWay){
+         if(SSO){
 			if(userProfile == null){
 				
 				AceLog.getAppLog().info("up is null "+auth.getApm().getUserName());
@@ -477,7 +512,7 @@ public class WorkbenchRunner {
                AceConfig.config = (AceConfig) ois.readObject();
                AceConfig.config.setProfileFile(userProfile);
                
-               if(oldWay){
+               if(!SSO){
                AceConfig.config.getUsername();
                prompter.setUsername(AceConfig.config.getUsername());
                prompter.setPassword(profiler.getPassword());}
@@ -560,7 +595,7 @@ public class WorkbenchRunner {
                afc.setMasterConfig(AceConfig.config);
 
                boolean login = true;
-if(oldWay){
+if(!SSO){
                while (login) {
                   if (frameCount == 1) {
                      if (ace.getPassword().equals(prompter.getPassword())) {
@@ -937,7 +972,7 @@ else{
                AceLog.getAppLog().alertAndLogException(e);
             }
          }
-         if(oldWay){
+         if(!SSO){
          loginDialog = new AceLoginDialog(parentFrame);
          loginDialog.setConnectToSvn(initializeFromSubversion);
          loginDialog.setLocation((d.width / 2) - (loginDialog.getWidth() / 2),
@@ -998,7 +1033,7 @@ else{
 
          
          try {
-        	 if(oldWay){
+        	 if(!SSO){
             // shows the AceLoginDialog
             userProfile = loginDialog.getUserProfile(lastProfileDir);
             password    = new String(loginDialog.getPassword());

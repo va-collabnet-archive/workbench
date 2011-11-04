@@ -93,6 +93,9 @@ public class SvnHelper {
                     changeLocations.add(new File(importLoc));
                 }
             }
+            
+            AceLog.getAppLog().info("svnCheckoutOnStart size = "+svnCheckoutOnStart.length);  
+            
         }
     }
 
@@ -101,6 +104,8 @@ public class SvnHelper {
             ClientException {
         Properties aceProperties = new Properties();
         aceProperties.setProperty("initial-svn-checkout", "true");
+        
+        
 
         if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
                 || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
@@ -184,23 +189,27 @@ public class SvnHelper {
         wbProperties.setProperty("initial-svn-checkout", "true");
         
 		String pw = prompter.getPassword();
-		
+		if(WorkbenchRunner.SSO){
 		if(pw == null || pw.length() == 0 ){
 			connectToSubversion = false;
 		}
 		else{
 			connectToSubversion = true;
 		}
+		}
 
         if ((svnCheckoutOnStart != null && svnCheckoutOnStart.length > 0)
                 || (svnUpdateOnStart != null && svnUpdateOnStart.length > 0)
                 || (svnCheckoutProfileOnStart != null && svnCheckoutProfileOnStart.length() > 0)) {
-            /*if (connectToSubversion == false) {
+        	
+        	if(!WorkbenchRunner.SSO){
+            if (connectToSubversion == false) {
                 connectToSubversion =
                         (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
                         "Would you like to connect over the network to Subversion?", "Confirm network operation",
                         JOptionPane.YES_NO_OPTION));
-            } */
+            } 
+        	}	
             Svn.setConnectedToSvn(connectToSubversion);
             try {
                 if (connectToSubversion) {
