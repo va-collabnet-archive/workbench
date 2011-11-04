@@ -898,10 +898,20 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         // Typically, B is the SnoRocket Results Set (for newly inferred)
         Iterator<SnoRel> itA = snorelA.iterator();
         Iterator<SnoRel> itB = snorelB.iterator();
-        SnoRel rel_A = itA.next();
-        SnoRel rel_B = itB.next();
+        SnoRel rel_A = null;
         boolean done_A = false;
+        if (itA.hasNext()) {
+            rel_A = itA.next();
+        } else {
+            done_A = true;
+        }
+        SnoRel rel_B = null;
         boolean done_B = false;
+        if (itB.hasNext()) {
+            rel_B = itB.next();
+        } else {
+            done_B = true;
+        }
 
         logger.log(Level.INFO, "\r\n::: [SnorocketTask]"
                 + "\r\n::: snorelA.size() = \t{0}\r\n::: snorelB.size() = \t{1}",
