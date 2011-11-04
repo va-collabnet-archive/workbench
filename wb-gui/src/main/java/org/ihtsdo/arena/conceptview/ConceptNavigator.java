@@ -122,7 +122,7 @@ public class ConceptNavigator extends JPanel {
         super(new GridBagLayout());
         this.treeScroller = treeScroller;
         this.historyScroller = new JScrollPane(new JLabel("History panel"));
-        this.historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.historyScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.historyScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         this.historyScroller.setVisible(false);
         this.statedInferredScroller = new JScrollPane(new JLabel("Stated inferred panel"));

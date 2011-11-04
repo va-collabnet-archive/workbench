@@ -1,12 +1,11 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.log.AceLog;
 
 import org.ihtsdo.tk.Ts;
@@ -70,887 +69,883 @@ import javax.swing.event.ChangeListener;
  * @author kec
  */
 public class HistoryPanel {
-   private static final int HISTORY_LABEL_WIDTH = 12;
-   private static final int insetAdjustment     = 3;
-   private static final int xStartLoc           = 5;
 
-   //~--- fields --------------------------------------------------------------
+    private static final int HISTORY_LABEL_WIDTH = 12;
+    private static final int insetAdjustment = 3;
+    private static final int xStartLoc = 5;
+    //~--- fields --------------------------------------------------------------
+    int hxWidth = 0;
+    int otherWidth = 313;
+    JPanel topHistoryPanel =
+            new JPanel(new GridBagLayout());
+    private final SelectedVersionChangedListener svcl =
+            new SelectedVersionChangedListener();
+    Map<JCheckBox, JLabel> positionVersionPanelCheckLabelMap =
+            new HashMap<JCheckBox, JLabel>();
+    Map<JCheckBox, JLabel> positionHeaderCheckLabelMap =
+            new HashMap<JCheckBox, JLabel>();
+    Map<PositionBI, JCheckBox> positionCheckMap =
+            new HashMap<PositionBI, JCheckBox>();
+    List<JCheckBox> positionCheckList =
+            new ArrayList<JCheckBox>();
+    private final Set<JRadioButton> originalButtonSelections =
+            new HashSet<JRadioButton>();
+    private final Map<NidSapNid, JRadioButton> nidSapNidButtonMap =
+            new HashMap<NidSapNid, JRadioButton>();
+    private final Map<Integer, ButtonGroup> nidGroupMap =
+            new HashMap<Integer, ButtonGroup>();
+    private final Map<Integer, ButtonGroup> inferredNidGroupMap =
+            new HashMap<Integer, ButtonGroup>();
+    HorizonatalScrollActionListener hsal =
+            new HorizonatalScrollActionListener();
+    JPanel historyHeaderPanel = new JPanel(null);
+    JScrollPane historyHeaderPanelScroller =
+            new JScrollPane(historyHeaderPanel);
+    Map<JCheckBox, PositionBI> checkPositionMap =
+            new HashMap<JCheckBox, PositionBI>();
+    Map<JCheckBox, List<JComponent>> checkComponentMap =
+            new HashMap<JCheckBox, List<JComponent>>();
+    private final Set<JRadioButton> changedSelections =
+            new HashSet<JRadioButton>();
+    private final Map<JRadioButton, ComponentVersionBI> buttonVersionMap =
+            new HashMap<JRadioButton, ComponentVersionBI>();
+    private final Map<JRadioButton, Integer> buttonSapMap = new HashMap<JRadioButton, Integer>();
+    private final Map<JRadioButton, Set<JComponent>> buttonPanelSetMap = new HashMap<JRadioButton, Set<JComponent>>();
+    private ApplyVersionChangesListener avcl =
+            new ApplyVersionChangesListener();
+    VerticalScrollActionListener vsal =
+            new VerticalScrollActionListener();
+    TopChangeListener tcl =
+            new TopChangeListener();
+    private List<JSeparator> seperators =
+            new ArrayList<JSeparator>();
+    private final ConceptNavigator navigator;
+    private final Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap;
+    JPanel versionPanel;
+    JScrollPane versionScroller;
+    ConceptView view;
 
-   int                                                 hxWidth                           = 0;
-   JPanel                                              topHistoryPanel                   =
-      new JPanel(new GridBagLayout());
-   private final SelectedVersionChangedListener        svcl                              =
-      new SelectedVersionChangedListener();
-   Map<JCheckBox, JLabel>                              positionVersionPanelCheckLabelMap =
-      new HashMap<JCheckBox, JLabel>();
-   Map<JCheckBox, JLabel>                              positionHeaderCheckLabelMap       =
-      new HashMap<JCheckBox, JLabel>();
-   Map<PositionBI, JCheckBox>                          positionCheckMap                  =
-      new HashMap<PositionBI, JCheckBox>();
-   List<JCheckBox>                                     positionCheckList                 =
-      new ArrayList<JCheckBox>();
-   private final Set<JRadioButton>                     originalButtonSelections          =
-      new HashSet<JRadioButton>();
-   private final Map<NidSapNid, JRadioButton>          nidSapNidButtonMap                =
-      new HashMap<NidSapNid, JRadioButton>();
-   private final Map<Integer, ButtonGroup>             nidGroupMap                       =
-      new HashMap<Integer, ButtonGroup>();
-   private final Map<Integer, ButtonGroup>             inferredNidGroupMap               =
-      new HashMap<Integer, ButtonGroup>();
-   HorizonatalScrollActionListener                     hsal                              =
-      new HorizonatalScrollActionListener();
-   JPanel                                              historyHeaderPanel                = new JPanel(null);
-   JScrollPane                                         historyHeaderPanelScroller        =
-      new JScrollPane(historyHeaderPanel);
-   Map<JCheckBox, PositionBI>                          checkPositionMap                  =
-      new HashMap<JCheckBox, PositionBI>();
-   Map<JCheckBox, List<JComponent>>                    checkComponentMap                 =
-      new HashMap<JCheckBox, List<JComponent>>();
-   private final Set<JRadioButton>                     changedSelections                 =
-      new HashSet<JRadioButton>();
-   private final Map<JRadioButton, ComponentVersionBI> buttonVersionMap                  =
-      new HashMap<JRadioButton, ComponentVersionBI>();
-   private final Map<JRadioButton, Integer>         buttonSapMap      = new HashMap<JRadioButton, Integer>();
-   private final Map<JRadioButton, Set<JComponent>> buttonPanelSetMap = new HashMap<JRadioButton,
-                                                                           Set<JComponent>>();
-   private ApplyVersionChangesListener                                     avcl       =
-      new ApplyVersionChangesListener();
-   VerticalScrollActionListener                                            vsal       =
-      new VerticalScrollActionListener();
-   TopChangeListener                                                       tcl        =
-      new TopChangeListener();
-   private List<JSeparator>                                                seperators =
-      new ArrayList<JSeparator>();
-   private final ConceptNavigator                                          navigator;
-   private final Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap;
-   JPanel                                                                  versionPanel;
-   JScrollPane                                                             versionScroller;
-   ConceptView                                                             view;
+    //~--- constructors --------------------------------------------------------
+    public HistoryPanel(ConceptView view, JScrollPane historyScroller, ConceptNavigator navigator)
+            throws IOException {
+        this.view = view;
+        versionPanel = new ScrollableHxPanel();
+        versionScroller = new JScrollPane(versionPanel);
+        positionPanelMap = view.getPositionPanelMap();
+        this.navigator = navigator;
+        navigator.getImplementButton().addActionListener(avcl);
 
-   //~--- constructors --------------------------------------------------------
+        if (view.getSettings().isForAjudciation()) {
+            navigator.getImplementButton().setEnabled(true);
+        }
 
-   public HistoryPanel(ConceptView view, JScrollPane historyScroller, ConceptNavigator navigator)
-           throws IOException {
-      this.view        = view;
-      versionPanel     = new ScrollableHxPanel();
-      versionScroller  = new JScrollPane(versionPanel);
-      positionPanelMap = view.getPositionPanelMap();
-      this.navigator   = navigator;
-      navigator.getImplementButton().addActionListener(avcl);
+        TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
 
-      if (view.getSettings().isForAjudciation()) {
-         navigator.getImplementButton().setEnabled(true);
-      }
+        if ((view.getPathRowMap() != null) && (positionOrderedSet != null)) {
+            setupHeader(view);
+            combineHistoryPanels();
+            setupVersionPanel(positionPanelMap);
+            topHistoryPanel.addComponentListener(new TopChangeListener());
+            historyScroller.setViewportView(topHistoryPanel);
+        }
 
-      TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
+        historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight());
+        historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+        historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
+        versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
+        versionPanel.setPreferredSize(versionPanel.getSize());
+        versionPanel.addHierarchyListener(new HistoryHierarchyListener());
+        versionScroller.getHorizontalScrollBar().getModel().addChangeListener(hsal);
+        ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().addChangeListener(vsal);
+        redoLayout();
+    }
 
-      if ((view.getPathRowMap() != null) && (positionOrderedSet != null)) {
-         setupHeader(view);
-         combineHistoryPanels();
-         setupVersionPanel(positionPanelMap);
-         topHistoryPanel.addComponentListener(new TopChangeListener());
-         historyScroller.setViewportView(topHistoryPanel);
-      }
+    //~--- methods -------------------------------------------------------------
+    private void combineHistoryPanels() {
+        topHistoryPanel.removeAll();
 
-      historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight());
-      historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
-      historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
-      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
-      versionPanel.setPreferredSize(versionPanel.getSize());
-      versionPanel.addHierarchyListener(new HistoryHierarchyListener());
-      versionScroller.getHorizontalScrollBar().getModel().addChangeListener(hsal);
-      ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().addChangeListener(vsal);
-      redoLayout();
-   }
+        for (JRadioButton button : buttonSapMap.keySet()) {
+            button.setVisible(false);
+        }
 
-   //~--- methods -------------------------------------------------------------
+        historyHeaderPanel.setSize(otherWidth, view.getHistoryPanel().getHeight() - insetAdjustment);
+        historyHeaderPanel.setMaximumSize(historyHeaderPanel.getSize());
+        historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
+        historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+        historyHeaderPanel.setBorder(BorderFactory.createEmptyBorder());
 
-   private void combineHistoryPanels() {
-      topHistoryPanel.removeAll();
 
-      for (JRadioButton button : buttonSapMap.keySet()) {
-         button.setVisible(false);
-      }
+        GridBagConstraints gbc = new GridBagConstraints();
 
-      historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight() - insetAdjustment);
-      historyHeaderPanel.setBorder(BorderFactory.createEmptyBorder());
-      historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        topHistoryPanel.add(historyHeaderPanelScroller, gbc);
+        historyHeaderPanelScroller.setLocation(0, 0);
+        historyHeaderPanelScroller.setBorder(BorderFactory.createEmptyBorder());
+        historyHeaderPanelScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        historyHeaderPanelScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        historyHeaderPanelScroller.setSize(otherWidth, view.getHistoryPanel().getHeight());
+        historyHeaderPanelScroller.setLocation(0, 0);
+        gbc.gridy++;
+        topHistoryPanel.add(versionScroller, gbc);
+        versionScroller.setSize(otherWidth, view.getParent().getHeight() + insetAdjustment);
+        versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
+        versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        versionScroller.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
+        versionPanel.setLocation(0, 0);
+        versionPanel.setSize(Math.max(otherWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                view.getParent().getParent().getHeight()
+                + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
+        versionPanel.setPreferredSize(versionPanel.getSize());
+        versionPanel.setMinimumSize(versionPanel.getSize());
+        versionPanel.setMaximumSize(versionPanel.getSize());
+        syncVerticalLayout();
+    }
 
-      GridBagConstraints gbc = new GridBagConstraints();
+    private void processAllPositions(ComponentVersionBI version, DragPanelComponentVersion<?> dragPanel)
+            throws IOException {
+        if (version instanceof RelationshipVersionBI) {
+            RelationshipVersionBI rv = (RelationshipVersionBI) version;
+            Collection<RelationshipVersionBI> positionVersions = rv.getChronicle().getVersions();
+            ButtonGroup group = getButtonGroup(version.getNid(),
+                    rv.isInferred());
 
-      gbc.weightx = 1.0;
-      gbc.weighty = 0.0;
-      gbc.gridx   = 0;
-      gbc.gridy   = 0;
-      gbc.fill    = GridBagConstraints.HORIZONTAL;
-      gbc.anchor  = GridBagConstraints.NORTHWEST;
-      topHistoryPanel.add(historyHeaderPanelScroller, gbc);
-      historyHeaderPanelScroller.setLocation(0, 0);
-      historyHeaderPanelScroller.setBorder(BorderFactory.createEmptyBorder());
-      historyHeaderPanelScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-      historyHeaderPanelScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      historyHeaderPanelScroller.setSize(topHistoryPanel.getWidth(), view.getHistoryPanel().getHeight());
-      historyHeaderPanelScroller.setLocation(0, 0);
-      gbc.gridy++;
-      topHistoryPanel.add(versionScroller, gbc);
-      versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
-      versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
-      versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-      versionScroller.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
-      versionPanel.setLocation(0, 0);
-      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                           view.getParent().getParent().getHeight()
-                           + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
-      versionPanel.setPreferredSize(versionPanel.getPreferredSize());
-
-//    topHistoryPanel.setSize(hxWidth, 
-//            historyHeaderPanel.getHeight() + versionPanel.getHeight());
-      syncVerticalLayout();
-   }
-
-   private void processAllPositions(ComponentVersionBI version, DragPanelComponentVersion<?> dragPanel)
-           throws IOException {
-      if (version instanceof RelationshipVersionBI) {
-         RelationshipVersionBI             rv               = (RelationshipVersionBI) version;
-         Collection<RelationshipVersionBI> positionVersions = rv.getChronicle().getVersions();
-         ButtonGroup                       group            = getButtonGroup(version.getNid(),
-                                                                 rv.isInferred());
-
-         for (RelationshipVersionBI positionVersion : positionVersions) {
-            if (positionVersion.isInferred() == rv.isInferred()) {
-               processPosition(group, version, positionVersion, dragPanel);
+            for (RelationshipVersionBI positionVersion : positionVersions) {
+                if (positionVersion.isInferred() == rv.isInferred()) {
+                    processPosition(group, version, positionVersion, dragPanel);
+                }
             }
-         }
-      } else {
-         Collection<ComponentVersionBI> positionVersions = version.getChronicle().getVersions();
-         ButtonGroup                    group            = getButtonGroup(version.getNid(), false);
+        } else {
+            Collection<ComponentVersionBI> positionVersions = version.getChronicle().getVersions();
+            ButtonGroup group = getButtonGroup(version.getNid(), false);
 
-         for (ComponentVersionBI positionVersion : positionVersions) {
-            processPosition(group, version, positionVersion, dragPanel);
-         }
-      }
-   }
+            for (ComponentVersionBI positionVersion : positionVersions) {
+                processPosition(group, version, positionVersion, dragPanel);
+            }
+        }
+    }
 
-   private void processPanel(DragPanelComponentVersion<?> dragPanel) throws IOException {
-      ComponentVersionBI                 version       = dragPanel.getComponentVersion();
-      List<DragPanelComponentVersion<?>> versionPanels = getVersionPanels(dragPanel);
-      List<DragPanelComponentVersion<?>> refexPanels   = getRefexPanels(dragPanel);
+    private void processPanel(DragPanelComponentVersion<?> dragPanel) throws IOException {
+        ComponentVersionBI version = dragPanel.getComponentVersion();
+        List<DragPanelComponentVersion<?>> versionPanels = getVersionPanels(dragPanel);
+        List<DragPanelComponentVersion<?>> refexPanels = getRefexPanels(dragPanel);
 
-      if (versionPanels.isEmpty()) {
-         processAllPositions(version, dragPanel);
-      } else {
-         boolean inferred = false;
+        if (versionPanels.isEmpty()) {
+            processAllPositions(version, dragPanel);
+        } else {
+            boolean inferred = false;
 
-         if (version instanceof RelationshipVersionBI) {
-            inferred = ((RelationshipVersionBI) version).isInferred();
-         }
-
-         ButtonGroup group = getButtonGroup(version.getNid(), inferred);
-
-         processPosition(group, version, version, dragPanel);
-
-         for (DragPanelComponentVersion panel : versionPanels) {
-            processPosition(group, version, panel.getComponentVersion(), panel);
-         }
-      }
-
-      for (DragPanelComponentVersion refexPanel : refexPanels) {
-         processPanel(refexPanel);
-      }
-   }
-
-   private void processPosition(ButtonGroup group, ComponentVersionBI viewVersion,
-                                ComponentVersionBI positionVersion, DragPanelComponentVersion<?> dragPanel) {
-      try {
-         boolean      add          = false;
-         PositionBI   p            = positionVersion.getPosition();
-         int          sapNid       = positionVersion.getSapNid();
-         NidSapNid    nidSapNidKey = new NidSapNid(viewVersion.getNid(), sapNid);
-         JRadioButton button       = nidSapNidButtonMap.get(nidSapNidKey);
-
-         if (button == null) {
-            button = new JRadioButton();
-            button.addChangeListener(svcl);
-            buttonVersionMap.put(button, positionVersion);
-
-            if (positionVersion.getTime() == Long.MAX_VALUE) {
-
-               // unimplemented change
-               button.setBackground(Color.YELLOW);
-               button.setOpaque(true);
+            if (version instanceof RelationshipVersionBI) {
+                inferred = ((RelationshipVersionBI) version).isInferred();
             }
 
-            if (view.getChangedVersionSelections().contains(positionVersion)) {
-               button.setBackground(Color.ORANGE);
-               button.setOpaque(true);
-               button.setSelected(true);
-               changedSelections.add(button);
+            ButtonGroup group = getButtonGroup(version.getNid(), inferred);
+
+            processPosition(group, version, version, dragPanel);
+
+            for (DragPanelComponentVersion panel : versionPanels) {
+                processPosition(group, version, panel.getComponentVersion(), panel);
+            }
+        }
+
+        for (DragPanelComponentVersion refexPanel : refexPanels) {
+            processPanel(refexPanel);
+        }
+    }
+
+    private void processPosition(ButtonGroup group, ComponentVersionBI viewVersion,
+            ComponentVersionBI positionVersion, DragPanelComponentVersion<?> dragPanel) {
+        try {
+            boolean add = false;
+            PositionBI p = positionVersion.getPosition();
+            int sapNid = positionVersion.getSapNid();
+            NidSapNid nidSapNidKey = new NidSapNid(viewVersion.getNid(), sapNid);
+            JRadioButton button = nidSapNidButtonMap.get(nidSapNidKey);
+
+            if (button == null) {
+                button = new JRadioButton();
+                button.addChangeListener(svcl);
+                buttonVersionMap.put(button, positionVersion);
+
+                if (positionVersion.getTime() == Long.MAX_VALUE) {
+
+                    // unimplemented change
+                    button.setBackground(Color.YELLOW);
+                    button.setOpaque(true);
+                }
+
+                if (view.getChangedVersionSelections().contains(positionVersion)) {
+                    button.setBackground(Color.ORANGE);
+                    button.setOpaque(true);
+                    button.setSelected(true);
+                    changedSelections.add(button);
+                }
+
+                if (viewVersion == positionVersion) {
+                    originalButtonSelections.add(button);
+
+                    if (group.getSelection() == null) {
+                        button.setSelected(true);
+                    }
+                }
+
+                nidSapNidButtonMap.put(nidSapNidKey, button);
+                buttonSapMap.put(button, sapNid);
+                add = true;
+
+                ConceptVersionBI author = Ts.get().getConceptVersion(view.getConfig().getViewCoordinate(),
+                        positionVersion.getAuthorNid());
+                ConceptVersionBI status = Ts.get().getConceptVersion(view.getConfig().getViewCoordinate(),
+                        positionVersion.getStatusNid());
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("<html>");
+                sb.append(
+                        positionVersion.toUserString(Ts.get().getSnapshot(view.getConfig().getViewCoordinate())));
+                sb.append("<br>");
+
+                if (status.getPreferredDescription() != null) {
+                    sb.append(status.getPreferredDescription().getText());
+                } else {
+                    sb.append(status.toString());
+                }
+
+                sb.append("<br>");
+
+                if (author.getPreferredDescription() != null) {
+                    sb.append(author.getPreferredDescription().getText());
+                } else {
+                    sb.append(author.toString());
+                }
+
+                sb.append("<br>");
+                sb.append(p.toString());
+
+                if (viewVersion == positionVersion) {
+                    sb.append("<br>");
+                    sb.append("<font color='#ff0000'>");
+                    sb.append("latest on view</font>");
+                }
+
+                sb.append("</html>");
+                button.setToolTipText(sb.toString());
             }
 
-            if (viewVersion == positionVersion) {
-               originalButtonSelections.add(button);
+            boolean enableButton = true;
 
-               if (group.getSelection() == null) {
-                  button.setSelected(true);
-               }
+            if (positionVersion instanceof RelationshipVersionBI) {
+                RelationshipVersionBI rv = (RelationshipVersionBI) positionVersion;
+
+                if (rv.isInferred()) {
+                    enableButton = false;
+                }
             }
 
-            nidSapNidButtonMap.put(nidSapNidKey, button);
-            buttonSapMap.put(button, sapNid);
-            add = true;
+            button.setEnabled(enableButton);
+            putPanelInButtonMap(button, dragPanel);
 
-            ConceptVersionBI author = Ts.get().getConceptVersion(view.getConfig().getViewCoordinate(),
-                                         positionVersion.getAuthorNid());
-            ConceptVersionBI status = Ts.get().getConceptVersion(view.getConfig().getViewCoordinate(),
-                                         positionVersion.getStatusNid());
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("<html>");
-            sb.append(
-                positionVersion.toUserString(Ts.get().getSnapshot(view.getConfig().getViewCoordinate())));
-            sb.append("<br>");
-
-            if (status.getPreferredDescription() != null) {
-               sb.append(status.getPreferredDescription().getText());
-            } else {
-               sb.append(status.toString());
+            if (group != null) {
+                if (add) {
+                    group.add(button);
+                }
             }
 
-            sb.append("<br>");
+            int yLoc = dragPanel.getY();
+            Component parentPanel = dragPanel.getParent();
 
-            if (author.getPreferredDescription() != null) {
-               sb.append(author.getPreferredDescription().getText());
-            } else {
-               sb.append(author.toString());
+            while ((parentPanel != null) && (parentPanel != view)) {
+                yLoc += parentPanel.getY();
+                parentPanel = parentPanel.getParent();
             }
 
-            sb.append("<br>");
-            sb.append(p.toString());
+            JCheckBox positionCheck = positionCheckMap.get(p);
 
-            if (viewVersion == positionVersion) {
-               sb.append("<br>");
-               sb.append("<font color='#ff0000'>");
-               sb.append("latest on view</font>");
+            if (positionCheck != null) {
+                button.setVisible(positionCheck.isVisible());
+                checkComponentMap.get(positionCheck).add(button);
+                button.setLocation(positionCheck.getX(), yLoc);
+
+                if (add) {
+                    versionPanel.add(button);
+                }
+
+                button.setSize(button.getPreferredSize());
+            }
+        } catch (Throwable ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    private void putPanelInButtonMap(JRadioButton button, JComponent panel) {
+        Set<JComponent> panels = buttonPanelSetMap.get(button);
+
+        if (panels == null) {
+            panels = new HashSet<JComponent>();
+            buttonPanelSetMap.put(button, panels);
+        }
+
+        panels.add(panel);
+    }
+
+    private void redoGrid() {
+        for (JSeparator sep : seperators) {
+            versionPanel.remove(sep);
+        }
+
+        seperators.clear();
+
+        for (JComponent comp : view.getSeperatorComponents()) {
+            if (comp.getParent() != null) {
+                JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
+
+                sep.setSize(Math.max(versionPanel.getWidth(), ConceptViewSettings.NAVIGATOR_WIDTH - 3), 6);
+
+                Point location = comp.getLocation();
+
+                SwingUtilities.convertPointToScreen(location, comp.getParent());
+                SwingUtilities.convertPointFromScreen(location, versionPanel.getParent());
+                sep.setLocation(0, location.y - sep.getHeight());
+                versionPanel.add(sep);
+                seperators.add(sep);
+            }
+        }
+    }
+
+    private void redoLayout() {
+        if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
+            navigator.getImplementButton().setEnabled(true);
+        } else {
+            navigator.getImplementButton().setEnabled(false);
+        }
+
+        int currentX = xStartLoc;
+
+        // int yAdjust = -historyHeaderPanel.getHeight();
+        next:
+        for (JCheckBox positionCheck : positionCheckList) {
+            PositionBI position = checkPositionMap.get(positionCheck);
+
+            if (position == null) {
+                continue next;
             }
 
-            sb.append("</html>");
-            button.setToolTipText(sb.toString());
-         }
+            Integer row = view.getPathRowMap().get(position.getPath());
 
-         boolean enableButton = true;
-
-         if (positionVersion instanceof RelationshipVersionBI) {
-            RelationshipVersionBI rv = (RelationshipVersionBI) positionVersion;
-
-            if (rv.isInferred()) {
-               enableButton = false;
-            }
-         }
-
-         button.setEnabled(enableButton);
-         putPanelInButtonMap(button, dragPanel);
-
-         if (group != null) {
-            if (add) {
-               group.add(button);
-            }
-         }
-
-         int       yLoc        = dragPanel.getY();
-         Component parentPanel = dragPanel.getParent();
-
-         while ((parentPanel != null) && (parentPanel != view)) {
-            yLoc        += parentPanel.getY();
-            parentPanel = parentPanel.getParent();
-         }
-
-         JCheckBox positionCheck = positionCheckMap.get(p);
-
-         if (positionCheck != null) {
-            button.setVisible(positionCheck.isVisible());
-            checkComponentMap.get(positionCheck).add(button);
-            button.setLocation(positionCheck.getX(), yLoc);
-
-            if (add) {
-               versionPanel.add(button);
+            if (row == null) {
+                continue next;
             }
 
-            button.setSize(button.getPreferredSize());
-         }
-      } catch (Throwable ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-   }
+            JCheckBox rowCheck = view.getRowToPathCheckMap().get(row);
+            boolean showPosition = rowCheck.isSelected();
 
-   private void putPanelInButtonMap(JRadioButton button, JComponent panel) {
-      Set<JComponent> panels = buttonPanelSetMap.get(button);
+            positionCheck.setVisible(showPosition);
+            positionCheck.setLocation(currentX, positionCheck.getY());
 
-      if (panels == null) {
-         panels = new HashSet<JComponent>();
-         buttonPanelSetMap.put(button, panels);
-      }
+            for (JComponent componentInColumn : checkComponentMap.get(positionCheck)) {
+                if (componentInColumn instanceof JRadioButton) {
+                    JRadioButton radioButton = (JRadioButton) componentInColumn;
 
-      panels.add(panel);
-   }
+                    if (showPosition) {
+                        if (isPanelVisibleForButton(radioButton)) {
+                            componentInColumn.setVisible(true);
 
-   private void redoGrid() {
-      for (JSeparator sep : seperators) {
-         versionPanel.remove(sep);
-      }
+                            int maxY = 0;
+                            Point location = new Point();
 
-      seperators.clear();
+                            for (JComponent panel : buttonPanelSetMap.get(radioButton)) {
+                                if ((panel.getParent() != null) && panel.isVisible()) {
+                                    location = panel.getLocation();
+                                    SwingUtilities.convertPointToScreen(location, panel.getParent());
+                                    maxY = Math.max(maxY, location.y);
+                                }
+                            }
 
-      for (JComponent comp : view.getSeperatorComponents()) {
-         if (comp.getParent() != null) {
-            JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-
-            sep.setSize(Math.max(versionPanel.getWidth(), ConceptViewSettings.NAVIGATOR_WIDTH - 3), 6);
-
-            Point location = comp.getLocation();
-
-            SwingUtilities.convertPointToScreen(location, comp.getParent());
-            SwingUtilities.convertPointFromScreen(location, versionPanel.getParent());
-            sep.setLocation(0, location.y - sep.getHeight());
-            versionPanel.add(sep);
-            seperators.add(sep);
-         }
-      }
-   }
-
-   private void redoLayout() {
-      if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
-         navigator.getImplementButton().setEnabled(true);
-      } else {
-         navigator.getImplementButton().setEnabled(false);
-      }
-
-      int currentX = xStartLoc;
-
-      // int yAdjust = -historyHeaderPanel.getHeight();
-      next:
-      for (JCheckBox positionCheck : positionCheckList) {
-         PositionBI position = checkPositionMap.get(positionCheck);
-
-         if (position == null) {
-            continue next;
-         }
-
-         Integer row = view.getPathRowMap().get(position.getPath());
-
-         if (row == null) {
-            continue next;
-         }
-
-         JCheckBox rowCheck     = view.getRowToPathCheckMap().get(row);
-         boolean   showPosition = rowCheck.isSelected();
-
-         positionCheck.setVisible(showPosition);
-         positionCheck.setLocation(currentX, positionCheck.getY());
-
-         for (JComponent componentInColumn : checkComponentMap.get(positionCheck)) {
-            if (componentInColumn instanceof JRadioButton) {
-               JRadioButton radioButton = (JRadioButton) componentInColumn;
-
-               if (showPosition) {
-                  if (isPanelVisibleForButton(radioButton)) {
-                     componentInColumn.setVisible(true);
-
-                     int   maxY     = 0;
-                     Point location = new Point();
-
-                     for (JComponent panel : buttonPanelSetMap.get(radioButton)) {
-                        if ((panel.getParent() != null) && panel.isVisible()) {
-                           location = panel.getLocation();
-                           SwingUtilities.convertPointToScreen(location, panel.getParent());
-                           maxY = Math.max(maxY, location.y);
+                            location.y = maxY;
+                            SwingUtilities.convertPointFromScreen(location, componentInColumn.getParent());
+                            componentInColumn.setLocation(currentX, location.y);
+                        } else {
+                            componentInColumn.setVisible(false);
                         }
-                     }
+                    }
+                } else {
+                    componentInColumn.setVisible(showPosition);
+                }
 
-                     location.y = maxY;
-                     SwingUtilities.convertPointFromScreen(location, componentInColumn.getParent());
-                     componentInColumn.setLocation(currentX, location.y);
-                  } else {
-                     componentInColumn.setVisible(false);
-                  }
-               }
-            } else {
-               componentInColumn.setVisible(showPosition);
+                componentInColumn.setLocation(currentX, componentInColumn.getY());
             }
 
-            componentInColumn.setLocation(currentX, componentInColumn.getY());
-         }
-
-         if (showPosition) {
-            currentX += positionCheck.getWidth();
-         }
-
-         JLabel positionLabel = positionHeaderCheckLabelMap.get(positionCheck);
-
-         if (positionLabel.isVisible()) {
-            positionLabel.setLocation(currentX, positionLabel.getY());
-
-            JLabel versionPanelLabel = positionVersionPanelCheckLabelMap.get(positionCheck);
-
-            if (versionPanelLabel != null) {
-               versionPanelLabel.setVisible(true);
-               versionPanelLabel.setLocation(currentX, versionPanelLabel.getY());
+            if (showPosition) {
+                currentX += positionCheck.getWidth();
             }
+
+            JLabel positionLabel = positionHeaderCheckLabelMap.get(positionCheck);
+
+            if (positionLabel.isVisible()) {
+                positionLabel.setLocation(currentX, positionLabel.getY());
+
+                JLabel versionPanelLabel = positionVersionPanelCheckLabelMap.get(positionCheck);
+
+                if (versionPanelLabel != null) {
+                    versionPanelLabel.setVisible(true);
+                    versionPanelLabel.setLocation(currentX, versionPanelLabel.getY());
+                }
+
+                if (positionCheck.isVisible()) {
+                    currentX += positionLabel.getWidth();
+                } else {
+                    positionLabel.setVisible(false);
+                }
+            }
+        }
+
+        redoGrid();
+    }
+
+    public void removeListeners() {
+        navigator.getImplementButton().removeActionListener(avcl);
+        topHistoryPanel.removeComponentListener(tcl);
+        versionScroller.getHorizontalScrollBar().getModel().removeChangeListener(hsal);
+        ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().removeChangeListener(
+                vsal);
+    }
+
+    private void reset() {
+        nidSapNidButtonMap.clear();
+        buttonSapMap.clear();
+        buttonPanelSetMap.clear();
+        originalButtonSelections.clear();
+        changedSelections.clear();
+        view.getChangedVersionSelections().clear();
+    }
+
+    public void resizeIfNeeded() {
+        try {
+            combineHistoryPanels();
+            setupVersionPanel(positionPanelMap);
+            redoLayout();
+            GuiUtil.tickle(historyHeaderPanel);
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+    }
+
+    private void setupHeader(ConceptView view) {
+        TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
+
+        if ((view.getPathRowMap() == null) || (view.getRowToPathCheckMap() == null)
+                || (positionOrderedSet == null)) {
+            return;
+        }
+
+        int locX = xStartLoc;
+
+        for (PositionBI p : positionOrderedSet) {
+            assert p != null;
+            assert view.getPathRowMap() != null;
+            assert view.getRowToPathCheckMap() != null;
+            assert p.getPath() != null;
+
+            Integer row = view.getPathRowMap().get(p.getPath());
+
+            if (row == null) {
+                continue;
+            }
+
+            JCheckBox rowCheck = view.getRowToPathCheckMap().get(row);
+            JCheckBox positionCheck = view.getJCheckBox();
+
+            positionCheck.setVisible(rowCheck.isSelected());
+            positionCheckList.add(positionCheck);
+            checkComponentMap.put(positionCheck, new ArrayList<JComponent>());
+            positionCheckMap.put(p, positionCheck);
+            checkPositionMap.put(positionCheck, p);
+            positionCheck.setLocation(locX, rowCheck.getLocation().y);
+            positionCheck.setSize(positionCheck.getPreferredSize());
+            positionCheck.setToolTipText(p.toString());
+            historyHeaderPanel.add(positionCheck);
 
             if (positionCheck.isVisible()) {
-               currentX += positionLabel.getWidth();
-            } else {
-               positionLabel.setVisible(false);
+                locX += positionCheck.getWidth();
             }
-         }
-      }
 
-      redoGrid();
-   }
+            JLabel historyLabel = setupLabel("", locX);
 
-   public void removeListeners() {
-      navigator.getImplementButton().removeActionListener(avcl);
-      topHistoryPanel.removeComponentListener(tcl);
-      versionScroller.getHorizontalScrollBar().getModel().removeChangeListener(hsal);
-      ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().removeChangeListener(
-          vsal);
-   }
+            positionHeaderCheckLabelMap.put(positionCheck, historyLabel);
+            historyHeaderPanel.add(historyLabel);
 
-   private void reset() {
-      nidSapNidButtonMap.clear();
-      buttonSapMap.clear();
-      buttonPanelSetMap.clear();
-      originalButtonSelections.clear();
-      changedSelections.clear();
-      view.getChangedVersionSelections().clear();
-   }
+            JLabel versionHistoryLabel = setupLabel(p.toString(), 0);
 
-   public void resizeIfNeeded() {
-      try {
-         combineHistoryPanels();
-         setupVersionPanel(positionPanelMap);
-         redoLayout();
-         GuiUtil.tickle(historyHeaderPanel);
-      } catch (IOException ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
-      }
-   }
+            positionVersionPanelCheckLabelMap.put(positionCheck, versionHistoryLabel);
+            positionCheck.addActionListener(new UpdateHistoryBorder(historyLabel, versionHistoryLabel));
+        }
 
-   private void setupHeader(ConceptView view) {
-      TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
+        hxWidth = locX;
+    }
 
-      if ((view.getPathRowMap() == null) || (view.getRowToPathCheckMap() == null)
-              || (positionOrderedSet == null)) {
-         return;
-      }
+    private JLabel setupLabel(String hxString, int locX) {
+        JLabel historyLabel = new JLabel("");
 
-      int locX = xStartLoc;
+        historyLabel.setVisible(false);
+        historyLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+        historyLabel.setLocation(locX, 0);
+        historyLabel.setSize(HISTORY_LABEL_WIDTH, 1000);
+        historyLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 0, 1,
+                Color.GRAY), new HistoryBorder(BorderFactory.createEmptyBorder(), hxString,
+                new Font("monospaced", Font.PLAIN, 10), Color.BLACK)));
 
-      for (PositionBI p : positionOrderedSet) {
-         assert p != null;
-         assert view.getPathRowMap() != null;
-         assert view.getRowToPathCheckMap() != null;
-         assert p.getPath() != null;
+        return historyLabel;
+    }
 
-         Integer row = view.getPathRowMap().get(p.getPath());
+    private void setupVersionPanel(Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap)
+            throws IOException {
+        for (Collection<DragPanelComponentVersion<?>> panelSet : positionPanelMap.values()) {
+            for (DragPanelComponentVersion<?> dragPanel : panelSet) {
+                processPanel(dragPanel);
+            }
+        }
 
-         if (row == null) {
-            continue;
-         }
+        for (JLabel versionPanelLabel : positionVersionPanelCheckLabelMap.values()) {
+            versionPanelLabel.setVisible(false);
+            versionPanel.add(versionPanelLabel);
+        }
+    }
 
-         JCheckBox rowCheck      = view.getRowToPathCheckMap().get(row);
-         JCheckBox positionCheck = view.getJCheckBox();
+    private void syncVerticalLayout() {
+        BoundedRangeModel eventModel =
+                view.getCvRenderer().getConceptScrollPane().getVerticalScrollBar().getModel();
+        BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
 
-         positionCheck.setVisible(rowCheck.isSelected());
-         positionCheckList.add(positionCheck);
-         checkComponentMap.put(positionCheck, new ArrayList<JComponent>());
-         positionCheckMap.put(p, positionCheck);
-         checkPositionMap.put(positionCheck, p);
-         positionCheck.setLocation(locX, rowCheck.getLocation().y);
-         positionCheck.setSize(positionCheck.getPreferredSize());
-         positionCheck.setToolTipText(p.toString());
-         historyHeaderPanel.add(positionCheck);
+        historyScrollModel.setMaximum(eventModel.getMaximum());
+        historyScrollModel.setMinimum(eventModel.getMinimum());
+        historyScrollModel.setValue(eventModel.getValue());
+        versionPanel.setLocation(0, -eventModel.getValue());
+    }
 
-         if (positionCheck.isVisible()) {
-            locX += positionCheck.getWidth();
-         }
+    //~--- get methods ---------------------------------------------------------
+    private ButtonGroup getButtonGroup(int componentNid, boolean inferred) {
+        if (inferred) {
+            ButtonGroup group = inferredNidGroupMap.get(componentNid);
 
-         JLabel historyLabel = setupLabel("", locX);
+            if (group == null) {
+                group = new ButtonGroup();
+                inferredNidGroupMap.put(componentNid, group);
+            }
 
-         positionHeaderCheckLabelMap.put(positionCheck, historyLabel);
-         historyHeaderPanel.add(historyLabel);
+            return group;
+        }
 
-         JLabel versionHistoryLabel = setupLabel(p.toString(), 0);
+        ButtonGroup group = nidGroupMap.get(componentNid);
 
-         positionVersionPanelCheckLabelMap.put(positionCheck, versionHistoryLabel);
-         positionCheck.addActionListener(new UpdateHistoryBorder(historyLabel, versionHistoryLabel));
-      }
-
-      hxWidth = locX;
-   }
-
-   private JLabel setupLabel(String hxString, int locX) {
-      JLabel historyLabel = new JLabel("");
-
-      historyLabel.setVisible(false);
-      historyLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
-      historyLabel.setLocation(locX, 0);
-      historyLabel.setSize(HISTORY_LABEL_WIDTH, 1000);
-      historyLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 0, 1,
-              Color.GRAY), new HistoryBorder(BorderFactory.createEmptyBorder(), hxString,
-                 new Font("monospaced", Font.PLAIN, 10), Color.BLACK)));
-
-      return historyLabel;
-   }
-
-   private void setupVersionPanel(Map<PositionBI, Collection<DragPanelComponentVersion<?>>> positionPanelMap)
-           throws IOException {
-      for (Collection<DragPanelComponentVersion<?>> panelSet : positionPanelMap.values()) {
-         for (DragPanelComponentVersion<?> dragPanel : panelSet) {
-            processPanel(dragPanel);
-         }
-      }
-
-      for (JLabel versionPanelLabel : positionVersionPanelCheckLabelMap.values()) {
-         versionPanelLabel.setVisible(false);
-         versionPanel.add(versionPanelLabel);
-      }
-   }
-
-   private void syncVerticalLayout() {
-      BoundedRangeModel eventModel =
-         view.getCvRenderer().getConceptScrollPane().getVerticalScrollBar().getModel();
-      BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
-
-      historyScrollModel.setMaximum(eventModel.getMaximum());
-      historyScrollModel.setMinimum(eventModel.getMinimum());
-      historyScrollModel.setValue(eventModel.getValue());
-      versionPanel.setLocation(0, -eventModel.getValue());
-   }
-
-   //~--- get methods ---------------------------------------------------------
-
-   private ButtonGroup getButtonGroup(int componentNid, boolean inferred) {
-      if (inferred) {
-         ButtonGroup group = inferredNidGroupMap.get(componentNid);
-
-         if (group == null) {
+        if (group == null) {
             group = new ButtonGroup();
-            inferredNidGroupMap.put(componentNid, group);
-         }
+            nidGroupMap.put(componentNid, group);
+        }
 
-         return group;
-      }
+        return group;
+    }
 
-      ButtonGroup group = nidGroupMap.get(componentNid);
+    private List<DragPanelComponentVersion<?>> getRefexPanels(DragPanelComponentVersion<?> dragPanel) {
+        List<DragPanelComponentVersion<?>> versionPanels = new ArrayList<DragPanelComponentVersion<?>>();
 
-      if (group == null) {
-         group = new ButtonGroup();
-         nidGroupMap.put(componentNid, group);
-      }
+        for (Component comp : dragPanel.getComponents()) {
+            if (comp.isVisible() && (comp instanceof DragPanelComponentVersion)) {
+                DragPanelComponentVersion cvdp = (DragPanelComponentVersion) comp;
 
-      return group;
-   }
-
-   private List<DragPanelComponentVersion<?>> getRefexPanels(DragPanelComponentVersion<?> dragPanel) {
-      List<DragPanelComponentVersion<?>> versionPanels = new ArrayList<DragPanelComponentVersion<?>>();
-
-      for (Component comp : dragPanel.getComponents()) {
-         if (comp.isVisible() && (comp instanceof DragPanelComponentVersion)) {
-            DragPanelComponentVersion cvdp = (DragPanelComponentVersion) comp;
-
-            if (!cvdp.getComponentVersion().getChronicle().equals(
-                    dragPanel.getComponentVersion().getChronicle())) {
-               versionPanels.add(cvdp);
+                if (!cvdp.getComponentVersion().getChronicle().equals(
+                        dragPanel.getComponentVersion().getChronicle())) {
+                    versionPanels.add(cvdp);
+                }
             }
-         }
-      }
+        }
 
-      return versionPanels;
-   }
+        return versionPanels;
+    }
 
-   private List<DragPanelComponentVersion<?>> getVersionPanels(DragPanelComponentVersion<?> dragPanel)
-           throws IOException {
-      List<DragPanelComponentVersion<?>> versionPanels = new ArrayList<DragPanelComponentVersion<?>>();
+    private List<DragPanelComponentVersion<?>> getVersionPanels(DragPanelComponentVersion<?> dragPanel)
+            throws IOException {
+        List<DragPanelComponentVersion<?>> versionPanels = new ArrayList<DragPanelComponentVersion<?>>();
 
-      for (Component comp : dragPanel.getComponents()) {
-         if (comp instanceof DragPanelComponentVersion) {
-            DragPanelComponentVersion cvdp = (DragPanelComponentVersion) comp;
+        for (Component comp : dragPanel.getComponents()) {
+            if (comp instanceof DragPanelComponentVersion) {
+                DragPanelComponentVersion cvdp = (DragPanelComponentVersion) comp;
 
-            if (cvdp.isVisible()) {
-               if (cvdp.getComponentVersion().getChronicle().equals(
-                       dragPanel.getComponentVersion().getChronicle())) {
-                  versionPanels.add(cvdp);
-               }
+                if (cvdp.isVisible()) {
+                    if (cvdp.getComponentVersion().getChronicle().equals(
+                            dragPanel.getComponentVersion().getChronicle())) {
+                        versionPanels.add(cvdp);
+                    }
+                }
             }
-         }
-      }
+        }
 
-      return versionPanels;
-   }
+        return versionPanels;
+    }
 
-   private boolean isPanelVisibleForButton(JRadioButton button) {
-      Set<JComponent> panels = buttonPanelSetMap.get(button);
+    private boolean isPanelVisibleForButton(JRadioButton button) {
+        Set<JComponent> panels = buttonPanelSetMap.get(button);
 
-      if (panels == null) {
-         return false;
-      }
+        if (panels == null) {
+            return false;
+        }
 
-      boolean visible = false;
+        boolean visible = false;
 
-      for (JComponent panel : panels) {
-         if (panel.isVisible()) {
-            return true;
-         }
-      }
+        for (JComponent panel : panels) {
+            if (panel.isVisible()) {
+                return true;
+            }
+        }
 
-      return visible;
-   }
+        return visible;
+    }
 
-   //~--- inner classes -------------------------------------------------------
+    //~--- inner classes -------------------------------------------------------
+    private class ApplyVersionChangesListener implements ActionListener {
 
-   private class ApplyVersionChangesListener implements ActionListener {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-         try {
-            EditCoordinate ec = view.getConfig().getEditCoordinate();
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                EditCoordinate ec = view.getConfig().getEditCoordinate();
 
-            for (JRadioButton button : changedSelections) {
-               ComponentVersionBI cv = buttonVersionMap.get(button);
+                for (JRadioButton button : changedSelections) {
+                    ComponentVersionBI cv = buttonVersionMap.get(button);
 
-               for (int pathNid : ec.getEditPaths()) {
-                  ((AnalogGeneratorBI) cv).makeAnalog(cv.getStatusNid(), ec.getAuthorNid(), pathNid,
-                          Long.MAX_VALUE);
-               }
+                    for (int pathNid : ec.getEditPaths()) {
+                        ((AnalogGeneratorBI) cv).makeAnalog(cv.getStatusNid(), ec.getAuthorNid(), pathNid,
+                                Long.MAX_VALUE);
+                    }
+                }
+
+                if (view.getSettings().isForAjudciation()) {
+                    ConceptChronicleBI cc = view.getConcept();
+
+                    cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(),
+                            view.getConfig().getViewCoordinate());
+                }
+
+                Ts.get().addUncommitted(view.getConcept());
+                reset();
+                navigator.getImplementButton().setEnabled(false);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+
+    private class HistoryHierarchyListener implements HierarchyListener {
+
+        @Override
+        public void hierarchyChanged(HierarchyEvent he) {
+            syncVerticalLayout();
+        }
+    }
+
+    private class HorizonatalScrollActionListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            BoundedRangeModel eventModel = (BoundedRangeModel) ce.getSource();
+            BoundedRangeModel historyScrollModel =
+                    historyHeaderPanelScroller.getHorizontalScrollBar().getModel();
+
+            historyScrollModel.setMaximum(eventModel.getMaximum());
+            historyScrollModel.setMinimum(eventModel.getMinimum());
+            historyScrollModel.setValue(eventModel.getValue());
+        }
+    }
+
+    private static class NidSapNid {
+
+        int nid;
+        int sapNid;
+
+        //~--- constructors -----------------------------------------------------
+        public NidSapNid(int nid, int sapNid) {
+            this.nid = nid;
+            this.sapNid = sapNid;
+        }
+
+        //~--- methods ----------------------------------------------------------
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof NidSapNid) {
+                NidSapNid another = (NidSapNid) o;
+
+                return (nid == another.nid) && (sapNid == another.sapNid);
             }
 
-            if (view.getSettings().isForAjudciation()) {
-               ConceptChronicleBI cc = view.getConcept();
+            return false;
+        }
 
-               cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(),
-                                          view.getConfig().getViewCoordinate());
-            }
+        @Override
+        public int hashCode() {
+            return Hashcode.compute(new int[]{nid, sapNid});
+        }
+    }
 
-            Ts.get().addUncommitted(view.getConcept());
-            reset();
-            navigator.getImplementButton().setEnabled(false);
-         } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
-   }
+    private class ScrollableHxPanel extends JPanel implements Scrollable {
 
+        public ScrollableHxPanel() {
+            super(null);
+        }
 
-   private class HistoryHierarchyListener implements HierarchyListener {
-      @Override
-      public void hierarchyChanged(HierarchyEvent he) {
-         syncVerticalLayout();
-      }
-   }
+        //~--- get methods ------------------------------------------------------
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return new Dimension(Math.max(otherWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
+        }
 
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 1;
+        }
 
-   private class HorizonatalScrollActionListener implements ChangeListener {
-      @Override
-      public void stateChanged(ChangeEvent ce) {
-         BoundedRangeModel eventModel         = (BoundedRangeModel) ce.getSource();
-         BoundedRangeModel historyScrollModel =
-            historyHeaderPanelScroller.getHorizontalScrollBar().getModel();
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
 
-         historyScrollModel.setMaximum(eventModel.getMaximum());
-         historyScrollModel.setMinimum(eventModel.getMinimum());
-         historyScrollModel.setValue(eventModel.getValue());
-      }
-   }
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return false;
+        }
 
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return 1;
+        }
+    }
 
-   private static class NidSapNid {
-      int nid;
-      int sapNid;
+    private class SelectedVersionChangedListener implements ChangeListener {
 
-      //~--- constructors -----------------------------------------------------
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            JRadioButton button = (JRadioButton) ce.getSource();
+            ComponentVersionBI version = buttonVersionMap.get(button);
+            int changedCount = changedSelections.size();
 
-      public NidSapNid(int nid, int sapNid) {
-         this.nid    = nid;
-         this.sapNid = sapNid;
-      }
+            if (button.isSelected()) {
+                if (originalButtonSelections.contains(button)) {
 
-      //~--- methods ----------------------------------------------------------
+                    // back to original state
+                    if (version.getTime() == Long.MAX_VALUE) {
+                        button.setBackground(Color.YELLOW);
+                        button.setOpaque(true);
+                    }
+                } else {
 
-      @Override
-      public boolean equals(Object o) {
-         if (o instanceof NidSapNid) {
-            NidSapNid another = (NidSapNid) o;
-
-            return (nid == another.nid) && (sapNid == another.sapNid);
-         }
-
-         return false;
-      }
-
-      @Override
-      public int hashCode() {
-         return Hashcode.compute(new int[] { nid, sapNid });
-      }
-   }
-
-
-   private class ScrollableHxPanel extends JPanel implements Scrollable {
-      public ScrollableHxPanel() {
-         super(null);
-      }
-
-      //~--- get methods ------------------------------------------------------
-
-      @Override
-      public Dimension getPreferredScrollableViewportSize() {
-         return new Dimension(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
-      }
-
-      @Override
-      public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-         return 1;
-      }
-
-      @Override
-      public boolean getScrollableTracksViewportHeight() {
-         return false;
-      }
-
-      @Override
-      public boolean getScrollableTracksViewportWidth() {
-         return false;
-      }
-
-      @Override
-      public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-         return 1;
-      }
-   }
-
-
-   private class SelectedVersionChangedListener implements ChangeListener {
-      @Override
-      public void stateChanged(ChangeEvent ce) {
-         JRadioButton       button       = (JRadioButton) ce.getSource();
-         ComponentVersionBI version      = buttonVersionMap.get(button);
-         int                changedCount = changedSelections.size();
-
-         if (button.isSelected()) {
-            if (originalButtonSelections.contains(button)) {
-
-               // back to original state
-               if (version.getTime() == Long.MAX_VALUE) {
-                  button.setBackground(Color.YELLOW);
-                  button.setOpaque(true);
-               }
+                    // unimplemented change
+                    button.setBackground(Color.ORANGE);
+                    button.setOpaque(true);
+                    changedSelections.add(button);
+                    view.getChangedVersionSelections().add(version);
+                }
             } else {
-
-               // unimplemented change
-               button.setBackground(Color.ORANGE);
-               button.setOpaque(true);
-               changedSelections.add(button);
-               view.getChangedVersionSelections().add(version);
+                button.setBackground(versionPanel.getBackground());
+                button.setOpaque(false);
+                changedSelections.remove(button);
+                view.getChangedVersionSelections().remove(version);
             }
-         } else {
-            button.setBackground(versionPanel.getBackground());
-            button.setOpaque(false);
-            changedSelections.remove(button);
-            view.getChangedVersionSelections().remove(version);
-         }
 
-         if (changedCount != changedSelections.size()) {
-            SwingUtilities.invokeLater(new Runnable() {
-               @Override
-               public void run() {
-                  if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
-                     navigator.getImplementButton().setEnabled(true);
-                  } else {
-                     navigator.getImplementButton().setEnabled(false);
-                  }
-               }
-            });
-         }
-      }
-   }
+            if (changedCount != changedSelections.size()) {
+                SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
+                    public void run() {
+                        if ((changedSelections.size() > 0) || view.getSettings().isForAjudciation()) {
+                            navigator.getImplementButton().setEnabled(true);
+                        } else {
+                            navigator.getImplementButton().setEnabled(false);
+                        }
+                    }
+                });
+            }
+        }
+    }
 
-   private class TopChangeListener implements ComponentListener {
-      @Override
-      public void componentHidden(ComponentEvent ce) {
+    private class TopChangeListener implements ComponentListener {
 
-         //
-      }
+        @Override
+        public void componentHidden(ComponentEvent ce) {
+            //
+        }
 
-      @Override
-      public void componentMoved(ComponentEvent ce) {
+        @Override
+        public void componentMoved(ComponentEvent ce) {
+            //
+        }
 
-         //
-      }
+        @Override
+        public void componentResized(ComponentEvent ce) {
+            resizeIfNeeded();
+        }
 
-      @Override
-      public void componentResized(ComponentEvent ce) {
-         resizeIfNeeded();
-      }
+        @Override
+        public void componentShown(ComponentEvent ce) {
+            syncVerticalLayout();
+        }
+    }
 
-      @Override
-      public void componentShown(ComponentEvent ce) {
-         syncVerticalLayout();
-      }
-   }
+    private class UpdateHistoryBorder implements ActionListener {
 
+        JLabel hxLabel;
+        JLabel versionHxLabel;
 
-   private class UpdateHistoryBorder implements ActionListener {
-      JLabel hxLabel;
-      JLabel versionHxLabel;
+        //~--- constructors -----------------------------------------------------
+        public UpdateHistoryBorder(JLabel historyLabel, JLabel versionHxLabel) {
+            this.hxLabel = historyLabel;
+            this.versionHxLabel = versionHxLabel;
+        }
 
-      //~--- constructors -----------------------------------------------------
+        //~--- methods ----------------------------------------------------------
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            JCheckBox check = (JCheckBox) ae.getSource();
 
-      public UpdateHistoryBorder(JLabel historyLabel, JLabel versionHxLabel) {
-         this.hxLabel        = historyLabel;
-         this.versionHxLabel = versionHxLabel;
-      }
+            if (check.isSelected()) {
+                BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
 
-      //~--- methods ----------------------------------------------------------
+                hxLabel.setVisible(true);
+                hxLabel.setLocation(hxLabel.getX(), historyScrollModel.getValue());
+                versionHxLabel.setVisible(true);
+                versionHxLabel.setLocation(hxLabel.getX(), historyScrollModel.getValue());
+            } else {
+                hxLabel.setVisible(false);
+                versionHxLabel.setVisible(false);
+            }
+            if (hxLabel.isVisible()) {
+                otherWidth += hxLabel.getWidth();
+            } else {
+                otherWidth -= hxLabel.getWidth();
+            }
+            resizeIfNeeded();
+        }
+    }
 
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-         JCheckBox check = (JCheckBox) ae.getSource();
+    private class VerticalScrollActionListener implements ChangeListener {
 
-         if (check.isSelected()) {
+        @Override
+        public void stateChanged(ChangeEvent ce) {
+            BoundedRangeModel eventModel = (BoundedRangeModel) ce.getSource();
+
+            for (JLabel hxLabel : positionVersionPanelCheckLabelMap.values()) {
+                hxLabel.setLocation(hxLabel.getX(), eventModel.getValue());
+            }
+
+            versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                    eventModel.getMaximum());
+            versionPanel.setPreferredSize(versionPanel.getSize());
+
             BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
 
-            hxLabel.setVisible(true);
-            hxLabel.setLocation(hxLabel.getX(), historyScrollModel.getValue());
-            versionHxLabel.setVisible(true);
-            versionHxLabel.setLocation(hxLabel.getX(), historyScrollModel.getValue());
-         } else {
-            hxLabel.setVisible(false);
-            versionHxLabel.setVisible(false);
-         }
-
-         redoLayout();
-      }
-   }
-
-
-   private class VerticalScrollActionListener implements ChangeListener {
-      @Override
-      public void stateChanged(ChangeEvent ce) {
-         BoundedRangeModel eventModel = (BoundedRangeModel) ce.getSource();
-
-         for (JLabel hxLabel : positionVersionPanelCheckLabelMap.values()) {
-            hxLabel.setLocation(hxLabel.getX(), eventModel.getValue());
-         }
-
-         versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                              eventModel.getMaximum());
-         versionPanel.setPreferredSize(versionPanel.getSize());
-
-         BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
-
-         historyScrollModel.setMaximum(eventModel.getMaximum());
-         historyScrollModel.setMinimum(eventModel.getMinimum());
-         historyScrollModel.setValue(eventModel.getValue());
-         versionPanel.setLocation(0, -eventModel.getValue());
-      }
-   }
+            historyScrollModel.setMaximum(eventModel.getMaximum());
+            historyScrollModel.setMinimum(eventModel.getMinimum());
+            historyScrollModel.setValue(eventModel.getValue());
+            versionPanel.setLocation(0, -eventModel.getValue());
+        }
+    }
 }
