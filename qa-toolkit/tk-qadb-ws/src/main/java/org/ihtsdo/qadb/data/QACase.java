@@ -23,6 +23,7 @@ public class QACase extends ViewPointSpecificObject implements Serializable {
 	private String assignmentEditor;
 	private Calendar assignmentDate;
 	private Calendar effectiveTime;
+	private Calendar lastStatusChanged;
 	private List<QAComment> comments;
 
 	public QACase() {
@@ -170,6 +171,14 @@ public class QACase extends ViewPointSpecificObject implements Serializable {
 				+ ", dispositionReasonUuid=" + dispositionReasonUuid + ", dispositionStatusDate=" + dispositionStatusDate + ", dispositionStatusEditor=" + dispositionStatusEditor
 				+ ", dispositionAnnotation=" + dispositionAnnotation + ", detail=" + detail + ", assignedTo=" + assignedTo + ", effectiveTime=" + effectiveTime + ", comments=" + comments
 				+ "]";
+	}
+
+	public void setLastStatusChanged(Calendar lastStatusChanged) {
+		this.lastStatusChanged = lastStatusChanged;
+	}
+
+	public Calendar getLastStatusChanged() {
+		return lastStatusChanged;
 	}
 
 }

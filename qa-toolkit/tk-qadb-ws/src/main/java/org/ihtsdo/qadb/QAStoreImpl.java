@@ -327,7 +327,7 @@ public class QAStoreImpl implements QAStoreBI {
 			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
 				coords.setStartLine(0);
 				coords.setPageLenght(10000);
-			}else{
+			} else {
 				coords.setStartLine(startLine - 1);
 				coords.setPageLenght(pageLenght);
 			}
@@ -396,6 +396,7 @@ public class QAStoreImpl implements QAStoreBI {
 
 				@SuppressWarnings("unchecked")
 				List<DispStatusCount> dispStatusCounts = sqlSession.selectList("org.ihtsdo.qadb.data.RuleMapper.selectDispositionStatusCounts", coords);
+
 				boolean filterExists = false;
 				if (filter != null) {
 					if (filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
@@ -439,10 +440,10 @@ public class QAStoreImpl implements QAStoreBI {
 			}
 
 			sortLines(lines, sortBy);
-			
+
 			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
 				newResult = new LinkedList<RulesReportLine>();
-				for(int i = startLine; i < startLine + pageLenght && i < lines.size(); i++){
+				for (int i = startLine; i < startLine + pageLenght && i < lines.size(); i++) {
 					newResult.add(lines.get(i));
 				}
 			}
@@ -453,7 +454,7 @@ public class QAStoreImpl implements QAStoreBI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(newResult!= null){
+		if (newResult != null) {
 			return newResult;
 		}
 		return lines;
@@ -747,18 +748,6 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.debug("Total Lines: " + totalLines);
 		logger.debug("Start Line: " + startLine);
 		logger.debug("Page Lenght: " + pageLenght);
-		// if (sortBy != null && !sortBy.isEmpty()) {
-		// logger.debug("************SORT BY**************");
-		// Set<Integer> keyset = sortBy.keySet();
-		// for (Integer integer : keyset) {
-		// logger.debug(integer + " " + sortBy.get(integer));
-		// }
-		// long sortStartTime = System.currentTimeMillis();
-		// Collections.sort(lines, new CaseReportLineComparator(sortBy));
-		// long sortEndTime = System.currentTimeMillis();
-		// logger.info("Sorting lines finished in: " + ((sortEndTime -
-		// sortStartTime) / 1000) + " Seconds");
-		// }
 		logger.debug("Reduced Lines: " + lines.size());
 
 		QACasesReportPage result = new QACasesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);

@@ -17,6 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="detail" column="detail" />
 		<result property="assignedTo" column="assigned_to" />
 		<result property="effectiveTime" column="effective_time" typeHandler="CalendarTypeHandler"/>
+		<result property="lastStatusChanged" column="last_status_change" typeHandler="CalendarTypeHandler"/>
 		<result property="assignmentEditor" column="assignment_editor" />
 		<result property="assignmentDate" column="assignment_date" typeHandler="CalendarTypeHandler"/>
 		<association property="dispositionStatus" column="disposition_status_uid"
