@@ -56,7 +56,7 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
@@ -73,7 +73,6 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataConCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
-import java.util.HashSet;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -166,6 +165,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
     // INTERNAL
     private static boolean debug = false; // :DEBUG:
     private static boolean debugDump = false; // :DEBUG: save to files
+    private static boolean debugDumpCore = false;
     private boolean usesRf2B = false;
 
     static {
@@ -180,6 +180,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         if (System.getProperties().get("SnorocketDebugCore") != null
                 && System.getProperties().get("SnorocketDebugCore").toString().toLowerCase().startsWith("t")) {
             au.csiro.snorocket.core.Snorocket.DEBUG_DUMP = true;
+            debugDumpCore = true;
         }
     }
 
@@ -407,8 +408,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     }
                 }
 
-                dumpSnoCon(cEditSnoCons, "SnoConEdit_RawNid.txt", 1);
-                dumpSnoRel(cEditSnoRels, "SnoRelEdit_RawNid.txt", 1);
+                // dumpSnoCon(cEditSnoCons, "SnoConEdit_RawNid.txt", 1);
+                // dumpSnoRel(cEditSnoRels, "SnoRelEdit_RawNid.txt", 1);
 
                 dumpSnoCon(cEditSnoCons, "SnoConEditData_full.txt", 4);
                 dumpSnoRel(cEditSnoRels, "SnoRelEditData_full.txt", 4);
@@ -541,7 +542,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             gui.setProgressInfoLower("... can take 4 to 6 minutes ...");
             gui.setIndeterminate(true);
 
-            if (debugDump) {
+            if (debugDumpCore) {
                 ArrayList<SnoCon> dataCon = new ArrayList<SnoCon>();
                 ArrayList<SnoRel> dataRel = new ArrayList<SnoRel>();
                 ArrayList<SnoCon> dataRole = new ArrayList<SnoCon>();
@@ -671,8 +672,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
             System.gc();
 
             if (debugDump) {
-                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
-                dumpSnoRel(cRocketSnoRels, "SnoRelInferData_compare.txt", 5);
+                dumpSnoRel(cRocketSnoRels, "SnoRelRocketData_full.txt", 4);
+                dumpSnoRel(cRocketSnoRels, "SnoRelRocketData_compare.txt", 5);
             }
 
             // ** GUI: 4 GET CLASSIFIER PATH DATA **
@@ -729,8 +730,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 //            }
 
             if (debugDump) {
-                dumpSnoRel(cClassSnoRels, "SnoRelCPathData_full.txt", 4);
-                dumpSnoRel(cClassSnoRels, "SnoRelCPathData_compare.txt", 5);
+                dumpSnoRel(cClassSnoRels, "SnoRelBdbCPathData_full.txt", 4);
+                dumpSnoRel(cClassSnoRels, "SnoRelBdbCPathData_compare.txt", 5);
             }
 
             // ** GUI: 4 -- done
@@ -819,7 +820,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 }
             });
         }
-        
+
 
         return Condition.CONTINUE;
     }
@@ -1002,8 +1003,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         rel_A = itA.next();
                     } else {
                         done_A = true;
+                        break;
                     }
-                    break;
                 }
 
                 // REMAINDER LIST_B GROUP 0 FOR C1
@@ -1018,8 +1019,8 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         rel_B = itB.next();
                     } else {
                         done_B = true;
+                        break;
                     }
-                    break;
                 }
 
                 // ** SEGMENT GROUPS **
@@ -1079,11 +1080,20 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
+                int rgNum = 0; // USED TO DETERMINE "AVAILABLE" ROLE GROUP NUMBERS
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual) {
-                        for (SnoRel sr_B : sg) {
-                            writeBackCurrent(sr_B, classPathNid, vTime);
+                        if (sg.get(0).group != 0) {
+                            rgNum = nextRoleGroupNumber(groupList_A, rgNum);
+                            for (SnoRel sr_B : sg) {
+                                sr_B.group = rgNum;
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
+                        } else {
+                            for (SnoRel sr_B : sg) {
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
                         }
                     }
                     countB_Total += groupList_A.countRels();
@@ -1191,6 +1201,31 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
         s.append("\r\n::: ");
 
         return s.toString();
+    }
+
+    private int nextRoleGroupNumber(SnoGrpList sgl, int gnum) {
+
+        int testNum = gnum + 1;
+        int sglSize = sgl.size();
+        int trial = 0;
+        while (trial <= sglSize) {
+
+            boolean exists = false;
+            for (int i = 0; i < sglSize; i++) {
+                if (sgl.get(i).get(0).group == testNum) {
+                    exists = true;
+                }
+            }
+
+            if (exists == false) {
+                return testNum;
+            } else {
+                testNum++;
+                trial++;
+            }
+        }
+
+        return testNum;
     }
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
@@ -1332,7 +1367,7 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                 isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
             }
 
-            snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
+            snorocketAuthorNid = tf.uuidToNative(Concept.SNOROCKET.getUids());
 
         } catch (Exception ex) {
             Logger.getLogger(SnorocketTask.class.getName()).log(Level.SEVERE, null, ex);
