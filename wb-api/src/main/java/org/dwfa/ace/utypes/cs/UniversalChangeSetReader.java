@@ -212,8 +212,8 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
     }
 
 	@Override
-	public int getConceptsImported() {
-		return conceptCount;
+	public boolean isContentMerged() {
+		return true;
 	}
 
 }

@@ -72,6 +72,8 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
 
+	private boolean fileContentMerged = false;
+
     public EConceptChangeSetReader() {
         super();
     }
@@ -202,7 +204,20 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 csrcOut.append(after.toLongString());
                 return after;
             } else {
-                return Concept.mergeAndWrite(eConcept);
+            	if (!fileContentMerged) {
+	                int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
+	                long lastChange = Concept.get(conceptNid).getData().getLastChange();
+
+	                Concept mergedConcept =  Concept.mergeAndWrite(eConcept);
+	                
+	                if (mergedConcept.getData().getLastChange() != lastChange) {
+	                	fileContentMerged = true;
+	                }
+	                
+	                return mergedConcept;
+            	} else {
+            		return Concept.mergeAndWrite(eConcept);
+            	}
             }
         } catch (Exception e) {
             AceLog.getEditLog().severe(
@@ -287,7 +302,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     }
 
 	@Override
-	public int getConceptsImported() {
-		return conceptCount;
+	public boolean isContentMerged() {
+		return fileContentMerged;
 	}
 }

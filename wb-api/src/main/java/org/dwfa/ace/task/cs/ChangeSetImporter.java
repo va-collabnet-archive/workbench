@@ -99,7 +99,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                 activity.setProgressInfoLower(readerSet.first().getChangeSetFile().getName());
 
                 File potentialImportCSFile = readerSet.first().getChangeSetFile();
-                if (readNext(readerSet) > 0) {
+                if (readNext(readerSet)) {
 					importedFileList.add(potentialImportCSFile);                
                 }
             }
@@ -206,9 +206,9 @@ public abstract class ChangeSetImporter implements ActionListener {
         return readerSet;
     }
 
-    public static int readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
+    public static boolean readNext(TreeSet<I_ReadChangeSet> readerSet) throws IOException, ClassNotFoundException {
         if (readerSet.isEmpty()) {
-            return 0;
+            return false;
         }
         I_TermFactory tf = Terms.get();
         if (tf.getTransactional()) {
@@ -253,7 +253,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             tf.commitTransaction();
         }
         
-        return first.getConceptsImported();
+        return first.isContentMerged();
     }
 
     public static void addAllChangeSetFiles(File rootFile, List<File> changeSetFiles, final String suffix) {
