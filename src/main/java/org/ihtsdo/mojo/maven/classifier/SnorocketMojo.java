@@ -528,10 +528,20 @@ public class SnorocketMojo extends AbstractMojo {
         // Typically, B is the SnoRocket Results Set (for newly inferred)
         Iterator<SnoRel> itA = snorelA.iterator();
         Iterator<SnoRel> itB = snorelB.iterator();
-        SnoRel rel_A = itA.next();
-        SnoRel rel_B = itB.next();
+        SnoRel rel_A = null;
         boolean done_A = false;
+        if (itA.hasNext()) {
+            rel_A = itA.next();
+        } else {
+            done_A = true;
+        }
+        SnoRel rel_B = null;
         boolean done_B = false;
+        if (itB.hasNext()) {
+            rel_B = itB.next();
+        } else {
+            done_B = true;
+        }
 
         logger.info("\r\n::: [SnorocketMojo]"
                 + "\r\n::: snorelA.size() = \t" + snorelA.size()
@@ -622,8 +632,8 @@ public class SnorocketMojo extends AbstractMojo {
                         rel_A = itA.next();
                     } else {
                         done_A = true;
+                        break;
                     }
-                    break;
                 }
 
                 // REMAINDER LIST_B GROUP 0 FOR C1
@@ -638,8 +648,8 @@ public class SnorocketMojo extends AbstractMojo {
                         rel_B = itB.next();
                     } else {
                         done_B = true;
+                        break;
                     }
-                    break;
                 }
 
                 // ** SEGMENT GROUPS **
@@ -699,11 +709,20 @@ public class SnorocketMojo extends AbstractMojo {
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
+                int rgNum = 0; // USED TO DETERMINE "AVAILABLE" ROLE GROUP NUMBERS
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual) {
-                        for (SnoRel sr_B : sg) {
-                            writeBackCurrent(sr_B, classPathNid, vTime);
+                        if (sg.get(0).group != 0) {
+                            rgNum = nextRoleGroupNumber(groupList_A, rgNum);
+                            for (SnoRel sr_B : sg) {
+                                sr_B.group = rgNum;
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
+                        } else {
+                            for (SnoRel sr_B : sg) {
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
                         }
                     }
                     countB_Total += groupList_A.countRels();
@@ -811,6 +830,31 @@ public class SnorocketMojo extends AbstractMojo {
         s.append("\r\n::: ");
 
         return s.toString();
+    }
+
+    private int nextRoleGroupNumber(SnoGrpList sgl, int gnum) {
+
+        int testNum = gnum + 1;
+        int sglSize = sgl.size();
+        int trial = 0;
+        while (trial <= sglSize) {
+
+            boolean exists = false;
+            for (int i = 0; i < sglSize; i++) {
+                if (sgl.get(i).get(0).group == testNum) {
+                    exists = true;
+                }
+            }
+
+            if (exists == false) {
+                return testNum;
+            } else {
+                testNum++;
+                trial++;
+            }
+        }
+
+        return testNum;
     }
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
