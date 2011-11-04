@@ -25,6 +25,8 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ExecutionException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -195,62 +197,74 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
         @Override
         protected void finished() {
-
-            JPanel wizardPanel = wizard.getWizardPanel();
-
-            Component[] components = wizardPanel.getComponents();
-            for (int i = 0; i < components.length; i++) {
-                wizardPanel.remove(components[i]);
-            }
-
-            wizardPanel.setLayout(new GridBagLayout());
-            GridBagConstraints c = new GridBagConstraints();
-            c.fill = GridBagConstraints.BOTH;
-
-            JPanel workflowPanel = config.getWorkflowPanel();
-            Component[] componentsPanel = workflowPanel.getComponents();
-            for (int i = 0; i < componentsPanel.length; i++) {
-                workflowPanel.remove(componentsPanel[i]);
-            }
-
-            // Add the Instructions
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weightx = 1.0;
-            c.weighty = 0;
-            c.anchor = GridBagConstraints.EAST;
-            wizardPanel.add(new JLabel(instruction), c);
-
-            // Add the Refset Purpose List ComboBox
-            c.gridx++;
-            c.gridy = 0;
-            I_GetConceptData parentList[] = new I_GetConceptData[6];
             try {
-                parentList[0] = Terms.get().getConcept(ConceptInactivationType.AMBIGUOUS_CONCEPT.getUuids());
-                parentList[1] = Terms.get().getConcept(ConceptInactivationType.DUPLICATE_CONCEPT.getUuids());
-                parentList[2] = Terms.get().getConcept(ConceptInactivationType.ERRONEOUS_CONCEPT.getUuids());
-                parentList[3] = Terms.get().getConcept(ConceptInactivationType.LIMITED_STATUS_CONCEPT.getUuids());
-                parentList[4] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
-                parentList[5] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
-            } catch (TerminologyException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                JPanel wizardPanel = wizard.getWizardPanel();
+
+                Component[] components = wizardPanel.getComponents();
+                for (int i = 0; i < components.length; i++) {
+                    wizardPanel.remove(components[i]);
+                }
+
+                wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+
+                if (config.getWorkflowPanel() != null) {
+                    JPanel workflowPanel = config.getWorkflowPanel();
+                    Component[] componentsPanel = workflowPanel.getComponents();
+                    for (int i = 0; i < componentsPanel.length; i++) {
+                        workflowPanel.remove(componentsPanel[i]);
+                    }
+                }else if (Terms.get().getActiveAceFrameConfig().getWorkflowPanel() != null){
+                    JPanel workflowPanel = Terms.get().getActiveAceFrameConfig().getWorkflowPanel();
+                    Component[] componentsPanel = workflowPanel.getComponents();
+                    for (int i = 0; i < componentsPanel.length; i++) {
+                        workflowPanel.remove(componentsPanel[i]);
+                    }
+                }
+                // Add the Instructions
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
+                wizardPanel.add(new JLabel(instruction), c);
+
+                // Add the Refset Purpose List ComboBox
+                c.gridx++;
+                c.gridy = 0;
+                I_GetConceptData parentList[] = new I_GetConceptData[6];
+                try {
+                    parentList[0] = Terms.get().getConcept(ConceptInactivationType.AMBIGUOUS_CONCEPT.getUuids());
+                    parentList[1] = Terms.get().getConcept(ConceptInactivationType.DUPLICATE_CONCEPT.getUuids());
+                    parentList[2] = Terms.get().getConcept(ConceptInactivationType.ERRONEOUS_CONCEPT.getUuids());
+                    parentList[3] = Terms.get().getConcept(ConceptInactivationType.LIMITED_STATUS_CONCEPT.getUuids());
+                    parentList[4] = Terms.get().getConcept(ConceptInactivationType.OUTDATED_CONCEPT.getUuids());
+                    parentList[5] = Terms.get().getConcept(ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getUuids());
+                } catch (TerminologyException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                refsetSelectionComboBox = new JComboBox(parentList);
+                wizardPanel.add(refsetSelectionComboBox, c);
+
+                // Add the processing buttons
+                c.weightx = 0.0;
+                setUpButtons(wizardPanel, c);
+
+                //empty thing
+                c.gridx = 0;
+                c.gridy = 1;
+                c.weightx = 0;
+                c.weighty = 1;
+                wizardPanel.add(new JPanel(), c);
+            } catch (TerminologyException ex) {
+                Logger.getLogger(SelectInactiveParent.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(SelectInactiveParent.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            refsetSelectionComboBox = new JComboBox(parentList);
-            wizardPanel.add(refsetSelectionComboBox, c);
-
-            // Add the processing buttons
-            c.weightx = 0.0;
-            setUpButtons(wizardPanel, c);
-
-            //empty thing
-            c.gridx = 0;
-            c.gridy = 1;
-            c.weightx = 0;
-            c.weighty = 1;
-            wizardPanel.add(new JPanel(), c);
         }
     }
 
