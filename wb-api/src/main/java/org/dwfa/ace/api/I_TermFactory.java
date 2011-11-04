@@ -407,7 +407,7 @@ public interface I_TermFactory {
     */
    void suspendChangeSetWriters();
 
-   public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
+   public void updateIsaCache(int cNid) throws Exception;
 
    int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 

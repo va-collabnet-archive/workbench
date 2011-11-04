@@ -9,6 +9,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
@@ -52,6 +53,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -146,10 +148,7 @@ public class BdbCommitManager {
       }
 
       try {
-    	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
-    	 for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
-    		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, igcd.getNid());
-    	 }
+    	  KindOfComputer.updateIsaCache(igcd.getNid());
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }
@@ -234,14 +233,9 @@ public class BdbCommitManager {
       LastChange.touch(c);
 
       try {
-    	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
-         if (frameConfig != null) {
-     	    for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
-     		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, c.getNid());
-     	    }
-         }
+    	  KindOfComputer.updateIsaCache(c.getNid());
       } catch (Exception ex) {
-         AceLog.getAppLog().alertAndLogException(ex);
+    	  AceLog.getAppLog().alertAndLogException(ex);
       }
 
       if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -437,10 +431,7 @@ public class BdbCommitManager {
                         if (getActiveFrame() != null) {
                            int cnid = uncommittedCNidItr.nid();
 
-                           for (IsaCoordinate isac :
-                                   getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-                              KindOfComputer.updateIsaCache(isac, cnid);
-                           }
+                           KindOfComputer.updateIsaCache(cnid);
 
                            Concept c = Concept.get(cnid);
 
@@ -451,12 +442,7 @@ public class BdbCommitManager {
                      NidBitSetItrBI uncommittedCNidItrNoChecks = uncommittedCNidsNoChecks.iterator();
 
                      while (uncommittedCNidItrNoChecks.next()) {
-                        if (getActiveFrame() != null) {
-                           for (IsaCoordinate isac :
-                                   getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-                              KindOfComputer.updateIsaCache(isac, uncommittedCNidItrNoChecks.nid());
-                           }
-                        }
+                         KindOfComputer.updateIsaCache(uncommittedCNidItrNoChecks.nid());
                      }
 
                      long   commitTime        = System.currentTimeMillis();
@@ -631,9 +617,7 @@ public class BdbCommitManager {
             Bdb.annotationConcepts.clear();
             KindOfComputer.reset();
 
-            for (IsaCoordinate isac : getActiveFrame().getViewCoordinate().getIsaCoordinates()) {
-               KindOfComputer.updateIsaCache(isac, c.getNid());
-            }
+            KindOfComputer.updateIsaCache(c.getNid());
 
             long          commitTime        = System.currentTimeMillis();
             NidSetBI      sapNidsFromCommit = c.setCommitTime(commitTime);

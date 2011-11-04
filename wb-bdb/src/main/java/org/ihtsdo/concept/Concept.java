@@ -230,12 +230,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
 
         try {
-            for (IsaCoordinate isac :
-                    Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates()) {
-                KindOfComputer.updateIsaCache(isac, this.getNid());
-            }
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            KindOfComputer.updateIsaCache(this.getNid());
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
@@ -548,12 +543,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
 
         try {
-            I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
-            if (frameConfig != null) {
-                for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
-                    KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, c.getNid());
-                }
-            }
+              KindOfComputer.updateIsaCache(c.getNid());
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }

@@ -1592,8 +1592,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    }
 
    @Override
-   public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception {
-      KindOfComputer.updateIsaCache(isaCoordinate, cNid);
+   public void updateIsaCache(int cNid) throws Exception {
+      KindOfComputer.updateIsaCache(cNid);
    }
 
    @Override
