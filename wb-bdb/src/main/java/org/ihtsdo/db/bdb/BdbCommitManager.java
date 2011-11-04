@@ -235,9 +235,11 @@ public class BdbCommitManager {
 
       try {
     	 I_ConfigAceFrame frameConfig = Terms.get().getActiveAceFrameConfig();
-     	 for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
+         if (frameConfig != null) {
+     	    for (IsaCoordinate loopIsaCoordinate : frameConfig.getViewCoordinate().getIsaCoordinates()) {
      		 KindOfComputer.updateIsaCacheUsingStatedView(loopIsaCoordinate, c.getNid());
-     	 }
+     	    }
+         }
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);
       }
