@@ -63,7 +63,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  * @author kec
  */
 public class ContradictionEditorFrame extends ComponentFrame implements PropertyChangeListener {
-    
+
     private static final long serialVersionUID = 1L;
     private static final Color ivoryColor = new Color(0xFFFFF0);
     private static final Color titleColor = new Color(255, 213, 162);
@@ -82,16 +82,16 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
     /* FindContradictionAction */
     private class FindContradictionAction extends AbstractAction {
-        
+
         private static final long serialVersionUID = 1L;
         private ContradictionEditorFrame frame;
-        
+
         public FindContradictionAction(ContradictionEditorFrame contradictionEditorFrame) {
             super("Run Contradiction Finder");
-            
+
             this.frame = contradictionEditorFrame;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent ae) {
             // START SEARCH
@@ -100,7 +100,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
             worker.execute();
         }
     }
-    
+
     public ContradictionEditorFrame(AceFrameConfig origConfig) throws Exception {
         super(new String[]{}, null);
         // Set the title for the frame
@@ -123,7 +123,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         TerminologyListModel batchListModel = new TerminologyListModel();
         batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
         createLeftComponent();
-        
+
         topSplit.setLeftComponent(resultsPane);
         topSplit.setRightComponent(conceptTabsPane);
         topSplit.setDividerLocation(350);
@@ -137,19 +137,19 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         });
         addWindowListener(new AceWindowActionListener());
     }
-    
+
     private void createLeftComponent() {
         /* Setting up resultsPane */
         JSplitPane progressIndicator = createProgressIndicator();
         JSplitPane conceptList = createConceptListPanel();
-        
+
         resultsPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
         resultsPane.setTopComponent(progressIndicator);
         resultsPane.setBottomComponent(conceptList);
         resultsPane.setDividerLocation(72);
         resultsPane.setEnabled(false);
     }
-    
+
     private JSplitPane createProgressIndicator() {
         // Setup Label
         JLabel statusTitle = new JLabel("Status", JLabel.CENTER);
@@ -180,14 +180,14 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
         // Setup conceptListPanel with label and progress panes
         JSplitPane progressIndicatorPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, statusLabel, progressPane);
-        
+
         progressIndicatorPane.setBackground(Color.WHITE);
         progressIndicatorPane.setDividerSize(3);
         progressIndicatorPane.setEnabled(false);
-        
+
         return progressIndicatorPane;
     }
-    
+
     private JSplitPane createConceptListPanel() {
         // Setup Label
         JLabel resultsTitle = new JLabel("Results", JLabel.CENTER);
@@ -202,20 +202,20 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
         // Setup conceptListPanel
         JSplitPane conceptListPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, resultsLabel, conceptList);
-        
+
         conceptListPane.setDividerSize(3);
         conceptListPane.setEnabled(false);
-        
+
         return conceptListPane;
     }
-    
+
     private void createRightComponent() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, TerminologyException {
         /* Setting up conceptTabsPane */
         c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1,
                 newFrameConfig, LINK_TYPE.UNLINKED,
                 conceptTabsPane, 1, "plugins/contradiction");
         conceptTabsPane.add(c1Panel);
-        
+
         arena = new Arena(newFrameConfig, new File("arena/adjudicate.mxe"));
         arena.getEditor().setForAjudication(true);
         conceptTabsPane.addTab("arena",
@@ -225,11 +225,11 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         this.addWindowListener(new OpenFramesWindowListener(this, this.cfb));
         this.setBounds(getDefaultFrameSize());
     }
-    
+
     public ConceptPanel getC1Panel() {
         return c1Panel;
     }
-    
+
     public Configuration getFrameConfig() {
         return config;
     }
@@ -257,7 +257,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     @Override
     public void addInternalFrames(JMenu menu) {
     }
-    
+
     void selectTab(int hostIndex) {
         conceptTabsPane.setSelectedIndex(0);
     }
@@ -287,7 +287,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
     /* SelectionListener */
     private class SelectionListener implements ListSelectionListener {
-        
+
         @Override
         public void valueChanged(ListSelectionEvent lse) {
             int selectedIndex = batchConceptList.getSelectedIndex();
@@ -301,25 +301,29 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
 
     /* NewAdjudicatorFrame */
     public class NewAdjudicatorFrame implements ActionListener {
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                MarshalledObject<I_ConfigAceFrame> marshalledFrame =
-                        new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
-                AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
-                newFrameConfig.setDbConfig(AceConfig.config.getActiveConfig().getDbConfig());
-                newFrameConfig.setWorker(AceConfig.config.getActiveConfig().getWorker());
+                I_ConfigAceFrame activeConfig = AceConfig.config.getActiveConfig();
+                if (activeConfig != null) {
+                    MarshalledObject<I_ConfigAceFrame> marshalledFrame =
+                            new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
+                    AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
+                    newFrameConfig.setAceFrame(((AceFrameConfig) activeConfig).getAceFrame());
+                    newFrameConfig.setDbConfig(activeConfig.getDbConfig());
+                    newFrameConfig.setWorker(activeConfig.getWorker());
 
-                ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
-                newFrame.setVisible(true);
+                    ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
+                    newFrame.setVisible(true);
+                }
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
-            
+
         }
     }
-    
+
     @Override
     public JMenuItem[] getNewWindowMenu() {
         if (ACE.editMode) {
@@ -329,7 +333,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         }
         return new JMenuItem[]{};
     }
-    
+
     public TerminologyList getBatchConceptList() {
         return batchConceptList;
     }
@@ -339,50 +343,47 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         progressBar.setStringPainted(true);
         progressBar.setString(string);
     }
-    
+
     public void setProgressIndeterminate(boolean b) {
         progressBar.setIndeterminate(b);
     }
-    
+
     public void setProgressValue(int i) {
         progressBar.setValue(i);
     }
-    
+
     public void addStopActionListener(ActionListener stopListener) {
-        stopButton.addActionListener(stopListener);        
+        stopButton.addActionListener(stopListener);
     }
-    
+
     public void setProgressMaximum(int totalConceptCount) {
         progressBar.setMaximum(totalConceptCount);
     }
-    
+
     public long getProgressMaximum() {
         return progressBar.getMaximum();
     }
-    
+
     public I_ConfigAceFrame getActiveFrameConfig() {
         return newFrameConfig;
     }
-    
+
     public void removeStopActionListener(ActionListener stopListener) {
         stopButton.removeActionListener(stopListener);
     }
-    
+
     public void enableStopButton(boolean show) {
         stopButton.setEnabled(show);
     }
-    
-       @Override
+
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("commit")) {
-
         } else if (evt.getPropertyName().equals("commitEnabled")) {
-
         } else if (evt.getPropertyName().equals("lastViewed")) {
-
         } else if (evt.getPropertyName().equals("uncommitted")) {
             // Nothing to do...
-        } 
+        }
     }
 
     private void doWindowActivation() {
@@ -405,7 +406,6 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         }
 
         public void windowClosing(WindowEvent e) {
-
         }
 
         public void windowDeactivated(WindowEvent e) {
@@ -420,7 +420,5 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         public void windowOpened(WindowEvent e) {
             doWindowActivation();
         }
-
     }
-
 }
