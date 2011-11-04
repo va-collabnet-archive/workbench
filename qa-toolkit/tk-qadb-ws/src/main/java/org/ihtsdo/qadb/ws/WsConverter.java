@@ -259,11 +259,12 @@ public class WsConverter {
 		result.setDispositionAnnotation(qaCase.getDispositionAnnotation());
 		result.setIsActive(qaCase.isActive());
 		result.setEffectiveTime(qaCase.getEffectiveTime());
+		result.setLastStatusChanged(qaCase.getLastStatusChanged());
 		result.setAssignedTo(qaCase.getAssignedTo());
 		
 		Component component = new Component();
 		component.setComponentUuid(qaCase.getComponentUuid().getComponentUuid());
-		result.setComponent(component );
+		result.setComponent(component);
 		result.setPathUuid(qaCase.getPathUuid());
 		result.setDatabaseUuid(qaCase.getDatabaseUuid());
 		result.setDetail(qaCase.getDetail());
