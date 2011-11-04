@@ -174,9 +174,10 @@ public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 //			File rf2FullOutputFolder=new File(outputFolder+ "/" + getFullOutputFolder() );
 //			File rf2OutputRelationships=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(),  FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
 //			File rf2OutputRelationships=getFullOutputFile( rf2FullOutputFolder.getAbsolutePath(), FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
-			File rf2OutputRelationshipsReassign=new File(exportedSnapshotFile,"outputRF2RelationshipReassigned.txt");
-			File outputUUIDsToAssign=new File(exportedSnapshotFile,"outputUUIDsToAssign.txt");
-			File outputDifferences=new File(exportedSnapshotFile,"outputDifferences.txt");
+			File expSnapFile=new File(exportedSnapshotFile);
+			File rf2OutputRelationshipsReassign=new File(expSnapFile.getParentFile().getAbsolutePath(),"outputRF2RelationshipReassigned.txt");
+			File outputUUIDsToAssign=new File(expSnapFile.getParentFile().getAbsolutePath(),"outputUUIDsToAssign.txt");
+			File outputDifferences=new File(expSnapFile.getParentFile().getAbsolutePath(),"outputDifferences.txt");
 
 			RF2RelsIDRetrieveImpl rIdReassign=new RF2RelsIDRetrieveImpl(sortedSnapPreviousfile, sortedSnapExportedfile,
 					rf2OutputRelationshipsReassign, outputUUIDsToAssign, outputDifferences);
