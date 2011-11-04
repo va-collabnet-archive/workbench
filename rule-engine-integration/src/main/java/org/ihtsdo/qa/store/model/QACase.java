@@ -20,6 +20,16 @@ public class QACase extends ViewPointSpecificObject {
 	private String assignmentEditor;
 	private Calendar assignmentDate;
 	private Calendar effectiveTime;
+	private Calendar lastChangedState;
+	
+	public Calendar getLastChangedState() {
+		return lastChangedState;
+	}
+
+	public void setLastChangedState(Calendar lastChangedState) {
+		this.lastChangedState = lastChangedState;
+	}
+
 	private List<QaCaseComment> comments;
 
 	public String getAssignmentEditor() {

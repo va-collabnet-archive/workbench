@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -343,9 +342,20 @@ public class QAResultsBrowser extends JPanel {
 					}
 					row.add(rowCategory);
 					row.add(line.getRule().getSeverity());
-					row.add(line.getStatusCount().get(true));
+					Integer openStatusCount = line.getStatusCount().get(true);
+					row.add(openStatusCount);
+					int cleardCount = 0;
 					for (DispositionStatus loopStatus : dispositionStatuses) {
-						row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+						if(loopStatus.getName().equalsIgnoreCase("Cleared")){
+							cleardCount = line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid());
+						}
+					}
+					for (DispositionStatus loopStatus : dispositionStatuses) {
+						if(loopStatus.getName().equalsIgnoreCase("not clear")){
+							row.add(openStatusCount - cleardCount);
+						}else{
+							row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+						}
 					}
 					row.add(line.getStatusCount().get(false));
 					if (line.getLastExecutionTime() != null) {

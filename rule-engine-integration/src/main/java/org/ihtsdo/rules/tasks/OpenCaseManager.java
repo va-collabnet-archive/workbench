@@ -18,6 +18,7 @@ package org.ihtsdo.rules.tasks;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
