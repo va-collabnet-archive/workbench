@@ -25,7 +25,8 @@ public abstract class RF2ArtifactPostExportAbst {
 		RF2_DESCRIPTION(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8},"sct2_Description_SUFFIX-en_INT"),
 		RF2_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_Relationship_SUFFIX_INT"), 
 		RF2_STATED_RELATIONSHIP(new int[]{0,1},0,new Integer[]{2,3,4,5,6,7,8,9},"sct2_StatedRelationship_SUFFIX_INT"), 
-		RF2_IDENTIFIER(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8,9},"sct2_Identifier_SUFFIX_INT"),
+		RF2_IDENTIFIER(new int[]{1,2},1,new Integer[]{3,4,5},"sct2_Identifier_SUFFIX_INT"),
+		RF2_COMPATIBILITY_IDENTIFIER(new int[]{1,2},1,new Integer[]{5},"xres2_Identifier_SUFFIX_INT"),
 		RF2_TEXTDEFINITION(new int[]{0,1},0,new Integer[]{2,4,5,6,7,8},"sct2_TextDefinition_SUFFIX-en_INT"),
 		RF2_LANGUAGE_REFSET(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_LanguageSUFFIX-en_INT"), 
 		RF2_ATTRIBUTE_VALUE(new int[]{0,1},0,new Integer[]{2,4,5,6},"der2_cRefset_AttributeValueSUFFIX_INT"),
@@ -66,49 +67,66 @@ public abstract class RF2ArtifactPostExportAbst {
 	};
 
 	public File getPreviousFile(String rf2FullFolder,FILE_TYPE fType) throws Exception {
-
-		RF2FileRetrieve RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
+		RF2FileRetrieve RF2fRetrieve=null;
+		AuxiliaryFilesRetrieve AuxFileRetrieve=null;
 		String retFile=null;
 		switch (fType){
 		case RF2_CONCEPT:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getConceptFile();
 			break;
 		case RF2_DESCRIPTION:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getDescriptionFile();
 			break;
-		case RF2_RELATIONSHIP:
+		case RF2_RELATIONSHIP:		
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getRelationshipFile();
 			break; 
 		case RF2_STATED_RELATIONSHIP:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getStatedRelationshipFile();
 			break; 
 		case RF2_IDENTIFIER:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getIdentifierFile();
 			break; 
-		case RF2_TEXTDEFINITION:
+		case RF2_TEXTDEFINITION:		
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getTextDefinitionFile();
 			break;
 		case RF2_LANGUAGE_REFSET:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getLanguageFile();
 			break; 
 		case RF2_ATTRIBUTE_VALUE:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getAttributeValueFile();
 			break;
 		case RF2_SIMPLE_MAP:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getSimpleMapFile();
 			break;
 		case RF2_SIMPLE:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getRefsetSimpleFile();
 			break;
 		case RF2_ASSOCIATION:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getAssociationFile();
 			break;
-		case RF2_QUALIFIER:
-			retFile=RF2fRetrieve.getQualifierFile();
-			break; 
 		case RF2_ICD9_MAP:
+			RF2fRetrieve = new RF2FileRetrieve(rf2FullFolder);
 			retFile=RF2fRetrieve.getICD9CrossMapFile();
 			break;
+		case RF2_QUALIFIER:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getQualifierFile();
+			break; 
+		case RF2_COMPATIBILITY_IDENTIFIER:
+			AuxFileRetrieve = new AuxiliaryFilesRetrieve(rf2FullFolder);
+			retFile=AuxFileRetrieve.getAssociationAuxiliaryFile();
+			break; 
 	
 		}
 		if (retFile==null){

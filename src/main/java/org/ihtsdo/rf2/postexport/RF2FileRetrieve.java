@@ -3,223 +3,303 @@ package org.ihtsdo.rf2.postexport;
 import java.io.File;
 
 public class RF2FileRetrieve {
-	private static final String TERMINOLOGY_FOLDER ="Terminology";
-	private static final String REFSET_FOLDER = "Refset";
-	private static final String ATTRIBUTEVALUE_FILENAME_PART = "AttributeValue";
-	private static final Object CONTENT_FOLDER = "Content";
-	private static final String END_FILE = ".txt";
-	private static final String ASSOCIATION_FILENAME_PART = "AssociationReference";
-	private static final Object LANGUAGE_FOLDER = "Language";
-	private static final String LANGUAGE_FILENAME_PART = "LanguageFull";
-	private static final Object CROSSMAP_FOLDER = "CrossMap";
-	private static final String SIMPLEMAP_FILENAME_PART = "SimpleMapFull";
-	private static final String ICD9MAP_FILENAME_PART = "ICD9CMEquivalence";
-	private static final String CONCEPT_FILENAME_PART = "Concept_";
-	private static final String DESCRIPTION_FILENAME_PART = "Description_";
-	private static final String RELATIONSHIP_FILENAME_PART = "_Relationship_";
-	private static final String STATEDRELATIONSHIP_FILENAME_PART = "StatedRelationship_";
-	private static final String QUALIFIER_FILENAME_PART = "Qualifier";
-	private static final String REFSETSIMPLE_FILENAME_PART = "Refset_Simple";
-	private static final String TEXTDEFINITION_FILENAME_PART = "TextDefinition";
-	private static final String IDENTIFIER_FILENAME_PART = "Identifier_";
-	
 	private String releaseFolder;
-	private String conceptFile;
-	private String descriptionFile;
-	private String relationshipFile;
-	private String qualifierFile;
-	private String attributeValueFile;
-	private String simpleMapFile;
-	private String associationFile;
-	private String languageFile;
-	private String refsetSimpleFile;
-	private String ICD9CrossMapFile;
-	private String statedRelationshipFile;
-	private String textDefinitionFile;
-	private String identifierFile;
-	
+
+	private String conceptFile = "";
+	private String descriptionFile = "";
+	private String relationshipFile = "";
+	private String qualifierFile = "";
+	private String attributeValueFile = "";
+	private String simpleMapFile = "";
+	private String associationFile = "";
+	private String languageFile = "";
+	private String identifierFile = "";
+	private String refsetSimpleFile = "";
+	private String ICD9CrossMapFile = "";
+	private String statedRelationshipFile = "";
+	private String textDefinitionFile = "";
+	private String refinabilityFile = "";
+	private String descriptionTypeFile = "";
+	private String refsetDescriptorFile = "";
+	private String moduleDependencyFile = "";
+	/* Snapshot files */
+	private String snapshotConceptFile = "";
+	private String snapshotDescriptionFile = "";
+	private String snapshotRelationshipFile = "";
+	private String snapshotQualifierFile = "";
+	private String snapshotAttributeValueFile = "";
+	private String snapshotSimpleMapFile = "";
+	private String snapshotAssociationFile = "";
+	private String snapshotLanguageFile = "";
+	private String snapshotIdentifierFile = "";
+	private String snapshotRefsetSimpleFile = "";
+	private String snapshotICD9CrossMapFile = "";
+	private String snapshotStatedRelationshipFile = "";
+	private String snapshotTextDefinitionFile = "";
+	private String snapshotRefinabilityFile = "";
+	private String snapshotDescriptionTypeFile = "";
+	private String snapshotRefsetDescriptorFile = "";
+	private String snapshotModuleDependencyFile = "";
+
+	private String crossMapICD9TgtAuxRF2File = "";
+	private String crossMapICDOTgtAuxRF2File = "";
+	private String compHistoryAuxiliaryFile = "";
+	private String associationAuxiliaryFile = "";
+	private String relationshipAuxiliaryFile = "";
+	private String statedRelationshipAuxiliaryFile = "";
+
+	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_int_";
+	private static final String END_FILE = ".txt";
+	private static final String ASSOCIATION_FILENAME_PART = "_crefset_associationreferencefull_int_";
+	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagefull-en_int_";
+	private static final String IDENTIFIER_FILENAME_PART = "_identifier_full_int_";
+	private static final String SIMPLEMAP_FILENAME_PART = "srefset_simplemapfull_int_";
+	private static final String CONCEPT_FILENAME_PART = "_concept_full_int_";
+	private static final String DESCRIPTION_FILENAME_PART = "_description_full-en_int_";
+	private static final String RELATIONSHIP_FILENAME_PART = "_relationship_full_int_";
+	private static final String STATEDRELATIONSHIP_FILENAME_PART = "_statedrelationship_full_int_";
+	private static final String REFSETSIMPLE_FILENAME_PART = "_refset_simplefull_int_";
+	private static final String TEXTDEFINITION_FILENAME_PART = "_textdefinition_full-en_int_";
+	private static final String DESCRIPTIONTYPE_FILENAME_PART = "_cirefset_descriptiontypefull_int_";
+	private static final String REFSETDESCRIPTOR_FILENAME_PART = "_ccirefset_refsetdescriptorfull_int_";
+	private static final String MODULEDEPENDENCY_FILENAME_PART = "_ssrefset_moduledependencyfull_int_";
+	private static final String ICD9_CROSSMAP_FILENAME_PART = "_iissscrefset_complexmapfull_int_";
 	public RF2FileRetrieve(String releaseFolder) throws Exception {
 		super();
 		this.releaseFolder = releaseFolder;
-		conceptFile="";
-		descriptionFile="";
-		relationshipFile="";
-		qualifierFile="";
-		attributeValueFile="";
-		simpleMapFile="";
-		associationFile="";
-		languageFile="";
-		refsetSimpleFile="";
-		
-		File rFolder=new File(this.releaseFolder);
-		if (rFolder.isDirectory()){
-			for (File folder:rFolder.listFiles()){
-				if (folder.isDirectory() && folder.getName().equals(TERMINOLOGY_FOLDER)){
-					getTerminologyComponents(folder);
-				}
-				if (folder.isDirectory() && folder.getName().equals(REFSET_FOLDER)){
-					getRefsetComponents(folder);
-				}
-			}
-		}
-		String strErr="";
-		if (conceptFile.equals("")){
-			strErr="Concept file not found.\n";
-		}
-		if (descriptionFile.equals("")){
-			strErr+="Description file not found.\n";
-		}
-
-		if (relationshipFile.equals("")){
-			strErr+="Relationship file not found.\n";
-		}
-
-		if (attributeValueFile.equals("")){
-			strErr+="Attribute value file not found.\n";
-		}
-
-		if (simpleMapFile.equals("")){
-			strErr+="Simple map file not found.\n";
-		}
-
-		if (associationFile.equals("")){
-			strErr+="Association file not found.\n";
-		}
-
-		if (languageFile.equals("")){
-			strErr+="Language file not found.\n";
-		}
-		if (!strErr.equals("")){
-			throw new Exception ("Errors in RF2 retrive file: " + strErr);
-		}
-		
+		File rf = new File(releaseFolder);
+		getFiles(rf);
 	}
-	private void getRefsetComponents(File folder) {
-		for (File childFolder :folder.listFiles())		{
-			if (childFolder.isDirectory() && childFolder.getName().equals(CONTENT_FOLDER)){
-				for (File component:childFolder.listFiles()){
-					if (component.getName().indexOf(ATTRIBUTEVALUE_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						attributeValueFile=component.getAbsolutePath();
-					}
-					if (component.getName().indexOf(ASSOCIATION_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						associationFile=component.getAbsolutePath();
-					}
-					if (component.getName().indexOf(REFSETSIMPLE_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						refsetSimpleFile=component.getAbsolutePath();
-					}
-				}
-			}
-			if (childFolder.isDirectory() && childFolder.getName().equals(LANGUAGE_FOLDER)){
-				for (File component:childFolder.listFiles()){
-					if (component.getName().indexOf(LANGUAGE_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						languageFile=component.getAbsolutePath();
-					}
-				}
-			}
-			if (childFolder.isDirectory() && childFolder.getName().equalsIgnoreCase((String) CROSSMAP_FOLDER)){
-				for (File component:childFolder.listFiles()){
-					if (component.getName().indexOf(SIMPLEMAP_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						simpleMapFile=component.getAbsolutePath();
-					}
-					if (component.getName().indexOf(ICD9MAP_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-						ICD9CrossMapFile=component.getAbsolutePath();
+
+	private void getFiles(File releaseFolder2) {
+		File[] fileList = releaseFolder2.listFiles();
+		for (File file : fileList) {
+			if (file.isDirectory()) {
+				getFiles(file);
+			} else {
+				if(!file.isHidden() && file.getName().endsWith(END_FILE)){
+					if(file.getName().toLowerCase().contains(ATTRIBUTEVALUE_FILENAME_PART)){
+						attributeValueFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(ASSOCIATION_FILENAME_PART)){
+						associationFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(LANGUAGE_FILENAME_PART)){
+						languageFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(IDENTIFIER_FILENAME_PART)){
+						identifierFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SIMPLEMAP_FILENAME_PART)){
+						simpleMapFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(CONCEPT_FILENAME_PART)){
+						conceptFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(DESCRIPTION_FILENAME_PART)){
+						descriptionFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(RELATIONSHIP_FILENAME_PART)){
+						relationshipFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(STATEDRELATIONSHIP_FILENAME_PART)){
+						statedRelationshipFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(REFSETSIMPLE_FILENAME_PART)){
+						refsetSimpleFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(TEXTDEFINITION_FILENAME_PART)){
+						textDefinitionFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(DESCRIPTIONTYPE_FILENAME_PART)){
+						descriptionTypeFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(REFSETDESCRIPTOR_FILENAME_PART)){
+						refsetDescriptorFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(MODULEDEPENDENCY_FILENAME_PART)){
+						moduleDependencyFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(ICD9_CROSSMAP_FILENAME_PART)){
+						ICD9CrossMapFile = file.getAbsolutePath();
 					}
 				}
 			}
 		}
 	}
-	private void getTerminologyComponents(File folder) {
-		for (File component:folder.listFiles()){
-			if (component.getName().indexOf(CONCEPT_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				conceptFile=component.getAbsolutePath();
-			}
-			if (component.getName().indexOf(DESCRIPTION_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				descriptionFile=component.getAbsolutePath();
-			}
-			if (component.getName().indexOf(RELATIONSHIP_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				relationshipFile=component.getAbsolutePath();
-			}
-			if (component.getName().indexOf(STATEDRELATIONSHIP_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				statedRelationshipFile=component.getAbsolutePath();
-			}
-		
-			if (component.getName().indexOf(QUALIFIER_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				qualifierFile=component.getAbsolutePath();
-			}
-			if (component.getName().indexOf(TEXTDEFINITION_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				textDefinitionFile=component.getAbsolutePath();
-			}
-			if (component.getName().indexOf(IDENTIFIER_FILENAME_PART)>-1 && component.getName().toLowerCase().endsWith(END_FILE)){
-				identifierFile=component.getAbsolutePath();
-			}
-			
-		}
-	}
+
+
 	/**
 	 * @return the releaseFolder
 	 */
 	public String getReleaseFolder() {
 		return releaseFolder;
 	}
+
 	/**
 	 * @return the conceptFile
 	 */
 	public String getConceptFile() {
 		return conceptFile;
 	}
+
 	/**
 	 * @return the descriptionFile
 	 */
 	public String getDescriptionFile() {
 		return descriptionFile;
 	}
+
 	/**
 	 * @return the relationshipFile
 	 */
 	public String getRelationshipFile() {
 		return relationshipFile;
 	}
+
 	/**
 	 * @return the attributeValueFile
 	 */
 	public String getAttributeValueFile() {
 		return attributeValueFile;
 	}
+
 	/**
 	 * @return the simpleMapFile
 	 */
 	public String getSimpleMapFile() {
 		return simpleMapFile;
 	}
+
 	/**
 	 * @return the associationFile
 	 */
 	public String getAssociationFile() {
 		return associationFile;
 	}
+
 	/**
 	 * @return the languageFile
 	 */
 	public String getLanguageFile() {
 		return languageFile;
 	}
+
 	public String getQualifierFile() {
 		return qualifierFile;
 	}
+
 	public String getRefsetSimpleFile() {
 		return refsetSimpleFile;
 	}
+
 	public String getICD9CrossMapFile() {
 		return ICD9CrossMapFile;
 	}
+
 	public String getStatedRelationshipFile() {
 		return statedRelationshipFile;
 	}
+
 	public String getTextDefinitionFile() {
 		return textDefinitionFile;
 	}
+
+	public String getRefinabilityFile() {
+		return refinabilityFile;
+	}
+
+	public String getDescriptionTypeFile() {
+		return descriptionTypeFile;
+	}
+
+	public String getRefsetDescriptorFile() {
+		return refsetDescriptorFile;
+	}
+
+	public String getModuleDependencyFile() {
+		return moduleDependencyFile;
+	}
+
+	public String getSnapshotConceptFile() {
+		return snapshotConceptFile;
+	}
+
+	public String getSnapshotDescriptionFile() {
+		return snapshotDescriptionFile;
+	}
+
+	public String getSnapshotRelationshipFile() {
+		return snapshotRelationshipFile;
+	}
+
+	public String getSnapshotQualifierFile() {
+		return snapshotQualifierFile;
+	}
+
+	public String getSnapshotAttributeValueFile() {
+		return snapshotAttributeValueFile;
+	}
+
+	public String getSnapshotSimpleMapFile() {
+		return snapshotSimpleMapFile;
+	}
+
+	public String getSnapshotAssociationFile() {
+		return snapshotAssociationFile;
+	}
+
+	public String getSnapshotLanguageFile() {
+		return snapshotLanguageFile;
+	}
+
+	public String getSnapshotRefsetSimpleFile() {
+		return snapshotRefsetSimpleFile;
+	}
+
+	public String getSnapshotICD9CrossMapFile() {
+		return snapshotICD9CrossMapFile;
+	}
+
+	public String getSnapshotStatedRelationshipFile() {
+		return snapshotStatedRelationshipFile;
+	}
+
+	public String getSnapshotTextDefinitionFile() {
+		return snapshotTextDefinitionFile;
+	}
+
+	public String getSnapshotRefinabilityFile() {
+		return snapshotRefinabilityFile;
+	}
+
+	public String getSnapshotDescriptionTypeFile() {
+		return snapshotDescriptionTypeFile;
+	}
+
+	public String getSnapshotRefsetDescriptorFile() {
+		return snapshotRefsetDescriptorFile;
+	}
+
+	public String getSnapshotModuleDependencyFile() {
+		return snapshotModuleDependencyFile;
+	}
+
+	public String getCrossMapICD9TgtAuxRF2File() {
+		return crossMapICD9TgtAuxRF2File;
+	}
+
+	public String getCrossMapICDOTgtAuxRF2File() {
+		return crossMapICDOTgtAuxRF2File;
+	}
+
+	public String getCompHistoryAuxiliaryFile() {
+		return compHistoryAuxiliaryFile;
+	}
+
+	public String getAssociationAuxiliaryFile() {
+		return associationAuxiliaryFile;
+	}
+
+	public String getRelationshipAuxiliaryFile() {
+		return relationshipAuxiliaryFile;
+	}
+
 	public String getIdentifierFile() {
 		return identifierFile;
 	}
-	
+
+	public String getSnapshotIdentifierFile() {
+		return snapshotIdentifierFile;
+	}
+
+	public String getStatedRelationshipAuxiliaryFile() {
+		return statedRelationshipAuxiliaryFile;
+	}
 }
