@@ -88,6 +88,7 @@ import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
+import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.helper.time.TimeHelper;
 
@@ -150,6 +151,10 @@ public class WorkbenchRunner {
                         Boolean.FALSE);
                 EConceptChangeSetWriter.validateAfterWrite =
                         (Boolean) jiniConfig.getEntry(this.getClass().getName(), "validateAfterWrite", Boolean.class,
+                        Boolean.FALSE);
+                
+                BatchActionEditorPanel.batchEditingDisabled = 
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "batchEditingDisabled", Boolean.class,
                         Boolean.FALSE);
             } else {
                 wbConfigFile = new File("config/wb.config");

@@ -66,6 +66,8 @@ import org.ihtsdo.util.swing.GuiUtil;
  */
 public final class BatchActionEditorPanel extends javax.swing.JPanel {
 
+    public static boolean batchEditingDisabled = false;
+
     private final ACE ace;
     private final TerminologyStoreDI ts;
     private final TerminologyList batchConceptList;
@@ -99,6 +101,9 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     }
 
     public void updateExistingLists(ListModel termList) {
+        if (batchEditingDisabled) {
+            return;
+        }
         existingParents = new ArrayList<RelationshipVersionBI>();
         existingRefsets = new ArrayList<ComponentVersionBI>();
         existingRoles = new ArrayList<RelationshipVersionBI>();
