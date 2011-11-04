@@ -355,6 +355,17 @@ public class BatchQACheck extends AbstractMojo {
 			e.printStackTrace();
 			throw e;
 		} finally {
+			// Add batch duplicate fsn rule
+//			rulePw.print("d4d60d70-0733-11e1-be50-0800200c9a66" + "\t");
+//			rulePw.print("FSN should be unique (batch check)" + "\t");
+//			rulePw.print("FSN should be unique (batch check)" + "\t");
+//			System.out.println("*+*+ " + "d4d60d70-0733-11e1-be50-0800200c9a66" + " - " + "FSN should be unique (batch check)" + " - Default");
+//			rulePw.print("f9545a20-12cf-11e0-ac64-0800200c9a66" + "\t");
+//			rulePw.print("Batch Rule" + "\t");
+//			rulePw.print("Batch Rule" + "\t");
+//			rulePw.print("" + "\t");
+//			rulePw.print(4);
+//			rulePw.println();
 			executionXmlOs.flush();
 			executionXmlOs.close();
 			rulePw.flush();

@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +46,7 @@ public class PerformQA implements I_ProcessConcepts {
 	HashMap<String,Long> traceElapsedTimes;
 	HashMap<String,Integer> traceCounts;
 	HashMap<String,Integer> uniqueFsnMap;
+	Set<Integer> duplicatesSet;
 
 	int fsnNid;
 	private String databaseUuid;
@@ -68,6 +71,7 @@ public class PerformQA implements I_ProcessConcepts {
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
 		uniqueFsnMap = new HashMap<String,Integer>();
+		duplicatesSet = new HashSet<Integer>();
 		try {
 			destRels = Terms.get().newIntSet();
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
@@ -112,33 +116,38 @@ public class PerformQA implements I_ProcessConcepts {
 					fsn = loopTuple.getText();
 				}
 			}
-			
+
 			if (uniqueFsnMap.containsKey(fsn)) {
-				ResultsItem r1 = new ResultsItem();
-				r1.setErrorCode(4);
-				r1.setMessage("FSN Duplicated:" + fsn);
-				r1.setRuleUuid("483f2cc0-cc1a-11df-bd3b-0800200c9a66");
-				r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-				List<ResultsItem> r1List = new ArrayList<ResultsItem>();
-				r1List.add(r1);
-				ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
-				tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-				tmpResults1.setResultsItems(r1List);
-				writeOutputFile(tmpResults1, loopConcept);
-				
+				if (!duplicatesSet.contains(loopConcept.getNid())) {
+					ResultsItem r1 = new ResultsItem();
+					r1.setErrorCode(4);
+					r1.setMessage("FSN Duplicated:" + fsn);
+					r1.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+					r1.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+					List<ResultsItem> r1List = new ArrayList<ResultsItem>();
+					r1List.add(r1);
+					ResultsCollectorWorkBench tmpResults1 = new ResultsCollectorWorkBench();
+					tmpResults1.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+					tmpResults1.setResultsItems(r1List);
+					writeOutputFile(tmpResults1, loopConcept);
+					duplicatesSet.add(loopConcept.getNid());
+				}
+
 				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(fsn));
-				ResultsItem r2 = new ResultsItem();
-				r2.setErrorCode(4);
-				r2.setMessage("FSN Duplicated:" + fsn);
-				r2.setRuleUuid("483f2cc0-cc1a-11df-bd3b-0800200c9a66");
-				r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
-				List<ResultsItem> r2List = new ArrayList<ResultsItem>();
-				r2List.add(r2);
-				ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
-				tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
-				tmpResults2.setResultsItems(r2List);
-				writeOutputFile(tmpResults2, duplicateConcept);
-				
+				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
+					ResultsItem r2 = new ResultsItem();
+					r2.setErrorCode(4);
+					r2.setMessage("FSN Duplicated:" + fsn);
+					r2.setRuleUuid("d4d60d70-0733-11e1-be50-0800200c9a66");
+					r2.setSeverity("f9545a20-12cf-11e0-ac64-0800200c9a66");
+					List<ResultsItem> r2List = new ArrayList<ResultsItem>();
+					r2List.add(r2);
+					ResultsCollectorWorkBench tmpResults2 = new ResultsCollectorWorkBench();
+					tmpResults2.setAlertList(new ArrayList<AlertToDataConstraintFailure>());
+					tmpResults2.setResultsItems(r2List);
+					writeOutputFile(tmpResults2, duplicateConcept);
+					duplicatesSet.add(duplicateConcept.getNid());
+				}
 			} else {
 				uniqueFsnMap.put(fsn, loopConcept.getNid());
 			}
