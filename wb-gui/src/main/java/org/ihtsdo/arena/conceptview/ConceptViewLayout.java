@@ -179,7 +179,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
             Collection<? extends RelationshipChronicleBI> rgRels = rg.getRels();
 
-            if (rgRels.size() == rg.getCurrentRels().size()) {
+            if (rgRels.size() == rg.getAllCurrentRelVersions().size()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         conceptPanel.add(cpr, gbc);
@@ -197,7 +197,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpr.setHistoryCount(cpr.historyCount += rgc.getHistorySubpanelCount());
                     cpr.setTemplateCount(cpr.templateCount += rgc.getTemplateSubpanelCount());
                 }
-            } else if (rg.getCurrentRels().isEmpty()) {
+            } else if (rg.getAllCurrentRelVersions().isEmpty()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
                         conceptPanel.add(cpr, gbc);
@@ -491,8 +491,16 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     gbc.gridy++;
 
                     I_TermFactory tf = Terms.get();
-                    ConAttrAnalogBI cav = (ConAttrAnalogBI) cv.getConAttrsActive();
-
+                    ConAttrAnalogBI cav = null;
+                    try {
+                        cav = (ConAttrAnalogBI) cv.getConAttrsActive();
+                    } catch (ContraditionException ex) {
+                        Collection<? extends ComponentVersionBI> versions = cv.getConAttrs().getVersions(cv.getViewCoordinate());
+                        if (!versions.isEmpty()) {
+                            removeContradictions(versions);
+                            cav = (ConAttrAnalogBI) versions.iterator().next();
+                        }
+                    }
                     if (cav == null) {
                         cav = (ConAttrAnalogBI) cv.getConAttrs().getVersion(coordinate.getVcWithAllStatusValues());
                     }
@@ -501,7 +509,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         if (cv.getChronicle().getConAttrs() != null) {
                             cav = (ConAttrAnalogBI) cv.getChronicle().getConAttrs().getPrimordialVersion();
                             cac = getConAttrComponent((ConAttrAnalogBI) cav, cpe);
-                            ArrayList<Integer> sapsForConflict = new ArrayList<Integer>();
+                            List<Integer> sapsForConflict = new ArrayList<Integer>();
                             for (ConAttrVersionBI v: cv.getChronicle().getConAttrs().getVersions()) {
                                 sapsForConflict.add(v.getSapNid());
                             }
@@ -846,7 +854,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
     }
 
-    private void removeContradictions(List<? extends ComponentVersionBI> componentVersions) {
+    private void removeContradictions(Collection<? extends ComponentVersionBI> componentVersions) {
         List<ComponentVersionBI> extraVersions = new ArrayList<ComponentVersionBI>();
 
         for (ComponentVersionBI cv : componentVersions) {
@@ -1308,7 +1316,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         HashSet<Integer> activeRelIds = new HashSet();
 
-        for (RelationshipVersionBI rv : group.getCurrentRels()) {
+        for (RelationshipVersionBI rv : group.getAllCurrentRelVersions()) {
             activeRelIds.add(rv.getNid());
 
             DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
