@@ -765,7 +765,10 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public ViewCoordinate getViewCoordinate() {
-        return config.getViewCoordinate();
+        ViewCoordinate vc = new ViewCoordinate(config.getViewCoordinate());
+        vc.setContradictionManager(getConflictResolutionStrategy());
+        vc.setPrecedence(getPrecedence());
+        return vc;
     }
 
     public VetoableChangeSupport getVetoSupport() {
@@ -933,7 +936,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public Precedence getPrecedence() {
-        return config.getPrecedence();
+        return Precedence.PATH;
     }
 
     public Map<Integer, Color> getPathColorMap() {

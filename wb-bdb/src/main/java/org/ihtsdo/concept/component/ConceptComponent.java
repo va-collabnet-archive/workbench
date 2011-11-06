@@ -635,7 +635,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
    public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
       boolean                       changed  = false;
-      Collection<? extends Version> versions = this.getVersions(vc);
+      Collection<? extends Version> versions = this.getVersions(vc.getVcWithAllStatusValues());
 
       if (ec.getEditPaths().length != 1) {
          throw new IOException("Edit paths != 1: " + ec.getEditPaths().length + " " + Arrays.asList(ec));
@@ -643,7 +643,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
       int pathNid = ec.getEditPaths()[0];
 
-      if (versions.size() == 1) {
+      if (versions.size() > 0) {
          for (Version cv : versions) {
             if (!cv.isBaselineGeneration() && (cv.getPathNid() != pathNid)
                     && (cv.getTime() != Long.MAX_VALUE)) {
