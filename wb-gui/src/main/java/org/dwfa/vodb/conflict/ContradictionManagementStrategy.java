@@ -50,6 +50,11 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
         this.config = config;
     }
 
+    @Override
+    public I_ConfigAceFrame getConfig() {
+        return this.config;
+    }
+
     /**
      * Base implementation of the method that determines if a concept is in
      * conflict.
@@ -108,10 +113,6 @@ public abstract class ContradictionManagementStrategy implements I_ManageContrad
     @Override
     public String toString() {
         return getDisplayName();
-    }
-
-    private I_ConfigAceFrame getConfig() throws TerminologyException, IOException {
-        return Terms.get().getActiveAceFrameConfig();
     }
 
     @Override

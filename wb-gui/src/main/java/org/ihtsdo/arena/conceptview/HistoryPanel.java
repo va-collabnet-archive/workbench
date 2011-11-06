@@ -209,8 +209,6 @@ public class HistoryPanel {
       gbc.weighty = 1.0;
       topHistoryPanel.add(versionScroller, gbc);
       versionScroller.setSize(otherWidth, view.getParent().getHeight() + 24 + insetAdjustment);
-      versionScroller.setBackground(versionPanel.getBackground());
-      versionScroller.setOpaque(true);
       versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
       versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
       versionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -444,7 +442,8 @@ public class HistoryPanel {
 
       // int yAdjust = -historyHeaderPanel.getHeight();
       next:
-      for (JCheckBox positionCheck : positionCheckMap.values()) {
+      for (PositionBI p : view.getPositionOrderedSet()) {
+         JCheckBox positionCheck = positionCheckMap.get(p);
          PositionBI position = checkPositionMap.get(positionCheck);
 
          if (position == null) {
@@ -579,7 +578,6 @@ public class HistoryPanel {
 
          JCheckBox rowCheck      = view.getRowToPathCheckMap().get(row);
          JCheckBox positionCheck = positionCheckMap.get(p);
-
          positionCheck.setLocation(locX, rowCheck.getLocation().y);
          positionCheck.setSize(positionCheck.getPreferredSize());
          positionCheck.setToolTipText(p.toString());
@@ -588,7 +586,7 @@ public class HistoryPanel {
             locX += positionCheck.getWidth();
          }
       }
-
+      historyHeaderPanel.revalidate();
       hxWidth = locX;
    }
 

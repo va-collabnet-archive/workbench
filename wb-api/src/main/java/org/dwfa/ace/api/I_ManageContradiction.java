@@ -35,6 +35,8 @@ import org.ihtsdo.tk.api.ContradictionManagerBI;
 public interface I_ManageContradiction extends ContradictionManagerBI, Serializable {
     
     void setConfig(I_ConfigAceFrame config);
+    
+    I_ConfigAceFrame getConfig();
     /**
      * Method to get the display name of this conflict resolution strategy.
      * Note that this is intended to be something meaningful to an end user
@@ -42,6 +44,7 @@ public interface I_ManageContradiction extends ContradictionManagerBI, Serializa
      * 
      * @return The display name of this conflict resolution strategy
      */
+    @Override
     String getDisplayName();
 
     /**
@@ -52,6 +55,7 @@ public interface I_ManageContradiction extends ContradictionManagerBI, Serializa
      * 
      * @return The display name of this conflict resolution strategy
      */
+    @Override
     String getDescription();
 
     /**

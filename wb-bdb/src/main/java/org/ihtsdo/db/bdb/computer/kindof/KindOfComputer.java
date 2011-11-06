@@ -22,7 +22,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ManageContradiction;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -147,6 +150,14 @@ public class KindOfComputer {
 		I_GetConceptData concept = Terms.get().getConcept(cNid);
 		boolean isClassifierEdit = false;
 		for (IsaCoordinate loopCoordinate : isaCache.keySet()) {
+                    if (loopCoordinate.getContradictionMgr() instanceof I_ManageContradiction) {
+                        I_ManageContradiction cm = (I_ManageContradiction) loopCoordinate.getContradictionMgr();
+                        if (cm.getConfig() == null) {
+                            cm.setConfig(ACE.getAceConfig().getActiveConfig());
+                        }
+                        
+                    }
+                    
 			List<? extends I_RelTuple> inferredRels = concept.getSourceRelTuples(null, null, 
 					loopCoordinate.getViewPositionSet(), 
 					loopCoordinate.getPrecedence(), 
