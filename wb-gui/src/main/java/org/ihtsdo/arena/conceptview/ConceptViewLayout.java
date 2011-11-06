@@ -87,6 +87,7 @@ import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.dwfa.swing.SwingTask;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 
 /**
@@ -112,7 +113,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             new TreeSet(new PositionComparator());
     private Map<PathBI, Integer> pathRowMap = new ConcurrentHashMap<PathBI, Integer>();
     private CountDownLatch latch = new CountDownLatch(6);
-    private JPanel historyPanel = new JPanel(new GridBagLayout());
     private Lock dramsLock = new ReentrantLock();
     private Map<Integer, Collection<Integer>> componentCountForConflict = new TreeMap<Integer, Collection<Integer>>();
     private List<DragPanelDescription> activeDescriptionPanels;
@@ -144,6 +144,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private ConceptViewSettings settings;
     private Collection<RelGroupVersionBI> statedRelGroups;
     private List<? extends I_RelTuple> statedRels;
+    private JPanel conceptPanel;
 
     //~--- constructors --------------------------------------------------------
     public ConceptViewLayout(ConceptView conceptView, I_GetConceptData layoutConcept) throws IOException {
@@ -181,7 +182,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (rgRels.size() == rg.getCurrentRels().size()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
-                        cView.add(cpr, gbc);
+                        conceptPanel.add(cpr, gbc);
                         gbc.gridy++;
                         cprAdded = true;
                     }
@@ -189,7 +190,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
 
                     seperatorComponents.add(rgc);
-                    cView.add(rgc, gbc);
+                    conceptPanel.add(rgc, gbc);
                     gbc.gridy++;
                     cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
                     cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
@@ -199,7 +200,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             } else if (rg.getCurrentRels().isEmpty()) {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
-                        cView.add(cpr, gbc);
+                        conceptPanel.add(cpr, gbc);
                         gbc.gridy++;
                         cprAdded = true;
                     }
@@ -209,7 +210,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpr.getInactiveComponentPanels().add(rgc);
                     rgc.setVisible(relHistoryIsShown);
                     seperatorComponents.add(rgc);
-                    cView.add(rgc, gbc);
+                    conceptPanel.add(rgc, gbc);
                     gbc.gridy++;
                     cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
                     cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
@@ -219,7 +220,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             } else {
                 if (!rgRels.isEmpty()) {
                     if (!cprAdded) {
-                        cView.add(cpr, gbc);
+                        conceptPanel.add(cpr, gbc);
                         gbc.gridy++;
                         cprAdded = true;
                     }
@@ -227,7 +228,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     DragPanelRelGroup rgc = getRelGroupComponent(rg, cpr);
 
                     seperatorComponents.add(rgc);
-                    cView.add(rgc, gbc);
+                    conceptPanel.add(rgc, gbc);
                     gbc.gridy++;
                     cpr.setAlertCount(cpr.alertCount += rgc.getAlertSubpanelCount());
                     cpr.setRefexCount(cpr.refexCount += rgc.getRefexSubpanelCount());
@@ -375,7 +376,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 return null;
             }
 
-            memberRefsets = cv.getCurrentRefsetMembers();
+            memberRefsets = cv.getRefsetMembersActive();
 
             // Get active descriptions
             descriptions = layoutConcept.getDescriptionTuples(config.getAllowedStatus(), null,
@@ -443,30 +444,50 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     return;
                 }
 
+                
                 try {
-                    GridBagConstraints gbc = new GridBagConstraints();
+                    GridBagConstraints topGbc = new GridBagConstraints();
 
+                    topGbc.weightx = 1;
+                    topGbc.weighty = 0;
+                    topGbc.anchor = GridBagConstraints.NORTHWEST;
+                    topGbc.fill = GridBagConstraints.BOTH;
+                    topGbc.gridheight = 1;
+                    topGbc.gridwidth = 1;
+                    topGbc.gridx = 1;
+                    topGbc.gridy = 0;
+                    //cView.add(historyPanel, topGbc);
+                    topGbc.gridy++;
+                    topGbc.anchor = GridBagConstraints.NORTHWEST;
+                    topGbc.weightx = 1;
+                    topGbc.weighty = 0;
+                    topGbc.fill = GridBagConstraints.BOTH;
+                    conceptPanel = new JPanel(new GridBagLayout());
+                    cView.add(conceptPanel, topGbc);
+                    
+                    topGbc.gridy++;
+                    topGbc.weighty = 1;
+                    cView.add(new JPanel(), topGbc);
+                    
+                    if (stop) {
+                        return;
+                    }
+
+                    GridBagConstraints gbc = new GridBagConstraints();
                     gbc.weightx = 1;
                     gbc.weighty = 0;
                     gbc.anchor = GridBagConstraints.NORTHWEST;
                     gbc.fill = GridBagConstraints.BOTH;
                     gbc.gridheight = 1;
                     gbc.gridwidth = 1;
-                    gbc.gridx = 1;
+                    gbc.gridx = 0;
                     gbc.gridy = 0;
-                    cView.add(historyPanel, gbc);
-                    gbc.gridy++;
-                    gbc.anchor = GridBagConstraints.NORTHWEST;
-
-                    if (stop) {
-                        return;
-                    }
-
+                    
                     CollapsePanel cpe = new CollapsePanel("concept:", settings, prefMap.get(PanelSection.CONCEPT),
                             PanelSection.CONCEPT);
 
                     cpe.addPanelsChangedActionListener(pcal);
-                    cView.add(cpe, gbc);
+                    conceptPanel.add(cpe, gbc);
                     gbc.gridy++;
 
                     I_TermFactory tf = Terms.get();
@@ -514,7 +535,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                     cpe.setHistoryCount(cac.getHistorySubpanelCount());
                     cpe.setTemplateCount(0);
-                    cView.add(cac, gbc);
+                    conceptPanel.add(cac, gbc);
                     gbc.gridy++;
 
                     if (stop) {
@@ -540,7 +561,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                                     seperatorComponents.add(ce);
                                     cpe.addToggleComponent(ce);
-                                    cView.add(ce, gbc);
+                                    conceptPanel.add(ce, gbc);
                                     cpe.getRefexPanels().add(ce);
                                     gbc.gridy++;
                                     cpe.setAlertCount(cpe.alertCount += ce.getAlertSubpanelCount());
@@ -557,7 +578,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpd.setRefexCount(0);
                     cpd.setHistoryCount(inactiveDescriptions.size());
                     cpd.setTemplateCount(0);
-                    cView.add(cpd, gbc);
+                    conceptPanel.add(cpd, gbc);
                     gbc.gridy++;
 
                     for (DragPanelDescription dc : activeDescriptionPanels) {
@@ -567,7 +588,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                         seperatorComponents.add(dc);
                         cpd.addToggleComponent(dc);
-                        cView.add(dc, gbc);
+                        conceptPanel.add(dc, gbc);
                         gbc.gridy++;
                         cpd.setAlertCount(cpd.alertCount += dc.getAlertSubpanelCount());
                         cpd.setRefexCount(cpd.refexCount += dc.getRefexSubpanelCount());
@@ -588,7 +609,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cpd.getInactiveComponentPanels().add(dc);
                         cpd.getRetiredPanels().add(dc);
                         cpd.addToggleComponent(dc);
-                        cView.add(dc, gbc);
+                        conceptPanel.add(dc, gbc);
                         gbc.gridy++;
                         cpd.setAlertCount(cpd.alertCount += dc.getAlertSubpanelCount());
                         cpd.setRefexCount(cpd.refexCount += dc.getRefexSubpanelCount());
@@ -622,7 +643,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
 
                             if (!cprAdded) {
-                                cView.add(cpr, gbc);
+                                conceptPanel.add(cpr, gbc);
                                 gbc.gridy++;
                                 cprAdded = true;
                             }
@@ -630,7 +651,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             setShowConflicts(rc.getComponentVersion(), rc);
                             seperatorComponents.add(rc);
                             cpr.addToggleComponent(rc);
-                            cView.add(rc, gbc);
+                            conceptPanel.add(rc, gbc);
                             gbc.gridy++;
                             cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
                             cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
@@ -644,7 +665,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
 
                             if (!cprAdded) {
-                                cView.add(cpr, gbc);
+                                conceptPanel.add(cpr, gbc);
                                 gbc.gridy++;
                                 cprAdded = true;
                             }
@@ -655,7 +676,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             cpr.addToggleComponent(rc);
                             cpr.getInactiveComponentPanels().add(rc);
                             cpr.getRetiredPanels().add(rc);
-                            cView.add(rc, gbc);
+                            conceptPanel.add(rc, gbc);
                             gbc.gridy++;
                             cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
                             cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
@@ -671,7 +692,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
 
                             if (!cprAdded) {
-                                cView.add(cpr, gbc);
+                                conceptPanel.add(cpr, gbc);
                                 gbc.gridy++;
                                 cprAdded = true;
                             }
@@ -679,7 +700,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             setShowConflicts(rc.getComponentVersion(), rc);
                             seperatorComponents.add(rc);
                             cpr.addToggleComponent(rc);
-                            cView.add(rc, gbc);
+                            conceptPanel.add(rc, gbc);
                             gbc.gridy++;
                             cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
                             cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
@@ -693,7 +714,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
 
                             if (!cprAdded) {
-                                cView.add(cpr, gbc);
+                                conceptPanel.add(cpr, gbc);
                                 gbc.gridy++;
                                 cprAdded = true;
                             }
@@ -703,7 +724,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             seperatorComponents.add(rc);
                             cpr.addToggleComponent(rc);
                             cpr.getInactiveComponentPanels().add(rc);
-                            cView.add(rc, gbc);
+                            conceptPanel.add(rc, gbc);
                             gbc.gridy++;
                             cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
                             cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
@@ -745,7 +766,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cptemplate.setRefexCount(0);
                         cptemplate.setHistoryCount(0);
                         cptemplate.setAlertCount(0);
-                        cView.add(cptemplate, gbc);
+                        conceptPanel.add(cptemplate, gbc);
                         gbc.gridy++;
 
                         for (Entry<SpecBI, Integer> entry : templates.entrySet()) {
@@ -760,7 +781,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                                 DragPanelRelTemplate template = getRelTemplate(spec);
 
                                 cptemplate.addToggleComponent(template);
-                                cView.add(template, gbc);
+                                conceptPanel.add(template, gbc);
                                 cptemplate.getTemplatePanels().add(template);
                                 gbc.gridy++;
                                 cptemplate.setTemplateCount(cptemplate.templateCount++);
@@ -769,7 +790,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                                 DragPanelDescTemplate template = getDescTemplate(spec);
 
                                 cptemplate.addToggleComponent(template);
-                                cView.add(template, gbc);
+                                conceptPanel.add(template, gbc);
                                 cptemplate.getTemplatePanels().add(template);
                                 gbc.gridy++;
                                 cptemplate.setTemplateCount(cptemplate.templateCount++);
@@ -778,7 +799,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     }
 
                     gbc.weighty = 1;
-                    cView.add(new JPanel(), gbc);
+                    conceptPanel.add(new JPanel(), gbc);
                 } catch (IOException e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 } catch (TerminologyException e) {
@@ -971,6 +992,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     protected void setupHistoryPane() throws IOException, ContraditionException {
+        JPanel historyPanel = cView.getHistoryPanel();
+        historyPanel.removeAll();
+        historyPanel.setLayout(new GridBagLayout());
         if (paths == null) {
             return;
         }
@@ -1022,6 +1046,27 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             gbc.gridy++;
             row++;
         }
+        t.schedule(new TickleTask(), 1000);
+        t.schedule(new UpdateHxPanelTask(), 1500);
+    }
+
+    java.util.Timer t = new java.util.Timer();
+      private class TickleTask extends SwingTask {
+
+        @Override
+        public void doRun() {
+            GuiUtil.tickle(cView.getHistoryPanel());
+        }
+        
+    }
+
+    private class UpdateHxPanelTask extends SwingTask {
+
+        @Override
+        public void doRun() {
+            settings.getNavigator().refreshHistory();
+        }
+        
     }
 
     private void setupRels(CountDownLatch latch, Collection<? extends I_RelTuple> rels,
@@ -1153,10 +1198,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return dpamsRef.get();
     }
 
-    public JPanel getHistoryPanel() {
-        return historyPanel;
-    }
-
     JCheckBox getJCheckBox() {
         JCheckBox check = new JCheckBox();
 
@@ -1284,8 +1325,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
 
+        HashSet<Integer> addedRels = new HashSet<Integer>();
         for (RelationshipVersionBI rv : group.getAllRels()) {
-            if (!activeRelIds.contains(rv.getNid())) {
+            if (!activeRelIds.contains(rv.getNid()) &&
+                    !addedRels.contains(rv.getNid())) {
+                addedRels.add(rv.getNid());
                 DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
 
                 dpr.setVisible(relHistoryIsShown);

@@ -159,11 +159,18 @@ public class RelGroupVersion implements RelGroupVersionBI {
 
       for (RelationshipChronicleBI relc : rg.getRels()) {
          if (coordinate != null) {
-            RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
-
-            if (rv != null) {
-               if (rv.getGroup() == rg.getRelGroup()) {
-                  results.add(rv);
+            try {
+               RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
+               if (rv != null) {
+                  if (rv.getGroup() == rg.getRelGroup()) {
+                     results.add(rv);
+                  }
+               }
+            } catch (ContraditionException ex) {
+               for (RelationshipVersionBI rv : relc.getVersions(coordinate.getVcWithAllStatusValues())) {
+                  if (rv.getGroup() == rg.getRelGroup()) {
+                     results.add(rv);
+                  }
                }
             }
          } else {

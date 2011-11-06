@@ -27,6 +27,7 @@ import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
@@ -83,6 +84,7 @@ public class ConceptView extends JPanel {
    long                                  lastLayoutSequence       = Long.MIN_VALUE;
    private Set<File>                     kbFiles                  = new HashSet<File>();
    private boolean                       historyShown             = false;
+   private JPanel                        historyPanel             = new JPanel(new GridBagLayout());
    private Collection<JComponent>        dropComponents           =
       Collections.synchronizedList(new ArrayList<JComponent>());
    private final Set<ComponentVersionBI> changedVersionSelections = new HashSet<ComponentVersionBI>();
@@ -94,6 +96,7 @@ public class ConceptView extends JPanel {
    private EditPanelKb                   kb;
    private Object                        lastThingBeingDropped;
    private ConceptViewSettings           settings;
+
 
    //~--- constant enums ------------------------------------------------------
 
@@ -152,6 +155,10 @@ public class ConceptView extends JPanel {
    public void layoutConcept(I_GetConceptData concept) throws IOException {
       if (concept != null) {
          if ((lastLayoutSequence == concept.getLastModificationSequence()) && (concept == this.concept)) {
+            if (this.settings.isNavigatorSetup()) {
+               this.settings.getNavigator().resetHistoryPanel();
+            }
+
             return;
          }
 
@@ -240,7 +247,7 @@ public class ConceptView extends JPanel {
    }
 
    public JPanel getHistoryPanel() {
-      return cvLayout.getHistoryPanel();
+      return historyPanel;
    }
 
    JCheckBox getJCheckBox() {
@@ -352,6 +359,11 @@ public class ConceptView extends JPanel {
    public boolean isHistoryShown() {
       return historyShown;
    }
+    void refreshHistory() {
+        if (historyShown) {
+            settings.getNavigator().refreshHistory();
+        }
+    }
 
    //~--- set methods ---------------------------------------------------------
 

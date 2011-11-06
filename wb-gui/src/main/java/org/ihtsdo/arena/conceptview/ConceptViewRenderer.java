@@ -216,7 +216,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     /**
      *
      */
-    public JComponent renderedComponent;
+    public ConceptView renderedComponent;
     private ConceptViewSettings settings;
     private ViewCoordinate viewCoord;
     public ConceptViewTitle title;
@@ -237,9 +237,9 @@ public class ConceptViewRenderer extends JLayeredPane {
     private JToggleButton oopsButton;
     private final static String advanceWorkflowActionPath = "migration-wf";
     private final String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
-    private JPanel historyPanel = new JPanel(new BorderLayout());
+    private JComponent historyPanel = new JPanel(new BorderLayout());
 
-    public JPanel getHistoryPanel() {
+    public JComponent getHistoryPanel() {
         return historyPanel;
     }
     private JPanel conceptViewPanel = new JPanel(new BorderLayout());
@@ -283,17 +283,16 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptScrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
-            renderedComponent = settings.getComponent(config);
-            if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
-                conceptScrollPane = (JScrollPane) renderedComponent;
-            } else {
-                conceptScrollPane = new JScrollPane(renderedComponent);
-            }
+            renderedComponent = (ConceptView) settings.getComponent(config);
+            conceptScrollPane = new JScrollPane();
         }
 
         if (conceptScrollPane != null) {
+            historyPanel = renderedComponent.getHistoryPanel();
+            
+            
             conceptViewPanel.add(historyPanel, BorderLayout.NORTH);
-            conceptViewPanel.add(conceptScrollPane, BorderLayout.CENTER);
+            conceptViewPanel.add(new JScrollPane(renderedComponent), BorderLayout.CENTER);
             add(conceptViewPanel, BorderLayout.CENTER);
             conceptScrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             conceptScrollPane.getViewport().setBackground(Color.WHITE);
