@@ -48,22 +48,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.ihtsdo.arena.contradiction.InteractiveAdjudicator;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -794,12 +783,13 @@ public class HistoryPanel {
                           Long.MAX_VALUE);
                }
             }
-
             if (view.getSettings().isForAjudciation()) {
                ConceptChronicleBI cc = view.getConcept();
+               ViewCoordinate adjudicateView = new ViewCoordinate(view.getConfig().getViewCoordinate());
 
+               adjudicateView.setContradictionManager(new InteractiveAdjudicator(nidGroupMap, buttonVersionMap));
                cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(),
-                                          view.getConfig().getViewCoordinate());
+                                          adjudicateView);
             }
 
             Ts.get().addUncommitted(view.getConcept());

@@ -7,7 +7,7 @@ import java.util.List;
  * Interface for classes that resolve contradictions - i.e. the scenario where two
  * different paths have different data for a given component.
  * <p>
- * Given a component's tuples and an optional time point (latest is assumed
+ * Given a component's versions and an optional time point (latest is assumed
  * without a time point), implementations of this interface will calculate the
  * "contradiction resolved view" of the component at that time point.
  */
