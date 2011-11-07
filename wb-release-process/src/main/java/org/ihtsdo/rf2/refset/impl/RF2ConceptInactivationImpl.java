@@ -8,7 +8,11 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IdPart;
+import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -16,6 +20,7 @@ import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
  * Title: RF2ConceptInactivationImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 ConceptInactivation Refset File Copyright: Copyright (c)
@@ -42,6 +47,79 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 	}
 
+	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException{
+		String valueId = "XXX";
+		
+		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
+				currenAceConfig.getViewPositionSetReadOnly(), 
+				Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+logger.info("====relationships====" + relationships.size());
+
+		for (I_RelTuple rel : relationships) {
+			String characteristicTypeId="";
+			I_Identify charId = tf.getId(rel.getCharacteristicId());
+		
+			List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+					snomedIntId);
+
+logger.info("====idParts====" + idParts.size());
+			
+			if (idParts != null) {
+				Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+						RelAssertionType.INFERRED_THEN_STATED);
+				if (denotation instanceof Long) {
+					Long c = (Long) denotation;
+					if (c != null)  characteristicTypeId = c.toString();
+				}
+			}
+			if (characteristicTypeId.equals(I_Constants.STATED) ){
+				String destinationId = "";
+				I_Identify id = tf.getId(rel.getC2Id());
+				if (id != null) {
+					idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+							snomedIntId);
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  destinationId = c.toString();
+						}
+					}
+				}
+
+logger.info("====destinationId====" + destinationId);
+				String relTypeId = "";
+
+				id = tf.getId(rel.getTypeNid());
+				if (id != null) {
+					idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+							snomedIntId);
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  relTypeId = c.toString();
+						}
+					}
+				}
+
+logger.info("====relTypeId====" + relTypeId);
+				if (relTypeId.equals(I_Constants.ISA)) {
+					if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT) || destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT) ||
+						destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
+						destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
+						destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
+					}
+						valueId = destinationId;
+					}
+				} 
+		}
+		
+		return valueId;
+		
+	}
 	
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) {
@@ -65,7 +143,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
+			
 			if (conceptAttributes.size() > 0) {
 				for (int i = 0; i < conceptAttributes.size(); i++) {
 					I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributes.get(i);
@@ -78,8 +156,9 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 						active = "1";
 					}
 
-
-					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+					valueId= getConceptInactivationRelationshipValueId(concept);
+					
+					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
 					if (!valueId.equals("XXX")) {
 						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
 					} else {
