@@ -1,16 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.termmed</groupId>
+	<parent>
+		<groupId>org.ihtsdo</groupId>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.6.0-trek-53-SNAPSHOT</version>
+	</parent>
 	<artifactId>id-generation-ws</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>id-generation-ws</name>
-
-	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws/trunk</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws/trunk</developerConnection>
-		<url>https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws/trunk</url>
-	</scm>
+	<name>${branch}: Workbench ID generation WS</name>
 
 	<dependencies>
 		<dependency>
@@ -51,7 +48,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>id-generation-ws-client</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -107,7 +104,7 @@
 								<artifactItem>
 									<groupId>com.termmed</groupId>
 									<artifactId>id-generation-ws</artifactId>
-									<version>0.0.1-SNAPSHOT</version>
+									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>
@@ -125,7 +122,7 @@
 								<artifactItem>
 									<groupId>org.ihtsdo</groupId>
 									<artifactId>id-generation-ws-client</artifactId>
-									<version>0.0.1-SNAPSHOT</version>
+									<version>${project.version}</version>
 									<type>zip</type>
 								</artifactItem>
 							</artifactItems>

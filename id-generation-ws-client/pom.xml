@@ -1,23 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<parent>
 		<groupId>org.ihtsdo</groupId>
-		<artifactId>ihtsdo-wb-parent</artifactId>
-		<version>1</version>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.6.0-trek-53-SNAPSHOT</version>
 	</parent>
-
-	<groupId>org.ihtsdo</groupId>
 	<artifactId>id-generation-ws-client</artifactId>
-	<version>2.6.0-trek-40-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>id-generation-ws-client</name>
-
-	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws-client/trunk</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws-client/trunk</developerConnection>
-		<url>https://csfe.aceworkspace.net/svn/repos/workbench/id-generation-ws-client/trunk</url>
-	</scm>
+	<name>${branch}: Workbench ID generation WS Client</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
