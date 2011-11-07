@@ -137,7 +137,7 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
-import org.ihtsdo.cs.econcept.WfHxLuceneChangeSetReader;
+import org.ihtsdo.cs.econcept.workflow.WfHxLuceneChangeSetReader;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;

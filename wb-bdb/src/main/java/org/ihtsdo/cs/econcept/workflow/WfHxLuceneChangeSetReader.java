@@ -1,4 +1,4 @@
-package org.ihtsdo.cs.econcept;
+package org.ihtsdo.cs.econcept.workflow;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -23,6 +23,7 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
@@ -86,12 +87,24 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
 
     	return nextCommit;
     }
-
+ 
    @Override
     public void readUntil(long endTime) throws IOException, ClassNotFoundException {
         HashSet<TimePathId> values = new HashSet<TimePathId>();
 
+        HashSet<TkRefsetAbstractMember<?>> scrubbedMembers = new HashSet<TkRefsetAbstractMember<?>>();
+        scrubbedMembers.addAll(wfMembersToCommit);
+        
         if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+        	for (I_WfChangeSetScrubber scrubber : getWfChangeSetFiltersInUse()) {
+	        	if (scrubber.identifyMembers(scrubbedMembers)) {
+	        		scrubbedMembers = scrubber.processScrubbedMembers();
+	        	}
+        	} 
+        	
+        	wfMembersToCommit.clear();
+        	wfMembersToCommit.addAll(scrubbedMembers);
+        	
         	updateLuceneIndex();
         	firstFileRead = null;
         	return;
@@ -112,7 +125,9 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
                     counter.increment();
                 }
 
-                 updateWfHxLuceneIndex(eConcept, nextCommit, values);
+                // Update WfHx Lucene Index here
+                updateWfHxLuceneIndex(eConcept, nextCommit, values);
+
                 conceptCount++;
                 nextCommit = dataStream.readLong();
             } catch (EOFException ex) {
@@ -147,7 +162,15 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
 
     }
 
-   @Override
+   	private Set<I_WfChangeSetScrubber> getWfChangeSetFiltersInUse() {
+   		HashSet<I_WfChangeSetScrubber> retSet = new HashSet<I_WfChangeSetScrubber>();
+	
+   		retSet.add(new WfDuplicateAutomatedAdjudicatorSyncFilter());
+	   
+   		return retSet;
+   	}
+
+   	@Override
     public void read() throws IOException, ClassNotFoundException {
         readUntil(Long.MAX_VALUE);
     }
@@ -236,16 +259,16 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    	private void updateWfHxLuceneIndex(EConcept eConcept, long time, Set<TimePathId> values) throws IOException, ClassNotFoundException {
 	   try {
 	       assert time != Long.MAX_VALUE;
-
 	       Set<TkRefsetAbstractMember<?>> members = new HashSet<TkRefsetAbstractMember<?>>();
+
 		   // Check for annotations as well as direct RefsetMembers, not either/or	       
-	       if ((eConcept.getRefsetMembers() != null) &&!eConcept.getRefsetMembers().isEmpty()) {
-	    	   members.addAll(eConcept.getRefsetMembers());
-	       } 
-	       
 	       if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
     		   members.addAll(eConcept.getConceptAttributes().getAnnotations());
-	       } 
+	       } else
+	       if ((eConcept.getRefsetMembers() != null) &&!eConcept.getRefsetMembers().isEmpty()) {
+	    	   members.addAll(eConcept.getRefsetMembers());
+	       }  
+	       
 	       
 	       // Have all potential WfHx refset members in EConcept
 	       for (TkRefsetAbstractMember<?>  member : members) {
