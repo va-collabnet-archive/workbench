@@ -39,12 +39,15 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -163,7 +166,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	private static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+	public static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
 		WorkflowHistoryRefsetWriter writer;
 		writer = new WorkflowHistoryRefsetWriter();
 
@@ -982,18 +985,47 @@ public class WorkflowHelper {
 		return endWorkflowActionUid;
     }
 
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(RefexVersionBI version) {
+		WorkflowHistoryJavaBean bean = null;
+		
+		try {
+			bean = populateWorkflowHistoryJavaBean(version.getNid(), 
+												   Terms.get().nidToUuid(version.getReferencedComponentNid()), 
+												   ((RefexStrVersionBI)version).getStr1(), 
+												   version.getTime());
+
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + version);
+		}
+		
+		return bean;
+	}
+
 	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRef ref) {
 		WorkflowHistoryJavaBean bean = null;
 		
 		try {
+			int idx = ref.getMutableParts().size() - 1;
+			long time = ref.getMutableParts().get(idx).getTime();
+			
 			bean = populateWorkflowHistoryJavaBean(ref.getMemberId(), 
 												   Terms.get().nidToUuid(ref.getComponentNid()), 
 												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
-												   new Long(ref.getMutableParts().get(0).getTime()));
+												   new Long(time));
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ref);
 		}
 		
+		return bean;
+	}
+
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(TkRefsetAbstractMember<?> ref) throws NumberFormatException, TerminologyException, IOException {
+		TkRefsetStrMember member = (TkRefsetStrMember) ref;
+
+		int memberNid = Terms.get().uuidToNative(member.getPrimordialComponentUuid());
+		WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(memberNid, member.getComponentUuid(), 
+																					  member.getStrValue(), member.getTime());
+	
 		return bean;
 	}
 
