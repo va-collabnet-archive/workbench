@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>id-generation-api</artifactId>
-			<version>2.6.0-trek-39</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
