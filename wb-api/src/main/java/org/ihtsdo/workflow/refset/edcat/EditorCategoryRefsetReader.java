@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetReader;
 
 
@@ -19,21 +21,6 @@ public  class EditorCategoryRefsetReader extends WorkflowRefsetReader
 	{
 		super(editorCategoryConcept);
 	}
-/*
- * 	"<properties>\n" +
-   	"<property>\n" +	nid
--
-   		"<key>editorCategory</key>" +
-   		"<value>" + getEditorCategory().getConceptUid() + "</value>" +
-   	"</property>" + 
-   	"<property>" +
-		"<key>semanticArea</key>" +
-		"<value>" + getSemanticArea() + "</value>" +
-	"</property>" + 
-"</properties>"; 
-
-*
-*/
 
 	public String getSemanticTag(String props) {
 		String key = "semanticArea";
@@ -46,5 +33,35 @@ public  class EditorCategoryRefsetReader extends WorkflowRefsetReader
 	
 	public UUID getEditorCategoryUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("editorCategory", props);
+	}
+	
+	/*
+		return "\nReferenced Component Id(Editor SCT) = " + Terms.get().getConcept(getReferencedComponentUid()).getInitialText() + 
+		   "(" + getReferencedComponentUid() + ")" +
+		   "\nSemantic Area = " + semanticArea +
+		   "\nEditor Category = " + Terms.get().getConcept(editorCategory).getInitialText() +
+		   "(" + editorCategory + ")";
+	 */
+	
+	@Override
+	public boolean isIdenticalAutomatedAdjudication(TkRefsetAbstractMember origMember, TkRefsetAbstractMember testMember) {
+		if (isIdenticalSap(origMember, testMember)) {
+			return false;
+		} else {
+			String orig = ((TkRefsetStrMember)origMember).getStrValue();
+			String test = ((TkRefsetStrMember)testMember).getStrValue();
+			
+			try {
+				if (origMember.getComponentUuid().equals(testMember.getComponentUuid()) &&
+					this.getEditorCategory(orig).equals(this.getEditorCategory(test)) && 
+					this.getSemanticTag(orig).equals(this.getSemanticTag(test))) {
+					return true;
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		return false;
 	}
 }

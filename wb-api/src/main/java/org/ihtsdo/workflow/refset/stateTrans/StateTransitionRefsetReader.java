@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetReader;
 
 
@@ -20,27 +22,6 @@ public  class StateTransitionRefsetReader extends WorkflowRefsetReader
 		super(stateTransitionConcept);
 	}
 
-	/*
-	"<properties>\n" +
-	   	"<property>\n" +
-	   		"<key>workflowType</key>" +
-	   		"<value>" + getWorkflowType().getConceptUid() + "</value>" +
-	   	"</property>" + 
-	   	"<property>" +
-				"<key>initialState</key>" +
-				"<value>" + getInitialState().getConceptUid() + "</value>" +
-			"</property>" + 
-		   	"<property>" +
-	   		"<key>action</key>" +
-	   		"<value>" + getAction().getConceptUid() + "</value>" +
-	   	"</property>" + 
-	   	"<property>" +
-	   		"<key>finalState</key>" +
-	   		"<value>" + getFinalState().getConceptUid() + "</value>" +
-	   	"</property>" +
-	"</properties>"; 
-		
-	*/
 	public I_GetConceptData getWorkflowType(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getConcept("workflowType", props);
 	}
@@ -71,5 +52,37 @@ public  class StateTransitionRefsetReader extends WorkflowRefsetReader
 
 	public UUID getFinalStateUid(String props) throws NumberFormatException, TerminologyException, IOException {
 		return getUUID("finalState", props);
+	}
+
+	/*	return "\nReferenced Component Id (Editor Category) = " + con.getInitialText() + 
+	   "(" + con.getConceptNid() + ")" +
+	   "\nWorkflow Type = " + Terms.get().getConcept(workflowType).getInitialText() +
+	   "\nInitial State = " + Terms.get().getConcept(initialState).getInitialText() +
+	   "\nAction = " + Terms.get().getConcept(action).getInitialText() +
+	   "\nFinal State= " + Terms.get().getConcept(finalState).getInitialText();
+	 */
+	
+	@Override
+	public boolean isIdenticalAutomatedAdjudication(TkRefsetAbstractMember origMember, TkRefsetAbstractMember testMember) {
+		if (isIdenticalSap(origMember, testMember)) {
+			return false;
+		} else {
+			String orig = ((TkRefsetStrMember)origMember).getStrValue();
+			String test = ((TkRefsetStrMember)testMember).getStrValue();
+			
+			try {
+				if (origMember.getComponentUuid().equals(testMember.getComponentUuid()) &&
+					this.getWorkflowType(orig).equals(this.getWorkflowType(test)) && 
+					this.getInitialState(orig).equals(this.getInitialState(test)) &&
+					this.getAction(orig).equals(this.getAction(test)) &&
+					this.getFinalState(orig).equals(this.getFinalState(test))) {
+					return true;
+				}
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		return false;
 	}
 }
