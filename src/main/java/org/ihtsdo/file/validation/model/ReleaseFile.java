@@ -3,7 +3,7 @@ package org.ihtsdo.file.validation.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class File implements java.io.Serializable {
+public class ReleaseFile implements java.io.Serializable {
 	private static final long serialVersionUID = 3934630179141814154L;
 	private ArrayList<Regex> regexList;
 	private String description;
