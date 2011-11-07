@@ -80,7 +80,7 @@ public class VodbClose extends AbstractMojo {
                      + nullComponentFinder.getNullComponent() + "\n");      
           }        
           
-         getLog().info("Testing for Null Components Finsihed.");
+         getLog().info("Testing for Null Components Finished.");
        
          
          getLog().info("Testing for dup UUIDs.");
