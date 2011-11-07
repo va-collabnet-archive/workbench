@@ -206,7 +206,10 @@ static {
                     String[].class, null);
             
             setSSO(svnUpdateOnStart);
-            System.out.println("is_SSO: " + SSO);
+            
+            //System.out.println("is_SSO: " + SSO);
+            AceLog.getAppLog().info("is_SSO: " + SSO);
+            
             DroolsExecutionManager.drools_dialect_java_compiler =
                (String) jiniConfig.getEntry(this.getClass().getName(), "drools_dialect_java_compiler",
                                             String.class, null);
@@ -242,7 +245,8 @@ static {
                      != null)) {
             lookAndFeelStr = (String) jiniConfig.getEntry(this.getClass().getName(), "lookAndFeelStr",
                     String.class, null);
-            System.out.println("LAF: " + lookAndFeelStr);
+            AceLog.getAppLog().info("LAF: " + lookAndFeelStr);
+           // System.out.println("LAF: " + lookAndFeelStr);
          } else if (windowsSystem && (lookAndFeelStr == null)) {
             for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
                System.out.println(lookAndFeel.getClassName());
