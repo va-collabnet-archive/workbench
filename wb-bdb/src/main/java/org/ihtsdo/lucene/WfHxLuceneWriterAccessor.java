@@ -59,13 +59,9 @@ public  class WfHxLuceneWriterAccessor {
         	Set<UUID> wfIdsSeen = new HashSet<UUID>();
             Set<WorkflowHistoryJavaBean> beansToAddToWf = new HashSet<WorkflowHistoryJavaBean>();
             
-            for (TkRefsetAbstractMember<?> ref : eConcepts) {
-				TkRefsetStrMember member = (TkRefsetStrMember)ref;
-
-				int memberNid = Terms.get().uuidToNative(member.getPrimordialComponentUuid());
-				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(memberNid, member.getComponentUuid(), 
-																							  member.getStrValue(), member.getTime());
-
+            for (TkRefsetAbstractMember<?> mem : eConcepts) {
+				WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(mem);
+				
 				// Only add to update once per WfId
 				if (bean != null) {
 					if (!wfIdsSeen.contains(bean.getWorkflowId())) {
@@ -73,8 +69,8 @@ public  class WfHxLuceneWriterAccessor {
 						wfIdsSeen.add(bean.getWorkflowId());
 					}
 				} else {
-		    		AceLog.getAppLog().log(Level.WARNING, "Failed to add WfHx to Lucene for RefComp: " + member.getComponentUuid() + " with values: " + member.getStrValue());
-				}
+		    		AceLog.getAppLog().log(Level.WARNING, "Beans: " + mem.toString());
+				} 
     		}
     	
     		// Only acquire if can access WfHx refset
