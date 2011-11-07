@@ -23,7 +23,6 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_ValidateChangeSetChanges;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.time.TimeHelper;
@@ -237,28 +236,25 @@ public class WfHxLuceneChangeSetReader implements I_ReadChangeSet {
    	private void updateWfHxLuceneIndex(EConcept eConcept, long time, Set<TimePathId> values) throws IOException, ClassNotFoundException {
 	   try {
 	       assert time != Long.MAX_VALUE;
-	       List<TkRefsetAbstractMember<?>> members = null;
-	       
-	       if ((eConcept.getRefsetMembers() != null) &&!eConcept.getRefsetMembers().isEmpty()) {
-	    	   members = eConcept.getRefsetMembers();
-	       } else if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
-	    	   members = eConcept.getConceptAttributes().getAnnotations();
-	       } 
 
-	       if (members != null) {
-		       for (TkRefsetAbstractMember<?>  member : members) {
-	   				if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
-	   					try {
-	   						if (!WorkflowHelper.getLuceneChangeSetStorage().contains(member.getPrimordialComponentUuid()))	
-	   						{
-	   							wfMembersToCommit.add(member);
-	   							WorkflowHelper.getLuceneChangeSetStorage().add(member.getPrimordialComponentUuid());
-		       				}
-		   				} catch (Exception e) {
-		   		            AceLog.getAppLog().log(Level.WARNING, "Failed getting extension with memberId: " + member.getPrimordialComponentUuid());
-		   			    }
-		   			}
-		       }
+	       Set<TkRefsetAbstractMember<?>> members = new HashSet<TkRefsetAbstractMember<?>>();
+		   // Check for annotations as well as direct RefsetMembers, not either/or	       
+	       if ((eConcept.getRefsetMembers() != null) &&!eConcept.getRefsetMembers().isEmpty()) {
+	    	   members.addAll(eConcept.getRefsetMembers());
+	       } 
+	       
+	       if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
+    		   members.addAll(eConcept.getConceptAttributes().getAnnotations());
+	       } 
+	       
+	       // Have all potential WfHx refset members in EConcept
+	       for (TkRefsetAbstractMember<?>  member : members) {
+   				if (member.getRefsetUuid().equals(workflowHistoryRefsetUid)) {
+					if (!WorkflowHelper.getLuceneChangeSetStorage().contains(member.getPrimordialComponentUuid())) {
+	   					wfMembersToCommit.add(member);
+						WorkflowHelper.getLuceneChangeSetStorage().add(member.getPrimordialComponentUuid());
+   					}
+				}
 	       }
 	   } catch (Exception e) {
 	       AceLog.getEditLog().severe(
