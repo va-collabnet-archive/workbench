@@ -48,7 +48,7 @@ public class InteractiveAdjudicator implements ContradictionManagerBI {
             AbstractButton activeButton = null;
 
             for (AbstractButton b : Collections.list(group.getElements())) {
-                if (b.isSelected()) {
+                if (b != null && b.isSelected()) {
                     activeButton = b;
                     break;
                 }
@@ -58,7 +58,6 @@ public class InteractiveAdjudicator implements ContradictionManagerBI {
                 return resolvedVersions;
             }
             //TODO add the interactive step here. May not be necessary since we are using the radio groups.
-            throw new UnsupportedOperationException("Not supported yet.");
         }
 
 
