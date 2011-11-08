@@ -11,4 +11,8 @@ public class SctIDParam {
 	public String executionId;
 	public String moduleId;
 	public String componentType;
+	public String idSaveTolist;
+	public String idType;
+	public String idColumnIndex;
+	public String idMapFile;
 }

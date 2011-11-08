@@ -206,6 +206,8 @@ public class I_Constants {
 	public final static String WAS_A_REFERENCES_REFSET_UID = "0c4a8933-bf14-39b9-a743-a5dc07faa7bb";
 	public final static String WAS_A_REFERENCES_REFSET_UID_TERM_AUX = "????";
 	
+	public static final String IDENTIFIER_SCHEME_ID = "900000000000002006";
+	
 	
 	
 	
