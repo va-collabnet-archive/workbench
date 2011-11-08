@@ -53,7 +53,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-logger.info("====relationships====" + relationships.size());
+//logger.info("====relationships====" + relationships.size());
 
 		for (I_RelTuple rel : relationships) {
 			String characteristicTypeId="";
@@ -61,8 +61,6 @@ logger.info("====relationships====" + relationships.size());
 		
 			List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 					snomedIntId);
-
-logger.info("====idParts====" + idParts.size());
 			
 			if (idParts != null) {
 				Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
@@ -88,7 +86,7 @@ logger.info("====idParts====" + idParts.size());
 					}
 				}
 
-logger.info("====destinationId====" + destinationId);
+//logger.info("====destinationId====" + destinationId);
 				String relTypeId = "";
 
 				id = tf.getId(rel.getTypeNid());
@@ -105,7 +103,7 @@ logger.info("====destinationId====" + destinationId);
 					}
 				}
 
-logger.info("====relTypeId====" + relTypeId);
+
 				if (relTypeId.equals(I_Constants.ISA)) {
 					if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT) || destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT) ||
 						destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
@@ -114,9 +112,11 @@ logger.info("====relTypeId====" + relTypeId);
 					}
 						valueId = destinationId;
 					}
+				
 				} 
 		}
-		
+
+		logger.info("====valueId====" + valueId);		
 		return valueId;
 		
 	}
@@ -155,7 +155,7 @@ logger.info("====relTypeId====" + relTypeId);
 					} else {
 						active = "1";
 					}
-
+					logger.info("====conceptStatus====" + conceptStatus);
 					valueId= getConceptInactivationRelationshipValueId(concept);
 					
 					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
