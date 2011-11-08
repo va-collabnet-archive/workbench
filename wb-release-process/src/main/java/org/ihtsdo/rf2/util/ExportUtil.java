@@ -465,10 +465,7 @@ public class ExportUtil {
 			Set<I_GetConceptData> parentSet = new HashSet<I_GetConceptData>();
 			parentSet.addAll(concept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
-			
-			System.out.println(concept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
-			
+				
 			boolean findParentSnomedId = true;
 			String parentSnomedId="";
 			
@@ -1077,16 +1074,15 @@ public class ExportUtil {
 			snomedId = idGen.getSNOMEDID(uuid);
 			if(snomedId.equals("") || snomedId.equals(null)){	}
 			else
-				System.out.println("=====SnomedId exist in the ID repository===" + snomedId);
+				logger.info("=====SnomedId exist in the ID repository===" + snomedId);
 			
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
 			if (logger.isDebugEnabled())
 				logger.debug("getSnomedID for UUID : " + uuid + " returned NULL calling to generate a new SnomedId");
 			try {
-				//System.out.println("===Creating SnomedId");
 				snomedId = idGen.createSNOMEDID(uuid, parentSnomedId);
-				System.out.println("===SnomedId Created Successfully " + snomedId);
+				logger.info("===SnomedId Created Successfully " + snomedId);
 			} catch (Exception cE) {
 				logger.error("Message : SnomedId creation error for UUID :" + uuid, cE);
 			}
@@ -1153,7 +1149,7 @@ public class ExportUtil {
 			ctv3Id = idGen.getCTV3ID(uuid);
 			if(ctv3Id.equals("") || ctv3Id.equals(null) ){	}
 			else
-				System.out.println("====Ctv3Id already exist in the ID repository===" + ctv3Id);
+				logger.info("====Ctv3Id already exist in the ID repository===" + ctv3Id);
 		} catch (NullPointerException e) {
 			// there is no SCTID so we are getting NULL
 			if (logger.isDebugEnabled())
@@ -1161,7 +1157,7 @@ public class ExportUtil {
 			try {
 				//System.out.println("===Creating Ctv3Id");
 				ctv3Id = idGen.createCTV3ID(uuid);
-				System.out.println("===Ctv3Id Created Successfully " + ctv3Id);
+				logger.info("===Ctv3Id Created Successfully " + ctv3Id);
 			} catch (Exception cE) {
 				logger.error("Message : Ctv3Id creation error for UUID :" + uuid, cE);
 			}
