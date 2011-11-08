@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,14 +59,14 @@ public class IdUtil {
 
 	public static void init() {
 
-		
+
 	}
 
 	private static HashSet<ModuleIDDAO> metaHierDAO;
 
-	
 
-	
+
+
 	public static void createTermFactory(Database db) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 
 		File vodbDirectory = new File(db.getLocation());
@@ -84,8 +85,8 @@ public class IdUtil {
 		return aceConfig;
 	}
 
-	
-	
+
+
 	public static String getSnomedId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String snomedId = "";
 		I_Identify i_Identify = concept.getIdentifier();
@@ -127,7 +128,7 @@ public class IdUtil {
 		return ctv3Id.toString();
 	}
 
-	
+
 
 	public static int getNid(String struuid) throws TerminologyException, IOException {
 		int nid = 0;
@@ -151,7 +152,7 @@ public class IdUtil {
 		return snomedCorePathNid;
 	}
 
-	
+
 
 	public static int getSnomedInferredPathNid() {
 		int snomedInferredPathNid = 0;
@@ -241,7 +242,7 @@ public class IdUtil {
 		}
 		return String.valueOf(sctId);
 	}
-	
+
 
 	// get the conceptid for the given UUID (Hardcoded values)
 	public static String getSCTId(Config config, UUID uuid) {
@@ -287,7 +288,7 @@ public class IdUtil {
 				}
 			}
 		}
-		
+
 		if (conceptId==null) return null;
 
 		return conceptId.toString();
@@ -299,7 +300,7 @@ public class IdUtil {
 		return partId;
 	}
 
-	
+
 	public static String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
 
 		Long descriptionId = null; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
@@ -325,6 +326,22 @@ public class IdUtil {
 		return descriptionId.toString();
 	}
 
-	
+	public static HashMap<UUID, Long> getSCTIdList(Config config,
+			List<UUID> componentUuidlist, Integer namespaceId,
+			String partitionId, String releaseId, String executionId,
+			String moduleId2) {
+
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		HashMap<UUID, Long> sctId = new HashMap<UUID,Long>();
+
+		try {
+			sctId = idGen.createSCTIDList(componentUuidlist, namespaceId, partitionId, releaseId, executionId, moduleId);
+		} catch (Exception cE) {
+			logger.error("Message : SCTID creation error for list " , cE);
+		}
+		return sctId;
+	}
+
+
 
 }

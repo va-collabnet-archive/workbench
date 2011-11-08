@@ -47,6 +47,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.coordinate.PositionSet;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public abstract class RF2AbstractImpl {
 
@@ -226,11 +227,11 @@ public abstract class RF2AbstractImpl {
 		setRootNid(tf.uuidToNative(SNOMED.Concept.ROOT.getUids()));
 
 		// Characteristic
-		setIsCh_STATED_RELATIONSHIP(tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()));
-		setIsCh_DEFINING_CHARACTERISTIC(tf.uuidToNative(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()));
+		setIsCh_STATED_RELATIONSHIP(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid());
+		setIsCh_DEFINING_CHARACTERISTIC(SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getLenient().getNid());
 		setIsCh_STATED_AND_INFERRED_RELATIONSHIP(tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_INFERRED_RELATIONSHIP.getUids()));
 		setIsCh_STATED_AND_SUBSUMED_RELATIONSHIP(tf.uuidToNative(ArchitectonicAuxiliary.Concept.STATED_AND_SUBSUMED_RELATIONSHIP.getUids()));
-		setIsCh_INFERRED_RELATIONSHIP(tf.uuidToNative(ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.getUids()));
+		setIsCh_INFERRED_RELATIONSHIP(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid());
 	}
 
 	public I_ConfigAceFrame getAceConfig() {

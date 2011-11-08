@@ -160,11 +160,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					
 					
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-					rel.getVersions();
-					getDateFormat().format(new Date(rel.getMutablePart().getTime()));
-					getDateFormat().format(new Date(rel.getFixedPart().getTime()));
-					getDateFormat().format(new Date(rel.getPrimordialVersion().getTime()));
-					getDateFormat().format(new Date(rel.getRelVersioned().getTime()));
 					
 					int relationshipGroup = rel.getGroup();
 

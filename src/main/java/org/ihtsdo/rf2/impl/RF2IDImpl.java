@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -107,7 +108,9 @@ public abstract class RF2IDImpl {
 	public String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws Exception {
 		return IdUtil.getSCTId(config, componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
 	}
-
+	public HashMap<UUID, Long> getSCTIdList(Config config, List<UUID> componentUuidlist, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws Exception {
+		return IdUtil.getSCTIdList(config, componentUuidlist, namespaceId, partitionId, releaseId, executionId, moduleId);
+	}
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		return IdUtil.getConceptId(concept, snomedCorePathNid);
 	}
