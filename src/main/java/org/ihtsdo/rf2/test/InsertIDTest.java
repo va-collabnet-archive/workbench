@@ -1,6 +1,8 @@
 package org.ihtsdo.rf2.test;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,6 +16,7 @@ import junit.framework.TestSuite;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -22,6 +25,8 @@ import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.cs.ChangeSetPolicy;
+import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
@@ -35,6 +40,7 @@ import org.ihtsdo.rf2.core.dao.DescriptionDAO;
 import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.rf2.util.ExportUtil;
 
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 
 
@@ -53,17 +59,25 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.commitlog.CommitLog;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.profile.NewDefaultProfile;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.FileIO;
 
+import org.ihtsdo.cs.ChangeSetWriterHandler;
+import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
+import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.etypes.EConceptAttributes;
 import org.ihtsdo.etypes.EConceptAttributesRevision;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 
 
@@ -99,13 +113,13 @@ public class InsertIDTest extends TestCase {
 			// get and set the database location
 			Database db = new Database();
 			db.setName("IHTSDO");
-			db.setLocation("E:\\Workbench_Bundle\\Sync_Bundle\\03312011\\wb-bundle\\berkeley-db");
-						
+			db.setLocation("E:\\Workbench_Bundle\\UAT\\UAT-2011-30-10\\berkeley-db");
+			
 			ExportUtil.createTermFactory(db);
 			ExportUtil.init();
 			// ExportUtil.InitializeFileName();
 			_termfactory = ExportUtil.getTermFactory();
-			//_aceConfig = ExportUtil.createAceConfig();
+			ExportUtil.createAceConfig();
 			_aceConfig = ExportUtil.getAceConfig();
 			
 			System.out.println("=======1=======" + _aceConfig.getPrecedence().getDescription());
@@ -134,6 +148,101 @@ public class InsertIDTest extends TestCase {
 		assertTrue(true);
 	}
 
+	
+	public void testCreateChangeset(int componentNid){
+		
+		
+		String wsSctId = "9999999";
+		boolean flag = false;
+		try {	
+			
+				DateFormat df = new SimpleDateFormat("yyyyMMdd");
+				long effectiveDate=df.parse("20120131").getTime();
+		
+			
+				I_GetConceptData testConcept = _termfactory.getConcept(UUID.fromString("5c37c3f6-22f4-4631-b0a1-95bee7f8b825"));
+				System.out.println(testConcept.getInitialText());
+		
+				I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConceptAttributes();
+				List<?> conceptAttributeTupleList = i_ConceptAttributeVersioned.getTuples();
+				
+				I_Identify i_Identify = _termfactory.getId(componentNid);	
+				
+		            
+				BdbTermFactory tfb = (BdbTermFactory) _termfactory;
+				I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+				newDbProfile.setUsername("susan-test");
+				newDbProfile.setUserConcept(_termfactory.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+				newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+				newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+				newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+				newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+				File changeSetRoot = new File("E:\\Temp", "changesets");
+				changeSetRoot.mkdirs();
+				//File changeSetRoot = new File("profiles" + File.separator + "susan-test" + File.separator + "changesets");
+				String changeSetWriterFileName = "susan-test" + "." + "#" + 0 + "#" + UUID.randomUUID().toString() + ".eccs"; 
+				newDbProfile.setChangeSetRoot(changeSetRoot);
+				newDbProfile.setChangeSetWriterFileName(changeSetWriterFileName);
+				String tempKey = UUID.randomUUID().toString();
+				 ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+							new File(newDbProfile.getChangeSetRoot(),
+									newDbProfile.getChangeSetWriterFileName()), 
+									new File(newDbProfile.getChangeSetRoot(), "#0#"
+											+ newDbProfile.getChangeSetWriterFileName()),
+											ChangeSetGenerationPolicy.MUTABLE_ONLY);
+				Ts.get().addChangeSetGenerator(tempKey, generator);
+		        try {
+		           	Terms.get().commit();
+		        } catch (Exception e) {
+		            throw new TaskFailedException();
+		        } finally {
+		             Ts.get().removeChangeSetGenerator(tempKey);
+		        }				   
+				  
+		        /*		   
+				ChangeSetWriterHandler.addWriter(newDbProfile.getUsername()
+						+ ".eccs", new EConceptChangeSetWriter(new File(newDbProfile.getChangeSetRoot(), newDbProfile.getChangeSetWriterFileName()), 
+								new File(newDbProfile.getChangeSetRoot(), "."
+										+ newDbProfile.getChangeSetWriterFileName()), 
+										ChangeSetGenerationPolicy.INCREMENTAL, true));
+				
+				ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
+						new CommitLog(new File(newDbProfile.getChangeSetRoot(),
+						"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+								"." + "commitLog.xls")));	
+				*/
+		        
+				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+						i_ConceptAttributeVersioned.getStatusNid(),
+						i_ConceptAttributeVersioned.getPathNid(),
+						effectiveDate);
+				I_GetConceptData commitedConcept = _termfactory.getConceptForNid(componentNid);
+				System.out.println("==flag==" + flag);
+				
+				_termfactory.addUncommitted(commitedConcept);
+				_termfactory.commit();
+				
+			} catch (NullPointerException ne) {
+				ne.printStackTrace();
+				System.out.println("NullPointerException " +ne.getMessage());
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+				System.out.println("NumberFormatException " +e.getMessage());
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+				System.out.println("TerminologyException " +e.getMessage());
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("IOException " +e.getMessage());;
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println("Exception " +e.getMessage());
+			}	
+		
+	}
+	
+	
+	
 	public void xtestInsertConceptId() throws IOException {
 		
 		try {

@@ -595,10 +595,10 @@ public abstract class RF2AbstractImpl {
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-					if(conceptid.equals("102550009")){
-						System.out.println("===conceptid===" + conceptid);
+					//if(conceptid.equals("102550009")){
+						//System.out.println("===conceptid===" + conceptid);
 						export(concept, conceptid);
-					}
+					//}
 			}
 		}
 	}
