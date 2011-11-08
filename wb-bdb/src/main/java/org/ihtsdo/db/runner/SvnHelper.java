@@ -208,6 +208,10 @@ public class SvnHelper {
                         (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(LogWithAlerts.getActiveFrame(null),
                         "Would you like to connect over the network to Subversion?", "Confirm network operation",
                         JOptionPane.YES_NO_OPTION));
+                
+                if(connectToSubversion){
+                	Svn.getPrompter().prompt("Subversion authentication", "");
+                }
             } 
         	}	
             Svn.setConnectedToSvn(connectToSubversion);
