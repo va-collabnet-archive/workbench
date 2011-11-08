@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JRadioButton;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
@@ -58,7 +57,7 @@ public class InteractiveAdjudicator implements ContradictionManagerBI {
                 resolvedVersions.add((T) buttonVersionMap.get((JRadioButton) activeButton));
                 return resolvedVersions;
             }
-
+            //TODO add the interactive step here. May not be necessary since we are using the radio groups.
             throw new UnsupportedOperationException("Not supported yet.");
         }
 

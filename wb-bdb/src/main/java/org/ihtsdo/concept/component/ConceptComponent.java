@@ -656,7 +656,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         // annotations
         if (annotations != null) {
             for (RefsetMember<?, ?> a : annotations) {
-                changed = changed || a.makeAdjudicationAnalogs(ec, vc);
+                boolean annotationChanged = a.makeAdjudicationAnalogs(ec, vc);
+                changed = changed || annotationChanged;
             }
         }
 
@@ -2098,6 +2099,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             return Bdb.getSapDb().getPathNid(primordialSapNid);
         }
 
+        @Override
         public int getSapNid() {
             if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
                 return additionalIdVersions.get(index).getSapNid();
