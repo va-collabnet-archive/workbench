@@ -109,8 +109,9 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 						destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
 						destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
 						destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
+							valueId = destinationId;
 					}
-						valueId = destinationId;
+						
 					}
 				
 				} 
