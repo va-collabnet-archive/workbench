@@ -4,7 +4,7 @@ public enum RulesReportColumn {
 	RULE_NAME(1, "Rule name"), RULE_CODE(2, "Rule code"), CATEGORY(3, "Category"),
 	SEVERITY(4, "Severity"), OPEN(5, "Open"), CLOSED(6,"Closed"), ESCALATED(7,"Escalated"),
 	DEFERRED(8, "Deferred"), CLEARED(9,"Cleared"), IN_DISCUTION(10,"In Discussion"), 
-	DISPOSITION_STATUS_FILTER(11, "Disposition status filter"), STATUS(12,"Status filter");
+	DISPOSITION_STATUS_FILTER(11, "Disposition status filter"), STATUS(12,"Status filter"), RULE_DATE(13, "Rule date");
 
 	private Integer columnNumber;
 	private String columnName;
