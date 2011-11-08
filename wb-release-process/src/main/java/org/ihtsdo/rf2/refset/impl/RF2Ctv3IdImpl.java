@@ -69,6 +69,8 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 						wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
 					}
 					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
+					
+					referencedComponentId=wsConceptId;
 				}
 			}
 			
