@@ -547,7 +547,7 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-bdb-mojo</artifactId>
-				<version>2.6.0-trek-13-SNAPSHOT</version>
+				<version>2.6.0-trek-16</version>
 				<executions>
 					<execution>
 						<id>load-econcepts-multi</id>
