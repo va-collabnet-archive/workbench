@@ -53,7 +53,6 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-//logger.info("====relationships====" + relationships.size());
 
 		for (I_RelTuple rel : relationships) {
 			String characteristicTypeId="";
@@ -86,7 +85,6 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					}
 				}
 
-//logger.info("====destinationId====" + destinationId);
 				String relTypeId = "";
 
 				id = tf.getId(rel.getTypeNid());
@@ -111,12 +109,11 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 						destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
 							valueId = destinationId;
 							logger.info("====valueId====" + valueId);
-					}
-						
+						}	
 					}
 				
 				} 
-		}
+			}
 
 				
 		return valueId;
@@ -128,18 +125,15 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 		try {
 			String effectiveTime = "";
 			String conceptStatus = "";
-			int firstInactivePassed = 0;
-			int firstLimitedPassed = 0;
-			String priorValueId = "";
 			String valueId = "";
-			String priorLimitedActiveFlag = "";
 			String active = "";
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
-			Date LIMITED = getDateFormat().parse(I_Constants.limited_policy_change);
+			//Date LIMITED = getDateFormat().parse(I_Constants.limited_policy_change);
+			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
@@ -157,13 +151,16 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					} else {
 						active = "1";
 					}
-					logger.info("====conceptStatus====" + conceptStatus + "===referencedComponentId==" + referencedComponentId);
-					
 					
 					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-					if (valueId.equals("XXX")) {
+					
+					if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
+						logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
 						valueId= getConceptInactivationRelationshipValueId(concept);
+					}else{
+						logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
 					}
+					
 					if (!valueId.equals("XXX")) {
 						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
 					} else {
@@ -179,12 +176,6 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 			logger.error("Exceptions in exportConcept: " + e.getMessage());
 			e.printStackTrace();
 		}
-	}
-
-	private void WriteRF2TypeLine(RefsetConceptDAO dao) throws IOException {
-		WriteUtil.write(getConfig(), dao.getUuid() + "\t" + dao.getEffectiveTime() + "\t" + dao.getActive() + "\t" + dao.getModuleId() + "\t" + dao.getRefsetId() + "\t"
-				+ dao.getReferencedComponentId() + "\t" + dao.getValueId());
-		WriteUtil.write(getConfig(), "\r\n");
 	}
 
 	private void WriteRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String valueId) throws IOException {

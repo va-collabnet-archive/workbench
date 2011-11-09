@@ -65,7 +65,7 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 						wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
 					}					
 					mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
-					referencedComponentId=wsConceptId;
+					//referencedComponentId=wsConceptId;
 				}
 			}
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
