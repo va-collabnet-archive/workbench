@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JList;
@@ -64,6 +65,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -117,6 +119,12 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 			File inputFile = new File(filename);
 			I_TermFactory tf = Terms.get();
 			config = tf.getActiveAceFrameConfig();
+			Set<PathBI> oldEditPathSet = config.getEditingPathSet();
+            Set<PathBI> editSet = config.getEditingPathSet();
+            editSet.clear();
+            for (PathBI loopPath : config.getPromotionPathSetReadOnly()) {
+            	config.addEditingPath(loopPath);
+            }
 			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
@@ -299,6 +307,11 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 			if (modified > 0) {
 				config.setCommitEnabled(true);
 			}
+			Set<PathBI> editSet2 = config.getEditingPathSet();
+	        editSet2.clear();
+	        for (PathBI loopPath : oldEditPathSet) {
+            	config.addEditingPath(loopPath);
+            }
 			JOptionPane.showMessageDialog(null,
 					"Batch update finished: Lines: " + lines + 
 					" Modified: " + modified + " Skipped: " + skipped );
