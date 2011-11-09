@@ -143,6 +143,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 
 			File file = new File(getConfig().getReleaseFolder() + File.separator + getConfig().getRf2Files().get(f).fileName);
 			File sctIdFile = new File(getConfig().getDestinationFolder() + File.separator + getConfig().getRf2Files().get(f).sctIdFileName);
+			sctIdFile.getParentFile().mkdirs();
 			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
 			ArrayList<String> Key = getConfig().getRf2Files().get(f).key.keyOrdinals;
 
@@ -226,10 +227,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 
 							List<UUID> list = new ArrayList<UUID>();
 
-							FileOutputStream fos = new FileOutputStream(idMapFile);
-							OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF8");
-							BufferedWriter rf2FileWriter = new BufferedWriter(osw);
-
 							FileInputStream fis = new FileInputStream(inputFile);
 							InputStreamReader isr = new InputStreamReader(fis, "UTF-8");				
 							BufferedReader rf2FileReader = new BufferedReader(isr);
@@ -243,9 +240,9 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 
 								}
 							}
-							rf2FileWriter.close();
-							osw.close();
-							fos.close();
+							rf2FileReader.close();
+							isr.close();
+							fis.close();
 
 							HashMap<UUID, Long> res = new HashMap<UUID, Long>();
 							if (list.size()>0){
@@ -255,10 +252,15 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 
-
 								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,moduleId);
 
 								if (idMapFile!=null && !idMapFile.equals("")){
+
+									File mapFile=new File(idMapFile);
+									mapFile.mkdirs();
+									FileOutputStream fos = new FileOutputStream(idMapFile);
+									OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF8");
+									BufferedWriter rf2FileWriter = new BufferedWriter(osw);
 
 									for (UUID uuid:res.keySet()){
 										rf2FileWriter.append(uuid.toString() );
@@ -266,6 +268,9 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 										rf2FileWriter.append(String.valueOf(res.get(uuid)));
 										rf2FileWriter.append("\r\n");
 									}
+									rf2FileWriter.close();
+									osw.close();
+									fos.close();
 								}
 							}
 
