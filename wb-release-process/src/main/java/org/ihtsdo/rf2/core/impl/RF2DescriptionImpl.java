@@ -63,7 +63,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
+			
 			
 			for (I_DescriptionTuple description: descriptions) {
 				
@@ -72,7 +72,9 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 
 				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
-				if (!sDescType.equals("4") && !description.getLang().equals("es") && !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
+
+				if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
+					//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
 					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 					String term = description.getText();
@@ -134,8 +136,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 								logger.error("Exception" +e);
 							}
 						}
-					}
-					
+					}					
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
 						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());

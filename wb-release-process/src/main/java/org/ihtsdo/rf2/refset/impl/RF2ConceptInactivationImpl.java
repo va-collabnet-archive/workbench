@@ -110,6 +110,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 						destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
 						destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
 							valueId = destinationId;
+							logger.info("====valueId====" + valueId);
 					}
 						
 					}
@@ -117,7 +118,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 				} 
 		}
 
-		logger.info("====valueId====" + valueId);		
+				
 		return valueId;
 		
 	}
@@ -156,10 +157,13 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					} else {
 						active = "1";
 					}
-					logger.info("====conceptStatus====" + conceptStatus);
-					valueId= getConceptInactivationRelationshipValueId(concept);
+					logger.info("====conceptStatus====" + conceptStatus + "===referencedComponentId==" + referencedComponentId);
 					
-					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+					
+					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+					if (valueId.equals("XXX")) {
+						valueId= getConceptInactivationRelationshipValueId(concept);
+					}
 					if (!valueId.equals("XXX")) {
 						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
 					} else {
