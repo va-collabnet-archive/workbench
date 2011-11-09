@@ -107,17 +107,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 
 	public void generateIdentifier(){
 
-
-		// check if the release folder exists
-		File rFile = new File(getConfig().getReleaseFolder());
-		if (!rFile.exists())
-			logger.info("Release folder : " + getConfig().getReleaseFolder() + " doesn't exist, exiting ..");
-
-		//check if the release folder contains files
-		String[] rFiles = rFile.list();
-		if ( rFiles.length == 0 )
-			logger.info("Release folder : " + getConfig().getReleaseFolder() + " is empty, exiting ..");
-
 		// create the destination folder if it doesn't exist
 		File dFile = new File(getConfig().getDestinationFolder());
 		if (!dFile.exists()) {
@@ -141,7 +130,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		HashMap<UUID,Long> hmTmp;
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 
-			File file = new File(getConfig().getReleaseFolder() + File.separator + getConfig().getRf2Files().get(f).fileName);
+			File file = new File( getConfig().getRf2Files().get(f).fileName);
 			File sctIdFile = new File(getConfig().getDestinationFolder() + File.separator + getConfig().getRf2Files().get(f).sctIdFileName);
 			sctIdFile.getParentFile().mkdirs();
 			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
@@ -213,7 +202,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 	private void extractUuidToList() {
 
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
-			File inputFile = new File(getConfig().getReleaseFolder() + File.separator + getConfig().getRf2Files().get(f).fileName);
+			File inputFile = new File(getConfig().getRf2Files().get(f).fileName);
 			String idSaveTolist = getConfig().getRf2Files().get(f).sctidparam.idSaveTolist;
 			String idType = getConfig().getRf2Files().get(f).sctidparam.idType;
 			String idColumnIndex= getConfig().getRf2Files().get(f).sctidparam.idColumnIndex;
