@@ -160,15 +160,15 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 			I_TermFactory tf = Terms.get();
         	SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
             
-			return "\nConcept (Referenced Component Id) = " + tf.getConcept(concept).getInitialText() +
+			return "\nConcept (UUID) = " + concept +
+				   "\nFSN = " + fsn +
 				   "\nWorkflow Id = " + workflowId.toString() +
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() + 
 				   "\nAction = " + tf.getConcept(action).getInitialText() +
 				   "\nState = " + tf.getConcept(state).getInitialText() +
-				   "\nFSN = " + fsn +
 				   "\nEffectiveTimestamp = " + formatter.format(new Date(effectiveTime)) +
-				   "\nWorkflow Time = " + formatter.format(new Date(workflowTime)) +
+				   "\nWorkflow Time = " + formatter.format(new Date(workflowTime)) + 
 				   "\nAutoApproved = " + autoApproved + 
 				   "\nOverridden = " + overridden +
 				   "\nRxMemberId = " + memberId;
