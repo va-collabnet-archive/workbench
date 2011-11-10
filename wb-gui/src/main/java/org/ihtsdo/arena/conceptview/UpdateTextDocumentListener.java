@@ -133,7 +133,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
                 refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
                 int type = desc.getTypeNid();
-                int fsn = 0;
+                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
                 //get rf1/rf2 concept
                 gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
