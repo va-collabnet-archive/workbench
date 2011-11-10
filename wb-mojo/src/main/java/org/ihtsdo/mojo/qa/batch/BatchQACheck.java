@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -200,6 +202,8 @@ public class BatchQACheck extends AbstractMojo {
 	UUID executionUUID;
 	DateFormat df;
 	Calendar executionDate ;
+
+	private HashMap<String, String> allRules;
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
@@ -224,6 +228,7 @@ public class BatchQACheck extends AbstractMojo {
 			}
 			contextHelper.clearCache();
 			cleanKbFileCache();
+			allRules=new HashMap<String,String>();
 			exportExecutionDescriptor(contextHelper);
 			performQA(executionUUID, contextHelper);
 		} catch (Exception e) {
@@ -268,7 +273,8 @@ public class BatchQACheck extends AbstractMojo {
 
 			Document document = impl.createDocument(null, "description", null);
 			Element rootElement = document.getDocumentElement();
-
+			
+			HashSet<String> rules;
 			List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
 			for (RulesDeploymentPackageReference loopPackage : kbPackages) {
 				Element packageElement = document.createElement("package");
@@ -276,9 +282,19 @@ public class BatchQACheck extends AbstractMojo {
 				packageElement.setAttribute("url", loopPackage.getUrl());
 				rootElement.appendChild(packageElement);
 
+				rules=new HashSet<String>();
 				for (Rule loopRule : loopPackage.getRules()) {
 					String ruleUid = (String) loopRule.getMetaData().get("UUID");
+					if (rules.contains(ruleUid)){
+						System.out.println("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
+						throw new Exception("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
+					}else{
+						rules.add(ruleUid);
+					}
 					String description = (String) loopRule.getMetaData().get("DESCRIPTION");
+					if (!allRules.containsKey(ruleUid)){
+						allRules.put(ruleUid, description);
+					}
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
 					String severityUid = (String) loopRule.getMetaData().get("SEVERITY");
 					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
@@ -385,7 +401,7 @@ public class BatchQACheck extends AbstractMojo {
 		//TODO: add header titles
 		findingPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "run Id" + "\t" + "rule uid" + "\t" + "component uuid"  + "\t" + "details" + "\t" + "component name");
 		Long start = Calendar.getInstance().getTimeInMillis();
-		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid));
+		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid,allRules));
 		findingPw.flush();
 		findingPw.close();
 		Long end = Calendar.getInstance().getTimeInMillis();
