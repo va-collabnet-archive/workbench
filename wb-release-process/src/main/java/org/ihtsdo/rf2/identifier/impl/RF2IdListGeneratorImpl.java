@@ -111,7 +111,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		File dFile = new File(getConfig().getDestinationFolder());
 		if (!dFile.exists()) {
 			logger.info("Destination folder : " + getConfig().getDestinationFolder() + " doesn't exist, creating ..");
-			dFile.mkdirs();
+			dFile.getParentFile().mkdirs();
 		}
 
 		String updateWbSctId = getConfig().isUpdateWbSctId();
@@ -246,7 +246,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								if (idMapFile!=null && !idMapFile.equals("")){
 
 									File mapFile=new File(idMapFile);
-									mapFile.mkdirs();
+									mapFile.getParentFile().mkdirs();
 									FileOutputStream fos = new FileOutputStream(idMapFile);
 									OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF8");
 									BufferedWriter rf2FileWriter = new BufferedWriter(osw);
