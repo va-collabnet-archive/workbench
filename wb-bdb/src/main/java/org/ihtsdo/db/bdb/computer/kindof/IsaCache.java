@@ -31,11 +31,25 @@ public class IsaCache extends TypeCache {
 
     public NidSet getParentSet(Concept concept) throws Exception {
         NidSet parentSet = new NidSet();
+        int relCounter = 0;
         for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
-            for (RelationshipVersionBI rv : relv.getVersions(coordinate)) {
+            for (RelationshipVersionBI rv : relv.getVersions(inferredViewCoordinate)) {
                 if (types.contains(rv.getTypeNid())) {
                    parentSet.add(rv.getDestinationNid());
+                   relCounter++;
                    break;
+                }
+            }
+        }
+        
+        if (relCounter == 0) {
+        	for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
+                for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
+                    if (types.contains(rv.getTypeNid())) {
+                       parentSet.add(rv.getDestinationNid());
+                       relCounter++;
+                       break;
+                    }
                 }
             }
         }
