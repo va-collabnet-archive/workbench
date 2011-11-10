@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 
 /**
- * Unit test for simple App.
+ * Unit test for ChangeSet Generation.
  */
 public class SctIDChangeSetCreation extends TestCase {
 
@@ -45,7 +45,8 @@ public class SctIDChangeSetCreation extends TestCase {
 	 * @param testName
 	 *        name of the test case
 	 */
-	public SctIDChangeSetCreation(String testName) {		
+	public SctIDChangeSetCreation(String testName) {
+		super(testName);
 		System.out.println("SctIDChangeSetCreation Junit Test Classes");
 	}
 
@@ -60,16 +61,14 @@ public class SctIDChangeSetCreation extends TestCase {
 			_termfactory = Terms.get();
 		} catch (Exception e) {
 			System.err.println("Unable to connect to the berkeley database" + e.getMessage());
-		} finally {
-		
-		}
+		} 
 	}
 
 	/**
 	 * @return the suite of tests being tested
 	 */
 	public static Test suite() {
-		return new TestSuite(InsertIDTest.class);
+		return new TestSuite(SctIDChangeSetCreation.class);
 	}
 
 	/**
@@ -81,16 +80,16 @@ public class SctIDChangeSetCreation extends TestCase {
 
 	//Adding newly created sctId for the new concept and committing concept 
 	//New sctId is now present in the database but no change set gets created
-	//Recurrent varicose vein of lower leg (disorder)
+	//
 	public void testCreateChangeset(){
 		String wsSctId = "797979"; // Dummy ids
 		boolean flag = false;
 		try {	
 				System.out.println("===============ChangeSet Creation Started============");
-				DateFormat df = new SimpleDateFormat("yyyyMMdd");
-				long effectiveDate=df.parse("20120131").getTime(); //Putting hardcoded values
-			
-				I_GetConceptData testConcept = _termfactory.getConcept(UUID.fromString("00119899-e520-5acd-ae88-86f7eb109cc9"));
+				//DateFormat df = new SimpleDateFormat("yyyyMMdd");
+				//long effectiveDate=df.parse("20120131").getTime(); //Putting hardcoded values
+				
+				I_GetConceptData testConcept = _termfactory.getConcept(UUID.fromString("aa23ea32-37cc-6cc8-e044-0003ba13161a"));
 				I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConceptAttributes();
 				I_Identify i_Identify = _termfactory.getId(testConcept.getNid());	
 				BdbTermFactory tfb = (BdbTermFactory) _termfactory;
@@ -130,10 +129,17 @@ public class SctIDChangeSetCreation extends TestCase {
 								"." + "commitLog.xls")));	
 				*/
 		        
-				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+				/*flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
 						i_ConceptAttributeVersioned.getStatusNid(),
 						i_ConceptAttributeVersioned.getPathNid(),
 						effectiveDate);
+				*/
+				 
+				 
+				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+						i_ConceptAttributeVersioned.getStatusNid(),
+						i_ConceptAttributeVersioned.getPathNid(),
+						Long.MAX_VALUE);
 				
 				I_GetConceptData commitedConcept = _termfactory.getConceptForNid(testConcept.getNid());
 				_termfactory.addUncommitted(commitedConcept);
