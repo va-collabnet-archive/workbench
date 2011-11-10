@@ -111,7 +111,9 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		File dFile = new File(getConfig().getDestinationFolder());
 		if (!dFile.exists()) {
 			logger.info("Destination folder : " + getConfig().getDestinationFolder() + " doesn't exist, creating ..");
-			dFile.getParentFile().mkdirs();
+			dFile.mkdirs();
+
+			logger.info("Creating dirs does not existent." );
 		}
 
 		String updateWbSctId = getConfig().isUpdateWbSctId();
@@ -125,8 +127,10 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 
 		hmTypeMap=new HashMap<String, HashMap<UUID,Long>>();
 
+		logger.info("Creating SCTIds lists" );
 		extractUuidToList();
 
+		logger.info("Assign ids from list." );
 		HashMap<UUID,Long> hmTmp;
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 
