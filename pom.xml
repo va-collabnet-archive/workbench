@@ -30,7 +30,7 @@
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>mrcm-refset-specs</artifactId>
 			<type>zip</type>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.6</version>
 		</dependency>
 	</dependencies>
 	<build>
