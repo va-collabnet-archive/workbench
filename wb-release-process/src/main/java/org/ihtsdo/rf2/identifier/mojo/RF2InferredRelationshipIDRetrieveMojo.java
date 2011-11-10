@@ -19,7 +19,6 @@ import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
  * 
  * @goal rf2-inferred-relationships-id-reassign
  * 
- * @phase install
  */
 public class RF2InferredRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
