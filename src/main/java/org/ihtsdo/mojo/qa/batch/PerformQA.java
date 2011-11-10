@@ -54,9 +54,10 @@ public class PerformQA implements I_ProcessConcepts {
 	private IsaCache isaCache;
 	private long elapsedTotal;
 	private int estimatedNumberOfConcepts;
+	private HashMap<String, String> allRules;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
-			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid) throws Exception {
+			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid, HashMap<String, String> allRules) throws Exception {
 		super();
 		this.config = config;
 		this.context = context;
@@ -68,6 +69,7 @@ public class PerformQA implements I_ProcessConcepts {
 		this.count = 0;
 		this.skippedCount = 0;
 		this.start = Calendar.getInstance().getTimeInMillis();
+		this.allRules=allRules;
 		traceElapsedTimes = new HashMap<String,Long>();
 		traceCounts = new HashMap<String,Integer>();
 		uniqueFsnMap = new HashMap<String,Integer>();
@@ -208,7 +210,11 @@ public class PerformQA implements I_ProcessConcepts {
 				String ruleUuid = resultItem.getRuleUuid();
 				String conceptName = concept.toUserString();
 				UUID conceptUUID = concept.getUids().get(0);
-
+				if (!allRules.containsKey(ruleUuid)){
+					System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+					throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+				
+				}
 				//Write data to file
 				findingPw.print(findingUUID + "\t");
 				findingPw.print(databaseUuid + "\t");
