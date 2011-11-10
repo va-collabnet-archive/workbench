@@ -58,14 +58,6 @@ public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 	
 
 	/**
-	 * Location of the release folder.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String releaseFolder;
-
-	/**
 	 * Location of the destination folder.
 	 * 
 	 * @parameter
@@ -143,12 +135,10 @@ public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 		config.setPassword(password);
 		config.setEndPoint(endpointURL);
 		config.setDestinationFolder(destinationFolder);
-		config.setReleaseFolder(releaseFolder);
 		config.setRf2Files(rf2Files);
 		config.setUpdateWbSctId(updateWbSctId);
 		
 		getLog().info("Running the RF2 File ID Creation with the following ");
-		getLog().info("Release Folder     :" + releaseFolder);
 		getLog().info("Destination Folder :" + destinationFolder);
 		
 		// Initialize meta hierarchy
@@ -158,7 +148,6 @@ public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 		factory.export();		
 		
 		getLog().info("Running the RF2 File ID Creation with the following ");
-		getLog().info("Release Folder     :" + releaseFolder);
 		getLog().info("Destination Folder :" + destinationFolder);
 
 	}
