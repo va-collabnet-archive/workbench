@@ -16,7 +16,6 @@ import org.ihtsdo.rf2.util.JAXBUtil;
  * 
  * @goal rf2-id-list-creator
  * 
- * @phase install
  */
 public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 	
