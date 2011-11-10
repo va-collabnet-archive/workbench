@@ -13,17 +13,17 @@
 
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>translation-module-master-pom</artifactId>
-	<version>2.6.0-trek-15-SNAPSHOT</version>
+	<version>2.6.0-trek-16-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>translation-module-master-pom</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<workbench.version>2.6.0-trek-15-SNAPSHOT</workbench.version>
+		<workbench.version>2.6.0-trek-16</workbench.version>
 	</properties>
 
 	<modules>
-		<module>documents</module>
+	<!--	<module>documents</module> -->
 		<module>issue-management-ndb</module>
 		<module>issue-repository-integration-ndb</module>
 		<module>project-management-ndb</module>
