@@ -131,7 +131,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		for (int f = 0; f < getConfig().getRf2Files().size(); f++) {
 
 			File file = new File( getConfig().getRf2Files().get(f).fileName);
-			File sctIdFile = new File(getConfig().getDestinationFolder() + File.separator + getConfig().getRf2Files().get(f).sctIdFileName);
+			File sctIdFile = new File(getConfig().getRf2Files().get(f).sctIdFileName);
 			sctIdFile.getParentFile().mkdirs();
 			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
 			ArrayList<String> Key = getConfig().getRf2Files().get(f).key.keyOrdinals;
