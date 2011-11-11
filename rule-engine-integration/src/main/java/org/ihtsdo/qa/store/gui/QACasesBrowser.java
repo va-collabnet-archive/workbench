@@ -78,6 +78,7 @@ import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
 
@@ -393,6 +394,13 @@ public class QACasesBrowser extends JPanel {
 
 						Collection<? extends ConceptVersionBI> versions = concept.getVersions(config.getViewCoordinate());
 						for (ConceptVersionBI conceptVersionBI : versions) {
+							
+//							int charNid = conceptVersionBI.getgetCharacteristicNid();
+//							int anotherNid = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+//							int architectonicAuxInferredNid = ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
+//							int snomedMetadataInferredNid = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
+//							if (anotherNid !=  charNid && charNid != architectonicAuxInferredNid 
+							
 							if (conceptVersionBI.getTime() > lastModification) {
 								lastModification = conceptVersionBI.getTime();
 							}
@@ -408,9 +416,16 @@ public class QACasesBrowser extends JPanel {
 
 						List<? extends I_RelTuple> sourcRels = concept.getSourceRelTuples(null, null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 						for (I_RelTuple i_RelTuple : sourcRels) {
-							long relTime = i_RelTuple.getTime();
-							if (relTime > lastModification) {
-								lastModification = relTime;
+							int charNid = i_RelTuple.getCharacteristicNid();
+							int anotherNid = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+							int architectonicAuxInferredNid = ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
+							int snomedMetadataInferredNid = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
+							if (anotherNid !=  charNid && charNid != architectonicAuxInferredNid 
+									&& snomedMetadataInferredNid != charNid) {
+								long relTime = i_RelTuple.getTime();
+								if (relTime > lastModification) {
+									lastModification = relTime;
+								}
 							}
 						}
 

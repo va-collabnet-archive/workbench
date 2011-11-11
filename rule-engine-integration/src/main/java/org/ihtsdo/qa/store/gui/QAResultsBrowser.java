@@ -73,6 +73,9 @@ public class QAResultsBrowser extends JPanel {
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 	private boolean firstLoad = true;
 	private QAStorePanel qaStorePanel;
+	HashMap<QADatabase, List<TerminologyComponent>> allPathsForDatabase = new HashMap<QADatabase, List<TerminologyComponent>>();
+	List<QADatabase> allDatabases;
+	HashMap<String, List<String>> allTimesForPath = new HashMap<String, List<String>>();
 
 	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane, QAStorePanel qaStorePanel) {
 		this.store = store;
@@ -264,8 +267,11 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupDatabasesCombo() {
 		comboBox1.removeAllItems();
-		if (store.getAllDatabases() != null) {
-			for (QADatabase loopDatabase : store.getAllDatabases()) {
+		if (allDatabases == null) {
+			allDatabases = store.getAllDatabases();
+		}
+		if (allDatabases != null) {
+			for (QADatabase loopDatabase : allDatabases) {
 				comboBox1.addItem(loopDatabase);
 			}
 		}
@@ -273,18 +279,35 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupPathsCombo() {
 		comboBox2.removeAllItems();
-		if (comboBox1.getSelectedItem() != null && store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid()) != null) {
-			for (TerminologyComponent loopPath : store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid())) {
+		if (comboBox1.getSelectedItem() != null && allPathsForDatabase != null) {
+			QADatabase selectedDatabase = (QADatabase) comboBox1.getSelectedItem();
+			List<TerminologyComponent> paths = null;
+			if (!allPathsForDatabase.containsKey(selectedDatabase)) {
+				paths= store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid());
+				allPathsForDatabase.put(selectedDatabase, paths);
+			} else {
+				paths = allPathsForDatabase.get(selectedDatabase);
+			}
+			for (TerminologyComponent loopPath : paths) {
 				comboBox2.addItem(loopPath);
 			}
+			comboBox2.setSelectedIndex(0);
 		}
 	}
 
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
-		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null
-				&& store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid()) != null) {
-			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid())) {
+		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && allTimesForPath != null) {
+			UUID databaseUUID = ((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid();
+			UUID pathUUID = ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid();
+			String key = databaseUUID.toString() + pathUUID.toString();
+			
+			if (!allTimesForPath.containsKey(key)) {
+				List<String> timeFOrPath = store.getAllTimesForPath(databaseUUID, pathUUID);
+				allTimesForPath.put(key, timeFOrPath);
+			} else {
+			}
+			for (String loopDate : allTimesForPath.get(key)) {
 				comboBox3.addItem(loopDate);
 			}
 		}
@@ -351,21 +374,21 @@ public class QAResultsBrowser extends JPanel {
 					row.add(openStatusCount);
 					int cleardCount = 0;
 					for (DispositionStatus loopStatus : dispositionStatuses) {
-						if(loopStatus.getName().equalsIgnoreCase("Cleared")){
+						if (loopStatus.getName().equalsIgnoreCase("Cleared")) {
 							cleardCount = line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid());
 						}
 					}
 					for (DispositionStatus loopStatus : dispositionStatuses) {
-						if(loopStatus.getName().equalsIgnoreCase("not clear")){
+						if (loopStatus.getName().equalsIgnoreCase("not clear")) {
 							row.add(openStatusCount - cleardCount);
-						}else{
+						} else {
 							row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
 						}
 					}
 					row.add(line.getStatusCount().get(false));
-					if(line.getRule().getEffectiveTime() != null){
+					if (line.getRule().getEffectiveTime() != null) {
 						row.add(sdf.format(new Date(line.getRule().getEffectiveTime().getTime())));
-					}else{
+					} else {
 						row.add("");
 					}
 					row.add(line.getRule().getRuleUuid());
@@ -423,18 +446,25 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void comboBox1ItemStateChanged(ItemEvent e) {
-		setupPathsCombo();
-		setupTimeCombo();
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			System.out.println("THIS METHOD SHOULD RUN ONLY ONCEEEE OK???");
+			setupPathsCombo();
+			setupTimeCombo();
+			clearTable1();
+		}
 	}
 
 	private void comboBox2ItemStateChanged(ItemEvent e) {
-		setupTimeCombo();
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			setupTimeCombo();
+			clearTable1();
+		}
 	}
 
 	private void comboBox3ItemStateChanged(ItemEvent e) {
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			clearTable1();
+		}
 	}
 
 	private void button2ActionPerformed(ActionEvent e) {
@@ -616,86 +646,70 @@ public class QAResultsBrowser extends JPanel {
 		totalLinesLabel = new JLabel();
 		nextButton = new JButton();
 
-		//======== this ========
+		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 
-			//---- label1 ----
+			// ---- label1 ----
 			label1.setText("Database");
-			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label2 ----
+			// ---- label2 ----
 			label2.setText("Path");
-			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label3 ----
+			// ---- label3 ----
 			label3.setText("Time");
-			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label17 ----
+			// ---- label17 ----
 			label17.setText("Sort by");
-			panel1.add(label17, new GridBagConstraints(10, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 5), 0, 0));
+			panel1.add(label17, new GridBagConstraints(10, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-			//---- label12 ----
+			// ---- label12 ----
 			label12.setText("Order");
-			panel1.add(label12, new GridBagConstraints(11, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+			panel1.add(label12, new GridBagConstraints(11, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-			//---- comboBox1 ----
+			// ---- comboBox1 ----
 			comboBox1.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					comboBox1ItemStateChanged(e);
 				}
 			});
-			panel1.add(comboBox1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(comboBox1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- comboBox2 ----
+			// ---- comboBox2 ----
 			comboBox2.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					comboBox2ItemStateChanged(e);
 				}
 			});
-			panel1.add(comboBox2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(comboBox2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- comboBox3 ----
+			// ---- comboBox3 ----
 			comboBox3.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					comboBox3ItemStateChanged(e);
 				}
 			});
-			panel1.add(comboBox3, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(comboBox3, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- button1 ----
+			// ---- button1 ----
 			button1.setText("Search");
 			button1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button1.addActionListener(new ActionListener() {
@@ -704,11 +718,9 @@ public class QAResultsBrowser extends JPanel {
 					searchActionPerformed(e);
 				}
 			});
-			panel1.add(button1, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(button1, new GridBagConstraints(7, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- button2 ----
+			// ---- button2 ----
 			button2.setText("Show filters");
 			button2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			button2.addActionListener(new ActionListener() {
@@ -717,92 +729,70 @@ public class QAResultsBrowser extends JPanel {
 					button2ActionPerformed(e);
 				}
 			});
-			panel1.add(button2, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(button2, new GridBagConstraints(8, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- sortByComboBox ----
+			// ---- sortByComboBox ----
 			sortByComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					sortByComboBoxItemStateChanged(e);
 				}
 			});
-			panel1.add(sortByComboBox, new GridBagConstraints(10, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel1.add(sortByComboBox, new GridBagConstraints(10, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- orderCombo ----
+			// ---- orderCombo ----
 			orderCombo.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					orderComboItemStateChanged(e);
 				}
 			});
-			panel1.add(orderCombo, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(orderCombo, new GridBagConstraints(11, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-		//======== panel4 ========
+		// ======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {85, 255, 159, 115, 0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0E-4};
-			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+			((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 85, 255, 159, 115, 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0E-4 };
+			((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 
-			//---- label11 ----
+			// ---- label11 ----
 			label11.setText("Rule code");
-			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label8 ----
+			// ---- label8 ----
 			label8.setText("Rule name");
-			panel4.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label10 ----
+			// ---- label10 ----
 			label10.setText("Category");
-			panel4.add(label10, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label10, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label9 ----
+			// ---- label9 ----
 			label9.setText("Severity");
-			panel4.add(label9, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label9, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label4 ----
+			// ---- label4 ----
 			label4.setText("Status");
-			panel4.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 15), 0, 0));
+			panel4.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 15), 0, 0));
 
-			//---- label5 ----
+			// ---- label5 ----
 			label5.setText("Disposition");
-			panel4.add(label5, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
+			panel4.add(label5, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-			//---- ruleCodeTextField ----
+			// ---- ruleCodeTextField ----
 			ruleCodeTextField.addKeyListener(new KeyAdapter() {
 				@Override
 				public void keyPressed(KeyEvent e) {
 					ruleCodeTextFieldKeyPressed(e);
 				}
 			});
-			panel4.add(ruleCodeTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(ruleCodeTextField, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- ruleNameTextField ----
+			// ---- ruleNameTextField ----
 			ruleNameTextField.setColumns(50);
 			ruleNameTextField.addKeyListener(new KeyAdapter() {
 				@Override
@@ -810,70 +800,58 @@ public class QAResultsBrowser extends JPanel {
 					ruleNameTextFieldKeyPressed(e);
 				}
 			});
-			panel4.add(ruleNameTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(ruleNameTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- categoryComboBox ----
+			// ---- categoryComboBox ----
 			categoryComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					categoryComboBoxItemStateChanged(e);
 				}
 			});
-			panel4.add(categoryComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(categoryComboBox, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- severityComboBox ----
+			// ---- severityComboBox ----
 			severityComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					severityComboBoxItemStateChanged(e);
 				}
 			});
-			panel4.add(severityComboBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(severityComboBox, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- statusComboBox ----
+			// ---- statusComboBox ----
 			statusComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					statusComboBoxItemStateChanged(e);
 				}
 			});
-			panel4.add(statusComboBox, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 15), 0, 0));
+			panel4.add(statusComboBox, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 15), 0, 0));
 
-			//---- dispositionComboBox ----
+			// ---- dispositionComboBox ----
 			dispositionComboBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					dispositionComboBoxItemStateChanged(e);
 				}
 			});
-			panel4.add(dispositionComboBox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel4.add(dispositionComboBox, new GridBagConstraints(5, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel4, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
 
-				//---- table1 ----
+				// ---- table1 ----
 				table1.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -882,30 +860,24 @@ public class QAResultsBrowser extends JPanel {
 				});
 				scrollPane1.setViewportView(table1);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-		//======== panel3 ========
+		// ======== panel3 ========
 		{
 			panel3.setLayout(new GridBagLayout());
-			((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0};
-			((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0 };
+			((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- label6 ----
+			// ---- label6 ----
 			label6.setText("Show ");
 			label6.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- showItemsCombo ----
+			// ---- showItemsCombo ----
 			showItemsCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			showItemsCombo.addItemListener(new ItemListener() {
 				@Override
@@ -913,21 +885,15 @@ public class QAResultsBrowser extends JPanel {
 					showItemsComboItemStateChanged(e);
 				}
 			});
-			panel3.add(showItemsCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(showItemsCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label7 ----
+			// ---- label7 ----
 			label7.setText("rows per page");
 			label7.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label7, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label7, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(hSpacer1, new GridBagConstraints(3, 0, 9, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- previousButton ----
+			// ---- previousButton ----
 			previousButton.setText("<");
 			previousButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			previousButton.addActionListener(new ActionListener() {
@@ -936,46 +902,34 @@ public class QAResultsBrowser extends JPanel {
 					previousButtonActionPerformed(e);
 				}
 			});
-			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(previousButton, new GridBagConstraints(12, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- startLineLable ----
+			// ---- startLineLable ----
 			startLineLable.setText("0");
 			startLineLable.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(startLineLable, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(startLineLable, new GridBagConstraints(13, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label16 ----
+			// ---- label16 ----
 			label16.setText("to");
 			label16.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label16, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label16, new GridBagConstraints(14, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- endLineLabel ----
+			// ---- endLineLabel ----
 			endLineLabel.setText("0");
 			endLineLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(endLineLabel, new GridBagConstraints(15, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- label14 ----
+			// ---- label14 ----
 			label14.setText("of");
 			label14.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(label14, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(label14, new GridBagConstraints(16, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- totalLinesLabel ----
+			// ---- totalLinesLabel ----
 			totalLinesLabel.setText("0");
 			totalLinesLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel3.add(totalLinesLabel, new GridBagConstraints(17, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- nextButton ----
+			// ---- nextButton ----
 			nextButton.setText(">");
 			nextButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			nextButton.addActionListener(new ActionListener() {
@@ -984,13 +938,9 @@ public class QAResultsBrowser extends JPanel {
 					nextButtonActionPerformed(e);
 				}
 			});
-			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel3.add(nextButton, new GridBagConstraints(18, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -1037,13 +987,13 @@ public class QAResultsBrowser extends JPanel {
 	private JLabel label14;
 	private JLabel totalLinesLabel;
 	private JButton nextButton;
+
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	class ResutlTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -2582804161676112393L;
 		public static final int ROW_DATA_SIZE = 14;
-		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated",
-				"Deferred", "In Discussion", "Not clear", "Closed","Rule date", "Last run", "Rule UUID"};
+		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated", "Deferred", "In Discussion", "Not clear", "Closed", "Rule date", "Last run", "Rule UUID" };
 
 		public ResutlTableModel(Object[] columnNames) {
 			super();
@@ -1082,7 +1032,7 @@ public class QAResultsBrowser extends JPanel {
 
 		@Override
 		public int getColumnCount() {
-			return columnNames.length-1;
+			return columnNames.length - 1;
 		}
 
 		@Override
