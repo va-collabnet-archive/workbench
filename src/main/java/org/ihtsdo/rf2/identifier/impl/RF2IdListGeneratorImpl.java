@@ -111,6 +111,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		File dFile = new File(getConfig().getDestinationFolder());
 		if (!dFile.exists()) {
 			logger.info("Destination folder : " + getConfig().getDestinationFolder() + " doesn't exist, creating ..");
+			logger.info("Creating dirs " + dFile.getAbsolutePath());
 			dFile.mkdirs();
 
 			logger.info("Creating dirs does not existent." );
