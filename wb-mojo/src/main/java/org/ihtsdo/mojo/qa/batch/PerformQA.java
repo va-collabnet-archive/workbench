@@ -55,6 +55,7 @@ public class PerformQA implements I_ProcessConcepts {
 	private long elapsedTotal;
 	private int estimatedNumberOfConcepts;
 	private HashMap<String, String> allRules;
+	private Set<String> rulesAlerted;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
 			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid, HashMap<String, String> allRules) throws Exception {
@@ -74,6 +75,7 @@ public class PerformQA implements I_ProcessConcepts {
 		traceCounts = new HashMap<String,Integer>();
 		uniqueFsnMap = new HashMap<String,Integer>();
 		duplicatesSet = new HashSet<Integer>();
+		rulesAlerted = new HashSet<String>();
 		try {
 			destRels = Terms.get().newIntSet();
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
@@ -211,9 +213,11 @@ public class PerformQA implements I_ProcessConcepts {
 				String conceptName = concept.toUserString();
 				UUID conceptUUID = concept.getUids().get(0);
 				if (!allRules.containsKey(ruleUuid)){
-					System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-					//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-				
+					if (!rulesAlerted.contains(ruleUuid)) {
+						rulesAlerted.add(ruleUuid);
+						System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+						//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+					}
 				}
 				//Write data to file
 				findingPw.print(findingUUID + "\t");
