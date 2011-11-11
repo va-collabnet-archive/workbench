@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -44,47 +45,24 @@ public class IsaCache extends TypeCache {
 
 	public NidSet getParentSet(Concept concept) throws Exception {
 		NidSet parentSet = new NidSet();
+		ConceptVersion cv = new ConceptVersion((Concept) concept, inferredViewCoordinate);
 		// Retired concept should be setup in the isa cache by stated parents
 		boolean isActive = true;
-		for (Version loopAttrVersion : concept.getConceptAttributes().getVersions(coordinate)) {
-			if (loopAttrVersion.getStatusNid() != activeValueNid) {
-				isActive = false;
+		if (cv.getConAttrs().getStatusNid() != activeValueNid) {
+			isActive = false;
+		}
+
+		if (!isActive || cv.getRelsOutgoingActiveIsa().isEmpty()) {
+			cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
+		}
+
+		for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
+			if (types.contains(rv.getTypeNid())) {
+				parentSet.add(rv.getDestinationNid());
+				break;
 			}
 		}
 
-		if (isActive) {
-			for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
-				for (RelationshipVersionBI rv : relv.getVersions(inferredViewCoordinate)) {
-					if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
-						parentSet.add(rv.getDestinationNid());
-						break;
-					}
-				}
-			}
-			
-			if (parentSet.size() == 0) {
-				for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
-					for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
-						if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
-							parentSet.add(rv.getDestinationNid());
-							break;
-						}
-					}
-				}
-			}
-			
-		} else {
-			for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
-				for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
-					if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
-						parentSet.add(rv.getDestinationNid());
-						break;
-					}
-				}
-			}
-		}
-		
-		
 		return parentSet;
 	}
 
