@@ -111,7 +111,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 		File dFile = new File(getConfig().getDestinationFolder());
 		if (!dFile.exists()) {
 			logger.info("Destination folder : " + getConfig().getDestinationFolder() + " doesn't exist, creating ..");
-			logger.info("Creating dirs " + dFile.getAbsolutePath());
+			logger.info("Creating dirs does not existent." );
 			dFile.mkdirs();
 
 			logger.info("Creating dirs does not existent." );
@@ -171,7 +171,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){	
 
 							String uuid = part[Integer.parseInt(Key.get(s))];
-							Long lSctId=hmTmp.get(uuid);
+							Long lSctId=hmTmp.get(UUID.fromString(uuid));
 							if (lSctId!=null){
 								sctid=String.valueOf(lSctId);
 							}else{
