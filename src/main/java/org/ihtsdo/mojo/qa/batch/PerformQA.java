@@ -212,7 +212,7 @@ public class PerformQA implements I_ProcessConcepts {
 				UUID conceptUUID = concept.getUids().get(0);
 				if (!allRules.containsKey(ruleUuid)){
 					System.out.println("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
-					throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
+					//throw new Exception("RULE DOESN'T EXIST IN RULE FILE - UUID:" + ruleUuid +  " error code:" + errorCode +  " Message:" + message);
 				
 				}
 				//Write data to file
