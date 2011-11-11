@@ -76,6 +76,7 @@ import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -171,8 +172,6 @@ public class QACasesBrowser extends JPanel {
 		TableColumn rowCheckBoxCol = caseTable.getColumnModel().getColumn(tableModel.ROW_CHECKBOX);
 		TableColumn corloCol = caseTable.getColumnModel().getColumn(tableModel.COLOR);
 		TableColumn caseCol = caseTable.getColumnModel().getColumn(tableModel.CASE);
-		
-		
 
 		conceptUuidCol.setPreferredWidth(0);
 		conceptUuidCol.setMinWidth(0);
@@ -185,11 +184,11 @@ public class QACasesBrowser extends JPanel {
 		rowCheckBoxCol.setPreferredWidth(20);
 		rowCheckBoxCol.setMinWidth(20);
 		rowCheckBoxCol.setMaxWidth(20);
-		
+
 		corloCol.setPreferredWidth(0);
 		corloCol.setMinWidth(0);
 		corloCol.setMaxWidth(0);
-	
+
 		caseCol.setPreferredWidth(0);
 		caseCol.setMinWidth(0);
 		caseCol.setMaxWidth(0);
@@ -361,58 +360,67 @@ public class QACasesBrowser extends JPanel {
 				row.add(line.getQaCase());
 				try {
 					if (config != null) {
-						I_GetConceptData concept = Terms.get().getConcept(componentUuid);
-						List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
-						if (!conceptAttributeTuples.isEmpty()) {
-							I_ConceptAttributeTuple attr = conceptAttributeTuples.get(0);
-							if (attr.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
-								row.add(Color.LIGHT_GRAY);
+						I_GetConceptData concept = null;
+						try {
+							concept = Terms.get().getConcept(componentUuid);
+							List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
+							if (!conceptAttributeTuples.isEmpty()) {
+								I_ConceptAttributeTuple attr = conceptAttributeTuples.get(0);
+								if (attr.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+									row.add(Color.LIGHT_GRAY);
+								} else {
+									row.add(Color.WHITE);
+								}
 							} else {
 								row.add(Color.WHITE);
 							}
-						}else{
+						} catch (Exception e) {
 							row.add(Color.WHITE);
 						}
 						long lastModification = Long.MIN_VALUE;
-						List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(null, config.getDescTypes(),
-					            config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+						List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(null, config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+								config.getConflictResolutionStrategy());
 						for (I_DescriptionTuple desc : descriptions) {
 							long descTime = desc.getTime();
 							Collection<? extends RefexChronicleBI<?>> annotations = desc.getAnnotations();
 							for (RefexChronicleBI<?> refexChronicleBI : annotations) {
-								//TODO: Get annotation date.
+								// TODO: Get annotation date.
 							}
-							if(descTime > lastModification){
+							if (descTime > lastModification) {
 								lastModification = descTime;
 							}
 						}
-						
-						
+
+						Collection<? extends ConceptVersionBI> versions = concept.getVersions(config.getViewCoordinate());
+						for (ConceptVersionBI conceptVersionBI : versions) {
+							if (conceptVersionBI.getTime() > lastModification) {
+								lastModification = conceptVersionBI.getTime();
+							}
+						}
+
 						List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 						for (I_ConceptAttributeTuple attr : attributes) {
 							long attrTime = attr.getTime();
-							if(attrTime > lastModification){
+							if (attrTime > lastModification) {
 								lastModification = attrTime;
 							}
 						}
-						
-						List<? extends I_RelTuple> sourcRels = concept.getSourceRelTuples(null, config.getSourceRelTypes(), config.getViewPositionSetReadOnly(),config.getPrecedence(), config.getConflictResolutionStrategy() );
+
+						List<? extends I_RelTuple> sourcRels = concept.getSourceRelTuples(null, null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 						for (I_RelTuple i_RelTuple : sourcRels) {
 							long relTime = i_RelTuple.getTime();
-							if(relTime > lastModification){
+							if (relTime > lastModification) {
 								lastModification = relTime;
 							}
 						}
-						
+
 						row.add(sdf.format(new Date(lastModification)));
-						
+
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					row.add(Color.WHITE);
+					row.add("");
 				}
-				
-				
 
 				tableModel.addData(row);
 			}
@@ -1027,10 +1035,8 @@ public class QACasesBrowser extends JPanel {
 		public final Integer CASE = 9;
 		public final Integer COLOR = 10;
 		public final Integer CONCEPT_LAST_MODIFIED = 11;
-		
 
-		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Last status change","Disposition", "Assigned to", "Time", "Case",
-				"Row Color", "Concept last modified"};
+		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Last status change", "Disposition", "Assigned to", "Time", "Case", "Row Color", "Concept last modified" };
 
 		private List<Object[]> dataList = new ArrayList<Object[]>();
 		private Object[][] data = new Object[0][11];
