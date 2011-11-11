@@ -17,12 +17,16 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import java.io.File;
+import java.io.IOException;
+
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
@@ -77,75 +81,59 @@ public class SctIDChangeSetCreation extends TestCase {
 	public void testApp() {
 		assertTrue(true);
 	}
+	
+	
+	private void addId() {
+        try {
+            //I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("aa23ea32-37cc-6cc8-e044-0003ba13161a"));
+            I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("a2993d32-bf7b-3305-e044-0003ba13161a"));
+            I_Identify i_Identify = Terms.get().getId(igcd.getNid());
+            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConceptAttributes();
+            i_Identify.addLongId(Long.parseLong("797977"), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+      	i_ConceptAttributeVersioned.getStatusNid(),
+      i_ConceptAttributeVersioned.getPathNid(),
+      Long.MAX_VALUE);
+            Terms.get().addUncommitted(igcd);
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }      
+    }
+	
+	
+	public void setupProfile() throws TerminologyException, IOException{
+		BdbTermFactory tfb = (BdbTermFactory) _termfactory;
+		I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+		newDbProfile.setUsername("testvp");
+		newDbProfile.setUserConcept(_termfactory.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+		newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.MUTABLE_ONLY);
+		newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+		//File changeSetRoot = new File("profiles" + File.separator + newDbProfile.getUsername() + File.separator + "changesets");				
+		File changeSetRoot = new File("E:\\Workbench_Bundle\\UAT\\UAT-2011-30-10\\profiles\\testvp", "changesets");
+		changeSetRoot.mkdirs();
+		String changeSetWriterFileName = "testvp" + "." + "#" + 1 + "#" + UUID.randomUUID().toString() + ".eccs"; 
+		newDbProfile.setChangeSetRoot(changeSetRoot);
+		newDbProfile.setChangeSetWriterFileName(changeSetWriterFileName);
+		String tempKey = UUID.randomUUID().toString();
+		
+		ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+					new File(newDbProfile.getChangeSetRoot(),
+							newDbProfile.getChangeSetWriterFileName()), 
+							new File(newDbProfile.getChangeSetRoot(), "#1#"
+									+ newDbProfile.getChangeSetWriterFileName()),
+									ChangeSetGenerationPolicy.MUTABLE_ONLY);			
+		 Ts.get().addChangeSetGenerator(tempKey, generator);
+	}
 
 	//Adding newly created sctId for the new concept and committing concept 
 	//New sctId is now present in the database but no change set gets created
-	//
 	public void testCreateChangeset(){
-		String wsSctId = "797979"; // Dummy ids
-		boolean flag = false;
 		try {	
 				System.out.println("===============ChangeSet Creation Started============");
-				//DateFormat df = new SimpleDateFormat("yyyyMMdd");
-				//long effectiveDate=df.parse("20120131").getTime(); //Putting hardcoded values
-				
-				I_GetConceptData testConcept = _termfactory.getConcept(UUID.fromString("aa23ea32-37cc-6cc8-e044-0003ba13161a"));
-				I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = testConcept.getConceptAttributes();
-				I_Identify i_Identify = _termfactory.getId(testConcept.getNid());	
-				BdbTermFactory tfb = (BdbTermFactory) _termfactory;
-				I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
-				newDbProfile.setUsername("testvp");
-				newDbProfile.setUserConcept(_termfactory.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
-				newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-				newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-				newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.MUTABLE_ONLY);
-				newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-				//File changeSetRoot = new File("profiles" + File.separator + newDbProfile.getUsername() + File.separator + "changesets");				
-				File changeSetRoot = new File("E:\\Workbench_Bundle\\UAT\\UAT-2011-30-10\\profiles\\testvp", "changesets");
-				changeSetRoot.mkdirs();
-				String changeSetWriterFileName = "testvp" + "." + "#" + 1 + "#" + UUID.randomUUID().toString() + ".eccs"; 
-				newDbProfile.setChangeSetRoot(changeSetRoot);
-				newDbProfile.setChangeSetWriterFileName(changeSetWriterFileName);
-				String tempKey = UUID.randomUUID().toString();
-				
-				ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
-							new File(newDbProfile.getChangeSetRoot(),
-									newDbProfile.getChangeSetWriterFileName()), 
-									new File(newDbProfile.getChangeSetRoot(), "#1#"
-											+ newDbProfile.getChangeSetWriterFileName()),
-											ChangeSetGenerationPolicy.MUTABLE_ONLY);			
-				 Ts.get().addChangeSetGenerator(tempKey, generator);		        			   
-				  
-		        /*		   
-				ChangeSetWriterHandler.addWriter(newDbProfile.getUsername()
-						+ ".eccs", new EConceptChangeSetWriter(new File(newDbProfile.getChangeSetRoot(), newDbProfile.getChangeSetWriterFileName()), 
-								new File(newDbProfile.getChangeSetRoot(), "."
-										+ newDbProfile.getChangeSetWriterFileName()), 
-										ChangeSetGenerationPolicy.INCREMENTAL, true));
-				
-				ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
-						new CommitLog(new File(newDbProfile.getChangeSetRoot(),
-						"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
-								"." + "commitLog.xls")));	
-				*/
-		        
-				/*flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
-						i_ConceptAttributeVersioned.getStatusNid(),
-						i_ConceptAttributeVersioned.getPathNid(),
-						effectiveDate);
-				*/
-				 
-				 
-				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
-						i_ConceptAttributeVersioned.getStatusNid(),
-						i_ConceptAttributeVersioned.getPathNid(),
-						Long.MAX_VALUE);
-				
-				I_GetConceptData commitedConcept = _termfactory.getConceptForNid(testConcept.getNid());
-				_termfactory.addUncommitted(commitedConcept);
+				addId();
+				setupProfile();
 		        Ts.get().commit();
-		        
-		     
 		        //Ts.get().removeChangeSetGenerator(tempKey);
 		        System.out.println("===============ChangeSet Creation Finished============");
 			} catch (Exception e) {
