@@ -55,7 +55,7 @@ public class IsaCache extends TypeCache {
 		if (isActive) {
 			for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
 				for (RelationshipVersionBI rv : relv.getVersions(inferredViewCoordinate)) {
-					if (types.contains(rv.getTypeNid())) {
+					if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
 						parentSet.add(rv.getDestinationNid());
 						break;
 					}
@@ -65,7 +65,7 @@ public class IsaCache extends TypeCache {
 			if (parentSet.size() == 0) {
 				for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
 					for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
-						if (types.contains(rv.getTypeNid())) {
+						if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
 							parentSet.add(rv.getDestinationNid());
 							break;
 						}
@@ -76,7 +76,7 @@ public class IsaCache extends TypeCache {
 		} else {
 			for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
 				for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
-					if (types.contains(rv.getTypeNid())) {
+					if (types.contains(rv.getTypeNid()) && rv.getStatusNid() == activeValueNid) {
 						parentSet.add(rv.getDestinationNid());
 						break;
 					}
