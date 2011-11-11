@@ -1082,11 +1082,15 @@ public class DiffBase {
         I_TermFactory tf = Terms.get();
         for (PathBI path : tf.getPaths()) {
             I_GetConceptData path_con = tf.getConcept(path.getConceptNid());
-            AceLog.getAppLog().info("Path: " + path_con.getInitialText());
-            AceLog.getAppLog().info("      " + path_con.getUids().get(0));
-            for (PositionBI position : path.getOrigins()) {
-                AceLog.getAppLog().info("Origin: " + position);
-                AceLog.getAppLog().info("Version: " + position.getVersion());
+            if (path_con.getUids().size() != 0) {
+                AceLog.getAppLog().info("Path: " + path_con.getInitialText());
+                AceLog.getAppLog().info("      " + path_con.getUids().get(0));
+                for (PositionBI position : path.getOrigins()) {
+                    AceLog.getAppLog().info("Origin: " + position);
+                    AceLog.getAppLog().info("Version: " + position.getVersion());
+                }
+            } else {
+                AceLog.getAppLog().info("Path concept does not exist: " + path);
             }
         }
     }
