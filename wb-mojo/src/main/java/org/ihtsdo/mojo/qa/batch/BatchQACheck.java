@@ -285,7 +285,7 @@ public class BatchQACheck extends AbstractMojo {
 				rules=new HashSet<String>();
 				for (Rule loopRule : loopPackage.getRules()) {
 					String ruleUid = (String) loopRule.getMetaData().get("UUID");
-					if (rules.contains(ruleUid)){
+					if (!ruleUid.equals("null") && rules.contains(ruleUid)){
 						System.out.println("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
 						//throw new Exception("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
 					}else{
