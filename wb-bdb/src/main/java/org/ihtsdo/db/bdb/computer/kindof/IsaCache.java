@@ -61,6 +61,18 @@ public class IsaCache extends TypeCache {
 					}
 				}
 			}
+			
+			if (parentSet.size() == 0) {
+				for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
+					for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
+						if (types.contains(rv.getTypeNid())) {
+							parentSet.add(rv.getDestinationNid());
+							break;
+						}
+					}
+				}
+			}
+			
 		} else {
 			for (RelationshipChronicleBI relv : concept.getRelsOutgoing()) {
 				for (RelationshipVersionBI rv : relv.getVersions(statedViewCoordinate)) {
@@ -71,6 +83,8 @@ public class IsaCache extends TypeCache {
 				}
 			}
 		}
+		
+		
 		return parentSet;
 	}
 
