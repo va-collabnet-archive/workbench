@@ -2065,9 +2065,27 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
 
         for (I_RelVersioned rel : getSourceRels()) {
-            if (rel.getTime() < cutoffTime) {
                 rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
-                        contradictionManager);
+                        contradictionManager, cutoffTime);
+        }
+
+        return returnRels;
+    }
+    
+    @Override
+    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
+            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
+            int classifierNid, RelAssertionType relAssertionType, Long cutoffTime)
+            throws IOException, TerminologyException {
+        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, positions, allowedStatus,
+                allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid,
+                relAssertionType, null, null);
+         List<I_RelTuple> returnRels = new ArrayList<I_RelTuple>();
+
+        for (Relationship rel : getSourceRels()) {
+            for (Relationship.Version rv : rel.getVersions(coordinate)) {
+                rel.addTuples(allowedStatus, allowedTypes, positions, returnRels, precedencePolicy,
+                        contradictionManager, cutoffTime);
             }
         }
 
@@ -2087,28 +2105,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         for (Relationship rel : getSourceRels()) {
             for (Relationship.Version rv : rel.getVersions(coordinate)) {
                 if ((allowedTypes == null) || allowedTypes.contains(rv.getTypeNid())) {
-                    actualValues.add(rv);
-                }
-            }
-        }
-
-        return actualValues;
-    }
-
-    @Override
-    public List<? extends I_RelTuple> getSourceRelTuples(NidSetBI allowedStatus, NidSetBI allowedTypes,
-            PositionSetBI positions, Precedence precedencePolicy, ContradictionManagerBI contradictionManager,
-            int classifierNid, RelAssertionType relAssertionType, Long cutoffTime)
-            throws IOException, TerminologyException {
-        ViewCoordinate coordinate = new ViewCoordinate(precedencePolicy, positions, allowedStatus,
-                allowedTypes, contradictionManager, Integer.MIN_VALUE, classifierNid,
-                relAssertionType, null, null);
-        List<Relationship.Version> actualValues = new ArrayList<Relationship.Version>();
-
-        for (Relationship rel : getSourceRels()) {
-            for (Relationship.Version rv : rel.getVersions(coordinate)) {
-                if (((allowedTypes == null) || allowedTypes.contains(rv.getTypeNid()))
-                        && (rv.getTime() < cutoffTime)) {
                     actualValues.add(rv);
                 }
             }
