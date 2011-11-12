@@ -59,7 +59,6 @@ public class IsaCache extends TypeCache {
 		for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
 			if (types.contains(rv.getTypeNid())) {
 				parentSet.add(rv.getDestinationNid());
-				break;
 			}
 		}
 
