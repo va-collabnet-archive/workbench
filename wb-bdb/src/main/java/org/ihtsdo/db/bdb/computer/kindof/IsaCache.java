@@ -45,23 +45,31 @@ public class IsaCache extends TypeCache {
 
 	public NidSet getParentSet(Concept concept) throws Exception {
 		NidSet parentSet = new NidSet();
-		ConceptVersion cv = new ConceptVersion((Concept) concept, inferredViewCoordinate);
-		// Retired concept should be setup in the isa cache by stated parents
-		boolean isActive = true;
-		if (cv.getConAttrs().getStatusNid() != activeValueNid) {
-			isActive = false;
-		}
-
-		if (!isActive || cv.getRelsOutgoingActiveIsa().isEmpty()) {
-			cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
-		}
-
+		ConceptVersion cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
 		for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
 			if (types.contains(rv.getTypeNid())) {
 				parentSet.add(rv.getDestinationNid());
 				break;
 			}
 		}
+		
+//		ConceptVersion cv = new ConceptVersion((Concept) concept, inferredViewCoordinate);
+//		// Retired concept should be setup in the isa cache by stated parents
+//		boolean isActive = true;
+//		if (cv.getConAttrs().getStatusNid() != activeValueNid) {
+//			isActive = false;
+//		}
+//
+//		if (!isActive || cv.getRelsOutgoingActiveIsa().isEmpty()) {
+//			cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
+//		}
+//
+//		for (RelationshipVersionBI rv : cv.getRelsOutgoingActive()) {
+//			if (types.contains(rv.getTypeNid())) {
+//				parentSet.add(rv.getDestinationNid());
+//				break;
+//			}
+//		}
 
 		return parentSet;
 	}
