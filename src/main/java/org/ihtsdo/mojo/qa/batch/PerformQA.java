@@ -1,5 +1,7 @@
 package org.ihtsdo.mojo.qa.batch;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -125,6 +127,13 @@ public class PerformQA implements I_ProcessConcepts {
 				System.out.println("Results for Monitored concept detected: " + results.getResultsItems().size());
 				for (ResultsItem loopItem : results.getResultsItems()) {
 					System.out.println("-- " + loopItem.getMessage() + " - " + loopItem.getRuleUuid());
+				}
+				
+				try {
+				    BufferedWriter out = new BufferedWriter(new FileWriter(loopConcept.getPrimUuid() + ".txt"));
+				    out.write(loopConcept.toLongString());
+				    out.close();
+				} catch (IOException e) {
 				}
 			}
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
