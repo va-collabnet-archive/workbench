@@ -121,6 +121,12 @@ public class PerformQA implements I_ProcessConcepts {
 		if (isaCache.isKindOf(loopConcept.getNid(), snomedRoot.getNid())) {
 			long individualStart = Calendar.getInstance().getTimeInMillis();
 			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper, INFERRED_VIEW_ORIGIN.INFERRED);
+			if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
+				System.out.println("Results for Monitored concept detected: " + results.getResultsItems().size());
+				for (ResultsItem loopItem : results.getResultsItems()) {
+					System.out.println("-- " + loopItem.getMessage() + " - " + loopItem.getRuleUuid());
+				}
+			}
 			long individualElapsed = Calendar.getInstance().getTimeInMillis()-individualStart;
 
 //			String fsn = "";
