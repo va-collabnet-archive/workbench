@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -56,6 +55,7 @@ public class PerformQA implements I_ProcessConcepts {
 	private int estimatedNumberOfConcepts;
 	private HashMap<String, String> allRules;
 	private Set<String> rulesAlerted;
+	private List<UUID> monitoredUuids;
 
 	public PerformQA(I_GetConceptData context, PrintWriter findingPw, I_ConfigAceFrame config, UUID executionUUID,
 			RulesContextHelper contextHelper, String databaseUuid, String testPathUuid, HashMap<String, String> allRules) throws Exception {
@@ -76,6 +76,14 @@ public class PerformQA implements I_ProcessConcepts {
 		uniqueFsnMap = new HashMap<String,Integer>();
 		duplicatesSet = new HashSet<Integer>();
 		rulesAlerted = new HashSet<String>();
+		monitoredUuids = new ArrayList<UUID>();
+		
+		monitoredUuids.add(UUID.fromString("298ce677-9986-3d03-8d55-28af02be7892"));
+		monitoredUuids.add(UUID.fromString("e98ee24f-6586-3e20-9ccb-fa36a4ea0b40"));
+		monitoredUuids.add(UUID.fromString("8003005b-e3ff-3ca6-ad4b-1cd0555fcd79"));
+		monitoredUuids.add(UUID.fromString("a70da6df-e8b1-3fb6-ba87-b2bed8298121"));
+		monitoredUuids.add(UUID.fromString("1cb37872-4476-3358-aea1-800fa4d97b5f"));
+		monitoredUuids.add(UUID.fromString("813562d6-5725-3da1-9d77-0a546061242d"));
 		try {
 			destRels = Terms.get().newIntSet();
 			destRels.add(Terms.get().uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
@@ -107,6 +115,9 @@ public class PerformQA implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
+		if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
+			System.out.println("Monitored concept detected: " + loopConcept);
+		}
 		if (isaCache.isKindOf(loopConcept.getNid(), snomedRoot.getNid())) {
 			long individualStart = Calendar.getInstance().getTimeInMillis();
 			ResultsCollectorWorkBench results = RulesLibrary.checkConcept(loopConcept, context, true, config, contextHelper, INFERRED_VIEW_ORIGIN.INFERRED);
