@@ -64,23 +64,24 @@ public class VodbClose extends AbstractMojo {
    public void execute() throws MojoExecutionException, MojoFailureException {
       try {
     	  
-    	  getLog().info("Testing for Null Components Started.");
-    	  
-    	  Concept.disableComponentsCRHM();
-    	  
-    	  NullComponentFinder nullComponentFinder = new NullComponentFinder();
-          Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
-          System.out.println();
-          
-          if (nullComponentFinder.getNullComponent().isEmpty()) {
-        	  getLog().info("No Null component found.");
-          } else {
-        	  nullComponentFinder.writeNullComponentFile();
-         	 getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
-                     + nullComponentFinder.getNullComponent() + "\n");      
-          }        
-          
-         getLog().info("Testing for Null Components Finished.");
+    	  // TODO: fix, Commented out due to slowdonw of all close actions... add a parameter to make it optional?
+//    	  getLog().info("Testing for Null Components Started.");
+//    	  
+//    	  Concept.disableComponentsCRHM();
+//    	  
+//    	  NullComponentFinder nullComponentFinder = new NullComponentFinder();
+//          Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+//          System.out.println();
+//          
+//          if (nullComponentFinder.getNullComponent().isEmpty()) {
+//        	  getLog().info("No Null component found.");
+//          } else {
+//        	  nullComponentFinder.writeNullComponentFile();
+//         	 getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+//                     + nullComponentFinder.getNullComponent() + "\n");      
+//          }        
+//          
+//         getLog().info("Testing for Null Components Finished.");
        
          
          getLog().info("Testing for dup UUIDs.");
