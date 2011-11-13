@@ -18,7 +18,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<drools.version>5.2.0.Final</drools.version>
-		<mvel2.version>2.1.0.drools2</mvel2.version>
+		<workbench.version>2.6.0-trek-56-SNAPSHOT</workbench.version>
+		<path.to.test>b4f0899d-39db-5c3d-ae03-2bac05433162</path.to.test>
+		<test.time>2111.11.16 11:00:00</test.time>
 	</properties>
 
 	<dependencies>
@@ -34,12 +36,12 @@
 			<plugin>
 				<groupId>org.ihtsdo</groupId>
 				<artifactId>wb-mojo</artifactId>
-				<version>2.6.0-trek-43-SNAPSHOT</version>
+				<version>${workbench.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.ihtsdo</groupId>
 						<artifactId>wb-bdb</artifactId>
-						<version>2.6.0-trek-43-SNAPSHOT</version>
+						<version>${workbench.version}</version>
 					</dependency>
 					<dependency>
 						<groupId>org.apache.lucene</groupId>
@@ -69,57 +71,48 @@
 					<dependency>
 						<groupId>org.mvel</groupId>
 						<artifactId>mvel2</artifactId>
-						<version>${mvel2.version}</version>
+						<version>2.1.0.drools2</version>
 					</dependency>
 				</dependencies>
 				<executions>
-					<!--<execution>
-						<id>svn-checkout</id>
+					<!--<execution> <id>svn-checkout</id> <phase>generate-sources</phase> 
+						<goals> <goal>svn-checkout</goal> </goals> <configuration> <workingCopyStr>${project.build.directory}/generated-resources/berkeley-db</workingCopyStr> 
+						<repositoryUrlStr>https://csfe.aceworkspace.net/svn/repos/wb-sct-all-sync-pa/trunk/database-sync/src/main/berkeley-db</repositoryUrlStr> 
+						<username>alopez</username> <password>snomed</password> </configuration> 
+						</execution> -->
+					<!--<execution> <id>run-cycle-check</id> <phase>process-sources</phase> 
+						<goals> <goal>run-cycle-check</goal> </goals> <configuration> <berkeleyDir>${project.build.directory}/generated-resources/berkeley-db</berkeleyDir> 
+						<uuidEditPath>${path.to.test}</uuidEditPath> <dateTimeStr>${test.time}</dateTimeStr> 
+						<throwExceptionIfCycleDetected>true</throwExceptionIfCycleDetected> </configuration> 
+						</execution> -->
+					<execution>
+						<id>vodb-open0</id>
 						<phase>generate-sources</phase>
-						<goals>
-							<goal>svn-checkout</goal>
-						</goals>
-						<configuration>
-							<workingCopyStr>${project.build.directory}/generated-resources/berkeley-db</workingCopyStr>
-							<repositoryUrlStr>https://csfe.aceworkspace.net/svn/repos/wb-sct-all-sync-pa/trunk/database-sync/src/main/berkeley-db</repositoryUrlStr>
-							<username>alopez</username>
-							<password>snomed</password>
-						</configuration>
-					</execution>
-					-->
-					<!--<execution>
-						<id>run-cycle-check</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>run-cycle-check</goal>
-						</goals>
-						<configuration>
-							<berkeleyDir>/Applications/UAT-07-Aug-A/berkeley-db</berkeleyDir>
-							<uuidEditPath>b4f0899d-39db-5c3d-ae03-2bac05433162</uuidEditPath>
-							<dateTimeStr>2111.11.16 11:00:00</dateTimeStr>
-							<throwExceptionIfCycleDetected>true</throwExceptionIfCycleDetected>
-						</configuration>
-					</execution>-->
-					<!--<execution>
-						<id>run-snorocket</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>run-snorocket</goal>
-						</goals>
-						<configuration>
-							<berkeleyDir>/Applications/UAT-31-Aug/berkeley-db</berkeleyDir>
-							<uuidEditPath>b4f0899d-39db-5c3d-ae03-2bac05433162</uuidEditPath>
-							<dateTimeStr>2111.11.16 11:00:00</dateTimeStr>
-						</configuration>
-					</execution>
-					--><execution>
-						<id>vodb-open</id>
-						<phase>generate-resources</phase>
 						<goals>
 							<goal>vodb-open</goal>
 						</goals>
 						<configuration>
-							<vodbDirectory>/Applications/UAT-23-Oct/berkeley-db</vodbDirectory>
+							<vodbDirectory>/Users/alo/Desktop/berkeley-db</vodbDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-set-default-config0</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>vodb-set-default-config</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>run-snorocket</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>run-snorocket</goal>
+						</goals>
+						<configuration>
+							<berkeleyDir>/Users/alo/Desktop/berkeley-db</berkeleyDir>
+							<uuidEditPath>${path.to.test}</uuidEditPath>
+							<dateTimeStr>${test.time}</dateTimeStr>
+							<enableDbWriteback>true</enableDbWriteback>
 						</configuration>
 					</execution>
 					<execution>
@@ -130,6 +123,21 @@
 						</goals>
 					</execution>
 					<execution>
+						<id>vodb-set-edit-path</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>vodb-set-edit-paths</goal>
+						</goals>
+						<configuration>
+							<editPaths>
+								<ConceptDescriptor>
+									<uuid>b4f0899d-39db-5c3d-ae03-2bac05433162</uuid>
+									<description>release candidate path</description>
+								</ConceptDescriptor>
+							</editPaths>
+						</configuration>
+					</execution>
+					<execution>
 						<id>run-qa</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -137,27 +145,19 @@
 						</goals>
 						<configuration>
 							<database_uuid>37d75b70-fd91-11df-8cff-0800200c9a66</database_uuid>
-							<test_path_uuid>b4f0899d-39db-5c3d-ae03-2bac05433162</test_path_uuid>
-							<execution_name>Daily morning qa execution of release candidate</execution_name>
-							<test_time>2111.11.16 11:00:00</test_time>
+							<test_path_uuid>${path.to.test}</test_path_uuid>
+							<execution_name>UAT Database</execution_name>
+							<test_time>${test.time}</test_time>
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
 							<pkgName>QA-Package-ad-hoc</pkgName>
 							<pkgUrl>http://mgr.servers.aceworkspace.net:50002/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
 						</configuration>
 					</execution>
-					<!--<execution>
-						<id>import-results</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>upload-to-qa-db</goal>
-						</goals>
-						<configuration>
-							<url>jdbc:mysql://cu029.servers.aceworkspace.net:3306/qa_db</url>
-							<username>root</username>
-							<password>snomed11</password>
-						</configuration>
-					</execution>
-					--><execution>
+					<!--<execution> <id>import-results</id> <phase>compile</phase> <goals> 
+						<goal>upload-to-qa-db</goal> </goals> <configuration> <url>jdbc:mysql://cu029.servers.aceworkspace.net:3306/qa_db</url> 
+						<username>root</username> <password>snomed11</password> </configuration> 
+						</execution> -->
+					<execution>
 						<id>vodb-close</id>
 						<phase>process-resources</phase>
 						<goals>
@@ -181,8 +181,12 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
-								<copy file="rules/je.properties" tofile="${project.build.directory}/generated-resources/berkeley-db/mutable/je.properties" overwrite="true" />
-								<copy file="rules/je.properties" tofile="${project.build.directory}/generated-resources/berkeley-db/read-only/je.properties" overwrite="true" />
+								<copy file="rules/je.properties"
+									tofile="/Users/alo/Desktop/berkeley-db/mutable/je.properties"
+									overwrite="true" />
+								<copy file="rules/je.properties"
+									tofile="/Users/alo/Desktop/berkeley-db/read-only/je.properties"
+									overwrite="true" />
 							</tasks>
 						</configuration>
 						<goals>
