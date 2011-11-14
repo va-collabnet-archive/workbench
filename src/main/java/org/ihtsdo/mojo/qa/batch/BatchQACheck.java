@@ -55,6 +55,7 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.conflict.EditPathWinsStrategy;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
@@ -503,6 +504,7 @@ public class BatchQACheck extends AbstractMojo {
 		config.setRelAssertionType(RelAssertionType.INFERRED);
 
 		config.setPrecedence(Precedence.TIME);
+		config.setConflictResolutionStrategy(new EditPathWinsStrategy());
 
 		return config;
 	}
