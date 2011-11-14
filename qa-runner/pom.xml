@@ -92,7 +92,7 @@
 							<goal>vodb-open</goal>
 						</goals>
 						<configuration>
-							<vodbDirectory>/Users/alo/Desktop/berkeley-db</vodbDirectory>
+							<vodbDirectory>/Applications/Prod-06-Nov/berkeley-db</vodbDirectory>
 						</configuration>
 					</execution>
 					<execution>
@@ -103,13 +103,30 @@
 						</goals>
 					</execution>
 					<execution>
+						<id>bcs-read-all0</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>bcs-read-all</goal>
+						</goals>
+						<configuration>
+							<changeSetDir>/Applications/Prod-06-Nov/profiles</changeSetDir>
+						</configuration>
+					</execution>
+					<execution>
+						<id>vodb-commit-csi0</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>vodb-commit</goal>
+						</goals>
+					</execution>
+					<execution>
 						<id>run-snorocket</id>
 						<phase>process-sources</phase>
 						<goals>
 							<goal>run-snorocket</goal>
 						</goals>
 						<configuration>
-							<berkeleyDir>/Users/alo/Desktop/berkeley-db</berkeleyDir>
+							<berkeleyDir>/Applications/Prod-06-Nov/berkeley-db</berkeleyDir>
 							<uuidEditPath>${path.to.test}</uuidEditPath>
 							<dateTimeStr>${test.time}</dateTimeStr>
 							<enableDbWriteback>true</enableDbWriteback>
@@ -144,19 +161,20 @@
 							<goal>perform-qa</goal>
 						</goals>
 						<configuration>
-							<database_uuid>37d75b70-fd91-11df-8cff-0800200c9a66</database_uuid>
+							<database_uuid>92e44160-db1a-11e0-9572-0800200c9a66</database_uuid>
 							<test_path_uuid>${path.to.test}</test_path_uuid>
-							<execution_name>UAT Database</execution_name>
+							<execution_name>Production Database</execution_name>
 							<test_time>${test.time}</test_time>
 							<context_uuid>d974c480-f9b9-3ea1-91e8-b0a4b756a17d</context_uuid>
 							<pkgName>QA-Package-ad-hoc</pkgName>
 							<pkgUrl>http://mgr.servers.aceworkspace.net:50002/drools-guvnor/org.drools.guvnor.Guvnor/package/ihtsdo-qa/qa-package</pkgUrl>
 						</configuration>
 					</execution>
-					<!--<execution> <id>import-results</id> <phase>compile</phase> <goals> 
-						<goal>upload-to-qa-db</goal> </goals> <configuration> <url>jdbc:mysql://cu029.servers.aceworkspace.net:3306/qa_db</url> 
+					<execution> <id>import-results</id> <phase>compile</phase> <goals> 
+						<goal>upload-to-qa-db</goal> </goals> 
+<configuration> <url>jdbc:mysql://cu029.servers.aceworkspace.net:3306/qa_db</url> 
 						<username>root</username> <password>snomed11</password> </configuration> 
-						</execution> -->
+						</execution> 
 					<execution>
 						<id>vodb-close</id>
 						<phase>process-resources</phase>
@@ -178,14 +196,14 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>generate-sources</phase>
+						<phase>initialize</phase>
 						<configuration>
 							<tasks>
 								<copy file="rules/je.properties"
-									tofile="/Users/alo/Desktop/berkeley-db/mutable/je.properties"
+									tofile="/Users/greynoso/workspace/prod/berkeley-db/mutable/je.properties"
 									overwrite="true" />
 								<copy file="rules/je.properties"
-									tofile="/Users/alo/Desktop/berkeley-db/read-only/je.properties"
+									tofile="/Users/greynoso/workspace/prod/berkeley-db/read-only/je.properties"
 									overwrite="true" />
 							</tasks>
 						</configuration>
