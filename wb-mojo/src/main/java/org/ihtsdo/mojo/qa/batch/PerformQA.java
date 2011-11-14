@@ -29,6 +29,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.helper.ResultsItem;
 
 public class PerformQA implements I_ProcessConcepts { 
@@ -100,10 +101,13 @@ public class PerformQA implements I_ProcessConcepts {
 			e.printStackTrace();
 		}
 		System.out.println("Setting up Is-a cache...");
+		
 		if (config.getViewCoordinate().getIsaCoordinates().size() != 1) {
 			throw new Exception("wrong number of view coordinates: " + config.getViewCoordinate().getIsaCoordinates());
 		}
-		for (IsaCoordinate isac: config.getViewCoordinate().getIsaCoordinates()) {
+		ViewCoordinate cacheViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
+		//cacheViewCoordinate.setPositionSet(positionSet)
+		for (IsaCoordinate isac: cacheViewCoordinate.getIsaCoordinates() ) {
 			KindOfComputer.setupIsaCacheAndWait(isac);
 		}
 		System.out.println("Is-a created OK...");
