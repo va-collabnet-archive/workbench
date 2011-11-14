@@ -416,8 +416,9 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
         for (int rowIndex = 0; rowIndex < allTuples.size(); rowIndex++) {
             for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
                 try {
-                    I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
-                    if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null) {
+                    if (columns[columnIndex] != null && columns[columnIndex].invokeOnObjectType != null
+                            && allTuples.get(rowIndex) != null) {
+                        I_ExtendByRefVersion tuple = allTuples.get(rowIndex);
                         switch (columns[columnIndex].invokeOnObjectType) {
                             case CONCEPT_COMPONENT:
                                 if (columns[columnIndex].readParamaters != null) {
