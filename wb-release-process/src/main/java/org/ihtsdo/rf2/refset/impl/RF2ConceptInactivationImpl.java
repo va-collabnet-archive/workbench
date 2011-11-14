@@ -146,7 +146,10 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
 					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
 					effectiveTime = getDateFormat().format(et);
-					if (conceptStatus.equals("0") || conceptStatus.equals("1")) {
+					
+					if (conceptStatus.equals("0")){
+						active = "0";
+					} else if(conceptStatus.equals("1") && (et.before(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
 						active = "0";
 					} else {
 						active = "1";
@@ -155,10 +158,10 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
 					
 					if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
-						logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
+						//logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
 						valueId= getConceptInactivationRelationshipValueId(concept);
 					}else{
-						logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
+						//logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
 					}
 					
 					if (!valueId.equals("XXX")) {
