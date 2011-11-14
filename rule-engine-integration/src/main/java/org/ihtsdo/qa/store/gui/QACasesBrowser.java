@@ -267,13 +267,13 @@ public class QACasesBrowser extends JPanel {
 
 	public void setupPanel(QAStoreBI store) {
 		setupBatchDispoStatusCombo();
+		this.coordinate = resultsPanel.getQACoordinate();
 		if (rule == null || !this.rule.getRuleUuid().equals(resultsPanel.getRule().getRuleUuid())) {
 			if (this.rule != null) {
 				this.rule = resultsPanel.getRule();
 				setupBatchDispoStatusCombo();
 			}
 			this.store = store;
-			this.coordinate = resultsPanel.getQACoordinate();
 			this.rule = resultsPanel.getRule();
 			panel4.setVisible(false);
 
