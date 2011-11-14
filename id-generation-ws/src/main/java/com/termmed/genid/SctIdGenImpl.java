@@ -89,7 +89,7 @@ public class SctIdGenImpl implements SctIdGen {
 			SctIdIdentifier sctIdIdentifier = new SctIdIdentifier();
 			sctIdIdentifier.setCode(componentUuid);
 			long selectStartTime = System.currentTimeMillis();
-			SctIdIdentifier sctIdentirier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.selectSctId", sctIdIdentifier);
+			SctIdIdentifier sctIdentirier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.getSctIdByComponentUuid", sctIdIdentifier);
 			log.info(sctIdentirier);
 			if(sctIdentirier != null){
 				result = sctIdentirier.getSctId() == null ? null : Long.parseLong(sctIdentirier.getSctId());
