@@ -45,7 +45,7 @@ public class SubversionData implements Serializable {
     public String getPreferredReadRepository() {
     	fixDataErrors();
         if (preferredReadRepository == null) {
-            if (readOnlyUrlMirrors == null || readOnlyUrlMirrors.size() == 0) {
+            if (readOnlyUrlMirrors == null || readOnlyUrlMirrors.isEmpty()) {
                 return repositoryUrlStr;
             }
             preferredReadRepository = readOnlyUrlMirrors.iterator().next();
@@ -117,7 +117,7 @@ public class SubversionData implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 		
 		buf.append("svd workingCopy: ");
 		buf.append(workingCopyStr);

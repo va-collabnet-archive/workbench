@@ -72,10 +72,12 @@ public class AddSubversionEntryAndQueueEntry extends AddSubversionEntry {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
 
+                @Override
                 public void run() {
                     FileDialog dialog = new FileDialog(new Frame(), "Select a queue");
                     dialog.setDirectory(System.getProperty("user.dir"));
                     dialog.setFilenameFilter(new FilenameFilter() {
+                        @Override
                         public boolean accept(File dir, String name) {
                             return name.endsWith("queue.config");
                         }
