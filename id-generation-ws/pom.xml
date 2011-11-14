@@ -102,7 +102,7 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>com.termmed</groupId>
+									<groupId>org.ihtsdo</groupId>
 									<artifactId>id-generation-ws</artifactId>
 									<version>${project.version}</version>
 									<type>zip</type>
