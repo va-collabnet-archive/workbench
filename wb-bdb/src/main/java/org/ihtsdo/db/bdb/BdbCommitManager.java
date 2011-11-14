@@ -2,6 +2,7 @@ package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -1095,6 +1096,47 @@ public class BdbCommitManager {
          }
       }
    }
+   
+   /**
+    * <p>
+    * Register a commit listener
+    * </p>
+    * @param listener
+    */
+   public static void addCommitListener(final ICommitListener listener) {
+       if (listener != null) {
+           listeners = (ICommitListener[]) ArrayUtils.add(listeners, listener);
+       }
+   }
+
+   /**
+    * <p>
+    * Remove the commit listener
+    * </p>
+    * @param listener
+    */
+   public static void removeCommitListener(final ICommitListener listener) {
+       if (listener != null) {
+           listeners = (ICommitListener[]) ArrayUtils.removeElement(listeners, listener);
+       }
+   }
+
+   /**
+    * <p>
+    * Remove all registered commit listener
+    * </p>
+    */
+   public static void removeAllCommitListeners() {
+       if (listeners != null && listeners.length > 0) {
+           listeners = new ICommitListener[0];
+       }
+   }
+   
+   /**
+    * <p>
+    * notify the commit event
+    * </p>
+    */  
 
    private static void notifyCommit() {
       if ((listeners != null) && (listeners.length > 0)) {
@@ -1116,7 +1158,7 @@ public class BdbCommitManager {
 
    /**
     * <p>
-    * notify the commit event
+    * notify the shutdown event
     * </p>
     */
    private static void notifyShutdown() {
