@@ -76,8 +76,13 @@ import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -362,7 +367,9 @@ public class QACasesBrowser extends JPanel {
 				try {
 					if (config != null) {
 						I_GetConceptData concept = null;
+						ConceptChronicleBI newConcept = Ts.get().getConcept(componentUuid);
 						try {
+							
 							concept = Terms.get().getConcept(componentUuid);
 							List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
 							if (!conceptAttributeTuples.isEmpty()) {
@@ -379,34 +386,57 @@ public class QACasesBrowser extends JPanel {
 							row.add(Color.WHITE);
 						}
 						long lastModification = Long.MIN_VALUE;
-						List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(null, config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
+//						ConceptVersionBI conceptVersion = newConcept.getVersion(config.getViewCoordinate());
+//						ConAttrChronicleBI attributes = conceptVersion.getConAttrs();
+//						if(attributes.getVersion(config.getViewCoordinate()).getTime() > lastModification){
+//							lastModification = attributes.getVersion(config.getViewCoordinate()).getTime() ;
+//						}
+//						
+//						Collection<? extends DescriptionChronicleBI> descriptions = conceptVersion.getDescs();
+//						for (DescriptionChronicleBI descriptionChronicleBI : descriptions) {
+//							long descTime = descriptionChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(descTime > lastModification){
+//								lastModification = descTime;
+//							}
+//						}
+//						Collection<? extends RelationshipChronicleBI> relationships = conceptVersion.getRelsOutgoing();
+//						for (RelationshipChronicleBI relationshipChronicleBI : relationships) {
+//							relationshipChronicleBI.get
+//							long relTime = relationshipChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(relTime > lastModification){
+//								lastModification = relTime;
+//							}
+//						}
+//						
+//						Collection<? extends RefexChronicleBI<?>> refsets = conceptVersion.getRefexes();
+//						for (RefexChronicleBI<?> refexChronicleBI : refsets) {
+//							long refTime = refexChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(refTime > lastModification){
+//								lastModification = refTime;
+//							}
+//							
+//						}
+						List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(null, null, config.getViewPositionSetReadOnly(), config.getPrecedence(),
 								config.getConflictResolutionStrategy());
 						for (I_DescriptionTuple desc : descriptions) {
 							long descTime = desc.getTime();
 							Collection<? extends RefexChronicleBI<?>> annotations = desc.getAnnotations();
 							for (RefexChronicleBI<?> refexChronicleBI : annotations) {
-								// TODO: Get annotation date.
+								Collection<? extends RefexChronicleBI<?>> refexces = refexChronicleBI.getRefexes();
+								for (RefexChronicleBI<?> refexChronicleBI2 : refexces) {
+									long time = refexChronicleBI2.getVersion(config.getViewCoordinate()).getTime();
+									if(time > lastModification){
+										lastModification = time;
+									}
+								}
 							}
 							if (descTime > lastModification) {
 								lastModification = descTime;
 							}
 						}
 
-						Collection<? extends ConceptVersionBI> versions = concept.getVersions(config.getViewCoordinate());
-						for (ConceptVersionBI conceptVersionBI : versions) {
-							
-//							int charNid = conceptVersionBI.getgetCharacteristicNid();
-//							int anotherNid = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
-//							int architectonicAuxInferredNid = ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
-//							int snomedMetadataInferredNid = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
-//							if (anotherNid !=  charNid && charNid != architectonicAuxInferredNid 
-							
-							if (conceptVersionBI.getTime() > lastModification) {
-								lastModification = conceptVersionBI.getTime();
-							}
-						}
 
-						List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+						List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
 						for (I_ConceptAttributeTuple attr : attributes) {
 							long attrTime = attr.getTime();
 							if (attrTime > lastModification) {
