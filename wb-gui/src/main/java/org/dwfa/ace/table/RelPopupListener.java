@@ -41,8 +41,25 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.RelTableModel.FieldToChange;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.descriptionlogic.DescriptionLogic;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class RelPopupListener extends MouseAdapter {
 
@@ -54,6 +71,7 @@ public class RelPopupListener extends MouseAdapter {
             super();
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
@@ -61,7 +79,7 @@ public class RelPopupListener extends MouseAdapter {
                 for (PathBI p : config.getEditingPathSet()) {
                     I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                     I_RelPart newPart =
-                            (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), p.getConceptNid(),
+                            (I_RelPart) currentPart.makeAnalog(currentPart.getStatusNid(), p.getConceptNid(),
                                 Long.MAX_VALUE);
                     selectedObject.getTuple().getRelVersioned().addVersion(newPart);
 
@@ -87,12 +105,118 @@ public class RelPopupListener extends MouseAdapter {
         }
     }
 
+    // SNOOWL LOGIC DESCRIPTION -- NEGATION TOGGLE POPUP MENU
+    private class ChangeNegationActionListener implements ActionListener {
+
+        public ChangeNegationActionListener() {
+            super();
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) { // SNOOWL NEGATION ACTION LISTENER
+            try {
+                // SETUP TERMINOLOGY SNAPSHOT
+                ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+                EditCoordinate ec = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
+                TerminologyStoreDI ts = Ts.get();
+                TerminologyConstructorBI tsSnapshot = ts.getTerminologyConstructor(ec, vc);
+                // SETUP CONCEPT AND RELATIONSHIP VALUES
+                int collectionNid = DescriptionLogic.getNegationRefsetNid();
+                int cNid = selectedObject.getTuple().getC1Id();
+                ConceptVersionBI c = Ts.get().getConceptVersion(vc, cNid);
+                int roleNid = selectedObject.getTuple().getTypeNid();
+                int valueNid = selectedObject.getTuple().getC2Id();
+                int roleGroup = selectedObject.getTuple().getGroup();
+                Collection<? extends RelationshipVersionBI> rels = null;
+                try {
+                    rels = c.getRelsOutgoingActive();
+                } catch (ContraditionException ex) {
+                    String s = RelPopupListener.class.getName() 
+                            + " Error getting outgoing active rels for : " 
+                            + c.toUserString();
+                    AceLog.getAppLog().severe(s);
+                    AceLog.getAppLog().alertAndLogException(new Exception(s));
+                    return;
+                }
+                Collection<? extends RefexVersionBI<?>> negationRefex = null;
+
+                for (RelationshipVersionBI rvbi : rels) {
+
+                    if (rvbi.getTypeNid() == roleNid && rvbi.getDestinationNid() == valueNid
+                            && (roleGroup == -1 || rvbi.getGroup() == roleGroup)
+                            && rvbi.getCharacteristicNid()
+                            == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+
+                        int statusNid = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
+                        negationRefex = rvbi.getCurrentRefexes(vc, collectionNid);
+                        if (negationRefex.size() > 0) {
+                            if (negationRefex.iterator().next().getStatusNid()
+                                    == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                                statusNid = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+                            }
+                        }
+
+                        // If not already a member, then a member record is added.
+                        try {
+                            RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rvbi.getNid(),
+                                    collectionNid);
+
+                            int normalMemberNid = ts.getConcept(
+                                    RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();
+                            refexSpec.with(RefexProperty.CNID1, normalMemberNid);
+
+                            refexSpec.with(RefexProperty.STATUS_NID, statusNid);
+                            refexSpec.setMemberContentUuid();
+                            tsSnapshot.constructIfNotCurrent(refexSpec);
+                        } catch (IOException iOException) {
+                            String s = RelPopupListener.class.getName()
+                                    + " iOException : "
+                                    + c.toUserString();
+                            AceLog.getAppLog().severe(s);
+                            AceLog.getAppLog().alertAndLogException(new Exception(s, iOException));
+                            return;
+                        } catch (InvalidCAB invalidCAB) {
+                            String s = RelPopupListener.class.getName()
+                                    + " invalidCAB : "
+                                    + c.toUserString();
+                            AceLog.getAppLog().severe(s);
+                            AceLog.getAppLog().alertAndLogException(new Exception(s, invalidCAB));
+                            return;
+                        }
+                        String logString = null;
+                        if (statusNid == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                            logString = "toggled rel negation (applied NOT!): " + rvbi.toUserString();
+                        } else {
+                            logString = "toggled rel negation (removed): " + rvbi.toUserString();
+                        }
+                        AceLog.getAppLog().info(logString);
+
+                        // ADD UNCOMMITTED
+                        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
+                        if (collectionConcept.isAnnotationStyleRefex()) {
+                            ts.addUncommitted(c);
+                        } else {
+                            ts.addUncommitted(collectionConcept);
+                        }
+                    }
+                }
+
+                model.fireTableDataChanged();
+            } catch (IOException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            } catch (TerminologyException ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+
     private class UndoActionListener implements ActionListener {
 
         public UndoActionListener() {
             super();
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
 			try {
 			    I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
@@ -121,6 +245,7 @@ public class RelPopupListener extends MouseAdapter {
             this.field = field;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 I_GetConceptData sourceBean = Terms.get().getConcept(selectedObject.getTuple().getC1Id());
@@ -131,38 +256,38 @@ public class RelPopupListener extends MouseAdapter {
                     if (newPart.getTime() != Long.MAX_VALUE) {
                         I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
                         newPart =
-                                (I_RelPart) currentPart.makeAnalog(currentPart.getStatusId(), currentPart.getPathId(),
+                                (I_RelPart) currentPart.makeAnalog(currentPart.getStatusNid(), currentPart.getPathNid(),
                                     Long.MAX_VALUE);
                         srcRel.addVersion(newPart);
                     } else {
-                        newPart.setPathId(p.getConceptNid());
+                        newPart.setPathNid(p.getConceptNid());
                     }
                     switch (field) {
                     case STATUS:
-                        newPart.setStatusId((AceConfig.getVodb().uuidToNative(ids)));
+                        newPart.setStatusNid((AceConfig.getVodb().uuidToNative(ids)));
                         break;
                     case CHARACTERISTIC:
                         newPart.setCharacteristicId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
+                        newPart.setStatusNid(config.getDefaultStatus().getConceptNid());
                         break;
                     case REFINABILITY:
                         newPart.setRefinabilityId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
+                        newPart.setStatusNid(config.getDefaultStatus().getConceptNid());
                         break;
                     case TYPE:
-                        newPart.setTypeId((AceConfig.getVodb().uuidToNative(ids)));
-                        newPart.setStatusId(config.getDefaultStatus().getConceptNid());
+                        newPart.setTypeNid((AceConfig.getVodb().uuidToNative(ids)));
+                        newPart.setStatusNid(config.getDefaultStatus().getConceptNid());
                         break;
 
                     default:
                     }
 
-                    model.referencedConcepts.put(newPart.getStatusId(), Terms.get().getConcept(newPart.getStatusId()));
+                    model.referencedConcepts.put(newPart.getStatusNid(), Terms.get().getConcept(newPart.getStatusNid()));
                     model.referencedConcepts.put(newPart.getCharacteristicId(), Terms.get().getConcept(
                         newPart.getCharacteristicId()));
                     model.referencedConcepts.put(newPart.getRefinabilityId(), Terms.get().getConcept(
                         newPart.getRefinabilityId()));
-                    model.referencedConcepts.put(newPart.getTypeId(), Terms.get().getConcept(newPart.getTypeId()));
+                    model.referencedConcepts.put(newPart.getTypeNid(), Terms.get().getConcept(newPart.getTypeNid()));
                 }
                 Terms.get().addUncommitted(sourceBean);
                 Terms.get().addUncommitted(destBean);
@@ -180,6 +305,7 @@ public class RelPopupListener extends MouseAdapter {
     JTable table;
 
     ActionListener change;
+    ActionListener toggleNegation; // SNOOWL LOGIC DESCRIPTION
 
     StringWithRelTuple selectedObject;
 
@@ -191,6 +317,7 @@ public class RelPopupListener extends MouseAdapter {
         this.config = config;
         this.model = model;
         change = new ChangeActionListener();
+        toggleNegation = new ChangeNegationActionListener();// SNOOWL LOGIC DESCRIPTION
     }
 
     private void makePopup(MouseEvent e) {
@@ -231,6 +358,10 @@ public class RelPopupListener extends MouseAdapter {
                 JMenu changeStatus = new JMenu("Change Status");
                 popup.add(changeStatus);
                 addSubmenuItems(changeStatus, FieldToChange.STATUS, model.host.getConfig().getEditStatusTypePopup());
+                // SNOOWL DESCRIPTION LOGIC ADDITION
+                JMenuItem changeNegation = new JMenuItem("Toggle Negation");
+                popup.add(changeNegation);
+                changeNegation.addActionListener(toggleNegation);
             }
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
@@ -249,10 +380,12 @@ public class RelPopupListener extends MouseAdapter {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         maybeShowPopup(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         maybeShowPopup(e);
     }

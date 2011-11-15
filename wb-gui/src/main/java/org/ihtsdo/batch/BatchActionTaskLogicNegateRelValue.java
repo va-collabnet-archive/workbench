@@ -81,7 +81,16 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
                     && (roleGroup == -1 || rvbi.getGroup() == roleGroup)
                     && rvbi.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
                 // :!!!:???:
-                // negationRefex = rvbi.getCurrentRefexes(vc, collectionNid);
+
+                int statusNid = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
+                negationRefex = rvbi.getCurrentRefexes(vc, collectionNid);
+                if (negationRefex.size() > 0) {
+                    if (negationRefex.iterator().next().getStatusNid()
+                            == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                        statusNid = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+                    }
+                }
+
                 // If not already a member, then a member record is added.
                 RefexCAB refexSpec = new RefexCAB(TK_REFSET_TYPE.CID, rvbi.getNid(), collectionNid);
 
@@ -89,15 +98,23 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
                         RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();
                 refexSpec.with(RefexProperty.CNID1, normalMemberNid);
 
-                refexSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+                refexSpec.with(RefexProperty.STATUS_NID, statusNid);
                 refexSpec.setMemberContentUuid();
                 tsSnapshot.constructIfNotCurrent(refexSpec);
 
+                String logString = null;
+                if (statusNid == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                    logString = "toggled rel negation (applied NOT!): "
+                            + nidToName(cNid) + " :: "
+                            + nidToName(roleNid) + " :: " + nidToName(valueNid);
+                } else {
+                    logString = "toggled rel negation (removed): "
+                            + nidToName(cNid) + " :: "
+                            + nidToName(roleNid) + " :: " + nidToName(valueNid);
+                }
                 BatchActionEventReporter.add(new BatchActionEvent(c,
                         BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE,
-                        BatchActionEventType.EVENT_SUCCESS, "toggled rel negation: "
-                        + nidToName(cNid) + " :: "
-                        + nidToName(roleNid) + " :: " + nidToName(valueNid)));
+                        BatchActionEventType.EVENT_SUCCESS, logString));
 
                 // ADD UNCOMMITTED
                 ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
@@ -108,7 +125,6 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
                     ts.addUncommitted(collectionConcept);
                     return false;
                 }
-
             }
         }
 
