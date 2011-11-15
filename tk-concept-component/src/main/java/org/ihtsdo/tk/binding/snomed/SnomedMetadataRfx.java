@@ -55,15 +55,22 @@ public class SnomedMetadataRfx {
     private static int GB_DIALECT_REFEX_NID;
     private static int SYNONYMY_REFEX_NID;
     private static int REFERS_TO_REFEX_NID;
-    // DESCRIPTION CONCEPTS
+
+    private static int STATUS_DUPLICATE_NID;
+    private static int STATUS_AMBIGUOUS_NID;
+    private static int STATUS_ERRONEOUS_NID;
+    private static int STATUS_OUTDATED_NID;
+
+    // DESCRIPTION CONCEPTSPECS
     private static ConceptSpec DESC_PREFERRED;
     private static ConceptSpec DESC_ACCEPTABLE;
-    // STATUS CONCEPTS
+    // STATUS CONCEPTSPECS
     private static ConceptSpec STATUS_DUPLICATE;
     private static ConceptSpec STATUS_AMBIGUOUS;
     private static ConceptSpec STATUS_ERRONEOUS;
     private static ConceptSpec STATUS_OUTDATED;
     private static ConceptSpec STATUS_LIMITED;
+
     //REFEX CONCEPTS
     private static ConceptSpec REFEX_NON_HUMAN;
     private static ConceptSpec REFEX_VTM;
@@ -201,6 +208,34 @@ public class SnomedMetadataRfx {
             setupSnoRf1Rf2();
         }
         return STATUS_INAPPROPRIATE_NID;
+    }
+
+    public static int getSTATUS_AMBIGUOUS_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_AMBIGUOUS_NID;
+    }
+
+    public static int getSTATUS_DUPLICATE_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_DUPLICATE_NID;
+    }
+
+    public static int getSTATUS_ERRONEOUS_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_ERRONEOUS_NID;
+    }
+
+    public static int getSTATUS_OUTDATED_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_OUTDATED_NID;
     }
 
     public static int getUS_DIALECT_REFEX_NID() throws IOException {
@@ -372,13 +407,17 @@ public class SnomedMetadataRfx {
             // DESCRIPTION CONCEPT
             DESC_PREFERRED = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1;
             DESC_ACCEPTABLE = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1;
-            // STATUS CONCEPT
+            // STATUS CONCEPTSPECS
             STATUS_DUPLICATE = SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1;
+            STATUS_DUPLICATE_NID = tf.getNidForUuids(STATUS_DUPLICATE.getUuids());
             STATUS_AMBIGUOUS = SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1;
+            STATUS_AMBIGUOUS_NID = tf.getNidForUuids(STATUS_AMBIGUOUS.getUuids());
             STATUS_ERRONEOUS = SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1;
+            STATUS_ERRONEOUS_NID  = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
             STATUS_OUTDATED = SnomedMetadataRf1.OUTDATED_INACTIVE_STATUS_RF1;
+            STATUS_OUTDATED_NID = tf.getNidForUuids(STATUS_OUTDATED.getUuids());
             STATUS_LIMITED = SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1;
-            // REFEX CONCEPTS
+            // REFEX CONCEPTSPECS
             REFEX_NON_HUMAN = SnomedMetadataRf1.NON_HUMAN_RF1;
             REFEX_VTM = SnomedMetadataRf1.VTM_RF1;
             REFEX_VMP = SnomedMetadataRf1.VMP_RF1;
@@ -437,9 +476,13 @@ public class SnomedMetadataRfx {
             DESC_ACCEPTABLE = SnomedMetadataRf2.ACCEPTABLE_RF2;
             // STATUS CONCEPT
             STATUS_DUPLICATE = SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2;
+            STATUS_DUPLICATE_NID = tf.getNidForUuids(STATUS_DUPLICATE.getUuids());
             STATUS_AMBIGUOUS = SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2;
+            STATUS_AMBIGUOUS_NID = tf.getNidForUuids(STATUS_AMBIGUOUS.getUuids());
             STATUS_ERRONEOUS = SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2;
+            STATUS_ERRONEOUS_NID  = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
             STATUS_OUTDATED = SnomedMetadataRf2.OUTDATED_COMPONENT_RF2;
+            STATUS_OUTDATED_NID = tf.getNidForUuids(STATUS_OUTDATED.getUuids());
             STATUS_LIMITED = SnomedMetadataRf2.LIMITED_COMPONENT_RF2;
             //REFEX CONCEPTS
             REFEX_NON_HUMAN = SnomedMetadataRf2.NON_HUMAN_RF2;
