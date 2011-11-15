@@ -38,11 +38,11 @@ import org.ihtsdo.idgen.ws.data.SCTIDResponse;
 import org.ihtsdo.idgen.ws.data.SNOMEDIDRequest;
 import org.ihtsdo.idgen.ws.data.SNOMEDIDResponse;
 
-
 public class IdAssignmentImpl implements IdAssignmentBI {
 
 	private String targetEndpoint = "http://mgr.servers.aceworkspace.net:50002/axis2/services/id_generator";
 	private Id_generatorStub idGenStub;
+	private static final String WEB_SERVICE_IMPL = "WebServiceImplementation";
 
 	public IdAssignmentImpl() {
 		super();
@@ -59,18 +59,18 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 			e.printStackTrace();
 		}
 	}
-	
-	public IdAssignmentImpl(File propertiesFile){
-			Properties props = new Properties();
-			try {
-				props.load(new FileInputStream("config/webservice.properties"));
-				this.targetEndpoint = props.getProperty("targetEndpoint");
-				this.idGenStub = new Id_generatorStub(targetEndpoint);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+	public IdAssignmentImpl(File propertiesFile) {
+		Properties props = new Properties();
+		try {
+			props.load(new FileInputStream("config/webservice.properties"));
+			this.targetEndpoint = props.getProperty("targetEndpoint");
+			this.idGenStub = new Id_generatorStub(targetEndpoint);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public IdAssignmentImpl(String targetEndpoint, String user, String password) {
@@ -91,9 +91,11 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		SCTIDResponse sctid = idGenStub.getSCTID(request);
 
 		BigInteger result = sctid.getSctid();
-		if(result != null){
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
+		if (result != null) {
 			return result.longValue();
-		}else{
+		} else {
 			return null;
 		}
 	}
@@ -104,7 +106,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		request.setComponentUuid(componentUuid.toString());
 
 		SNOMEDIDResponse resonse = idGenStub.getSNOMEDID(request);
-
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return resonse.getSnomedid();
 	}
 
@@ -114,7 +117,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		request.setComponentUuid(componentUuid.toString());
 
 		CTV3IDResponse ctv3id = idGenStub.getCTV3ID(request);
-
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return ctv3id.getCtv3Id();
 	}
 
@@ -137,7 +141,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 			System.out.println("[componentUUID: " + codeSctIdType.getCode() + " SCTID " + sctid + "]");
 			result.put(UUID.fromString(codeSctIdType.getCode()), sctid.longValue());
 		}
-
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return result;
 	}
 
@@ -154,10 +159,11 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		CreateSCTIDResponse response = idGenStub.createSCTID(request);
 
 		BigInteger sctid = response.getSctId();
-		
-		if(sctid != null){
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
+		if (sctid != null) {
 			return sctid.longValue();
-		}else{
+		} else {
 			return null;
 		}
 	}
@@ -170,7 +176,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		request.setParentSnomedId(parentSnomedId);
 
 		CreateSNOMEDIDResponse response = idGenStub.createSNOMEDID(request);
-
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return response.getSnomedId();
 	}
 
@@ -179,12 +186,14 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 		CreateCTV3IDRequest request = new CreateCTV3IDRequest();
 		request.setComponentUuid(componentUuid.toString());
 		CreateCTV3IDResponse response = idGenStub.createCTV3ID(request);
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return response.getCtv3Id();
 	}
 
 	@Override
 	public HashMap<UUID, Long> createSCTIDList(List<UUID> componentUuidList, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws Exception {
-		long soTimeout = 10 * 60 * 1000; 
+		long soTimeout = 10 * 60 * 1000;
 		idGenStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(soTimeout);
 
 		CreateSCTIDListRequest request = new CreateSCTIDListRequest();
@@ -253,13 +262,14 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 			}
 			result.put(UUID.fromString(conceptIds2.getComponentUuid()), identifierId);
 		}
-
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return result;
 	}
 
 	@Override
-	public HashMap<IDENTIFIER, String> createConceptIds(UUID componentUuid, String parentSnomedId, Integer namespaceId, String partitionId, String releaseId, String executionId,
-			String moduleId) throws Exception {
+	public HashMap<IDENTIFIER, String> createConceptIds(UUID componentUuid, String parentSnomedId, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId)
+			throws Exception {
 		CreateConceptIdsRequest request = new CreateConceptIdsRequest();
 		request.setComponentUuid(componentUuid.toString());
 		request.setParentSnomedId(parentSnomedId);
@@ -280,6 +290,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 				}
 			}
 		}
+		idGenStub._getServiceClient().cleanupTransport();
+		idGenStub._getServiceClient().cleanup();
 		return result;
 	}
 
