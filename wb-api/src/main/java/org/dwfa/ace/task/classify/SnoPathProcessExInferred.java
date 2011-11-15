@@ -137,16 +137,13 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
             countConAdded++;
 
             for (I_RelTuple rt : relTupList) {
-                int authorNid = rt.getAuthorNid();
-                if (authorNid != snorocketAuthorNid) {
-                    continue; // SKIP IF NOT INFERRED
-                }
+//                int authorNid = rt.getAuthorNid();
+//                if (authorNid != snorocketAuthorNid) {
+//                    continue; // SKIP IF NOT INFERRED
+//                }
                 int charId = rt.getCharacteristicId();
                 boolean keep = false;
-                if (charId == isCh_DEFINING_CHARACTERISTIC) {
-                    keep = true;
-                    countRelCharDefining++;
-                } else if (charId == isCh_INFERRED_RELATIONSHIP) {
+                if (charId == isCh_INFERRED_RELATIONSHIP) {
                     keep = true;
                     countRelCharInferred++;
                 } else {
