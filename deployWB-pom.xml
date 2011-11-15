@@ -17,7 +17,7 @@
 	<properties>
 		<!-- ant deploy properties -->
 		<!-- Run the Ant Script? Values: yes or no -->
-		<runAntDeploy>yes</runAntDeploy>
+		<runAntDeploy>no</runAntDeploy>
 		<!--
 			Delete the old BDB directory and copy in a new one? Values : yes or
 			no
@@ -35,19 +35,11 @@
 		<!-- The Folder to output the Zip file to. Values : FilePath -->
 		<AntDeployCreateZip_Dir>D:/adam/Test/TestInstance/zips</AntDeployCreateZip_Dir>
 		<!-- The path to the default Workbench instance. Values : FilePath -->
-		<!--   
-		 <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/nhs-subset-editor-sa-bundle</AntDeployWorkBenchDeploy_Dir> 
-		 <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/wb-bundle-test/wb-bundle</AntDeployWorkBenchDeploy_Dir> 
-		 <AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev</AntDeployWorkBenchDeploy_Dir> 
-		 <AntDeployWorkBenchDeploy_Dir>D:\Data\Terminology\WB_Builds\trektest\editor-sync-1.0.1-SNAPSHOT-assembly</AntDeployWorkBenchDeploy_Dir>  
-		 <AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev_sso</AntDeployWorkBenchDeploy_Dir> 
-		 <AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev_norm</AntDeployWorkBenchDeploy_Dir> 
-		<AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\devIncMut</AntDeployWorkBenchDeploy_Dir>
-		
-		-->
-		
-		<AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev_norm</AntDeployWorkBenchDeploy_Dir> 
-		
+		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/nhs-subset-editor-sa-bundle</AntDeployWorkBenchDeploy_Dir> -->
+		<!--  <AntDeployWorkBenchDeploy_Dir>D:/adam/Test/TestInstance/wb-bundle-test/wb-bundle</AntDeployWorkBenchDeploy_Dir> -->
+		<!--  <AntDeployWorkBenchDeploy_Dir>D:\adam\Test\TestInstance\trekbuilds\dev</AntDeployWorkBenchDeploy_Dir> -->
+		<!-- <AntDeployWorkBenchDeploy_Dir>D:\Data\Terminology\WB_Builds\trektest\editor-sync-1.0.1-SNAPSHOT-assembly</AntDeployWorkBenchDeploy_Dir>  -->
+		<AntDeployWorkBenchDeploy_Dir>D:\Data\Terminology\WB_Builds\trektest\release</AntDeployWorkBenchDeploy_Dir> 
 		<!-- Run workbench? Values :  yes or no -->
 		<AntDeployExec>no</AntDeployExec>
 		
