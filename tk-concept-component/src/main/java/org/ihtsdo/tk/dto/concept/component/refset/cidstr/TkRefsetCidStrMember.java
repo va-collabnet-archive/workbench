@@ -5,7 +5,10 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidstr;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -17,10 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrRevision> {
    public static final long serialVersionUID = 1;
@@ -34,6 +34,28 @@ public class TkRefsetCidStrMember extends TkRefsetAbstractMember<TkRefsetCidStrR
 
    public TkRefsetCidStrMember() {
       super();
+   }
+
+   public TkRefsetCidStrMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      TerminologyStoreDI                          ts        = Ts.get();
+      Collection<? extends RefexCnidStrVersionBI> refexes   = another.getVersions();
+      int                                         partCount = refexes.size();
+      Iterator<? extends RefexCnidStrVersionBI>   itr       = refexes.iterator();
+      RefexCnidStrVersionBI                       rv        = itr.next();
+
+      this.c1Uuid   = ts.getUuidPrimordialForNid(rv.getCnid1());
+      this.strValue = rv.getStr1();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetCidStrRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            rv = itr.next();
+            revisions.add(new TkRefsetCidStrRevision(rv));
+         }
+      }
    }
 
    public TkRefsetCidStrMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -63,11 +63,15 @@ public class PathSegmentExpander extends SwingWorker<Integer, Object> {
          } else {
             int row = factory.getTree().getRowForPath(path);
 
-            row = Math.min(row + 15, factory.getTree().getRowCount());
-            factory.getTree().scrollRowToVisible(row);
-            factory.getTree().expandPath(path.getParentPath());
-            factory.getTree().setSelectionPath(path);
-            factory.getTree().scrollPathToVisible(path);
+             try {
+                 row = Math.min(row + 15, factory.getTree().getRowCount());
+                 factory.getTree().scrollRowToVisible(row);
+                 factory.getTree().expandPath(path.getParentPath());
+                 factory.getTree().setSelectionPath(path);
+                 factory.getTree().scrollPathToVisible(path);
+             } catch (NullPointerException e) {
+                 AceLog.getAppLog().info("Expander: " + e.getLocalizedMessage());
+             }
          }
       } catch (Exception ex) {
          AceLog.getAppLog().alertAndLogException(ex);

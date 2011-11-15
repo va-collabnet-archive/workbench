@@ -176,6 +176,7 @@ public class WsClientDataConverter {
 		result.setPathUuid(UUID.fromString(qaCase.getPathUuid()));
 		result.setRuleUuid(UUID.fromString(qaCase.getRule().getRuleUuid()));
 		result.setEffectiveTime(qaCase.getEffectiveTime());
+		result.setLastChangedState(qaCase.getLastStatusChanged());
 		result.setActive(qaCase.getIsActive());
 		result.setAssignmentEditor(qaCase.getAssignmentEditor());
 		result.setAssignmentDate(qaCase.getAssignmentDate());

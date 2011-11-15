@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributePart<ConceptAttributesRevision>,
-                   ConAttrAnalogBI<ConceptAttributesRevision> {
+                   ConAttrAnalogBI<ConceptAttributesRevision> {  
    private boolean defined = false;
 
    //~--- constructors --------------------------------------------------------
@@ -120,7 +120,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
 
       ConceptAttributesRevision newR;
 
-      newR = new ConceptAttributesRevision(this.primordialComponent, statusNid, authorNid, pathNid, time,
+      newR = new ConceptAttributesRevision(this, statusNid, authorNid, pathNid, time,
               this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 

@@ -59,6 +59,7 @@ import org.dwfa.ace.task.classify.SnoPathProcessStated;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.Bdb;
@@ -144,6 +145,7 @@ public class SnorocketMojo extends AbstractMojo {
     private static int isMANDATORY_REFINABILITY = Integer.MAX_VALUE;
     private static int isCh_STATED_RELATIONSHIP = Integer.MAX_VALUE;
     private static int isCh_DEFINING_CHARACTERISTIC = Integer.MAX_VALUE;
+    private static int isCh_INFERRED_CHARACTERISTIC = Integer.MAX_VALUE;
     private static int workbenchAuxPath = Integer.MAX_VALUE;
     private static int snorocketAuthorNid = Integer.MAX_VALUE;
     // NID SETS
@@ -526,10 +528,20 @@ public class SnorocketMojo extends AbstractMojo {
         // Typically, B is the SnoRocket Results Set (for newly inferred)
         Iterator<SnoRel> itA = snorelA.iterator();
         Iterator<SnoRel> itB = snorelB.iterator();
-        SnoRel rel_A = itA.next();
-        SnoRel rel_B = itB.next();
+        SnoRel rel_A = null;
         boolean done_A = false;
+        if (itA.hasNext()) {
+            rel_A = itA.next();
+        } else {
+            done_A = true;
+        }
+        SnoRel rel_B = null;
         boolean done_B = false;
+        if (itB.hasNext()) {
+            rel_B = itB.next();
+        } else {
+            done_B = true;
+        }
 
         logger.info("\r\n::: [SnorocketMojo]"
                 + "\r\n::: snorelA.size() = \t" + snorelA.size()
@@ -620,8 +632,8 @@ public class SnorocketMojo extends AbstractMojo {
                         rel_A = itA.next();
                     } else {
                         done_A = true;
+                        break;
                     }
-                    break;
                 }
 
                 // REMAINDER LIST_B GROUP 0 FOR C1
@@ -636,8 +648,8 @@ public class SnorocketMojo extends AbstractMojo {
                         rel_B = itB.next();
                     } else {
                         done_B = true;
+                        break;
                     }
-                    break;
                 }
 
                 // ** SEGMENT GROUPS **
@@ -697,11 +709,20 @@ public class SnorocketMojo extends AbstractMojo {
 
                 // FIND GROUPS IN GROUPLIST_B WITHOUT AN EQUAL IN GROUPLIST_A
                 // WRITE THESE GROUPED RELS AS "NEW, CURRENT"
+                int rgNum = 0; // USED TO DETERMINE "AVAILABLE" ROLE GROUP NUMBERS
                 if (groupList_B.size() > 0) {
                     groupList_NotEqual = groupList_B.whichNotEqual(groupList_A);
                     for (SnoGrp sg : groupList_NotEqual) {
-                        for (SnoRel sr_B : sg) {
-                            writeBackCurrent(sr_B, classPathNid, vTime);
+                        if (sg.get(0).group != 0) {
+                            rgNum = nextRoleGroupNumber(groupList_A, rgNum);
+                            for (SnoRel sr_B : sg) {
+                                sr_B.group = rgNum;
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
+                        } else {
+                            for (SnoRel sr_B : sg) {
+                                writeBackCurrent(sr_B, classPathNid, vTime);
+                            }
                         }
                     }
                     countB_Total += groupList_A.countRels();
@@ -811,6 +832,31 @@ public class SnorocketMojo extends AbstractMojo {
         return s.toString();
     }
 
+    private int nextRoleGroupNumber(SnoGrpList sgl, int gnum) {
+
+        int testNum = gnum + 1;
+        int sglSize = sgl.size();
+        int trial = 0;
+        while (trial <= sglSize) {
+
+            boolean exists = false;
+            for (int i = 0; i < sglSize; i++) {
+                if (sgl.get(i).get(0).group == testNum) {
+                    exists = true;
+                }
+            }
+
+            if (exists == false) {
+                return testNum;
+            } else {
+                testNum++;
+                trial++;
+            }
+        }
+
+        return testNum;
+    }
+
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
             throws IOException {
         if (rel_A.typeId == isaNid) {
@@ -873,7 +919,7 @@ public class SnorocketMojo extends AbstractMojo {
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId, rel_B.c2Id,
-                isCh_DEFINING_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
+        		isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
         // :!!!:TODO: [SnorocketMojo] move addUncommittedNoChecks() to more efficient location.
@@ -962,9 +1008,10 @@ public class SnorocketMojo extends AbstractMojo {
             isMANDATORY_REFINABILITY = SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID();
             isCh_STATED_RELATIONSHIP = SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID();
             isCh_DEFINING_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_DEFINING_CHARACTERISTIC_NID();
+            isCh_INFERRED_CHARACTERISTIC = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
 
             snorocketAuthorNid =
-                    tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET.getUids());
+                    tf.uuidToNative(Concept.SNOROCKET.getUids());
 
         } catch (TerminologyException e) {
             logger.info(e.toString());
@@ -1146,7 +1193,7 @@ public class SnorocketMojo extends AbstractMojo {
                 sb.append(cNid).append("\t");
                 sb.append(c.getInitialText());
             }
-         } catch (IOException e) {
+        } catch (IOException e) {
             logger.info(e.toString());
         } catch (TerminologyException e) {
             logger.info(e.toString());

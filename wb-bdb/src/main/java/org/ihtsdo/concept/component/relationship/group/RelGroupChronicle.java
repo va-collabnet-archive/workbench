@@ -252,4 +252,9 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    public boolean isUncommitted() {
       return false;
    }
+
+    @Override
+    public Concept getEnclosingConcept() {
+        return (Concept) rels.iterator().next().getEnclosingConcept();
+    }
 }

@@ -29,12 +29,14 @@ public class AddFromSpecAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ConceptVersionBI concept;
     SpecFact<?> spec;
+    I_ConfigAceFrame config;
 
     public AddFromSpecAction(String actionName,
-            ConceptFact concept, SpecFact<?> spec) throws IOException {
+            ConceptFact concept, SpecFact<?> spec, I_ConfigAceFrame config) throws IOException {
         super(actionName);
         this.concept = concept.getConcept();
         this.spec = spec;
+        this.config = config;
 
     }
 
@@ -55,11 +57,10 @@ public class AddFromSpecAction extends AbstractAction {
 
     private void addDesc() throws TerminologyException, IOException {
         DescriptionSpec descSpec = ((DescSpecFact) spec).getDescSpec();
-        I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         Terms.get().newDescription(UUID.randomUUID(), Terms.get().getConcept(concept.getNid()),
                 descSpec.getLangText(),
                 descSpec.getDescText(),
-                Terms.get().getConcept(descSpec.getDescTypeSpec().get(concept.getViewCoordinate()).getNid()),
+                Terms.get().getConcept(descSpec.getDescTypeSpec().getLenient().getNid()),
                 config, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
         Terms.get().addUncommitted(Terms.get().getConcept(concept.getNid()));
     }
@@ -67,14 +68,12 @@ public class AddFromSpecAction extends AbstractAction {
     private void addRel() {
         RelSpec relSpec = ((RelSpecFact) spec).getRelSpec();
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             I_GetConceptData originConcept = Terms.get().getConcept(concept.getNid());
             I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(),
                     originConcept,
-                    relSpec.getRelTypeSpec().get(concept.getViewCoordinate()).getNid(),
-                    relSpec.getDestinationSpec().get(concept.getViewCoordinate()).getNid(),
+                    relSpec.getRelTypeSpec().getLenient().getNid(),
+                    relSpec.getDestinationSpec().getLenient().getNid(),
                     SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getLenient().getNid(),
                     SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID(),
                     0,

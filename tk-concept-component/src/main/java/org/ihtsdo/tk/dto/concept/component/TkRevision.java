@@ -39,6 +39,17 @@ public abstract class TkRevision implements I_VersionExternally {
       super();
    }
 
+   public TkRevision(ComponentVersionBI another) throws IOException {
+      super();
+      this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
+      this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
+      this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
+      assert pathUuid != null : another;
+      assert authorUuid != null : another;
+      assert statusUuid != null : another;
+      this.time = another.getTime();
+   }
+
    public TkRevision(IdBI id) throws IOException {
       super();
       this.authorUuid = Ts.get().getComponent(id.getAuthorNid()).getPrimUuid();
@@ -64,10 +75,6 @@ public abstract class TkRevision implements I_VersionExternally {
          this.statusUuid = Ts.get().getComponent(another.getStatusNid()).getPrimUuid();
          this.authorUuid = Ts.get().getComponent(another.getAuthorNid()).getPrimUuid();
          this.pathUuid   = Ts.get().getComponent(another.getPathNid()).getPrimUuid();
-      }
-
-      if (pathUuid == null) {
-         System.out.println("ouch");
       }
 
       assert pathUuid != null : another;

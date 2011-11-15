@@ -158,7 +158,7 @@ public class ImportRefsetSpecTask extends AbstractTask {
                     try {
                         activityPanel.complete();
                     } catch (ComputationCanceled e) {
-                        // Canceled;
+                        // Nothing to do
                     }
                 }
                 Terms.get().cancel();

@@ -16,10 +16,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 
 public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public static final long serialVersionUID = 1;
@@ -33,6 +32,23 @@ public class TkRefsetMember extends TkRefsetAbstractMember<TkRefsetRevision> {
    public TkRefsetMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+   }
+   public TkRefsetMember(RefexChronicleBI another) throws IOException {
+      super((RefexVersionBI) another.getPrimordialVersion());
+
+      Collection<? extends RefexCnidCnidCnidVersionBI> refexes   = another.getVersions();
+      int                                              partCount = refexes.size();
+      Iterator<? extends RefexCnidCnidCnidVersionBI>   itr       = refexes.iterator();
+      RefexCnidCnidCnidVersionBI                       rv        = itr.next();
+
+      if (partCount > 1) {
+         revisions = new ArrayList<TkRefsetRevision>(partCount - 1);
+
+         while (itr.hasNext()) {
+            rv = itr.next();
+            revisions.add(new TkRefsetRevision(rv));
+         }
+      }
    }
 
    public TkRefsetMember(TkRefsetMember another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+
 public class DrDefiningRolesSet {
 	
 	private String rolesSetType;
@@ -63,7 +65,8 @@ public class DrDefiningRolesSet {
 		if (groupCondition.equals("ungrouped")) {
 			int counter = 0;
 			for (DrRelationship loopRel : relationships) {
-				if (loopRel.getTypeUuid().equals(typeUuid) && loopRel.getRelGroup() == 0) {
+				if (loopRel.getTypeUuid().equals(typeUuid) && loopRel.getRelGroup() == 0 &&
+						loopRel.getStatusUuid().equals("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
 					counter++;
 				}
 			}
@@ -74,7 +77,8 @@ public class DrDefiningRolesSet {
 			result = true;
 			Map<Integer, Integer> countMap = new HashMap<Integer,Integer>();
 			for (DrRelationship loopRel : relationships) {
-				if (loopRel.getTypeUuid().equals(typeUuid)) {
+				if (loopRel.getTypeUuid().equals(typeUuid) &&
+						loopRel.getStatusUuid().equals("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
 					int group = loopRel.getRelGroup();
 					if (countMap.containsKey(group)) {
 						countMap.put(group, countMap.get(group) + 1);
@@ -91,7 +95,8 @@ public class DrDefiningRolesSet {
 		} else { // "any" or unknown value
 			int counter = 0;
 			for (DrRelationship loopRel : relationships) {
-				if (loopRel.getTypeUuid().equals(typeUuid)) {
+				if (loopRel.getTypeUuid().equals(typeUuid) &&
+						loopRel.getStatusUuid().equals("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
 					counter++;
 				}
 			}

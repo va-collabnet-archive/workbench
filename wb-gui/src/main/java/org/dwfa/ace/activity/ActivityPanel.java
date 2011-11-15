@@ -70,7 +70,7 @@ public class ActivityPanel implements I_ShowActivity, AncestorListener {
                 try {
                     shower.complete();
                 } catch (ComputationCanceled e1) {
-                    // nothing to report. ;
+                    // Nothing to do
                 }
             }
             showActivityListeners.clear();

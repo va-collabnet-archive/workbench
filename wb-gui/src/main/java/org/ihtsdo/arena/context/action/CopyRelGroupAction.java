@@ -29,18 +29,19 @@ public class CopyRelGroupAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ComponentVersionBI sourceComponent;
     ComponentVersionBI targetComponent;
+    I_ConfigAceFrame config;
 
-    public CopyRelGroupAction(String actionName, RelGroupFact sourceFact, ConceptFact destFact) {
+    public CopyRelGroupAction(String actionName, RelGroupFact sourceFact, ConceptFact destFact, I_ConfigAceFrame config) {
         super(actionName);
         this.sourceComponent = sourceFact.getComponent();
         this.targetComponent = destFact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             //get group number of sourceComponent
             RelGroupVersionBI relGroup = (RelGroupVersionBI) sourceComponent;

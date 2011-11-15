@@ -388,6 +388,10 @@ public interface I_TermFactory {
                               I_ConfigAceFrame differenceSearchConfig)
            throws IOException, ParseException;
 
+   public void setIsaCache(IsaCoordinate isaCoordinate, KindOfCacheBI isaCache) throws IOException;
+   
+   public void clearIsaCache();
+
    public KindOfCacheBI setupIsaCache(IsaCoordinate isaCoordinate) throws IOException;
 
    public KindOfCacheBI setupIsaCacheAndWait(IsaCoordinate isaCoordinate)
@@ -403,7 +407,7 @@ public interface I_TermFactory {
     */
    void suspendChangeSetWriters();
 
-   public void updateIsaCache(IsaCoordinate isaCoordinate, int cNid) throws Exception;
+   public void updateIsaCache(int cNid) throws Exception;
 
    int uuidToNative(Collection<UUID> uids) throws TerminologyException, IOException;
 

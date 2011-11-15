@@ -1,69 +1,135 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+
 package org.ihtsdo.mojo.mojo;
 
-import java.io.File;
-import java.security.NoSuchAlgorithmException;
+//~--- non-JDK imports --------------------------------------------------------
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.Terms;
+
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.helper.bdb.NullComponentFinder;
+import org.ihtsdo.helper.bdb.UuidDupFinder;
+import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.mojo.maven.MojoUtil;
 
+//~--- JDK imports ------------------------------------------------------------
+
+import java.io.File;
+
+import java.security.NoSuchAlgorithmException;
+
 /**
- * 
+ *
  * @goal vodb-close
- * 
+ *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
 public class VodbClose extends AbstractMojo {
 
-    /**
-     * Location of the build directory.
-     * 
-     * @parameter expression="${project.build.directory}"
-     * @required
-     */
-    private File targetDirectory;
+   /**
+    * Location of the build directory.
+    *
+    * @parameter expression="${project.build.directory}"
+    * @required
+    */
+   private File targetDirectory;
 
-    public void execute() throws MojoExecutionException, MojoFailureException {
-        I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
-        try {
-            try {
-                if (MojoUtil.alreadyRun(getLog(), "VodbClose", this.getClass(), targetDirectory)) {
-                    return;
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new MojoExecutionException(e.getLocalizedMessage(), e);
+   //~--- methods -------------------------------------------------------------
+
+    @Override
+   public void execute() throws MojoExecutionException, MojoFailureException {
+      try {
+    	  
+    	  // TODO: fix, Commented out due to slowdonw of all close actions... add a parameter to make it optional?
+//    	  getLog().info("Testing for Null Components Started.");
+//    	  
+//    	  Concept.disableComponentsCRHM();
+//    	  
+//    	  NullComponentFinder nullComponentFinder = new NullComponentFinder();
+//          Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+//          System.out.println();
+//          
+//          if (nullComponentFinder.getNullComponent().isEmpty()) {
+//        	  getLog().info("No Null component found.");
+//          } else {
+//        	  nullComponentFinder.writeNullComponentFile();
+//         	 getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+//                     + nullComponentFinder.getNullComponent() + "\n");      
+//          }        
+//          
+//         getLog().info("Testing for Null Components Finished.");
+       
+         
+         getLog().info("Testing for dup UUIDs.");
+         UuidDupFinder dupFinder = new UuidDupFinder();
+
+         Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+         System.out.println();
+
+         if (dupFinder.getDupUuids().isEmpty()) {
+            getLog().info("No dup UUIDs found.");
+         } else {
+            dupFinder.writeDupFile();
+            getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
+                          + dupFinder.getDupUuids() + "\n");
+
+            UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+
+            Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+            reporter.reportDupClasses();
+         }        
+               
+         Concept.enableComponentsCRHM();
+
+         I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
+
+         try {
+            if (MojoUtil.alreadyRun(getLog(), "VodbClose", this.getClass(), targetDirectory)) {
+               return;
             }
-            termFactoryImpl.close();
-        } catch (Exception e) {
+         } catch (NoSuchAlgorithmException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        }
-    }
+         }
 
-    public File getTargetDirectory() {
-        return targetDirectory;
-    }
+         termFactoryImpl.close();
+      } catch (Exception e) {
+         throw new MojoExecutionException(e.getLocalizedMessage(), e);
+      }
+   }
 
-    public void setTargetDirectory(File targetDirectory) {
-        this.targetDirectory = targetDirectory;
-    }
+   //~--- get methods ---------------------------------------------------------
+
+   public File getTargetDirectory() {
+      return targetDirectory;
+   }
+
+   //~--- set methods ---------------------------------------------------------
+
+   public void setTargetDirectory(File targetDirectory) {
+      this.targetDirectory = targetDirectory;
+   }
 }

@@ -21,7 +21,10 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -45,13 +48,21 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
 import org.ihtsdo.qa.store.QAStoreBI;
@@ -65,15 +76,25 @@ import org.ihtsdo.qa.store.model.view.QACasesReportColumn;
 import org.ihtsdo.qa.store.model.view.QACasesReportLine;
 import org.ihtsdo.qa.store.model.view.QACasesReportPage;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * @author Guillermo Reynoso
  */
 public class QACasesBrowser extends JPanel {
 
-	/**
-	 * 
-	 */
+	private Logger logger = Logger.getLogger(QACasesBrowser.class);
+
+	private I_ConfigAceFrame config = null;
 	private static final long serialVersionUID = 1L;
 	private boolean showFilters = false;
 	private LinkedHashSet<DispositionStatus> dispositionStatuses;
@@ -97,16 +118,26 @@ public class QACasesBrowser extends JPanel {
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 	private boolean firstLoad = true;
 
+	private I_IntSet inactiveValuesSet;
+
 	public QACasesBrowser(QAStoreBI store, QAResultsBrowser resultsPanel, JTabbedPane parentTabbedPanel) {
 		try {
-			th = new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null);
+			config = Terms.get().getActiveAceFrameConfig();
+			th = new ObjectTransferHandler(config, null);
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
-		users = RulesLibrary.getUsers();
+		try {
+			users = RulesLibrary.getUsers();
+		} catch (Exception e) {
+			users = new HashSet<I_GetConceptData>();
+			e.printStackTrace();
+		}
 
 		filter = new HashMap<QACasesReportColumn, Object>();
 
@@ -129,7 +160,13 @@ public class QACasesBrowser extends JPanel {
 
 		caseTable.setModel(tableModel);
 		caseTable.setTransferHandler(th);
-		caseTable.setDragEnabled(false);
+		caseTable.setDragEnabled(true);
+
+		int columnCount = caseTable.getColumnCount();
+		for (int i = 0; i < columnCount; i++) {
+			TableColumn column = caseTable.getColumnModel().getColumn(i);
+			column.setCellRenderer(new CaseTableCellRenderer());
+		}
 
 		TableColumn tc = caseTable.getColumnModel().getColumn(1);
 		tc.setCellEditor(caseTable.getDefaultEditor(Boolean.class));
@@ -139,6 +176,8 @@ public class QACasesBrowser extends JPanel {
 		TableColumn conceptUuidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_UUID);
 		TableColumn conceptSctidCol = caseTable.getColumnModel().getColumn(tableModel.CONCEPT_SCTID);
 		TableColumn rowCheckBoxCol = caseTable.getColumnModel().getColumn(tableModel.ROW_CHECKBOX);
+		TableColumn corloCol = caseTable.getColumnModel().getColumn(tableModel.COLOR);
+		TableColumn caseCol = caseTable.getColumnModel().getColumn(tableModel.CASE);
 
 		conceptUuidCol.setPreferredWidth(0);
 		conceptUuidCol.setMinWidth(0);
@@ -151,6 +190,14 @@ public class QACasesBrowser extends JPanel {
 		rowCheckBoxCol.setPreferredWidth(20);
 		rowCheckBoxCol.setMinWidth(20);
 		rowCheckBoxCol.setMaxWidth(20);
+
+		corloCol.setPreferredWidth(0);
+		corloCol.setMinWidth(0);
+		corloCol.setMaxWidth(0);
+
+		caseCol.setPreferredWidth(0);
+		caseCol.setMinWidth(0);
+		caseCol.setMaxWidth(0);
 
 		tableModel.addTableModelListener(new TableModelListener() {
 			@Override
@@ -168,8 +215,10 @@ public class QACasesBrowser extends JPanel {
 		setupBatchDispoStatusCombo();
 
 		batchAssigneTo.addItem("");
-		for (I_GetConceptData user : users) {
-			batchAssigneTo.addItem(user.toString());
+		if (users != null) {
+			for (I_GetConceptData user : users) {
+				batchAssigneTo.addItem(user.toString());
+			}
 		}
 
 		if (coordinate != null && rule != null) {
@@ -218,18 +267,18 @@ public class QACasesBrowser extends JPanel {
 
 	public void setupPanel(QAStoreBI store) {
 		setupBatchDispoStatusCombo();
+		this.coordinate = resultsPanel.getQACoordinate();
 		if (rule == null || !this.rule.getRuleUuid().equals(resultsPanel.getRule().getRuleUuid())) {
 			if (this.rule != null) {
 				this.rule = resultsPanel.getRule();
 				setupBatchDispoStatusCombo();
 			}
 			this.store = store;
-			this.coordinate = resultsPanel.getQACoordinate();
 			this.rule = resultsPanel.getRule();
 			panel4.setVisible(false);
 
 			clearTable1();
-			((CheckBoxHeader)caseTable.getColumnModel().getColumn(1).getHeaderRenderer()).setSelected(false);
+			((CheckBoxHeader) caseTable.getColumnModel().getColumn(1).getHeaderRenderer()).setSelected(false);
 			QADatabase qaDatabase = getQaDatabase(coordinate.getDatabaseUuid());
 			label7.setText(qaDatabase.getName());
 
@@ -246,7 +295,11 @@ public class QACasesBrowser extends JPanel {
 			conceptNameTextField.setText("");
 			showFilters = false;
 			filterButton.setText("Show filters");
+			filter = new HashMap<QACasesReportColumn, Object>();
 			// updateTable1();
+			startLine = 0;
+			totalLines = 0;
+			finalLine = 0;
 			updatePageCounters();
 		}
 	}
@@ -296,7 +349,8 @@ public class QACasesBrowser extends JPanel {
 			boolean lineApproved = true;
 			if (lineApproved) {
 				List<Object> row = new ArrayList<Object>();
-				row.add(line.getComponent().getComponentUuid().toString());
+				UUID componentUuid = line.getComponent().getComponentUuid();
+				row.add(componentUuid.toString());
 				row.add(false);
 				row.add(String.valueOf(line.getComponent().getSctid()));
 				row.add(line.getComponent().getComponentName());
@@ -305,10 +359,114 @@ public class QACasesBrowser extends JPanel {
 				} else {
 					row.add("Closed");
 				}
+				row.add(sdf.format(line.getQaCase().getLastChangedState().getTime()));
 				row.add(line.getDisposition().getName());
 				row.add(line.getQaCase().getAssignedTo());
 				row.add(sdf.format(line.getQaCase().getEffectiveTime().getTime()));
 				row.add(line.getQaCase());
+				try {
+					if (config != null) {
+						I_GetConceptData concept = null;
+						ConceptChronicleBI newConcept = Ts.get().getConcept(componentUuid);
+						try {
+							
+							concept = Terms.get().getConcept(componentUuid);
+							List<? extends I_ConceptAttributeTuple> conceptAttributeTuples = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
+							if (!conceptAttributeTuples.isEmpty()) {
+								I_ConceptAttributeTuple attr = conceptAttributeTuples.get(0);
+								if (attr.getStatusNid() != SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+									row.add(Color.LIGHT_GRAY);
+								} else {
+									row.add(Color.WHITE);
+								}
+							} else {
+								row.add(Color.WHITE);
+							}
+						} catch (Exception e) {
+							row.add(Color.WHITE);
+						}
+						long lastModification = Long.MIN_VALUE;
+//						ConceptVersionBI conceptVersion = newConcept.getVersion(config.getViewCoordinate());
+//						ConAttrChronicleBI attributes = conceptVersion.getConAttrs();
+//						if(attributes.getVersion(config.getViewCoordinate()).getTime() > lastModification){
+//							lastModification = attributes.getVersion(config.getViewCoordinate()).getTime() ;
+//						}
+//						
+//						Collection<? extends DescriptionChronicleBI> descriptions = conceptVersion.getDescs();
+//						for (DescriptionChronicleBI descriptionChronicleBI : descriptions) {
+//							long descTime = descriptionChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(descTime > lastModification){
+//								lastModification = descTime;
+//							}
+//						}
+//						Collection<? extends RelationshipChronicleBI> relationships = conceptVersion.getRelsOutgoing();
+//						for (RelationshipChronicleBI relationshipChronicleBI : relationships) {
+//							relationshipChronicleBI.get
+//							long relTime = relationshipChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(relTime > lastModification){
+//								lastModification = relTime;
+//							}
+//						}
+//						
+//						Collection<? extends RefexChronicleBI<?>> refsets = conceptVersion.getRefexes();
+//						for (RefexChronicleBI<?> refexChronicleBI : refsets) {
+//							long refTime = refexChronicleBI.getVersion(config.getViewCoordinate()).getTime();
+//							if(refTime > lastModification){
+//								lastModification = refTime;
+//							}
+//							
+//						}
+						List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(null, null, config.getViewPositionSetReadOnly(), config.getPrecedence(),
+								config.getConflictResolutionStrategy());
+						for (I_DescriptionTuple desc : descriptions) {
+							long descTime = desc.getTime();
+							Collection<? extends RefexChronicleBI<?>> annotations = desc.getAnnotations();
+							for (RefexChronicleBI<?> refexChronicleBI : annotations) {
+								Collection<? extends RefexChronicleBI<?>> refexces = refexChronicleBI.getRefexes();
+								for (RefexChronicleBI<?> refexChronicleBI2 : refexces) {
+									long time = refexChronicleBI2.getVersion(config.getViewCoordinate()).getTime();
+									if(time > lastModification){
+										lastModification = time;
+									}
+								}
+							}
+							if (descTime > lastModification) {
+								lastModification = descTime;
+							}
+						}
+
+
+						List<? extends I_ConceptAttributeTuple> attributes = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy());
+						for (I_ConceptAttributeTuple attr : attributes) {
+							long attrTime = attr.getTime();
+							if (attrTime > lastModification) {
+								lastModification = attrTime;
+							}
+						}
+
+						List<? extends I_RelTuple> sourcRels = concept.getSourceRelTuples(null, null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+						for (I_RelTuple i_RelTuple : sourcRels) {
+							int charNid = i_RelTuple.getCharacteristicNid();
+							int anotherNid = SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+							int architectonicAuxInferredNid = ArchitectonicAuxiliary.Concept.INFERRED_RELATIONSHIP.localize().getNid();
+							int snomedMetadataInferredNid = SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
+							if (anotherNid !=  charNid && charNid != architectonicAuxInferredNid 
+									&& snomedMetadataInferredNid != charNid) {
+								long relTime = i_RelTuple.getTime();
+								if (relTime > lastModification) {
+									lastModification = relTime;
+								}
+							}
+						}
+
+						row.add(sdf.format(new Date(lastModification)));
+
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					row.add("");
+				}
+
 				tableModel.addData(row);
 			}
 		}
@@ -422,13 +580,13 @@ public class QACasesBrowser extends JPanel {
 			String conceptName = rowData[tableModel.CONCEPT_NAME].toString();
 			boolean tabExists = false;
 			for (int i = 0; i < tabCount; i++) {
-				if (conceptName.length() > 7) {
-					if (parentTabbedPanel.getTitleAt(i).equals(conceptName.substring(0, 7) + "...")) {
+				if (conceptName.length() > 7 && parentTabbedPanel.getToolTipTextAt(i) != null) {
+					if (parentTabbedPanel.getToolTipTextAt(i).equals(conceptName.substring(0, 7) + " (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
-				} else {
-					if (parentTabbedPanel.getTitleAt(i).equals(conceptName)) {
+				} else if (parentTabbedPanel.getToolTipTextAt(i) != null) {
+					if (parentTabbedPanel.getToolTipTextAt(i).equals(conceptName + " (" + rowData[tableModel.CONCEPT_UUID] + ")")) {
 						tabExists = true;
 						parentTabbedPanel.setSelectedIndex(i);
 					}
@@ -443,9 +601,9 @@ public class QACasesBrowser extends JPanel {
 
 				QACaseDetailsPanel rulesDetailsPanel = new QACaseDetailsPanel(rule, component, selectedCase, dispositionStatuses, headerComponent, qaDatabase, store);
 				if (conceptName.length() > 7) {
-					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName.substring(0, 7) + "...", null, rulesDetailsPanel, conceptName + " (" + rowData[tableModel.CONCEPT_UUID] + ")");
 				} else {
-					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName);
+					parentTabbedPanel.addTab(conceptName, null, rulesDetailsPanel, conceptName + " (" + rowData[tableModel.CONCEPT_UUID] + ")");
 				}
 				initTabComponent(parentTabbedPanel.getTabCount() - 1);
 				parentTabbedPanel.setSelectedIndex(parentTabbedPanel.getTabCount() - 1);
@@ -907,6 +1065,7 @@ public class QACasesBrowser extends JPanel {
 	// //GEN-END:variables
 
 	class CaseTableModel extends AbstractTableModel {
+
 		private static final long serialVersionUID = -2582804161676112393L;
 
 		public final Integer CONCEPT_UUID = 0;
@@ -914,15 +1073,23 @@ public class QACasesBrowser extends JPanel {
 		public final Integer CONCEPT_SCTID = 2;
 		public final Integer CONCEPT_NAME = 3;
 		public final Integer STATUS = 4;
-		public final Integer DISPOSITION_STATUS = 5;
-		public final Integer ASSIGNED_TO = 6;
-		public final Integer TIME = 7;
-		public final Integer CASE = 8;
+		public final Integer LAST_STATUS_CHANGED = 5;
+		public final Integer DISPOSITION_STATUS = 6;
+		public final Integer ASSIGNED_TO = 7;
+		public final Integer TIME = 8;
+		public final Integer CASE = 9;
+		public final Integer COLOR = 10;
+		public final Integer CONCEPT_LAST_MODIFIED = 11;
 
-		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Disposition", "Assigned to", "Time", "Case" };
+		private String[] columnNames = { "Concept UUID", " ", "Concept Sctid", "Concept Name", "Status", "Last status change", "Disposition", "Assigned to", "Time", "Case", "Row Color", "Concept last modified" };
 
 		private List<Object[]> dataList = new ArrayList<Object[]>();
-		private Object[][] data = new Object[0][8];
+		private Object[][] data = new Object[0][11];
+
+		public CaseTableModel() {
+			super();
+			setInactiveValues();
+		}
 
 		public Object[] getRow(int rowNum) {
 			return data[rowNum];
@@ -930,7 +1097,8 @@ public class QACasesBrowser extends JPanel {
 
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
-			data = new Object[0][8];
+			data = new Object[0][11];
+			System.gc();
 		}
 
 		public void addData(List<Object> row) {
@@ -952,7 +1120,7 @@ public class QACasesBrowser extends JPanel {
 
 		@Override
 		public int getColumnCount() {
-			return columnNames.length - 1;
+			return columnNames.length;
 		}
 
 		@Override
@@ -981,9 +1149,56 @@ public class QACasesBrowser extends JPanel {
 			return false;
 		}
 
+		public Color getRowColor(int row) {
+			return (Color) data[row][COLOR];
+		}
+
+	}
+
+	public I_IntSet getInactiveValuesSet() {
+		return inactiveValuesSet;
+	}
+
+	private void setInactiveValues() {
+		try {
+			inactiveValuesSet = Terms.get().newIntSet();
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+			inactiveValuesSet.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+		} catch (ValidationException e) {
+			logger.error(e);
+		} catch (IOException e) {
+			logger.error(e);
+		} catch (TerminologyException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+	}
+
+	static class CaseTableCellRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = -4117756700808758059L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			CaseTableModel model = (CaseTableModel) table.getModel();
+			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			if (!isSelected) {
+				Color color = model.getRowColor(row);
+				c.setBackground(color);
+			}
+			return c;
+		}
 	}
 
 	class CheckBoxHeader extends JCheckBox implements TableCellRenderer, MouseListener {
+		private static final long serialVersionUID = -5834284323210153347L;
 		protected CheckBoxHeader rendererComponent;
 		protected int column;
 		protected boolean mousePressed = false;
@@ -993,10 +1208,10 @@ public class QACasesBrowser extends JPanel {
 			rendererComponent.addItemListener(itemListener);
 		}
 
-		public CheckBoxHeader getComp(){
+		public CheckBoxHeader getComp() {
 			return this.rendererComponent;
 		}
-		
+
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			if (table != null) {
 				JTableHeader header = table.getTableHeader();

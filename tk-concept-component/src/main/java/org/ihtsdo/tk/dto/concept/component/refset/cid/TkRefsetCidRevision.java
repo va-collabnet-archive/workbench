@@ -2,6 +2,8 @@ package org.ihtsdo.tk.dto.concept.component.refset.cid;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -12,6 +14,7 @@ import java.io.IOException;
 
 import java.util.Map;
 import java.util.UUID;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 
 public class TkRefsetCidRevision extends TkRevision {
    public static final long serialVersionUID = 1;
@@ -24,6 +27,14 @@ public class TkRefsetCidRevision extends TkRevision {
 
    public TkRefsetCidRevision() {
       super();
+   }
+
+   public TkRefsetCidRevision(RefexCnidVersionBI another) throws IOException {
+      super(another);
+
+      TerminologyStoreDI ts = Ts.get();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(another.getCnid1());
    }
 
    public TkRefsetCidRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -54,6 +65,7 @@ public class TkRefsetCidRevision extends TkRevision {
     * @return <code>true</code> if the objects are the same;
     *         <code>false</code> otherwise.
     */
+   @Override
    public boolean equals(Object obj) {
       if (obj == null) {
          return false;

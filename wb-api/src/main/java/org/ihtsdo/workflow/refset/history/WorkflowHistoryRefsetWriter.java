@@ -339,7 +339,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 			"</properties>"; 
 	}
 	
-	public  I_ExtendByRef updateWorkflowHistory(WorkflowHistoryJavaBean update) throws Exception
+	public I_ExtendByRef updateWorkflowHistory(WorkflowHistoryJavaBean update, UUID modeler, long workflowTime) throws Exception
 	{
 		setConceptUid(update.getConcept());
     	setWorkflowUid(update.getWorkflowId());
@@ -347,20 +347,24 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
     	setFSN(update.getFSN());
     	
     	// Always update on current modeler regardless of bean's request
-    	setModelerUid(WorkflowHelper.getCurrentModeler().getPrimUuid());
+    	setModelerUid(modeler);
     	setPathUid(update.getPath());
     	setStateUid(update.getState());
     	setAutoApproved(update.getAutoApproved());
     	setOverride(update.getOverridden());
-    	
-    	// Add new timestamp for new version (in case this row is retired for WFid)
-    	java.util.Date today = new java.util.Date();
-		setWorkflowTime(today.getTime());
+		setWorkflowTime(workflowTime);
         
         setEffectiveTime(Long.MAX_VALUE);
 
 		I_ExtendByRef ref = addMember();
 		
 		return ref;
+	}
+
+	public  I_ExtendByRef updateWorkflowHistory(WorkflowHistoryJavaBean bean) throws Exception
+	{
+    	java.util.Date nowStamp = new java.util.Date();
+
+    	return updateWorkflowHistory(bean, WorkflowHelper.getCurrentModeler().getPrimUuid(), nowStamp.getTime());
 	}
 }

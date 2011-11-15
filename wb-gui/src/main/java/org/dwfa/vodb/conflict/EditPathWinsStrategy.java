@@ -91,6 +91,15 @@ public class EditPathWinsStrategy extends ContradictionManagementStrategy {
 
    @Override
    public <T extends ComponentVersionBI> List<T> resolveVersions(T part1, T part2) {
+       if (config == null) {
+           System.out.println("opps");
+       }
+       assert part1 != null;
+       assert part2 != null;
+       assert config != null;
+       assert config.getEditingPathSetReadOnly() != null: config.getClass().getName();
+       assert config.getEditingPathSetReadOnly().getPathNidSet() != null;
+       
       List<T> returnValues = new ArrayList<T>(2);
 
       if (config.getEditingPathSetReadOnly().getPathNidSet().contains(part1.getPathNid())) {

@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.str;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.dto.concept.UtfHelper;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
@@ -25,6 +26,11 @@ public class TkRefsetStrRevision extends TkRevision {
 
    public TkRefsetStrRevision() {
       super();
+   }
+
+   public TkRefsetStrRevision(RefexStrVersionBI another) throws IOException {
+      super(another);
+      this.stringValue = another.getStr1();
    }
 
    public TkRefsetStrRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

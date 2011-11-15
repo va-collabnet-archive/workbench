@@ -121,6 +121,11 @@ public class WfHxIndexGenerator extends IndexGenerator {
 
 			    	if (!lastBeanInWfMap.containsKey(wfId)) {
 			    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), wfId);
+				    	
+			    		if (latestBean == null) {
+			    			latestBean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
+			    		}
+			    		
 			    		vals = new WorkflowLuceneSearchResult(latestBean);
 			    		
 			    		lastBeanInWfMap.put(wfId, vals);

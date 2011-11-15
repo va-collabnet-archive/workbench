@@ -211,4 +211,9 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
 
     }
 
+	@Override
+	public boolean isContentMerged() {
+		return true;
+	}
+
 }

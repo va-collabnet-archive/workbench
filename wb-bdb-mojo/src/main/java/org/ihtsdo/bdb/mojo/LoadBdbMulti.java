@@ -26,7 +26,9 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.io.FileIO;
@@ -49,6 +52,8 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.bdb.UuidDupFinder;
+import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -119,6 +124,12 @@ public class LoadBdbMulti extends AbstractMojo {
      * @parameter
      */
     private List<ConceptDescriptor> annotationIndexes;
+    /**
+     * Watch concepts that will be printed to log when encountered.
+     * 
+     * @parameter
+     */
+    private String[] watchConceptUuids;
     AtomicInteger conceptsRead = new AtomicInteger();
     AtomicInteger conceptsProcessed = new AtomicInteger();
     private ThreadGroup loadBdbMultiDbThreadGroup = new ThreadGroup("LoadBdbMulti threads");
@@ -126,7 +137,8 @@ public class LoadBdbMulti extends AbstractMojo {
             new NamedThreadFactory(loadBdbMultiDbThreadGroup, "converter "));
     LinkedBlockingQueue<I_ProcessEConcept> converters = new LinkedBlockingQueue<I_ProcessEConcept>();
     private int runtimeConverterSize = Runtime.getRuntime().availableProcessors() * 2;
-    private int converterSize = 1;
+    private int converterSize = runtimeConverterSize;
+    ConcurrentSkipListSet<Object> watchSet = new ConcurrentSkipListSet<Object>();
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -136,6 +148,11 @@ public class LoadBdbMulti extends AbstractMojo {
 
     void executeMojo(String[] conceptsFileNames, String generatedResources,
             File berkeleyDir) throws MojoExecutionException {
+        if (watchConceptUuids != null) {
+            for (String uuidStr : watchConceptUuids) {
+                watchSet.add(UUID.fromString(uuidStr));
+            }
+        }
         try {
             for (int i = 0; i < converterSize; i++) {
                 converters.put(new ConvertConcept());
@@ -144,8 +161,8 @@ public class LoadBdbMulti extends AbstractMojo {
             long startTime = System.currentTimeMillis();
             FileIO.recursiveDelete(new File(berkeleyDir, "mutable"));
             FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
-//            Bdb.selectJeProperties(new File(berkeleyDir, "je-prop-options"), 
-//                    berkeleyDir);
+            Bdb.selectJeProperties(berkeleyDir,
+                    berkeleyDir);
 
             Bdb.setup(berkeleyDir.getAbsolutePath());
             if (initialPaths != null) {
@@ -158,7 +175,7 @@ public class LoadBdbMulti extends AbstractMojo {
                 File conceptsFile = new File(generatedResources, fname);
                 getLog().info("Starting load from: " + conceptsFile.getAbsolutePath());
 
-				FileInputStream  fis = new FileInputStream(conceptsFile);
+                FileInputStream fis = new FileInputStream(conceptsFile);
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
@@ -196,7 +213,23 @@ public class LoadBdbMulti extends AbstractMojo {
             while (conceptsProcessed.get() < conceptsRead.get()) {
                 Thread.sleep(1000);
             }
+            getLog().info("Testing for dup UUIDs.");
+            Concept.disableComponentsCRHM();
+            UuidDupFinder dupFinder = new UuidDupFinder();
+            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+            System.out.println();
+            if (dupFinder.getDupUuids().isEmpty()) {
+                getLog().info("No dup UUIDs found.");
+            } else {
+                dupFinder.writeDupFile();
+                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
+                        + dupFinder.getDupUuids() + "\n");
+                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                reporter.reportDupClasses();
 
+            }
+            Concept.enableComponentsCRHM();
             if (annotationIndexes != null) {
                 for (ConceptDescriptor cd : annotationIndexes) {
                     Concept c = (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
@@ -204,7 +237,8 @@ public class LoadBdbMulti extends AbstractMojo {
                     Ts.get().addUncommitted(c);
                     Ts.get().commit();
                     getLog().info("Setting concept to annotation index: "
-                                    + cd.getDescription());                  }
+                            + cd.getDescription());
+                }
             }
             if (rstaFileNames != null) {
                 for (String rstaName : rstaFileNames) {
@@ -300,11 +334,31 @@ public class LoadBdbMulti extends AbstractMojo {
             getLog().info("Finished db sync, starting generate lucene index.");
             createLuceneIndices();
             BdbCommitManager.commit();
-            getLog().info("Finished create index, starting close.");
+            getLog().info("Finished create index, testing for UUID dups.");
+
+            Concept.disableComponentsCRHM();
+            dupFinder = new UuidDupFinder();
+            Bdb.getConceptDb().iterateConceptDataInParallel(dupFinder);
+            System.out.println();
+            if (dupFinder.getDupUuids().isEmpty()) {
+                getLog().info("No dup UUIDs found.");
+            } else {
+                dupFinder.writeDupFile();
+                getLog().warn("\n\nDuplicate UUIDs found: " + dupFinder.getDupUuids().size() + "\n"
+                        + dupFinder.getDupUuids() + "\n");
+                UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+                Bdb.getConceptDb().iterateConceptDataInParallel(reporter);
+                reporter.reportDupClasses();
+
+            }
+            Concept.enableComponentsCRHM();
+            getLog().info("Starting close.");
             Bdb.close();
             getLog().info("db closed");
             getLog().info("elapsed time: " + (System.currentTimeMillis() - startTime));
-
+            if (!dupFinder.getDupUuids().isEmpty()) {
+                throw new Exception("Duplicate UUIDs found: " + dupFinder.getDupUuids().size());
+            }
             if (moveToReadOnly) {
                 File mutableFile = new File(berkeleyDir, "mutable");
                 FileIO.recursiveDelete(new File(berkeleyDir, "read-only"));
@@ -402,7 +456,7 @@ public class LoadBdbMulti extends AbstractMojo {
                         RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
                                 enTextWithVariantsRefexColl.getNid(), enTextWithVariantsRefexColl.getNid());
                         textRefexSpec.with(RefexProperty.STRING1, word);
-                        textRefexSpec.with(RefexProperty.STATUS_NID, 
+                        textRefexSpec.with(RefexProperty.STATUS_NID,
                                 SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         textRefexSpec.setMemberContentUuid();
 
@@ -412,7 +466,7 @@ public class LoadBdbMulti extends AbstractMojo {
                                 textRefex.getNid(), dialectVariantsRefexColl.getNid());
 
                         variantRefexSpec.with(RefexProperty.STRING1, variant);
-                        variantRefexSpec.with(RefexProperty.STATUS_NID, 
+                        variantRefexSpec.with(RefexProperty.STATUS_NID,
                                 SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         variantRefexSpec.setMemberContentUuid();
                         amender.constructIfNotCurrent(variantRefexSpec);
@@ -482,7 +536,7 @@ public class LoadBdbMulti extends AbstractMojo {
                                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
                         wordRefexSpec.with(RefexProperty.STRING1, word);
                         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
-                        wordRefexSpec.with(RefexProperty.STATUS_NID, 
+                        wordRefexSpec.with(RefexProperty.STATUS_NID,
                                 SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         wordRefexSpec.setMemberContentUuid();
 
@@ -520,14 +574,19 @@ public class LoadBdbMulti extends AbstractMojo {
             if (nidCnidMap == null) {
                 nidCnidMap = Bdb.getNidCNidMap();
             }
+            if (watchSet.contains(eConcept.getPrimordialUuid())) {
+                AceLog.getAppLog().info("Watch found: " + eConcept);
+            }
             try {
                 newConcept = Concept.get(eConcept);
-                assert newConcept.readyToWrite();
-                Bdb.getConceptDb().writeConcept(newConcept);
-                Collection<Integer> nids = newConcept.getAllNids();
-                assert nidCnidMap.getCNid(newConcept.getNid()) == newConcept.getNid();
-                for (int nid : nids) {
-                    assert nidCnidMap.getCNid(nid) == newConcept.getNid();
+                if (newConcept != null) {
+                    assert newConcept.readyToWrite();
+                    Bdb.getConceptDb().writeConcept(newConcept);
+                    Collection<Integer> nids = newConcept.getAllNids();
+                    assert nidCnidMap.getCNid(newConcept.getNid()) == newConcept.getNid();
+                    for (int nid : nids) {
+                        assert nidCnidMap.getCNid(nid) == newConcept.getNid();
+                    }
                 }
                 conceptsProcessed.incrementAndGet();
             } catch (Throwable e) {

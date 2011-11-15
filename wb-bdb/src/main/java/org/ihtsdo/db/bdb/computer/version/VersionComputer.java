@@ -261,15 +261,15 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
             List<V> specifiedVersions, List<? extends V> versions,
             Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager,
-            long time) {
+            long cutoffTime) {
         if (positions == null || positions.size() < 1) {
             addSpecifiedVersionsNullPositions(allowedStatus, allowedTypes,
                     specifiedVersions, versions, precedencePolicy,
                     contradictionManager, null);
-        } else if(time != 0){
+        } else if(cutoffTime != 0){
             //add more filters here if needed
             InferredFilter[] filters = new InferredFilter[1];
-            filters[0] = new CutoffFilter(time);
+            filters[0] = new CutoffFilter(cutoffTime);
             addSpecifiedVersionsWithCutoff(allowedStatus, allowedTypes,
                     positions, specifiedVersions, versions, precedencePolicy,
                     contradictionManager,filters);

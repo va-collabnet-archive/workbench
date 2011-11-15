@@ -10,6 +10,18 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
@@ -56,6 +68,25 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
    public TkComponent() {
       super();
+   }
+
+   public TkComponent(ComponentVersionBI another) throws IOException {
+      super(another);
+
+      Collection<? extends IdBI> anotherAdditionalIds = another.getAdditionalIds();
+
+      if (anotherAdditionalIds != null) {
+         this.additionalIds = new ArrayList<TkIdentifier>(anotherAdditionalIds.size());
+         nextId:
+         for (IdBI id : anotherAdditionalIds) {
+            this.additionalIds.add((TkIdentifier) TkIdentifier.convertId(id));
+         }
+      }
+
+      Collection<? extends RefexChronicleBI<?>> anotherAnnotations = another.getAnnotations();
+
+      processAnnotations(anotherAnnotations);
+      this.primordialUuid = another.getPrimUuid();
    }
 
    public TkComponent(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -123,6 +154,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
    //~--- methods -------------------------------------------------------------
 
+
    /**
     * Compares this object to the specified object. The result is <tt>true</tt>
     * if and only if the argument is not <tt>null</tt>, is a
@@ -188,6 +220,16 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    public int hashCode() {
       return Arrays.hashCode(new int[] { getPrimordialComponentUuid().hashCode(), statusUuid.hashCode(),
                                          pathUuid.hashCode(), (int) time, (int) (time >>> 32) });
+   }
+
+   private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
+      if ((annotations != null) &&!annotations.isEmpty()) {
+         this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotations.size());
+
+         for (RefexChronicleBI<?> r : annotations) {
+            this.annotations.add(TkConcept.convertRefex(r));
+         }
+      }
    }
 
    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate vc,

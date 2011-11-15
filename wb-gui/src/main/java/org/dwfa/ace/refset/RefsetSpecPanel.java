@@ -1304,7 +1304,7 @@ public class RefsetSpecPanel extends JPanel {
             activity.complete();
          } catch (ComputationCanceled e1) {
 
-            // canceled. ;
+            // Nothing to do
          }
 
          refsetTableModel.clearSelectedTuples();

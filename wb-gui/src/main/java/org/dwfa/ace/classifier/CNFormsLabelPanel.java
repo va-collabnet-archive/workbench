@@ -54,6 +54,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.id.IdBI;
@@ -1716,6 +1717,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public void setVersion(int version) {
          throw new UnsupportedOperationException();
       }
+
+        @Override
+        public ConceptChronicleBI getEnclosingConcept() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
    }
 
 
@@ -2358,5 +2364,10 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       public void setTypeNid(int typeNid) throws PropertyVetoException {
          part.setTypeNid(typeNid);
       }
+
+        @Override
+        public ConceptChronicleBI getEnclosingConcept() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
    }
 }

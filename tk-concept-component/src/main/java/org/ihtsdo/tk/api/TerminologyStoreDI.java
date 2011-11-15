@@ -99,6 +99,11 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc);
 
    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
+   /**
+    * @return the primordial UUID if known. The IUnknown UUID (00000000-0000-0000-C000-000000000046) if not known.
+    */
+ 
+   UUID getUuidPrimordialForNid(int nid) throws IOException;
 
    List<UUID> getUuidsForNid(int nid) throws IOException;
 

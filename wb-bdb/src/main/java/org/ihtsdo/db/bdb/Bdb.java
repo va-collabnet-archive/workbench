@@ -60,8 +60,10 @@ import com.sleepycat.je.EnvironmentLockedException;
 import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
-import org.dwfa.util.io.FileIO;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.helper.io.FileIO;
 
 public class Bdb {
 
@@ -188,56 +190,66 @@ public class Bdb {
 
     public static void selectJeProperties(File configDir, File dbDir) throws IOException {
         long maxMem = Runtime.getRuntime().maxMemory();
+        configDir.mkdirs();
+        File jePropOptionsDir = new File(configDir, "je-prop-options");
+        jePropOptionsDir.mkdirs();
+        for (HeapSize size : HeapSize.values()) {
+            File destFile =new File(configDir, size.configFileName);
+            if (!destFile.exists()) {
+                FileIO.copyFile(size.getPropFile(configDir), new File(configDir, size.configFileName));
+            }
+        }
+
 
         File mutableDir = new File(dbDir, "mutable");
         File readOnlyDir = new File(dbDir, "read-only");
         mutableDir.mkdirs();
         if (maxMem > 8000000000L) {
             heapSize = HeapSize.HEAP_8000;
-            FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_8000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_8000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_8000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 6000000000L) {
             heapSize = HeapSize.HEAP_6000;
-            FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_6000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_6000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_6000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 4000000000L) {
             heapSize = HeapSize.HEAP_4000;
-            FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_4000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_4000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_4000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 2000000000) {
             heapSize = HeapSize.HEAP_2000;
-            FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_2000.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_2000.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_2000.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else if (maxMem > 1400000000) {
             heapSize = HeapSize.HEAP_1400;
-            FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_1400.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_1400.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_1400.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         } else {
             heapSize = HeapSize.HEAP_1200;
-            FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_1200.configFileName),
                     new File(mutableDir, "je.properties"));
             if (readOnlyDir.exists()) {
-                FileIO.copyFile(HeapSize.HEAP_1200.getPropFile(configDir),
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_1200.configFileName),
                         new File(readOnlyDir, "je.properties"));
             }
         }
@@ -246,6 +258,8 @@ public class Bdb {
     }
 
     public static void setup(String dbRoot, ActivityPanel activity) {
+        sapNidCache = new ConcurrentHashMap<String, Integer>();
+        watchList = new ConcurrentHashMap<Integer, Integer>();
         try {
             closed = false;
             syncService = Executors.newFixedThreadPool(1,
@@ -273,6 +287,9 @@ public class Bdb {
             readOnly = new Bdb(readOnlyExists, readOnlyDir);
             inform(activity, "loading property database...");
             propDb = new PropertiesBdb(readOnly, mutable);
+
+
+
             inform(activity, "loading uuid to nid map database...");
             uuidsToNidMapDb = new UuidToNidMapBdb(readOnly, mutable);
 
@@ -282,6 +299,9 @@ public class Bdb {
             statusAtPositionDb = new StatusAtPositionBdb(readOnly, mutable);
             inform(activity, "loading concept database...");
             conceptDb = new ConceptBdb(readOnly, mutable);
+            
+           
+            
             inform(activity, "setting up term factory...");
 
             String versionString = getProperty(G_VERSION);
@@ -300,7 +320,12 @@ public class Bdb {
                 Ts.set(ts);
             }
             LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
-            inform(activity, "loading cross references...");
+
+            REFSET_TYPES.setupNids();
+            ReferenceConcepts.reset();
+            Concept.reset();
+
+             inform(activity, "loading cross references...");
             xref = new Xref(readOnly, mutable);
             //watchList.put(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
 
@@ -316,6 +341,7 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
+
 //            watchList.put(Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")), 
 //                            Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")));
 
@@ -352,15 +378,12 @@ public class Bdb {
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
             /*
-            int primeForLockTable =
-            SieveForPrimeNumbers.largestPrime(
-            Runtime.getRuntime().availableProcessors() - 1);
-            
-            envConfig.setConfigParam("je.lock.nLockTables", 
-            Integer.toString(primeForLockTable));
-            envConfig.setConfigParam("je.log.faultReadSize", 
-            "4096");
-             * 
+             * int primeForLockTable = SieveForPrimeNumbers.largestPrime(
+             * Runtime.getRuntime().availableProcessors() - 1);
+             *
+             * envConfig.setConfigParam("je.lock.nLockTables", Integer.toString(primeForLockTable));
+             * envConfig.setConfigParam("je.log.faultReadSize", "4096");
+             *
              */
 
 
@@ -460,14 +483,11 @@ public class Bdb {
             activity.setProgressInfoUpper("Database sync to disk...");
 
             /*
-            try {
-            Concept pathOrigins = getConceptDb().getConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid());
-            if (pathOrigins != null) {
-            AceLog.getAppLog().info("Refset origins:\n\n" + pathOrigins.toLongString());
-            }
-            } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-            }
+             * try { Concept pathOrigins =
+             * getConceptDb().getConcept(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.localize().getNid()); if
+             * (pathOrigins != null) { AceLog.getAppLog().info("Refset origins:\n\n" +
+             * pathOrigins.toLongString()); } } catch (Exception e) {
+             * AceLog.getAppLog().alertAndLogException(e); }
              */
 
             activity.setProgressInfoLower("Starting sync...");
@@ -520,7 +540,7 @@ public class Bdb {
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
             } catch (ComputationCanceled e) {
-                AceLog.getAppLog().alertAndLogException(e);
+                // Nothing to do 
             }
         }
     }
@@ -555,12 +575,14 @@ public class Bdb {
                         Terms.get().getActiveAceFrameConfig(), "Executing shutdown sequence", false);
                 activity.setStopButtonVisible(false);
 
-                activity.setProgressInfoLower("1/11: Stopping Isa Cache generation.");
-                for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
-                    loopCache.shutdown();
-                }
+                activity.setProgressInfoLower("1-a/11: Stopping Isa Cache generation.");
                 for (IsaCache loopCache : KindOfComputer.getIsaCacheMap().values()) {
                     loopCache.getLatch().await();
+                }
+                
+                if (KindOfComputer.persistIsaCache) {
+                	activity.setProgressInfoLower("1-b/11: Persisting Isa Cache.");
+                    KindOfComputer.persistIsaCache();
                 }
 
                 activity.setProgressInfoLower("2/11: Starting sync using service.");
@@ -599,6 +621,7 @@ public class Bdb {
                 xref.close();
                 mutable.bdbEnv.sync();
                 mutable.bdbEnv.close();
+                sapNidCache.clear();
                 activity.setProgressInfoLower("11/11: Shutdown complete");
             } catch (DatabaseException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -609,13 +632,20 @@ public class Bdb {
         if (readOnly != null && readOnly.bdbEnv != null) {
             readOnly.bdbEnv.close();
         }
-        mutable = null;
-        readOnly = null;
-        uuidsToNidMapDb = null;
-        nidCidMapDb = null;
-        statusAtPositionDb = null;
+        annotationConcepts = null;
         conceptDb = null;
+        mutable = null;
+        nidCidMapDb = null;
+        pathManager = null;
         propDb = null;
+        readOnly = null;
+        sapNidCache = null;
+        statusAtPositionDb = null;
+        uuidsToNidMapDb = null;
+        watchList = null;
+        xref = null;
+       
+        Concept.reset();
         AceLog.getAppLog().info("bdb close finished.");
     }
 

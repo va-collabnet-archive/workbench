@@ -86,7 +86,7 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
     	     ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
              HashMap<String, ConceptVersionBI> modelers = new HashMap<String, ConceptVersionBI>();
              EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
-             File f= new File("workflow/userPermissionRefset.txt");
+             File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
 
          	 BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
 

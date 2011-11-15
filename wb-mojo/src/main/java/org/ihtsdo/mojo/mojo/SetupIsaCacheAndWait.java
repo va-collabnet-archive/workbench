@@ -28,6 +28,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 
 /**
  *
@@ -49,6 +50,8 @@ public class SetupIsaCacheAndWait extends AbstractMojo {
                 "Only one is-a coordinate allowed. Found: "
                 + Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates());
          }
+         
+         KindOfComputer.persistIsaCache = false;
 
          Terms.get().setupIsaCacheAndWait(
              Terms.get().getActiveAceFrameConfig().getViewCoordinate().getIsaCoordinates().iterator().next());

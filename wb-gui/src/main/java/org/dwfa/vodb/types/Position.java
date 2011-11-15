@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
@@ -50,7 +51,32 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class Position implements I_Position {
+public class Position implements I_Position, Serializable {
+  private static final int dataVersion = 1;
+
+   /**
+    *
+    */
+   private static final long serialVersionUID = 1L;
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      int objDataVersion = in.readInt();
+
+      if (objDataVersion == 1) {
+          time = in.readLong();
+          path = (PathBI) in.readObject();
+      }
+      else {
+         throw new IOException("Can't handle dataversion: " + objDataVersion);
+      }
+   }
+
+   private void writeObject(ObjectOutputStream out) throws IOException {
+      out.writeInt(dataVersion);
+      out.writeLong(time);
+      out.writeObject(path);
+   }
+
+
    static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 
    //~--- fields --------------------------------------------------------------

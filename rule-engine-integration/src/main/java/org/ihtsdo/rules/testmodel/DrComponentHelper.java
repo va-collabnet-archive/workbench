@@ -28,6 +28,9 @@ import org.ihtsdo.testmodel.DrDescription;
 import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -52,9 +55,16 @@ public class DrComponentHelper {
 		try {
 			I_GetConceptData oldStyleConcept = tf.getConcept(conceptBi.getNid());
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			
+			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+			for (PathBI loopPath : config.getEditingPathSet()) {
+				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
+				viewPositions.add(pos);
+			}
+			PositionSet mockViewSet = new PositionSet(viewPositions);
 
 			List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					mockViewSet, config.getPrecedence(), 
 					config.getConflictResolutionStrategy());
 
 			if (attributeTuples != null && !attributeTuples.isEmpty()) {
@@ -68,7 +78,7 @@ public class DrComponentHelper {
 			}
 
 			Collection<? extends DescriptionVersionBI> descriptionsList = oldStyleConcept.getDescriptionTuples(null, 
-					null, config.getViewPositionSetReadOnly(), 
+					null, mockViewSet, 
 					config.getPrecedence(), config.getConflictResolutionStrategy());
 
 			HashMap<Integer,DrLanguageDesignationSet> languageDesignationSetsMap = new HashMap<Integer,DrLanguageDesignationSet>();
@@ -153,7 +163,7 @@ public class DrComponentHelper {
 			if (inferredOrigin == INFERRED_VIEW_ORIGIN.STATED) {
 				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
 						null, 
-						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+						mockViewSet, config.getPrecedence(), 
 						config.getConflictResolutionStrategy())) {
 					if (relTuple.getCharacteristicNid() == stated) {
 						DrRelationship loopRel = new DrRelationship();
@@ -176,7 +186,7 @@ public class DrComponentHelper {
 			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.INFERRED) {
 				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
 						null, 
-						config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+						mockViewSet, config.getPrecedence(), 
 						config.getConflictResolutionStrategy())) {
 					if (relTuple.getCharacteristicNid() == inferred) {
 						DrRelationship loopRel = new DrRelationship();
@@ -213,11 +223,11 @@ public class DrComponentHelper {
 			modelersRolesSet.setRolesSetType("Modelers");
 			
 			DrDefiningRolesSet definingFormRolesSet = new DrDefiningRolesSet();
-			modelersRolesSet.setRolesSetType("Defining");
+			definingFormRolesSet.setRolesSetType("Defining");
 
 			for (RelationshipVersionBI relTuple : oldStyleConcept.getSourceRelTuples(null, 
 					null, 
-					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+					mockViewSet, config.getPrecedence(), 
 					config.getConflictResolutionStrategy())) {
 				DrRelationship loopRel = new DrRelationship();
 				loopRel.setModifierUuid("someUuid");
@@ -263,7 +273,7 @@ public class DrComponentHelper {
 			//TODO: incoming rels is heavy on performance moved to helper method
 			//			for (RelationshipVersionBI relTuple :  oldStyleConcept.getDestRelTuples(config.getAllowedStatus(), 
 			//					null, 
-			//					config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+			//					mockViewSet, config.getPrecedence(), 
 			//					config.getConflictResolutionStrategy())) {
 			//				if (relTuple.getCharacteristicNid() == historical) {
 			//					DrRelationship loopRel = new DrRelationship();
@@ -297,9 +307,15 @@ public class DrComponentHelper {
 		try {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+			for (PathBI loopPath : config.getEditingPathSet()) {
+				PositionBI pos = termFactory.newPosition(loopPath, Long.MAX_VALUE);
+				viewPositions.add(pos);
+			}
+			PositionSet mockViewSet = new PositionSet(viewPositions);
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), 
-					config.getDestRelTypes(), config.getViewPositionSetReadOnly()
+					config.getDestRelTypes(), mockViewSet
 					, config.getPrecedence(), config.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
@@ -330,5 +346,5 @@ public class DrComponentHelper {
 		}
 		return descriptionId.toString();
 	}
-
+	
 }

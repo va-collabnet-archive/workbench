@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
 import org.dwfa.ace.api.cs.I_Count;
@@ -72,6 +71,8 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
     }
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
+
+	private boolean fileContentMerged = false;
 
     public EConceptChangeSetReader() {
         super();
@@ -203,7 +204,20 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                 csrcOut.append(after.toLongString());
                 return after;
             } else {
-                return Concept.mergeAndWrite(eConcept);
+            	if (!fileContentMerged) {
+	                int conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
+	                long lastChange = Concept.get(conceptNid).getData().getLastChange();
+
+	                Concept mergedConcept =  Concept.mergeAndWrite(eConcept);
+	                
+	                if (mergedConcept.getData().getLastChange() != lastChange) {
+	                	fileContentMerged = true;
+	                }
+	                
+	                return mergedConcept;
+            	} else {
+            		return Concept.mergeAndWrite(eConcept);
+            	}
             }
         } catch (Exception e) {
             AceLog.getEditLog().severe(
@@ -287,4 +301,8 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         return 0;
     }
 
+	@Override
+	public boolean isContentMerged() {
+		return fileContentMerged;
+	}
 }

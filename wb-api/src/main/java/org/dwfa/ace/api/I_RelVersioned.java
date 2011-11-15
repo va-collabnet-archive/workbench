@@ -108,7 +108,7 @@ public interface I_RelVersioned<A extends RelationshipAnalogBI>
                     throws TerminologyException, IOException;
     
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
-            List<I_RelTuple> returnRels, Precedence precedencePolicy, ContradictionManagerBI contradictionManager, Long time) 
+            List<I_RelTuple> returnRels, Precedence precedencePolicy, ContradictionManagerBI contradictionManager, Long cutoffTime) 
                     throws TerminologyException, IOException;
 
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig) throws TerminologyException, IOException;

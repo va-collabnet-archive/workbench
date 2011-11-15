@@ -2,6 +2,9 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidcidcid;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -26,6 +29,16 @@ public class TkRefsetCidCidCidRevision extends TkRevision {
 
    public TkRefsetCidCidCidRevision() {
       super();
+   }
+
+   public TkRefsetCidCidCidRevision(RefexCnidCnidCnidVersionBI another) throws IOException {
+      super(another);
+
+      TerminologyStoreDI ts = Ts.get();
+
+      this.c1Uuid = ts.getUuidPrimordialForNid(another.getCnid1());
+      this.c2Uuid = ts.getUuidPrimordialForNid(another.getCnid2());
+      this.c3Uuid = ts.getUuidPrimordialForNid(another.getCnid3());
    }
 
    public TkRefsetCidCidCidRevision(DataInput in, int dataVersion)

@@ -45,7 +45,7 @@ public class UpdateAllPackagesTask extends SwingWorker<Object, Object> {
 		try {
 			activity.complete();
 		} catch (ComputationCanceled e) {
-			e.printStackTrace();
+			// Nothing to do
 		}
 		config.setStatusMessage("");
 		return null;

@@ -1,17 +1,15 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,27 +24,30 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.workflow.WorkflowHistoryJavaBeanBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
@@ -105,9 +106,19 @@ public class WorkflowHelper {
 	private static boolean wfCapabilitiesInitialized = false;
 	private static Map<String, BufferedWriter> logFiles = new HashMap<String, BufferedWriter>();
 	private static HashSet<UUID> wfRefsetUidList = null;
+	private static HashSet<UUID> luceneChangeSetImportStorageSet;
+	private static HashSet<UUID> luceneChangeSetWFIdImportStorageSet;
 	
 	public static ConceptVersionBI getCurrentModeler() throws TerminologyException, IOException {
-		return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
+		if (modelers == null) {
+			updateModelers(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		}
+		
+		if (modelers != null) {
+			return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
+		} 
+			
+		return null;
 	}
 	
 	public static String identifyPrefTerm(int conceptNid, ViewCoordinate vc)  {
@@ -155,7 +166,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	private static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+	public static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
 		WorkflowHistoryRefsetWriter writer;
 		writer = new WorkflowHistoryRefsetWriter();
 
@@ -626,6 +637,10 @@ public class WorkflowHelper {
     }
     
     public static boolean isCommitWorkflowAction(ConceptVersionBI actionConcept) {
+    	return isCommitWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isCommitWorkflowAction(UUID actionConcept) {
     	if (commitWorkflowActions  == null)
 		{
     		commitWorkflowActions = new HashSet<UUID>();
@@ -648,14 +663,17 @@ public class WorkflowHelper {
 		}
 
     	if (commitWorkflowActions != null && actionConcept != null) {
-    		return (commitWorkflowActions.contains(actionConcept.getPrimUuid()));
+    		return (commitWorkflowActions.contains(actionConcept));
     	} else {
     		return false;
     	}
     }
     
     public static boolean isEndWorkflowAction(ConceptVersionBI actionConcept) {
-		
+    	return isEndWorkflowAction(actionConcept.getPrimUuid());
+    }
+    
+    public static boolean isEndWorkflowAction(UUID actionConcept) {
     	if (endWorkflowActionUid  == null && actionConcept != null)
 		{
 			try
@@ -678,7 +696,7 @@ public class WorkflowHelper {
 		}
 
     	if (endWorkflowActionUid != null && actionConcept != null) {
-    		return (endWorkflowActionUid.equals(actionConcept.getPrimUuid()));
+    		return (endWorkflowActionUid.equals(actionConcept));
     	} else {
     		return false;
     	}
@@ -765,11 +783,8 @@ public class WorkflowHelper {
 	            	writer.setAutoApproved(true);
 
 	            	// Identify and overwrite Accept Action
-	            	UUID acceptActionUid = getAcceptAction();
-	            	writer.setActionUid(acceptActionUid);
-
 	            	// Identify and overwrite Next State
-	            	UUID nextState = identifyNextState(writer.getModelerUid(), concept, acceptActionUid, vc);
+	            	UUID nextState = getApprovedState();
 					writer.setStateUid(nextState);
 	            } else
 	            	writer.setAutoApproved(false);
@@ -897,6 +912,10 @@ public class WorkflowHelper {
     }
 
 	public static boolean isEndWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+		return isEndWorkflowState(stateConcept.getPrimUuid());
+	}
+	
+	public static boolean isEndWorkflowState(UUID stateConcept) throws IOException, TerminologyException {
     	if (endWorkflowStateUid  == null)
 		{
     		// TODO: Remove hardcode and add to metadata
@@ -904,13 +923,17 @@ public class WorkflowHelper {
 		}
 
     	if (endWorkflowStateUid != null && stateConcept != null) {
-    		return (endWorkflowStateUid.equals(stateConcept.getPrimUuid()));
+    		return (endWorkflowStateUid.equals(stateConcept));
     	} else {
     		return false;
     	}
     }
     	
 	public static boolean isBeginWorkflowState(ConceptVersionBI stateConcept) throws IOException, TerminologyException {
+		return isBeginWorkflowState(stateConcept.getPrimUuid());
+	}
+	
+	public static boolean isBeginWorkflowState(UUID stateConcept) throws IOException, TerminologyException {
     	if (beginWorkflowStateUids  == null)
 		{
     		beginWorkflowStateUids = new HashSet<UUID>();
@@ -933,7 +956,7 @@ public class WorkflowHelper {
 		}
 
     	if (beginWorkflowStateUids != null && stateConcept != null) {
-    		return (beginWorkflowStateUids.contains(stateConcept.getPrimUuid()));
+    		return (beginWorkflowStateUids.contains(stateConcept));
     	} else {
     		return false;
     	}
@@ -962,18 +985,47 @@ public class WorkflowHelper {
 		return endWorkflowActionUid;
     }
 
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(RefexVersionBI version) {
+		WorkflowHistoryJavaBean bean = null;
+		
+		try {
+			bean = populateWorkflowHistoryJavaBean(version.getNid(), 
+												   Terms.get().nidToUuid(version.getReferencedComponentNid()), 
+												   ((RefexStrVersionBI)version).getStr1(), 
+												   version.getTime());
+
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + version);
+		}
+		
+		return bean;
+	}
+
 	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRef ref) {
 		WorkflowHistoryJavaBean bean = null;
 		
 		try {
+			int idx = ref.getMutableParts().size() - 1;
+			long time = ref.getMutableParts().get(idx).getTime();
+			
 			bean = populateWorkflowHistoryJavaBean(ref.getMemberId(), 
 												   Terms.get().nidToUuid(ref.getComponentNid()), 
 												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
-												   new Long(ref.getMutableParts().get(0).getTime()));
+												   new Long(time));
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ref);
 		}
 		
+		return bean;
+	}
+
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(TkRefsetAbstractMember<?> ref) throws NumberFormatException, TerminologyException, IOException {
+		TkRefsetStrMember member = (TkRefsetStrMember) ref;
+
+		int memberNid = Terms.get().uuidToNative(member.getPrimordialComponentUuid());
+		WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(memberNid, member.getComponentUuid(), 
+																					  member.getStrValue(), member.getTime());
+	
 		return bean;
 	}
 
@@ -1004,14 +1056,14 @@ public class WorkflowHelper {
 		return "";
 	}
 
-	public static WorkflowHistoryJavaBean getLatestWfHxJavaBeanForConcept(I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException 
+	public static WorkflowHistoryJavaBean getLatestWfHxJavaBeanForWorkflowId(I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException 
 	{
-		SortedSet<WorkflowHistoryJavaBean> wfSet = getLatestWfHxForConcept(con, workflowId);
+		SortedSet<WorkflowHistoryJavaBean> wfSet = getWfHxForWorkflowId(con, workflowId);
 		
-		if (wfSet != null) {
-			return wfSet.last();
-		} else {
+		if (wfSet == null || wfSet.size() == 0) {
 			return null;
+		} else {
+			return wfSet.last();
 		}
 	}
 
@@ -1026,34 +1078,21 @@ public class WorkflowHelper {
 		}
 	}
 
-	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) 
-		throws IOException, TerminologyException 
+	public static TreeSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(I_GetConceptData con) throws IOException, TerminologyException 
 	{
-		if (activeNidRf1 == 0) {
-			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
-			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
-		}
-
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
 
 		if (con != null) {
-			Set<String> ignoredWorkflows = new HashSet<String>();
-			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-			
+			Set<String> processedIds = new HashSet<String>();
 			long latestTimestamp = 0;
 			String currentWorkflowId = null;
-				
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
 			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (!ignoredWorkflows.contains(reader.getWorkflowId(member.getStr1()))) {
-					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), con.getPrimUuid(), member.getStr1(), member.getTime());
-					
+			for (WorkflowHistoryJavaBean bean : getWfHxMembersAsBeans(con)) {
+				if (!processedIds.contains(bean.getWorkflowId())) {
 					if (latestTimestamp == 0 || 
 						(latestTimestamp < bean.getWorkflowTime() && !currentWorkflowId.equals(bean.getWorkflowId().toString()))) {
 						returnSet.clear();
-						ignoredWorkflows.add(currentWorkflowId);
+						processedIds.add(currentWorkflowId);
 						
 						currentWorkflowId = bean.getWorkflowId().toString();
 						latestTimestamp = bean.getWorkflowTime();
@@ -1067,26 +1106,16 @@ public class WorkflowHelper {
 		return returnSet;
 	}
 
-	public static SortedSet<WorkflowHistoryJavaBean> getLatestWfHxForConcept(
+	public static SortedSet<WorkflowHistoryJavaBean> getWfHxForWorkflowId(
 			I_GetConceptData con, UUID workflowId) throws IOException, TerminologyException {
-		if (activeNidRf1 == 0) {
-			 activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
-			 activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
-		}
 		TreeSet<WorkflowHistoryJavaBean> returnSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxJavaBeanComparer());
-
+  
 		if (con != null && workflowId != null) {
-			WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-	
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
-			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (workflowId.equals(UUID.fromString(reader.getWorkflowIdAsString(member.getStr1())))) {
-					returnSet.add(populateWorkflowHistoryJavaBean(member.getNid(), 
-																  Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																  member.getStr1(),
-																  member.getTime()));
+			TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(con);
+
+			for (WorkflowHistoryJavaBean bean : members) {
+				if (workflowId.equals(bean.getWorkflowId())) {
+					returnSet.add(bean);
 				}
 			}
 		}
@@ -1095,35 +1124,60 @@ public class WorkflowHelper {
 	}
 
 	 
-	public static void listWorkflowHistory(UUID uuid) throws NumberFormatException, IOException, TerminologyException 
-	{
-		Writer outputFile = new OutputStreamWriter(new FileOutputStream("C:\\Users\\jefron\\Desktop\\wb-bundle\\log\\Output.txt"));
-		int counter = 0;
-		WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
+	public static TreeSet<WorkflowHistoryJavaBean> getWfHxMembersAsBeans(I_GetConceptData con) throws IOException, TerminologyException {
+		TreeSet<WorkflowHistoryJavaBean> retSet = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
 
+		if (activeNidRf1 == 0) {
+			activeNidRf1 = Terms.get().uuidToNative(SnomedMetadataRf1.CURRENT_RF1.getUuids()[0]);
+			activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+		}		
 
-		I_GetConceptData con = Terms.get().getConcept(uuid);
-		Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
+		if (Terms.get().getActiveAceFrameConfig() == null) {
+			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
+
+			for (I_ExtendByRef member : members) {
+				I_ExtendByRefPart part = member.getMutableParts().get(member.getTuples().size() - 1);
+				if (part.getStatusNid() == activeNidRf1 ||
+					part.getStatusNid() == activeNidRf2) {
+					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
+					retSet.add(bean);
+				}
+			}
+		} else {
+			ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(vc, getWorkflowRefsetNid());
 		
-		for (RefexVersionBI<?> m : members) {
-			RefexStrVersionBI member = (RefexStrVersionBI) m;
-		
-			WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																		   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																		   member.getStr1(),
-																		   member.getTime());
-			
-			System.out.println("\n\nBean #: " + counter++ + " = " + bean.toString());
-			outputFile.write("\n\nBean #: " + counter++ + " = " + bean.toString());
+			for (RefexVersionBI m : members) {
+				RefexStrVersionBI member = (RefexStrVersionBI) m;
+				if (member.getStatusNid() == activeNidRf1 ||
+					member.getStatusNid() == activeNidRf2) {
+					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
+																				   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
+																				   member.getStr1(),
+																				   member.getTime());
+				
+					retSet.add(bean);
+				}
+			}
 		}
-		outputFile.flush();
-		outputFile.close();
+		
+		return retSet;
+	}
+
+	public static void listWorkflowHistory(UUID conceptId) throws NumberFormatException, IOException, TerminologyException 
+	{
+		int counter = 0;
+
+		TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(Terms.get().getConcept(conceptId));
+		
+		for (WorkflowHistoryJavaBean bean : members) {
+			System.out.println("\n\nBean #: " + counter + " = " + bean.toString());
+		}
 	}
 
 	public static Object getOverrideAction() {
 	   	if (overrideActionUid   == null)
 		{
-    		// TODO: Remove hardcode and add to metadata
 	   		try {
 				overrideActionUid = ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid();
 			} catch (Exception e) {
@@ -1157,16 +1211,7 @@ public class WorkflowHelper {
 		}
 		
 		try {
-			Collection<? extends RefexVersionBI<?>> members = concept.getCurrentAnnotationMembers(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), getWorkflowRefsetNid());
-			
-			for (RefexVersionBI<?> m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																  			   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																  			   member.getStr1(),
-																  			   member.getTime());
-				retSet.add(bean);
-			}
+			retSet = getWfHxMembersAsBeans(concept);
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Cannot access Workflow History Refset members with error: " + e.getMessage());
 		}
@@ -1251,8 +1296,6 @@ public class WorkflowHelper {
 	}
 
 	public static Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContraditionException {
-		
-		EditorCategoryRefsetSearcher searcher = null;		
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
 		
 		try {
@@ -1335,10 +1378,12 @@ public class WorkflowHelper {
 				wfCapabilitiesInitialized = true;
 			
 				UUID testUid = ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid();
-		         if (Ts.get().getConcept(testUid) != null) {
+		         if (Ts.get().hasUuid(testUid)) {
 		        	 wfCapabilitiesAvailable = true;
 		         }
 			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
+			} catch (Error assertionCatch) {
 				AceLog.getAppLog().log(Level.INFO, "Workflow Capability not present");
 			}
 		}
@@ -1418,6 +1463,53 @@ public class WorkflowHelper {
 		}
 		
 		return wfRefsetUidList;
+	}
+
+	public static HashSet<UUID> getLuceneChangeSetStorage() {
+		if (luceneChangeSetImportStorageSet == null) {
+			luceneChangeSetImportStorageSet = new HashSet<UUID>();
+		}
+		
+		return luceneChangeSetImportStorageSet;
+	}
+
+	public static HashSet<UUID> getLuceneChangeWfIdSetStorage() {
+		if (luceneChangeSetWFIdImportStorageSet == null) {
+			luceneChangeSetWFIdImportStorageSet = new HashSet<UUID>();
+		}
+		
+		return luceneChangeSetWFIdImportStorageSet;
+	}
+
+	public static void clearChangeSetStorage() {
+		if (luceneChangeSetImportStorageSet != null) {
+		luceneChangeSetImportStorageSet.clear();
+		} 
+		
+		if (luceneChangeSetWFIdImportStorageSet != null) {
+			luceneChangeSetWFIdImportStorageSet.clear();
+		}
+	}
+
+	// Search for latest Approved State for Concept's WF
+	public static long getLatestApprovedTimeStamp(int conceptNid) {
+		try {
+			TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(Terms.get().getConcept(conceptNid));
+			Iterator itr = members.descendingIterator();
+
+			while (itr.hasNext()) {
+				WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean) itr.next();
+				if (bean.getState().equals(getApprovedState())) {
+					// Query in reverse order so return first visited Approved State's WF Timestamp 
+					return bean.getWorkflowTime();
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.INFO, "Unable to access Workflow History for concept: " + conceptNid);
+		}
+		
+		// No Workflow exists for concept or it exists without Approved State
+		return 0;
 	}
 }
  

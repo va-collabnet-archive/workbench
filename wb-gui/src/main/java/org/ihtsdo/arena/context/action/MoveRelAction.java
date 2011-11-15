@@ -26,76 +26,76 @@ import org.ihtsdo.tk.drools.facts.ConceptFact;
 
 public class MoveRelAction extends AbstractAction {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    ComponentVersionBI sourceComponent;
+    ComponentVersionBI targetComponent;
+    I_ConfigAceFrame config;
 
-	ComponentVersionBI sourceComponent;
-	ComponentVersionBI targetComponent;
-	public MoveRelAction(String actionName, RelFact sourceFact, ConceptFact destFact) {
-		super(actionName);
-		this.sourceComponent = sourceFact.getComponent();
-		this.targetComponent = destFact.getComponent();
-	}
+    public MoveRelAction(String actionName, RelFact sourceFact, ConceptFact destFact, I_ConfigAceFrame config) {
+        super(actionName);
+        this.sourceComponent = sourceFact.getComponent();
+        this.targetComponent = destFact.getComponent();
+        this.config = config;
+    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		try {
-			I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
-			if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
-				throw new UnsupportedOperationException();
-			}
-			if (ConceptVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
-				throw new UnsupportedOperationException();
-			}
-			if (DescriptionVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
-				DescriptionVersionBI desc = (DescriptionVersionBI) sourceComponent;
-				Terms.get().newDescription(UUID.randomUUID(), concept, 
-						desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()), 
-						config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
-			}
-			if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
-				RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
-				I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept, 
-						rel.getTypeNid(), 
-						rel.getDestinationNid(), 
-						rel.getCharacteristicNid(), 
-						rel.getRefinabilityNid(), 
-						0, 
-						rel.getStatusNid(), 
-						config.getDbConfig().getUserConcept().getNid(), 
-						pathItr.next().getConceptNid(), 
-						Long.MAX_VALUE);
-			}
-			
-			Terms.get().addUncommitted(concept);
-			
-			
-			
-			if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
-				I_AmPart componentVersion = (I_AmPart) sourceComponent;
-				for (PathBI ep: config.getEditingPathSet()) {
-					componentVersion.makeAnalog(
-							SnomedMetadataRfx.getSTATUS_RETIRED_NID(), 
-							config.getDbConfig().getUserConcept().getNid(),
-							ep.getConceptNid(), 
-							Long.MAX_VALUE);
-				}
-				I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
-				Terms.get().addUncommitted(retireConcept);
-			}
-			
-			
-			
-			
-			
-			
-		} catch (TerminologyException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		} catch (IOException e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
+            Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
+            if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+                throw new UnsupportedOperationException();
+            }
+            if (ConceptVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+                throw new UnsupportedOperationException();
+            }
+            if (DescriptionVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+                DescriptionVersionBI desc = (DescriptionVersionBI) sourceComponent;
+                Terms.get().newDescription(UUID.randomUUID(), concept,
+                        desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
+                        config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
+            }
+            if (RelationshipVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
+                RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
+                I_RelVersioned newRel = Terms.get().newRelationshipNoCheck(UUID.randomUUID(), concept,
+                        rel.getTypeNid(),
+                        rel.getDestinationNid(),
+                        rel.getCharacteristicNid(),
+                        rel.getRefinabilityNid(),
+                        0,
+                        rel.getStatusNid(),
+                        config.getDbConfig().getUserConcept().getNid(),
+                        pathItr.next().getConceptNid(),
+                        Long.MAX_VALUE);
+            }
 
-	}
+            Terms.get().addUncommitted(concept);
 
+
+
+            if (I_AmPart.class.isAssignableFrom(sourceComponent.getClass())) {
+                I_AmPart componentVersion = (I_AmPart) sourceComponent;
+                for (PathBI ep : config.getEditingPathSet()) {
+                    componentVersion.makeAnalog(
+                            SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+                            config.getDbConfig().getUserConcept().getNid(),
+                            ep.getConceptNid(),
+                            Long.MAX_VALUE);
+                }
+                I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
+                Terms.get().addUncommitted(retireConcept);
+            }
+
+
+
+
+
+
+        } catch (TerminologyException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (IOException e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+
+    }
 }

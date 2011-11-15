@@ -102,7 +102,8 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					
 					moduleId = computeModuleId(concept);	
 					//moduleId = getConceptMetaModuleID(concept , effectiveTime);
-					if(moduleId.equals(I_Constants.META_MOULE_ID)){				
+					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
+						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
 					}
 					
@@ -112,28 +113,25 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					
 					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
-					}
-					
-					if (descriptionid.contains("-") && updateWbSctId.equals("true")){
-						try {
-							DateFormat df = new SimpleDateFormat("yyyyMMdd");
-							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
-							
-							//get text descriptionId by calling web service 
-							String wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
-							if(wbSctId.equals("0")){
-								 wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
+						if (descriptionid.contains("-") && updateWbSctId.equals("true")){
+							try {
+								DateFormat df = new SimpleDateFormat("yyyyMMdd");
+								long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();								
+								//get text descriptionId by calling web service 
+								String wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
+								if(wbSctId.equals("0")){
+									 wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
+								}
+								descriptionid=wbSctId;
+								//insert textdescriptionId in the workbench database 
+								insertSctId(description.getDescId() , getConfig(), wbSctId , description.getPathNid() , description.getStatusNid() , effectiveDate);
+							} catch (NumberFormatException e) {
+								logger.error("NumberFormatException" +e);
+							} catch (Exception e) {
+								logger.error("Exception" +e);
 							}
-							
-							//insert textdescriptionId in the workbench database 
-							insertSctId(description.getDescId() , getConfig(), wbSctId , description.getPathNid() , description.getStatusNid() , effectiveDate);
-						} catch (NumberFormatException e) {
-							logger.error("NumberFormatException" +e);
-						} catch (Exception e) {
-							logger.error("Exception" +e);
-						}
+						}						
 					}
-					
 					
 					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
 					
@@ -147,12 +145,17 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 					
 				}
 			}
+		}catch (NullPointerException ne) {
+			logger.error("NullPointerException: " + ne.getMessage());
+			logger.error("NullPointerException " + conceptid);
 		} catch (IOException e) {
 			logger.error("IOExceptions: " + e.getMessage());
+			logger.error("IOExceptions: " + conceptid);
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("Exceptions in exporttextDef: " + e.getMessage());
+			logger.error("Exceptions in exportTextDefinition: " + e.getMessage());
+			logger.error("Exceptions in exportTextDefinition: " +conceptid);
 		}
+		
 	}
 	
 	

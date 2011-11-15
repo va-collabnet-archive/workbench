@@ -58,6 +58,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.PropertyChangeSupportWithPropagationId;
+import org.dwfa.vodb.conflict.IdentifyAllConflictStrategy;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -764,7 +765,10 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public ViewCoordinate getViewCoordinate() {
-        return config.getViewCoordinate();
+        ViewCoordinate vc = new ViewCoordinate(config.getViewCoordinate());
+        vc.setContradictionManager(getConflictResolutionStrategy());
+        vc.setPrecedence(getPrecedence());
+        return vc;
     }
 
     public VetoableChangeSupport getVetoSupport() {
@@ -932,7 +936,7 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public Precedence getPrecedence() {
-        return config.getPrecedence();
+        return Precedence.PATH;
     }
 
     public Map<Integer, Color> getPathColorMap() {
@@ -988,11 +992,12 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public PathSetReadOnly getEditingPathSetReadOnly() {
-        return config.getEditingPathSetReadOnly();
+        return new PathSetReadOnly(getPromotionPathSet());
     }
 
     public Set<PathBI> getEditingPathSet() {
-        return config.getEditingPathSet();
+        Set<PathBI> editSet = getPromotionPathSet();
+        return editSet;
     }
 
     public I_IntList getEditStatusTypePopup() {
@@ -1075,7 +1080,8 @@ public class ContradictionConfig implements I_ConfigAceFrame {
     }
 
     public I_ManageContradiction getConflictResolutionStrategy() {
-        return config.getConflictResolutionStrategy();
+        IdentifyAllConflictStrategy strategy = new IdentifyAllConflictStrategy();
+        return strategy;
     }
 
     public I_HostConceptPlugins getConceptViewer(int index) {

@@ -1061,6 +1061,7 @@ public class NewConcept extends PreviousNextOrCancel {
                         NewConcept.this.notifyTaskDone();
                     }
                     NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
+                    Boolean found = false;
                     search:
                     for (int i = 0; i < result.topDocs.totalHits; i++) {
                         Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
@@ -1070,19 +1071,25 @@ public class NewConcept extends PreviousNextOrCancel {
                         I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
                         if (potential_fsn != null) {
                             for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                                String test = part_search.getText();
                                 if (allowedStatusNids.contains(part_search.getStatusNid())
                                         && part_search.getText().equals(fullFsn)) {
-                                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                            "<html>FSN already used: " + fullFsn, "",
-                                            JOptionPane.ERROR_MESSAGE);
+                                    found = true;
                                     break search;
                                 } else {
-                                    returnCondition = Condition.CONTINUE;
-                                    done = true;
-                                    NewConcept.this.notifyTaskDone();
+                                    found = false;
                                 }
                             }
                         }
+                    }
+                    if (found) {
+                        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                                "<html>FSN already used: " + fullFsn, "",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        returnCondition = Condition.CONTINUE;
+                        done = true;
+                        NewConcept.this.notifyTaskDone();
                     }
                 } catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);

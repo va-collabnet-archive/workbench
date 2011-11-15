@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -53,7 +54,7 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * @required
 	 */
 	private File outputDirectory;
-	
+
 	/**
 	 * Execution details csv/txt file.
 	 * 
@@ -81,35 +82,35 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * @parameter
 	 */
 	private String rulesOutputStr;
-	
+
 	/**
 	 * Execution details csv/txt file.
 	 * 
 	 * @parameter
 	 */
 	private File executionDetails;
-	
+
 	/**
 	 * Execution details xml file.
 	 * 
 	 * @parameter
 	 */
 	private File executionXml;
-	
+
 	/**
 	 * Findings csv/txt file.
 	 * 
 	 * @parameter
 	 */
 	private File findings;
-	
+
 	/**
 	 * Rules csv/txt file.
 	 * 
 	 * @parameter
 	 */
 	private File rules;
-	
+
 	/**
 	 * dbConnection JDBC URL
 	 * 
@@ -117,7 +118,7 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * @required
 	 */
 	private String url;
-	
+
 	/**
 	 * dbConnection JDBC username
 	 * 
@@ -125,7 +126,7 @@ public class UploadToQADatabase extends AbstractMojo {
 	 * @required
 	 */
 	private String username;
-	
+
 	/**
 	 * dbConnection JDBC password
 	 * 
@@ -159,13 +160,29 @@ public class UploadToQADatabase extends AbstractMojo {
 		loadExecutionInfo();
 		loadFindings();
 		loadRules();
+		ruleSeverityCtrl();
 		if (!runId.equals("")){
 
-		    java.sql.CallableStatement cStmt = con.prepareCall("{call qa_controller(?)}");
+			java.sql.CallableStatement cStmt = con.prepareCall("{call qa_controller(?)}");
 
-		    cStmt.setString(1, runId);
-		    
-		    cStmt.execute();
+			cStmt.setString(1, runId);
+
+			cStmt.execute();
+		}
+	}
+
+	private void ruleSeverityCtrl() {     
+
+		try {
+			ResultSet rs = con.createStatement().executeQuery("select rule_uid,name from qa_rule_imp r where not exists(select * from qa_severity s where s.severity_uid=r.severity_uid)");
+
+			while (rs.next()){
+				System.out.println("[WARNING] RULE WITHOUT SEVERITY: " + rs.getString(1) + " - " + rs.getString(2));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -186,7 +203,7 @@ public class UploadToQADatabase extends AbstractMojo {
 		statement.execute("ALTER TABLE qa_rule_imp ENABLE KEYS");
 		statement.execute("SET UNIQUE_CHECKS=1; ");
 	}
-	
+
 
 	private void loadFindings() throws SQLException {      
 		Statement statement = (com.mysql.jdbc.Statement)con.createStatement();
@@ -238,7 +255,7 @@ public class UploadToQADatabase extends AbstractMojo {
 		}
 
 		inputFileReader.close();
-		
+
 		InputStreamReader fi = new  InputStreamReader(new FileInputStream(executionXml),Charset.forName("ISO-8859-1"));
 
 		CharBuffer target =null;
@@ -252,12 +269,12 @@ public class UploadToQADatabase extends AbstractMojo {
 			target.rewind();
 			xmlExec=target.toString();
 		}
-		
+
 		fi.close();
-		
+
 		String statementText="INSERT INTO qa_database (database_uid, name) select distinct '" + 
-							db + "','" + name + "' from dual where not exists (select 0 from " +
-						"qa_database where database_uid='" + db + "')";
+		db + "','" + name + "' from dual where not exists (select 0 from " +
+		"qa_database where database_uid='" + db + "')";
 
 		PreparedStatement statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
 
@@ -268,13 +285,13 @@ public class UploadToQADatabase extends AbstractMojo {
 		statementText = "INSERT INTO qa_run (run_id, database_uid, path_uid,name, viewpoint_time, start_time, end_time,context_name,context_configuration,run_configuration,path_name)" +
 		" values (?,?,?,?,?,?,?,?,?,?,?) " ;
 
-//		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name,context_name,context_configuration,run_configuration)" +
-//		" values (?,?,?,?,?,?,?) " ;
-		
+		//		String statementText = "INSERT INTO QA_RUN (run_id, database_uid, path_uid,name,context_name,context_configuration,run_configuration)" +
+		//		" values (?,?,?,?,?,?,?) " ;
+
 		statement = (com.mysql.jdbc.PreparedStatement)con.clientPrepareStatement(statementText);
-	
+
 		statement.setString(1, runId);
-		
+
 		statement.setString(2, db);
 		statement.setString(3, path);
 		statement.setString(4, name);
@@ -286,16 +303,16 @@ public class UploadToQADatabase extends AbstractMojo {
 		statement.setString(10, xmlExec);
 		statement.setString(11, pathName);
 
-//		statement.setString(5, context);
-//		statement.setString(6, xmlExec);
-//		statement.setString(7, xmlExec);
+		//		statement.setString(5, context);
+		//		statement.setString(6, xmlExec);
+		//		statement.setString(7, xmlExec);
 
 		statement.execute();
 
 		statement.close();
 	}
 
-		
+
 
 
 	private void validateParamenters() throws Exception {
@@ -303,7 +320,7 @@ public class UploadToQADatabase extends AbstractMojo {
 		if (!qaOutput.exists()) {
 			qaOutput.mkdirs();
 		}
-		
+
 		if (executionXmlOutputStr == null || executionXmlOutputStr.isEmpty()) {
 			executionXml = new File(qaOutput, "executionXmlOutput.xml");
 		} else {
@@ -329,13 +346,13 @@ public class UploadToQADatabase extends AbstractMojo {
 		}
 		if (backupFolder.exists() &&  !backupFolder.isDirectory()){
 			throw new Exception("Backup folder parameter is not folder");
-			
+
 		}
 
 		// validate connection data
 		Class.forName("com.mysql.jdbc.Driver");
 		con= (com.mysql.jdbc.Connection)DriverManager.getConnection(url,username,password);
-	
+
 	}
 
 

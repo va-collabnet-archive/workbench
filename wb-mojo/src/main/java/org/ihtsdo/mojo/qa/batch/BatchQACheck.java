@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,6 +55,8 @@ import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.vodb.conflict.EditPathWinsStrategy;
+import org.dwfa.vodb.conflict.LastCommitWinsConflictResolutionStrategy;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
@@ -200,6 +204,8 @@ public class BatchQACheck extends AbstractMojo {
 	UUID executionUUID;
 	DateFormat df;
 	Calendar executionDate ;
+
+	private HashMap<String, String> allRules;
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
@@ -224,6 +230,7 @@ public class BatchQACheck extends AbstractMojo {
 			}
 			contextHelper.clearCache();
 			cleanKbFileCache();
+			allRules=new HashMap<String,String>();
 			exportExecutionDescriptor(contextHelper);
 			performQA(executionUUID, contextHelper);
 		} catch (Exception e) {
@@ -268,7 +275,8 @@ public class BatchQACheck extends AbstractMojo {
 
 			Document document = impl.createDocument(null, "description", null);
 			Element rootElement = document.getDocumentElement();
-
+			
+			HashSet<String> rules;
 			List<RulesDeploymentPackageReference> kbPackages = contextHelper.getPackagesForContext(context);
 			for (RulesDeploymentPackageReference loopPackage : kbPackages) {
 				Element packageElement = document.createElement("package");
@@ -276,9 +284,19 @@ public class BatchQACheck extends AbstractMojo {
 				packageElement.setAttribute("url", loopPackage.getUrl());
 				rootElement.appendChild(packageElement);
 
+				rules=new HashSet<String>();
 				for (Rule loopRule : loopPackage.getRules()) {
 					String ruleUid = (String) loopRule.getMetaData().get("UUID");
+					if (ruleUid != null && !ruleUid.equals("null") && rules.contains(ruleUid)){
+						System.out.println("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
+						//throw new Exception("DUPLICATED RULE UUID:" + ruleUid +  " Name:" + (String) loopRule.getMetaData().get("DESCRIPTION"));
+					}else{
+						rules.add(ruleUid);
+					}
 					String description = (String) loopRule.getMetaData().get("DESCRIPTION");
+					if (!allRules.containsKey(ruleUid)){
+						allRules.put(ruleUid, description);
+					}
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
 					String severityUid = (String) loopRule.getMetaData().get("SEVERITY");
 					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
@@ -355,6 +373,17 @@ public class BatchQACheck extends AbstractMojo {
 			e.printStackTrace();
 			throw e;
 		} finally {
+			// Add batch duplicate fsn rule
+//			rulePw.print("d4d60d70-0733-11e1-be50-0800200c9a66" + "\t");
+//			rulePw.print("FSN should be unique (batch check)" + "\t");
+//			rulePw.print("FSN should be unique (batch check)" + "\t");
+//			System.out.println("*+*+ " + "d4d60d70-0733-11e1-be50-0800200c9a66" + " - " + "FSN should be unique (batch check)" + " - Default");
+//			rulePw.print("f9545a20-12cf-11e0-ac64-0800200c9a66" + "\t");
+//			rulePw.print("Batch Rule" + "\t");
+//			rulePw.print("Batch Rule" + "\t");
+//			rulePw.print("" + "\t");
+//			rulePw.print(4);
+//			rulePw.println();
 			executionXmlOs.flush();
 			executionXmlOs.close();
 			rulePw.flush();
@@ -374,7 +403,7 @@ public class BatchQACheck extends AbstractMojo {
 		//TODO: add header titles
 		findingPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "run Id" + "\t" + "rule uid" + "\t" + "component uuid"  + "\t" + "details" + "\t" + "component name");
 		Long start = Calendar.getInstance().getTimeInMillis();
-		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid));
+		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid,allRules));
 		findingPw.flush();
 		findingPw.close();
 		Long end = Calendar.getInstance().getTimeInMillis();
@@ -452,12 +481,14 @@ public class BatchQACheck extends AbstractMojo {
 		I_ConfigAceFrame config = null;
 		config = tf.newAceFrameConfig();
 		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+		config.getViewPositionSet().clear();
 		config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }), df.parse(test_time).getTime()));
 
 		// Addes inferred promotion template to catch the context relationships [ testing
 		//config.addViewPosition(tf.newPosition(tf.getPath(new UUID[] { UUID.fromString("cb0f6c0d-ebf3-5d84-9e12-d09a937cbffd") }), Integer.MAX_VALUE));
 
 		//config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2") }));
+		config.getEditingPathSet().clear();
 		config.addEditingPath(tf.getPath(new UUID[] { UUID.fromString(test_path_uuid) }));
 		config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 		config.getDescTypes().add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
@@ -474,6 +505,7 @@ public class BatchQACheck extends AbstractMojo {
 		config.setRelAssertionType(RelAssertionType.INFERRED);
 
 		config.setPrecedence(Precedence.TIME);
+		config.setConflictResolutionStrategy(new LastCommitWinsConflictResolutionStrategy());
 
 		return config;
 	}

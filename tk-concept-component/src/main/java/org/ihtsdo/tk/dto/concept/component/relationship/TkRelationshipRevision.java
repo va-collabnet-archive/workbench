@@ -2,6 +2,9 @@ package org.ihtsdo.tk.dto.concept.component.relationship;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -27,6 +30,18 @@ public class TkRelationshipRevision extends TkRevision {
 
    public TkRelationshipRevision() {
       super();
+   }
+
+   public TkRelationshipRevision(RelationshipVersionBI rv) throws IOException {
+      TerminologyStoreDI ts = Ts.get();
+
+      characteristicUuid = ts.getUuidPrimordialForNid(rv.getCharacteristicNid());
+      refinabilityUuid   = ts.getUuidPrimordialForNid(rv.getRefinabilityNid());
+      group              = rv.getGroup();
+      typeUuid           = ts.getUuidPrimordialForNid(rv.getTypeNid());
+      pathUuid           = ts.getUuidPrimordialForNid(rv.getPathNid());
+      statusUuid         = ts.getUuidPrimordialForNid(rv.getStatusNid());
+      time               = rv.getTime();
    }
 
    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

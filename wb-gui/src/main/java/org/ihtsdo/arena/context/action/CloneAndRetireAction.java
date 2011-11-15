@@ -32,7 +32,10 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
@@ -42,17 +45,18 @@ public class CloneAndRetireAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
+    I_ConfigAceFrame config;
 
-    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact) {
+    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
                 throw new UnsupportedOperationException();
@@ -69,17 +73,51 @@ public class CloneAndRetireAction extends AbstractAction {
                 newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
                 TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                         config.getViewCoordinate());
-                int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
-                for (RefexVersionBI refex : oldRefexes) {
+                int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
+                                for (RefexVersionBI refex : oldRefexes) {
                     if (refex.getCollectionNid() != dosNid) { //not cloning degree of synonymy refeset membership
-                        RefexCAB newSpec = new RefexCAB(
+                        RefexCAB newSpec;
+                        if (RefexCnidVersionBI.class.isAssignableFrom(refex.getClass())) {
+                            newSpec = new RefexCAB(
                                 TK_REFSET_TYPE.CID,
                                 newDesc.getNid(),
                                 refex.getCollectionNid());
-                        RefexCnidVersionBI cv =
-                                (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
-                        int typeNid = cv.getCnid1();
-                        newSpec.put(RefexProperty.CNID1, typeNid);
+                            RefexCnidVersionBI cv =
+                                    (RefexCnidVersionBI) refex.getVersion(config.getViewCoordinate());
+                            int typeNid = cv.getCnid1();
+                            newSpec.put(RefexProperty.CNID1, typeNid);
+                        } else if(RefexBooleanVersionBI.class.isAssignableFrom(refex.getClass())){
+                            newSpec = new RefexCAB(
+                                TK_REFSET_TYPE.BOOLEAN,
+                                newDesc.getNid(),
+                                refex.getCollectionNid());
+                            RefexBooleanVersionBI bv =
+                                    (RefexBooleanVersionBI) refex.getVersion(config.getViewCoordinate());
+                            boolean boolean1 = bv.getBoolean1();
+                            newSpec.put(RefexProperty.BOOLEAN1, boolean1);
+                        } else if (RefexStrVersionBI.class.isAssignableFrom(refex.getClass())){
+                            newSpec = new RefexCAB(
+                                TK_REFSET_TYPE.STR,
+                                newDesc.getNid(),
+                                refex.getCollectionNid());
+                            RefexStrVersionBI sv =
+                                    (RefexStrVersionBI) refex.getVersion(config.getViewCoordinate());
+                            String string1 = sv.getStr1();
+                            newSpec.put(RefexProperty.STRING1, string1);
+                        } else if(RefexIntVersionBI.class.isAssignableFrom(refex.getClass())){
+                            newSpec = new RefexCAB(
+                                TK_REFSET_TYPE.INT,
+                                newDesc.getNid(),
+                                refex.getCollectionNid());
+                            RefexIntVersionBI iv =
+                                    (RefexIntVersionBI) refex.getVersion(config.getViewCoordinate());
+                            int int1 = iv.getInt1();
+                            newSpec.put(RefexProperty.INTEGER1, int1);
+                        } else{
+                            throw new UnsupportedOperationException("can't handle refex type: " +
+                                    refex);
+                        }
+
                         tc.construct(newSpec);
                         ConceptChronicleBI refexConcept = Ts.get().getConcept(refex.getConceptNid());
                         if (!refexConcept.isAnnotationStyleRefex()) {
@@ -139,17 +177,16 @@ public class CloneAndRetireAction extends AbstractAction {
         }
 
     }
-    
+
     private void retireFromRefexes(ComponentVersionBI component) {
         DescriptionVersionBI desc = (DescriptionVersionBI) component;
         try {
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             I_AmPart componentVersion;
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes = desc.getCurrentRefexes(vc);
             int usNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
             int gbNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-            int dosNid =SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
+            int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
             for (RefexChronicleBI refex : refexes) {
                 int refexNid = refex.getCollectionNid();
                 if (refexNid == gbNid || refexNid == usNid || refexNid == dosNid) {
@@ -168,8 +205,6 @@ public class CloneAndRetireAction extends AbstractAction {
                 }
             }
         } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }

@@ -197,23 +197,17 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       CID(2, RefsetAuxiliary.Concept.CONCEPT_EXTENSION, I_ExtendByRefPartCid.class),
       CID_CID(3, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_EXTENSION, I_ExtendByRefPartCidCid.class),
       CID_CID_CID(4, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_CONCEPT_EXTENSION,
-                  I_ExtendByRefPartCidCidCid.class), CID_CID_STR(5,
-                     RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION,
-                     I_ExtendByRefPartCidCidString.class), STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION,
-                        I_ExtendByRefPartStr.class), INT(7, RefsetAuxiliary.Concept.INT_EXTENSION,
-                           I_ExtendByRefPartInt.class), CID_INT(8,
-                              RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION,
-                              I_ExtendByRefPartCidInt.class), BOOLEAN(9,
-                                 RefsetAuxiliary.Concept.BOOLEAN_EXTENSION,
-                                 I_ExtendByRefPartBoolean.class), CID_STR(10,
-                                    RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION,
-                                    I_ExtendByRefPartStr.class), CID_FLOAT(11,
-                                       RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION,
-                                       I_ExtendByRefPartCidFloat.class), CID_LONG(12,
-                                          RefsetAuxiliary.Concept.CID_LONG_EXTENSION,
-                                             I_ExtendByRefPartCidLong.class), LONG(13,
-                                                RefsetAuxiliary.Concept.LONG_EXTENSION,
-                                                   I_ExtendByRefPartLong.class);
+              I_ExtendByRefPartCidCidCid.class), 
+      CID_CID_STR(5, RefsetAuxiliary.Concept.CONCEPT_CONCEPT_STRING_EXTENSION, 
+              I_ExtendByRefPartCidCidString.class), 
+      STR(6, RefsetAuxiliary.Concept.STRING_EXTENSION, I_ExtendByRefPartStr.class), 
+      INT(7, RefsetAuxiliary.Concept.INT_EXTENSION, I_ExtendByRefPartInt.class), 
+      CID_INT(8, RefsetAuxiliary.Concept.CONCEPT_INT_EXTENSION, I_ExtendByRefPartCidInt.class), 
+      BOOLEAN(9, RefsetAuxiliary.Concept.BOOLEAN_EXTENSION, I_ExtendByRefPartBoolean.class), 
+      CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class), 
+      CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, I_ExtendByRefPartCidFloat.class), 
+      CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
+      LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class);
 
       private static Map<Integer, REFSET_TYPES> nidTypeMap;
 
@@ -291,7 +285,8 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       }
 
       public static REFSET_TYPES readType(DataInput input) throws IOException {
-         switch (input.readByte()) {
+          byte type = input.readByte();
+         switch (type) {
          case 1 :
             return MEMBER;
 
@@ -332,10 +327,10 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             return LONG;
          }
 
-         throw new UnsupportedOperationException();
+         throw new UnsupportedOperationException("Can't handle refset type: " + type);
       }
 
-      private static void setupNids() {
+      public static void setupNids() {
          if (nidTypeMap == null) {
             HashMap<Integer, REFSET_TYPES> temp = new HashMap<Integer, REFSET_TYPES>();
 

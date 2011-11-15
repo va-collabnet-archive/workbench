@@ -17,7 +17,6 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.I_HandleFutureStatusAtPositionSetup;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -32,7 +31,6 @@ import java.util.UUID;
 
 public abstract class IdentifierVersion
         implements I_IdPart, I_IdVersion, I_HandleFutureStatusAtPositionSetup {
-   private static StatusAtPositionBdb sapBdb = Bdb.getSapDb();
 
    //~--- fields --------------------------------------------------------------
 
@@ -47,7 +45,7 @@ public abstract class IdentifierVersion
 
    protected IdentifierVersion(TkIdentifier idv) {
       super();
-      this.statusAtPositionNid = sapBdb.getSapNid(Bdb.uuidToNid(idv.getStatusUuid()),
+      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(Bdb.uuidToNid(idv.getStatusUuid()),
               Bdb.uuidToNid(idv.getAuthorUuid()), Bdb.uuidToNid(idv.getPathUuid()), idv.getTime());
       this.authorityNid = Bdb.uuidToNid(idv.getAuthorityUuid());
    }
@@ -59,7 +57,7 @@ public abstract class IdentifierVersion
    }
 
    protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time) {
-      this.statusAtPositionNid = sapBdb.getSapNid(statusNid, authorNid, pathNid, time);
+      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(statusNid, authorNid, pathNid, time);
    }
 
    protected IdentifierVersion(int statusNid, int authorNid, int pathNid, long time,
@@ -162,12 +160,12 @@ public abstract class IdentifierVersion
    }
 
    public int getAuthorId() {
-      return sapBdb.getAuthorNid(statusAtPositionNid);
+      return Bdb.getSapDb().getAuthorNid(statusAtPositionNid);
    }
 
    @Override
    public int getAuthorNid() {
-      return sapBdb.getAuthorNid(statusAtPositionNid);
+      return Bdb.getSapDb().getAuthorNid(statusAtPositionNid);
    }
 
    @Override
@@ -191,31 +189,32 @@ public abstract class IdentifierVersion
 
    @Override
    public int getPathId() {
-      return sapBdb.getPathNid(statusAtPositionNid);
+      return Bdb.getSapDb().getPathNid(statusAtPositionNid);
    }
 
    @Override
    public int getPathNid() {
-      return sapBdb.getPathNid(statusAtPositionNid);
+      return Bdb.getSapDb().getPathNid(statusAtPositionNid);
    }
 
+    @Override
    public int getSapNid() {
       return statusAtPositionNid;
    }
 
    @Override
    public int getStatusId() {
-      return sapBdb.getStatusNid(statusAtPositionNid);
+      return Bdb.getSapDb().getStatusNid(statusAtPositionNid);
    }
 
    @Override
    public int getStatusNid() {
-      return sapBdb.getStatusNid(statusAtPositionNid);
+      return Bdb.getSapDb().getStatusNid(statusAtPositionNid);
    }
 
    @Override
    public long getTime() {
-      return sapBdb.getTime(statusAtPositionNid);
+      return Bdb.getSapDb().getTime(statusAtPositionNid);
    }
 
    @Override
@@ -287,7 +286,7 @@ public abstract class IdentifierVersion
          throw new UnsupportedOperationException("Time alreay committed.");
       }
 
-      this.statusAtPositionNid = sapBdb.getSapNid(getStatusId(), getAuthorId(), getPathId(), time);
+      this.statusAtPositionNid = Bdb.getSapDb().getSapNid(getStatusId(), getAuthorId(), getPathId(), time);
    }
 
    @Override

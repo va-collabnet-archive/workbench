@@ -29,19 +29,22 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
 
 	protected ConcurrentHashMap<Integer, int[]> typeMap;
-	private List<ParallelConceptIterator> pcis;
+	private transient List<ParallelConceptIterator> pcis;
 	protected ViewCoordinate coordinate;
 	protected ViewCoordinate statedViewCoordinate;
 	protected ViewCoordinate inferredViewCoordinate;
 	protected ViewCoordinate inferredThenStatedViewCoordinate;
 	private boolean ready = false;
 	private boolean cancelled = false;
-	private CountDownLatch latch = new CountDownLatch(1);
+	private transient CountDownLatch latch = new CountDownLatch(1);
 	protected int maxSubtypeIterations = 500;
 	protected NidSetBI types;
 
 	@Override
 	public CountDownLatch getLatch() {
+            if (latch == null) {
+                latch = new CountDownLatch(0);
+            }
 		return latch;
 	}
 

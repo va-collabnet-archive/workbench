@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -39,6 +40,7 @@ public class WfHxQueryParser {
 	private final String lastActionKey =	"lastAction";
 	private final String lastStateKey = 	"lastState";
 	private final String lastModelerKey = 	"lastModeler";
+	private final String refsetMemberIdKey = "memberId";
 	
 	private boolean wfInProgress;
 	private boolean completedWf;
@@ -51,6 +53,11 @@ public class WfHxQueryParser {
 		this.checkList = checkList;
 		
 		standardQuery = createStandardQuery();
+	}
+
+	public WfHxQueryParser(boolean inProg, boolean compWf) {
+		this.wfInProgress = inProg;
+		this.completedWf = compWf;
 	}
 
 	private BooleanQuery createStandardQuery() {
@@ -222,5 +229,12 @@ public class WfHxQueryParser {
 
 	public Query getStandardAnalyzerQuery() {
 		return standardQuery;
+	}
+
+	public Query getRefsetMemberIdQuery(String testMemberId) throws ParseException {
+		Analyzer refsetIdAnalyzer = new StandardAnalyzer(LuceneManager.version);
+		QueryParser refsetIdParser = new QueryParser(LuceneManager.version, refsetMemberIdKey, refsetIdAnalyzer);
+		
+		return refsetIdParser.parse(testMemberId);
 	}
 }

@@ -47,7 +47,9 @@ import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
  * @goal load-econcepts
  * 
  * @phase process-sources
+ * @deprecated use LoadBdbMulti
  */
+@Deprecated
 public class LoadBdb extends AbstractMojo {
 	/**
 	 * concepts file name.

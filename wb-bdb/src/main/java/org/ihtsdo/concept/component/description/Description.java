@@ -513,7 +513,10 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
          throw new ContraditionException(vForC.toString());
       }
 
-      return vForC.get(0);
+      if (!vForC.isEmpty()) {
+        return vForC.get(0);
+      }
+      return null;
    }
 
    @Override

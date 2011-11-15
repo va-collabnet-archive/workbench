@@ -7,7 +7,7 @@ import java.lang.String;
 import java.util.Collection;
 
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.Context;
 import org.ihtsdo.tk.drools.facts.ConAttrFact;
@@ -54,7 +54,7 @@ end
 rule "abandon concept and restart"
 	when
 		$c: ConceptFact(getConcept() != null,
-                    ((ConAttrChronicleBI)getConcept().getChronicle().getConAttrs().getPrimordialVersion()).isUncommitted() == true) 
+                    ((ConAttrVersionBI)getConcept().getChronicle().getConAttrs().getPrimordialVersion()).getTime() == Long.MAX_VALUE) 
 	then
 		actions.add(actionFactory.make(new File("plugins/arena/redo-concept.bp")));
 end

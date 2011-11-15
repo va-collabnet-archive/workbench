@@ -24,24 +24,33 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ComponentFact;
+import org.ihtsdo.tk.drools.facts.ConAttrFact;
 
 public class CancelAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ComponentVersionBI component;
     ViewCoordinate vc;
+    I_ConfigAceFrame config;
 
-    public CancelAction(String actionName, ComponentFact<ComponentVersionBI> fact, ViewCoordinate vc) {
+    public CancelAction(String actionName, ComponentFact<ComponentVersionBI> fact, ViewCoordinate vc, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
         this.vc = vc;
+        this.config = config;
+    }
+    
+    public CancelAction(String actionName, ConAttrFact fact, ViewCoordinate vc, I_ConfigAceFrame config) {
+        super(actionName);
+        this.component = fact.getComponent();
+        this.vc = vc;
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConAttrVersionBI.class.isAssignableFrom(component.getClass())) {
                 I_GetConceptData c = Terms.get().getConcept(component.getNid());

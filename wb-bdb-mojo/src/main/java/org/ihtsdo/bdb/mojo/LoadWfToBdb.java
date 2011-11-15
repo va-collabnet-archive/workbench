@@ -97,7 +97,6 @@ public class LoadWfToBdb extends AbstractMojo {
 	        
 	        // Init Lucene
 			LuceneManager.setLuceneRootDir(wfLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-	        WfHxIndexGenerator.setSourceInputFile(new File(inputWfHxFilePath));
 
 	        // Generate Lucene Index
 	        LuceneManager.createLuceneIndex(LuceneSearchType.WORKFLOW_HISTORY, vc);

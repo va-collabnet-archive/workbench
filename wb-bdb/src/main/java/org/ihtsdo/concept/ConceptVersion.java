@@ -72,6 +72,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    //~--- fields --------------------------------------------------------------
 
    private Concept        concept;
+
    NidListBI              fsnOrder;
    NidListBI              preferredOrder;
    NidListBI              synonymOrder;
@@ -91,6 +92,10 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    public boolean addAnnotation(RefexChronicleBI<?> annotation) throws IOException {
       return concept.addAnnotation(annotation);
    }
+   @Override
+    public ConceptChronicleBI getEnclosingConcept() {
+        return concept;
+    }
 
    @Override
    public void cancel() throws IOException {

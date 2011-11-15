@@ -34,7 +34,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
-import org.ihtsdo.cs.econcept.WfHxLuceneChangeSetReader;
+import org.ihtsdo.cs.econcept.workflow.WfHxLuceneChangeSetReader;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;

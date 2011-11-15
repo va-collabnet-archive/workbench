@@ -90,7 +90,8 @@ public class I_Constants {
 	// set output relationship path
 	public static String outRelPath = "ALL";
 	public static String limited_policy_change = "20100131";
-
+	public static String inactivation_policy_change = "20110731";
+	
 	public static String TimeFormat = "yyyyMMdd"; // 20100305 Per SC no TZ only YMD
 
 	// set Snomed Refset sctid
@@ -205,6 +206,8 @@ public class I_Constants {
 	public final static String WAS_A_REFERENCES_REFSET_ID = "900000000000528000";
 	public final static String WAS_A_REFERENCES_REFSET_UID = "0c4a8933-bf14-39b9-a743-a5dc07faa7bb";
 	public final static String WAS_A_REFERENCES_REFSET_UID_TERM_AUX = "????";
+	
+	public static final String IDENTIFIER_SCHEME_ID = "900000000000002006";
 	
 	
 	

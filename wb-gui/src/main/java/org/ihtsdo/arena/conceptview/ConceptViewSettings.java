@@ -60,7 +60,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
 public class ConceptViewSettings extends ArenaComponentSettings {
-   public static final int  NAVIGATOR_WIDTH = 350;
+   public static final int  NAVIGATOR_WIDTH = 400;
    private static final int dataVersion     = 3;
 
    /**
@@ -402,12 +402,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    @Override
    public I_HostConceptPlugins getHost() {
       if ((linkedTab != null) && (linkedTab != -1)) {
-         if (getConfig() != null) {
+            I_ConfigAceFrame hostConfig = getConfig();
+         if (hostConfig != null) {
             if (linkedTab == -2) {
-               return getConfig().getListConceptViewer();
+               return hostConfig.getListConceptViewer();
             }
 
-            return getConfig().getConceptViewer(linkedTab);
+            return hostConfig.getConceptViewer(linkedTab);
          }
       }
 
@@ -699,6 +700,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
          if (view != null) {
             try {
                view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
+               SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            view.refreshHistory();
+                        }
+                    });
             } catch (IOException iOException) {
                AceLog.getAppLog().alertAndLogException(iOException);
             }

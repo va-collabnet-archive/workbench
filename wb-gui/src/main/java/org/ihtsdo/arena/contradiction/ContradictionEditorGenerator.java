@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.ihtsdo.arena.contradiction;
 
 import java.awt.event.ActionEvent;
@@ -49,26 +48,27 @@ public class ContradictionEditorGenerator implements I_InitComponentMenus {
         return new JMenuItem[]{};
     }
 
-        public class NewAdjudicatorFrame implements ActionListener {
+    public class NewAdjudicatorFrame implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                MarshalledObject<I_ConfigAceFrame> marshalledFrame =
-                        new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
-                AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
-                newFrameConfig.setAceFrame(((AceFrameConfig) AceConfig.config.getActiveConfig()).getAceFrame());
-                newFrameConfig.setDbConfig(AceConfig.config.getActiveConfig().getDbConfig());
-                newFrameConfig.setWorker(AceConfig.config.getActiveConfig().getWorker());
+                I_ConfigAceFrame activeConfig = AceConfig.config.getActiveConfig();
+                if (activeConfig != null) {
+                    MarshalledObject<I_ConfigAceFrame> marshalledFrame =
+                            new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
+                    AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
+                    newFrameConfig.setAceFrame(((AceFrameConfig) activeConfig).getAceFrame());
+                    newFrameConfig.setDbConfig(activeConfig.getDbConfig());
+                    newFrameConfig.setWorker(activeConfig.getWorker());
 
-                ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
-                
-                newFrame.setVisible(true);
+                    ContradictionEditorFrame newFrame = new ContradictionEditorFrame(newFrameConfig);
+                    newFrame.setVisible(true);
+                }
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
 
         }
     }
-
 }

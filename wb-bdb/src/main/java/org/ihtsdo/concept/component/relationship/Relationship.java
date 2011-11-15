@@ -131,11 +131,11 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
    @Override
    public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
                          List<I_RelTuple> relTupleList, Precedence precedencePolicy,
-                         ContradictionManagerBI contradictionManager, Long time) {
+                         ContradictionManagerBI contradictionManager, Long cutoffTime) {
       List<Version> tuplesToReturn = new ArrayList<Version>();
 
       computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn, getVersions(),
-                                    precedencePolicy, contradictionManager, time);
+                                    precedencePolicy, contradictionManager, cutoffTime);
       relTupleList.addAll(tuplesToReturn);
    }
 
@@ -631,7 +631,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
          throw new ContraditionException(vForC.toString());
       }
 
-      return vForC.get(0);
+      if (!vForC.isEmpty()) {
+        return vForC.get(0);
+      }
+      return null;
    }
 
    @Override
@@ -691,8 +694,9 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
    @Override
    public boolean hasExtensions() throws IOException {
-      return getEnclosingConcept().hasExtensionsForComponent(nid);
+      return ((Concept) getEnclosingConcept()).hasExtensionsForComponent(nid);
    }
+   
 
    @Override
    public boolean isInferred() {

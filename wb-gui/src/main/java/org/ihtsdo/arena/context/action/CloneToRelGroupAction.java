@@ -7,27 +7,20 @@ import java.util.UUID;
 
 import javax.swing.AbstractAction;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.api.relationship.group.RelGroupVersionBI;
-import org.ihtsdo.tk.drools.facts.ComponentFact;
 import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.drools.facts.RelGroupFact;
-import org.ihtsdo.tk.drools.facts.ConceptFact;
 
 public class CloneToRelGroupAction extends AbstractAction {
 
@@ -35,18 +28,19 @@ public class CloneToRelGroupAction extends AbstractAction {
 
 	ComponentVersionBI sourceComponent;
 	ComponentVersionBI targetComponent;
+        I_ConfigAceFrame config;
 	
-	public CloneToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact) {
+	public CloneToRelGroupAction(String actionName, RelFact sourceFact, RelGroupFact destFact, I_ConfigAceFrame config) {
 		super(actionName);
 		this.sourceComponent = sourceFact.getComponent();
 		this.targetComponent = destFact.getComponent();
+                this.config = config;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
 			I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
-			I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 			Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
 			if (ConAttrVersionBI.class.isAssignableFrom(sourceComponent.getClass())) {
 				throw new UnsupportedOperationException();

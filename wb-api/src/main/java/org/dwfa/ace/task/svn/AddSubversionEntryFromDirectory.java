@@ -65,6 +65,7 @@ public class AddSubversionEntryFromDirectory extends AddSubversionEntry {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         JFileChooser chooser = new JFileChooser();

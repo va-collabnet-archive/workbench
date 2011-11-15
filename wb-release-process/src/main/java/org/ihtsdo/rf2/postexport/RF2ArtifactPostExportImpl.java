@@ -113,7 +113,6 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		fsc=null;
 		System.gc();
 		
-
 		File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousFile.getName());
 		SnapshotGenerator sg=new SnapshotGenerator(sortedPreviousfile, previousReleaseDate, fType.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
 		sg.execute();

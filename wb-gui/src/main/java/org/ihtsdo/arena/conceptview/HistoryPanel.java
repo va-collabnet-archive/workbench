@@ -48,22 +48,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.ihtsdo.arena.contradiction.InteractiveAdjudicator;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -77,6 +66,7 @@ public class HistoryPanel {
    //~--- fields --------------------------------------------------------------
 
    int                                                 hxWidth                           = 0;
+   int                                                 otherWidth                        = 150;
    JPanel                                              topHistoryPanel                   =
       new JPanel(new GridBagLayout());
    private final SelectedVersionChangedListener        svcl                              =
@@ -87,8 +77,6 @@ public class HistoryPanel {
       new HashMap<JCheckBox, JLabel>();
    Map<PositionBI, JCheckBox>                          positionCheckMap                  =
       new HashMap<PositionBI, JCheckBox>();
-   List<JCheckBox>                                     positionCheckList                 =
-      new ArrayList<JCheckBox>();
    private final Set<JRadioButton>                     originalButtonSelections          =
       new HashSet<JRadioButton>();
    private final Map<NidSapNid, JRadioButton>          nidSapNidButtonMap                =
@@ -99,9 +87,11 @@ public class HistoryPanel {
       new HashMap<Integer, ButtonGroup>();
    HorizonatalScrollActionListener                     hsal                              =
       new HorizonatalScrollActionListener();
+   //J-
    JPanel                                              historyHeaderPanel                = new JPanel(null);
    JScrollPane                                         historyHeaderPanelScroller        =
       new JScrollPane(historyHeaderPanel);
+   //J+
    Map<JCheckBox, PositionBI>                          checkPositionMap                  =
       new HashMap<JCheckBox, PositionBI>();
    Map<JCheckBox, List<JComponent>>                    checkComponentMap                 =
@@ -152,15 +142,26 @@ public class HistoryPanel {
          historyScroller.setViewportView(topHistoryPanel);
       }
 
-      historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight());
-      historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+      otherWidth = ConceptViewSettings.NAVIGATOR_WIDTH - 6;
+      historyHeaderPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                                 view.getHistoryPanel().getHeight());
       historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
-      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
+      historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+      historyHeaderPanel.setMaximumSize(historyHeaderPanel.getSize());
+      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                           getVersionPanelHeight());
+      versionPanel.setMinimumSize(versionPanel.getSize());
       versionPanel.setPreferredSize(versionPanel.getSize());
+      versionPanel.setMaximumSize(versionPanel.getSize());
       versionPanel.addHierarchyListener(new HistoryHierarchyListener());
       versionScroller.getHorizontalScrollBar().getModel().addChangeListener(hsal);
       ((JScrollPane) view.getParent().getParent()).getVerticalScrollBar().getModel().addChangeListener(vsal);
-      redoLayout();
+      SwingUtilities.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            redoLayout();
+         }
+      });
    }
 
    //~--- methods -------------------------------------------------------------
@@ -172,9 +173,11 @@ public class HistoryPanel {
          button.setVisible(false);
       }
 
-      historyHeaderPanel.setSize(hxWidth, view.getHistoryPanel().getHeight() - insetAdjustment);
-      historyHeaderPanel.setBorder(BorderFactory.createEmptyBorder());
+      historyHeaderPanel.setSize(otherWidth, view.getHistoryPanel().getHeight() - insetAdjustment);
+      historyHeaderPanel.setMaximumSize(historyHeaderPanel.getSize());
+      historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
       historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+      historyHeaderPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
 
       GridBagConstraints gbc = new GridBagConstraints();
 
@@ -189,22 +192,22 @@ public class HistoryPanel {
       historyHeaderPanelScroller.setBorder(BorderFactory.createEmptyBorder());
       historyHeaderPanelScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
       historyHeaderPanelScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-      historyHeaderPanelScroller.setSize(topHistoryPanel.getWidth(), view.getHistoryPanel().getHeight());
+      historyHeaderPanelScroller.setSize(otherWidth, view.getHistoryPanel().getHeight());
       historyHeaderPanelScroller.setLocation(0, 0);
       gbc.gridy++;
+      gbc.weighty = 1.0;
       topHistoryPanel.add(versionScroller, gbc);
-      versionScroller.setSize(topHistoryPanel.getWidth(), view.getParent().getHeight() + insetAdjustment);
+      versionScroller.setSize(otherWidth, view.getParent().getHeight() + 24 + insetAdjustment);
       versionScroller.setLocation(0, historyHeaderPanel.getHeight() + 1);
-      versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+      versionScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+      versionScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
       versionScroller.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
       versionPanel.setLocation(0, 0);
-      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                           view.getParent().getParent().getHeight()
-                           + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY()));
-      versionPanel.setPreferredSize(versionPanel.getPreferredSize());
-
-//    topHistoryPanel.setSize(hxWidth, 
-//            historyHeaderPanel.getHeight() + versionPanel.getHeight());
+      versionPanel.setSize(Math.max(otherWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                           getVersionPanelHeight());
+      versionPanel.setPreferredSize(versionPanel.getSize());
+      versionPanel.setMinimumSize(versionPanel.getSize());
+      versionPanel.setMaximumSize(versionPanel.getSize());
       syncVerticalLayout();
    }
 
@@ -428,7 +431,8 @@ public class HistoryPanel {
 
       // int yAdjust = -historyHeaderPanel.getHeight();
       next:
-      for (JCheckBox positionCheck : positionCheckList) {
+      for (PositionBI p : view.getPositionOrderedSet()) {
+         JCheckBox positionCheck = positionCheckMap.get(p);
          PositionBI position = checkPositionMap.get(positionCheck);
 
          if (position == null) {
@@ -504,7 +508,22 @@ public class HistoryPanel {
          }
       }
 
+      hxWidth = currentX;
+      historyHeaderPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                                 view.getHistoryPanel().getHeight());
+      historyHeaderPanel.setMinimumSize(historyHeaderPanel.getSize());
+      historyHeaderPanel.setPreferredSize(historyHeaderPanel.getSize());
+      historyHeaderPanel.setMaximumSize(historyHeaderPanel.getSize());
+      versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                           getVersionPanelHeight());
+      versionPanel.setMinimumSize(versionPanel.getSize());
+      versionPanel.setPreferredSize(versionPanel.getSize());
+      versionPanel.setMaximumSize(versionPanel.getSize());
       redoGrid();
+   }
+
+   public void refreshHistory() {
+      resizeIfNeeded();
    }
 
    public void removeListeners() {
@@ -524,8 +543,46 @@ public class HistoryPanel {
       view.getChangedVersionSelections().clear();
    }
 
+   private void resetHeader(ConceptView view) {
+      TreeSet<PositionBI> positionOrderedSet = view.getPositionOrderedSet();
+
+      if ((view.getPathRowMap() == null) || (view.getRowToPathCheckMap() == null)
+              || (positionOrderedSet == null)) {
+         return;
+      }
+
+      int locX = xStartLoc;
+
+      for (PositionBI p : positionOrderedSet) {
+         assert p != null;
+         assert view.getPathRowMap() != null;
+         assert view.getRowToPathCheckMap() != null;
+         assert p.getPath() != null;
+
+         Integer row = view.getPathRowMap().get(p.getPath());
+
+         if (row == null) {
+            continue;
+         }
+
+         JCheckBox rowCheck      = view.getRowToPathCheckMap().get(row);
+         JCheckBox positionCheck = positionCheckMap.get(p);
+         positionCheck.setLocation(locX, rowCheck.getLocation().y);
+         positionCheck.setSize(positionCheck.getPreferredSize());
+         positionCheck.setToolTipText(p.toString());
+
+         if (positionCheck.isVisible()) {
+            locX += positionCheck.getWidth();
+         }
+      }
+      historyHeaderPanel.revalidate();
+      hxWidth = locX;
+   }
+
    public void resizeIfNeeded() {
       try {
+
+         resetHeader(view);
          combineHistoryPanels();
          setupVersionPanel(positionPanelMap);
          redoLayout();
@@ -561,7 +618,6 @@ public class HistoryPanel {
          JCheckBox positionCheck = view.getJCheckBox();
 
          positionCheck.setVisible(rowCheck.isSelected());
-         positionCheckList.add(positionCheck);
          checkComponentMap.put(positionCheck, new ArrayList<JComponent>());
          positionCheckMap.put(p, positionCheck);
          checkPositionMap.put(positionCheck, p);
@@ -668,6 +724,11 @@ public class HistoryPanel {
       return versionPanels;
    }
 
+   private int getVersionPanelHeight() {
+      return view.getParent().getParent().getHeight()
+             + (view.getHistoryPanel().getHeight() + view.getHistoryPanel().getY() + 24);
+   }
+
    private List<DragPanelComponentVersion<?>> getVersionPanels(DragPanelComponentVersion<?> dragPanel)
            throws IOException {
       List<DragPanelComponentVersion<?>> versionPanels = new ArrayList<DragPanelComponentVersion<?>>();
@@ -722,12 +783,13 @@ public class HistoryPanel {
                           Long.MAX_VALUE);
                }
             }
-
             if (view.getSettings().isForAjudciation()) {
                ConceptChronicleBI cc = view.getConcept();
+               ViewCoordinate adjudicateView = new ViewCoordinate(view.getConfig().getViewCoordinate());
 
+               adjudicateView.setContradictionManager(new InteractiveAdjudicator(nidGroupMap, buttonVersionMap));
                cc.makeAdjudicationAnalogs(view.getConfig().getEditCoordinate(),
-                                          view.getConfig().getViewCoordinate());
+                                          adjudicateView);
             }
 
             Ts.get().addUncommitted(view.getConcept());
@@ -802,7 +864,8 @@ public class HistoryPanel {
 
       @Override
       public Dimension getPreferredScrollableViewportSize() {
-         return new Dimension(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6), view.getHeight());
+         return new Dimension(Math.max(otherWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
+                              view.getHeight());
       }
 
       @Override
@@ -927,7 +990,7 @@ public class HistoryPanel {
             versionHxLabel.setVisible(false);
          }
 
-         redoLayout();
+         resizeIfNeeded();
       }
    }
 
@@ -942,8 +1005,10 @@ public class HistoryPanel {
          }
 
          versionPanel.setSize(Math.max(hxWidth, ConceptViewSettings.NAVIGATOR_WIDTH - 6),
-                              eventModel.getMaximum());
+                              Math.max(eventModel.getMaximum() + 48, getVersionPanelHeight()));
+         versionPanel.setMinimumSize(versionPanel.getSize());
          versionPanel.setPreferredSize(versionPanel.getSize());
+         versionPanel.setMaximumSize(versionPanel.getSize());
 
          BoundedRangeModel historyScrollModel = versionScroller.getVerticalScrollBar().getModel();
 

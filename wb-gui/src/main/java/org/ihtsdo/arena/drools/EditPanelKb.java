@@ -98,14 +98,14 @@ public class EditPanelKb {
             AceLog.getAppLog().alertAndLogException(ex);
         }
 
-        try {
-            I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CONTEXT.getUids());
-            ResultsCollectorWorkBench results = RulesLibrary.checkConcept(c, context, false, config);
-            Map<SpecBI, Integer> guvnorTemplates = results.getWbTemplates();
-            templates.putAll(guvnorTemplates);
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
+//        try {
+//            I_GetConceptData context = Terms.get().getConcept(RefsetAuxiliary.Concept.TEMPLATE_CONTEXT.getUids());
+//            ResultsCollectorWorkBench results = RulesLibrary.checkConcept(c, context, false, config);
+//            Map<SpecBI, Integer> guvnorTemplates = results.getWbTemplates();
+//            templates.putAll(guvnorTemplates);
+//        } catch (Exception e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        }
 
         return templates;
     }

@@ -1,6 +1,8 @@
 package org.ihtsdo.workflow;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -156,16 +158,17 @@ public class WorkflowHistoryJavaBean implements WorkflowHistoryJavaBeanBI{
 	public String toString() {
 		try {
 			I_TermFactory tf = Terms.get();
-			
-			return "\nConcept (Referenced Component Id) = " + tf.getConcept(concept).getInitialText() +
+        	SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            
+			return "\nConcept (UUID) = " + concept +
+				   "\nFSN = " + fsn +
 				   "\nWorkflow Id = " + workflowId.toString() +
 				   "\nPath = " + tf.getConcept(path).getInitialText() +
 				   "\nModeler = " + tf.getConcept(modeler).getInitialText() + 
 				   "\nAction = " + tf.getConcept(action).getInitialText() +
 				   "\nState = " + tf.getConcept(state).getInitialText() +
-				   "\nFSN = " + fsn +
-				   "\nEffectiveTimestamp = " + effectiveTime +
-				   "\nWorkflow Time = " + workflowTime + 
+				   "\nEffectiveTimestamp = " + formatter.format(new Date(effectiveTime)) +
+				   "\nWorkflow Time = " + formatter.format(new Date(workflowTime)) + 
 				   "\nAutoApproved = " + autoApproved + 
 				   "\nOverridden = " + overridden +
 				   "\nRxMemberId = " + memberId;

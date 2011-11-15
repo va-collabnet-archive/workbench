@@ -10,6 +10,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.id.IdBI;
@@ -158,11 +159,18 @@ public class RelGroupVersion implements RelGroupVersionBI {
 
       for (RelationshipChronicleBI relc : rg.getRels()) {
          if (coordinate != null) {
-            RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
-
-            if (rv != null) {
-               if (rv.getGroup() == rg.getRelGroup()) {
-                  results.add(rv);
+            try {
+               RelationshipVersionBI rv = relc.getVersion(coordinate.getVcWithAllStatusValues());
+               if (rv != null) {
+                  if (rv.getGroup() == rg.getRelGroup()) {
+                     results.add(rv);
+                  }
+               }
+            } catch (ContraditionException ex) {
+               for (RelationshipVersionBI rv : relc.getVersions(coordinate.getVcWithAllStatusValues())) {
+                  if (rv.getGroup() == rg.getRelGroup()) {
+                     results.add(rv);
+                  }
                }
             }
          } else {
@@ -268,6 +276,11 @@ public class RelGroupVersion implements RelGroupVersionBI {
       }
 
       return results;
+   }
+
+   @Override
+   public ConceptChronicleBI getEnclosingConcept() {
+      return rg.getEnclosingConcept();
    }
 
    @Override

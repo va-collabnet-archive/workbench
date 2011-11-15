@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.DefaultSimilarity;
@@ -27,8 +26,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
-import org.dwfa.ace.api.I_DescriptionVersioned;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.Stopwatch;
 import org.dwfa.tapi.TerminologyException;
@@ -228,10 +225,11 @@ public abstract class LuceneManager {
 			} else {
 				WfHxLuceneManager.writeToLuceneNoLock(items, viewCoord);
 			}
-		} catch (CorruptIndexException e) {
-			throw new IOException(e);
 		} catch (IOException e) {
 			throw new IOException(e);
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
 			rwl.writeLock().unlock();
 		}

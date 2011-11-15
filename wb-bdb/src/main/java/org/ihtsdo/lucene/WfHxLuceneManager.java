@@ -3,61 +3,88 @@ package org.ihtsdo.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WfHxLuceneManager extends LuceneManager {
 
 
     static final String wfLuceneFileSuffix = "lucene";
-	protected static File wfHxLuceneDirFile = new File("target/workflow/lucene");
-	protected static File runningLuceneDirFile = new File("workflow/lucene");
-	private static UUID workflowIdToUpdate = null;
+	protected static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
+	protected static File runningLuceneDirFile = new File("workflow" + File.separatorChar + "lucene");
+	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 	public final static int matchLimit = 10000000;
 
-	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws CorruptIndexException, IOException {
-        int idx = beans.size() - 1;
-
-        if (workflowIdToUpdate == null) {
-			throw new CorruptIndexException("Should have workflowIdToUpdate set, but is null");
-		}
-		if (wfHxWriter == null) {
-		    wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-		    wfHxWriter.setUseCompoundFile(true);
+	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, ViewCoordinate viewCoord) throws IOException, TerminologyException {
+        if (wfHxWriter == null) {
+        	
+        	if (runningLuceneDirFile.exists()) {
+        		wfHxLuceneDir = setupWriter(runningLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	} else {
+        		wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
+        	}
+        	
+        	wfHxWriter.setUseCompoundFile(true);
 		    wfHxWriter.setMergeFactor(15);
 		    wfHxWriter.setMaxMergeDocs(Integer.MAX_VALUE);
 		    wfHxWriter.setMaxBufferedDocs(1000);
 		}
 		
-		IndexWriter writerCopy = wfHxWriter;
-		if (writerCopy != null) {
-			writerCopy.deleteDocuments(new Term("workflowId", workflowIdToUpdate.toString()));
-            workflowIdToUpdate = null;
+		if (wfHxWriter != null) {
+			Set<UUID> processedIds = new HashSet<UUID>();
+            WfHxIndexGenerator.initializeSemTags(viewCoord);
+            WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
 
-			
-			if (idx >= 0) {
-	            WorkflowHistoryJavaBean lastBean = ((WorkflowHistoryJavaBean)beans.toArray()[idx]);
-	            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
-	            WfHxIndexGenerator.initializeSemTags(viewCoord);
-
-	            for (WorkflowHistoryJavaBean bean : beans) {
-			        writerCopy.addDocument(WfHxIndexGenerator.createDoc(bean, vals));
-			    }
-			}
-
-			writerCopy.commit();
+            if (searcher.isInitialized()) {
+				for (WorkflowHistoryJavaBean bean : beans) {
+					if (!processedIds.contains(bean.getWorkflowId())) {
+						wfHxWriter.deleteDocuments(new Term("workflowId", bean.getWorkflowId().toString()));
+						processedIds.add(bean.getWorkflowId());
+						I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
+						
+						Set<WorkflowHistoryJavaBean> wfIdBeans = searcher.getAllHistoryForWorkflowId(con, bean.getWorkflowId());
+						WorkflowHistoryJavaBean lastBean;
+						try {
+							lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
+							
+							if (lastBean == null) {
+								lastBean = bean;
+							}
+							
+				            WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(lastBean);
+	
+				            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
+				            	wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, vals));
+				            }
+			            } catch (TerminologyException e) {
+						    AceLog.getAppLog().log(Level.WARNING, "Failed adding WfId: " + bean.getWorkflowId() + " for concept: " + bean.getFSN() + " to lucene index");
+						}
+					
+					}
+				}
+            }
+            
+			wfHxWriter.commit();
 		}
 		
 		if (wfHxSearcher != null) {
@@ -67,13 +94,21 @@ public class WfHxLuceneManager extends LuceneManager {
 		wfHxSearcher = null;
     }
 
+	public static boolean refsetMemberIdExists(UUID memberId) throws CorruptIndexException, IOException, ParseException {
+        WfHxQueryParser wfHxParser = new WfHxQueryParser(true, true);
+		Query wfQuery = wfHxParser.getRefsetMemberIdQuery(memberId.toString());
+        
+        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+		
+		return result.topDocs.totalHits != 0;
+	}
+	
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
         
 		if (searcher.isInitialized()) {
 	        WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
-	    	
-	        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
+	    	Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
 	
 
 	        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
@@ -91,7 +126,23 @@ public class WfHxLuceneManager extends LuceneManager {
         }
 	}
 
-	public static void setWorkflowId(UUID workflowId) {
-		workflowIdToUpdate  = workflowId;
+	public static void addToLuceneNoWrite(SortedSet<WorkflowHistoryJavaBean> latestWorkflow) {
+		if (beansToAdd == null) {
+			beansToAdd = new HashSet<WorkflowHistoryJavaBean>();
+		}
+		
+		beansToAdd.addAll(latestWorkflow);
+	}
+	
+	public static void addToLuceneNoWrite(WorkflowHistoryJavaBean latestWorkflow) {
+		if (beansToAdd == null) {
+			beansToAdd = new HashSet<WorkflowHistoryJavaBean>();
+		}
+		
+		beansToAdd.add(latestWorkflow);
+	}
+
+	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
+		writeToLuceneNoLock(beansToAdd, null);
 	}
 }

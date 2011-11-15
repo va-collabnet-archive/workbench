@@ -179,6 +179,7 @@ public class ConceptViewRenderer extends JLayeredPane {
         public void ancestorRemoved(AncestorEvent event) {
             settings.hideNavigator();
             wfHxDetails.hideWfHxDetailsPanel();
+            setWorkflowStatusLabel();
         }
 
         @Override
@@ -215,7 +216,7 @@ public class ConceptViewRenderer extends JLayeredPane {
     /**
      *
      */
-    public JComponent renderedComponent;
+    public ConceptView renderedComponent;
     private ConceptViewSettings settings;
     private ViewCoordinate viewCoord;
     public ConceptViewTitle title;
@@ -236,9 +237,9 @@ public class ConceptViewRenderer extends JLayeredPane {
     private JToggleButton oopsButton;
     private final static String advanceWorkflowActionPath = "migration-wf";
     private final String advanceWorkflowActionFile = "AdvanceWorkflow.bp";
-    private JPanel historyPanel = new JPanel(new BorderLayout());
+    private JComponent historyPanel = new JPanel(new BorderLayout());
 
-    public JPanel getHistoryPanel() {
+    public JComponent getHistoryPanel() {
         return historyPanel;
     }
     private JPanel conceptViewPanel = new JPanel(new BorderLayout());
@@ -282,17 +283,16 @@ public class ConceptViewRenderer extends JLayeredPane {
         conceptScrollPane = null;
 
         if (graph.getModel().getChildCount(cell) == 0) {
-            renderedComponent = settings.getComponent(config);
-            if (JScrollPane.class.isAssignableFrom(renderedComponent.getClass())) {
-                conceptScrollPane = (JScrollPane) renderedComponent;
-            } else {
-                conceptScrollPane = new JScrollPane(renderedComponent);
-            }
+            renderedComponent = (ConceptView) settings.getComponent(config);
+            conceptScrollPane = new JScrollPane();
         }
 
         if (conceptScrollPane != null) {
+            historyPanel = renderedComponent.getHistoryPanel();
+            
+            
             conceptViewPanel.add(historyPanel, BorderLayout.NORTH);
-            conceptViewPanel.add(conceptScrollPane, BorderLayout.CENTER);
+            conceptViewPanel.add(new JScrollPane(renderedComponent), BorderLayout.CENTER);
             add(conceptViewPanel, BorderLayout.CENTER);
             conceptScrollPane.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             conceptScrollPane.getViewport().setBackground(Color.WHITE);
@@ -800,7 +800,11 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                 if (capWorkflow) {
                 	setWorkflowStatusLabel(concept);
-                	wfHxDetails.regenerateWfPanel(concept, false);
+                	if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                		wfHxDetails.regenerateWfPanel(concept, false);
+                	} else {
+                		wfHxDetailsToggleButton.setSelected(false);
+                	}
                 }
             }
 
@@ -820,11 +824,12 @@ public class ConceptViewRenderer extends JLayeredPane {
                 commitButton.setVisible(false);
                 
 
-               if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
                 	if (wfHxDetails.regenerateWfPanel(settings.getConcept(), false)) {
-                    	setWorkflowStatusLabel(settings.getConcept());
                 	}
                 }
+               
+                setWorkflowStatusLabel(settings.getConcept());
             }
         }
     }
@@ -846,6 +851,9 @@ public class ConceptViewRenderer extends JLayeredPane {
     		AceLog.getAppLog().log(Level.WARNING, "Error in identifying wf display values for arena");
         }
 		
+	}
+	private void setWorkflowStatusLabel() {
+		workflowStatusLabel.setText("");
 	}
 	
 	private void setWorkflowStatusLabel(I_GetConceptData concept) {

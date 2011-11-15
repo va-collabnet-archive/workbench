@@ -40,6 +40,24 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.media.MediaChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid_str.RefexCnidCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public class TkConcept {
    public static final String PADDING          = "     ";
@@ -65,6 +83,76 @@ public class TkConcept {
    public TkConcept(DataInput in) throws IOException, ClassNotFoundException {
       super();
       readExternal(in);
+   }
+   public TkConcept(ConceptChronicleBI c) throws IOException {
+      conceptAttributes = new TkConceptAttributes(c.getConAttrs());
+      relationships = new ArrayList<TkRelationship>(c.getRelsOutgoing().size());
+
+      for (RelationshipChronicleBI rel : c.getRelsOutgoing()) {
+         relationships.add(new TkRelationship(rel));
+      }
+
+      descriptions = new ArrayList<TkDescription>(c.getDescs().size());
+
+      for (DescriptionChronicleBI desc : c.getDescs()) {
+         descriptions.add(new TkDescription(desc));
+      }
+
+      media = new ArrayList<TkMedia>(c.getMedia().size());
+
+      for (MediaChronicleBI mediaChronicle : c.getMedia()) {
+         TkMedia tkMedia = new TkMedia(mediaChronicle);
+         media.add(tkMedia);
+      }
+
+      if (!c.isAnnotationStyleRefex()) {
+         Collection<? extends RefexChronicleBI> members = c.getRefsetMembers();
+
+         if (members != null) {
+            refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(members.size());
+
+            for (RefexChronicleBI m : members) {
+               TkRefsetAbstractMember<?> member = convertRefex(m);
+
+               if (member != null) {
+                  refsetMembers.add(member);
+               } else {
+                  throw new IOException("Could not convert refset member: " + m + "\nfrom refset: " + c);
+               }
+            }
+         }
+      }
+   }
+   public static TkRefsetAbstractMember<?> convertRefex(RefexChronicleBI<?> m) throws IOException {
+      if (m.getPrimordialVersion() instanceof RefexCnidCnidCnidVersionBI) {
+         return new TkRefsetCidCidCidMember((RefexCnidCnidCnidVersionBI) m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidCnidStrVersionBI) {
+         return new TkRefsetCidCidStrMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidCnidVersionBI) {
+         return new TkRefsetCidCidMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidFloatVersionBI) {
+         return new TkRefsetCidFloatMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidIntVersionBI) {
+         return new TkRefsetCidIntMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidLongVersionBI) {
+         return new TkRefsetCidLongMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidStrVersionBI) {
+         return new TkRefsetCidStrMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexCnidVersionBI) {
+         return new TkRefsetCidMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexIntVersionBI) {
+         return new TkRefsetIntMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexStrVersionBI) {
+         return new TkRefsetStrMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexLongVersionBI) {
+         return new TkRefsetLongMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexBooleanVersionBI) {
+         return new TkRefsetBooleanMember(m);
+      } else if (m.getPrimordialVersion() instanceof RefexMemberVersionBI) {
+         return new TkRefsetMember(m);
+      } else {
+         throw new UnsupportedOperationException("Cannot handle: " + m);
+      }
    }
 
    public TkConcept(TkConcept another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll) {

@@ -15,8 +15,9 @@ import org.ihtsdo.tk.hash.Hashcode;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
+import java.io.Serializable;
 
-public class IsaCoordinate {
+public class IsaCoordinate implements Serializable {
 
    /**
     * The allowed status cNids for which this cache is valid.

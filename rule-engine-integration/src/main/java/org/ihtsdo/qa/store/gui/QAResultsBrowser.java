@@ -16,11 +16,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,8 +70,12 @@ public class QAResultsBrowser extends JPanel {
 	private JTabbedPane parentTabbedPanel = null;
 	private List<Category> allCategories;
 	private Rule rule = null;
+	private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 	private boolean firstLoad = true;
 	private QAStorePanel qaStorePanel;
+	HashMap<QADatabase, List<TerminologyComponent>> allPathsForDatabase = new HashMap<QADatabase, List<TerminologyComponent>>();
+	List<QADatabase> allDatabases;
+	HashMap<String, List<String>> allTimesForPath = new HashMap<String, List<String>>();
 
 	public QAResultsBrowser(QAStoreBI store, JTabbedPane parentTabbedPane, QAStorePanel qaStorePanel) {
 		this.store = store;
@@ -96,6 +101,7 @@ public class QAResultsBrowser extends JPanel {
 			columnNames.add(loopStatus.getName());
 		}
 		columnNames.add("Closed");
+		columnNames.add("Rule date");
 		columnNames.add("Last run");
 
 		tableModel = new ResutlTableModel(columnNames.toArray());
@@ -197,6 +203,7 @@ public class QAResultsBrowser extends JPanel {
 		sortByComboBox.addItem(RulesReportColumn.CLEARED);
 		sortByComboBox.addItem(RulesReportColumn.ESCALATED);
 		sortByComboBox.addItem(RulesReportColumn.DEFERRED);
+		sortByComboBox.addItem(RulesReportColumn.RULE_DATE);
 		sortBy.put(RulesReportColumn.RULE_NAME, true);
 	}
 
@@ -260,8 +267,11 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupDatabasesCombo() {
 		comboBox1.removeAllItems();
-		if (store.getAllDatabases() != null) {
-			for (QADatabase loopDatabase : store.getAllDatabases()) {
+		if (allDatabases == null) {
+			allDatabases = store.getAllDatabases();
+		}
+		if (allDatabases != null) {
+			for (QADatabase loopDatabase : allDatabases) {
 				comboBox1.addItem(loopDatabase);
 			}
 		}
@@ -269,18 +279,35 @@ public class QAResultsBrowser extends JPanel {
 
 	private void setupPathsCombo() {
 		comboBox2.removeAllItems();
-		if (comboBox1.getSelectedItem() != null && store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid()) != null) {
-			for (TerminologyComponent loopPath : store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid())) {
+		if (comboBox1.getSelectedItem() != null && allPathsForDatabase != null) {
+			QADatabase selectedDatabase = (QADatabase) comboBox1.getSelectedItem();
+			List<TerminologyComponent> paths = null;
+			if (!allPathsForDatabase.containsKey(selectedDatabase)) {
+				paths= store.getAllPathsForDatabase(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid());
+				allPathsForDatabase.put(selectedDatabase, paths);
+			} else {
+				paths = allPathsForDatabase.get(selectedDatabase);
+			}
+			for (TerminologyComponent loopPath : paths) {
 				comboBox2.addItem(loopPath);
 			}
+			comboBox2.setSelectedIndex(0);
 		}
 	}
 
 	private void setupTimeCombo() {
 		comboBox3.removeAllItems();
-		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null
-				&& store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid()) != null) {
-			for (String loopDate : store.getAllTimesForPath(((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid(), ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid())) {
+		if (comboBox1.getSelectedItem() != null && comboBox2.getSelectedItem() != null && allTimesForPath != null) {
+			UUID databaseUUID = ((QADatabase) comboBox1.getSelectedItem()).getDatabaseUuid();
+			UUID pathUUID = ((TerminologyComponent) comboBox2.getSelectedItem()).getComponentUuid();
+			String key = databaseUUID.toString() + pathUUID.toString();
+			
+			if (!allTimesForPath.containsKey(key)) {
+				List<String> timeFOrPath = store.getAllTimesForPath(databaseUUID, pathUUID);
+				allTimesForPath.put(key, timeFOrPath);
+			} else {
+			}
+			for (String loopDate : allTimesForPath.get(key)) {
 				comboBox3.addItem(loopDate);
 			}
 		}
@@ -332,7 +359,7 @@ public class QAResultsBrowser extends JPanel {
 			for (RulesReportLine line : lines) {
 				boolean lineApproved = true;
 				if (lineApproved) {
-					LinkedList<Object> row = new LinkedList<Object>();
+					List<Object> row = new ArrayList<Object>();
 					row.add(String.valueOf(line.getRule().getRuleCode()));
 					row.add(line.getRule());
 					Category rowCategory = new Category();
@@ -343,13 +370,24 @@ public class QAResultsBrowser extends JPanel {
 					}
 					row.add(rowCategory);
 					row.add(line.getRule().getSeverity());
-					row.add(line.getStatusCount().get(true));
+					Integer openStatusCount = line.getStatusCount().get(true);
+					row.add(openStatusCount);
+					int cleardCount = 0;
 					for (DispositionStatus loopStatus : dispositionStatuses) {
-						row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+						if (loopStatus.getName().equalsIgnoreCase("Cleared")) {
+							cleardCount = line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid());
+						}
+					}
+					for (DispositionStatus loopStatus : dispositionStatuses) {
+						if (loopStatus.getName().equalsIgnoreCase("not clear")) {
+							row.add(openStatusCount - cleardCount);
+						} else {
+							row.add(line.getDispositionStatusCount().get(loopStatus.getDispositionStatusUuid()));
+						}
 					}
 					row.add(line.getStatusCount().get(false));
-					if (line.getLastExecutionTime() != null) {
-						row.add(line.getLastExecutionTime().toString());
+					if (line.getRule().getEffectiveTime() != null) {
+						row.add(sdf.format(new Date(line.getRule().getEffectiveTime().getTime())));
 					} else {
 						row.add("");
 					}
@@ -408,18 +446,25 @@ public class QAResultsBrowser extends JPanel {
 	}
 
 	private void comboBox1ItemStateChanged(ItemEvent e) {
-		setupPathsCombo();
-		setupTimeCombo();
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			System.out.println("THIS METHOD SHOULD RUN ONLY ONCEEEE OK???");
+			setupPathsCombo();
+			setupTimeCombo();
+			clearTable1();
+		}
 	}
 
 	private void comboBox2ItemStateChanged(ItemEvent e) {
-		setupTimeCombo();
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			setupTimeCombo();
+			clearTable1();
+		}
 	}
 
 	private void comboBox3ItemStateChanged(ItemEvent e) {
-		clearTable1();
+		if (e.getStateChange() == ItemEvent.SELECTED) {
+			clearTable1();
+		}
 	}
 
 	private void button2ActionPerformed(ActionEvent e) {
@@ -947,8 +992,8 @@ public class QAResultsBrowser extends JPanel {
 
 	class ResutlTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -2582804161676112393L;
-		public static final int ROW_DATA_SIZE = 13;
-		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated", "Deferred", "In Discussion", "Not clear", "Closed", "Last run", "Rule UUID" };
+		public static final int ROW_DATA_SIZE = 14;
+		private Object[] columnNames = { "Rule code", "Rule name", "Category", "Severity", "Open", "Cleared", "Escalated", "Deferred", "In Discussion", "Not clear", "Closed", "Rule date", "Last run", "Rule UUID" };
 
 		public ResutlTableModel(Object[] columnNames) {
 			super();
@@ -965,11 +1010,12 @@ public class QAResultsBrowser extends JPanel {
 		public void clearData() {
 			dataList = new ArrayList<Object[]>();
 			data = new Object[0][ROW_DATA_SIZE];
+			System.gc();
 		}
 
 		public void addData(List<Object> row) {
 			dataList.add(row.toArray());
-			data = new Object[dataList.size()][4];
+			data = new Object[dataList.size()][ROW_DATA_SIZE];
 			for (int j = 0; j < dataList.size(); j++) {
 				data[j] = dataList.get(j);
 			}

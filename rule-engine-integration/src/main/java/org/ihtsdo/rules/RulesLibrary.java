@@ -259,11 +259,12 @@ public class RulesLibrary {
 								DescriptionVersionBI description = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(),
 										UUID.fromString(dtemplate.getComponentUuid()));
 								DescriptionSpec dSpec = SpecFactory.get(description, config.getViewCoordinate());
-								if (dtemplate.getText() != null) {
+								if ( dSpec!= null && dtemplate.getText() != null) {
 									dSpec.setDescText(dtemplate.getText());
+									//TODO: implement other properties
+									results.getWbTemplates().put(dSpec, description.getNid());
 								}
-								//TODO: implement other properties
-								results.getWbTemplates().put(dSpec, description.getNid());
+								
 							}
 						}
 
@@ -302,7 +303,7 @@ public class RulesLibrary {
 				try {
 					activity.complete();
 				} catch (ComputationCanceled e1) {
-					e1.printStackTrace();
+					// Nothing to do
 				}
 				e.printStackTrace();
 			}
@@ -319,7 +320,7 @@ public class RulesLibrary {
 			try {
 				activity.complete();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 			config.setStatusMessage("");
 		}
@@ -652,7 +653,7 @@ public class RulesLibrary {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();
@@ -719,7 +720,7 @@ public class RulesLibrary {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				e.printStackTrace();
+				// Nothing to do
 			}
 		} catch (Exception e) {
 			long endTime = System.currentTimeMillis();

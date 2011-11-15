@@ -2,6 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.Long;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -24,6 +25,11 @@ public class TkRefsetLongRevision extends TkRevision {
 
    public TkRefsetLongRevision() {
       super();
+   }
+
+   public TkRefsetLongRevision(RefexLongVersionBI another) throws IOException {
+      super(another);
+      this.longValue = another.getLong1();
    }
 
    public TkRefsetLongRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

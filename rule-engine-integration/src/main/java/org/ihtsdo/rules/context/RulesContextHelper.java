@@ -202,7 +202,7 @@ public class RulesContextHelper {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				AceLog.getAppLog().alertAndLogException(e);
+				// Nothing to do
 			}
 		} catch (Exception e1) {
 			long endTime = System.currentTimeMillis();
@@ -214,7 +214,7 @@ public class RulesContextHelper {
 				activity.complete();
 				activity.removeActivityFromViewer();
 			} catch (ComputationCanceled e) {
-				AceLog.getAppLog().alertAndLogException(e);
+				// Nothing to do
 			}
 			e1.printStackTrace();
 		}

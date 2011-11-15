@@ -2,6 +2,9 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidflt;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatVersionBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -25,6 +28,15 @@ public class TkRefsetCidFloatRevision extends TkRevision {
 
    public TkRefsetCidFloatRevision() {
       super();
+   }
+
+   public TkRefsetCidFloatRevision(RefexCnidFloatVersionBI another) throws IOException {
+      super(another);
+
+      TerminologyStoreDI ts = Ts.get();
+
+      this.c1Uuid     = ts.getUuidPrimordialForNid(another.getCnid1());
+      this.floatValue = another.getFloat1();
    }
 
    public TkRefsetCidFloatRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

@@ -168,53 +168,22 @@
             <xsd:complexType name="Case">
             	<xsd:sequence>
             		<xsd:element name="caseUuid" type="xsd:string"></xsd:element>
-            		<xsd:element name="rule" type="tns:Rule"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="component" type="tns:Component"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="isActive" type="xsd:boolean"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="dispositionStatus"
-            			type="tns:DispositionStatus" maxOccurs="1"
-            			minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="dispositionReasonUuid"
-            			type="xsd:string" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="dispositionStatusDate"
-            			type="xsd:dateTime" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="dispositionStatusEditor"
-            			type="xsd:string" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="dispositionAnnotation"
-            			type="xsd:string" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="detail" type="xsd:string"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="assignedTo" type="xsd:string"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="effectiveTime" type="xsd:dateTime"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="pathUuid" type="xsd:string"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="databaseUuid" type="xsd:string"
-            			maxOccurs="1" minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="comments"
-            			type="tns:QACaseComment" maxOccurs="unbounded"
-            			minOccurs="0">
-            		</xsd:element>
-            		<xsd:element name="assignmentEditor"
-            			type="xsd:string" maxOccurs="1" minOccurs="0">
-            		</xsd:element>
+            		<xsd:element name="rule" type="tns:Rule" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="component" type="tns:Component" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="isActive" type="xsd:boolean" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="dispositionStatus" type="tns:DispositionStatus" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="dispositionReasonUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="dispositionStatusDate" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="dispositionStatusEditor" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="dispositionAnnotation" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="detail" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="assignedTo" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="effectiveTime" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="lastStatusChanged" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="pathUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="databaseUuid" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+            		<xsd:element name="comments" type="tns:QACaseComment" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            		<xsd:element name="assignmentEditor" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
             		<xsd:element name="assignmentDate" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
             	</xsd:sequence>
             </xsd:complexType>

@@ -36,7 +36,9 @@ public interface ComponentVersionBI extends ComponentBI {
    boolean isActive(NidSetBI allowedStatusNids) throws IOException;
 
    boolean isActive(ViewCoordinate vc) throws IOException;
-
+   
+   public boolean isUncommitted();
+   
    /**
     *
     * @return  <code>true</code> if this version is stored in the read-only

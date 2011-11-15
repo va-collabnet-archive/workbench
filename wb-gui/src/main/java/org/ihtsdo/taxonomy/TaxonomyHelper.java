@@ -262,7 +262,9 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    public void updateNewModel(String propChangeName) {
       try {
          model.unLink();
-         model = new TaxonomyModel(aceFrameConfig.getViewCoordinate(),
+         ViewCoordinate newVc = new ViewCoordinate(aceFrameConfig.getViewCoordinate());
+         newVc.setRelAssertionType(assertionType);
+         model = new TaxonomyModel(newVc,
                                    new NidList(aceFrameConfig.getRoots().getSetValues()), renderer, tree,
                                    childNodeFilter);
          model.addTreeWillExpandListener(tree);

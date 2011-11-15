@@ -39,18 +39,18 @@ public class SetSynonymyAction extends AbstractAction {
     String dialect;
     ConceptSpec synonymy;
     boolean currentSynonymy;
+    I_ConfigAceFrame config;
 
-    public SetSynonymyAction(String actionName, DescFact fact, ConceptSpec synonymy, boolean currentSynonymy) {
+    public SetSynonymyAction(String actionName, DescFact fact, ConceptSpec synonymy, boolean currentSynonymy, I_ConfigAceFrame config) {
         super(actionName);
         this.desc = fact.getComponent();
-        this.dialect = dialect;
         this.synonymy = synonymy;
         this.currentSynonymy = currentSynonymy;
+        this.config = config;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        I_ConfigAceFrame config;
         try {
             I_AmPart componentVersion;
             config = Terms.get().getActiveAceFrameConfig();
