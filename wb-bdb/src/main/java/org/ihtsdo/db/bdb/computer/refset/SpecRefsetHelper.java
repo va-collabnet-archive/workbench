@@ -34,6 +34,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpMemberRefset;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -46,7 +47,9 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -415,24 +418,28 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         }
         // create a new extension (with a part for each path the user is
         // editing)
-
         // generate a UUID based on this refset's input data so that it is
         // stable in future executions
-//		System.out.println(">>>>>EM: " + refsetNid + " - "
-//				+ Ts.get().getConcept(refsetNid));
-//		System.out.println(">>>>>EM: " + componentNid + " - "
-//				+ Ts.get().getComponent(componentNid));
-//		System.out.println(">>>>>EM: " + memberTypeNid + " - "
-//				+ Ts.get().getConcept(memberTypeNid));
-        UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
+        //		System.out.println(">>>>>EM: " + refsetNid + " - "
+        //				+ Ts.get().getConcept(refsetNid));
+        //		System.out.println(">>>>>EM: " + componentNid + " - "
+        //				+ Ts.get().getComponent(componentNid));
+        //		System.out.println(">>>>>EM: " + memberTypeNid + " - "
+        //				+ Ts.get().getConcept(memberTypeNid));
+        if (Ts.get().getComponent(componentNid) == null) {
+            AceLog.getAppLog().info("Nid has null component: " + componentNid);
+        } else {
+            UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
 
-        RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
-        refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeNid);
-        I_ExtendByRef newExtension = makeMemberAndSetup(refsetNid,
-                componentNid, REFSET_TYPES.CID, refsetMap, memberUuid);
-        if (isAutocommitActive()) {
-            Terms.get().addUncommittedNoChecks(newExtension);
+            RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
+            refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeNid);
+            I_ExtendByRef newExtension = makeMemberAndSetup(refsetNid,
+                    componentNid, REFSET_TYPES.CID, refsetMap, memberUuid);
+            if (isAutocommitActive()) {
+                Terms.get().addUncommittedNoChecks(newExtension);
+            }
         }
+
         return true;
     }
 
