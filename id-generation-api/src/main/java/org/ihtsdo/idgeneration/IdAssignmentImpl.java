@@ -42,8 +42,11 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 
 	private String targetEndpoint = "http://mgr.servers.aceworkspace.net:50002/axis2/services/id_generator";
 	private Id_generatorStub idGenStub;
-	private static final String WEB_SERVICE_IMPL = "WebServiceImplementation";
 
+	static{
+		IdAssignmentFactory.getInstance().registerProduct(IdAssignmentFactory.WEB_SERVICE_IMPL, IdAssignmentImpl.class);
+	}
+	
 	public IdAssignmentImpl() {
 		super();
 		try {
