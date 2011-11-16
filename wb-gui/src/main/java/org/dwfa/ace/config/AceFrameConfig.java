@@ -2431,7 +2431,11 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
         this.editImageTypePopup = editImageTypePopup;
     }
 
+    @Override
     public I_HostConceptPlugins getListConceptViewer() {
+        if (aceFrame == null) {
+            return null;
+        }
         return aceFrame.getListConceptViewer();
     }
 

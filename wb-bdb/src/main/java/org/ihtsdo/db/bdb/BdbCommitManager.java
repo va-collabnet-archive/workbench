@@ -417,12 +417,12 @@ public class BdbCommitManager {
 
                   if (performCommit) {
                      lastCommit = Bdb.gVersion.incrementAndGet();
-
-                     for (Concept annotationConcept : Bdb.annotationConcepts) {
-                        dbWriterService.execute(new ConceptWriter(annotationConcept));
+                     if (Bdb.annotationConcepts != null) {
+                        for (Concept annotationConcept : Bdb.annotationConcepts) {
+                            dbWriterService.execute(new ConceptWriter(annotationConcept));
+                        }
+                        Bdb.annotationConcepts.clear();
                      }
-
-                     Bdb.annotationConcepts.clear();
                      KindOfComputer.reset();
 
                      NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
