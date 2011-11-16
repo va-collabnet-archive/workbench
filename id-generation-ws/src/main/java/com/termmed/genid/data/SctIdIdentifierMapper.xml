@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>	
 	
 	<select id="selectSctId" parameterType="SctIdIdentifier" resultMap="sctIdResultMap">
-		SELECT * FROM SCTID_IDENTIFIER where code=#{code} AND Partition_ID=#{partitionId} AND NAMESPACE_ID=#{namespaceId};
+		SELECT * FROM SCTID_IDENTIFIER where code=#{code} AND Partition_ID=#{partitionId} AND NAMESPACE_ID=#{namespaceId}
 	</select>
 	
 	<select id="selectSctIdByComponentUuid" parameterType="String" resultMap="sctIdResultMap" >
@@ -23,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="getSctIdByComponentUuid" parameterType="String" resultType="Long">
-		SELECT SCTID FROM SCTID_IDENTIFIER where code=#{id} ;
+		SELECT SCTID FROM SCTID_IDENTIFIER where code=#{id}
 	</select>
 	
 	<insert id="insertSctIdIdentifier" parameterType="SctIdIdentifier">

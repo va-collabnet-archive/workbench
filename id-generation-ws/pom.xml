@@ -2,8 +2,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
-        <artifactId>wb-mmb</artifactId>
-        <version>2.6.0-trek-58-SNAPSHOT</version>
+		<artifactId>wb-mmb</artifactId>
+		<version>2.6.0-trek-55-SNAPSHOT</version>
 	</parent>
 	<artifactId>id-generation-ws</artifactId>
 	<packaging>jar</packaging>
@@ -70,47 +70,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>pack-ibatis-conf</id>
-						<configuration>
-							<descriptors>
-								<descriptor>${basedir}/src/main/assembly/profiles.xml</descriptor>
-							</descriptors>
-						</configuration>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- Unpacks .xml and .properties files to include in the aar file. because axis2 plugin don't use maven directory structure -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
-					<execution>
-						<id>unpack-ibatis-conf</id>
-						<phase>install</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>org.ihtsdo</groupId>
-									<artifactId>id-generation-ws</artifactId>
-									<version>${project.version}</version>
-									<type>zip</type>
-								</artifactItem>
-							</artifactItems>
-							<outputDirectory>${project.build.directory}</outputDirectory>
-						</configuration>
-					</execution>
 					<execution>
 						<id>unpack-ws-conf</id>
 						<phase>install</phase>
@@ -131,54 +95,67 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<executions>
-					<execution>
-						<id>build aar</id>
-						<phase>install</phase>
-						<goals>
-							<goal>aar</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>deploy aar</id>
-						<phase>install</phase>
-						<goals>
-							<goal>deployaar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<groupId>org.apache.axis2</groupId>
-				<artifactId>axis2-aar-maven-plugin</artifactId>
-				<version>1.5.3</version>
-				<extensions>true</extensions>
-				<configuration>
-					<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-					<aarName>idgen</aarName>
-					<classesDirectory></classesDirectory>
-					<includeDependencies>true</includeDependencies>
-					<servicesXmlFile>${project.build.directory}/resources/services.xml</servicesXmlFile>
-					<wsdlFile>${project.build.directory}/resources/id_generator.wsdl</wsdlFile>
-					<fileSets>
-						<fileSet>
-							<directory>${project.build.directory}/ibatis-conf</directory>
-							<includes>
-								<include>**/*.xml</include>
-								<include>**/*.properties</include>
-							</includes>
-						</fileSet>
-					</fileSets>
-				</configuration>
-			</plugin>
 		</plugins>
-
 	</build>
-
 	<profiles>
 		<profile>
-			<id>deploy-aar</id>
+			<id>build-jar</id>
+			<properties>
+				<driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
+				<url>jdbc:derby:id_gen;create=true</url>
+				<username></username>
+				<password></password>
+			</properties>
 			<build>
+				<resources>
+					<resource>
+						<directory>src/main/java</directory>
+						<includes>
+							<include>properties/*.properties</include>
+							<include>**/*.xml</include>
+						</includes>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.3.2</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<classifier>service-core</classifier>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>deploy-aar</id>
+			<properties>
+				<driver>com.mysql.jdbc.Driver</driver>
+				<url>jdbc:mysql://localhost:3306/id_gen</url>
+				<username>root</username>
+				<password>snomed11</password>
+			</properties>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/java</directory>
+						<includes>
+							<include>properties/*.properties</include>
+							<include>**/*.xml</include>
+						</includes>
+						<filtering>true</filtering>
+					</resource>
+				</resources>
 				<plugins>
 					<plugin>
 						<executions>
@@ -209,19 +186,10 @@
 							<axis2AdminConsoleURL>http://mgr.servers.aceworkspace.net:50002/axis2/axis2-admin/</axis2AdminConsoleURL>
 							<!-- <axis2AdminConsoleURL>http://localhost:8080/axis2/axis2-admin</axis2AdminConsoleURL> -->
 
-							<axis2AdminPassword>axis2</axis2AdminPassword>
-							<axis2AdminUser>admin</axis2AdminUser>
+							<axis2AdminPassword>termmed</axis2AdminPassword>
+							<axis2AdminUser>termmed</axis2AdminUser>
 							<servicesXmlFile>${project.build.directory}/resources/services.xml</servicesXmlFile>
 							<wsdlFile>${project.build.directory}/resources/id_generator.wsdl</wsdlFile>
-							<fileSets>
-								<fileSet>
-									<directory>${project.build.directory}/ibatis-conf</directory>
-									<includes>
-										<include>**/*.xml</include>
-										<include>**/*.properties</include>
-									</includes>
-								</fileSet>
-							</fileSets>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -268,7 +236,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
 				</plugins>
 			</build>
 		</profile>

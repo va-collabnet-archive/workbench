@@ -32,6 +32,17 @@ public interface SctIdGen {
 
 	public HashMap<String, Long> getSCTIDList(List<String> componentUuidList) throws Exception;
 
+	/**
+	 * Creates SCTID
+	 * @param componentUuid
+	 * @param namespaceId
+	 * @param partitionId
+	 * @param releaseId
+	 * @param executionId
+	 * @param moduleId
+	 * @return
+	 * @throws Exception
+	 */
 	public Long createSCTID(String componentUuid, Integer namespaceId, String partitionId, 
 			String releaseId, String executionId, String moduleId) throws Exception;
 
@@ -46,6 +57,17 @@ public interface SctIdGen {
 	public HashMap<String, Long> createSCTIDList(List<String> componentUuidList, Integer namespaceId, String partitionId, 
 			String releaseId, String executionId, String moduleId) throws Exception;
 
+	/**
+	 * 
+	 * @param componentUUIDandParentSnomedId
+	 * @param namespaceId
+	 * @param partitionId
+	 * @param releaseId
+	 * @param executionId
+	 * @param moduleId
+	 * @return
+	 * @throws Exception
+	 */
 	public HashMap<String, HashMap<IDENTIFIER, String>> createConceptIDList(HashMap<String, String> componentUUIDandParentSnomedId, 
 			Integer namespaceId, String partitionId, String releaseId,
 			String executionId, String moduleId) throws Exception;
