@@ -53,6 +53,8 @@ public class ConceptMembershipRefset extends ConceptRefset {
 			tf.newRelationship(UUID.randomUUID(), newMembershipConcept, typeRelConcept, memberTypeConcept, defining, refinability, 
 					current, 0, config);
 			
+			tf.addUncommittedNoChecks(newMembershipConcept);
+			
 			tf.commit();
 			
 			newConceptMembershipRefset = new ConceptMembershipRefset(newMembershipConcept);
