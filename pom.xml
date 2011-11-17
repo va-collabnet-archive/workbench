@@ -7,8 +7,8 @@
 		<version>1</version>
 	</parent>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</developerConnection>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm-046</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm-046</developerConnection>
 		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/translation-mm</url>
 	</scm>
 
@@ -20,7 +20,7 @@
 	<name>translation-module-master-pom</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<workbench.version>2.6.0-trek-13-SNAPSHOT</workbench.version>
+		<workbench.version>2.6.0-trek-13</workbench.version>
 	</properties>
 
 	<modules>
