@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 public class TestIdAssignmentImpl extends TestCase {
 	public void testApi() {
 		try {
-			IdAssignmentBI idAssignment = new IdAssignmentImpl("http://mgr.servers.aceworkspace.net:5000833/axis2/services/id_generator","userName","passwd");
+			IdAssignmentBI idAssignment = new IdAssignmentImpl("http://mgr.servers.aceworkspace.net:50008/axis2/services/id_generator","userName","passwd");
 			
 			//Individual creation for any component
 			UUID componentUuid = UUID.fromString("c83bafaa-ec84-55c1-b1c9-1234a25fe706");
