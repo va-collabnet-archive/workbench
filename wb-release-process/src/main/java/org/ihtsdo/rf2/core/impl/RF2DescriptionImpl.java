@@ -108,7 +108,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
 					moduleId = computeModuleId(concept);	
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){			
-						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
+						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
 					}
 					

@@ -154,7 +154,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					}
 					
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
-						logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
+						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
 					}
 					
@@ -216,7 +216,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 								characteristicTypeId, modifierId);	
 					}
-					
 				}
 			}
 		

@@ -34,8 +34,8 @@ public class I_Constants {
 	public final static String STATED = "900000000000010007"; //special change
 	public final static String INFERRED = "900000000000011006"; //special change
 	public final static String HISTORICAL = "HISTORICAL";
-	// set up refinability
 	
+	// set up refinability	
 	public final static String NON_REFINABLE = "900000000000007000";
 	public final static String OPTIONAL_REFINABLE = "900000000000216007";
 	public final static String MANTOTARY = "900000000000218008";

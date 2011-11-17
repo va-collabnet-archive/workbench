@@ -26,7 +26,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
@@ -83,7 +85,7 @@ public class SctIDChangeSetCreation extends TestCase {
 	}
 	
 	
-	private void addId() {
+	private void addConceptId() {
         try {
             //I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("aa23ea32-37cc-6cc8-e044-0003ba13161a"));
             I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("a2993d32-bf7b-3305-e044-0003ba13161a"));
@@ -94,6 +96,61 @@ public class SctIDChangeSetCreation extends TestCase {
       i_ConceptAttributeVersioned.getPathNid(),
       Long.MAX_VALUE);
             Terms.get().addUncommitted(igcd);
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }      
+    }
+	
+	private void addId() {
+        try {
+            boolean insertConceptId=false;
+			boolean insertCtv3Id=false;
+			boolean insertSnomedId=false;
+			
+            I_GetConceptData igcd = _termfactory.getConcept(UUID.fromString("122ccc03-c72f-4969-94d5-af5a7004905f"));
+            I_Identify i_Identify = Terms.get().getId(igcd.getNid());
+            I_ConceptAttributeVersioned<?> i_ConceptAttributeVersioned = igcd.getConceptAttributes();
+            
+            /*i_Identify.addLongId(Long.parseLong("797977"), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+            		i_ConceptAttributeVersioned.getStatusNid(),
+            		i_ConceptAttributeVersioned.getPathNid(),
+            		Long.MAX_VALUE);
+           */ 
+    					
+			//DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+			DateFormat df = new SimpleDateFormat("yyyyMMdd");
+			long effectiveDate=df.parse("20120131").getTime();
+					
+			//get conceptId by calling webservice 
+			String wsConceptId ="449804003";
+			insertConceptId =  i_Identify.addLongId(Long.parseLong(wsConceptId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), 
+			      	i_ConceptAttributeVersioned.getStatusNid(),
+			        i_ConceptAttributeVersioned.getPathNid(),
+			        Long.MAX_VALUE);
+			System.out.println("==SctId insertion finish==" + wsConceptId + "	" + insertConceptId);
+			
+			//get ctv3Id by calling webservice 
+			String wsCtv3Id = "XUl7b";
+			//insert ctv3id if conceptId inserted Successfully
+			insertCtv3Id = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), 
+			      	i_ConceptAttributeVersioned.getStatusNid(),
+			        i_ConceptAttributeVersioned.getPathNid(),
+			        Long.MAX_VALUE);
+			System.out.println("==Ctv3Id insertion finish==" + wsCtv3Id + "	" + insertCtv3Id);
+				
+			
+			//get snomedId by calling webservice
+			String wsSnomedId ="DF-00900";				
+			//insert snomedid if conceptId & Ctv3Id inserted Successfully
+			insertSnomedId = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(), 
+			      	i_ConceptAttributeVersioned.getStatusNid(),
+			        i_ConceptAttributeVersioned.getPathNid(),
+			        Long.MAX_VALUE);
+			System.out.println("==SnomedId insertion finish==" + wsSnomedId + "	" + insertSnomedId);
+			
+			//Adding all the uncommited changes to Terms factory
+			Terms.get().addUncommitted(igcd);
+            
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }      
@@ -122,7 +179,14 @@ public class SctIDChangeSetCreation extends TestCase {
 							newDbProfile.getChangeSetWriterFileName()), 
 							new File(newDbProfile.getChangeSetRoot(), "#1#"
 									+ newDbProfile.getChangeSetWriterFileName()),
-									ChangeSetGenerationPolicy.MUTABLE_ONLY);			
+									ChangeSetGenerationPolicy.MUTABLE_ONLY);
+		
+		ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
+				new CommitLog(new File(newDbProfile.getChangeSetRoot(),
+				"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+						"." + "commitLog.xls")));	
+		
+		
 		 Ts.get().addChangeSetGenerator(tempKey, generator);
 	}
 
