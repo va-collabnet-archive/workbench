@@ -62,16 +62,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 				AND r.severity_uid = #{severity}
 			</if>
 		</trim>
-		order by r.name	<!-- CONCEPT_NAME(1), STATUS(2), DISPOSITION(3), ASSIGNED_TO(4), TIME(5);
 		<choose>
-			<when test="sortBy.keySet().iterator().next() == 1">
-				r.name
+			<when test="sortBy.containsKey(new Integer(1))">
+				order by r.name
 			</when>
-			<when test="sortBy.keySet().iterator().next() != 1">
-			
+			<when test="sortBy.containsKey(new Integer(13))">
+				order by r.effective_time
 			</when>
 		</choose>
--->
 		<include refid="pagingSql"/>
 	</select>
 	<select id="selectRulesCount" parameterType="RuleFilterCoords"

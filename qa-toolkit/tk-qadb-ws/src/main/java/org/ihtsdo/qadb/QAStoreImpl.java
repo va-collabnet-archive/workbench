@@ -324,6 +324,7 @@ public class QAStoreImpl implements QAStoreBI {
 			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
 			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
 			coords.setViewPointTime(qaCoordinate.getViewPointTime());
+			coords.setSortBy(sortBy);
 			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
 				coords.setStartLine(0);
 				coords.setPageLenght(10000);
@@ -346,6 +347,15 @@ public class QAStoreImpl implements QAStoreBI {
 					coords.setSeverity(filter.get(RulesReportColumn.SEVERITY).toString());
 				}
 			}
+			
+			if(sortBy.containsKey(new Integer(5)) || sortBy.containsKey(new Integer(9))|| sortBy.containsKey(new Integer(7))|| sortBy.containsKey(new Integer(8))){
+				coords.setStartLine(0);
+				coords.setPageLenght(10000);
+			}else{
+				coords.setStartLine(startLine - 1);
+				coords.setPageLenght(pageLenght);
+			}
+				
 			@SuppressWarnings("unchecked")
 			List<Rule> rules = sqlSession.selectList("org.ihtsdo.qadb.data.RuleMapper.selectRulesByCoords", coords);
 			logger.debug("rules selected by coordinates...");

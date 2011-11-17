@@ -201,6 +201,7 @@ public class WsConverter {
 			response.setSeverity(severity);
 		}
 		response.setRuleCode(ruleResult.getRuleCode());
+		response.setEffectiveTime(ruleResult.getEffectiveTime());
 		return response;
 	}
 	
