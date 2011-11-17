@@ -22,12 +22,14 @@ public class RefsetMemberValueMgr {
 	private int refsetId;
 	private I_ConfigAceFrame config;
 	private int memberType;
+	private I_GetConceptData refsetConcept;
 
 	public RefsetMemberValueMgr(I_GetConceptData refsetConcept) throws Exception {
 		this.refsetId = refsetConcept.getConceptNid();
 		this.termFactory = Terms.get();
 		config=termFactory.getActiveAceFrameConfig();
 		memberType=SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+		this.refsetConcept=refsetConcept;
 	}
 	
 	public void putConceptMember(int conceptMemberId) throws Exception {
@@ -48,6 +50,7 @@ public class RefsetMemberValueMgr {
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(extension);
+					termFactory.addUncommitted(refsetConcept);
 //					termFactory.commit();
 				}
 			}
@@ -61,13 +64,20 @@ public class RefsetMemberValueMgr {
 					EConcept.REFSET_TYPES.CID, 
 					bpm,
 					config); 
-			
-			for (I_ExtendByRef extension : termFactory.getConcept(conceptMemberId).getExtensions()) {
-				if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+
+			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(refsetConcept.getConceptNid())) {
+				if (extension.getComponentNid() == conceptMemberId &&
+						extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+					termFactory.addUncommittedNoChecks(refsetConcept);
 					termFactory.addUncommittedNoChecks(extension);
-//					termFactory.commit();
 				}
-			}		
+			}
+//			for (I_ExtendByRef extension : termFactory.getConcept(conceptMemberId).getExtensions()) {
+//				if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+//					termFactory.addUncommittedNoChecks(extension);
+//					termFactory.addUncommitted(refsetConcept);
+//				}
+//			}		
 		}
 		return;
 	}
