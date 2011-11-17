@@ -57,13 +57,47 @@ public class Config {
 	private String updateWbSctId;
 	
 	
-//Below Parameters are necessary for ID-Generation
+	//Below Parameters are necessary for ID-Generation
 	private String namespaceId;
 	private String partitionId;
 	private String executionId;
 	private String moduleId;
 	private String releaseId;
 	private String componentType;
+	
+	
+	public String getChangesetUserName() {
+		return changesetUserName;
+	}
+
+	public void setChangesetUserName(String changesetUserName) {
+		this.changesetUserName = changesetUserName;
+	}
+
+	public String getChangesetUserConcept() {
+		return changesetUserConcept;
+	}
+
+	public void setChangesetUserConcept(String changesetUserConcept) {
+		this.changesetUserConcept = changesetUserConcept;
+	}
+
+	public String getChangesetRoot() {
+		return changesetRoot;
+	}
+
+	public void setChangesetRoot(String changesetRoot) {
+		this.changesetRoot = changesetRoot;
+	}
+
+	public String getUpdateWbSctId() {
+		return updateWbSctId;
+	}
+
+	// for id insertion
+	private String changesetUserName;
+	private String changesetUserConcept;
+	private String changesetRoot;
 	
 
 	@XmlTransient
