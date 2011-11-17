@@ -97,6 +97,7 @@ public class RefsetMemberValueMgr {
 							Long.MAX_VALUE);
 					extension.addVersion(part);
 				}
+				termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(extension);
 //				termFactory.commit();
 			}
