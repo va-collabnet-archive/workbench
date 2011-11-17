@@ -41,6 +41,7 @@ public class I_Constants {
 	public final static String MANTOTARY = "900000000000218008";
 
 	// if (status==retId) valueId="Don'tknow value"; //1 Retired without reason
+	
 	// (foundation metadata concept)
 	public final static String DUPLICATE = "900000000000482003";
 	public final static String OUTDATED = "900000000000483008";

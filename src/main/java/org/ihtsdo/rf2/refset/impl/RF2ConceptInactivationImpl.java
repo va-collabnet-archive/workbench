@@ -1,6 +1,7 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,73 +48,81 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 	}
 
-	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException{
+	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException, ParseException{
 		String valueId = "XXX";
-		
+		Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
+
 		List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
 				currenAceConfig.getViewPositionSetReadOnly(), 
 				Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 		for (I_RelTuple rel : relationships) {
-			String characteristicTypeId="";
-			I_Identify charId = tf.getId(rel.getCharacteristicId());
-		
-			List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-					snomedIntId);
-			
-			if (idParts != null) {
-				Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-						RelAssertionType.INFERRED_THEN_STATED);
-				if (denotation instanceof Long) {
-					Long c = (Long) denotation;
-					if (c != null)  characteristicTypeId = c.toString();
-				}
-			}
-			if (characteristicTypeId.equals(I_Constants.STATED) ){
-				String destinationId = "";
-				I_Identify id = tf.getId(rel.getC2Id());
-				if (id != null) {
-					idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-							snomedIntId);
-					if (idParts != null) {
-						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-								RelAssertionType.INFERRED_THEN_STATED);
-						if (denotation instanceof Long) {
-							Long c = (Long) denotation;
-							if (c != null)  destinationId = c.toString();
-						}
-					}
-				}
-
-				String relTypeId = "";
-
-				id = tf.getId(rel.getTypeNid());
-				if (id != null) {
-					idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-							snomedIntId);
-					if (idParts != null) {
-						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-								RelAssertionType.INFERRED_THEN_STATED);
-						if (denotation instanceof Long) {
-							Long c = (Long) denotation;
-							if (c != null)  relTypeId = c.toString();
-						}
-					}
-				}
-
-
-				if (relTypeId.equals(I_Constants.ISA)) {
-					if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT) || destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT) ||
-						destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
-						destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
-						destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
-							valueId = destinationId;
-							logger.info("====valueId====" + valueId);
-						}	
-					}
+			Date et = new Date(rel.getTime());
+			if (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE)){
+				String characteristicTypeId="";
+				I_Identify charId = tf.getId(rel.getCharacteristicId());
 				
-				} 
+				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+						snomedIntId);
+				
+				if (idParts != null) {
+					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+							RelAssertionType.INFERRED_THEN_STATED);
+					if (denotation instanceof Long) {
+						Long c = (Long) denotation;
+						if (c != null)  characteristicTypeId = c.toString();
+					}
+				}
+				if (characteristicTypeId.equals(I_Constants.STATED) ){
+					String destinationId = "";
+					I_Identify id = tf.getId(rel.getC2Id());
+					if (id != null) {
+						idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+								snomedIntId);
+						if (idParts != null) {
+							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+									RelAssertionType.INFERRED_THEN_STATED);
+							if (denotation instanceof Long) {
+								Long c = (Long) denotation;
+								if (c != null)  destinationId = c.toString();
+							}
+						}
+					}
+
+					String relTypeId = "";
+	
+					id = tf.getId(rel.getTypeNid());
+					if (id != null) {
+						idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+								snomedIntId);
+						if (idParts != null) {
+							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+									RelAssertionType.INFERRED_THEN_STATED);
+							if (denotation instanceof Long) {
+								Long c = (Long) denotation;
+								if (c != null)  relTypeId = c.toString();
+							}
+						}
+					}
+
+					if (relTypeId.equals(I_Constants.ISA)) {
+						if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT))
+							valueId = I_Constants.DUPLICATE;
+						if (destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT))
+							valueId = I_Constants.AMBIGUOUS;
+						if (destinationId.equals(I_Constants.OUTDATED_CONCEPT))
+							valueId = I_Constants.OUTDATED;
+						if (destinationId.equals(I_Constants.ERRONEOUS_CONCEPT))
+							valueId = I_Constants.ERRONEOUS;
+						if (destinationId.equals(I_Constants.LIMITED_CONCEPT))
+							valueId = I_Constants.LIMITED;
+						if (destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT))
+							valueId = I_Constants.MOVED_ELSE_WHERE;
+						//REASON_NOT_STATED_CONCEPT = 363661006
+					} 
+				}
 			}
+		}
 
 				
 		return valueId;
@@ -156,13 +165,15 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					}
 					
 					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+					if (valueId.equals("XXX")){
+						valueId= getConceptInactivationRelationshipValueId(concept);
+					}
 					
-					if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
-						//logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
+					/*if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
 						valueId= getConceptInactivationRelationshipValueId(concept);
 					}else{
 						//logger.info("====else====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
-					}
+					}*/
 					
 					if (!valueId.equals("XXX")) {
 						WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
