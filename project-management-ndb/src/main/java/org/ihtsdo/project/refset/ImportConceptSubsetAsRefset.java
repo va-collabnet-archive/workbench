@@ -74,7 +74,8 @@ public class ImportConceptSubsetAsRefset {
             lineCount++;
 		}
 		inputFileReader.close();
-
+		termFactory.addUncommittedNoChecks(refsetConcept.getRefsetConcept());
+		System.out.println("Committing new refset content.");
 		termFactory.commit();
 		outputFileWriter.println("Imported from file " + importFile.getName()  + " : " + imported + " concepts");
 		outputFileWriter.flush();
@@ -142,6 +143,10 @@ public class ImportConceptSubsetAsRefset {
 		if (!incremental){
 			inactivateNotExistentMembers(refset);
 		}
+		
+		termFactory.addUncommittedNoChecks(refset);
+		System.out.println("Committing existing refset content.");
+		
 		termFactory.commit();
 		outputFileWriter.println("Imported from file " + importFile.getName()  + " : " + imported + " concepts");
 
