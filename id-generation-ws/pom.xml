@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.ihtsdo</groupId>
@@ -8,7 +9,6 @@
 	<artifactId>id-generation-ws</artifactId>
 	<packaging>jar</packaging>
 	<name>${branch}: Workbench ID generation WS</name>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.mybatis</groupId>
@@ -70,7 +70,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Unpacks .xml and .properties files to include in the aar file. because axis2 plugin don't use maven directory structure -->
+			<!-- Unpacks .xml and .properties files to include in the aar file. because 
+				axis2 plugin don't use maven directory structure -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -100,6 +101,9 @@
 	<profiles>
 		<profile>
 			<id>build-jar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<properties>
 				<driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
 				<url>jdbc:derby:id_gen;create=true</url>
