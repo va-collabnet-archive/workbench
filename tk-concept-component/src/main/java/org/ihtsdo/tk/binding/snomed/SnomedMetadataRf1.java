@@ -23,7 +23,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * @author marc
  */
 public class SnomedMetadataRf1 {
-    
+
     /*** DEFINITIONS ***/
     // SCT ID: none.
     // SCT Enum: DescriptionType 3
@@ -34,23 +34,23 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec SYNOMYM_DESCRIPTION_TYPE_RF1 =
             new ConceptSpec("synonym (description type)",
             UUID.fromString("d6fad981-7df6-3388-94d8-238cc0465a79"));
-
     /*** DescriptionType ***/
     /*** Acceptability ***/
     // SCT ID: none.
     // SCT Enum: DescriptionType 0 -- Unspecified
-
     // SCT Enum: DescriptionType 1 -- Preferred
     // SCT ID: none.
     public static ConceptSpec PREFERRED_TERM_DESCRIPTION_TYPE_RF1 =
             new ConceptSpec("preferred term (description type)",
             UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44"));
+    public static ConceptSpec PREFERRED_ACCEPTABILITY_RF1 =
+            new ConceptSpec("preferred acceptability",
+            UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"));
     // SCT ID: none.
     // SCT Enum: DescriptionType 2 -- Acceptible
     public static ConceptSpec ACCEPTABLE_DESCRIPTION_TYPE_RF1 =
             new ConceptSpec("acceptable",
             UUID.fromString("51b45763-09c4-34eb-a303-062ba8e0c0e9"));
-
     /*** LANGUAGE ***/
     // US language 100033
     public static ConceptSpec US_LANGUAGE_REFSET_RF1 =
@@ -60,11 +60,9 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec GB_LANGUAGE_REFSET_RF1 =
             new ConceptSpec("GB Language Refset",
             UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
-
     /*** CASE SIGNIFICANCE ***/
     // Case significant 1
     // Case nosignificant 0
-
     /*** definitionStatusId ***/
     // primitive 1
     public static ConceptSpec PRIMITIVE_RF1 =
@@ -74,7 +72,6 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec DEFINED_RF1 =
             new ConceptSpec("defined",
             UUID.fromString("73dde8a7-aeb5-3af5-8db9-7aa60e6726a7"));
-
     /*** CROSSMAPS ***/
     // ICD9 100046
 //    public static ConceptSpec NAME_RF1 =
@@ -84,7 +81,6 @@ public class SnomedMetadataRf1 {
 //    public static ConceptSpec NAME_RF1 =
 //            new ConceptSpec("",
 //            UUID.fromString(""));
-
     /*** REFINABILITY ***/
     // notRefinable 0
     public static ConceptSpec NOT_REFINABLE_REFINABILITY_TYPE_RF1 =
@@ -98,7 +94,6 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec MANDATORY_REFINABILITY_TYPE_RF1 =
             new ConceptSpec("mandatory (refinability type)",
             UUID.fromString("3f2cec85-be64-339e-ba99-4a75f53bc51c"));
-
     /*** CharacteristicType ***/
     // Additional 3
     public static ConceptSpec ADDITIONAL_CHARACTERISTIC_TYPE_RF1 =
@@ -112,7 +107,6 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1 =
             new ConceptSpec("inferred (defining characteristic type)",
             UUID.fromString("d8fb4fb0-18c3-3352-9431-4919193f85bc"));
-
     //
     // Stated 0
     public static ConceptSpec STATED_DEFINING_CHARACTERISTIC_TYPE_RF1 =
@@ -126,7 +120,6 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec HISTORICAL_CHARACTERISTIC_TYPE_RF1 =
             new ConceptSpec("historical (characteristic type)",
             UUID.fromString("1d054ca3-2b32-3004-b7af-2701276059d5"));
-
     /*** STATUS ***/
     // Limited 6
     public static ConceptSpec LIMITED_ACTIVE_STATUS_RF1 =
@@ -174,7 +167,6 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec CURRENT_RF1 =
             new ConceptSpec("current (active status type)",
             UUID.fromString("2faa9261-8fb2-11db-b606-0800200c9a66"));
-
     /**** Associations ***/
     // Part_Of (Refset) 123005000
     public static ConceptSpec PART_OF_ATTRIBUTE_REFSET =
@@ -204,28 +196,22 @@ public class SnomedMetadataRf1 {
     public static ConceptSpec MOVED_FROM_RF1 =
             new ConceptSpec("MOVED FROM (attribute)",
             UUID.fromString("9ceab5fa-7b4c-3618-b229-6997dc69ad65"));
-     
     /*** Synonymy ***/
-     public static ConceptSpec DEGREE_OF_SYNONYMY_REFSET_RF1 =
+    public static ConceptSpec DEGREE_OF_SYNONYMY_REFSET_RF1 =
             new ConceptSpec("Degree of Synonymy Refset",
             UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847"));
-     
-     public static ConceptSpec REFERS_TO_REFSET_RF1 =
+    public static ConceptSpec REFERS_TO_REFSET_RF1 =
             new ConceptSpec("Refers To Refset",
             UUID.fromString("1b122b8f-172f-53d5-a2e2-eb1161737c2a"));
-     
-     public static ConceptSpec VMP_RF1 =
+    public static ConceptSpec VMP_RF1 =
             new ConceptSpec("VMP subset",
             UUID.fromString("d085216e-e34d-52e8-9785-d8af93939f99"));
-    
     public static ConceptSpec VTM_RF1 =
             new ConceptSpec("VTM subset",
             UUID.fromString("e65ea362-72d4-3641-bfba-fe4429eea6f9"));
-    
     public static ConceptSpec NON_HUMAN_RF1 =
             new ConceptSpec("Non-human Subset",
             UUID.fromString("0e2687b7-db28-5a01-b968-b98865648f2b"));
-    
     /* References */
     // Replaced_By 1
 //    public static ConceptSpec NAME_RF1 =

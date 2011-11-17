@@ -35,8 +35,13 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -49,9 +54,16 @@ import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.ace.task.commit.validator.impl.NotEmptyConceptDataValidator;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * The <code>TestForPreferredTermValue</code> class represents a data constraint
@@ -61,9 +73,10 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author Matthew Edwards
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
 public class TestForPreferredTermValue extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -94,17 +107,46 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
             List<I_DescriptionVersioned> descriptions = new ConceptDescriptionFacade(termFactory, this).getAllDescriptions(concept);
 
             GetConceptDataValidationStrategy validator = new NotEmptyConceptDataValidator(requiredConcept,
-                descriptions, concept);
+                    descriptions, concept);
             try {
                 validator.validate();
             } catch (ValidationException e) {
                 getLogger().info(e.getMessage());
                 alerts.add(getAlertFactory(forCommit).createAlertToDataConstraintFailure(
-                    String.format(ALERT_MESSAGE, requiredConcept.toString()), concept));
+                        String.format(ALERT_MESSAGE, requiredConcept.toString()), concept));
             }
+            int gbPrefCount = 0;
+            int usPrefCount = 0;
+            ConceptSpec EN_GB_LANG =
+                    new ConceptSpec("GB English Dialect Subset",
+                    UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
 
+            ConceptSpec EN_US_LANG =
+                    new ConceptSpec("US English Dialect Subset",
+                    UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"));
+            ArrayList<I_DescriptionVersioned> uniqueDescriptions = new ArrayList<I_DescriptionVersioned>();
+            for(I_DescriptionVersioned d : descriptions){
+                if(!uniqueDescriptions.contains(d)){
+                    uniqueDescriptions.add(d);
+                }
+            }
+            for (I_DescriptionVersioned desc : uniqueDescriptions) {
+                if (desc.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()
+                        && desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
+                    if(this.isPreferredTerm(desc, EN_US_LANG)){
+                        usPrefCount++;
+                    }else if (this.isPreferredTerm(desc, EN_GB_LANG)){
+                        gbPrefCount++;
+                    }
+                }
+            }
+            if (gbPrefCount > 1 || usPrefCount > 1) {
+                alerts.add(getAlertFactory(forCommit).createAlertToDataConstraintFailure(
+                        String.format("<html>More than one PT for dialect in concept",
+                        requiredConcept.toString()), concept));
+            }
             // return alerts;
-            return new ArrayList<AlertToDataConstraintFailure>();
+            return alerts;
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
@@ -116,5 +158,40 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
 
     private I_TermFactory getTermFactory() {
         return Terms.get();
+    }
+
+    private boolean isPreferredTerm(I_DescriptionVersioned desc, ConceptSpec evalRefset) {
+        boolean isPreferredTerm = false;
+        try {
+            Collection<? extends RefexChronicleBI> refexes =
+                    desc.getCurrentRefexes(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+            int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
+
+            if (refexes != null) {
+                for (RefexChronicleBI refex : refexes) {
+                    if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
+                            RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+
+                            if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                    isPreferredTerm = true;
+                                }
+                            } else {
+                                System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);
+                            }
+                        } else {
+                            System.out.println("Can't convert: RefexVersionBI:  " + refex);
+                        }
+                    }
+                }
+            }
+            return isPreferredTerm;
+        } catch (TerminologyException ex) {
+            return isPreferredTerm;
+        } catch (IOException ex) {
+            return isPreferredTerm;
+        }
     }
 }

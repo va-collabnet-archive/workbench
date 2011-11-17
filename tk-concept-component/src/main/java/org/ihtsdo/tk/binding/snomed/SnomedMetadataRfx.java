@@ -366,7 +366,7 @@ public class SnomedMetadataRfx {
             ACCEPTABLE_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getUuids());
             PREFERRED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getUuids());
+                    SnomedMetadataRf1.PREFERRED_ACCEPTABILITY_RF1.getUuids());
             // RELATIONSHIPS
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());

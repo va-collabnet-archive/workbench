@@ -53,6 +53,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -225,7 +226,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
 
                                 if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
                                     int cnid = ((RefexCnidVersionBI) rv).getCnid1();
-                                    if (cnid == AcceptabilityType.PREF.getLenient().getNid()) {
+                                    if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
                                         isPreferredTerm = true;
                                     }
                                 } else {

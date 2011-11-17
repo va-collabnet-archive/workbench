@@ -156,10 +156,10 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                 }
             }
         }
-        if (langs.get("en") == null)
-            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                "<html>No FSN for en", concept));
+//        if (langs.get("en") == null)
+//            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+//                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+//                "<html>No FSN for en", concept));
         return alertList;
     }
 }
