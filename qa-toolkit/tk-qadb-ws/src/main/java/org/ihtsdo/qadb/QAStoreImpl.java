@@ -47,6 +47,7 @@ public class QAStoreImpl implements QAStoreBI {
 	private final static Logger logger = Logger.getLogger(QAStoreImpl.class);
 
 	private SqlSession sqlSession = null;
+	Integer totalLines = 0;
 
 	public QAStoreImpl(SqlSession sqlSession) {
 		super();
@@ -315,7 +316,8 @@ public class QAStoreImpl implements QAStoreBI {
 		return null;
 	}
 
-	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
+	public List<RulesReportLine> getRulesReportLines(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy,
+			HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		logger.debug("Getting rules report lines...");
 		List<RulesReportLine> lines = null;
 		LinkedList<RulesReportLine> newResult = null;
@@ -325,13 +327,6 @@ public class QAStoreImpl implements QAStoreBI {
 			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
 			coords.setViewPointTime(qaCoordinate.getViewPointTime());
 			coords.setSortBy(sortBy);
-			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
-				coords.setStartLine(0);
-				coords.setPageLenght(10000);
-			} else {
-				coords.setStartLine(startLine - 1);
-				coords.setPageLenght(pageLenght);
-			}
 			List<DispositionStatus> existingDispStatuses = getAllDispositionStatus();
 			if (filter != null) {
 				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
@@ -348,7 +343,10 @@ public class QAStoreImpl implements QAStoreBI {
 				}
 			}
 			
-			if(sortBy.containsKey(new Integer(5)) || sortBy.containsKey(new Integer(9))|| sortBy.containsKey(new Integer(7))|| sortBy.containsKey(new Integer(8))){
+			if(filter.containsKey(RulesReportColumn.STATUS) 
+					|| filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS)) 
+					|| sortBy.containsKey(new Integer(5)) || sortBy.containsKey(new Integer(9))
+					|| sortBy.containsKey(new Integer(7))|| sortBy.containsKey(new Integer(8))){
 				coords.setStartLine(0);
 				coords.setPageLenght(10000);
 			}else{
@@ -371,7 +369,6 @@ public class QAStoreImpl implements QAStoreBI {
 					logger.error(e.getCause());
 					continue;
 				}
-				logger.debug(rule.getSeverity());
 				RulesReportLine line = new RulesReportLine();
 				coords.setRuleUuid(rule.getRuleUuid().toString());
 				coords.setStatus("1");
@@ -386,18 +383,22 @@ public class QAStoreImpl implements QAStoreBI {
 						logger.debug("Status object " + filter.get(RulesReportColumn.STATUS).toString());
 						if (statusFilter.equalsIgnoreCase("open cases")) {
 							if (openStatus == null) {
+								logger.debug("STATUS FILTER APLYED");
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("no open cases")) {
 							if (openStatus != null) {
+								logger.debug("STATUS FILTER APLYED");
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("closed cases")) {
 							if (closedStatus == null) {
+								logger.debug("STATUS FILTER APLYED");
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("no closed cases")) {
 							if (closedStatus != null) {
+								logger.debug("STATUS FILTER APLYED");
 								continue;
 							}
 						}
@@ -417,6 +418,7 @@ public class QAStoreImpl implements QAStoreBI {
 							}
 						}
 						if (!filterExists) {
+							logger.debug("DISPOSITION STATUS FILTER APLYED");
 							continue;
 						}
 					}
@@ -448,12 +450,14 @@ public class QAStoreImpl implements QAStoreBI {
 				line.setRule(rule);
 				lines.add(line);
 			}
-
+			logger.debug("Line after filtering: " + lines.size());
 			sortLines(lines, sortBy);
-
+			
+			totalLines = lines.size();
+			//Paging if there is status and disposition status filter
 			if (filter.containsKey(RulesReportColumn.STATUS) || filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
 				newResult = new LinkedList<RulesReportLine>();
-				for (int i = startLine; i < startLine + pageLenght && i < lines.size(); i++) {
+				for (int i = startLine - 1; i < startLine + pageLenght && i < lines.size(); i++) {
 					newResult.add(lines.get(i));
 				}
 			}
@@ -468,15 +472,6 @@ public class QAStoreImpl implements QAStoreBI {
 			return newResult;
 		}
 		return lines;
-	}
-
-	private List<RulesReportLine> reduceLines(List<RulesReportLine> lines, int startLine, int pageLenght) {
-		int total = lines.size();
-
-		if (startLine + pageLenght - 1 > total) {
-			return lines.subList(startLine - 1, total);
-		}
-		return lines.subList(startLine - 1, startLine + pageLenght - 1);
 	}
 
 	private void sortLines(List<RulesReportLine> lines, LinkedHashMap<Integer, Boolean> sortBy) {
@@ -578,11 +573,9 @@ public class QAStoreImpl implements QAStoreBI {
 	@Override
 	public RulesReportPage getRulesReportLinesByPage(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
 		List<RulesReportLine> lines = new ArrayList<RulesReportLine>();
-		Integer totalLines = 0;
 		try {
 			lines.addAll(getRulesReportLines(qaCoordinate, sortBy, filter, startLine, pageLenght));
 			logger.debug("Rules report line size: " + lines.size());
-			totalLines = countRulesByCoords(qaCoordinate, sortBy, filter, startLine, pageLenght);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -593,35 +586,6 @@ public class QAStoreImpl implements QAStoreBI {
 		logger.debug("page size " + (startLine + lines.size() - 1));
 		logger.debug("total lines " + totalLines);
 		return new RulesReportPage(lines, sortBy, filter, startLine, startLine + lines.size() - 1, totalLines);
-	}
-
-	private Integer countRulesByCoords(QACoordinate qaCoordinate, LinkedHashMap<Integer, Boolean> sortBy, HashMap<Integer, Object> filter, int startLine, int pageLenght) {
-		Integer result = 0;
-		try {
-			RuleFilterCoords coords = new RuleFilterCoords();
-			coords.setDatabaseUuid(qaCoordinate.getDatabaseUuid().toString());
-			coords.setPathUuid(qaCoordinate.getPathUuid().toString());
-			coords.setViewPointTime(qaCoordinate.getViewPointTime());
-			if (filter != null) {
-				if (filter.containsKey(RulesReportColumn.RULE_NAME)) {
-					coords.setName("%" + filter.get(RulesReportColumn.RULE_NAME).toString() + "%");
-				}
-				if (filter.containsKey(RulesReportColumn.RULE_CODE)) {
-					coords.setRuleCode("%" + filter.get(RulesReportColumn.RULE_CODE).toString() + "%");
-				}
-				if (filter.containsKey(RulesReportColumn.CATEGORY)) {
-					coords.setRuleCategory(filter.get(RulesReportColumn.CATEGORY).toString());
-				}
-				if (filter.containsKey(RulesReportColumn.SEVERITY)) {
-					coords.setSeverity(filter.get(RulesReportColumn.SEVERITY).toString());
-				}
-			}
-			result = (Integer) sqlSession.selectOne("org.ihtsdo.qadb.data.RuleMapper.selectRulesCount", coords);
-			logger.debug("Rules amount: " + result);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
 	}
 
 	@Override
