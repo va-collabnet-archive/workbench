@@ -58,7 +58,8 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 		for (I_RelTuple rel : relationships) {
 			Date et = new Date(rel.getTime());
-			if (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE)){
+			//Active stated relationship pointing to one of the special inactive concept
+			if ((rel.getStatusNid() == activeNid) && (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))){
 				String characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
 				
@@ -108,15 +109,15 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					if (relTypeId.equals(I_Constants.ISA)) {
 						if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT))
 							valueId = I_Constants.DUPLICATE;
-						if (destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT))
+						else if (destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT))
 							valueId = I_Constants.AMBIGUOUS;
-						if (destinationId.equals(I_Constants.OUTDATED_CONCEPT))
+						else if (destinationId.equals(I_Constants.OUTDATED_CONCEPT))
 							valueId = I_Constants.OUTDATED;
-						if (destinationId.equals(I_Constants.ERRONEOUS_CONCEPT))
+						else if (destinationId.equals(I_Constants.ERRONEOUS_CONCEPT))
 							valueId = I_Constants.ERRONEOUS;
-						if (destinationId.equals(I_Constants.LIMITED_CONCEPT))
+						else if (destinationId.equals(I_Constants.LIMITED_CONCEPT))
 							valueId = I_Constants.LIMITED;
-						if (destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT))
+						else if (destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT))
 							valueId = I_Constants.MOVED_ELSE_WHERE;
 						//REASON_NOT_STATED_CONCEPT = 363661006
 					} 
@@ -164,10 +165,12 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 						active = "1";
 					}
 					
-					valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-					if (valueId.equals("XXX")){
-						valueId= getConceptInactivationRelationshipValueId(concept);
-					}
+					//valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+					//if (valueId.equals("XXX")){
+						//valueId= getConceptInactivationRelationshipValueId(concept);
+					//}
+					
+					valueId= getConceptInactivationRelationshipValueId(concept);
 					
 					/*if (valueId.equals("XXX") && et.after(PREVIOUSRELEASEDATE)) {
 						valueId= getConceptInactivationRelationshipValueId(concept);
