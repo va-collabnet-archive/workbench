@@ -697,7 +697,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
    private class ConceptChangedListener implements PropertyChangeListener {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-         if (view != null) {
+         if (view != null && getHost() != null) {
             try {
                view.layoutConcept((I_GetConceptData) getHost().getTermComponent());
                SwingUtilities.invokeLater(new Runnable() {
