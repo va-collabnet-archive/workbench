@@ -20,10 +20,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.dwfa.vodb.types.Position;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
-   private ViewCoordinate      vc;
+
+    private ViewCoordinate      vc;
 
    //~--- constructors --------------------------------------------------------
 
@@ -84,6 +86,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    public ChangeSetGeneratorBI createDtoChangeSetGenerator(File changeSetFileName,
            File changeSetTempFileName, ChangeSetGenerationPolicy policy) {
       return store.createDtoChangeSetGenerator(changeSetFileName, changeSetTempFileName, policy);
+   }
+   
+   @Override
+   public Position newPosition(PathBI path, long time) throws IOException {
+        return store.newPosition(path, time);
    }
 
    @Override

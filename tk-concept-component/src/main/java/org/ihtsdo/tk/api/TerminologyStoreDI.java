@@ -26,6 +26,8 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    void iterateConceptDataInSequence(ProcessUnfetchedConceptDataBI processor) throws Exception;
 
    void removeTermChangeListener(TermChangeListener cl);
+   
+   PositionBI newPosition(PathBI path, long time) throws IOException;
 
    boolean satisfiesDependencies(Collection<DbDependency> dependencies);
 

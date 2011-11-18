@@ -162,6 +162,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         Bdb.getConceptDb().iterateConceptDataInSequence(processor);
     }
 
+    
+   @Override
+   public Position newPosition(PathBI path, long time) throws IOException {
+      return new Position(time, path);
+   }
+
     @Override
     public void removeChangeSetGenerator(String key) {
         ChangeSetWriterHandler.removeWriter(key);

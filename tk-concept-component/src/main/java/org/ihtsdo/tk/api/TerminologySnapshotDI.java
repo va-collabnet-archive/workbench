@@ -16,6 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface TerminologySnapshotDI extends TerminologyTransactionDI {
+    
+   PositionBI newPosition(PathBI path, long time) throws IOException;
+
    TerminologyConstructorBI getAmender(EditCoordinate ec);
 
    ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
