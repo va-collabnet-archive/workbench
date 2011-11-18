@@ -169,7 +169,7 @@ public class ConceptCB extends CreateOrAmendBlueprint {
     public DescCAB getFsnCAB() throws IOException {
         //get rf1/rf2 concepts
         UUID fsnUuid = null;
-        if (Ts.get().hasUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid())) {
+        if (Ts.get().usesRf2Metadata()) {
             fsnUuid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid();
         } else {
             fsnUuid = SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid();
@@ -185,7 +185,7 @@ public class ConceptCB extends CreateOrAmendBlueprint {
     public DescCAB getPreferredCAB() throws IOException {
         //get rf1/rf2 concepts
         UUID synUuid = null;
-        if (Ts.get().hasUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid())) {
+        if (Ts.get().usesRf2Metadata()) {
             synUuid = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid();
         } else {
             synUuid = SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid();

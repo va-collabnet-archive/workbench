@@ -19,6 +19,7 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
@@ -92,21 +94,14 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     private List<AlertToDataConstraintFailure> testDescriptions(I_GetConceptData concept,
             ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit) throws Exception {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-        I_GetConceptData fsn_type =
-                getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-        if (fsn_type == null)
-            return alertList;
         I_IntSet actives = getActiveStatus(Terms.get());
         HashMap<String, ArrayList<DescriptionVersionBI>> langs = new HashMap<String, ArrayList<DescriptionVersionBI>>();
         ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
-        
+        Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
         
         for (DescriptionVersionBI<?> desc : cv.getDescsActive()) {
-            
-                if (!actives.contains(desc.getStatusNid()))
-                    continue;
-                if (desc.getTypeNid() == fsn_type.getConceptNid()) {
+                if (desc.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
                     if (desc.getText().matches(".*\\(\\?+\\).*") && desc.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
@@ -145,7 +140,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                                 if (potential_fsn != null) {
                                     for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                                         if (actives.contains(part_search.getStatusNid())
-                                            && part_search.getTypeNid() == fsn_type.getConceptNid()
+                                            && part_search.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()
                                             && part_search.getText().equals(desc.getText())
                                             && part_search.getLang().equals(desc.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(
