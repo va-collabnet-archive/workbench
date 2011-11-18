@@ -39,6 +39,10 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
@@ -93,22 +97,26 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         if (fsn_type == null)
             return alertList;
         I_IntSet actives = getActiveStatus(Terms.get());
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
-        for (I_DescriptionVersioned<?> desc : descriptions) {
-            for (I_DescriptionPart part : desc.getMutableParts()) {
-                if (!actives.contains(part.getStatusNid()))
+        HashMap<String, ArrayList<DescriptionVersionBI>> langs = new HashMap<String, ArrayList<DescriptionVersionBI>>();
+        ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+        ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
+        
+        
+        for (DescriptionVersionBI<?> desc : cv.getDescsActive()) {
+            
+                if (!actives.contains(desc.getStatusNid()))
                     continue;
-                if (part.getTypeNid() == fsn_type.getConceptNid()) {
-                    if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
+                if (desc.getTypeNid() == fsn_type.getConceptNid()) {
+                    if (desc.getText().matches(".*\\(\\?+\\).*") && desc.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                       : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
-                                + part.getText(), concept));
+                                + desc.getText(), concept));
                     }
-                    String lang = part.getLang();
+                    String lang = desc.getLang();
                     if (langs.get(lang) != null) {
-                        for (I_DescriptionVersioned d : langs.get(lang)) {
-                            if (d.getDescId() != desc.getDescId()) {
+                        for (DescriptionVersionBI d : langs.get(lang)) {
+                            if (d.getNid() != desc.getNid()) {
                                 alertList.add(new AlertToDataConstraintFailure(
                                     (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                               : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
@@ -117,12 +125,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         }
                         langs.get(lang).add(desc);
                     } else {
-                        ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
+                        ArrayList<DescriptionVersionBI> dl = new ArrayList<DescriptionVersionBI>();
                         dl.add(desc);
                         langs.put(lang, dl);
                     }
-                    if (part.getTime() == Long.MAX_VALUE && !part.getText().equals("New Fully Specified Description")) {
-                        String filteredDescription = part.getText();
+                    if (desc.getTime() == Long.MAX_VALUE && !desc.getText().equals("New Fully Specified Description")) {
+                        String filteredDescription = desc.getText();
                         // new removal using native lucene escaping
                         filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
@@ -138,12 +146,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                                     for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                                         if (actives.contains(part_search.getStatusNid())
                                             && part_search.getTypeNid() == fsn_type.getConceptNid()
-                                            && part_search.getText().equals(part.getText())
-                                            && part_search.getLang().equals(part.getLang())) {
+                                            && part_search.getText().equals(desc.getText())
+                                            && part_search.getLang().equals(desc.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(
                                                 (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                           : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                                "<html>FSN already used: " + part.getText(), concept));
+                                                "<html>FSN already used: " + desc.getText(), concept));
                                             break search;
                                         }
                                     }
@@ -154,12 +162,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         }
                     }
                 }
-            }
+            
         }
-//        if (langs.get("en") == null)
-//            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
-//                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-//                "<html>No FSN for en", concept));
+        if (langs.get("en") == null)
+            alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
+                                                                     : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
+                "<html>No FSN for en", concept));
         return alertList;
     }
 }
