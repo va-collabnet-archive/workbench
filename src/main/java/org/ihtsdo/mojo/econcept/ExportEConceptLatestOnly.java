@@ -99,19 +99,7 @@ public class ExportEConceptLatestOnly extends AbstractMojo {
          };
          ViewCoordinate vc           = Ts.get().getMetadataVC();
          ViewCoordinate exportVc     = new ViewCoordinate(vc);
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.DISCOURAGED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_INAPPROPRIATE_NID());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
+         exportVc.getAllowedStatusNids().clear();
 
          PathBI         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
          PositionBI     viewPosition = new Position(Long.MAX_VALUE, path);
