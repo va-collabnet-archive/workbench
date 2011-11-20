@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
@@ -51,9 +53,9 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     private AtomicInteger count = new AtomicInteger(0);
-    private AtomicInteger dots = new AtomicInteger(0);    
+    private AtomicInteger dots = new AtomicInteger(0);
     ConcurrentSkipListSet<Integer> allPrimNids = new ConcurrentSkipListSet<Integer>();
-    ConcurrentSkipListSet<Integer> nullComponent     = new ConcurrentSkipListSet<Integer>();
+    ConcurrentSkipListSet<Integer> nullComponent = new ConcurrentSkipListSet<Integer>();
     File nullComponentFile = new File("nullComponent.oos");
     private final NidBitSetBI nidset;
 
@@ -71,57 +73,62 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
     //~--- methods -------------------------------------------------------------
     private void verifyComponent(ComponentChroncileBI component) throws IOException {
         if (component != null) {
-        	if (component instanceof ConAttrChronicleBI) {
-        		ConAttrChronicleBI attr = (ConAttrChronicleBI) component;
-        		for (ConAttrVersionBI loopVersion : attr.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion(), component);
-            	}
-        	} else if (component instanceof DescriptionChronicleBI) {
-        		DescriptionChronicleBI desc = (DescriptionChronicleBI) component;
-        		for (DescriptionVersionBI loopVersion : desc.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion(), component);
-            	}
-        	} else if (component instanceof RelationshipChronicleBI) {
-        		RelationshipChronicleBI rel = (RelationshipChronicleBI) component;
-        		for (RelationshipVersionBI loopVersion : rel.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion(), component);
-            	}
-        	} else if (component instanceof MediaChronicleBI) {
-        		MediaChronicleBI media = (MediaChronicleBI) component;
-        		for (MediaVersionBI loopVersion : media.getVersions()) {
-        			verifyNids(loopVersion.getAllNidsForVersion(), component);
-            	}
-        	}  else if (component instanceof RefexChronicleBI) {
-        		RefexChronicleBI refex = (RefexChronicleBI) component;
-        		for (Object loopVersion : refex.getVersions()) {
-        			RefexVersionBI loopRefversion = (RefexVersionBI) loopVersion;
-        			verifyNids(loopRefversion.getAllNidsForVersion(), component);
-            	}
-        	}
+            if (component instanceof ConAttrChronicleBI) {
+                ConAttrChronicleBI attr = (ConAttrChronicleBI) component;
+                for (ConAttrVersionBI loopVersion : attr.getVersions()) {
+                    verifyNids(loopVersion.getAllNidsForVersion(), component);
+                }
+            } else if (component instanceof DescriptionChronicleBI) {
+                DescriptionChronicleBI desc = (DescriptionChronicleBI) component;
+                for (DescriptionVersionBI loopVersion : desc.getVersions()) {
+                    verifyNids(loopVersion.getAllNidsForVersion(), component);
+                }
+            } else if (component instanceof RelationshipChronicleBI) {
+                RelationshipChronicleBI rel = (RelationshipChronicleBI) component;
+                for (RelationshipVersionBI loopVersion : rel.getVersions()) {
+                    verifyNids(loopVersion.getAllNidsForVersion(), component);
+                }
+            } else if (component instanceof MediaChronicleBI) {
+                MediaChronicleBI media = (MediaChronicleBI) component;
+                for (MediaVersionBI loopVersion : media.getVersions()) {
+                    verifyNids(loopVersion.getAllNidsForVersion(), component);
+                }
+            } else if (component instanceof RefexChronicleBI) {
+                RefexChronicleBI refex = (RefexChronicleBI) component;
+                for (Object loopVersion : refex.getVersions()) {
+                    RefexVersionBI loopRefversion = (RefexVersionBI) loopVersion;
+                    verifyNids(loopRefversion.getAllNidsForVersion(), component);
+                }
+            }
 
             for (ComponentChroncileBI annotation : component.getAnnotations()) {
                 verifyComponent(annotation);
             }
         }
     }
-    
+
     private void verifyNids(Set<Integer> nids, ComponentChroncileBI component) {
-    	for (Integer nid : nids) {
-    		ComponentChroncileBI<?> referencedComponent = null;
-    		try {
-				referencedComponent = Ts.get().getComponent(nid);
-			} catch (IOException e) {
-				AceLog.getAppLog().warning(e.getMessage());
-			}
-			
-			if (referencedComponent == null) {
-				AceLog.getAppLog().warning("No component for Nid: " + nid + ". Used in component with nid:" + component.getNid());
-				nullComponent.add(nid);
-			}
-    	}
-    	
+        for (Integer nid : nids) {
+            ComponentChroncileBI<?> referencedComponent = null;
+            try {
+                referencedComponent = Ts.get().getComponent(nid);
+            } catch (IOException e) {
+                AceLog.getAppLog().warning(e.getMessage());
+            }
+
+            if (referencedComponent == null) {
+                try {
+                    AceLog.getAppLog().warning("No component for nid: " + nid
+                            + " " + Ts.get().getUuidsForNid(nid)
+                            + ". Used in component:" + component);
+                    nullComponent.add(nid);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().warning(ex.getMessage());
+                }
+            }
+        }
+
     }
-   
 
     @Override
     public boolean continueWork() {
@@ -191,8 +198,8 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
 
     //~--- get methods ---------------------------------------------------------    
     public ConcurrentSkipListSet<Integer> getNullComponent() {
- 	  return nullComponent;
-    } 
+        return nullComponent;
+    }
 
     @Override
     public NidBitSetBI getNidSet() throws IOException {

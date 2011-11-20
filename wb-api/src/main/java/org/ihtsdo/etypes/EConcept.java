@@ -330,6 +330,9 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
          throw new UnsupportedOperationException("Can't handle refset type: " + type);
       }
 
+      public static void resetNids() {
+          nidTypeMap = null;
+      }
       public static void setupNids() {
          if (nidTypeMap == null) {
             HashMap<Integer, REFSET_TYPES> temp = new HashMap<Integer, REFSET_TYPES>();

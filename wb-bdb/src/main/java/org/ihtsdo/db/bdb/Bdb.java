@@ -268,6 +268,9 @@ public class Bdb {
             BdbCommitManager.reset();
             PositionMapper.reset();
             NidDataFromBdb.resetExecutorPool();
+            BdbPathManager.reset();
+            REFSET_TYPES.resetNids();
+            
             for (@SuppressWarnings("unused") OFFSETS o : OFFSETS.values()) {
                 // ensure all OFFSETS are initialized prior to multi-threading. 
             }
@@ -301,6 +304,9 @@ public class Bdb {
             conceptDb = new ConceptBdb(readOnly, mutable);
             
            
+            Concept.reset();
+
+            ReferenceConcepts.reset();
             
             inform(activity, "setting up term factory...");
 
@@ -321,9 +327,6 @@ public class Bdb {
             }
             LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 
-            REFSET_TYPES.setupNids();
-            ReferenceConcepts.reset();
-            Concept.reset();
 
              inform(activity, "loading cross references...");
             xref = new Xref(readOnly, mutable);
@@ -341,9 +344,6 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
-
-//            watchList.put(Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")), 
-//                            Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")));
 
         } catch (Exception e) {
             throw new RuntimeException(e);

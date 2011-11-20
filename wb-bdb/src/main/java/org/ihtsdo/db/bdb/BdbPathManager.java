@@ -264,6 +264,17 @@ public class BdbPathManager implements I_Manage<PathBI> {
       return singleton;
    }
 
+   public static void reset() {
+      if (singleton != null) {
+         l.lock();
+         try {
+         singleton = null;
+         } finally {
+            l.unlock();
+         }
+      }
+   }
+
    @Override
    public PathBI get(int nid) throws IOException {
       if (exists(nid)) {

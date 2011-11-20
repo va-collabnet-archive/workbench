@@ -18,10 +18,7 @@ package org.dwfa.ace.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
@@ -41,9 +38,12 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
@@ -100,8 +100,14 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
         Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
         
+        NidSet fsnSet = new NidSet();
+        fsnSet.add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
+        fsnSet.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getConceptNid());
+        fsnSet.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
+        fsnSet.add(Ts.get().getNidForUuids(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")));
+        
         for (DescriptionVersionBI<?> desc : cv.getDescsActive()) {
-                if (desc.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()) {
+                if (fsnSet.contains(desc.getTypeNid())) {
                     if (desc.getText().matches(".*\\(\\?+\\).*") && desc.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
@@ -140,7 +146,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                                 if (potential_fsn != null) {
                                     for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
                                         if (actives.contains(part_search.getStatusNid())
-                                            && part_search.getTypeNid() == SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID()
+                                            && fsnSet.contains(part_search.getTypeNid())
                                             && part_search.getText().equals(desc.getText())
                                             && part_search.getLang().equals(desc.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(

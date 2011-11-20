@@ -21,9 +21,7 @@ import org.ihtsdo.db.bdb.ComponentBdb;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -42,6 +40,9 @@ public class NidCNidMapBdb extends ComponentBdb {
     private boolean[] mapChanged;
     private AtomicReference<int[][]> nidCNidMaps;
     private int readOnlyRecords;
+    
+    static TreeSet<Integer> maxValueEntries = new TreeSet<Integer>();
+
 
     //~--- constructors --------------------------------------------------------
     public NidCNidMapBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv) throws IOException {
@@ -138,7 +139,6 @@ public class NidCNidMapBdb extends ComponentBdb {
             Arrays.fill(nidCNidMaps.get()[index], Integer.MAX_VALUE);
         }
 
-        maxId = (nidCNidMaps.get().length * NID_CNID_MAP_SIZE) - Integer.MIN_VALUE;
         readMaps(readOnly, true);
         closeReadOnly();
         readMaps(mutable, false);
@@ -198,14 +198,13 @@ public class NidCNidMapBdb extends ComponentBdb {
                 int index = IntegerBinding.entryToInt(foundKey);
                 TupleInput ti = new TupleInput(foundData.getData());
                 int j = 0;
-                List<String> maxValueEntries = new ArrayList<String>();
 
                 while (ti.available() > 0) {
                     nidCNidMaps.get()[index][j++] = ti.readInt();
 
                     if (nidCNidMaps.get()[index][j - 1] == Integer.MAX_VALUE) {
-                        maxValueEntries.add("[" + index + "][" + (j - 1) + "]: "
-                                + ((index * NID_CNID_MAP_SIZE) + (j - 1) + Integer.MIN_VALUE));
+                        int nid = Integer.MIN_VALUE + (index + 1) * (j - 1);
+                        maxValueEntries.add(nid);
                     }
                 }
 
@@ -281,9 +280,6 @@ public class NidCNidMapBdb extends ComponentBdb {
                 if (mapChanged[key]) {
                     IntegerBinding.intToEntry(key, keyEntry);
                     TupleOutput output = new TupleOutput(new byte[NID_CNID_MAP_SIZE * 4]);
-
-                    TreeSet<Integer> maxValueEntries = new TreeSet<Integer>();
-
 
                     for (int i = 0; i < NID_CNID_MAP_SIZE; i++) {
                         output.writeInt(nidCNidMaps.get()[key][i]);

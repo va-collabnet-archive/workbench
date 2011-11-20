@@ -141,6 +141,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
 
    boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException;
 
+   boolean isActive() throws IOException;
+   
    boolean isChildOf(ConceptVersionBI child) throws IOException;
 
    boolean isKindOf(ConceptVersionBI parentKind) throws IOException;

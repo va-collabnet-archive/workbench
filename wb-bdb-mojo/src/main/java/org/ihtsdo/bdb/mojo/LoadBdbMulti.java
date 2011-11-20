@@ -52,6 +52,7 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.bdb.NullComponentFinder;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.lucene.LuceneManager;
@@ -351,6 +352,28 @@ public class LoadBdbMulti extends AbstractMojo {
                 reporter.reportDupClasses();
 
             }
+            
+            
+               getLog().info("Testing for Null Components Started.");
+
+                Concept.disableComponentsCRHM();
+
+                NullComponentFinder nullComponentFinder = new NullComponentFinder();
+                Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+                System.out.println();
+
+                if (nullComponentFinder.getNullComponent().isEmpty()) {
+                    getLog().info("No Null component found.");
+                } else {
+                    nullComponentFinder.writeNullComponentFile();
+                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+                            + nullComponentFinder.getNullComponent() + "\n");
+                }
+                Concept.enableComponentsCRHM();
+                getLog().info("Testing for Null Components Finished.");
+            
+            
+            
             Concept.enableComponentsCRHM();
             getLog().info("Starting close.");
             Bdb.close();

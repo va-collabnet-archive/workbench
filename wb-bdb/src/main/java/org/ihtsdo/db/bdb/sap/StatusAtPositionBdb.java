@@ -251,7 +251,10 @@ public class StatusAtPositionBdb extends ComponentBdb {
     public static void reset() {
         hits.set(0);
         misses.set(0);
+        initialPosition = -1;
         currentPaths = null;
+        mapperCache.clear();
+        
     }
 
     @Override

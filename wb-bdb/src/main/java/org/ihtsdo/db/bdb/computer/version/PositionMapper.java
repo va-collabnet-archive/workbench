@@ -483,7 +483,6 @@ public class PositionMapper {
         mappersToSetup = new LinkedBlockingQueue<PositionMapper>();
         closed = false;
         setupManager = new PositionMapperSetupManager();
-
     }
     /**
      * Only need an approximate query count, so no need to incur

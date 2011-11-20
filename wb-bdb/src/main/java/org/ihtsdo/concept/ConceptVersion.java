@@ -1136,17 +1136,43 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
    public boolean hasRefsetMemberForComponentActive(int componentNid) throws IOException {
       return concept.hasCurrentRefsetMemberForComponent(vc, componentNid);
    }
-
    @Override
-   public boolean isActive(NidSetBI allowedStatusNids) throws IOException {
+   public boolean isActive() throws IOException {
       try {
          if (getConAttrsActive() == null) {
             return false;
          }
 
-         return allowedStatusNids.contains(getConAttrsActive().getStatusNid());
+         return true;
       } catch (ContraditionException ex) {
          for (ConAttrVersionBI version : concept.getConceptAttributes().getVersions(vc)) {
+            if (vc.getAllowedStatusNids().contains(version.getStatusNid())) {
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public boolean isActive(NidSetBI allowedStatusNids) throws IOException {
+       
+       ViewCoordinate tempVc = new ViewCoordinate(vc);
+       tempVc.getAllowedStatusNids().clear();
+       tempVc.getAllowedStatusNids().addAll(allowedStatusNids.getSetValues());
+       
+      try {
+         if (concept.getConceptAttributes().getVersion(tempVc) == null) {
+            return false;
+         }
+
+         if (allowedStatusNids == null || allowedStatusNids.size() == 0) {
+             return true;
+         }
+         return allowedStatusNids.contains(getConAttrsActive().getStatusNid());
+      } catch (ContraditionException ex) {
+         for (ConAttrVersionBI version : concept.getConceptAttributes().getVersions(tempVc)) {
             if (allowedStatusNids.contains(version.getStatusNid())) {
                return true;
             }
