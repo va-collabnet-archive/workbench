@@ -34,7 +34,7 @@ public class SctIdGenImpl implements SctIdGen {
 		session.rollback();
 	}
 
-	public void closeSession(){
+	public void closeSession() {
 		session.close();
 	}
 
@@ -89,11 +89,9 @@ public class SctIdGenImpl implements SctIdGen {
 			SctIdIdentifier sctIdIdentifier = new SctIdIdentifier();
 			sctIdIdentifier.setCode(componentUuid);
 			long selectStartTime = System.currentTimeMillis();
-			SctIdIdentifier sctIdentirier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.getSctIdByComponentUuid", sctIdIdentifier);
+			Long sctIdentirier = (Long) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.getSctIdByComponentUuid", componentUuid);
 			log.info(sctIdentirier);
-			if(sctIdentirier != null){
-				result = sctIdentirier.getSctId() == null ? null : Long.parseLong(sctIdentirier.getSctId());
-			}
+			result = sctIdentirier;
 			long selectEndTime = System.currentTimeMillis();
 			log.info("SELECT SCTID IN: " + (selectEndTime - selectStartTime) + " MS");
 
@@ -154,7 +152,7 @@ public class SctIdGenImpl implements SctIdGen {
 		String snoID = null;
 		try {
 			SctIdIdentifier sctIdentifier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.selectSctIdByComponentUuid", componentUuid);
-			if(sctIdentifier != null){
+			if (sctIdentifier != null) {
 				ConidMap conidmap = (ConidMap) session.selectOne("com.termmed.genid.data.ConidMapMapper.getConidMapByCode", componentUuid);
 				log.debug("SELECTED CONIDMAP: " + conidmap);
 				if (conidmap != null) {
@@ -183,7 +181,7 @@ public class SctIdGenImpl implements SctIdGen {
 		String ctv3ID = null;
 		try {
 			SctIdIdentifier sctIdentifier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.selectSctIdByComponentUuid", componentUuid);
-			if(sctIdentifier != null){
+			if (sctIdentifier != null) {
 				ConidMap conidmap = (ConidMap) session.selectOne("com.termmed.genid.data.ConidMapMapper.getConidMapByCode", componentUuid);
 				log.debug(conidmap);
 				if (conidmap != null) {
@@ -208,8 +206,8 @@ public class SctIdGenImpl implements SctIdGen {
 	}
 
 	@Override
-	public HashMap<IDENTIFIER, String> createConceptIds(String componentUuid, String parentSnomedId, Integer namespaceId, String partitionId, String releaseId, String executionId,
-			String moduleId) throws Exception {
+	public HashMap<IDENTIFIER, String> createConceptIds(String componentUuid, String parentSnomedId, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId)
+			throws Exception {
 
 		long startTime = System.currentTimeMillis();
 		HashMap<IDENTIFIER, String> result = new HashMap<SctIdGen.IDENTIFIER, String>();
@@ -308,7 +306,7 @@ public class SctIdGenImpl implements SctIdGen {
 		return result;
 	}
 
-	private void insertNewSctIdentifier(SctIdIdentifier newSctIdent) throws Exception{
+	private void insertNewSctIdentifier(SctIdIdentifier newSctIdent) throws Exception {
 		long insertStartTime;
 		long insertEndTime;
 		insertStartTime = System.currentTimeMillis();
@@ -331,8 +329,7 @@ public class SctIdGenImpl implements SctIdGen {
 	}
 
 	@Override
-	public HashMap<String, Long> createSCTIDList(List<String> componentUuidList, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId)
-			throws Exception {
+	public HashMap<String, Long> createSCTIDList(List<String> componentUuidList, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) throws Exception {
 		HashMap<String, Long> result = new HashMap<String, Long>();
 
 		for (String componentUuid : componentUuidList) {
@@ -342,12 +339,12 @@ public class SctIdGenImpl implements SctIdGen {
 	}
 
 	@Override
-	public HashMap<String, HashMap<IDENTIFIER, String>> createConceptIDList(HashMap<String, String> componentUUIDandParentSnomedId, Integer namespaceId, String partitionId,
-			String releaseId, String executionId, String moduleId) throws Exception {
+	public HashMap<String, HashMap<IDENTIFIER, String>> createConceptIDList(HashMap<String, String> componentUUIDandParentSnomedId, Integer namespaceId, String partitionId, String releaseId,
+			String executionId, String moduleId) throws Exception {
 		HashMap<String, HashMap<IDENTIFIER, String>> result = new HashMap<String, HashMap<IDENTIFIER, String>>();
 		for (String loopComponentUuid : componentUUIDandParentSnomedId.keySet()) {
-			HashMap<IDENTIFIER, String> idString = createConceptIds(loopComponentUuid, componentUUIDandParentSnomedId.get(loopComponentUuid), namespaceId, partitionId, releaseId,
-					executionId, moduleId);
+			HashMap<IDENTIFIER, String> idString = createConceptIds(loopComponentUuid, componentUUIDandParentSnomedId.get(loopComponentUuid), namespaceId, partitionId, releaseId, executionId,
+					moduleId);
 			result.put(loopComponentUuid, idString);
 		}
 		return result;
