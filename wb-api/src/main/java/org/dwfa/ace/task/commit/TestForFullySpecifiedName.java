@@ -76,7 +76,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
             for (I_DescriptionTuple desc : descriptionTupleList) {
                 descriptions.add(desc.getDescVersioned());
             }
-            return testDescriptions(concept, descriptions, forCommit);
+            
+            // only test of concepts have been added to the description. 
+            if (descriptions.size() > 0) {
+                return testDescriptions(concept, descriptions, forCommit);
+            }
+            return new ArrayList<AlertToDataConstraintFailure>();
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
