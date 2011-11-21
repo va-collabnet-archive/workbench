@@ -56,6 +56,8 @@ import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
 import org.dwfa.ace.task.classify.SnoPathProcessInferred;
 import org.dwfa.ace.task.classify.SnoPathProcessStated;
+import org.dwfa.ace.task.classify.SnoPathProcessExInferred;
+import org.dwfa.ace.task.classify.SnoPathProcessExStated;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -68,11 +70,6 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
-/**
- *
- * @author marc
- *
- */
 /**
  * 
  * @goal run-snorocket
@@ -119,6 +116,12 @@ public class SnorocketMojo extends AbstractMojo {
      * @parameter default-value="false"
      */
     private boolean enableDbWriteback;
+    /**
+     * Include Inactive Concepts true/false
+     *
+     * @parameter default-value="false"
+     */
+    private boolean includeInactiveConcepts;
     /**
      * Report Changes File Name<br>
      * No report file generated if not provided.
@@ -217,10 +220,10 @@ public class SnorocketMojo extends AbstractMojo {
         SnoQuery.initAll();
 
         try {
-        	tf = Terms.get();
-        	if (tf == null) {
-        		Bdb.setup(berkeleyDir.getAbsolutePath());
-        	}
+            tf = Terms.get();
+            if (tf == null) {
+                Bdb.setup(berkeleyDir.getAbsolutePath());
+            }
             tf = Terms.get();
             config = getMojoDbConfig();
             tf.setActiveAceFrameConfig(config);
@@ -252,13 +255,23 @@ public class SnorocketMojo extends AbstractMojo {
             cEditSnoCons = new ArrayList<SnoCon>();
             cEditSnoRels = new ArrayList<SnoRel>();
 
+            SnoPathProcessExStated pcEditEx = null;
             SnoPathProcessStated pcEdit = null;
-            pcEdit = new SnoPathProcessStated(null, cEditSnoCons, cEditSnoRels,
-                    allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
-                    config.getConflictResolutionStrategy());
-            tf.iterateConcepts(pcEdit);
-            logger.info("\r\n::: [SnorocketMojo] GET STATED (Edit) PATH DATA : "
-                    + pcEdit.getStats(startTime));
+            if (includeInactiveConcepts) {
+                pcEditEx = new SnoPathProcessExStated(null, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEditEx);
+                logger.info("\r\n::: [SnorocketExpMojo] GET STATED (Edit) PATH DATA : "
+                        + pcEditEx.getStats(startTime));
+            } else {
+                pcEdit = new SnoPathProcessStated(null, cEditSnoCons, cEditSnoRels,
+                        allowedRoleTypes, statusSet, cEditPosSet, null, config.getPrecedence(),
+                        config.getConflictResolutionStrategy());
+                tf.iterateConcepts(pcEdit);
+                logger.info("\r\n::: [SnorocketMojo] GET STATED (Edit) PATH DATA : "
+                        + pcEdit.getStats(startTime));
+            }
 
             // SETUP CONCEPT NID ARRAY
             final int reserved = 2;
@@ -379,6 +392,8 @@ public class SnorocketMojo extends AbstractMojo {
 
             cEditSnoCons = null; // :MEMORY:
             cEditSnoRels = null; // :MEMORY:
+
+            pcEditEx = null; // :MEMORY:
             pcEdit = null; // :MEMORY:
             System.gc();
 
@@ -413,12 +428,22 @@ public class SnorocketMojo extends AbstractMojo {
             // GET CLASSIFIER_PATH RELS
             startTime = System.currentTimeMillis();
             cClassSnoRels = new ArrayList<SnoRel>();
+
             SnoPathProcessInferred pcClass = null;
-            pcClass = new SnoPathProcessInferred(null, cClassSnoRels, allowedRoleTypes,
-                    statusSet, cViewPosSet, null, precedence, contradictionMgr);
-            tf.iterateConcepts(pcClass);
-            logger.info("\r\n::: [SnorocketMojo] GET INFERRED (View) PATH DATA : "
-                    + pcClass.getStats(startTime));
+            SnoPathProcessExInferred pcClassEx = null;
+            if (includeInactiveConcepts) {
+                pcClassEx = new SnoPathProcessExInferred(null, cClassSnoRels, allowedRoleTypes,
+                        statusSet, cViewPosSet, null, precedence, contradictionMgr);
+                tf.iterateConcepts(pcClassEx);
+                logger.info("\r\n::: [SnorocketExpMojo] GET INFERRED (View) PATH DATA : "
+                        + pcClassEx.getStats(startTime));
+            } else {
+                pcClass = new SnoPathProcessInferred(null, cClassSnoRels, allowedRoleTypes,
+                        statusSet, cViewPosSet, null, precedence, contradictionMgr);
+                tf.iterateConcepts(pcClass);
+                logger.info("\r\n::: [SnorocketMojo] GET INFERRED (View) PATH DATA : "
+                        + pcClass.getStats(startTime));
+            }
 
             // FILTER RELATIONSHIPS
             int last = cClassSnoRels.size();
@@ -429,6 +454,7 @@ public class SnorocketMojo extends AbstractMojo {
             }
 
             pcClass = null; // :MEMORY:
+            pcClassEx = null; // :MEMORY:
 
             // WRITEBACK RESULTS
             startTime = System.currentTimeMillis();
@@ -919,7 +945,7 @@ public class SnorocketMojo extends AbstractMojo {
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
         tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId, rel_B.c2Id,
-        		isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
+                isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
         // :!!!:TODO: [SnorocketMojo] move addUncommittedNoChecks() to more efficient location.

@@ -53,7 +53,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
             new PositionArrayBinder();
     private static ConcurrentHashMap<PositionBI, PositionMapper> mapperCache =
             new ConcurrentHashMap<PositionBI, PositionMapper>();
-    private static Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
+    private static final Map<UncommittedStatusForPath, Integer> uncomittedStatusPathEntries =
             new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
     private static CountDownLatch setupLatch = new CountDownLatch(1);
     private static AtomicInteger misses = new AtomicInteger(0);
@@ -132,8 +132,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
                 new PositionArrayBinder();
         mapperCache =
                 new ConcurrentHashMap<PositionBI, PositionMapper>();
-        uncomittedStatusPathEntries =
-                new ConcurrentHashMap<UncommittedStatusForPath, Integer>();
+        uncomittedStatusPathEntries.clear();
         setupLatch = new CountDownLatch(1);
         misses = new AtomicInteger(0);
         hits = new AtomicInteger(0);
@@ -385,13 +384,10 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
     public PositionBI getPosition(int sapNid)
             throws IOException, PathNotExistsException, TerminologyException {
-        if (sapNid == -1) {
-            System.out.print("");
-        }
-        int pathNid = -1;
-        long time = -1;
         int status = -1;
         int author = -1;
+        int pathNid = -1;
+        long time = -1;
 
         if (sapNid < readOnlyArray.getSize()) {
             pathNid = readOnlyArray.pathNids[sapNid];
@@ -482,12 +478,12 @@ public class StatusAtPositionBdb extends ComponentBdb {
             int statusAtPositionNid = sequence.getAndIncrement();
 
             mapperCache.clear();
-            sapToIntMap.put(statusNid, authorNid, pathNid, time, statusAtPositionNid);
             mutableArray.setSize(getMutableIndex(statusAtPositionNid) + 1);
             mutableArray.statusNids[getMutableIndex(statusAtPositionNid)] = statusNid;
             mutableArray.authorNids[getMutableIndex(statusAtPositionNid)] = authorNid;
             mutableArray.pathNids[getMutableIndex(statusAtPositionNid)] = pathNid;
             mutableArray.commitTimes[getMutableIndex(statusAtPositionNid)] = time;
+            sapToIntMap.put(statusNid, authorNid, pathNid, time, statusAtPositionNid);
             misses.incrementAndGet();
 
             return statusAtPositionNid;

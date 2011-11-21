@@ -90,7 +90,7 @@ public class I_Constants {
 	// set output relationship path
 	public static String outRelPath = "ALL";
 	public static String limited_policy_change = "20100131";
-	public static String inactivation_policy_change = "20110731";
+	public static String inactivation_policy_change = "20110801"; //20110731
 	
 	public static String TimeFormat = "yyyyMMdd"; // 20100305 Per SC no TZ only YMD
 

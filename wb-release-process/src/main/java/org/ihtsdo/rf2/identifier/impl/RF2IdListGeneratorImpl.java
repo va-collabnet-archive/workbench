@@ -171,7 +171,10 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){	
 
 							String uuid = part[Integer.parseInt(Key.get(s))];
-							Long lSctId=hmTmp.get(UUID.fromString(uuid));
+							Long lSctId=null;
+							if (hmTmp!=null){
+								lSctId=hmTmp.get(UUID.fromString(uuid));
+							}
 							if (lSctId!=null){
 								sctid=String.valueOf(lSctId);
 							}else{
@@ -246,7 +249,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 
-								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,moduleId);
+								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 
 								if (idMapFile!=null && !idMapFile.equals("")){
 
@@ -269,7 +272,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 							}
 
 							hmTypeMap.put(idType, res);
-							break;
 						}
 					} catch (IOException e) {
 						logger.error(e);
