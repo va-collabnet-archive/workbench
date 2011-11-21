@@ -69,7 +69,12 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					descTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
+			
+			//Added speciall call for text-definition so that they are also part of  language refset
+			descriptions = concept.getDescriptionTuples(allStatuses, 
+					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
+					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+		
 			//if (logger.isDebugEnabled()) {
 				logger.info("Concept : " + conceptid);
 				logger.info("I_DescriptionVersioned Descriptions size :" + descriptions.size());
