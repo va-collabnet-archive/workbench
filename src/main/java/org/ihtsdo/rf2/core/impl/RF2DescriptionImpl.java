@@ -1,11 +1,8 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -121,24 +118,6 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 				
 					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
-						if (descriptionid.contains("-") && updateWbSctId.equals("true")){
-							try {
-								DateFormat df = new SimpleDateFormat("yyyyMMdd");
-								long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();							
-								//get descriptionId by calling web service 
-								String wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
-								if(wbSctId.equals("0")){
-									 wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
-								}							
-								//insert descriptionId in the workbench database 
-								insertSctId(description.getDescId() , getConfig(), wbSctId , description.getPathNid() , description.getStatusNid() , effectiveDate);
-								descriptionid=wbSctId;
-							} catch (NumberFormatException e) {
-								logger.error("NumberFormatException" +e);
-							} catch (Exception e) {
-								logger.error("Exception" +e);
-							}
-						}
 					}					
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
