@@ -69,30 +69,21 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					descTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			
-			/*//Added speciall call for text-definition so that they are also part of  language refset
-			descriptions = concept.getDescriptionTuples(allStatuses, 
-					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
-					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			*/
-			
-			//if (logger.isDebugEnabled()) {
+
+			if (logger.isDebugEnabled()) {
 				logger.info("Concept : " + conceptid);
 				logger.info("I_DescriptionVersioned Descriptions size :" + descriptions.size());
-				
-			//}
+			}
 
 			if (!descriptions.isEmpty() && descriptions.size() > 0) {
 
-				//if (logger.isDebugEnabled()) {
-					logger.info("!descs.isEmpty() && descs.size() > 0 :" + (!descriptions.isEmpty() && descriptions.size() > 0));
-				//}
+				if (logger.isDebugEnabled()) {
+					logger.debug("!descs.isEmpty() && descs.size() > 0 :" + (!descriptions.isEmpty() && descriptions.size() > 0));
+				}
 				for (I_DescriptionTuple description: descriptions) {
-					logger.info("description values :" + description.getText());
+
 					List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(
 							description.getDescId(), true);
-					logger.info("extensions: " + extensions.size() );
-					
 					I_ExtendByRef languageExtension=null;
 					for (I_ExtendByRef extension : extensions) {
 						if (extension.getRefsetId() == langRefsetId) {
@@ -106,18 +97,16 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 						I_ExtendByRefPartCid extensionPart=null;
 						for (I_ExtendByRefVersion loopTuple : languageExtension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
 								Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
-							logger.info("loopTuple.getTime(): " + loopTuple.getTime() );
-							logger.info("lastVersion : " + lastVersion);
-							
+
 							if (loopTuple.getTime() >= lastVersion) {
 								lastVersion = loopTuple.getTime();
 								extensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
 							}
 						}
 						if (extensionPart == null) {
-							//if (logger.isDebugEnabled()) {
+							if (logger.isDebugEnabled()) {
 								logger.debug("Language refset extension part not found!");
-							//}
+							}
 						}else{
 
 							extensionStatusId = extensionPart.getStatusNid();
@@ -144,7 +133,6 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 							if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
 								descriptionid=description.getUUIDs().iterator().next().toString();
-								logger.info("===uuid based description===" + descriptionid);
 							}
 							
 							if (descriptionid==null || descriptionid.equals("")){
