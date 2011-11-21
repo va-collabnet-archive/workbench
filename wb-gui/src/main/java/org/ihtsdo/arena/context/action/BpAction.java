@@ -2,12 +2,14 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,13 +53,15 @@ public class BpAction extends AbstractAction implements Runnable {
 
     public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
             I_HostConceptPlugins host, ScrollablePanel wizardPanel)
-            throws MalformedURLException, IOException, ClassNotFoundException {
+            throws MalformedURLException, IOException, ClassNotFoundException,
+            FileNotFoundException, URISyntaxException {
         this(new URL(processUrlStr), frameConfig, host, wizardPanel);
     }
 
     public BpAction(URL processUrl, I_ConfigAceFrame frameConfig,
             I_HostConceptPlugins host, ScrollablePanel wizardPanel)
-            throws MalformedURLException, IOException, ClassNotFoundException {
+            throws MalformedURLException, IOException, ClassNotFoundException, 
+            FileNotFoundException, URISyntaxException {
         super();
         processURL = processUrl;
         this.frameConfig = frameConfig;
@@ -97,13 +101,15 @@ public class BpAction extends AbstractAction implements Runnable {
 
     public BpAction(String processUrlStr, I_ConfigAceFrame frameConfig,
             I_HostConceptPlugins host)
-            throws MalformedURLException, IOException, ClassNotFoundException {
+            throws MalformedURLException, IOException, ClassNotFoundException,
+            FileNotFoundException, URISyntaxException {
         this(new URL(processUrlStr), frameConfig, host);
     }
 
     public BpAction(URL processUrl, I_ConfigAceFrame frameConfig,
             I_HostConceptPlugins host)
-            throws MalformedURLException, IOException, ClassNotFoundException {
+            throws MalformedURLException, IOException, ClassNotFoundException,
+            FileNotFoundException, URISyntaxException {
         super();
         processURL = processUrl;
         this.frameConfig = frameConfig;
@@ -141,10 +147,10 @@ public class BpAction extends AbstractAction implements Runnable {
     }
 
     private I_EncodeBusinessProcess getProcess() throws FileNotFoundException,
-            IOException, ClassNotFoundException {
+            IOException, ClassNotFoundException, URISyntaxException {
         InputStream inStream;
         if (processURL.getProtocol().toLowerCase().startsWith("file")) {
-            inStream = new FileInputStream(processURL.getFile());
+            inStream = new FileInputStream(new File(processURL.toURI()));
         } else {
             inStream = processURL.openStream();
         }
