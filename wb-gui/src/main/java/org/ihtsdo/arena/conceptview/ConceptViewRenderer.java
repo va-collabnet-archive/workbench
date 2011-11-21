@@ -815,21 +815,20 @@ public class ConceptViewRenderer extends JLayeredPane {
 
     protected void updateCancelAndCommit() {
         if (settings != null && cancelButton != null && commitButton != null) {
-            if (settings.getConcept() != null
-                    && settings.getConcept().isUncommitted()) {
+            if (settings.getConcept() != null && settings.getConcept().isUncommitted()) {
                 cancelButton.setVisible(true);
                 commitButton.setVisible(true);
             } else {
                 cancelButton.setVisible(false);
                 commitButton.setVisible(false);
                 
-
-                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
-                	if (wfHxDetails.regenerateWfPanel(settings.getConcept(), false)) {
-                	}
-                }
+                if (settings.getConcept() != null) {
+	                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+	                	wfHxDetails.regenerateWfPanel(settings.getConcept(), false);
+	                }
                
-                setWorkflowStatusLabel(settings.getConcept());
+                    setWorkflowStatusLabel(settings.getConcept());
+               }
             }
         }
     }
