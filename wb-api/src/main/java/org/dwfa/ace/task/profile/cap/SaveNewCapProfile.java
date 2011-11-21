@@ -41,7 +41,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
+@BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
 public class SaveNewCapProfile extends AbstractTask {
 
     /**
