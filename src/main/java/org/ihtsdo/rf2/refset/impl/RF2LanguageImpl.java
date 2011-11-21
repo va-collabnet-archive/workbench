@@ -70,14 +70,16 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					descTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 			
-			//Added speciall call for text-definition so that they are also part of  language refset
+			/*//Added speciall call for text-definition so that they are also part of  language refset
 			descriptions = concept.getDescriptionTuples(allStatuses, 
 					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-		
+			*/
+			
 			//if (logger.isDebugEnabled()) {
 				logger.info("Concept : " + conceptid);
 				logger.info("I_DescriptionVersioned Descriptions size :" + descriptions.size());
+				
 			//}
 
 			if (!descriptions.isEmpty() && descriptions.size() > 0) {
@@ -86,7 +88,7 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					logger.info("!descs.isEmpty() && descs.size() > 0 :" + (!descriptions.isEmpty() && descriptions.size() > 0));
 				//}
 				for (I_DescriptionTuple description: descriptions) {
-
+					logger.info("description values :" + description.getText());
 					List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(
 							description.getDescId(), true);
 					logger.info("extensions: " + extensions.size() );
