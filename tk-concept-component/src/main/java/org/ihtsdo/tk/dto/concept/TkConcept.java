@@ -216,6 +216,8 @@ public class TkConcept {
             for (int nid : d.getAllNidsForVersion()) {
                if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                   continue nextDescription;
+               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+                   continue nextDescription;
                }
             }
 
@@ -228,14 +230,16 @@ public class TkConcept {
       if (activeMedia != null) {
          this.media = new ArrayList<TkMedia>(activeMedia.size());
          nextMedia:
-         for (MediaVersionBI d : activeMedia) {
-            for (int nid : d.getAllNidsForVersion()) {
+         for (MediaVersionBI m : activeMedia) {
+            for (int nid : m.getAllNidsForVersion()) {
                if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                   continue nextMedia;
+               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+                   continue nextMedia;
                }
-            }
+            } 
 
-            this.media.add(new TkMedia(d, exclusions, conversionMap, offset, mapAll, vc));
+            this.media.add(new TkMedia(m, exclusions, conversionMap, offset, mapAll, vc));
          }
       }
 
@@ -244,18 +248,16 @@ public class TkConcept {
       if (activeRefsetMembers != null) {
          this.refsetMembers = new ArrayList<TkRefsetAbstractMember<?>>(activeRefsetMembers.size());
          nextRefsetMember:
-         for (RefexVersionBI d : activeRefsetMembers) {
-            for (int nid : d.getAllNidsForVersion()) {
+         for (RefexVersionBI rxm : activeRefsetMembers) {
+            for (int nid : rxm.getAllNidsForVersion()) {
                if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
-                  if (Ts.get().getComponent(nid) == null) {
-                     System.out.println("Null component for: " + d);
-                  }
-
                   continue nextRefsetMember;
+               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+                   continue nextRefsetMember;
                }
             }
 
-            this.refsetMembers.add(d.getTkRefsetMemberActiveOnly(vc, exclusions, conversionMap));
+            this.refsetMembers.add(rxm.getTkRefsetMemberActiveOnly(vc, exclusions, conversionMap));
          }
       }
 
@@ -264,14 +266,16 @@ public class TkConcept {
       if (rels != null) {
          this.relationships = new ArrayList<TkRelationship>(rels.size());
          nextRel:
-         for (RelationshipVersionBI d : rels) {
-            for (int nid : d.getAllNidsForVersion()) {
+         for (RelationshipVersionBI rel : rels) {
+            for (int nid : rel.getAllNidsForVersion()) {
                if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                   continue nextRel;
+               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+                   continue nextRel;
                }
             }
 
-            this.relationships.add(new TkRelationship(d, exclusions, conversionMap, offset, mapAll, vc));
+            this.relationships.add(new TkRelationship(rel, exclusions, conversionMap, offset, mapAll, vc));
          }
       }
    }

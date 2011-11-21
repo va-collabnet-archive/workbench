@@ -65,9 +65,6 @@ public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         if (!exclusionSet.isMember(cNid)) {
             ConceptVersionBI conceptVersion = fetcher.fetch(vc);
-            if (conceptVersion.getPrimUuid().equals(UUID.fromString("78126c8c-204f-3217-af3d-6bc46493ebb2"))) {
-                System.out.println("Found Canis familiaris");
-            }
 
             if ((conceptVersion.getPrimUuid() != null) && conceptVersion.isActive()) {
                 TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, vc);

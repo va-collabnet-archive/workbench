@@ -34,6 +34,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import java.io.IOException;
 
 import java.io.Serializable;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class IdentifierSet implements I_RepresentIdSet, Serializable {
@@ -47,6 +48,7 @@ public class IdentifierSet implements I_RepresentIdSet, Serializable {
    private static int             segmentShift     = 32 - sshift;
    private static int             segmentMask      = ssize - 1;
    private static ReentrantLock[] locks            = new ReentrantLock[concurrencyLevel];
+   private static Semaphore expandPermit = new Semaphore(1);
 
    //~--- static initializers -------------------------------------------------
 
@@ -250,10 +252,11 @@ public class IdentifierSet implements I_RepresentIdSet, Serializable {
    @Override
    public boolean isMember(int nid) {
       int index = nid + offset;
+      if (index < bitSet.size()) {
+        return bitSet.get(index);
+      }
+       return false;
 
-      bitSet.ensureCapacity(index);
-
-      return bitSet.get(index);
    }
 
    //~--- set methods ---------------------------------------------------------
@@ -272,7 +275,12 @@ public class IdentifierSet implements I_RepresentIdSet, Serializable {
       try {
          int index = nid + offset;
 
-         bitSet.ensureCapacity(index);
+         expandPermit.acquireUninterruptibly();
+         try {
+            bitSet.ensureCapacity(index);
+         } finally {
+             expandPermit.release();
+         }
          bitSet.set(index);
       } finally {
          locks[word].unlock();
@@ -292,8 +300,12 @@ public class IdentifierSet implements I_RepresentIdSet, Serializable {
 
       try {
          int index = nid + offset;
-
-         bitSet.ensureCapacity(index);
+         expandPermit.acquireUninterruptibly();
+         try {
+            bitSet.ensureCapacity(index);
+         } finally {
+             expandPermit.release();
+         }
          bitSet.clear(index);
       } finally {
          locks[word].unlock();
