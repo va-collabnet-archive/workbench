@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -85,6 +86,8 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						if (term.indexOf("\n")>-1){
 							term=term.replaceAll("\n", "");
 						}
+
+						term=StringEscapeUtils.unescapeHtml(term);
 					}
 					String textDefstatus = getStatusType(description.getStatusNid());
 					if (description.isInitialCaseSignificant()) {
