@@ -290,7 +290,6 @@ public class NewCapDefaultProfile extends NewProfile {
         try {
         	
             PathBI editPath = tf.getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
-            // activeConfig.addEditingPath(editPath);
 
             PositionBI viewPosition = tf.newPosition(editPath, Long.MAX_VALUE);
             Set<PositionBI> viewSet = new HashSet<PositionBI>();

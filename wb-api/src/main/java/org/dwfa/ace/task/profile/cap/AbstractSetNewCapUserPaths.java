@@ -26,7 +26,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.swing.SwingWorker;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -54,10 +53,9 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
         }
     }
 
-    protected String[] generatePotentialParentConcepts(ConceptVersionBI parentNode) {
+    protected String[] generatePotentialParentConcepts(I_GetConceptData parentNode) {
 	   try {
-		   I_GetConceptData tmpCon = Terms.get().getConcept(parentNode.getConceptNid());
-    		Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(tmpCon);
+    		Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
     		
     		SortedSet<I_GetConceptData> sortedPotentialParents = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
@@ -212,11 +210,7 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
 	    	parentIds = new LinkedList<Integer>();
 	    	I_GetConceptData parentNode = Terms.get().getConcept(getParentNode());
 	    	
-	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
-
-	    	ConceptVersionBI parentVersioned = parentNode.getVersion(newConfig.getViewCoordinate());
-	    	
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentVersioned);
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
 	    	
 	        instruction = getInstruction();
 	        pathList = new JComboBox(potentialParentConcepts);

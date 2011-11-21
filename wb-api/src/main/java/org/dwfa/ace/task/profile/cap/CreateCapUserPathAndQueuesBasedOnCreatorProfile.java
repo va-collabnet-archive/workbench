@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.profile.cap;
 
 import java.awt.Color;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -38,10 +39,15 @@ import net.jini.config.Configuration;
 import net.jini.config.ConfigurationProvider;
 import net.jini.core.entry.Entry;
 
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_Path;
+import org.dwfa.ace.api.I_RelPart;
+import org.dwfa.ace.api.I_RelTuple;
+import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -53,6 +59,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.tapi.TerminologyException;
@@ -62,13 +69,15 @@ import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
@@ -88,7 +97,6 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     private String releaseDatePropName = ProcessAttachmentKeys.RELEASE_DATE.getAttachmentKey();
 	private I_GetConceptData parentConceptForPath;
 
-	private Set<String> existingUserStrings;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -142,10 +150,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             throw new TaskFailedException(e2);
         }
         try {
-            String s = (String)process.getProperty(parentConceptForUserPropName);
-            I_GetConceptData parentConceptForUser = Terms.get().getConcept(Integer.parseInt(s));
-        	
-            s = (String)process.getProperty(parentConceptForPathPropName);
+            String s = (String)process.getProperty(parentConceptForPathPropName);
             parentConceptForPath = Terms.get().getConcept(Integer.parseInt(s));
 
             // Only one path for 3 PathsProps thus far
@@ -156,46 +161,52 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             PathBI pathsForView= Terms.get().getPath(Integer.parseInt(s));
 
             s = (String)process.getProperty(pathsForOriginPropName);
-            PathBI pathsForOrigin = Terms.get().getPath(Integer.parseInt(s));
-
+            
+            PathBI pathsForOrigin = null;
+            try {
+            	pathsForOrigin = Terms.get().getPath(Integer.parseInt(s));
+            } catch (Exception ee) {
+            	System.out.println("Unable to identify paths for origin from selection");
+            }
+            
             String releaseDate = (String) process.getProperty(releaseDatePropName);
 
+            // Set edit path to be Workbench Aux (via Architectonic branch)
+            I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
+            PathBI editPath = Terms.get().getPath(Concept.ARCHITECTONIC_BRANCH.getUids());
+            creatorConfig.getEditingPathSet().clear();
+            creatorConfig.addEditingPath(editPath);
+//            creatorConfig.getViewPositionSet().clear();
+//            creatorConfig.getViewPositionSet().add(Terms.get().newPosition(editPath, Long.MAX_VALUE));
+
+            
             newConfig.getViewPositionSet().clear();
             newConfig.getEditingPathSet().clear();
-            I_ConfigAceFrame creatorConfig = (I_ConfigAceFrame) process.getProperty(creatorProfilePropName);
             newConfig.setClassificationRoleRoot(creatorConfig.getClassificationRoleRoot());
             newConfig.setClassificationRoot(creatorConfig.getClassificationRoot());
             newConfig.setClassifierInputPath(creatorConfig.getClassifierInputPath());
             newConfig.setClassifierIsaType(creatorConfig.getClassifierIsaType());
             newConfig.setClassifierOutputPath(creatorConfig.getClassifierOutputPath());
             
-
-
-            String userDirStr = "profiles" + File.separator + newConfig.getUsername();
+            String releaseDateProfileName= releaseDate + "_" + newConfig.getUsername();
+            String userDirStr = "profiles" + File.separator + releaseDateProfileName;
+            
             File userDir = new File(userDirStr);
-            File userQueueRoot = new File("queues", newConfig.getUsername());
+            File userQueueRoot = new File("queues", releaseDateProfileName);
             userQueueRoot.mkdirs();
 
-            I_GetConceptData userConcept = null;
             // Create new concept for user if not already in existence...
-            if (userNonExistent(newConfig.getDbConfig().getFullName(), newConfig.getUsername(), newConfig.getViewCoordinate())) {
+            I_GetConceptData userConcept = userConceptExists(newConfig.getDbConfig().getFullName(), newConfig.getUsername());
+           	
+            if (userConcept == null) {            	
+                s = (String)process.getProperty(parentConceptForUserPropName);
+                I_GetConceptData parentConceptForUser = Terms.get().getConcept(Integer.parseInt(s));
             	userConcept = createUser(newConfig, creatorConfig, parentConceptForUser);
-            } else {
-	    		I_GetConceptData parentCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-	    		
-	    		for (ConceptVersionBI user : WorkflowHelper.getChildren(parentCon.getVersion(newConfig.getViewCoordinate()))) {
-	    			String childFsnName = user.getFullySpecifiedDescription().getText();
-	    			String childPrefName = user.getPreferredDescription().getText();
-	    			
-	    			if (childPrefName.equals(newConfig.getUsername()))
-	    			{
-	    				userConcept = Terms.get().getConcept(user.getPrimUuid());
-	    			}
-	    		}
-            }
-            
+            } 
+           	
             newConfig.getDbConfig().setUserConcept(userConcept);
 
+            //This is creating issue (since modelers are already active , still it goes make user as active
             
             if (userWithoutActiveModeler(userConcept, newConfig)) {
              	setNewUserAsActiveModeler(userConcept, creatorConfig);
@@ -230,9 +241,10 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             changeSetRoot.mkdirs();
             I_ConfigAceDb newDbProfile = newConfig.getDbConfig();
             newDbProfile.setChangeSetRoot(changeSetRoot);
-            newDbProfile.setChangeSetWriterFileName(newConfig.getUsername() + "#1#" + 
+            
+            newDbProfile.setChangeSetWriterFileName(releaseDateProfileName + "#1#" + 
             		UUID.randomUUID().toString() + ".eccs");
-            newDbProfile.setUsername(newConfig.getUsername());
+            newDbProfile.setUsername(releaseDateProfileName);
 
             
             String tempKey = UUID.randomUUID().toString();
@@ -310,9 +322,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             newConfig.getDescTypes().addAll(creatorConfig.getDescTypes().getSetValues());
             newConfig.getPrefFilterTypesForRel().addAll(creatorConfig.getPrefFilterTypesForRel().getSetValues());
             newConfig.setHighlightConflictsInComponentPanel(creatorConfig.getHighlightConflictsInComponentPanel());
-            newConfig.setHighlightConflictsInTaxonomyView(creatorConfig.getHighlightConflictsInTaxonomyView());
-            newConfig.setConflictResolutionStrategy(creatorConfig.getConflictResolutionStrategy());
-            
+            newConfig.setHighlightConflictsInTaxonomyView(creatorConfig.getHighlightConflictsInTaxonomyView());   
             newConfig.getDbConfig().setClassifierChangesChangeSetPolicy(
                 creatorConfig.getDbConfig().getClassifierChangesChangeSetPolicy());
             newConfig.getDbConfig().setRefsetChangesChangeSetPolicy(
@@ -321,8 +331,12 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
                 creatorConfig.getDbConfig().getUserChangesChangeSetPolicy());
             newConfig.getDbConfig().setChangeSetWriterThreading(
                 creatorConfig.getDbConfig().getChangeSetWriterThreading());
-            newConfig.setPrecedence(creatorConfig.getPrecedence());
-
+//
+// Will fire prop change unnecessarily
+//            Precedence c = creatorConfig.getPrecedence();
+//             newConfig.setPrecedence(c);
+//            newConfig.setConflictResolutionStrategy(creatorConfig.getConflictResolutionStrategy());
+            
             // clear the user's path color
             if (creatorConfig.getDbConfig().getUserPath() != null) {
                 Color userColor = newConfig.getPathColorMap().remove(
@@ -330,17 +344,19 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
                 newConfig.setColorForPath(newConfig.getDbConfig().getUserPath().getConceptNid(), userColor);
             }
 
-            // Create inbox
-            createInbox(newConfig, newConfig.getUsername() + ".inbox", userQueueRoot, newConfig.getUsername()
+            /*
+           // Create inbox
+            createInbox(newConfig, releaseDateProfileName + ".inbox", userQueueRoot, releaseDateProfileName
                 + ".inbox");
             // Create todo box
-            createInbox(newConfig, newConfig.getUsername() + ".todo", userQueueRoot, newConfig.getUsername() + ".inbox");
+            createInbox(newConfig, releaseDateProfileName + ".todo", userQueueRoot, releaseDateProfileName + ".inbox");
             // Create outbox box
-            createOutbox(newConfig, newConfig.getUsername() + ".outbox", userQueueRoot, newConfig.getUsername()
+            createOutbox(newConfig, releaseDateProfileName + ".outbox", userQueueRoot, releaseDateProfileName
                 + ".inbox");
-
+             */
+            
         } catch (Exception e) {
-            AceLog.getAppLog().log(Level.WARNING, e.getLocalizedMessage(), e);
+            AceLog.getAppLog().log(Level.WARNING, "Failed to create cap user with exception: " + e.getLocalizedMessage(), e);
 
             List<AlertToDataConstraintFailure> errorsAndWarnings = Terms.get().getCommitErrorsAndWarnings();
 
@@ -364,50 +380,86 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     	return !WorkflowHelper.isActiveModeler(userConcept.getVersion(newConfig.getViewCoordinate()));
 	}
 
-	private void setNewUserAsActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame creatorConfig) throws TerminologyException, IOException {
+	private void setNewUserAsActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame creatorConfig) throws TerminologyException, IOException, PropertyVetoException {
         I_TermFactory tf = Terms.get();
         
-        // Set user as active editor (for Workflow)
-        tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS
-                .getUids()), tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()), tf
-                .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
-                .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), tf
-                .getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()), 0, 
-                creatorConfig);
-            
+    	I_GetConceptData workflowEditorStatusRelType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getUids());
+    	I_GetConceptData activeModelerDestinationConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids());
+		I_GetConceptData activeStatus = tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
+
+		PathBI editPath = creatorConfig.getEditingPathSet().iterator().next();
+		
+		// Retire bad pathed ActMod and also check to see if need new one
+        boolean hasActModRel = false;
+
+        NidSetBI desiredRelType = new NidSet();
+        desiredRelType.add(workflowEditorStatusRelType.getConceptNid());
+        
+        List<? extends I_RelTuple> rels = userConcept.getSourceRelTuples(creatorConfig.getAllowedStatus(), 
+        																 desiredRelType,
+					        											 creatorConfig.getViewPositionSetReadOnly(), 
+					        											 creatorConfig.getPrecedence(), 
+					        											 creatorConfig.getConflictResolutionStrategy());
+        
+        for (I_RelTuple rel : rels) {
+			if (rel.getC2Id() == activeModelerDestinationConcept.getConceptNid()) {
+				if (rel.getPathNid() == editPath.getConceptNid()) {
+					hasActModRel = true;
+				} else {
+					retireRel(rel, creatorConfig);
+				}
+			}
+        }
+        
+        if (!hasActModRel) {
+	        // Set user as active editor (for Workflow)
+	        tf.newRelationship(UUID.randomUUID(), userConcept, workflowEditorStatusRelType , activeModelerDestinationConcept , tf
+	                .getConcept(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getUuids()), tf
+	                .getConcept(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getUuids()), 
+	                activeStatus, 0, creatorConfig);
+        }
+        
         tf.addUncommitted(userConcept);
 	}
 
-	private boolean userNonExistent(String fsn, String preferred, ViewCoordinate vc) {
-    	if (existingUserStrings == null) {
-    		try {
-	    		existingUserStrings = new HashSet<String>();
-	    		
-	    		I_GetConceptData userCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
-	    		
-	    		for (ConceptVersionBI user : WorkflowHelper.getChildren(userCon.getVersion(vc))) {
-	    			String s = user.getFullySpecifiedDescription().getText();
-	    			if (s.length() > 0) {
-	    				existingUserStrings.add(s);
-	
-		    			s = user.getPreferredDescription().getText();
-		    			if (s.length() > 0) {
-		    				existingUserStrings.add(s);
-		    			}
+	private I_GetConceptData userConceptExists(String fsn, String preferred) {
+		I_GetConceptData parentUserCon = null;
+		Set<String> existingUserStrings = new HashSet<String>();
+
+		try {
+			int fsnNid = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid();
+			int prefNid = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid();
+			int rf2FsnNid = Terms.get().uuidToNative(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()[0]);
+			int rf2PrefNid = Terms.get().uuidToNative(SnomedMetadataRf2.PREFERRED_RF2.getUuids()[0]);
+			
+			
+			parentUserCon = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+
+    		for (I_GetConceptData user : WorkflowHelper.getChildren(parentUserCon)) {
+    			Collection<? extends I_DescriptionVersioned> descs = user.getDescriptions();
+    			
+    			for (I_DescriptionVersioned desc : descs) {
+    				if (desc.getTypeNid() == fsnNid || desc.getTypeNid() == rf2FsnNid ||
+    					desc.getTypeNid() == prefNid || desc.getTypeNid() == rf2PrefNid) {
+	    				existingUserStrings.add(desc.getText().toLowerCase());
+    				}
+    			}
+    		}
+    	
+	    	if (existingUserStrings.contains(fsn.toLowerCase()) && existingUserStrings.contains(preferred.toLowerCase())) {
+	    		// Return Concept
+	    		for (I_GetConceptData user : WorkflowHelper.getChildren(parentUserCon)) {
+	    			if (WorkflowHelper.getFsn(user).equalsIgnoreCase(fsn) &&
+	    				WorkflowHelper.getPrefTerm(user).equalsIgnoreCase(preferred)) {
+	    				return user;
 	    			}
 	    		}
-    		} catch (Exception e) {
-    			AceLog.getAppLog().log(Level.WARNING, "Cannot access user concepts to add their fsn/pref terms to a storage collection");
-    		}
-    	}
-    	
-    	if (existingUserStrings.contains(fsn) || existingUserStrings.contains(preferred)) {
-    		return false;
-    	} else {
-    		existingUserStrings.add(fsn);
-    		existingUserStrings.add(preferred);
-    		return true;
-    	}
+	    	} 
+		} catch (Exception e) {
+			AceLog.getAppLog().log(Level.WARNING, "Cannot access user concepts to add their fsn/pref terms to a storage collection");
+		}
+		
+		return null;
 	}
 
     String[] QueueTypes = new String[] { "aging", "archival", "compute", "inbox", "launcher", "outbox" };
@@ -493,7 +545,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             }
 
         } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
+            AceLog.getAppLog().log(Level.WARNING, "Failed to create cap queue with exception: " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -514,8 +566,8 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
             .getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()), creatorConfig);
         tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername(), Terms.get().getConcept(
         		SnomedMetadataRf2.PREFERRED_RF2.getUuids()), creatorConfig);
-        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername() + ".inbox", Terms.get()
-            .getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()), creatorConfig);
+//        tf.newDescription(UUID.randomUUID(), userConcept, "en", newConfig.getUsername() + ".inbox", Terms.get()
+//            .getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids()), creatorConfig);
 
         // Needs a relationship record...
         tf.newRelationship(UUID.randomUUID(), userConcept, tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL
@@ -532,8 +584,6 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
     }
 
     private void createDevPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig, String releaseDate, PathBI pathsForView, PathBI pathsForOrigin, PathBI addToPathOrigin) throws Exception {
-/*        Set<PositionBI> inputSet = getDeveloperOrigins(creatorConfig);
-*/    	
     	Set<PositionBI> inputSet = new HashSet<PositionBI>();
     	inputSet.add(Terms.get().newPosition(pathsForOrigin, Long.MAX_VALUE));
     	
@@ -551,41 +601,6 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         		Terms.get().getActiveAceFrameConfig());
     }
 
-    private void createClassifierPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame creatorConfig) throws Exception {
-        Collection<? extends PositionBI> inputSet = Terms.get().getPath(creatorConfig.getClassifierOutputPath().getUids()).getOrigins();
-        PathBI classifierPath = createNewPath(newConfig, creatorConfig, inputSet, " classifier path");
-        newConfig.setClassifierOutputPath(Terms.get().getConcept(classifierPath.getConceptNid()));
-    }
-
-    private PathBI createNewPath(I_ConfigAceFrame newConfig,
-			I_ConfigAceFrame creatorConfig,
-			Collection<? extends PositionBI> inputSet, String suffix) throws TaskFailedException, TerminologyException, IOException {
-    	String fsnName = newConfig.getDbConfig().getFullName() + suffix;
-    	String prefName = newConfig.getUsername() + suffix;
-    	
-        return createNewPath(newConfig, creatorConfig, inputSet, fsnName, prefName);
-	}
-
-	private Set<PositionBI> getDeveloperOrigins(I_ConfigAceFrame creatorConfig) throws TerminologyException,
-            IOException, TaskFailedException {
-    	PositionBI developerViewPosition = creatorConfig.getViewPositionSet().iterator().next();
-        if (developerViewPosition == null) {
-            throw new TaskFailedException("developerViewPosition input path is null..."
-                + "You must set the view position prior to running the new user process...");
-        }
-        Set<PositionBI> inputSet = new HashSet<PositionBI>(developerViewPosition.getPath().getOrigins());
-        return inputSet;
-    }
-
-    private PathBI createPromotionPath(I_ConfigAceFrame newConfig, I_ConfigAceFrame commitConfig) throws Exception {
-        for (PathBI promotionPath : commitConfig.getPromotionPathSet()) {
-        	PathBI newConfigPromotionPath = createNewPath(newConfig, commitConfig, new HashSet<PositionBI>(
-                promotionPath.getOrigins()), " promotion path");
-            newConfig.addPromotionPath(newConfigPromotionPath);
-            return newConfigPromotionPath;
-        }
-        return null;
-    }
 
     private PathBI createNewPath(I_ConfigAceFrame config, I_ConfigAceFrame commitConfig, 
     		Collection<? extends PositionBI> positionSet,
@@ -606,7 +621,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         I_GetConceptData pathConcept = Terms.get().newConcept(newPathUid, false, commitConfig);
 
         // Needs a description record...
-        Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", fsnPathName,
+        Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", prefPathName,
         		Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()), 
         		commitConfig);
         Terms.get().newDescription(UUID.randomUUID(), pathConcept, "en", prefPathName,
@@ -702,6 +717,32 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
 
     public void setReleaseDatePropName(String prop) {
         this.releaseDatePropName = prop;
+    }
+
+    private void retireRel(I_RelTuple rel, I_ConfigAceFrame config) throws TerminologyException, PropertyVetoException {
+        try {
+            I_RelVersioned relVersioned = rel.getFixedPart();
+
+            for (PathBI editPath : config.getEditingPathSet()) {
+                I_RelPart oldPart = relVersioned.getLastTuple().getMutablePart();
+                I_RelPart newPart =(I_RelPart) oldPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
+									                              config.getDbConfig().getUserConcept().getNid(),
+									                              editPath.getConceptNid(),
+									                              Long.MAX_VALUE);
+                newPart.setPathNid(oldPart.getPathNid());
+                
+                if (oldPart.getStatusNid() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() &&
+                	oldPart.getStatusNid() != SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+                    relVersioned.addVersion(newPart);
+                }
+            }
+
+            I_GetConceptData concept = Terms.get().getConceptForNid(relVersioned.getNid());
+            Terms.get().addUncommitted(concept);
+        } catch (IOException e1) {
+            AceLog.getAppLog().log(Level.WARNING, "Failed to retire existing workflow user rel with exception: " + e1.getLocalizedMessage(), e1);
+        }
+
     }
 
 }

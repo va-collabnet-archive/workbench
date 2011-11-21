@@ -20,40 +20,45 @@ import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile/cap", type = BeanType.TASK_BEAN) })
-public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapUserParentConcept {
+public class SelectExistingUserConcept extends AbstractSetNewCapUserConcept {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
-    private String parentConceptForPathPropName = ProcessAttachmentKeys.PARENT_CONCEPT_FOR_PATH.getAttachmentKey();
+    private String existingUserConceptPropName = ProcessAttachmentKeys.EXISTING_USER_CONCEPT.getAttachmentKey();
     private String newProfilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
-        out.writeObject(parentConceptForPathPropName);
+        out.writeObject(existingUserConceptPropName);
         out.writeObject(newProfilePropName);
    }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         int objDataVersion = in.readInt();
         if (objDataVersion == dataVersion) {
-        	parentConceptForPathPropName = (String) in.readObject();
+        	existingUserConceptPropName = (String) in.readObject();
             newProfilePropName = (String) in.readObject();
        } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -67,8 +72,8 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
 
         try {
             I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
-	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PATH.getPrimoridalUid());
-
+	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getPrimoridalUid());
+	    	
 	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
 	    	
 	        instruction = getInstruction();
@@ -83,22 +88,30 @@ public class SetNewCapUserParentConceptForPathConcept extends AbstractSetNewCapU
 
 		try {
             int index = parentConceptList.getSelectedIndex();
-            process.setProperty(parentConceptForPathPropName, parentIds.get(index).toString());
+            process.setProperty(existingUserConceptPropName, parentIds.get(index).toString());
+            I_GetConceptData con = Terms.get().getConcept(parentIds.get(index));
+            String fsn = WorkflowHelper.getFsn(con);
+            String pref = WorkflowHelper.getPrefTerm(con);
+            
+            config.getDbConfig().setFullName(fsn);
+            config.setUsername(pref);
+            config.setPassword(pref);
+            config.setFrameName(fsn + " Editor Window");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
     }
 
 	protected JLabel getInstruction() {
-		return new JLabel("Parent of path");
+		return new JLabel("Existing User");
 	}
 	
-    public String getParentConceptForPathPropName() {
-        return parentConceptForPathPropName;
+    public String getExistingUserConceptPropName() {
+        return existingUserConceptPropName;
     }
 
-    public void setParentConceptForPathPropName(String prop) {
-        this.parentConceptForPathPropName = prop;
+    public void setExistingUserConceptPropName(String prop) {
+        this.existingUserConceptPropName = prop;
     }
 
     public String getNewProfilePropName() {

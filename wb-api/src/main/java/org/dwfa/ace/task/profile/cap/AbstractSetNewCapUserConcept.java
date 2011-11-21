@@ -23,13 +23,12 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.swing.SwingWorker;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
-public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrCancel {
 
+public abstract class AbstractSetNewCapUserConcept extends PreviousNextOrCancel {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
@@ -75,7 +74,7 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
 					initialIndex = i;
 				}
 				parentConcepts[i] = WorkflowHelper.getFsn(con);
-	    		parentIds.add(i++, con.getConceptNid());
+				parentIds.add(i++, con.getConceptNid());
     		}
 			
 			return parentConcepts;
@@ -169,5 +168,6 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
         
         return returnCondition;	
     }
+
 
 }
