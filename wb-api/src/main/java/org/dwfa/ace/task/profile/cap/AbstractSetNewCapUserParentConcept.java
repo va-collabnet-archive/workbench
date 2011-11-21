@@ -62,26 +62,20 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
 
     protected String[] generatePotentialParentConcepts(I_GetConceptData parentConcept, ViewCoordinate vc) {
 	   try {
-		   ConceptVersionBI parentVersioned = parentConcept.getVersion(vc);
-		   Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentVersioned);
+		   Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(parentConcept);
     			
-		   SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createFsnComparer());
+		   SortedSet<I_GetConceptData> sortedPotentialParents = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 		   
 			sortedPotentialParents.addAll(potentialParentConcepts);
 		
 			String[] parentConcepts = new String[sortedPotentialParents.size()];
 		
 			int i = 0;
-			for (ConceptVersionBI con : sortedPotentialParents) {
-				if (con.equals(parentVersioned)) {
+			for (I_GetConceptData con : sortedPotentialParents) {
+				if (con.equals(parentConcept)) {
 					initialIndex = i;
 				}
-				String displayStr = con.getPreferredDescription().getText();
-				if (displayStr == null || displayStr.length() == 0) { 
-					displayStr =  con.getFullySpecifiedDescription().getText();
-				}
-
-				parentConcepts[i] = displayStr;
+				parentConcepts[i] = WorkflowHelper.getFsn(con);
 	    		parentIds.add(i++, con.getConceptNid());
     		}
 			
