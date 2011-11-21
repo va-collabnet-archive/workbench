@@ -59,12 +59,18 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			if(mapTarget.equals("") || mapTarget.equals(null) ){	
 				if(referencedComponentId.contains("-")){	
 					String parentSnomedId = getParentSnomedId(concept);
-					//get conceptId by calling web service if exist otherwise create
-					String wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-					if(wsConceptId.equals("0")){
-						wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
-					}					
-					mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
+					
+					if(parentSnomedId.equals("")){
+						logger.info("=====No parentSnomedId===" + concept.getInitialText());
+						System.out.println("=====No parentSnomedId===" + concept.getInitialText());
+					}else{
+						//get conceptId by calling web service if exist otherwise create
+						String wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
+						if(wsConceptId.equals("0")){
+							wsConceptId = getSCTId(getConfig(), UUID.fromString(referencedComponentId));
+						}					
+						mapTarget = getSNOMEDID(getConfig(), UUID.fromString(referencedComponentId), parentSnomedId);
+					}
 					//referencedComponentId=wsConceptId;
 				}
 			}
