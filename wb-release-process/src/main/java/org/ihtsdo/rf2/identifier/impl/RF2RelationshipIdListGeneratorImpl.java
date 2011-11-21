@@ -242,6 +242,9 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String[] part= lineRead.split("\t");
 								String uuid=part[colIx];
 								if(uuid.contains("-")){	
+									uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]).toString();	// sourceId + destinationId + typeId + relationshipGroup
+									logger.info("Inferred relationship uuid map "  +uuid);
+									
 									list.add(UUID.fromString(uuid));
 
 								}
