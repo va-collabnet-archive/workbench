@@ -174,6 +174,8 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 							UUID uuid= null;
 							try {
 								uuid = Type5UuidFactory.get(part[4] + part[5] + part[7] + part[6]);	// sourceId + destinationId + typeId + relationshipGroup
+								logger.info("Inferred relationship uuid sending to webservice "  +uuid);
+								
 								Long lSctId=null;
 								if (hmTmp!=null){
 									//lSctId=hmTmp.get(UUID.fromString(uuid));

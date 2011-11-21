@@ -9,7 +9,7 @@ import org.ihtsdo.rf2.identifier.impl.RF2RelationshipIdListGeneratorImpl;
 import org.ihtsdo.rf2.util.Config;
 
 /**
- * Title: RF2IdGeneratorFactory Description: Generating sct identifier by calling idgenerator webservice  Copyright: Copyright (c) 2010 Company: IHTSDO
+ * Title: RF2RelationshipIdListGeneratorFactory Relationship: Generating relationshipId by calling idgenerator webservice using specific combination Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
  * @author Varsha Parekh
  * @version 1.0
