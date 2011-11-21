@@ -178,18 +178,6 @@ public class ExportUtil {
 		parents = getParentLocal(parents, concept); // check size		
 		String parentSnomedId="";
 		boolean findParentSnomedId = true;
-		/*	
-	  	Iterator iter = parents.iterator();	
-		while (iter.hasNext()) {
-			if(findParentSnomedId){
-				I_GetConceptData parentConcept = (I_GetConceptData) iter.next();
-				parentSnomedId = getSnomedId(parentConcept, getSnomedCorePathNid());	
-				if(!(parentSnomedId.equals("") && parentSnomedId.equals(null))){
-					findParentSnomedId = false;
-				}
-			}
-		}		
-		*/		
 		
 		for (I_GetConceptData loopConcept : parents) {
 			if(findParentSnomedId){
@@ -200,9 +188,9 @@ public class ExportUtil {
 			}
 		}
 			
-		if(findParentSnomedId){
+	/*	if(findParentSnomedId){
 			parentSnomedId="R-10000"; //Default Value
-		}	
+		}*/	
 		
 		return parentSnomedId;
 	}
