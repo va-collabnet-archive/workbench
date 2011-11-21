@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
@@ -39,7 +40,6 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -1511,5 +1511,37 @@ public class WorkflowHelper {
 		// No Workflow exists for concept or it exists without Approved State
 		return 0;
 	}
+
+	public static String getPrefTerm(I_GetConceptData con) throws IOException, TerminologyException {
+		int descTypeNid = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid();
+		int rf2DescTypeNid = Terms.get().uuidToNative(SnomedMetadataRf2.PREFERRED_RF2.getUuids()[0]);
+
+		Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
+		
+		for (I_DescriptionVersioned desc : descs) {
+			if ((desc.getTypeNid() == descTypeNid || desc.getTypeNid() == rf2DescTypeNid) &&
+			    (desc.getLang().equals("en") || desc.getLang().equals("en-us"))) {
+				return desc.getText();
+			}
+		}
+		
+		return null;
+	}
+
+	public static String getFsn(I_GetConceptData con) throws IOException, TerminologyException {
+		int descTypeNid = ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid();
+		int rf2DescTypeNid = Terms.get().uuidToNative(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids()[0]);
+
+		Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
+			
+		for (I_DescriptionVersioned desc : descs) {
+			if (desc.getTypeNid() == descTypeNid || desc.getTypeNid() == rf2DescTypeNid) {
+				return desc.getText();
+			}
+		}
+		
+		return null;
+	}
+
 }
  
