@@ -39,8 +39,8 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     public EditorComponent setupEditor() {
     	
     	ConceptVersionBI defaultModeler = null;
-    	TreeSet<ConceptVersionBI> activeModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
-    	TreeSet<ConceptVersionBI> inactiveModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet<ConceptVersionBI> activeModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
+    	TreeSet<ConceptVersionBI> inactiveModelers = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
     	WorkflowConceptCollection modelers = new WorkflowConceptCollection();
 
     	try {

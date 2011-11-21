@@ -346,7 +346,7 @@ public class WorkflowHelper {
     }
 
     public static void updateWorkflowUserRoles(ViewCoordinate vc) {
-    	TreeSet <ConceptVersionBI> sortedRoles = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet <ConceptVersionBI> sortedRoles = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
    	   	try {
    			I_GetConceptData rolesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getPrimoridalUid());
@@ -368,7 +368,7 @@ public class WorkflowHelper {
     }
 
     public static void updateWorkflowStates(ViewCoordinate vc) {
-    	TreeSet <ConceptVersionBI> sortedStates = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet <ConceptVersionBI> sortedStates = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
 		try {
 			I_GetConceptData statesParentConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
@@ -391,7 +391,7 @@ public class WorkflowHelper {
 
     public static void updateWorkflowActions(ViewCoordinate vc) {
 		Set<UUID> availableActions = new HashSet<UUID>();
-    	TreeSet <ConceptVersionBI> sortedActions = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    	TreeSet <ConceptVersionBI> sortedActions = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 		List<UUID> sortedAvailableActions = new LinkedList<UUID>();
 
 		try {

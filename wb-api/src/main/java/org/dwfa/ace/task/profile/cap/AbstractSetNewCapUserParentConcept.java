@@ -65,7 +65,7 @@ public abstract class AbstractSetNewCapUserParentConcept extends PreviousNextOrC
 		   ConceptVersionBI parentVersioned = parentConcept.getVersion(vc);
 		   Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentVersioned);
     			
-		   SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+		   SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createFsnComparer());
 		   
 			sortedPotentialParents.addAll(potentialParentConcepts);
 		

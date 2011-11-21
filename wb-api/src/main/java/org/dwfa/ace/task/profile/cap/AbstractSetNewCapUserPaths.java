@@ -58,7 +58,7 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
 	   try {
     		Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
     		
-    		SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    		SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createFsnComparer());
 
     		sortedPotentialParents.addAll(potentialParentConcepts);
     		
