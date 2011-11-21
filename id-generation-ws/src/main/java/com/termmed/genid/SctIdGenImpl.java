@@ -149,30 +149,48 @@ public class SctIdGenImpl implements SctIdGen {
 
 	@Override
 	public String createSNOMEDID(String componentUuid, String parentSnomedId) throws Exception {
+		log.debug("\n\n##################### CREATE SNOMED ID #######################");
+		log.debug("Component uuid: " + componentUuid);
+		log.debug("Parent Snomed ID: " + parentSnomedId);
 		String snoID = null;
 		try {
+			log.debug("Getting sctIdentifier");
 			SctIdIdentifier sctIdentifier = (SctIdIdentifier) session.selectOne("com.termmed.genid.data.SctIdIdentifierMapper.selectSctIdByComponentUuid", componentUuid);
+			log.debug("SctIdentifier: " + sctIdentifier);
 			if (sctIdentifier != null) {
+				log.debug("Getting conidmap for component uuid");
 				ConidMap conidmap = (ConidMap) session.selectOne("com.termmed.genid.data.ConidMapMapper.getConidMapByCode", componentUuid);
 				log.debug("SELECTED CONIDMAP: " + conidmap);
 				if (conidmap != null) {
 					if (conidmap.getSnomedId() != null && !conidmap.getSnomedId().trim().equals("")) {
+						log.debug("Result: " + conidmap.getSnomedId());
+						log.debug("\n\n######################### DONE #############################");
 						return conidmap.getSnomedId();
 					} else {
+						log.debug("Getting new snomed id");
 						snoID = GenIdHelper.getNewSNOMEDID(parentSnomedId, session);
+						log.debug("New snomed id: " + snoID);
+						log.debug("Updating sonmed id");
 						conidmap.setSnomedId(snoID);
-						session.update("com.termmed.genid.data.ConidMapMapper.updateConidmap", conidmap);
+						int result = session.update("com.termmed.genid.data.ConidMapMapper.updateConidmap", conidmap);
+						log.debug(result  + " rows affected");
 					}
 				} else {
+					log.debug("Getting new snomed id");
 					snoID = GenIdHelper.getNewSNOMEDID(parentSnomedId, session);
+					log.debug("New snomed id: " + snoID);
+					log.debug("Inserting sonmed id");
 					ConidMap newConidMap = new ConidMap(sctIdentifier.getSctId(), null, snoID, componentUuid, sctIdentifier.getArtifactId(), sctIdentifier.getNamespaceId());
-					session.insert("com.termmed.genid.data.ConidMapMapper.insertConidMap", newConidMap);
+					int result = session.insert("com.termmed.genid.data.ConidMapMapper.insertConidMap", newConidMap);
+					log.debug(result + " rows affected");
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
+		log.debug("Create snomed id result: " + snoID);
+		log.debug("\n\n######################### DONE #############################");
 		return snoID;
 	}
 

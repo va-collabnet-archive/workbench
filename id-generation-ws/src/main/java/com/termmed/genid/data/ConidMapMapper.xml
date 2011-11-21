@@ -55,6 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where snomedid <![CDATA[ >= ]]> #{start}
 		and snomedid <![CDATA[ <= ]]> #{end}
 		order by snomedid
+		LIMIT #{startLine}, #{pageLenght}
 	</select>		
 	
 	<select id="getSnomedIdByComponentUuid" parameterType="String" resultType="String">

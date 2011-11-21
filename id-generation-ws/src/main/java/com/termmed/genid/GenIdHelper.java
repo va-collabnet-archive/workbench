@@ -1,5 +1,8 @@
 package com.termmed.genid;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -36,11 +39,6 @@ public class GenIdHelper {
 		return InverseD5[check];
 	}
 
-	public static void main(String[] args) {
-		SqlSession sqlSession = MyBatisUtil.getSessionFactory().openSession();
-		System.out.println(getNewSNOMEDID("G-FFFF", sqlSession));
-	}
-
 	public static String getNewCTV3ID(SqlSession session) {
 		String lcode = (String) session.selectOne("com.termmed.genid.data.IDBaseMapper.selectIdBase");
 		Long decimalCode = BaseConverterUtil.fromBase62(lcode);
@@ -50,7 +48,13 @@ public class GenIdHelper {
 		return lcode;
 	}
 
+	public static void main(String[] args) {
+		SqlSession sqlSession = MyBatisUtil.getSessionFactory().openSession();
+		System.out.println(getNewSNOMEDID("P1-06005", sqlSession));
+	}
+
 	public static String getNewSNOMEDID(String parentSnomedId, SqlSession session) {
+		logger.debug("#################### Get New SNOMEDID Start ############################");
 		String result = "";
 
 		String tempParent = "";
@@ -69,6 +73,15 @@ public class GenIdHelper {
 				suffixToNum = 65536;
 				pos = 2;
 				lenSuffix = 5;
+				logger.debug("Getting id form id_base.");
+				String idbase = (String) session.selectOne("com.termmed.genid.data.IDBaseMapper.selectSnomedIdBase");
+				logger.debug("ID_BASE result: " + idbase);
+				long hexValue = BaseConverterUtil.fromBase16(idbase);
+				hexValue++;
+				String incremented = BaseConverterUtil.toBase16(hexValue);
+				logger.debug("ID_BASE result incremented: " + incremented);
+				session.update("com.termmed.genid.data.IDBaseMapper.updateSnomedIdBase", incremented);
+				return incremented;
 			} else {
 				logger.debug("Parent snomed id:" + parentSnomedId);
 				pos = parentSnomedId.indexOf('-');
@@ -77,71 +90,88 @@ public class GenIdHelper {
 				suffix = parentSnomedId.split("-")[1];
 				suffixToNum = Integer.parseInt(suffix, 16);
 				logger.debug("Prefix: " + prefix);
+				logger.debug("Suffix: " + suffix);
+				logger.debug("suffixToNum: " + suffixToNum);
 				if (prefix.equals("G")) {
 					lenSuffix = 4;
 				} else {
 					lenSuffix = 5;
 				}
+				logger.debug("lenSuffix: " + lenSuffix);
 
 				int digits = 1;
-				String endId = parentSnomedId.substring(0, parentSnomedId.length() - 1) + "F";
-				String startId = parentSnomedId.substring(0, parentSnomedId.length() - 1) + "0";
-				logger.debug("End Id: " + endId);
-				SnomedIdRange idRange = new SnomedIdRange(startId, endId);
-				logger.debug("Id Range" + idRange);
-
-				Integer total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
-				logger.debug("Count By Snomed id total: " + total);
-				Integer number = Integer.parseInt(startId.substring(parentSnomedId.length() - digits), 16);
-				logger.debug("Number: " + number);
-				logger.debug("POW: " + (total == Math.pow(16d, digits)));
-				while (total == Math.pow(16d, digits) - number && digits < lenSuffix) {
-					digits++;
-
-					String fs = "";
-					for (int i = 1; i <= digits; i++) {
-						fs = fs + "F";
-					}
-					endId = parentSnomedId.substring(0, parentSnomedId.length() - digits) + fs;
-
-					String ss = "";
-					for (int i = 1; i <= digits; i++) {
-						ss = ss + "0";
-					}
-					startId = parentSnomedId.substring(0, parentSnomedId.length() - digits) + ss;
-
-					idRange.setEnd(endId);
-					idRange.setStart(startId);
-
-					logger.debug("ID RANGE: " + idRange);
-					total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
-					logger.debug("Count By Snomed id total: " + total);
-					number = Integer.parseInt(parentSnomedId.substring(startId.length() - digits), 16);
-					logger.debug("Number: " + number);
+				String endId = prefix + "-";
+				for (int i = 0; i < lenSuffix; i++) {
+					endId = endId + "F";
 				}
 
-				List<String> lista = session.selectList("com.termmed.genid.data.ConidMapMapper.selectSnomedIdList", idRange);
-				if (lista != null && !lista.isEmpty()) {
-					int resultNum = findFirstAvailableNumber(lista, digits, lenSuffix);
-					logger.debug("First Avalable Number: " + resultNum);
+				String startId = parentSnomedId;
+				logger.debug("End Id: " + endId);
+				SnomedIdRange idRange = new SnomedIdRange(parentSnomedId, endId);
+				logger.debug("Id Range " + idRange);
 
-					char[] newNumArray = new char[lenSuffix];
-					for (int i = 0; i < newNumArray.length; i++) {
-						newNumArray[i] = '0';
+				Integer total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
+				logger.debug("REAL TOTAL: " + total);
+				int endDecimal = Integer.parseInt(endId.split("-")[1], 16);
+				int startDecimal = Integer.parseInt(parentSnomedId.split("-")[1], 16);
+				logger.debug("Full Total: " + (startDecimal - startDecimal));
+				int k = 1;
+				while (endDecimal - startDecimal == total && k < lenSuffix) {
+					startId = parentSnomedId.substring(0, lenSuffix - k);
+					for (int j = 0; j < k; j++) {
+						startId = startId + "0";
 					}
-					String tmpNum = Integer.toString(resultNum, 16).toUpperCase();
-					int len = lenSuffix;
-					int tmpLen = tmpNum.length();
-					while (tmpLen > 0) {
-						newNumArray[len - 1] = tmpNum.charAt(tmpLen - 1);
-						len--;
-						tmpLen--;
+					logger.debug("End Id: " + endId);
+					idRange = new SnomedIdRange(startId, endId);
+					logger.debug("Id Range " + idRange);
+					total = (Integer) session.selectOne("com.termmed.genid.data.ConidMapMapper.countBySnomedId", idRange);
+					logger.debug("New REAL TOTAL: " + total);
+					endDecimal = Integer.parseInt(endId.split("-")[1], 16);
+					startDecimal = Integer.parseInt(startId);
+					logger.debug("New Full Total: " + (startDecimal - startDecimal));
+					k++;
+				}
+
+				int page = 0;
+				int startLine = 0;
+				int pageLenght = 5000;
+				idRange.setPageLenght(pageLenght);
+				while (startLine < total) {
+					idRange.setStartLine(startLine);
+					@SuppressWarnings("unchecked")
+					List<String> lista = session.selectList("com.termmed.genid.data.ConidMapMapper.selectSnomedIdList", idRange);
+					if (!lista.contains(startId) && page == 0) {
+						String[] startSplit = startId.split("-");
+						int startNum = Integer.parseInt(startSplit[1], 16);
+						startNum--;
+						lista.add(startSplit[0] + "-" + Integer.toString(startNum, 16));
+						Collections.sort(lista);
 					}
-					result = prefix + "-" + new String(newNumArray);
-					logger.debug("RESULT: " + result);
+					if (lista != null && !lista.isEmpty() && lista.size() < pageLenght) {
+						int resultNum = findFirstAvailableNumber(lista, digits, lenSuffix);
+						logger.debug("First Avalable Number: " + resultNum);
+
+						char[] newNumArray = new char[lenSuffix];
+						for (int i = 0; i < newNumArray.length; i++) {
+							newNumArray[i] = '0';
+						}
+						String tmpNum = Integer.toString(resultNum, 16).toUpperCase();
+						int len = lenSuffix;
+						int tmpLen = tmpNum.length();
+						while (tmpLen > 0) {
+							newNumArray[len - 1] = tmpNum.charAt(tmpLen - 1);
+							len--;
+							tmpLen--;
+						}
+						result = prefix + "-" + new String(newNumArray);
+						logger.debug("RESULT: " + result);
+					}
+					page++;
+					startLine = startLine + pageLenght;
 				}
 			}
 		}
+		logger.debug("#################### Get New SNOMEDID End ############################");
 		return result;
 	}
 
@@ -157,9 +187,9 @@ public class GenIdHelper {
 					return ++antNum;
 				} else if (lenSuffix == 5 && !lista.get(0).endsWith("FFFFF")) {
 					return ++antNum;
-				}else if(lenSuffix == 4 && lista.get(0).endsWith("FFFF")){
+				} else if (lenSuffix == 4 && lista.get(0).endsWith("FFFF")) {
 					return --antNum;
-				}else if(lenSuffix == 5 && lista.get(0).endsWith("FFFFF")) {
+				} else if (lenSuffix == 5 && lista.get(0).endsWith("FFFFF")) {
 					return --antNum;
 				}
 			} else {
@@ -172,19 +202,19 @@ public class GenIdHelper {
 				int lastNum = Integer.parseInt(lastSuffix, 16);
 
 				if (lastNum - firstNum == lista.size() + 1) {
-					if(lenSuffix == 4 && lastSuffix.equalsIgnoreCase("ffff")){
+					if (lenSuffix == 4 && lastSuffix.equalsIgnoreCase("ffff")) {
 						return --firstNum;
-					}else if(lenSuffix == 5 && lastSuffix.equalsIgnoreCase("fffff")){
+					} else if (lenSuffix == 5 && lastSuffix.equalsIgnoreCase("fffff")) {
 						return --firstNum;
-					}else if(lenSuffix == 4 && !lastSuffix.equalsIgnoreCase("ffff")){
+					} else if (lenSuffix == 4 && !lastSuffix.equalsIgnoreCase("ffff")) {
 						return ++lastNum;
-					}else if(lenSuffix == 5 && !lastSuffix.equalsIgnoreCase("fffff")){
+					} else if (lenSuffix == 5 && !lastSuffix.equalsIgnoreCase("fffff")) {
 						return --lastNum;
 					}
 				} else {
 					antNum = firstNum;
 					String actSuffix = "";
-					lista.remove(0);
+					// lista.remove(0);
 					for (String string : lista) {
 						actSuffix = string.split("-")[1];
 						int actNum = Integer.parseInt(actSuffix, 16);
