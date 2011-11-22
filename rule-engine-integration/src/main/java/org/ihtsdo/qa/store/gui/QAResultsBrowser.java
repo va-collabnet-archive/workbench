@@ -447,7 +447,6 @@ public class QAResultsBrowser extends JPanel {
 
 	private void comboBox1ItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
-			System.out.println("THIS METHOD SHOULD RUN ONLY ONCEEEE OK???");
 			setupPathsCombo();
 			setupTimeCombo();
 			clearTable1();
