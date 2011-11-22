@@ -115,7 +115,25 @@ public class WorkflowHelper {
 		}
 		
 		if (modelers != null) {
-			return modelers.get(Terms.get().getActiveAceFrameConfig().getUsername());
+			
+			I_GetConceptData userCon = null;
+			String prefTerm = null;
+			
+			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+			
+			for (I_GetConceptData con : getChildren(parentEditorConcept)) {
+				if (Terms.get().getActiveAceFrameConfig().getUsername().endsWith(WorkflowHelper.getPrefTerm(con))) {
+					prefTerm = WorkflowHelper.getPrefTerm(con);
+					break;
+				}
+			}
+			
+			
+			if (prefTerm == null) {
+	        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current user's workflow login");
+			}
+			
+			return modelers.get(prefTerm);
 		} 
 			
 		return null;
@@ -126,7 +144,7 @@ public class WorkflowHelper {
 			TerminologySnapshotDI dbSnapshot = Ts.get().getSnapshot(vc);
 			return dbSnapshot.getConceptVersion(conceptNid).getPreferredDescription().getText();
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's Preferred with msg: \n" + e.getMessage() + "\n");
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's Preferred with msg: \n" + e.getMessage());
 		}
 
    		return "";
@@ -138,7 +156,7 @@ public class WorkflowHelper {
 			TerminologySnapshotDI dbSnapshot = Ts.get().getSnapshot(vc);
 			return dbSnapshot.getConceptVersion(conceptNid).getFullySpecifiedDescription().getText();
 		} catch (Exception e) {
-        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's FSN with msg: \n" + e.getMessage() + "\n");
+        	AceLog.getAppLog().log(Level.WARNING, "Error in identifying current concept's FSN with msg: \n" + e.getMessage());
 		}
 
    		return "";		
