@@ -22,13 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -113,17 +108,17 @@ public class NullComponentFinder implements ProcessUnfetchedConceptDataBI {
             try {
                 referencedComponent = Ts.get().getComponent(nid);
             } catch (IOException e) {
-                AceLog.getAppLog().warning(e.getMessage());
+                e.printStackTrace();
             }
 
             if (referencedComponent == null) {
                 try {
-                    AceLog.getAppLog().warning("No component for nid: " + nid
+                    System.out.println("No component for nid: " + nid
                             + " " + Ts.get().getUuidsForNid(nid)
                             + ". Used in component:" + component);
                     nullComponent.add(nid);
                 } catch (IOException ex) {
-                    AceLog.getAppLog().warning(ex.getMessage());
+                    ex.printStackTrace();
                 }
             }
         }
