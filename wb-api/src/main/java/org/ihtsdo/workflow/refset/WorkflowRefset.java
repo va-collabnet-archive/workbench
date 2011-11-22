@@ -74,8 +74,15 @@ public abstract class WorkflowRefset
 	}
 
 	public String toString() {
+		String fieldStr;
+		if (fields == null) {
+			fieldStr = "null";
+		} else {
+			fieldStr = fields.toString();
+		}
+		
 		return "Refset: " + refsetName + " (refsetId: " + refsetNid + ") with fields: " + 
-			   "\n" + fields.toString();
+			   "\n" + fieldStr;
 	}
 
 	public String getProp(String key, String props) {
