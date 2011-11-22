@@ -65,6 +65,8 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersion> {
    private static IntSet classifierCharacteristics;
@@ -220,7 +222,10 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
          IntSet temp = new IntSet();
 
          try {
-            temp.add(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
+            temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.DEFINED_RF1.getUuids()));
+            temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids()));
+            temp.add(Ts.get().getNidForUuids(SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids()));
+            temp.add(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getConceptNid());
          } catch (ValidationException e) {
             throw new RuntimeException(e);
          } catch (IOException e) {

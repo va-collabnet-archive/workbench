@@ -1,36 +1,26 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
-import org.ihtsdo.concept.component.attributes.ConceptAttributes.Version;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsaCache extends TypeCache {
 
 	private NidBitSetBI nidSet;
-	private int activeValueNid;
 
 	public IsaCache(NidBitSetBI nidSet) {
 		super();
 		this.nidSet = nidSet;
-		try {
-			this.activeValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-		} catch (ValidationException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
 	}
 
 	@Override
@@ -38,6 +28,9 @@ public class IsaCache extends TypeCache {
 			ConceptFetcherBI fcfc) throws Exception {
 		if (isCancelled() == false) {
 			Concept c = (Concept) fcfc.fetch();
+                        if (c.getPrimUuid().equals(UUID.fromString("874ec6f1-5e6d-3478-9dbd-11ee47dac99d"))) {
+                            System.out.println("Found: 874ec6f1-5e6d-3478-9dbd-11ee47dac99d");
+                        }
 			NidSet parentSet = getParentSet(c);
 			typeMap.put(cNid, parentSet.getSetValues());
 		}
@@ -47,12 +40,9 @@ public class IsaCache extends TypeCache {
 		NidSet parentSet = new NidSet();
 		ConceptVersion cv = new ConceptVersion((Concept) concept, inferredViewCoordinate);
 		// Retired concept should be setup in the isa cache by stated parents
-		boolean isActive = true;
-		if (cv.getConAttrs().getStatusNid() != activeValueNid) {
-			isActive = false;
-		}
+		
 
-		if (!isActive || cv.getRelsOutgoingActiveIsa().isEmpty()) {
+		if (!cv.isActive() || cv.getRelsOutgoingActiveIsa().isEmpty()) {
 			cv = new ConceptVersion((Concept) concept, statedViewCoordinate);
 		}
 

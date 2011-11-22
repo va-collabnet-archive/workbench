@@ -422,7 +422,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
             metadataVC = new ViewCoordinate(Precedence.PATH, positionSet, allowedStatusNids, isaTypeNids,
                     contradictionManager, languageNid, classifierNid,
-                    RelAssertionType.STATED, null,
+                    RelAssertionType.INFERRED_THEN_STATED, null,
                     ViewCoordinate.LANGUAGE_SORT.TYPE_BEFORE_LANG);
         }
 

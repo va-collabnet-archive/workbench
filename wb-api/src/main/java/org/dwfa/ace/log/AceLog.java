@@ -23,7 +23,7 @@ public class AceLog {
 
     public static AceLogWithAlerts getAppLog() {
         return appLog;
-    }
+    } 
 
     public static AceLogWithAlerts getEditLog() {
         return editLog;

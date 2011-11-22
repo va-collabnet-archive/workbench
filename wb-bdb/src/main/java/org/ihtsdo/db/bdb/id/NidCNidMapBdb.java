@@ -20,6 +20,7 @@ import org.ihtsdo.db.bdb.ComponentBdb;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.TreeSet;
@@ -190,6 +191,7 @@ public class NidCNidMapBdb extends ComponentBdb {
 
         Cursor cursor = db.openCursor(null, cursorConfig);
 
+        maxValueEntries.clear();
         try {
             DatabaseEntry foundKey = new DatabaseEntry();
             DatabaseEntry foundData = new DatabaseEntry();
@@ -209,6 +211,8 @@ public class NidCNidMapBdb extends ComponentBdb {
                 }
 
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
+                    maxValueEntries.remove(-2147483648);
+                    maxValueEntries.remove(-2147483647);
                     if (readOnly) {
                         AceLog.getAppLog().info("\n\nmax value entry count for read only index[" + index + "]: "
                                 + maxValueEntries.size());
@@ -297,7 +301,17 @@ public class NidCNidMapBdb extends ComponentBdb {
                     maxValueEntries.remove(-2147483648);
                     maxValueEntries.remove(-2147483647);
                     if ((maxValueEntries.size() > 0) && (key < nidCNidMaps.get().length - 1)) {
-                        System.out.println("writing max value entries: " + maxValueEntries);
+                        ArrayList<Integer> toRemove = new ArrayList<Integer>(maxValueEntries.size());
+                        for (int nid: maxValueEntries) {
+                            if (getCNid(nid) != Integer.MAX_VALUE) {
+                                toRemove.add(nid);
+                            } 
+                        }
+                        maxValueEntries.removeAll(toRemove);
+                        if (maxValueEntries.size() > 0) {
+                            AceLog.getAppLog().info("writing max value entry count: " + maxValueEntries.size() + 
+                                "\nvalues: " + maxValueEntries);
+                        }
                     }
 
                     DatabaseEntry valueEntry = new DatabaseEntry(output.toByteArray());
