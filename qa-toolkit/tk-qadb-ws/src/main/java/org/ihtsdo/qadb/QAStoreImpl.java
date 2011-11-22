@@ -359,6 +359,8 @@ public class QAStoreImpl implements QAStoreBI {
 			for (Integer integer : filterset) {
 				logger.info("Filter " + integer + " " + filter.get(integer));
 			}
+			logger.debug("Rules page size: " + rules.size());
+			int lineNumber = 1;
 			for (Rule rule : rules) {
 				try {
 					UUID.fromString(rule.getRuleUuid());
@@ -376,26 +378,31 @@ public class QAStoreImpl implements QAStoreBI {
 				logger.debug("Closed status count: " + closedStatus);
 				if (filter != null) {
 					if (filter.containsKey(RulesReportColumn.STATUS)) {
+						logger.debug("Filtering by status");
 						String statusFilter = filter.get(RulesReportColumn.STATUS).toString();
 						logger.debug("Status object " + filter.get(RulesReportColumn.STATUS).toString());
 						if (statusFilter.equalsIgnoreCase("open cases")) {
 							if (openStatus == null) {
 								logger.debug("STATUS FILTER APLYED");
+								lineNumber++;
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("no open cases")) {
 							if (openStatus != null) {
 								logger.debug("STATUS FILTER APLYED");
+								lineNumber++;
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("closed cases")) {
 							if (closedStatus == null) {
 								logger.debug("STATUS FILTER APLYED");
+								lineNumber++;
 								continue;
 							}
 						} else if (statusFilter.equalsIgnoreCase("no closed cases")) {
 							if (closedStatus != null) {
 								logger.debug("STATUS FILTER APLYED");
+								lineNumber++;
 								continue;
 							}
 						}
@@ -404,7 +411,7 @@ public class QAStoreImpl implements QAStoreBI {
 
 				@SuppressWarnings("unchecked")
 				List<DispStatusCount> dispStatusCounts = sqlSession.selectList("org.ihtsdo.qadb.data.RuleMapper.selectDispositionStatusCounts", coords);
-
+				logger.debug("disposition status counts: " + dispStatusCounts);
 				boolean filterExists = false;
 				if (filter != null) {
 					if (filter.containsKey(new Integer(RulesReportColumn.DISPOSITION_STATUS))) {
@@ -416,6 +423,7 @@ public class QAStoreImpl implements QAStoreBI {
 						}
 						if (!filterExists) {
 							logger.debug("DISPOSITION STATUS FILTER APLYED");
+							lineNumber++;
 							continue;
 						}
 					}
@@ -445,6 +453,8 @@ public class QAStoreImpl implements QAStoreBI {
 				line.setDispositionStatusCount(statusesResult);
 				line.setStatusCount(statusCounts);
 				line.setRule(rule);
+				logger.debug(lineNumber + " - line: " + line);
+				lineNumber++;
 				lines.add(line);
 			}
 			logger.debug("Line after filtering: " + lines.size());

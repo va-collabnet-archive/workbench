@@ -57,5 +57,10 @@ public class RulesReportLine {
 	public void setLastExecutionTime(Date lastExecutionTime) {
 		this.lastExecutionTime = lastExecutionTime;
 	}
+	
+	@Override
+	public String toString() {
+		return rule.toString() + " " + statusCount + " " + dispositionStatusCount + " " + lastExecutionTime;
+	}
 
 }

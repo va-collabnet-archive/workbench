@@ -46,11 +46,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectRulesByCoords" parameterType="RuleFilterCoords"
 		resultMap="ruleResultMap">
 		select * from qa_db.qa_rule r
-		inner join qa_severity s on
+		left join qa_severity s on
 		r.severity_uid = s.severity_uid
-		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+		where r.rule_uid != 'null'
 			<if test="name != null">
-				r.name like #{name}
+				AND	r.name like #{name}
 			</if>
 			<if test="ruleCode != null">
 				AND r.rule_code like #{ruleCode}
@@ -61,7 +61,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="severity != null">
 				AND r.severity_uid = #{severity}
 			</if>
-		</trim>
 		<choose>
 			<when test="sortBy.containsKey(new Integer(1))">
 				order by r.name
@@ -75,11 +74,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectRulesCount" parameterType="RuleFilterCoords"
 		resultType="Integer">
 		select count(*) from qa_db.qa_rule r
-		inner join qa_severity s on
-		r.severity_uid = s.severity_uid
-		<trim prefix="WHERE" prefixOverrides="AND |OR ">
+		left join qa_severity s on
+		r.severity_uid = s.severity_uid 
+		where r.rule_uid != 'null'
 			<if test="name != null">
-				r.name like #{name}
+				AND r.name like #{name}
 			</if>
 			<if test="ruleCode != null">
 				AND r.rule_code like #{ruleCode}
@@ -90,7 +89,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="severity != null">
 				AND r.severity_uid = #{severity}
 			</if>
-		</trim>
 	</select>
 	
 	<sql id="pagingSql">
