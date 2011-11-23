@@ -61,6 +61,7 @@ import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
@@ -440,7 +441,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     return returnUuid;
                 }
             };
-            ActiveOnlyExport exporter = new ActiveOnlyExport(conceptPanel.getConfig().getViewCoordinate(),
+            ViewCoordinate vc = conceptPanel.getConfig().getViewCoordinate();
+            ActiveOnlyExport exporter = new ActiveOnlyExport(vc, vc, vc,
                     exclusionSet, out, conversionMap);
 
             Ts.get().iterateConceptDataInSequence(exporter);

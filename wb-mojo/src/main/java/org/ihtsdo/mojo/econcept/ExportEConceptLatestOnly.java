@@ -28,6 +28,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -98,15 +99,28 @@ public class ExportEConceptLatestOnly extends AbstractMojo {
             }
          };
          ViewCoordinate vc           = Ts.get().getMetadataVC();
-         ViewCoordinate exportVc     = new ViewCoordinate(vc);
-         exportVc.getAllowedStatusNids().clear();
+         ViewCoordinate conceptVc     = new ViewCoordinate(vc);
+         conceptVc.getAllowedStatusNids().clear();
 
          PathBI         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
          PositionBI     viewPosition = new Position(Long.MAX_VALUE, path);
 
-         exportVc.setPositionSet(new PositionSet(viewPosition));
+         conceptVc.setPositionSet(new PositionSet(viewPosition));
 
-         ActiveOnlyExport exporter = new ActiveOnlyExport(exportVc, exclusionSet, out, conversionMap);
+         ViewCoordinate relVc     = new ViewCoordinate(vc);
+         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
+         viewPosition = new Position(Long.MAX_VALUE, path);
+
+         relVc.setPositionSet(new PositionSet(viewPosition));
+
+         ViewCoordinate descVc     = new ViewCoordinate(vc);
+         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
+         viewPosition = new Position(Long.MAX_VALUE, path);
+
+         descVc.setPositionSet(new PositionSet(viewPosition));
+         descVc.getAllowedStatusNids().add(Ts.get().getNidForUuids(UUID.fromString("6cc3df26-661e-33cd-a93d-1c9e797c90e3")));
+         ActiveOnlyExport exporter = new ActiveOnlyExport(conceptVc, descVc, relVc, 
+                 exclusionSet, out, conversionMap);
 
          Ts.get().iterateConceptDataInSequence(exporter);
       } catch (Exception ex) {

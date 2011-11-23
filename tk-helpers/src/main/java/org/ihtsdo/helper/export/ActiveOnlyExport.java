@@ -40,18 +40,21 @@ public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
     NidBitSetBI exclusionSet;
     NidBitSetBI nidSet;
     DataOutputStream out;
-    TerminologySnapshotDI ts;
-    ViewCoordinate vc;
+    ViewCoordinate conceptVc;
+    ViewCoordinate descVc;
+    ViewCoordinate relVc;
 
     //~--- constructors --------------------------------------------------------
-    public ActiveOnlyExport(ViewCoordinate vc, NidBitSetBI exclusionSet, DataOutputStream out,
+    public ActiveOnlyExport(ViewCoordinate conceptVc, ViewCoordinate descVc, ViewCoordinate relVc, 
+            NidBitSetBI exclusionSet, DataOutputStream out,
             Map<UUID, UUID> conversionMap)
             throws IOException {
-        this.vc = vc;
+        this.conceptVc = conceptVc;
+        this.descVc = descVc;
+        this.relVc = relVc;
         this.exclusionSet = exclusionSet;
         this.nidSet = Ts.get().getAllConceptNids();
-        this.ts = Ts.get().getSnapshot(vc);
-        this.out = out;
+         this.out = out;
         this.conversionMap = conversionMap;
     }
 
@@ -64,10 +67,11 @@ public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
         if (!exclusionSet.isMember(cNid)) {
-            ConceptVersionBI conceptVersion = fetcher.fetch(vc);
+            ConceptVersionBI conceptVersion = fetcher.fetch(conceptVc);
 
             if ((conceptVersion.getPrimUuid() != null) && conceptVersion.isActive()) {
-                TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, vc);
+                TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, 
+                        conceptVc, descVc, relVc);
 
                 tkc.writeExternal(out);
             }
