@@ -23,7 +23,7 @@
 	</properties>
 
 	<modules>
-	<!--	<module>documents</module> -->
+		<module>documents</module>
 		<module>issue-management-ndb</module>
 		<module>issue-repository-integration-ndb</module>
 		<module>project-management-ndb</module>
