@@ -101,8 +101,8 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
 
 import org.ihtsdo.arena.Arena;
-import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.objectCache.ObjectCache;
+import org.ihtsdo.statics.CustomStatics;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListenerForAce;
 import org.ihtsdo.taxonomy.TaxonomyTree;
