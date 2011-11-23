@@ -1,57 +1,69 @@
 package org.ihtsdo.objectCache;
-/**
- * @author Adam Flinton
- */
 
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+/**
+ * An object cache for statically managing shared objects.
+ * @author Adam Flinton
+ *
+ */
 public enum ObjectCache {
-
+    /** The Instance. **/
 	INSTANCE;
-	
-	private Hashtable<String, Object> cache;
-	private final Logger log = Logger.getLogger(ObjectCache.class.getName());
-
+	/** The Cache hashtable. **/
+	private ConcurrentHashMap<String, Object> cache;
+	/** The logger. **/
+	private static final Logger LOG = 
+	    Logger.getLogger(ObjectCache.class.getName());
+/**
+ * The constructor.
+ */
 	private ObjectCache() {
-		cache = new Hashtable<String, Object>();
+		cache = new ConcurrentHashMap<String, Object>();
 	}
-
-	public Object get(String key) {
-		Object o = null;
+/**
+ * Retrieves the object from the cache using a key.
+ * @param key The key
+ * @return The object indicated by the key. If nothing found then null.
+ */
+	public Object get(final String key) {
+		Object obj = null;
 		try {
-			if (cache.containsKey(key)){
-				synchronized (this) // make thread safe
-				{
-					o = cache.get(key);
+			if (cache.containsKey(key)) {
+				synchronized (this) { // make thread safe
+					obj = cache.get(key);
 				}
 			}
-		} catch (Exception E) {
-			//log.error("Error in ObjectCache.get key = " + key, E);
-			log.log(Level.SEVERE,"Error in ObjectCache.get key = " + key, E);
+		} catch (Exception excep) {
+			LOG.log(Level.SEVERE , "Error in ObjectCache.get key = "
+			    + key , excep);
 		}
-		return o;
+		return obj;
 	}
-
-	public boolean put(String key, Object o) {
-		boolean ok = false;
+/**
+ * Adds an object into the cache.
+ * @param key The Key value used to retrieve the object.
+ * @param obj The object to be stored.
+ * @return A boolean which indicates if the operation was a success.
+ */
+	public boolean put(final String key, final Object obj) {
+		boolean isok = false;
 		try {
-			synchronized (this) // make thread safe
-			{
-				cache.put(key, o);
-				ok = true;
+			synchronized (this) { // make thread safe
+				cache.put(key, obj);
+				isok = true;
 			}
 
-		} catch (Exception E) {
-			//log.error("Error in ObjectCache.put key = " + key + "Object = " + o,E);
-			log.log(Level.SEVERE,"Error in ObjectCache.put key = " + key + "Object = " + o,E);
-			ok = false;
+		} catch (Exception excep) {
+			LOG.log(Level.SEVERE , "Error in ObjectCache.put key = "
+			    + key + "Object = " + obj , excep);
+			isok = false;
 		}
 
-		return ok;
+		return isok;
 	}
 
 	/**
@@ -61,7 +73,7 @@ public enum ObjectCache {
 		cache.clear();
 	}
 
-	/*
+	/**
 	 * 
 	 * @return java.util.Enumeration
 	 */
@@ -75,7 +87,7 @@ public enum ObjectCache {
 	 * @param key
 	 *            The filename of the object.
 	 */
-	public void remove(Object key) {
+	public void remove(final Object key) {
 		cache.remove(key);
 	}
 
@@ -94,9 +106,9 @@ public enum ObjectCache {
 	 */
 	public void debugOC() {
 
-		for(Entry<String, Object> entry : cache.entrySet()) {
-			log.severe("OC Key = " + entry.getKey());
-			log.severe("OC Value = " + entry.getValue());
+		for (Entry<String, Object> entry : cache.entrySet()) {
+			LOG.severe("OC Key = " + entry.getKey());
+			LOG.severe("OC Value = " + entry.getValue());
 		}
 
 	}
