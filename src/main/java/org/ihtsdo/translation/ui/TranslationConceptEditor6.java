@@ -131,6 +131,7 @@ import org.ihtsdo.project.refset.CommentsRefset;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.FSNGenerationException;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.LanguageUtil.Language;
@@ -153,16 +154,12 @@ public class TranslationConceptEditor6 extends JPanel {
 	private I_GetConceptData preferred;
 	private List<Integer> sourceIds;
 	private int targetId;
-	private I_GetConceptData notAcceptable;
 	private I_GetConceptData acceptable;
-	private I_GetConceptData current;
 	private Set<LanguageMembershipRefset> sourceLangRefsets;
 	private LanguageMembershipRefset targetLangRefset;
 	private SimpleDateFormat formatter;
-	// private I_GetConceptData description;
 	private I_GetConceptData inactive;
 	private I_GetConceptData active;
-	private I_GetConceptData retired;
 	private IssuesListPanel2 issueListPanel;
 	private ConfigTranslationModule translConfig;
 	private String assignedMnemo;
@@ -171,6 +168,8 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JButton button5;
 	private Thread updateUIThread;
 	private boolean alreadyVerified;
+	private I_GetConceptData Snomed_Isa;
+	private int inferred;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -186,36 +185,20 @@ public class TranslationConceptEditor6 extends JPanel {
 	 */
 	public TranslationConceptEditor6() {
 		sourceIds = new ArrayList<Integer>();
-		// if (sourceLangRefsets!=null)
-		// for (LanguageMembershipRefset sourceRef:sourceLangRefsets){
-		// sourceIds.add(sourceRef.getRefsetId());
-		// }
-		// if (targetLangRefset!=null)
-		// targetId=targetLangRefset.getRefsetId();
 		I_ConfigAceFrame config = null;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			// translConfig=LanguageUtil.getTranslationConfig(config);
-			// if (translConfig==null){
-			// setDefaultConfigValues(translConfig);
-			// }
-			synonym = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-
-			// TODO review!! previously was DESCRIPTION_DESCRIPTION_TYPE
-			// description =
-			// Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DESCRIPTION_TYPE.getUids());
-			notAcceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
-			inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-			retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			acceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
-			current = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			active = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			definingChar = ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
-			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
-			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
-			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
+			inactive = Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
+			fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			synonym = Terms.get().getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+			Snomed_Isa= Terms.get().getConcept(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+			acceptable = Terms.get().getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
+			active = Terms.get().getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+			definingChar = SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getLenient().getNid();
+			inferred=SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
+			config.getDescTypes().add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			config.getDescTypes().add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -250,26 +233,10 @@ public class TranslationConceptEditor6 extends JPanel {
 		DefaultComboBoxModel comboBoxModel2 = new DefaultComboBoxModel();
 		comboBoxModel2.addElement(preferred);
 		comboBoxModel2.addElement(acceptable);
-		comboBoxModel2.addElement(notAcceptable);
 
 		cmbAccep.setModel(comboBoxModel2);
 		cmbAccep.setSelectedIndex(1);
 		cmbAccep.setEnabled(false);
-
-		// rbYes.setEnabled(false);
-		// rbNo.setEnabled(false);
-		// rbAct.setEnabled(false);
-		// rbInact.setEnabled(false);
-
-		// tree1.setCellRenderer(new HtmlSafeTreeCellRenderer());
-
-		// tree1.setCellRenderer(new IconRenderer());
-		// tree1.setRootVisible(true);
-		// tree1.setShowsRootHandles(false);
-		//
-		// tree2.setCellRenderer(new IconRenderer());
-		// tree2.setRootVisible(true);
-		// tree2.setShowsRootHandles(false);
 
 		tree3.setCellRenderer(new DetailsIconRenderer());
 		tree3.setRootVisible(true);
@@ -286,11 +253,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		bEscalate.setEnabled(false);
 		label4.setVisible(false);
 
-		// DefaultMutableTreeNode sourceRoot=new DefaultMutableTreeNode();
-		// tree1.setModel(new DefaultTreeModel(sourceRoot));
-		//
-		// DefaultMutableTreeNode targetRoot=new DefaultMutableTreeNode();
-		// tree2.setModel(new DefaultTreeModel(targetRoot));
 		tabSou.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabSou.setModel(new DefaultTableModel());
@@ -362,7 +324,7 @@ public class TranslationConceptEditor6 extends JPanel {
 
 					ContextualizedDescription description = (ContextualizedDescription) model.getValueAt(rowModel, TableSourceColumn.TERM.ordinal());
 
-					if (description.getDescriptionStatusId() == retired.getConceptNid()) {
+					if (description.getDescriptionStatusId() == inactive.getConceptNid()) {
 						return;
 					}
 					mItemListener.setItem(description);
@@ -518,7 +480,6 @@ public class TranslationConceptEditor6 extends JPanel {
 							try {
 								Terms.get().cancel();
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -735,29 +696,6 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
-	private void mCloseActionPerformed() {
-		AceFrameConfig config;
-		try {
-			config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-			AceFrame ace = config.getAceFrame();
-			JTabbedPane tp = ace.getCdePanel().getConceptTabs();
-			if (tp != null) {
-				int tabCount = tp.getTabCount();
-				for (int i = 0; i < tabCount; i++) {
-					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-						tp.remove(i);
-						tp.repaint();
-						tp.revalidate();
-					}
-
-				}
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	private void mAddPrefActionPerformed() {
 		if (verifySavePending(null, false)) {
@@ -767,37 +705,21 @@ public class TranslationConceptEditor6 extends JPanel {
 			panel2.revalidate();
 			saveDesc = true;
 			mSpellChk.setEnabled(true);
-			// button5.setEnabled(true);
-			// comboBox1.setEnabled(true);
 			comboBox1.setSelectedItem(synonym);
-			// cmbAccep.setEnabled(true);
 			cmbAccep.setSelectedItem(preferred);
-			// rbNo.setEnabled(true);
-			// rbAct.setEnabled(true);
-			// rbYes.setEnabled(true);
-			// rbInact.setEnabled(true);
 		}
 	}
 
 	private void mAddDescActionPerformed() {
 		if (verifySavePending(null, false)) {
 			descriptionInEditor = null;
-			// label4.setText("");
-			// label4.setVisible(false);
 			targetTextField.setText("");
 			targetTextField.setEnabled(true && !readOnlyMode);
 			panel2.revalidate();
 			saveDesc = true;
 			mSpellChk.setEnabled(true);
-			// button5.setEnabled(true);
-			// comboBox1.setEditable(true);
 			comboBox1.setSelectedItem(synonym);
-			// cmbAccep.setEditable(true);
 			cmbAccep.setSelectedItem(acceptable);
-			// rbNo.setSelected(true);
-			// rbAct.setSelected(true);
-			// rbInact.setEnabled(true);
-			// rbYes.setEnabled(true);
 		}
 	}
 
@@ -807,9 +729,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		bKeep.setEnabled(false);
 		bReview.setEnabled(false);
 		bEscalate.setEnabled(false);
-		// bExec.setEnabled(true);
-		// table3.setEnabled(true);
-		// mClose.setEnabled(true);
 	}
 
 	private void bReviewActionPerformed() {
@@ -880,13 +799,9 @@ public class TranslationConceptEditor6 extends JPanel {
 				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
 			}
 
-			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() && !((I_GetConceptData) cmbAccep.getSelectedItem()).equals(notAcceptable)) {
+			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() ) {
 				descriptionInEditor = (ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
 
-				// if
-				// (((I_GetConceptData)comboBox1.getSelectedItem()).equals(notAcceptable)){
-				//
-				// }
 			}
 			if (descriptionInEditor != null) {
 				descriptionInEditor.setText(targetTextField.getText());
@@ -903,33 +818,28 @@ public class TranslationConceptEditor6 extends JPanel {
 					descriptionInEditor.setTypeId(fsn.getConceptNid());
 				}
 				// if some is wrong then all to retire
-				if ((((I_GetConceptData) cmbAccep.getSelectedItem()).equals(notAcceptable)) || (rbInact.isSelected())) {
+				if  (rbInact.isSelected()) {
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-					// descriptionInEditor.(retired.getConceptNid());
-					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
+//					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
 
 				} else {
 					// TODO: Discuss how to handle retirement and re-activation
 					// in liked descriptions form source language
 					// if all current
 					descriptionInEditor.setAcceptabilityId(((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid());
-					descriptionInEditor.setDescriptionStatusId(current.getConceptNid());
+					descriptionInEditor.setDescriptionStatusId(active.getConceptNid());
 					descriptionInEditor.setExtensionStatusId(active.getConceptNid());
 				}
 
 				result = descriptionInEditor.persistChanges();
-				ContextualizedDescription fsnDesc = null;
 				try {
-					fsnDesc = (ContextualizedDescription) LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
+					 LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
 
 				} catch (FSNGenerationException e1) {
 					e1.printStackTrace();
 
 					JOptionPane.showOptionDialog(this, e1.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 				}
-				// if (fsnDesc!=null && result){
-				// if (!fsnDesc.persistChanges()) result = false;
-				// }
 			}
 
 			if (result)
@@ -1165,14 +1075,6 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	}
 
-	private String getTextFromHeader(String header, int toIndex) {
-
-		String tmp = header.substring(0, toIndex);
-		int lastInd = tmp.lastIndexOf(HEADER_SEPARATOR);
-		return tmp.substring(lastInd + HEADER_SEPARATOR.length());
-
-	}
-
 	private void mLogActionPerformed() {
 		try {
 			TranslationWlstMemberLogPanel panel = getTranslMemberLogPanel();
@@ -1221,10 +1123,8 @@ public class TranslationConceptEditor6 extends JPanel {
 				return uiPanel;
 			}
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -1247,10 +1147,8 @@ public class TranslationConceptEditor6 extends JPanel {
 				}
 			}
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return false;
@@ -1356,8 +1254,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		termZoomDialog.dispose();
 		zoomTextArea.setText("");
 	}
-
-	private HashMap<Object, Boolean> normalStates;
 
 	class SelectionListener implements ListSelectionListener {
 
@@ -2356,11 +2252,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	private String targetPreferred;
 	private String targetFSN;
 
-	/** The target preferred ics. */
-	private boolean targetPreferredICS;
 
-	/** The source sem tag. */
-	private String sourceSemTag;
 	private int definingChar = -1;
 	private String sourceFSN;
 	private WorkListMember worklistMember;
@@ -2446,15 +2338,13 @@ public class TranslationConceptEditor6 extends JPanel {
 							row[TableSourceColumn.LANGUAGE.ordinal()] = description.getLang();
 							row[TableSourceColumn.ICS.ordinal()] = description.isInitialCaseSignificant();
 
-							if (description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid()
-									|| description.getDescriptionStatusId() == retired.getConceptNid()) {
+							if ( description.getExtensionStatusId() == inactive.getConceptNid()
+									|| description.getDescriptionStatusId() == inactive.getConceptNid()) {
 								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 									rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
-									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
-									// row[TableSourceColumn.STATUS.ordinal()]=inactive;
+//									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 									termType_Status[1] = inactive;
 									if (description.getTypeId() == fsn.getConceptNid()) {
-										// row[TableSourceColumn.TERM_TYPE.ordinal()]=fsn;
 										termType_Status[0] = fsn;
 									} else {
 										// row[TableSourceColumn.TERM_TYPE.ordinal()]=this.description;
@@ -2477,28 +2367,11 @@ public class TranslationConceptEditor6 extends JPanel {
 								if (semtagLocation == -1)
 									semtagLocation = description.getText().length();
 
-								int endParenthesis = description.getText().lastIndexOf(")");
-
-								if (semtagLocation > -1 && semtagLocation < endParenthesis)
-									sourceSemTag = description.getText().substring(semtagLocation + 1, endParenthesis);
-								// saveDesc.setEnabled(true);
 								if (!bSourceFSN) {
 									bSourceFSN = true;
 									sourceFSN = description.getText().substring(0, semtagLocation);
 
 									final SimilarityPanel similPanel = getSimilarityPanel();
-									// similPanel.getSimilarityTable().getModel().addTableModelListener(new
-									// TableModelListener() {
-									// @Override
-									// public void tableChanged(
-									// TableModelEvent ev) {
-									// label14.setText("S:" +
-									// similPanel.getSimilarityHitsCount());
-									// label14.revalidate();
-									// }
-									//
-									// });
-									// similPanel.updateTabs(sourceFSN,concept,sourceIds,targetId,translationProject,worklistMember);
 									Runnable simil = new Runnable() {
 										public void run() {
 											similPanel.updateTabs(sourceFSN, concept, sourceIds, targetId, translationProject, worklistMember);
@@ -2561,7 +2434,7 @@ public class TranslationConceptEditor6 extends JPanel {
 								bNewNode = true;
 							} else if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
-								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+//								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 								termType_Status[0] = this.synonym;
 								termType_Status[1] = inactive;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
@@ -2722,7 +2595,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		bAddFSN.setEnabled(true && !readOnlyMode);
 		targetPreferred = "";
 		targetFSN = "";
-		targetPreferredICS = false;
 		targetPreferredRow = null;
 		targetFSNRow = null;
 		int authId;
@@ -2789,11 +2661,11 @@ public class TranslationConceptEditor6 extends JPanel {
 						row[TableTargetColumn.LANGUAGE.ordinal()] = description.getLang();
 						row[TableTargetColumn.ICS.ordinal()] = description.isInitialCaseSignificant();
 
-						if (description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid()
-								|| description.getDescriptionStatusId() == retired.getConceptNid()) {
+						if ( description.getExtensionStatusId() == inactive.getConceptNid()
+								|| description.getDescriptionStatusId() == inactive.getConceptNid()) {
 							if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
-								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+//								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 								termType_Status[1] = inactive;
 								if (description.getTypeId() == fsn.getConceptNid()) {
 									termType_Status[0] = fsn;
@@ -2830,12 +2702,11 @@ public class TranslationConceptEditor6 extends JPanel {
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
 							bHasPref = true;
 							targetPreferred = description.getText();
-							targetPreferredICS = description.isInitialCaseSignificant();
 
 							bNewNode = true;
 						} else if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
-							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+//							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 							termType_Status[0] = this.synonym;
 							termType_Status[1] = inactive;
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
@@ -2951,19 +2822,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		cmodel.getColumn(TableTargetColumn.LANGUAGE.ordinal()).setCellRenderer(new LanguageIconRenderer());
 		cmodel.getColumn(TableTargetColumn.ICS.ordinal()).setCellRenderer(new ICSIconRenderer());
 
-		// double widthAvai = panel8.getPreferredSize().getWidth();
-
-		// double widthAdj=0;
-		// if (authorAdj==1){
-		// widthAdj=cmodel.getColumn(authorColPos).getWidth();
-		// }
-		// int termColAvai=(int) (widthAvai-100-widthAdj);
-		// if (termColAvai>maxTermWidth)
-		// cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(termColAvai);
-		// // if
-		// (cmodel.getColumn(TableTargetColumn.TERM.ordinal()).getWidth()<maxTermWidth)
-		// else
-		// cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setPreferredWidth(maxTermWidth);
 		cmodel.getColumn(TableTargetColumn.TERM.ordinal()).setMinWidth(maxTermWidth);
 		cmodel.getColumn(TableTargetColumn.TERM_TYPE.ordinal()).setMaxWidth(48);
 		cmodel.getColumn(TableTargetColumn.ACCEPTABILITY.ordinal()).setMaxWidth(48);
@@ -2986,33 +2844,15 @@ public class TranslationConceptEditor6 extends JPanel {
 		if (concept != null) {
 			try {
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-
-				// top = new DefaultMutableTreeNode(new
-				// TreeEditorObjectWrapper(concept.toString(),
-				// IconUtilities.CONCEPT, concept));
 				I_ConceptAttributeTuple attributes = null;
 				attributes = concept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next();
 
-				// String definedOrPrimitive = "";
-				// DefaultMutableTreeNode idNode=null;
-				String statusName = tf.getConcept(attributes.getStatusId()).toString();
-				if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")) {
+				if (attributes.getStatusNid()==inactive.getConceptNid()) {
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.INACTIVE, concept));
 				} else if (attributes.isDefined()) {
-					// definedOrPrimitive = "fully defined";
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.DEFINED, concept));
-
-					// idNode= new DefaultMutableTreeNode(
-					// new TreeEditorObjectWrapper(definedOrPrimitive,
-					// IconUtilities.DEFINED, attributes.getMutablePart()));
-					//
 				} else {
 					top = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(concept.toString(), IconUtilities.PRIMITIVE, concept));
-					// definedOrPrimitive = "primitive";
-					// idNode= new DefaultMutableTreeNode(
-					// new TreeEditorObjectWrapper(definedOrPrimitive,
-					// IconUtilities.PRIMITIVE, attributes.getMutablePart()));
-					//
 				}
 
 				Long concpetID = null;
@@ -3028,26 +2868,8 @@ public class TranslationConceptEditor6 extends JPanel {
 				DefaultMutableTreeNode conceptIdNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper("Concept ID: " + concpetID, IconUtilities.ID, concpetID));
 				top.add(conceptIdNode);
 
-				// top.add(idNode);
-
-				// String statusName =
-				// tf.getConcept(attributes.getStatusId()).toString();
-				// DefaultMutableTreeNode statusNode =null;
-				// if (statusName.equalsIgnoreCase("retired") ||
-				// statusName.equalsIgnoreCase("inactive")){
-				// statusNode = new DefaultMutableTreeNode(
-				// new TreeEditorObjectWrapper(statusName,
-				// IconUtilities.INACTIVE, attributes.getMutablePart()));
-				// }else{
-				// statusNode = new DefaultMutableTreeNode(
-				// new TreeEditorObjectWrapper(statusName,
-				// IconUtilities.ATTRIBUTE, attributes.getMutablePart()));
-				// }
-				// top.add(statusNode);
 				List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(config.getAllowedStatus(), config.getDestRelTypes(), config.getViewPositionSetReadOnly(),
 						config.getPrecedence(), config.getConflictResolutionStrategy(), config.getClassifierConcept().getNid(), RelAssertionType.INFERRED);
-				// List<I_RelVersioned> relationships2 = (List<I_RelVersioned>)
-				// concept.getDestRels();
 
 				List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
 
@@ -3059,11 +2881,10 @@ public class TranslationConceptEditor6 extends JPanel {
 					I_GetConceptData typeConcept = tf.getConcept(relationship.getTypeNid());
 					String label = typeConcept + ": " + targetConcept;
 
-					if ((relationship.getTypeNid() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid()) || (typeConcept.toString().equalsIgnoreCase("is a"))) {
+					if ((relationship.getTypeNid() == Snomed_Isa.getConceptNid()) || (relationship.getTypeNid() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid())) {
 						attributes = targetConcept.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next();
 						DefaultMutableTreeNode supertypeNode = null;
-						statusName = tf.getConcept(attributes.getStatusNid()).toString();
-						if (statusName.equalsIgnoreCase("retired") || statusName.equalsIgnoreCase("inactive")) {
+						if (attributes.getStatusNid()==inactive.getConceptNid()) {
 							supertypeNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.INACTIVE_PARENT, relationship.getMutablePart()));
 
 						} else if (attributes.isDefined()) {
@@ -3075,7 +2896,8 @@ public class TranslationConceptEditor6 extends JPanel {
 						nodesToAdd.add(supertypeNode);
 					} else {
 						if (relationship.getGroup() == 0) {
-							if (relationship.getCharacteristicId() == definingChar) {
+							if (relationship.getCharacteristicId() == definingChar 
+									|| relationship.getCharacteristicId() == inferred) {
 								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, IconUtilities.ROLE, relationship.getMutablePart()));
 								nodesToAdd.add(roleNode);
 							} else {
@@ -3143,6 +2965,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	class TermTypeIconRenderer extends DefaultTableCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3161,6 +2988,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	class AcceptabilityIconRenderer extends DefaultTableCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3175,6 +3007,11 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	class TermRenderer extends DefaultTableCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
 			JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -3185,6 +3022,11 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	class LanguageIconRenderer extends DefaultTableCellRenderer {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
@@ -3200,6 +3042,11 @@ public class TranslationConceptEditor6 extends JPanel {
 	}
 
 	class ICSIconRenderer extends DefaultTableCellRenderer {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 

@@ -36,6 +36,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 
 /**
@@ -101,10 +102,10 @@ public class ContextualizeDescriptions extends AbstractTask {
 			I_GetConceptData conceptTarget = tf.getConcept(concept.ids);
 			I_GetConceptData languageRefsetConcept = tf.getConcept(languageRefset.ids);
 
-			I_GetConceptData preferred = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData synonym = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData acceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
-			I_GetConceptData fsn = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			I_GetConceptData preferred = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			I_GetConceptData synonym = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+			I_GetConceptData acceptable = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
+			I_GetConceptData fsn = tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 			
 			String lang="";
 			if (languageRefsetConcept.getInitialText().toLowerCase().contains("spanish")){

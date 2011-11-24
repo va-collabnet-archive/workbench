@@ -34,7 +34,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -46,6 +45,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 
 /**
@@ -130,11 +130,10 @@ public class TranslationWorkflowInit extends AbstractTask {
 			}
 			
 			fully_specified_description_type_aux = termFactory
-			.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-					.getUids());
+			.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 			
 			preferred_description_type_aux = termFactory
-			.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 			
 			/*Iterator<I_GetConceptData> conceptIterator = termFactory.getConceptIterator();
 			
@@ -243,7 +242,7 @@ public class TranslationWorkflowInit extends AbstractTask {
 		I_ExtendByRef commentExtension = null;
 		I_ExtendByRef timeStampExtension = null;
 		int memberId;
-		int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
+//		int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 		I_GetConceptData editPath = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
 		boolean newStatusPartNeeded = true;
 		boolean newCommentPartNeeded = true;

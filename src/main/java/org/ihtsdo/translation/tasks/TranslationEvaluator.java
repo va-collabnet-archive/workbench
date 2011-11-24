@@ -33,11 +33,11 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 
 /**
@@ -121,11 +121,10 @@ public class TranslationEvaluator extends AbstractTask {
 			boolean preferredTerTranslated = false;
 			
 			I_GetConceptData fully_specified_description_type_aux = termFactory
-			.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-					.getUids());
+			.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 			
 			I_GetConceptData preferred_description_type_aux = termFactory
-			.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 			
 			long lastVersion = Long.MIN_VALUE;
 			for (I_DescriptionVersioned<?> description : concept.getDescriptions()) {

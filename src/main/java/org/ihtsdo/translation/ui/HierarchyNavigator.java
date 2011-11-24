@@ -75,6 +75,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.panel.TreeObj;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * @author Guillermo Reynoso
@@ -103,7 +104,7 @@ public class HierarchyNavigator extends JPanel {
 			//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			allowedStatus=config.getAllowedStatus();
 
-			inactive =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
+			inactive =Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			retired =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
 			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			//			allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
@@ -324,7 +325,7 @@ public class HierarchyNavigator extends JPanel {
 				try {
 					 I_GetConceptData childCpt = Terms.get().getConcept( child.getC1Id());
 					I_ConceptAttributeTuple attributes = childCpt.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).get(0);
-					if (attributes.getStatusNid()==retired.getNid() ||attributes.getStatusNid()==inactive.getNid()){
+					if (attributes.getStatusNid()==inactive.getNid() || attributes.getStatusNid()==retired.getNid() ){
 						newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.INACTIVE),childCpt.toString() + " (" + getChildren(childCpt).size() + ")",childCpt));
 					}else if (attributes.isDefined()) {
 						newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.DEFINED),childCpt.toString() + " (" + getChildren(childCpt).size() + ")",childCpt));

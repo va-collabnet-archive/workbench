@@ -23,7 +23,6 @@ import java.security.PrivilegedActionException;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Level;
 
 import javax.security.auth.login.LoginException;
@@ -51,7 +50,6 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.ListItemBean;
@@ -62,6 +60,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.ui.TranslationConceptEditorRO;
 import org.ihtsdo.translation.ui.ZebraJTable;
 
@@ -280,7 +279,7 @@ public class ListComponentViewerPanel extends JPanel {
 
 						I_TerminologyProject project = (I_TerminologyProject) projectComboModel.getSelectedItem();
 						WorkListMember worklistMember = new WorkListMember(item.getText(), item.getConceptId(), item.getConcept().getUUIDs(), null, null,
-								ArchitectonicAuxiliary.Concept.ACTIVE.getUids().iterator().next(), new GregorianCalendar().getTimeInMillis());
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getUUIDs().iterator().next(), new GregorianCalendar().getTimeInMillis());
 
 						if (worklistMember != null) {
 							TranslationConceptEditorRO editorRO = new TranslationConceptEditorRO();

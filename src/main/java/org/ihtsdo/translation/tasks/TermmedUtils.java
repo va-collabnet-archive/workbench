@@ -16,7 +16,6 @@
  */
 package org.ihtsdo.translation.tasks;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -24,8 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import javax.swing.JButton;
 
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -43,6 +40,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 
 /**
@@ -179,7 +177,7 @@ public class TermmedUtils
 	public static String getFSN(I_GetConceptData concept, I_TermFactory termFactory) throws TerminologyException, IOException {
 		int lastVersion = Integer.MIN_VALUE;
 		String fsn = "";
-		int fullyId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next());
+		int fullyId = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 		for (I_DescriptionVersioned<?> description : concept.getDescriptions()) {
 			for (I_DescriptionPart part : description.getMutableParts()) {
 				if (part.getTypeNid() == fullyId && part.getVersion() > lastVersion && !part.getText().contains("metamodel")) {
@@ -218,7 +216,7 @@ public class TermmedUtils
 		I_ExtendByRef commentExtension = null;
 		I_ExtendByRef timeStampExtension = null;
 		int memberId;
-		int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
+//		int currentStatusId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next());
 		I_GetConceptData editPath = termFactory.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
 		boolean newStatusPartNeeded = true;
 		boolean newCommentPartNeeded = true;

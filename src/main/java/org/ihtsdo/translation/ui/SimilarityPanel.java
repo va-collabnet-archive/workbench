@@ -5,7 +5,6 @@
 package org.ihtsdo.translation.ui;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -24,7 +23,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -66,6 +64,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.SimilarityMatchedItem;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.DefaultSimilaritySearchOption;
@@ -94,8 +93,8 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		initComponents();
 		try {
 			this.config = Terms.get().getActiveAceFrameConfig();
-			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {

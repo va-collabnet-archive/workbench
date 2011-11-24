@@ -78,6 +78,7 @@ import org.ihtsdo.project.refset.LanguageSpecRefset;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.ResultsItem;
 import org.ihtsdo.translation.tasks.PutsDescriptionsInLanguageRefset;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
@@ -103,10 +104,10 @@ public class LanguageUtil {
 		I_TermFactory tf = Terms.get();
 
 		try {
-			I_GetConceptData preferred = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData synonym = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData fsn = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData acceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+			I_GetConceptData preferred = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			I_GetConceptData synonym = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+			I_GetConceptData fsn = tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			I_GetConceptData acceptable = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
 
 			config.getDescTypes().clear();
 			config.getDescTypes().add(preferred.getConceptNid());
@@ -140,7 +141,7 @@ public class LanguageUtil {
 			I_GetConceptData languageRefset = null;
 			I_GetConceptData languagePath = null;
 			I_GetConceptData languageCode = null;
-
+//TODO some language refset still belong to architectonic
 			switch (language) {
 			case danish:
 				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_DA.getUids());
@@ -148,7 +149,7 @@ public class LanguageUtil {
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.DA_DK.getUids());
 				break;
 			case spanish:
-				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_ES.getUids());
+				languageRefset = tf.getConcept(UUID.fromString("03615ef2-aa56-336d-89c5-a1b5c4cee8f6"));
 				languagePath = tf.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_ES_PATH.getUids());
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.ES.getUids());
 				break;
@@ -158,17 +159,18 @@ public class LanguageUtil {
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.SV_SE.getUids());
 				break;
 			case french_canadian:
-				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_FR_CA.getUids());
+//				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_FR_CA.getUids());
+				languageRefset = tf.getConcept(UUID.fromString("15d652f0-d246-54f1-914d-956cd3bd265a"));
 				languagePath = tf.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_FR_CA_PATH.getUids());
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.FR_CA.getUids());
 				break;
 			case english_us:
-				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
+				languageRefset = tf.getConcept(SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid());
 				languagePath = tf.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.EN.getUids());
 				break;
 			case english_uk:
-				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN_GB.getUids());
+				languageRefset = tf.getConcept(SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid());
 				languagePath = tf.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_EN_GB_PATH.getUids());
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.EN_GB.getUids());
 				break;
@@ -216,18 +218,20 @@ public class LanguageUtil {
 					String descriptionStatusId = column[1];
 					I_GetConceptData descriptionStatus = null;
 					if (descriptionStatusId.trim().equals("0")) {
-						descriptionStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+						descriptionStatus = tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 					} else {
-						descriptionStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+						descriptionStatus = tf.getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 					}
 					String conceptId = column[2];
 					String term = column[3];
 					String initialCapitalStatusId = column[4];
 
 					String descriptionTypeId = column[5];
-					I_GetConceptData descriptionType = tf.getConcept(ArchitectonicAuxiliary.getSnomedDescriptionType(Integer.parseInt(descriptionTypeId)).getUids());
-					if (descriptionType == null) {
-						descriptionType = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+					I_GetConceptData descriptionType=null ;
+					if (descriptionTypeId.equals("3")){
+						descriptionType=tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+					}else{
+						descriptionType=tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());	
 					}
 					String langCodeStr = column[6];
 
@@ -260,7 +264,7 @@ public class LanguageUtil {
 
 						I_Identify descriptionWithIdentifiers = (I_Identify) newDescription;
 						descriptionWithIdentifiers.addLongId(Long.parseLong(descriptionId), tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
-								tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), languagePath.getConceptNid(), Integer.MAX_VALUE);
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), languagePath.getConceptNid(), Integer.MAX_VALUE);
 
 						if (initialCapitalStatusId.trim().equals("0")) {
 							newDescription.getMutableParts().iterator().next().setInitialCaseSignificant(false);
@@ -274,9 +278,9 @@ public class LanguageUtil {
 						// newDescription.getMutableParts().iterator().next().setTime(date.getTime());
 						// }
 
-						I_GetConceptData acceptabilityConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+						I_GetConceptData acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
 						if (descriptionTypeId.trim().equals("1") || descriptionTypeId.trim().equals("3")) {
-							acceptabilityConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+							acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 						}
 						I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefset.getConceptNid());
 
@@ -335,10 +339,10 @@ public class LanguageUtil {
 		try {
 			SearchResult results = tf.doLuceneSearch(query);
 			// System.out.println("Hits: " + results.length());
-			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+			config.getDescTypes().add(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
 
 			I_IntSet allowedStatuses = tf.newIntSet();
-			allowedStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+			allowedStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 
 			for (int i = 0; i < results.topDocs.scoreDocs.length; i++) {
 				Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
@@ -352,27 +356,29 @@ public class LanguageUtil {
 				I_DescriptionVersioned<?> matchedDescription = tf.getDescription(dnid, cnid);
 				sourceText = matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText();
 
-				if (matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getTypeNid() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE
-						.localize().getNid()
+				if (matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()
 						&& sourceLangCode.toLowerCase().startsWith(
 								matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getLang().trim().toLowerCase().substring(0, 2))
-						&& matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == ArchitectonicAuxiliary.Concept.CURRENT.localize()
-								.getNid()) {
+						&& matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
 
 					I_GetConceptData matchedConcept = tf.getConcept(cnid);
-
-					List<? extends I_DescriptionTuple> tuples = matchedConcept.getDescriptionTuples(allowedStatuses, config.getDescTypes(), config.getViewPositionSetReadOnly(),
-							config.getPrecedence(), config.getConflictResolutionStrategy());
-
-					for (I_DescriptionTuple tuple : tuples) {
-						if (targetLangCode.toLowerCase().startsWith(tuple.getLang().trim().toLowerCase().substring(0, 2))) {
-							targetText = tuple.getText();
-							targetDescriptionId = tuple.getDescId();
-							if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
-								break;
-							}
+					I_GetConceptData refsetConcept =(I_GetConceptData) ArchitectonicAuxiliary.getLanguageConcept(targetLangCode);
+					List<ContextualizedDescription> descriptions=null;
+					try {
+						descriptions = LanguageUtil.getContextualizedDescriptions(cnid, refsetConcept.getConceptNid(), true);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					for (I_ContextualizeDescription targetDesc : descriptions) {
+						targetText = targetDesc.getText();
+						targetDescriptionId = targetDesc.getDescId();
+						if (targetDesc.getAcceptabilityId() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+							break;
 						}
 					}
+
+					
 				}
 
 				if (targetDescriptionId != null) {
@@ -425,12 +431,12 @@ public class LanguageUtil {
 			// config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
 
 			I_IntSet allowedStatuses = tf.newIntSet();
-			allowedStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
+			allowedStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 
-			int preferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-			int synonym = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+			int preferred = SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
+			int synonym =SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid();
 
-			int fsn = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			int fsn = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 
 			// 200 similarity matches cut off - previously
 			// results.topDocs.scoreDocs.length
@@ -468,7 +474,7 @@ public class LanguageUtil {
 								if (sourceDesc.getLanguageExtension() != null) {
 									if (descTypes.contains(fsn) && sourceDesc.getTypeId() == fsn && (sourceDesc.getAcceptabilityId() == preferred || sourceDesc.getAcceptabilityId() == fsn)) {
 										sourceText = sourceDesc.getText();
-									} else if (descTypes.contains(preferred) && (sourceDesc.getTypeId() == preferred || sourceDesc.getTypeId() == synonym) && sourceDesc.getAcceptabilityId() == preferred) {
+									} else if (descTypes.contains(preferred) && (sourceDesc.getAcceptabilityId() == preferred || sourceDesc.getTypeId() == synonym) && sourceDesc.getAcceptabilityId() == preferred) {
 										sourceText = sourceDesc.getText();
 									}
 								}
@@ -491,7 +497,7 @@ public class LanguageUtil {
 							if (descTypes.contains(fsn) && targetDesc.getTypeId() == fsn && (targetDesc.getAcceptabilityId() == preferred || targetDesc.getAcceptabilityId() == fsn)) {
 								targetText = targetDesc.getText();
 								targetDescriptionId = targetDesc.getDescId();
-							} else if (descTypes.contains(preferred) && (sourceDesc.getTypeId() == preferred || sourceDesc.getTypeId() == synonym) && targetDesc.getAcceptabilityId() == preferred) {
+							} else if (descTypes.contains(preferred) && (sourceDesc.getAcceptabilityId() == preferred || sourceDesc.getTypeId() == synonym) && targetDesc.getAcceptabilityId() == preferred) {
 								targetText = targetDesc.getText();
 								targetDescriptionId = targetDesc.getDescId();
 							}
@@ -708,10 +714,10 @@ public class LanguageUtil {
 					String target = "";
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
 							config.getPrecedence(), config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals(sourceLangCode)) {
+						if (tuple.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid() && tuple.getLang().equals(sourceLangCode)) {
 							source = tuple.getText();
 						}
-						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals(targetLangCode)) {
+						if (tuple.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid() && tuple.getLang().equals(targetLangCode)) {
 							target = tuple.getText();
 						}
 					}
@@ -982,9 +988,9 @@ public class LanguageUtil {
 		I_TermFactory tf = Terms.get();
 		try {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-			I_GetConceptData current = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			I_GetConceptData retired = tf.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			I_GetConceptData notAcceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
+			I_GetConceptData current = tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+			I_GetConceptData retired = tf.getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
+//			I_GetConceptData notAcceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
 			I_GetConceptData languageSpecConcept = tf.getConcept(languageSpecRefsetId);
 			LanguageSpecRefset languageSpec = new LanguageSpecRefset(languageSpecConcept);
 			I_GetConceptData enumeratedOriginConcept = languageSpec.getEnumeratedOriginRefsetConcept(tf.getActiveAceFrameConfig());
@@ -1022,8 +1028,7 @@ public class LanguageUtil {
 			// retiring not acceptable and missing descriptions from previous
 			// computation
 			for (I_ExtendByRef previousComputationMember : tf.getRefsetExtensionMembers(languageMembershipConcept.getConceptNid())) {
-				if (descIdAcceptabilityMap.get(previousComputationMember.getComponentId()) == notAcceptable.getConceptNid()
-						|| !descIdAcceptabilityMap.containsKey(previousComputationMember.getComponentId())) {
+				if ( !descIdAcceptabilityMap.containsKey(previousComputationMember.getComponentId())) {
 					long lastVersion = Long.MIN_VALUE;
 					I_ExtendByRefPartCid previousComputationPart = null;
 					for (I_ExtendByRefVersion loopTuple : previousComputationMember.getTuples(config.getConflictResolutionStrategy())) {
@@ -1042,7 +1047,7 @@ public class LanguageUtil {
 			}
 			// Adding or updating positive acceptance members
 			for (Integer loopDescId : descIdAcceptabilityMap.keySet()) {
-				if (descIdAcceptabilityMap.get(loopDescId) != notAcceptable.getConceptNid()) {
+//				if (descIdAcceptabilityMap.get(loopDescId) != notAcceptable.getConceptNid()) {
 					I_ExtendByRef currentMember = null;
 					for (I_ExtendByRef specMember : tf.getAllExtensionsForComponent(loopDescId)) {
 						if (specMember.getRefsetId() == languageMembershipConcept.getConceptNid()) {
@@ -1068,7 +1073,7 @@ public class LanguageUtil {
 						refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, EConcept.REFSET_TYPES.CID,
 								new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
 					}
-				}
+//				}
 			}
 
 		} catch (IOException e) {
@@ -1109,9 +1114,11 @@ public class LanguageUtil {
 
 		if (!translationConfig.getSelectedFsnGenStrategy().equals(ConfigTranslationModule.FsnGenerationStrategy.NONE)) {
 
-			I_GetConceptData fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			I_GetConceptData fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
-			I_GetConceptData preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			I_GetConceptData preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+
+			I_GetConceptData synonym = Terms.get().getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 
 			List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
@@ -1125,7 +1132,7 @@ public class LanguageUtil {
 
 			boolean alreadyHasFSN = false;
 			for (ContextualizedDescription loopDescription : targetDescriptions) {
-				if (loopDescription.getTypeId() == preferred.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageExtension() != null) {
+				if (loopDescription.getTypeId() == synonym.getConceptNid() && loopDescription.getAcceptabilityId() == preferred.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageExtension() != null) {
 					targetPreferred = loopDescription;
 				} else if (loopDescription.getTypeId() == fsn.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageExtension() != null) {
 					alreadyHasFSN = true;
@@ -1188,7 +1195,7 @@ public class LanguageUtil {
 				// Do nothing, empty default
 			} else {
 				ContextualizedDescription sourceFSN = null;
-				I_GetConceptData fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+				I_GetConceptData fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 				List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
@@ -1232,7 +1239,7 @@ public class LanguageUtil {
 				// Do nothing, empty default
 			} else {
 				ContextualizedDescription sourceFSN = null;
-				I_GetConceptData fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+				I_GetConceptData fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 				List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
@@ -1275,9 +1282,9 @@ public class LanguageUtil {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
 		try {
+			activeStatuses.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 			activeStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 			activeStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
-			activeStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.LIMITED.getUids()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -1290,6 +1297,7 @@ public class LanguageUtil {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		I_TermFactory tf = Terms.get();
 		try {
+			inactiveStatuses.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			inactiveStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.INACTIVE.getUids()));
 			inactiveStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
 		} catch (IOException e) {
@@ -1381,6 +1389,8 @@ public class LanguageUtil {
 		I_TermFactory tf = Terms.get();
 		try {
 			I_IntSet allowedDestRelTypes = tf.newIntSet();
+
+			allowedDestRelTypes.add(Terms.get().getConcept(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")).getNid());
 			allowedDestRelTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedDestRelTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.getUids()));
 			children = concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),

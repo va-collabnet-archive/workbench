@@ -64,9 +64,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -76,7 +76,6 @@ import javax.swing.text.Position;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -92,7 +91,6 @@ import net.jini.lookup.entry.Name;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -110,8 +108,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.Worker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.queue.SelectAll;
 import org.dwfa.queue.bpa.worker.OnDemandOutboxQueueWorker;
@@ -128,6 +124,7 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
@@ -152,11 +149,8 @@ public class InboxPanel extends JPanel {
 	private I_QueueProcesses queue;
 	private I_GetConceptData fsn;
 	private I_GetConceptData preferred;
-	private I_GetConceptData notAcceptable;
 	private I_GetConceptData inactive;
-	private I_GetConceptData retired;
 	private boolean closing;
-	private I_GetConceptData enRefset;
 	public final String EntryIDBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + EntryID.class.getName();
 	private DefaultMutableTreeNode wNode;
 	private DefaultMutableTreeNode iNode;
@@ -206,14 +200,10 @@ public class InboxPanel extends JPanel {
 		worklistHash = new HashMap<Integer, String>();
 
 		this.userName = Terms.get().getActiveAceFrameConfig().getUsername();
-		fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-		preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+		fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+		preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 
-		notAcceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
-		inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-		retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-		enRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
-		// setAccordian(false);
+		inactive = Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 		closing = false;
 		foldTree.setRootVisible(false);
 		foldTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -337,6 +327,11 @@ public class InboxPanel extends JPanel {
 
 	class SelectRevisionProcess implements I_SelectProcesses {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
 			String sub = process.getSubject();
@@ -359,6 +354,11 @@ public class InboxPanel extends JPanel {
 	}
 
 	class SelectRevisionProcessCancel implements I_SelectProcesses {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
@@ -800,6 +800,11 @@ public class InboxPanel extends JPanel {
 
 	class IconRenderer extends DefaultTreeCellRenderer {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
@@ -924,27 +929,27 @@ public class InboxPanel extends JPanel {
 		return false;
 	}
 
-	private boolean testPaths(DefaultMutableTreeNode[] nodes1, DefaultMutableTreeNode[] nodes2) {
-		if (nodes1.length != nodes2.length)
-			return false;
-		int nodesCount = nodes1.length;
-		for (int i = 0; i < nodesCount; i++) {
-			if (nodes1[i] != null && nodes2[i] != null) {
-
-				FolderTreeObj foldObj1 = (FolderTreeObj) nodes1[i].getUserObject();
-				FolderMetadata fMData1 = (FolderMetadata) foldObj1.getAtrValue();
-				FolderTreeObj foldObj2 = (FolderTreeObj) nodes2[i].getUserObject();
-				FolderMetadata fMData2 = (FolderMetadata) foldObj2.getAtrValue();
-
-				if (!fMData1.getFolderName().equals(fMData2.getFolderName()))
-					return false;
-
-			} else if (nodes1[i] != nodes2[i]) {
-				return false;
-			}
-		}
-		return true;
-	}
+//	private boolean testPaths(DefaultMutableTreeNode[] nodes1, DefaultMutableTreeNode[] nodes2) {
+//		if (nodes1.length != nodes2.length)
+//			return false;
+//		int nodesCount = nodes1.length;
+//		for (int i = 0; i < nodesCount; i++) {
+//			if (nodes1[i] != null && nodes2[i] != null) {
+//
+//				FolderTreeObj foldObj1 = (FolderTreeObj) nodes1[i].getUserObject();
+//				FolderMetadata fMData1 = (FolderMetadata) foldObj1.getAtrValue();
+//				FolderTreeObj foldObj2 = (FolderTreeObj) nodes2[i].getUserObject();
+//				FolderMetadata fMData2 = (FolderMetadata) foldObj2.getAtrValue();
+//
+//				if (!fMData1.getFolderName().equals(fMData2.getFolderName()))
+//					return false;
+//
+//			} else if (nodes1[i] != nodes2[i]) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
 	private void getOutboxItems() throws TerminologyException, IOException, TaskFailedException, LoginException, ConfigurationException, PrivilegedActionException, InterruptedException {
 
@@ -989,19 +994,18 @@ public class InboxPanel extends JPanel {
 		}
 		outboxQueue = (I_QueueProcesses) service.service;
 		Collection<I_DescribeBusinessProcess> processes = outboxQueue.getProcessMetaData(selector);
-		HashMap<Integer, Integer> countAssignments = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> projectHash = new HashMap<Integer, Integer>();
 		HashMap<Integer, String> statusHash = new HashMap<Integer, String>();
-		I_EncodeBusinessProcess process = null;
+//		I_EncodeBusinessProcess process = null;
 		int countAssignmentsInt = 0;
-		Object[] arr;
-		List<Integer> sourceLang = null;
+//		Object[] arr;
+//		List<Integer> sourceLang = null;
 		Integer targetLang = null;
-		Integer langRefset;
+//		Integer langRefset;
 		Integer statusId;
 		Long statusTime;
 		String[] targetTerms = new String[] { "", "" };
-		String[] sourceTerms;
+//		String[] sourceTerms;
 		HashSet<String> oFolder;
 		String status = "";
 		for (I_DescribeBusinessProcess descProcess : processes) {
@@ -1038,13 +1042,13 @@ public class InboxPanel extends JPanel {
 						worklistmemberId = Integer.valueOf(worklistMemberIdStr);
 					}
 
-					String promoRefsetgIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()];
-					Integer promoRefsetId = null;
-					try {
-						promoRefsetId = Terms.get().uuidToNative(UUID.fromString(promoRefsetgIdStr));
-					} catch (IllegalArgumentException e) {
-						promoRefsetId = Integer.valueOf(promoRefsetgIdStr);
-					}
+//					String promoRefsetgIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()];
+//					Integer promoRefsetId = null;
+//					try {
+//						promoRefsetId = Terms.get().uuidToNative(UUID.fromString(promoRefsetgIdStr));
+//					} catch (IllegalArgumentException e) {
+//						promoRefsetId = Integer.valueOf(promoRefsetgIdStr);
+//					}
 
 					countAssignmentsInt++;
 					oFolder = new HashSet<String>();
@@ -1287,13 +1291,13 @@ public class InboxPanel extends JPanel {
 							String worklistmemberName = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_MEMBER_SOURCE_NAME.ordinal()];
 							String worklistName = parsedSubj[TerminologyProjectDAO.subjectIndexes.WORKLIST_NAME.ordinal()];
 
-							String promoRefsetgIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()];
-							Integer promoRefsetId = null;
-							try {
-								promoRefsetId = Terms.get().uuidToNative(UUID.fromString(promoRefsetgIdStr));
-							} catch (IllegalArgumentException e) {
-								promoRefsetId = Integer.valueOf(promoRefsetgIdStr);
-							}
+//							String promoRefsetgIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.PROMO_REFSET_ID.ordinal()];
+//							Integer promoRefsetId = null;
+//							try {
+//								promoRefsetId = Terms.get().uuidToNative(UUID.fromString(promoRefsetgIdStr));
+//							} catch (IllegalArgumentException e) {
+//								promoRefsetId = Integer.valueOf(promoRefsetgIdStr);
+//							}
 
 							String tags = parsedSubj[TerminologyProjectDAO.subjectIndexes.TAGS_ARRAY.ordinal()].trim();
 							String statusIdStr = parsedSubj[TerminologyProjectDAO.subjectIndexes.STATUS_ID.ordinal()];
@@ -1409,57 +1413,75 @@ public class InboxPanel extends JPanel {
 		System.out.println("Inbox took:" + (new java.util.Date().getTime() - tim) + " miliseconds");
 	}
 
-	private String[] getSourceTerms(Integer worklistmemberId, Integer sourceLang, boolean b, boolean sourcePrefCol) {
-		String[] retString = { "", "" };
-		String sFsn = "";
-		String sPref = "";
-		if (sourceLang != null) {
-
-			List<ContextualizedDescription> descriptions;
-			try {
-				descriptions = LanguageUtil.getContextualizedDescriptions(worklistmemberId, sourceLang, true);
-
-				for (I_ContextualizeDescription description : descriptions) {
-					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == sourceLang) {
-
-						if (!(description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid() || description
-								.getDescriptionStatusId() == retired.getConceptNid())) {
-
-							if (description.getTypeId() == fsn.getConceptNid()) {
-								sFsn = description.getText();
-								if (!sourcePrefCol || !sPref.equals("")) {
-									break;
-								}
-							} else {
-								if (sourcePrefCol && description.getAcceptabilityId() == preferred.getConceptNid()) {
-									sPref = description.getText();
-									if (!sFsn.equals("")) {
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			} catch (TerminologyException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			retString[0] = sFsn;
-			retString[1] = sPref;
-		}
-
-		return retString;
-
-	}
+//	private String[] getSourceTerms(Integer worklistmemberId, Integer sourceLang,  boolean sourcePrefCol) {
+//		String[] retString = { "", "" };
+//		String sFsn = "";
+//		String sPref = "";
+//		String sRetFsn = "";
+//		String sRetPref = "";
+//		if (sourceLang != null) {
+//
+//			List<ContextualizedDescription> descriptions;
+//			try {
+//				descriptions = LanguageUtil.getContextualizedDescriptions(worklistmemberId, sourceLang, true);
+//
+//				for (I_ContextualizeDescription description : descriptions) {
+//					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == sourceLang) {
+//
+//						if (!( description.getExtensionStatusId() == inactive.getConceptNid() || description
+//								.getDescriptionStatusId() == inactive.getConceptNid())) {
+//
+//							if (description.getTypeId() == fsn.getConceptNid()) {
+//								sFsn = description.getText();
+//								if (!sourcePrefCol || !sPref.equals("")) {
+//									break;
+//								}
+//							} else {
+//								if (sourcePrefCol && description.getAcceptabilityId() == preferred.getConceptNid()) {
+//									sPref = description.getText();
+//									if (!sFsn.equals("")) {
+//										break;
+//									}
+//								}
+//							}
+//
+//						}else{
+//							if (description.getTypeId() == fsn.getConceptNid() ) {
+//								sRetFsn=description.getText();
+//							}else if (sourcePrefCol ){
+//								sRetPref=description.getText();
+//							}
+//						}
+//					}
+//				}
+//			} catch (TerminologyException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			if (sFsn.equals(""))
+//				retString[0]=sRetFsn;
+//			else
+//				retString[0]=sFsn;
+//			
+//			if (sPref.equals(""))
+//				retString[1]=sRetPref;
+//			else
+//				retString[1]=sPref;
+//		}
+//
+//		return retString;
+//
+//	}
 
 	private String[] getTargetTerms(Integer worklistmemberId, Integer targetLang, boolean targetFSNCol, boolean targetPrefCol) {
 		String[] retString = { "", "" };
 		String sFsn = "";
 		String sPref = "";
+		String sRetFsn = "";
+		String sRetPref = "";
 		if (targetLang != null) {
 			List<ContextualizedDescription> descriptions;
 			try {
@@ -1468,8 +1490,8 @@ public class InboxPanel extends JPanel {
 				for (I_ContextualizeDescription description : descriptions) {
 					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == targetLang) {
 
-						if (!(description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid() || description
-								.getDescriptionStatusId() == retired.getConceptNid())) {
+						if (!( description.getExtensionStatusId() == inactive.getConceptNid() || description
+								.getDescriptionStatusId() == inactive.getConceptNid())) {
 
 							if (targetFSNCol && description.getTypeId() == fsn.getConceptNid()) {
 								sFsn = description.getText();
@@ -1484,6 +1506,13 @@ public class InboxPanel extends JPanel {
 									}
 								}
 							}
+
+						}else{
+							if (description.getTypeId() == fsn.getConceptNid() ) {
+								sRetFsn=description.getText();
+							}else if (targetPrefCol ){
+								sRetPref=description.getText();
+							}
 						}
 					}
 				}
@@ -1494,8 +1523,15 @@ public class InboxPanel extends JPanel {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			retString[0] = sFsn;
-			retString[1] = sPref;
+			if (sFsn.equals(""))
+				retString[0]=sRetFsn;
+			else
+				retString[0]=sFsn;
+			
+			if (sPref.equals(""))
+				retString[1]=sRetPref;
+			else
+				retString[1]=sPref;
 		}
 
 		return retString;
@@ -1608,6 +1644,10 @@ public class InboxPanel extends JPanel {
 	}
 
 	class FolderMetadata implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private boolean pendingRefresh;
 		private String folderName;
 
@@ -1647,69 +1687,6 @@ public class InboxPanel extends JPanel {
 			}
 		}
 		setNextEntryID(nEntryID);
-	}
-
-	private String[] getTerms(WorkListMember member, I_TerminologyProject translationProject, boolean targetLanguage) {
-		String[] retString = { "", "" };
-		if (translationProject instanceof TranslationProject) {
-			I_TermFactory tf = Terms.get();
-			String sFsn = "";
-			String sPref = "";
-			I_GetConceptData langRefset = null;
-			List<I_GetConceptData> langSets;
-			if (member.getConcept() != null) {
-				try {
-					if (targetLanguage) {
-						langRefset = ((TranslationProject) translationProject).getTargetLanguageRefset();
-					} else {
-						langSets = ((TranslationProject) translationProject).getSourceLanguageRefsets();
-						if (langSets != null) {
-							if (langSets.size() > 0) {
-								for (I_GetConceptData lCon : langSets) {
-									if (lCon.getConceptNid() == enRefset.getConceptNid()) {
-										langRefset = lCon;
-										break;
-									}
-								}
-								if (langRefset == null) {
-									langRefset = langSets.get(0);
-								}
-							}
-						}
-					}
-					if (langRefset != null) {
-						List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(member.getConcept().getConceptNid(), langRefset.getConceptNid(), true);
-
-						for (I_ContextualizeDescription description : descriptions) {
-							if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
-
-								if (!(description.getAcceptabilityId() == notAcceptable.getConceptNid() || description.getExtensionStatusId() == inactive.getConceptNid() || description
-										.getDescriptionStatusId() == retired.getConceptNid())) {
-
-									if (description.getTypeId() == fsn.getConceptNid()) {
-										sFsn = description.getText();
-									} else {
-										if (description.getAcceptabilityId() == preferred.getConceptNid()) {
-											sPref = description.getText();
-										}
-									}
-								}
-							}
-						}
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (TerminologyException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				retString[0] = sFsn;
-				retString[1] = sPref;
-			}
-
-		}
-		return retString;
 	}
 
 	private I_TerminologyProject getProjectForMember(WorkListMember member, I_ConfigAceFrame config) throws TerminologyException, IOException {
@@ -1889,10 +1866,8 @@ public class InboxPanel extends JPanel {
 									wFrame.setVisible(true);
 
 								} catch (TerminologyException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								} catch (IOException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							}
@@ -2093,19 +2068,6 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
-	synchronized private void moveAllItemsToFolder(String folderSource, String folderTarget) {
-		Set<EntryID> foldEntries = hashFolders.get(folderTarget);
-		Set<EntryID> custFoldEntries = hashFolders.get(folderSource);
-
-		for (EntryID entryId : custFoldEntries) {
-			foldEntries.add(entryId);
-			changeTagFromProcess(entryId, folderSource, folderTarget);
-		}
-
-		hashFolders.put(folderSource, new HashSet<EntryID>());
-
-	}
-
 	synchronized private void moveItemsToFolder(EntryID[] entries, String folderSource, String folderTarget) {
 		Set<EntryID> targetEntries = hashFolders.get(folderTarget);
 		Set<EntryID> sourceEntries = hashFolders.get(folderSource);
@@ -2258,6 +2220,7 @@ public class InboxPanel extends JPanel {
 			}
 		}
 
+		@SuppressWarnings("static-access")
 		@Override
 		public void mouseClicked(MouseEvent e) {
 

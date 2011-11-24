@@ -19,12 +19,12 @@ public class createSer {
             ds.other.message = "nested structure";
             ds.other.data = new int[] { 9, 8, 7 };
 */
-		OpenTranslationForSelectedConceptToMP lap=new OpenTranslationForSelectedConceptToMP();
+		GetDataFromWFUserSelectionPanelStoreInSameBpExec lap=new GetDataFromWFUserSelectionPanelStoreInSameBpExec();
             // Display the original object graph
             System.out.println("Original data structure: " + lap );
 
             // Output it to a file
-            File f = new File("/Users/ar/documents/org.ihtsdo.translation.tasks.OpenTranslationForSelectedConceptToMP.task");
+            File f = new File("/Users/ar/documents/org.ihtsdo.translation.tasks.GetDataFromWFUserSelectionPanelStoreInSameBpExec.task");
             System.out.println("Storing to a file...");
             Serializer.store(lap, f);
 //
