@@ -73,6 +73,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.arena.contradiction.ContradictionEditorGenerator;
+import org.ihtsdo.config.ConfigServiceBase;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.Bdb;
@@ -785,18 +786,20 @@ public class WorkbenchRunner {
                     Properties custProps = new Properties();
 
                     custProps.loadFromXML(new FileInputStream(custPropertiesFile));
-
-                    if (custProps.getProperty(CustomStatics.CUSTOM_UI_CLASSNAME) != null) {
-                        String custCN = custProps.getProperty(CustomStatics.CUSTOM_UI_CLASSNAME);
+                    
+                    ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
+                    ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
+                    
+                    if (custProps.getProperty(CustomStatics.CONFIG_SERVICE_CLASSNAME) != null) {
+                        String custCN = custProps.getProperty(CustomStatics.CONFIG_SERVICE_CLASSNAME);
 
                         AceLog.getAppLog().info("checkCustom custCN = " + custCN);
 
-                        Object obj = ObjectCacheClassHandler.getInstClass(custCN);
+                        ConfigServiceBase csb = (ConfigServiceBase)ObjectCacheClassHandler.getInstClass(custCN);
 
-                        if (obj != null) {
-                            ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
-                            ObjectCache.INSTANCE.put(CustomStatics.CUSTOM_UI_CLASS, custCN);
-                            ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
+                        if (csb != null) {
+                            csb.init();
+                            ObjectCache.INSTANCE.put(CustomStatics.CONFIG_SERVICE, csb);     
                         }
                     }
                 }
