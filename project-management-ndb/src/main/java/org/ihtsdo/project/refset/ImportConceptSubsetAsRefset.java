@@ -15,13 +15,8 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
-import org.ihtsdo.tk.api.PathBI;
 
 public class ImportConceptSubsetAsRefset {
 	PrintWriter outputFileWriter;

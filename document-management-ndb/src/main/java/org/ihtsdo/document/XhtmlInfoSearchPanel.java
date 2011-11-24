@@ -39,10 +39,8 @@ import javax.swing.event.HyperlinkListener;
 
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 
 /**
  * The Class XhtmlInfoSearchPanel.

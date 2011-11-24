@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.issue.manager;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,8 +44,8 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -59,6 +60,7 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 
 
@@ -412,6 +414,7 @@ public static I_ExtendByRefPart getLastExtensionPart(I_ExtendByRef extension) th
 	I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 	I_IntSet allowedStatus = Terms.get().newIntSet();
 	allowedStatus.addAll(config.getAllowedStatus().getSetValues());
+	allowedStatus.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 	allowedStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 	allowedStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 	I_ExtendByRefPart lastPart = null;
@@ -544,6 +547,7 @@ public static void promote(I_AmTermComponent termComponent, I_ConfigAceFrame con
 	I_IntSet allowedStatusWithRetired = Terms.get().newIntSet();
 	allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
 	try {
+		allowedStatusWithRetired.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 		allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 		allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 		//			if (I_GetConceptData.class.isAssignableFrom(termComponent.getClass())) {

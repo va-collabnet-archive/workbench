@@ -21,6 +21,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ProjectPermissionsAPI {
 
@@ -447,6 +448,7 @@ public class ProjectPermissionsAPI {
 	public boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
+			activeStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
@@ -461,6 +463,7 @@ public class ProjectPermissionsAPI {
 	public boolean isInactive(int statusId) {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		try {
+			inactiveStatuses.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			inactiveStatuses.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			inactiveStatuses.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 		} catch (IOException e) {

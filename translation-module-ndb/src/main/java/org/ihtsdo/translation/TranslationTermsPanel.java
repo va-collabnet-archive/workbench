@@ -49,6 +49,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class TranslationTermsPanel.
@@ -75,8 +76,8 @@ public class TranslationTermsPanel extends JPanel {
 //		loadLanguages();
 		I_TermFactory tf = Terms.get();
 		try {
-			synonym = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			fsn = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			synonym = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+			fsn = tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

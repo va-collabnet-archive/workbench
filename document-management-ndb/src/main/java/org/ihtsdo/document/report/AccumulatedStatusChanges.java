@@ -35,6 +35,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.document.report.I_Report;
 import org.ihtsdo.document.report.model.UserStatusCount;
 import org.ihtsdo.document.report.model.UserStatusCountComparator;
 import org.ihtsdo.project.ProjectPermissionsAPI;
@@ -46,10 +47,11 @@ import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.panel.TranslationProjectDialog;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class AccumulatedStatusChanges implements I_Report {
+public class AccumulatedStatusChanges implements I_Report { 
 
 	private SimpleDateFormat formatter;
 	private I_TermFactory tf;
@@ -188,6 +190,7 @@ public class AccumulatedStatusChanges implements I_Report {
 								I_IntSet allowedStatus = Terms.get().newIntSet();
 								allowedStatus.addAll(config.getAllowedStatus().getSetValues());
 								allowedStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+								allowedStatus.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 								allowedStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 								members.add(tf.getConcept(extension.getComponentNid()));
 							}
@@ -199,7 +202,7 @@ public class AccumulatedStatusChanges implements I_Report {
 									I_GetConceptData workListRefset = termFactory.getConcept(wl.getId());
 
 									I_IntSet descriptionTypes = termFactory.newIntSet();
-									descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+									descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 									List<? extends I_DescriptionTuple> descTuples = member.getDescriptionTuples(config.getAllowedStatus(), descriptionTypes,
 											config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());

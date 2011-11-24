@@ -41,6 +41,7 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.WorkListChooser;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -97,7 +98,8 @@ public class WorklistMemberByStatusReport implements I_Report {
 								I_IntSet descriptionTypes =  tf.newIntSet();
 								I_IntSet allowedStatus = tf.newIntSet();
 
-								descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+								descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+								allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 
@@ -114,7 +116,8 @@ public class WorklistMemberByStatusReport implements I_Report {
 								descriptionTypes = tf.newIntSet();
 								allowedStatus = tf.newIntSet();
 								
-								descriptionTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()));
+								descriptionTypes.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+								allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 								allowedStatus.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 								
@@ -123,7 +126,7 @@ public class WorklistMemberByStatusReport implements I_Report {
 								String targetPreferred = "";
 								for (ContextualizedDescription desc : descriptions) {
 									if(desc.getLanguageRefsetId() == targetLanguage){
-										if(desc.getTypeId() == tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids())){
+										if(desc.getAcceptabilityId() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()){
 											targetPreferred = desc.getText();
 										}
 									}

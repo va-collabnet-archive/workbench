@@ -39,12 +39,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.jini.config.ConfigurationException;
 import net.jini.core.entry.Entry;
@@ -74,7 +73,6 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.worker.Worker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.queue.ObjectServerCore;
 import org.dwfa.swing.SwingWorker;
@@ -89,6 +87,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
@@ -105,7 +104,6 @@ public class SpecialInboxPanel extends JPanel {
 	private I_SelectProcesses selector;
 	private SelectRevisionProcess2 revisionProcSelector;
 	private Worker worker;
-	private Worker cloneWorker;
 	private I_QueueProcesses queue;
 	private I_GetConceptData fsn;
 	private I_GetConceptData preferred;
@@ -115,18 +113,12 @@ public class SpecialInboxPanel extends JPanel {
 	private boolean closing;
 	private I_GetConceptData enRefset;
 	public final String EntryIDBeanType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + EntryID.class.getName();
-	private DefaultMutableTreeNode wNode;
-	private DefaultMutableTreeNode iNode;
-	private DefaultMutableTreeNode sNode;
-	private DefaultMutableTreeNode cNode;
 	private HashMap<String, Set<EntryID>> hashFolders;
 	private HashMap<EntryID, QueueTableObj> hashAllItems;
-	private DefaultMutableTreeNode selectedFolder;
 	private String[] cNames = { "Source Name", "Status" };
 	private LinkedHashSet<InboxColumn> colSet;
 	private ArrayList<InboxColumn> colPos;
 	private List<SortKey> lSortKeys;
-	private DefaultMutableTreeNode oNode;
 	private I_Work outboxReadWorker;
 	private I_QueueProcesses outboxQueue;
 	TranslationConceptEditorRO translationConceptViewer1;
@@ -148,11 +140,9 @@ public class SpecialInboxPanel extends JPanel {
 		revisionProcSelector = new SelectRevisionProcess2();
 		hashFolders = new HashMap<String, Set<EntryID>>();
 		enRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());
-		notAcceptable = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
-		inactive = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-		retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-		fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-		preferred = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+		inactive = Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
+		fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+		preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 		hashAllItems = new HashMap<EntryID, QueueTableObj>();
 
 		initCustomComponents();
@@ -362,6 +352,11 @@ public class SpecialInboxPanel extends JPanel {
 
 	class SelectRevisionProcess2 implements I_SelectProcesses {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public boolean select(I_DescribeBusinessProcess process) {
 			String sub = process.getSubject();
@@ -514,7 +509,6 @@ public class SpecialInboxPanel extends JPanel {
 	private String[] getTerms(WorkListMember member, I_TerminologyProject translationProject, boolean targetLanguage) {
 		String[] retString = { "", "" };
 		if (translationProject instanceof TranslationProject) {
-			I_TermFactory tf = Terms.get();
 			String sFsn = "";
 			String sPref = "";
 			I_GetConceptData langRefset = null;
@@ -715,7 +709,6 @@ public class SpecialInboxPanel extends JPanel {
 	}
 
 	List<I_Work> cloneList = new ArrayList<I_Work>();
-	private boolean setByCode;
 
 	protected void executeProcess() {
 		Runnable r = new Runnable() {
@@ -821,9 +814,7 @@ public class SpecialInboxPanel extends JPanel {
 				e1.printStackTrace();
 			}
 			try {
-				setByCode = true;
 				refreshItemsTable();
-				setByCode = false;
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -850,30 +841,6 @@ public class SpecialInboxPanel extends JPanel {
 			hashFolders.put(worklistName, foldEntries);
 		}
 
-	}
-
-	private void addEntryToFolders(Set<String> tagsArray, EntryID entryId) {
-		Set<EntryID> foldEntries = null;
-		if (tagsArray == null || tagsArray.size() < 1) {
-			if (hashFolders.containsKey(IconUtilities.INBOX_NODE))
-				foldEntries = hashFolders.get(IconUtilities.INBOX_NODE);
-			else
-				foldEntries = new HashSet<EntryID>();
-
-			foldEntries.add(entryId);
-			hashFolders.put(IconUtilities.INBOX_NODE, foldEntries);
-		} else {
-			for (String folderKey : tagsArray) {
-				if (hashFolders.containsKey(folderKey))
-					foldEntries = hashFolders.get(folderKey);
-				else {
-					foldEntries = new HashSet<EntryID>();
-				}
-
-				foldEntries.add(entryId);
-				hashFolders.put(folderKey, foldEntries);
-			}
-		}
 	}
 
 	private void delEntryFromFolders(Set<String> tagsArray, EntryID entryId) {

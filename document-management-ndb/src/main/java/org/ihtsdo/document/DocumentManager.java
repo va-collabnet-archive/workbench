@@ -763,15 +763,16 @@ public class DocumentManager {
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 				descendants = getDescendants(descendants, semtagsRoot);
 				HashMap<String, String> infoMap = new HashMap<String, String>();
+				
 				for (I_GetConceptData infoConcept : descendants) {
 					String key = "";
 					String info = "";
 					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
+						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
+						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							info = tuple.getText();
 						}
 					}
@@ -785,10 +786,8 @@ public class DocumentManager {
 					}
 				}
 			} catch (TerminologyException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -810,10 +809,10 @@ public class DocumentManager {
 					String info = "";
 					for (I_DescriptionTuple tuple : infoConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
+						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							key = tuple.getText();
 						}
-						if (tuple.getTypeId() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
+						if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.XHTML_PREFERRED_DESC_TYPE.localize().getNid() && tuple.getLang().equals("en")) {
 							info = tuple.getText();
 						}
 					}

@@ -52,6 +52,7 @@ import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.panel.details.ProjectDetailsPanel;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * @author Guillermo Reynoso
@@ -133,9 +134,10 @@ public class RefsetViewerPanel extends JPanel {
 				List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
 
 				for (I_ExtendByRef member : tf.getRefsetExtensionMembers(selectedRefset.getNid())) {
-					if (member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), 
-							config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == 
-						tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())) {
+					int stat=member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), 
+							config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
+					if (stat == tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids())
+							|| stat == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
 						members.add(tf.getConcept(member.getComponentNid()));
 					}
 					// System.out.println("*-*-* " +

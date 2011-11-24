@@ -25,10 +25,7 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.TerminologyProjectAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.WorkflowRefset;
 

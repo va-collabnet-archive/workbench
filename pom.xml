@@ -13,13 +13,13 @@
 
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>translation-module-master-pom</artifactId>
-	<version>2.6.0-trek-16-SNAPSHOT</version>
+	<version>2.6.0-trek-17-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>translation-module-master-pom</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<workbench.version>2.6.0-trek-16</workbench.version>
+		<workbench.version>2.6.0-trek-62</workbench.version>
 	</properties>
 
 	<modules>

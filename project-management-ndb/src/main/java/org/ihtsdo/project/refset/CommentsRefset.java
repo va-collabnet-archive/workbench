@@ -36,6 +36,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class CommentsRefset extends Refset {
 
@@ -87,7 +88,7 @@ public class CommentsRefset extends Refset {
 			for (PathBI editPath : config.getEditingPathSet()) {
 				I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 				lastPart.makeAnalog(
-						ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+						SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 						editPath.getConceptNid(),
 						Long.MAX_VALUE);
 				commentstMember.addVersion(part);

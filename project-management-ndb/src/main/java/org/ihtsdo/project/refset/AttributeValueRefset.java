@@ -14,6 +14,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class AttributeValueRefset extends Refset {
 
@@ -68,7 +69,7 @@ public class AttributeValueRefset extends Refset {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartCidCid newAttributeValuePart =(I_ExtendByRefPartCidCid) 
 						attributeValueExtensionPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(), 
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), 
 								editPath.getConceptNid(), 
 								Long.MAX_VALUE);
 						newAttributeValuePart.setC2id(value);

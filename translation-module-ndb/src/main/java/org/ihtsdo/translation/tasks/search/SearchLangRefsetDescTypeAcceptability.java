@@ -30,7 +30,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.search.AbstractSearchTest;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
@@ -39,6 +38,8 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/search", type = BeanType.TASK_BEAN),
 		@Spec(directory = "search", type = BeanType.TASK_BEAN) })
@@ -50,17 +51,18 @@ import org.ihtsdo.project.refset.PromotionRefset;
 
 	/**
 	 * Status concept for the term component to test.
-	 */
+	 */ 
 	private TermEntry langRefsetTerm = new TermEntry(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN_US.getUids());
-	private TermEntry descTypeTerm = new TermEntry(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-	private TermEntry acceptabilityTerm = new TermEntry(ArchitectonicAuxiliary.Concept.PREFERRED_ACCEPTABILITY.getUids());
+	private TermEntry descTypeTerm ;
+	private TermEntry acceptabilityTerm ;
 
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
 		out.writeObject(this.descTypeTerm);
 		out.writeObject(this.acceptabilityTerm);
 	}
-
+	public SearchLangRefsetDescTypeAcceptability() throws ValidationException, IOException{
+	}
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
@@ -74,6 +76,8 @@ import org.ihtsdo.project.refset.PromotionRefset;
 	@Override
 	public boolean test(I_AmTermComponent component, I_ConfigAceFrame frameConfig) throws TaskFailedException {
 		try {
+			 descTypeTerm = new TermEntry(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getUUIDs());
+			 acceptabilityTerm =   new TermEntry(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getUUIDs());
 			I_GetConceptData langRefsetConcept = AceTaskUtil.getConceptFromObject(langRefsetTerm);
 			I_GetConceptData descTypeToMatch = AceTaskUtil.getConceptFromObject(descTypeTerm);
 			I_GetConceptData acceptabilityToMatch = AceTaskUtil.getConceptFromObject(acceptabilityTerm);

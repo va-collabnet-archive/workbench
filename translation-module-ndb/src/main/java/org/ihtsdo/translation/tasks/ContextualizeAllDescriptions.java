@@ -25,8 +25,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Path;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
@@ -42,6 +40,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class CreateNewContextualizedDescription.
@@ -94,10 +93,10 @@ public class ContextualizeAllDescriptions extends AbstractTask {
 		try{
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			
-			I_GetConceptData preferred = tf.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData synonym = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-			I_GetConceptData acceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
-			I_GetConceptData fsn = tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			I_GetConceptData preferred = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			I_GetConceptData synonym = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+			I_GetConceptData acceptable = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
+			I_GetConceptData fsn = tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 			Set<PositionBI> savedViewPositionSet = config.getViewPositionSet();
 			Set<PathBI> savedEditPathSet = config.getEditingPathSet();
@@ -118,8 +117,8 @@ public class ContextualizeAllDescriptions extends AbstractTask {
 			config.getDescTypes().add(synonym.getConceptNid());
 			config.getDescTypes().add(fsn.getConceptNid());
 			
-			config.setDefaultStatus(tf.getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid())));
-			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			config.setDefaultStatus(tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()));
+			config.getAllowedStatus().add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 
 			tf.setActiveAceFrameConfig(config);

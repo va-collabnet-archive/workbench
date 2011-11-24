@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -30,6 +31,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * @author Guillermo Reynoso
@@ -41,7 +44,8 @@ public class ConceptDetailsPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private I_GetConceptData concept;
-	private int definingChar=-1;
+	private int inferredChar=-1;
+	private I_GetConceptData Snomed_Isa;
 	public ConceptDetailsPanel(I_GetConceptData concept) {
 		initComponents();	
 		this.concept=concept;
@@ -49,14 +53,17 @@ public class ConceptDetailsPanel extends JPanel {
 		tree1.setCellRenderer(new IconRenderer());
 		tree1.setRootVisible(true);
 		tree1.setShowsRootHandles(false);
+		try {
+			Snomed_Isa= Terms.get().getConcept(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"));
+		} catch (TerminologyException e2) {
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		DefaultTreeModel dtm;
 		try {
-			definingChar=ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.localize().getNid();
+			inferredChar=SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TerminologyException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		if (this.concept!=null ){
@@ -67,7 +74,6 @@ public class ConceptDetailsPanel extends JPanel {
 					tree1.expandRow(i);
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			tree1.revalidate();
@@ -141,7 +147,6 @@ public class ConceptDetailsPanel extends JPanel {
 	@SuppressWarnings("unchecked")
 	private DefaultTreeModel getConceptTreeModel(I_GetConceptData concept) throws Exception {
 		I_TermFactory tf = Terms.get();
-		//TODO add config as parameter
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		DefaultMutableTreeNode top = null;
 		if (concept != null) {
@@ -160,15 +165,14 @@ public class ConceptDetailsPanel extends JPanel {
 						new TreeEditorObjectWrapper(definedOrPrimitive, TreeEditorObjectWrapper.ATTRIBUTE, attributes.getMutablePart()));
 				top.add(idNode);
 
-				String statusName = tf.getConcept(attributes.getStatusId()).toString();
+				String statusName = tf.getConcept(attributes.getStatusNid()).toString();
 				DefaultMutableTreeNode statusNode = new DefaultMutableTreeNode(
 						new TreeEditorObjectWrapper(statusName, TreeEditorObjectWrapper.ATTRIBUTE, attributes.getMutablePart()));
 				top.add(statusNode);
 
-				List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getDestRelTuples(config.getAllowedStatus(), null,
+				List<I_RelTuple> relationships = (List<I_RelTuple>) concept.getSourceRelTuples(config.getAllowedStatus(),null,
 						config.getViewPositionSetReadOnly(),
-						config.getPrecedence(), config.getConflictResolutionStrategy());
-//				List<I_RelVersioned> relationships2 = (List<I_RelVersioned>) concept.getDestRels();
+						config.getPrecedence(), config.getConflictResolutionStrategy(),config.getClassifierConcept().getNid(),RelAssertionType.INFERRED);
 
 				List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
 
@@ -177,16 +181,17 @@ public class ConceptDetailsPanel extends JPanel {
 				int group=0;
 				for (I_RelTuple relationship : relationships) {
 					I_GetConceptData targetConcept = tf.getConcept(relationship.getC2Id());
-					I_GetConceptData typeConcept = tf.getConcept(relationship.getTypeId());
+					I_GetConceptData typeConcept = tf.getConcept(relationship.getTypeNid());
 					String label = typeConcept + ": " + targetConcept;
 
-					if (relationship.getTypeId() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid()) {
+					if (relationship.getTypeNid()==Snomed_Isa.getConceptNid()
+							|| relationship.getTypeNid() == ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid()) {
 						DefaultMutableTreeNode supertypeNode = new DefaultMutableTreeNode(
 								new TreeEditorObjectWrapper(label, TreeEditorObjectWrapper.SUPERTYPE, relationship.getMutablePart()));
 						nodesToAdd.add(supertypeNode);
 					} else {
 						if (relationship.getGroup()==0){
-							if (relationship.getCharacteristicId()==definingChar){
+							if (relationship.getCharacteristicId()==inferredChar){
 								DefaultMutableTreeNode roleNode = new DefaultMutableTreeNode(
 										new TreeEditorObjectWrapper(label, TreeEditorObjectWrapper.ROLE, relationship.getMutablePart()));
 								nodesToAdd.add(roleNode);
@@ -276,7 +281,6 @@ public class ConceptDetailsPanel extends JPanel {
 					tree1.expandRow(i);
 				}
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			if (dtm!=null)

@@ -22,6 +22,7 @@ import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ExportConceptMemberRefsetAsSubset {
 	BufferedWriter outputFileWriter;
@@ -66,7 +67,8 @@ public class ExportConceptMemberRefsetAsSubset {
 		for (I_ExtendByRef ext : extensions) {
 
 			I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(ext);
-			if (lastPart.getStatusNid()!=ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()){
+			if (lastPart.getStatusNid()!=ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()
+					&& lastPart.getStatusNid()!=SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()){
 //			List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(helper.getCurrentStatusIntSet(), null, 
 //					config.getPrecedence(),
 //					config.getConflictResolutionStrategy());

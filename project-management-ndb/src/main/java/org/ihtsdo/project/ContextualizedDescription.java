@@ -23,13 +23,12 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ContextualizedDescription implements I_ContextualizeDescription {
 	private int descId;
@@ -259,7 +258,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 	}
 
 	public void retireFromThisContext() throws Exception {
-		this.extensionStatusId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
+		this.extensionStatusId = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid();
 		persistChanges();
 	}
 
@@ -313,12 +312,12 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 		//validateRefsetAsSpec(refsetId);
 
 		I_GetConceptData concept = tf.getConcept(conceptId);
-		I_GetConceptData typeConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+		I_GetConceptData typeConcept = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 		I_DescriptionVersioned<?> newDescription = tf.newDescription(UUID.randomUUID(), concept, langCode, 
 				"New Description", typeConcept, config);
 		newDescription.getMutableParts().iterator().next().setInitialCaseSignificant(false);
 
-		I_GetConceptData acceptabilityConcept = tf.getConcept(ArchitectonicAuxiliary.Concept.ACCEPTABLE.getUids());
+		I_GetConceptData acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
 		I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefsetId);
 
 		refsetHelper.newRefsetExtension(languageRefsetId, 
