@@ -21,7 +21,7 @@ public class CustomStatics {
 	public static final String CUSTOM_UI_CONCEPTSERVICENAME = "conceptServiceName";
 	
     /**The lookup string for configService input file. **/
-    public static final String CONFIG_FILE = "configFile";
+    public static final String CONFIG_SERVICE_CONFIG_FILE = "configServiceConfigFile";
     /**The classname for the configService. **/
     public static final String CONFIG_SERVICE_CLASSNAME = "configServiceClassName";
     /**The lookup string for configService. **/
