@@ -42,9 +42,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/profile", type = BeanType.TASK_BEAN) })
 public class NewDefaultProfile extends NewProfile {
@@ -190,7 +192,8 @@ public class NewDefaultProfile extends NewProfile {
         allowedStatus.add(tf.uuidToNative(Concept.CURRENT.getUids()));
         
         // TODO: Adding status = "Active value" in snomed metadata - TEMP fix
-        allowedStatus.add(tf.uuidToNative(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f")));
+        allowedStatus.add(Ts.get().getNidForUuids(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()));
+        allowedStatus.add(Ts.get().getNidForUuids(SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getUuids()));
         
         addIfNotNull(allowedStatus, Concept.DO_NOT_EDIT_INTERNAL_USE, tf);
         addIfNotNull(allowedStatus, Concept.DO_NOT_EDIT_FOR_RELEASE, tf);
