@@ -5,17 +5,16 @@ import java.util.Collection;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class RefsetMemberValueMgr {
 
@@ -23,12 +22,14 @@ public class RefsetMemberValueMgr {
 	private int refsetId;
 	private I_ConfigAceFrame config;
 	private int memberType;
+	private I_GetConceptData refsetConcept;
 
 	public RefsetMemberValueMgr(I_GetConceptData refsetConcept) throws Exception {
 		this.refsetId = refsetConcept.getConceptNid();
 		this.termFactory = Terms.get();
 		config=termFactory.getActiveAceFrameConfig();
-		memberType=termFactory.getId(ArchitectonicAuxiliary.Concept.CURRENT.getUids()).getNid();
+		memberType=SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+		this.refsetConcept=refsetConcept;
 	}
 	
 	public void putConceptMember(int conceptMemberId) throws Exception {
@@ -43,12 +44,13 @@ public class RefsetMemberValueMgr {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPart part = (I_ExtendByRefPart) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(extension);
+					termFactory.addUncommitted(refsetConcept);
 //					termFactory.commit();
 				}
 			}
@@ -62,13 +64,20 @@ public class RefsetMemberValueMgr {
 					EConcept.REFSET_TYPES.CID, 
 					bpm,
 					config); 
-			
-			for (I_ExtendByRef extension : termFactory.getConcept(conceptMemberId).getExtensions()) {
-				if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+
+			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(refsetConcept.getConceptNid())) {
+				if (extension.getComponentNid() == conceptMemberId &&
+						extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+					termFactory.addUncommittedNoChecks(refsetConcept);
 					termFactory.addUncommittedNoChecks(extension);
-//					termFactory.commit();
 				}
-			}		
+			}
+//			for (I_ExtendByRef extension : termFactory.getConcept(conceptMemberId).getExtensions()) {
+//				if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+//					termFactory.addUncommittedNoChecks(extension);
+//					termFactory.addUncommitted(refsetConcept);
+//				}
+//			}		
 		}
 		return;
 	}
@@ -83,11 +92,12 @@ public class RefsetMemberValueMgr {
 				for (PathBI editPath : config.getEditingPathSet()) {
 					I_ExtendByRefPart part = (I_ExtendByRefPart) 
 					lastPart.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+							SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 							editPath.getConceptNid(),
 							Long.MAX_VALUE);
 					extension.addVersion(part);
 				}
+				termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(extension);
 //				termFactory.commit();
 			}

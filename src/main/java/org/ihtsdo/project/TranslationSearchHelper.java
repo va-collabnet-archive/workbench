@@ -10,9 +10,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class TranslationSearchHelper {
 
@@ -22,9 +22,9 @@ public class TranslationSearchHelper {
 		
 		List<ListItemBean> result = new ArrayList<ListItemBean>();
 
-		I_GetConceptData fsnType = termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+		I_GetConceptData fsnType = termFactory.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
-		I_GetConceptData preferredType = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+		I_GetConceptData preferredType = termFactory.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 
 		JList conceptList = config.getBatchConceptList();
 		I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();

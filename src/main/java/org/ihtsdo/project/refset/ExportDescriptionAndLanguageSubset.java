@@ -27,6 +27,7 @@ import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 	BufferedWriter outputDescFileWriter;
@@ -74,10 +75,11 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 		this.excludedStatus=excludedStatus;
 		this.completeWithCoreTems=completeWithCoreTems;
 		try {
-			CONCEPT_RETIRED=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.getUids()).getConceptNid();
-			LIMITED=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.LIMITED.getUids()).getConceptNid();
-			FSN=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()).getConceptNid();
-			PREFERRED=Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()).getConceptNid();
+			CONCEPT_RETIRED=SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getLenient().getNid();
+			LIMITED=SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getNid();
+			FSN=SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
+			//TODO change logic for detect preferred from language refset
+			PREFERRED=SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
 
 			snomedRoot = Terms.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
 
@@ -179,7 +181,8 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 
 					}
 					String dStatus="";
-					if (cdescription.getDescriptionStatusId()==ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() ||
+					if (cdescription.getDescriptionStatusId()==SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid() ||
+						cdescription.getDescriptionStatusId()==ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() ||
 							cdescription.getDescriptionStatusId()==ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid()){
 						dStatus="1";
 					}else{

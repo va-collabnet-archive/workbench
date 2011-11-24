@@ -42,8 +42,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
-import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.issue.Issue;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
@@ -52,6 +51,7 @@ import org.ihtsdo.issue.manager.implementation.CollabnetIssueManager;
 import org.ihtsdo.issue.manager.implementation.I_IssueManager;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.panel.TreeObj;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class IssuesView.
@@ -100,9 +100,6 @@ public class IssuesView extends JPanel {
 	/** The Constant FSNROOTNODE. */
 	private static final String FSNROOTNODE = "FR";
 	
-	/** The Constant PREFROOTNODE. */
-	private static final String PREFROOTNODE = "PR";
-	
 	/** The Constant SYNROOTNODE. */
 	private static final String SYNROOTNODE = "SR";
 	
@@ -136,15 +133,14 @@ public class IssuesView extends JPanel {
 			tree1.setModel(treeModel);
 			tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 	        tree1.setRootVisible(false);
-	        termFactory=LocalVersionedTerminology.get();
+	        termFactory=Terms.get();
 			config= termFactory.getActiveAceFrameConfig();
 			dbConfig= config.getDbConfig();
 	
 			DefaultMutableTreeNode conceptNode= addObject(rootNode,new TreeObj(CONCEPTNODE,"Concept: " + concept.getInitialText(),null),true);
 			
-			int FSNid=termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-			int PREFid=termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-			int SYNid=termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
+			int FSNid=SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
+			int SYNid=SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid();
 			
 			issuesRepos=new ArrayList<IssueRepository>();
 	
@@ -156,23 +152,17 @@ public class IssuesView extends JPanel {
 				
 				DefaultMutableTreeNode fsn=addObject(rootNode,new TreeObj(FSNROOTNODE,"Fully Specified Name",null),true); 
 				rootNode.add(fsn);
-				DefaultMutableTreeNode preferred=addObject(rootNode,new TreeObj(PREFROOTNODE,"Preferred Term",null),true); 
-				rootNode.add(preferred);
 				DefaultMutableTreeNode synonym=addObject(rootNode,new TreeObj(SYNROOTNODE,"Synonym",null),true); 
 				rootNode.add(synonym);
 				descriptions = (List<I_DescriptionTuple>) concept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), 
 						config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple description : descriptions) {
 					if (description.getLang().equals(sourceLangCode) ) {
-						if (description.getTypeId() == FSNid) {
+						if (description.getTypeNid() == FSNid) {
 							DefaultMutableTreeNode nodeTmp=addObject(fsn,new TreeObj(DESCRIPTIONNODE,description.getText(),null),true);
 							for (IssueRepository ir:issuesRepos)
 								loadIssuesForDescription(ir,nodeTmp,description);
-						} else if (description.getTypeId() == PREFid) {
-							DefaultMutableTreeNode nodeTmp=addObject(preferred,new TreeObj(DESCRIPTIONNODE,description.getText(),null),true);
-							for (IssueRepository ir:issuesRepos)
-								loadIssuesForDescription(ir,nodeTmp,description);
-						} else if (description.getTypeId() == SYNid) {
+						} else if (description.getTypeNid() == SYNid) {
 							DefaultMutableTreeNode nodeTmp=addObject(synonym,new TreeObj(DESCRIPTIONNODE,description.getText(),null),true);
 							for (IssueRepository ir:issuesRepos)
 								loadIssuesForDescription(ir,nodeTmp,description);

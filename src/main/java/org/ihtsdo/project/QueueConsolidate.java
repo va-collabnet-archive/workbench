@@ -19,6 +19,7 @@ import net.jini.core.transaction.UnknownTransactionException;
 import net.jini.lookup.ServiceItemFilter;
 import net.jini.lookup.entry.Name;
 
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.select.Selector;
 import org.dwfa.bpa.BusinessProcess;
@@ -30,6 +31,8 @@ import org.dwfa.bpa.process.NoMatchingEntryException;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.queue.SelectAll;
 import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.Precedence;
 
 public class QueueConsolidate {
 
@@ -77,6 +80,7 @@ public class QueueConsolidate {
                     BusinessProcess.validateAddress(process.getOriginator(), process.getProcessID());
                     WorkListMember member=(WorkListMember)process.readAttachement("A:WORKLIST_MEMBER");
                     concept= (I_GetConceptData)member.getConcept();
+                 
                 } catch (TaskFailedException ex) {
                     System.out.println("Found missing or malformed origin for process: " + process
                         + " setting origin to queue's node inbox address");

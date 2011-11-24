@@ -18,7 +18,6 @@ package org.ihtsdo.project.model;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,13 +25,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.refset.PromotionRefset;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 
 /**
  * The Class WorkListMember.

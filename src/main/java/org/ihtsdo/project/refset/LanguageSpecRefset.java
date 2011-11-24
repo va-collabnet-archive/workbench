@@ -20,6 +20,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class LanguageSpecRefset extends WorkflowRefset {
 
@@ -164,16 +165,16 @@ public class LanguageSpecRefset extends WorkflowRefset {
 	public void computeLanguageRefsetSpec(I_ConfigAceFrame config) {
 		I_TermFactory tf = Terms.get();
 		try {
-			I_GetConceptData current = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
-			I_GetConceptData retired = tf.getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			I_GetConceptData notAcceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
+			I_GetConceptData current = tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+			I_GetConceptData retired = tf.getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
+			I_GetConceptData notAcceptable = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
 			I_GetConceptData enumeratedOriginConcept = getEnumeratedOriginRefsetConcept(config);
 			I_GetConceptData languageMembershipConcept = getLanguageMembershipRefsetConcept(config);
 			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			HashMap<Integer, Integer> descIdAcceptabilityMap = new HashMap<Integer,Integer>();
 
 			// adding enumerated members to map
-			for (I_ExtendByRef enumeratedOriginMember : 
+			for (I_ExtendByRef enumeratedOriginMember :  
 				tf.getRefsetExtensionMembers(enumeratedOriginConcept.getConceptNid())) {
 				long lastVersion = Long.MIN_VALUE;
 				I_ExtendByRefPartCid languageExtensionPart = null;

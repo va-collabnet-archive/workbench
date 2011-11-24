@@ -16,8 +16,6 @@
  */
 package org.ihtsdo.project;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,8 +66,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -77,7 +75,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery.StopActionListener;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
@@ -104,6 +101,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * The Class TerminologyProjectDAO.
@@ -398,7 +396,7 @@ public class TerminologyProjectDAO {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -741,7 +739,7 @@ public class TerminologyProjectDAO {
 					I_RelVersioned relVersioned = rel.getFixedPart();
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						relVersioned.addVersion(newPart);
@@ -784,7 +782,7 @@ public class TerminologyProjectDAO {
 					I_RelVersioned relVersioned = rel.getFixedPart();
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						relVersioned.addVersion(newPart);
@@ -827,7 +825,7 @@ public class TerminologyProjectDAO {
 					I_RelVersioned relVersioned = rel.getFixedPart();
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						relVersioned.addVersion(newPart);
@@ -994,7 +992,7 @@ public class TerminologyProjectDAO {
 					I_RelVersioned relVersioned = rel.getFixedPart();
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						relVersioned.addVersion(newPart);
@@ -1051,7 +1049,7 @@ public class TerminologyProjectDAO {
 						I_RelVersioned relVersioned = rel.getFixedPart();
 						for (PathBI editPath : config.getEditingPathSet()) {
 							I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-									ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+									SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							relVersioned.addVersion(newPart);
@@ -1146,7 +1144,7 @@ public class TerminologyProjectDAO {
 						I_RelVersioned relVersioned = rel.getFixedPart();
 						for (PathBI editPath : config.getEditingPathSet()) {
 							I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-									ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+									SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							relVersioned.addVersion(newPart);
@@ -1239,7 +1237,7 @@ public class TerminologyProjectDAO {
 						I_RelVersioned relVersioned = rel.getFixedPart();
 						for (PathBI editPath : config.getEditingPathSet()) {
 							I_RelPart newPart = (I_RelPart) rel.getMutablePart().makeAnalog(
-									ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+									SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							relVersioned.addVersion(newPart);
@@ -1654,7 +1652,7 @@ public class TerminologyProjectDAO {
 					if (isInactive(part.getStatusNid())) {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							I_ExtendByRefPartStr newStringPart = (I_ExtendByRefPartStr) part.makeAnalog(
-									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							extension.addVersion(newStringPart);
@@ -1722,7 +1720,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -1772,7 +1770,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						extTuples.iterator().next().makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -1818,7 +1816,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -1863,7 +1861,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -1911,7 +1909,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -2737,7 +2735,7 @@ public class TerminologyProjectDAO {
 					} else if (isInactive(part.getStatusNid())) {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							part.makeAnalog(
-									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							//part.setStringValue(metadata); //Removed to minimize changeset footprint
@@ -2828,7 +2826,7 @@ public class TerminologyProjectDAO {
 					} else if (isInactive(part.getStatusNid())) {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							part.makeAnalog(
-									ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							extension.addVersion(part);
@@ -3011,13 +3009,11 @@ public class TerminologyProjectDAO {
 	static {
 
 		try {
-			fsn = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
+			fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
-			preferred =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			preferred =  Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 
-			notAcceptable =  Terms.get().getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
-			inactive =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.INACTIVE.getUids());
-			retired =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+			inactive =Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			enRefset=Terms.get().getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_EN.getUids());} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -3029,7 +3025,9 @@ public class TerminologyProjectDAO {
 			Integer sourceLang) {
 		String [] retString={"",""};
 		String sFsn="";
+		String sRetFsn="";
 		String sPref="";
+		String sRetPref="";
 		if (sourceLang!=null){
 
 			List<ContextualizedDescription> descriptions;
@@ -3040,9 +3038,8 @@ public class TerminologyProjectDAO {
 				for (I_ContextualizeDescription description : descriptions) {
 					if (description.getLanguageExtension()!=null && description.getLanguageRefsetId()==sourceLang){
 
-						if (!(description.getAcceptabilityId()==notAcceptable.getConceptNid() ||
-								description.getExtensionStatusId()==inactive.getConceptNid() ||
-								description.getDescriptionStatusId()==retired.getConceptNid())){
+						if (description.getExtensionStatusId()!=inactive.getConceptNid() &&
+								description.getDescriptionStatusId()!=inactive.getConceptNid()){
 
 							if (description.getTypeId() == fsn.getConceptNid() ) {
 								sFsn= description.getText();
@@ -3057,6 +3054,12 @@ public class TerminologyProjectDAO {
 									}
 								}
 							}
+						}else{
+							if (description.getTypeId() == fsn.getConceptNid() ) {
+								sRetFsn=description.getText();
+							}else{
+								sRetPref=description.getText();
+							}
 						}
 					}
 				}
@@ -3067,8 +3070,15 @@ public class TerminologyProjectDAO {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			retString[0]=sFsn;
-			retString[1]=sPref;
+			if (sFsn.equals(""))
+				retString[0]=sRetFsn;
+			else
+				retString[0]=sFsn;
+			
+			if (sPref.equals(""))
+				retString[1]=sRetPref;
+			else
+				retString[1]=sPref;
 		}
 
 		return retString;
@@ -3207,7 +3217,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData workListRefset = termFactory.getConcept(workListId);
 
 			I_IntSet descriptionTypes =  termFactory.newIntSet();
-			descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
+			descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
 			List<? extends I_DescriptionTuple> descTuples = workListMemberConcept.getDescriptionTuples(
 					config.getAllowedStatus(), 
@@ -3353,7 +3363,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						extTuples.iterator().next().makeAnalog(
-								ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						part.setStringValue(metadata);
@@ -3495,7 +3505,8 @@ public class TerminologyProjectDAO {
 	public static void retireWorkList(WorkList workList, I_ConfigAceFrame config) throws Exception {
 		for (WorkListMember member : workList.getWorkListMembers()) {
 			if (!ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(member.getActivityStatus()) &&
-					!ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())) {
+					!ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus()) &&
+					!SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getUUIDs().contains(member.getActivityStatus())) {
 				throw new Exception("WorkList cannot be retired, some members have been delivered and are still active.");
 			}
 		}
@@ -3539,7 +3550,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) 
 						lastPart.makeAnalog(
-								ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+								SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 								editPath.getConceptNid(),
 								Long.MAX_VALUE);
 						extension.addVersion(part);
@@ -3573,7 +3584,7 @@ public class TerminologyProjectDAO {
 			for (PathBI editPath : config.getEditingPathSet()) {
 				I_ConceptAttributePart newAttributeVersion = 
 					(I_ConceptAttributePart) lastAttributePart.makeAnalog(
-							ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
+							SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(),
 							editPath.getConceptNid(), 
 							Long.MAX_VALUE);
 				conceptToRetireUpdatedFromDB.getConceptAttributes().addVersion(newAttributeVersion);
@@ -3806,6 +3817,7 @@ public class TerminologyProjectDAO {
 		allowedStatus.addAll(config.getAllowedStatus().getSetValues());
 		allowedStatus.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 		allowedStatus.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
+		allowedStatus.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 		I_ExtendByRefPart lastPart = null;
 		for (I_ExtendByRefVersion loopTuple : extension.getTuples(
 				allowedStatus, config.getViewPositionSetReadOnly(), Precedence.TIME,
@@ -3842,6 +3854,7 @@ public class TerminologyProjectDAO {
 	public static boolean isActive(int statusId) {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
+			activeStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
@@ -3856,6 +3869,7 @@ public class TerminologyProjectDAO {
 	private static boolean isInactive(int statusId) {
 		List<Integer> inactiveStatuses = new ArrayList<Integer>();
 		try {
+			inactiveStatuses.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			inactiveStatuses.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			inactiveStatuses.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 		} catch (IOException e) {
