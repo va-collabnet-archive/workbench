@@ -85,7 +85,6 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
@@ -615,6 +614,71 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         return false;
+    }
+
+    @Override
+    public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
+        List<? extends Version> versions1 = getVersions(vc1);
+        List<? extends Version> versions2 = getVersions(vc2);
+
+        if (versions1.size() != versions2.size()) {
+            return false;
+        } else if (versions1.size() == 1 && versions2.size() == 1) {
+            for (Version v1 : versions1) {
+                for (Version v2 : versions2) {
+                    if (v1 == v2) {
+                        return true;
+                    }
+
+                    if (v1.getStatusNid() != v2.getStatusNid()) {
+                        return false;
+                    }
+
+                    if (compareAuthoring) {
+                        if (v1.getAuthorNid() != v2.getAuthorNid()) {
+                            return false;
+                        }
+
+                        if (v1.getPathNid() != v2.getPathNid()) {
+                            return false;
+                        }
+                    }
+
+                    if (v1.getTime() != v2.getTime()) {
+                        return false;
+                    }
+
+                    if (v1.fieldsEqual(v2)) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            int foundCount = 0;
+            for (Version v1 : versions1) {
+                for (Version v2 : versions2) {
+                    if (v1 == v2) {
+                        foundCount++;
+                    } else if (v1.getStatusNid() != v2.getStatusNid()) {
+                        continue;
+                    } else if (v1.getTime() != v2.getTime()) {
+                        continue;
+                    } else if (compareAuthoring
+                            && (v1.getAuthorNid() != v2.getAuthorNid())) {
+                        continue;
+                    } else if (compareAuthoring
+                            && (v1.getPathNid() != v2.getPathNid())) {
+                        continue;
+                    } else if (v1.fieldsEqual(v2)) {
+                        foundCount++;
+                    }
+                }
+            }
+            if (foundCount != versions1.size()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public abstract boolean fieldsEqual(ConceptComponent<R, C> another);
@@ -2254,6 +2318,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
             }
 
             return false;
+        }
+
+        public abstract boolean fieldsEqual(ConceptComponent<R, C>.Version another);
+
+        @Override
+        public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2,
+                Boolean compareAuthoring) {
+            return ConceptComponent.this.versionsEqual(vc1, vc2, compareAuthoring);
         }
 
         @Override

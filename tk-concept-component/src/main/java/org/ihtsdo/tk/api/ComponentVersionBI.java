@@ -45,4 +45,17 @@ public interface ComponentVersionBI extends ComponentBI {
     * database, rather than in the mutable database. <code>false</code> otherwise.
     */
    boolean isBaselineGeneration();
+   
+   /**
+    *
+    * @param vc1 ViewCoordinate of the first version
+    * 
+    * @param vc2 ViewCoordinate of the second version
+    * 
+    * @param compareAuthoring Set to <code>true</code> to compare the author and path of the 
+    * versions. Otherwise <code>false</code> to disregard author and path.
+    * 
+    * @return <code>true</code> if the versions are equal. <code>false</code> otherwise.
+    */
+   boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring);
 }

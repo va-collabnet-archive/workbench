@@ -24,4 +24,6 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
    TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
            throws ContraditionException, IOException;
+   
+   boolean refexFieldsEqual (RefexVersionBI another);
 }

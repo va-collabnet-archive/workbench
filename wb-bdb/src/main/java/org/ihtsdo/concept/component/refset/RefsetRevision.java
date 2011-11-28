@@ -21,6 +21,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.Set;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends RefsetMember<V, C>>
         extends Revision<V, C> implements I_ExtendByRefPart<V>, RefexAnalogBI<V> {
@@ -88,6 +89,11 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
       }
 
       return false;
+   }
+   
+   @Override
+   public boolean refexFieldsEqual(RefexVersionBI another){
+       return primordialComponent.refexFieldsEqual(another);
    }
 
    public abstract V makeAnalog();

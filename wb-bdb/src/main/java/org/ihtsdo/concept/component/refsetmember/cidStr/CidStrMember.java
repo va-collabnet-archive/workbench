@@ -39,6 +39,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 
 public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
         implements I_ExtendByRefPartCidString<CidStrRevision>, RefexCnidStrAnalogBI<CidStrRevision> {
@@ -138,7 +140,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<CidStrRevision, CidStrMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<CidStrRevision, CidStrMember> obj) {
       if (CidStrMember.class.isAssignableFrom(obj.getClass())) {
          CidStrMember another = (CidStrMember) obj;
 
@@ -147,6 +149,15 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexCnidStrVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexCnidStrVersionBI cv = (RefexCnidStrVersionBI) another;
+            return (this.c1Nid == cv.getCnid1()) && this.strValue.equals(cv.getStr1());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {

@@ -35,7 +35,9 @@ import org.ihtsdo.tk.hash.Hashcode;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberAnalogBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 
 public class MembershipMember extends RefsetMember<MembershipRevision, MembershipMember> 
     implements RefexMemberAnalogBI<MembershipRevision> {
@@ -125,13 +127,22 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<MembershipRevision, MembershipMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<MembershipRevision, MembershipMember> obj) {
       if (MembershipMember.class.isAssignableFrom(obj.getClass())) {
          return true;
       }
 
       return false;
    }
+   
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexMemberVersionBI.class.isAssignableFrom(another.getClass())){
+            return true;
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {

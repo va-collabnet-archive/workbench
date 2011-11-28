@@ -38,6 +38,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
 
 public class IntMember extends RefsetMember<IntRevision, IntMember>
         implements I_ExtendByRefPartInt<IntRevision>, RefexIntAnalogBI<IntRevision> {
@@ -135,7 +137,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<IntRevision, IntMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<IntRevision, IntMember> obj) {
       if (IntMember.class.isAssignableFrom(obj.getClass())) {
          IntMember another = (IntMember) obj;
 
@@ -144,6 +146,15 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexIntVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexIntVersionBI iv = (RefexIntVersionBI) another;
+            return this.intValue == iv.getInt1();
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {

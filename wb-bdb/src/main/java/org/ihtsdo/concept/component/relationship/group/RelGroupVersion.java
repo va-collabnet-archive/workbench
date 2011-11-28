@@ -111,7 +111,12 @@ public class RelGroupVersion implements RelGroupVersionBI {
    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
       return toUserString();
    }
-
+   
+   @Override
+    public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+   
    //~--- get methods ---------------------------------------------------------
 
    @Override

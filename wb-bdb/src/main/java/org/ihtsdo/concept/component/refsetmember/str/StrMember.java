@@ -38,6 +38,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 
 public class StrMember extends RefsetMember<StrRevision, StrMember>
         implements I_ExtendByRefPartStr<StrRevision>, RefexStrAnalogBI<StrRevision> {
@@ -135,7 +137,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<StrRevision, StrMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<StrRevision, StrMember> obj) {
       if (StrMember.class.isAssignableFrom(obj.getClass())) {
          StrMember another = (StrMember) obj;
 
@@ -144,6 +146,16 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
       return false;
    }
+   
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexStrVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexStrVersionBI sv = (RefexStrVersionBI) another;
+            return this.stringValue.equals(sv.getStr1());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {

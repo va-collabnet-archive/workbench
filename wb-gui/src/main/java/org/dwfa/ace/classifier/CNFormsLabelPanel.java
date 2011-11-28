@@ -1722,6 +1722,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public ConceptChronicleBI getEnclosingConcept() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
    }
 
 
@@ -2367,6 +2372,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public ConceptChronicleBI getEnclosingConcept() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }

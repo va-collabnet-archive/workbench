@@ -830,7 +830,33 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
       public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
          return (RelationshipRevision) getCv().makeAnalog(statusNid, authorNid, pathNid, time);
       }
+      
+      @Override
+        public boolean fieldsEqual(ConceptComponent<RelationshipRevision, Relationship>.Version another) {
+          Relationship.Version anotherVersion = (Relationship.Version) another;
+            if (this.getC2Nid() != anotherVersion.getC2Nid()) {
+            return false;
+         }
 
+         if (this.getCharacteristicNid() != anotherVersion.getCharacteristicNid()) {
+            return false;
+         }
+
+         if (this.getGroup() != anotherVersion.getGroup()) {
+            return false;
+         }
+
+         if (this.getRefinabilityNid() != anotherVersion.getRefinabilityNid()) {
+            return false;
+         }
+
+         if (this.getTypeNid() != anotherVersion.getTypeNid()) {
+            return false;
+         }
+
+         return true;
+        }
+        
       //~--- get methods ------------------------------------------------------
 
       @Override
