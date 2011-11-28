@@ -27,6 +27,9 @@ public class CustomStatics {
     /**The lookup string for configService. **/
     public static final String CONFIG_SERVICE = "configService";
     
+    /**The lookup string for configService. **/
+    public static final String CONFIG_SERVICE_DTO = "configServiceDTO";
+    
     /** The name of the custom UI config file. */
     public static final String CUSTOM_FILE_FN = "customFileFullName";
 	
