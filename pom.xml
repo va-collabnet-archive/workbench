@@ -35,12 +35,15 @@
 	<properties>
 		<branch>trek</branch>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+<!--		<drools.version>5.3.0.Final</drools.version>
+		<jbpm.version>5.1.0.Final</jbpm.version>
+		<mvel2.version>2.1.0.drools4</mvel2.version>-->
 		<drools.version>5.2.0.Final</drools.version>
 		<jbpm.version>5.1.0.Final</jbpm.version>
-		<mvel2.version>2.1.0.drools2</mvel2.version>
-		<org.apache.lucene.version>3.0.3</org.apache.lucene.version>
+		<mvel2.version>2.1.0.drools2</mvel2.version>		
+                <org.apache.lucene.version>3.0.3</org.apache.lucene.version>
 		<wb-icons-version>1.0.8</wb-icons-version>
-		<je.version>4.1.10</je.version>
+		<je.version>5.0.34</je.version>
 		<svnusername>${relusername}</svnusername>
 		<svnpassword>${relpassword}</svnpassword>
 		<svnkit.version>1.3.5</svnkit.version>
@@ -216,8 +219,8 @@
 		<module>wb-foundation</module>
 		<module>wb-core</module>
 		<module>wb-api</module>
-		<module>id-generation-ws-client</module>
-		<module>id-generation-api</module>
+<!--		<module>id-generation-ws-client</module>-->
+<!--		<module>id-generation-api</module>-->
 		<module>wb-release-process</module>
 		<module>wb-mojo</module>
 		<module>wb-gui</module>

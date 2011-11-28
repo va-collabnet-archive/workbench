@@ -118,7 +118,7 @@ public class ExportEConceptLatestOnly extends AbstractMojo {
          viewPosition = new Position(Long.MAX_VALUE, path);
 
          descVc.setPositionSet(new PositionSet(viewPosition));
-         descVc.getAllowedStatusNids().add(Ts.get().getNidForUuids(UUID.fromString("6cc3df26-661e-33cd-a93d-1c9e797c90e3")));
+         descVc.getAllowedStatusNids().add(Ts.get().getNidForUuids(SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getUuids()));
          ActiveOnlyExport exporter = new ActiveOnlyExport(conceptVc, descVc, relVc, 
                  exclusionSet, out, conversionMap);
 
