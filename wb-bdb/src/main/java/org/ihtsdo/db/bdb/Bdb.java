@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb;
 
+import com.sleepycat.je.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -50,14 +51,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
-import com.sleepycat.je.CheckpointConfig;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.EnvironmentLockedException;
-import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
@@ -285,6 +278,7 @@ public class Bdb {
 
             inform(activity, "Setting up database environment...");
             mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
+            inform(activity, "Berkeley DB Version: " + JEVersion.CURRENT_VERSION.getVersionString());
             File readOnlyDir = new File(bdbDirectory, "read-only");
             boolean readOnlyExists = readOnlyDir.exists();
             readOnly = new Bdb(readOnlyExists, readOnlyDir);
