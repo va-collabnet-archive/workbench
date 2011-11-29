@@ -1235,12 +1235,12 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	private void targetTextFieldMouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
-			termZoomDialog.setVisible(true);
-			termZoomDialog.pack();
 			zoomTextArea.setText(targetTextField.getText());
 			zoomTextArea.setEnabled(targetTextField.isEnabled());
 			zoomTextArea.revalidate();
 			zoomTextArea.repaint();
+			termZoomDialog.setVisible(true);
+			termZoomDialog.pack();
 		}
 	}
 
