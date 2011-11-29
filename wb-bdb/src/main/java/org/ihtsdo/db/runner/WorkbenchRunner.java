@@ -803,6 +803,7 @@ public class WorkbenchRunner {
                         }
                     }
                 }
+                
             }
         } catch (Exception E) {
             AceLog.getAppLog().severe("checkCustom threw an error trying to get " + custPropFN, E);
