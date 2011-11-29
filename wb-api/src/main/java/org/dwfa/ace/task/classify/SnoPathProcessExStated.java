@@ -73,7 +73,8 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
             I_IntSet statSet,
             PositionSetReadOnly pathPos,
             PositionSetReadOnly pathOverridePos,
-            I_ShowActivity gui, Precedence precedence,
+            I_ShowActivity gui,
+            Precedence precedence,
             I_ManageContradiction contradictionMgr)
             throws Exception {
         // Has additionof PositionSetReadOnly pathOverridePos parameter
@@ -87,6 +88,9 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
         this.statusSetRel = statSet;
 
         // :ADD: Experiment
+        this.statusSetCon = Terms.get().newIntSet();
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
         this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_AMBIGUOUS_NID());
         this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_DUPLICATE_NID());
         this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_ERRONEOUS_NID());
@@ -130,7 +134,19 @@ public class SnoPathProcessExStated implements I_ProcessConcepts {
         this.fromPathPos = pathPos;
         this.roleTypeSet = roleSet;
         this.statusSetRel = statSet;
+
+        // :ADD: Experiment
+        this.statusSetCon = Terms.get().newIntSet();
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_AMBIGUOUS_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_DUPLICATE_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_ERRONEOUS_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
+        this.statusSetCon.add(SnomedMetadataRfx.getSTATUS_OUTDATED_NID());
+
         //this.doNotCareIfHasSnomedIsa = doNotCareIfHasIsa;
+
         this.gui = gui;
         this.precedence = precedence;
         this.contradictionMgr = contradictionMgr;
