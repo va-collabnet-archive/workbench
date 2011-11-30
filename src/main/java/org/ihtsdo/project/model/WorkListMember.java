@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.workflow.model.WfInstance;
 
 /**
  * The Class WorkListMember.
@@ -57,8 +58,7 @@ public class WorkListMember implements Serializable {
 	/** The status last date */
 	private Long statusDate;
 	
-	/** The business process with attachments. */
-//	private BusinessProcess businessProcessWithAttachments;
+	private WfInstance wfInstance;
 	
 	/**
 	 * Instantiates a new work list member.
@@ -268,6 +268,14 @@ public class WorkListMember implements Serializable {
 
 	public void setStatusDate(Long statusDate) {
 		this.statusDate = statusDate;
+	}
+
+	public WfInstance getWfInstance() {
+		return wfInstance;
+	}
+
+	public void setWfInstance(WfInstance wfInstance) {
+		this.wfInstance = wfInstance;
 	}
 	
 	

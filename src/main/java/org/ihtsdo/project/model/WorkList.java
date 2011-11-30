@@ -28,6 +28,8 @@ import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.WorkflowRefset;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
  * The Class WorkList.
@@ -49,11 +51,9 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	/** The partition id. */
 	private UUID partitionUUID;
 	
-	/** The destination. */
-	private String destination;
+	private WorkflowDefinition workflowDefinition;
 	
-	/** The business process. */
-	private BusinessProcess businessProcess;
+	private List<WfUser> users;
 	
 	/**
 	 * Instantiates a new work list.
@@ -69,8 +69,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	 * @throws TerminologyException 
 	 */
 	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID,
-			String destination,
-			BusinessProcess businessProcess) throws TerminologyException, IOException {
+			WorkflowDefinition workflowDefinition) throws TerminologyException, IOException {
 		super();
 		this.name = name;
 		if (uids!=null)
@@ -78,8 +77,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		this.id = id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
-		this.destination = destination;
-		this.businessProcess = businessProcess;
+		this.workflowDefinition = workflowDefinition;
 		
 	}
 	
@@ -155,42 +153,6 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	}
 	
 	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public String getDestination() {
-		return destination;
-	}
-	
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination the new destination
-	 */
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
-	
-	/**
-	 * Gets the business process.
-	 * 
-	 * @return the business process
-	 */
-	public BusinessProcess getBusinessProcess() {
-		return businessProcess;
-	}
-	
-	/**
-	 * Sets the business process.
-	 * 
-	 * @param businessProcess the new business process
-	 */
-	public void setBusinessProcess(BusinessProcess businessProcess) {
-		this.businessProcess = businessProcess;
-	}
-	
-	/**
 	 * Gets the work list members.
 	 * 
 	 * @return the work list members
@@ -238,6 +200,14 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 		partition = TerminologyProjectDAO.getPartition(concept, config);
 		return partition;
+	}
+
+	public WorkflowDefinition getWorkflowDefinition() {
+		return workflowDefinition;
+	}
+
+	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
+		this.workflowDefinition = workflowDefinition;
 	}
 	
 	
