@@ -28,6 +28,10 @@ public class Config {
 	@XmlTransient
 	private String releaseDate;
 	@XmlTransient
+	private String previousReleaseDate;
+	
+
+	@XmlTransient
 	private String fileExtension;
 	@XmlTransient
 	private String outputFolderName;
@@ -41,6 +45,7 @@ public class Config {
 	private Date fromReleaseDate;
 	@XmlTransient
 	private Date toReleaseDate;
+
 	
 	// for accessing the web service
 	@XmlTransient
@@ -154,6 +159,14 @@ public class Config {
 		this.releaseDate = releaseDate;
 	}
 
+	public String getPreviousReleaseDate() {
+		return previousReleaseDate;
+	}
+
+	public void setPreviousReleaseDate(String previousReleaseDate) {
+		this.previousReleaseDate = previousReleaseDate;
+	}
+	
 	public String getFileExtension() {
 		return fileExtension;
 	}

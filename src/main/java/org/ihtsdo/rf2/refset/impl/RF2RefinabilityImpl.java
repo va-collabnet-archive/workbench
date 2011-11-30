@@ -67,7 +67,7 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 			Collection<? extends I_RelVersioned> rels = concept.getSourceRels();
 			if (!rels.isEmpty()) {
 				for (I_RelVersioned<?> rel : rels) {
-					if (rel.getAuthorNid() == getSnorocketAuthorNid()) {
+					if (rel.getAuthorNid() == getNid(I_Constants.SNOROCKET_AUTHOR_UID)) {
 						List<? extends I_RelPart> relVers = rel.getMutableParts();
 						if (!relVers.isEmpty()) {
 							String priorActive = "X";
