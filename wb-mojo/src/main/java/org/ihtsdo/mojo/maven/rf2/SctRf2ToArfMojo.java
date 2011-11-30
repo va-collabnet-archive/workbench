@@ -35,7 +35,7 @@ import org.dwfa.tapi.TerminologyException;
 /**
  * @author Marc E. Campbell
  *
- * @goal sct-rf2-to-arf
+ * @goal sct-rf2-to-arf 
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
@@ -71,8 +71,8 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      */
     private String statusDir;
     /**
-     * Directory used to output the eConcept format files
-     * Default value "/classes" set programmatically due to file separator
+     * Directory used to output the eConcept format files Default value "/classes"
+     * set programmatically due to file separator
      *
      * @parameter default-value="generated-arf"
      */
@@ -108,34 +108,36 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                     outDir + "ids.txt"), "UTF-8"));
             getLog().info("::: IDS OUTPUT: " + outDir + "ids_sct.txt");
 
-            // :NYI: extended status implementation does not multiple version years
+            // :NYI: extended status implementation does not support multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
+
+            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<Rf2_RefsetCRecord[]>();
+            int arrayCont = 0;
+            for (Rf2File rf2File : filesInStatus) {
+                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null));
+            }
+            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
+                arrayCont += rf2_RefsetCRecordTmp.length;
+            }
+
+            Rf2_RefsetCRecord[] statusRecords = new Rf2_RefsetCRecord[arrayCont];
+            int index = 0;
+            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
+                for (int i = 0; i < rf2_RefsetCRecordTmp.length; i++) {
+                    statusRecords[index] = rf2_RefsetCRecordTmp[i];
+                    index++;
+                }
+            }
             
-            ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray=new ArrayList<Rf2_RefsetCRecord[]>();
-            int arrayCont=0;
-            for (Rf2File rf2File :filesInStatus){
-            	rf2_RefsetCRecordArray.add( Rf2_RefsetCRecord.parseRefset(rf2File, null));
-            }
-            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray){
-            	arrayCont+=rf2_RefsetCRecordTmp.length;
-            }
-
-            Rf2_RefsetCRecord[] statusRecords=new Rf2_RefsetCRecord[arrayCont];
-            int index=0;
-            for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray){
-            	for (int i=0;i<rf2_RefsetCRecordTmp.length;i++){
-            		statusRecords[index]=rf2_RefsetCRecordTmp[i];
-            		index++;
-            	}
-            }
-//            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null); // hardcoded
-
+            // Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null);
+            // hardcoded
             // CONCEPT FILES: parse, write
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concepts_rf2.txt"), "UTF-8"));
             getLog().info("::: CONCEPTS FILE: " + outDir + "concepts_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
             for (Rf2File rf2File : filesIn) {
+                getLog().info("    ... " + rf2File.file.getName());
                 Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File);
                 concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
@@ -152,6 +154,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             getLog().info("::: DESCRIPTIONS FILE: " + outDir + "descriptions_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
             for (Rf2File rf2File : filesIn) {
+                getLog().info("    ... " + rf2File.file.getName());
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File);
                 descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
@@ -167,7 +170,9 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
                     outDir + "relationships_rf2.txt"), "UTF-8"));
             getLog().info("::: RELATIONSHIPS FILE: " + outDir + "relationships_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Relationship", ".txt");
+            filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
+                getLog().info("    ... " + rf2File.file.getName());
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true);
                 rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
@@ -177,7 +182,9 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             }
 
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_StatedRelationship", ".txt");
+            filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredStatedIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
+                getLog().info("    ... " + rf2File.file.getName());
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false);
                 for (Sct2_RelRecord r : rels) {
                     r.writeArf(bw);
