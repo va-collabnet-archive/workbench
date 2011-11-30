@@ -58,14 +58,17 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER;
 			int relationshipStatusId=0;
-			String updateWbSctId = "false";
-			if(!getConfig().isUpdateWbSctId().equals(null)){
-				updateWbSctId = getConfig().isUpdateWbSctId();
-			}
+			
+			//Change this to come from config
+			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
+			
+			System.out.println("==PREVIOUSRELEASEDATE==" + PREVIOUSRELEASEDATE);
+			
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
+			System.out.println("==relationships==" + relationships.size());
+			
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
@@ -96,7 +99,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-
+					System.out.println("==destinationId==" + destinationId);
 					relTypeId = "";
 
 					id = tf.getId(rel.getTypeNid());
@@ -121,7 +124,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							continue;
 						}
 					} 
-
+					System.out.println("==relTypeId==" + relTypeId);
+					
 					relationshipId = "";
 
 					id = tf.getId(rel.getNid());
@@ -137,22 +141,29 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
+					System.out.println("==relationshipId==" + relationshipId);
+					
+					Date et = new Date(rel.getTime());
+					effectiveTime = getDateFormat().format(et);
 
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) { 														
-						active = "1";
+						active = "1";	
 						moduleId = computeModuleId(sourceConcept);
 					} else if (relationshipStatusId == inactiveNid) { 														
 						active = "0";
-						moduleId = computeModuleId(sourceConcept);
+						System.out.println("==going in special inactive elseif==");
+						//This change was needed for already published relationshipid should not change moduleid
+						 if(et.after(PREVIOUSRELEASEDATE)) {
+							 moduleId = computeModuleId(sourceConcept);
+						 }
 					}
 					
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
-						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
+						logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
-					}					
-
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+					}
+					
 					int relationshipGroup = rel.getGroup();
 
 					if (sourceId==null || sourceId.equals("")){
@@ -185,6 +196,18 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId, authorName);
 					}else{
+						
+						System.out.println( relationshipId +
+								" " +effectiveTime+ 
+								" " +active+
+								" " +moduleId+ 
+								" " +sourceId+ 
+								" " +destinationId+ 
+								" " +relationshipGroup+ 
+								" " +relTypeId+
+								" " +characteristicTypeId+
+								" " +modifierId);
+						
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
 					}
