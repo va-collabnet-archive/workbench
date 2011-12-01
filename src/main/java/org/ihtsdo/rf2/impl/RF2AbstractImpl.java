@@ -27,6 +27,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ManageContradiction;
+import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -258,6 +259,11 @@ public abstract class RF2AbstractImpl {
 	public String getMetaModuleID(I_GetConceptData concept) throws TerminologyException, IOException {
 		return ExportUtil.getMetaModuleID(concept);
 	}
+	
+	public Long getLatestActivePart(List<I_RelPart> parts) throws Exception {
+		return ExportUtil.getLatestActivePart(parts);
+	}
+	
 
 	public String getRefinabilityStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getRefinabilityStatusType(status);
@@ -276,6 +282,18 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
 	}
 		
+	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid);
+	}	
+	
+	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid );
+	}	
+	
+	public boolean insertCtv3Id(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid) throws Exception {
+		return ExportUtil.insertCtv3Id(componentNid , getConfig(), wbSctId , pathNid , statusNid );
+	}
+	
 	public String getConceptInactivationStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getConceptInactivationStatusType(status);
 	}
@@ -389,7 +407,12 @@ public abstract class RF2AbstractImpl {
 	public String getSCTId(Config config, UUID uuid) throws Exception {
 		return ExportUtil.getSCTId(config, uuid);
 	}
-
+	
+	// get the conceptid for the given UUID
+	public String getConceptId(Config config, UUID uuid) throws Exception {
+		return ExportUtil.getConceptId(config, uuid);
+	}
+	
 	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getConceptId(concept, snomedCorePathNid);
 	}
@@ -405,7 +428,22 @@ public abstract class RF2AbstractImpl {
 	public String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
 		return ExportUtil.getDescriptionId(descriptionNid, snomedCorePathNid);
 	}
+	
+	
+	// get the descriptionid for the given UUID
+	public String getDescriptionId(Config config, UUID uuid) throws Exception {
+		return ExportUtil.getDescriptionId(config, uuid);
+	}
+	
+	// get the relationshipid for the given UUID
+	public String getRelationshipId(Config config, UUID uuid) throws Exception {
+		return ExportUtil.getRelationshipId(config, uuid);
+	}
 
+	public static void setupProfile(Config config) throws TerminologyException, IOException {
+		ExportUtil.setupProfile(config);
+	}
+	
 	public Set<I_GetConceptData> getDescendants(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		return ExportUtil.getDescendants(descendants, concept);
 	}
@@ -597,10 +635,7 @@ public abstract class RF2AbstractImpl {
 			if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
-					//if(conceptid.equals("102550009")){
-						//System.out.println("===conceptid===" + conceptid);
-						export(concept, conceptid);
-					//}
+					export(concept, conceptid);
 			}
 		}
 	}
