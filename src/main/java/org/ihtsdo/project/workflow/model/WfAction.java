@@ -16,15 +16,6 @@ public abstract class WfAction {
 	
 	public abstract WfInstance doAction(WfInstance instance) throws Exception;
 	
-	public WfAction(String name, UUID id,
-			WfState consequence,
-			List<WfRole> permissions) {
-		super();
-		this.name = name;
-		this.id = id;
-		this.consequence = consequence;
-		this.permissions = permissions;
-	}
 	public String getName() {
 		return name;
 	}
@@ -49,4 +40,5 @@ public abstract class WfAction {
 	public void setPermissions(List<WfRole> permissions) {
 		this.permissions = permissions;
 	}
+
 }

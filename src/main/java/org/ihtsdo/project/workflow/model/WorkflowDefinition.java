@@ -1,20 +1,24 @@
 package org.ihtsdo.project.workflow.model;
 
 import java.util.List;
+import java.util.Map;
+
+import org.drools.KnowledgeBase;
 
 
 public class WorkflowDefinition {
 	
 	private List<WfRole> roles;
 	private List<WfState> states;
-	private List<WfAction> actions;
+	private Map<String,WfAction> actions;
+	private KnowledgeBase stateTransitionEngine;
 
 	public WorkflowDefinition() {
 		super();
 	}
 
 	public WorkflowDefinition(List<WfRole> roles, List<WfState> states,
-			List<WfAction> actions) {
+			Map<String,WfAction> actions) {
 		super();
 		this.roles = roles;
 		this.states = states;
@@ -37,12 +41,20 @@ public class WorkflowDefinition {
 		this.states = states;
 	}
 
-	public List<WfAction> getActions() {
+	public Map<String,WfAction> getActions() {
 		return actions;
 	}
 
-	public void setActions(List<WfAction> actions) {
+	public void setActions(Map<String,WfAction> actions) {
 		this.actions = actions;
+	}
+
+	public KnowledgeBase getStateTransitionEngine() {
+		return stateTransitionEngine;
+	}
+
+	public void setStateTransitionEngine(KnowledgeBase stateTransitionEngine) {
+		this.stateTransitionEngine = stateTransitionEngine;
 	}
 
 }
