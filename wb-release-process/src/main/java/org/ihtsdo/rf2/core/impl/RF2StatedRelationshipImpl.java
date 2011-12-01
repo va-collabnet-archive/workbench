@@ -196,18 +196,6 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId, authorName);
 					}else{
-						
-						System.out.println( relationshipId +
-								" " +effectiveTime+ 
-								" " +active+
-								" " +moduleId+ 
-								" " +sourceId+ 
-								" " +destinationId+ 
-								" " +relationshipGroup+ 
-								" " +relTypeId+
-								" " +characteristicTypeId+
-								" " +modifierId);
-						
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 							characteristicTypeId, modifierId);
 					}
