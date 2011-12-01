@@ -15,11 +15,11 @@
 	<properties>
 		<src.dir>${project.build.directory}/generated-resources</src.dir>
 		<!-- Application mandatory arguments -->
-		<database>E:\Workbench_Bundle\ARF_Bundle\wb-bundle\berkeley-db</database>
-		<releaseDate>20110131</releaseDate>
+		<database />
+		<releaseDate>20120131</releaseDate>
 		<outputFolder>export</outputFolder>
 		<!-- Application optional arguments -->
-		<rf2Format>false</rf2Format>
+		<rf2Format />
 		<invokeDrools />
 		<incrementalRelease />
 		<fromReleaseDate />

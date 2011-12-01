@@ -11,6 +11,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
+import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -61,13 +62,10 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			
 			//Change this to come from config
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
-			
-			System.out.println("==PREVIOUSRELEASEDATE==" + PREVIOUSRELEASEDATE);
-			
+		
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			System.out.println("==relationships==" + relationships.size());
 			
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
@@ -99,7 +97,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-					System.out.println("==destinationId==" + destinationId);
+			
 					relTypeId = "";
 
 					id = tf.getId(rel.getTypeNid());
@@ -124,7 +122,6 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							continue;
 						}
 					} 
-					System.out.println("==relTypeId==" + relTypeId);
 					
 					relationshipId = "";
 
@@ -141,26 +138,29 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-					System.out.println("==relationshipId==" + relationshipId);
 					
 					Date et = new Date(rel.getTime());
 					effectiveTime = getDateFormat().format(et);
-
-					relationshipStatusId = rel.getStatusNid();
-					if (relationshipStatusId == activeNid) { 														
-						active = "1";	
-						moduleId = computeModuleId(sourceConcept);
-					} else if (relationshipStatusId == inactiveNid) { 														
-						active = "0";
-						System.out.println("==going in special inactive elseif==");
-						//This change was needed for already published relationshipid should not change moduleid
-						 if(et.after(PREVIOUSRELEASEDATE)) {
-							 moduleId = computeModuleId(sourceConcept);
-						 }
-					}
 					
+					relationshipStatusId = rel.getStatusNid();
+					if (relationshipStatusId == activeNid) {               
+						active = "1";
+						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+				     } else if (relationshipStatusId == inactiveNid) {               
+					      active = "0";
+					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
+						      
+					      if (lastActiveDate!=null){
+					      moduleId = getConceptMetaModuleID(sourceConcept,
+					        getDateFormat().format(new Date(lastActiveDate)));
+					      }else{
+					       moduleId = getConceptMetaModuleID(sourceConcept,
+					         getDateFormat().format(new Date(rel.getTime())));
+					      }
+				     }
+				    
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){		
-						logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
+						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
 						incrementMetaDataCount();
 					}
 					
@@ -225,6 +225,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 		}
 
 	}
+	
+	
 
 	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId) throws IOException {
