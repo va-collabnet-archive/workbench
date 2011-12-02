@@ -72,14 +72,13 @@ public class WorkListMember implements Serializable {
 	 * @param businessProcessWithAttachments the business process with attachments
 	 */
 	public WorkListMember(String name, int id, List<UUID> uids,
-			UUID workListUUID, String destination,
+			UUID workListUUID,
 			UUID activityStatus, Long statusDate) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.uids = uids;
 		this.workListUUID = workListUUID;
-		this.destination = destination;
 		this.activityStatus = activityStatus;
 		this.statusDate=statusDate;
 //		this.businessProcessWithAttachments = businessProcessWithAttachments;

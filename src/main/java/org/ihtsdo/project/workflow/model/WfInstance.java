@@ -7,6 +7,8 @@ import java.util.UUID;
 public class WfInstance {
 	
 	private UUID componentId = null;
+	private UUID workListId;
+	private WfUser destination;
 	private WorkflowDefinition wfDefinition;
 	private WfState state;
 	private Map<String,Object> properties;
@@ -64,6 +66,22 @@ public class WfInstance {
 
 	public void setHistory(List<WfHistoryEntry> history) {
 		this.history = history;
+	}
+
+	public UUID getWorkListId() {
+		return workListId;
+	}
+
+	public void setWorkListId(UUID workListId) {
+		this.workListId = workListId;
+	}
+
+	public WfUser getDestination() {
+		return destination;
+	}
+
+	public void setDestination(WfUser destination) {
+		this.destination = destination;
 	}
 
 }

@@ -24,9 +24,10 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
@@ -68,8 +69,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	 * @throws IOException 
 	 * @throws TerminologyException 
 	 */
-	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID,
-			WorkflowDefinition workflowDefinition) throws TerminologyException, IOException {
+	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID) throws TerminologyException, IOException {
 		super();
 		this.name = name;
 		if (uids!=null)
@@ -77,7 +77,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		this.id = id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
-		this.workflowDefinition = workflowDefinition;
+		//this.workflowDefinition = workflowDefinition;
 		
 	}
 	
@@ -208,6 +208,29 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
 		this.workflowDefinition = workflowDefinition;
+	}
+	
+	public PromotionAndAssignmentRefset getPromotionRefset(I_ConfigAceFrame config) {
+		try {
+			I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+			I_GetConceptData refsetConcept = getRefsetConcept();
+			if (refsetConcept == null) {
+				return null;
+			}
+	
+			return new PromotionAndAssignmentRefset(getLatestSourceRelationshipTarget(refsetConcept, promotionRel, config));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public void setUsers(List<WfUser> users) {
+		this.users = users;
+	}
+
+	public List<WfUser> getUsers() {
+		return users;
 	}
 	
 	
