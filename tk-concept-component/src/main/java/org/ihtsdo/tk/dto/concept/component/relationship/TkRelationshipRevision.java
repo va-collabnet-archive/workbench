@@ -174,6 +174,10 @@ public class TkRelationshipRevision extends TkRevision {
       return group;
    }
 
+   public int getRelGroup() {
+      return group;
+   }
+
    public UUID getRefinabilityUuid() {
       return refinabilityUuid;
    }

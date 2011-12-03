@@ -20,5 +20,5 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tk-concept-component</artifactId>
-    <name>${branch}: Toolkit DTOs &amp; API </name>
+    <name>${branch}: Toolkit DTOs and API </name>
 </project>    

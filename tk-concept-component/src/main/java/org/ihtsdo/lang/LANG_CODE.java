@@ -49,6 +49,7 @@ public enum LANG_CODE {
         return LANG_CODE.valueOf(result);
     }
 
+    @Override
     public String toString() {
         return this.name();
     }
