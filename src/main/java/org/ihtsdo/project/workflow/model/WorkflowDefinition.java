@@ -11,7 +11,7 @@ public class WorkflowDefinition {
 	private List<WfRole> roles;
 	private List<WfState> states;
 	private Map<String,WfAction> actions;
-	private KnowledgeBase stateTransitionEngine;
+	private String stateTransitionKBFileName;
 
 	public WorkflowDefinition() {
 		super();
@@ -49,12 +49,12 @@ public class WorkflowDefinition {
 		this.actions = actions;
 	}
 
-	public KnowledgeBase getStateTransitionEngine() {
-		return stateTransitionEngine;
+	public String getStateTransitionKBFileName() {
+		return stateTransitionKBFileName;
 	}
 
-	public void setStateTransitionEngine(KnowledgeBase stateTransitionEngine) {
-		this.stateTransitionEngine = stateTransitionEngine;
+	public void setStateTransitionKBFileName(String stateTransitionKBFileName) {
+		this.stateTransitionKBFileName = stateTransitionKBFileName;
 	}
 
 }
