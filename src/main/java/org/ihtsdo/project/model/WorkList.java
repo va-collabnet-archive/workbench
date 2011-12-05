@@ -29,6 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
+import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
@@ -54,7 +55,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	
 	private WorkflowDefinition workflowDefinition;
 	
-	private List<WfUser> users;
+	private List<WfMembership> workflowMembers;
 	
 	/**
 	 * Instantiates a new work list.
@@ -77,7 +78,6 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		this.id = id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
-		//this.workflowDefinition = workflowDefinition;
 		
 	}
 	
@@ -225,13 +225,12 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		}
 	}
 
-	public void setUsers(List<WfUser> users) {
-		this.users = users;
+	public List<WfMembership> getWorkflowMembers() {
+		return workflowMembers;
 	}
 
-	public List<WfUser> getUsers() {
-		return users;
+	public void setWorkflowMembers(List<WfMembership> workflowMembers) {
+		this.workflowMembers = workflowMembers;
 	}
-	
 	
 }
