@@ -128,7 +128,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             config = Terms.get().getActiveAceFrameConfig();
             tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
-            if (update) { //create new
+            I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+            if (update && concept.isUncommitted()) { //create new
 
                 update = false;
 
@@ -180,13 +181,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                             }
                         }
                     }
-                    if (type == fsn) {
-                        doFsnUpdate(gbRefex, usRefex);
-                    } else {
-                        doSynUpdate(gbRefex, usRefex);
+                    if (gbRefex != null && usRefex != null) {
+                        if (type == fsn) {
+                            doFsnUpdate(gbRefex, usRefex);
+                        } else {
+                            doSynUpdate(gbRefex, usRefex);
+                        }
                     }
                 }
-                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
                 Terms.get().addUncommitted(concept);
 
             }
@@ -297,29 +299,32 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
-            /* REMOVED FOR RF2
-            RefexCAB refexSpecGb = new RefexCAB(
-            TK_REFSET_TYPE.CID,
-            desc.getNid(),
-            gbConcept.getNid());
-            refexSpecGb.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-            RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
-            
-            I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
-            Ts.get().addUncommitted(refexGb); */
+            /*
+             * REMOVED FOR RF2 RefexCAB refexSpecGb = new RefexCAB(
+             * TK_REFSET_TYPE.CID, desc.getNid(), gbConcept.getNid());
+             * refexSpecGb.put(RefexProperty.CNID1,
+             * Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+             * RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
+             *
+             * I_GetConceptData refexGb =
+             * Terms.get().getConceptForNid(newRefexGb.getConceptNid());
+             * Ts.get().addUncommitted(refexGb);
+             */
 
             I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
             Ts.get().addUncommitted(refexUs);
         } else if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())) { //acceptable in GB
-                /* REMOVED FOR RF2
-            RefexCAB refexSpecUs = new RefexCAB(
-            TK_REFSET_TYPE.CID,
-            desc.getNid(),
-            Refsets.EN_GB_LANG.getLenient().getNid());
-            refexSpecUs.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-            RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
-            I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
-            Ts.get().addUncommitted(refexUs); */
+                /*
+             * REMOVED FOR RF2 RefexCAB refexSpecUs = new RefexCAB(
+             * TK_REFSET_TYPE.CID, desc.getNid(),
+             * Refsets.EN_GB_LANG.getLenient().getNid());
+             * refexSpecUs.put(RefexProperty.CNID1,
+             * Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
+             * RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
+             * I_GetConceptData refexUs =
+             * Terms.get().getConceptForNid(newRefexUs.getConceptNid());
+             * Ts.get().addUncommitted(refexUs);
+             */
 
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFSET_TYPE.CID,
