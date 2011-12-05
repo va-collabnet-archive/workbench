@@ -12,6 +12,7 @@ public class WorkflowDefinition {
 	private List<WfState> states;
 	private Map<String,WfAction> actions;
 	private String stateTransitionKBFileName;
+	private String name ;
 
 	public WorkflowDefinition() {
 		super();
@@ -55,6 +56,14 @@ public class WorkflowDefinition {
 
 	public void setStateTransitionKBFileName(String stateTransitionKBFileName) {
 		this.stateTransitionKBFileName = stateTransitionKBFileName;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }
