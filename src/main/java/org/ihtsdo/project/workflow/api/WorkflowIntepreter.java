@@ -81,7 +81,13 @@ public class WorkflowIntepreter {
 		facts.addAll(user.getPermissions());
 		ksession.execute(facts);
 
-		//TODO: convert string to actions
+		for (String returnedActionName : actions) {
+			for (String loopActionName : wfDefinition.getActions().keySet()) {
+				if (loopActionName.equals(returnedActionName)) {
+					possibleActions.add(wfDefinition.getActions().get(loopActionName));
+				}
+			}
+		}
 
 		return possibleActions;
 	}
@@ -127,7 +133,7 @@ public class WorkflowIntepreter {
 				}
 			}
 		}
-		
+
 		return nextUser;
 	}
 
