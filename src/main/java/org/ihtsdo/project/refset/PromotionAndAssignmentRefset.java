@@ -63,7 +63,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			return termFactory.getConcept(promotionExtensionPart.getC1id());
 		}
 	}
-	
+
 	public I_GetConceptData getDestination(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_ExtendByRefVersion lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -83,7 +83,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			return promotionExtensionPart.getTime();
 		}
 	}
-	
+
 	public I_GetConceptData getLastPromotionAuthor(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_ExtendByRefVersion lastTuple = getLastPromotionTuple(componentId, config);
 		if (lastTuple == null) {
@@ -170,27 +170,32 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 						promotionStatusExtensionPart = (I_ExtendByRefPartCidCid) loopPart;
 					}
 				}
-				for (PathBI editPath : config.getEditingPathSet()) {
-					I_ExtendByRefPartCidCid newPromotionStatusPart =(I_ExtendByRefPartCidCid) 
-					promotionStatusExtensionPart.makeAnalog(
-							SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
-							config.getDbConfig().getUserConcept().getNid(),
-							editPath.getConceptNid(), 
-							Long.MAX_VALUE);
-					newPromotionStatusPart.setC1id(statusConceptId);
-					promotionStatusMember.addVersion(newPromotionStatusPart);
+				if (promotionStatusExtensionPart!=null 
+						&& (promotionStatusExtensionPart.getStatusNid()!=SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()
+								|| promotionStatusExtensionPart.getC1id() != statusConceptId)){
+
+					for (PathBI editPath : config.getEditingPathSet()) {
+						I_ExtendByRefPartCidCid newPromotionStatusPart =(I_ExtendByRefPartCidCid) 
+						promotionStatusExtensionPart.makeAnalog(
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+								config.getDbConfig().getUserConcept().getNid(),
+								editPath.getConceptNid(), 
+								Long.MAX_VALUE);
+						newPromotionStatusPart.setC1id(statusConceptId);
+						promotionStatusMember.addVersion(newPromotionStatusPart);
+					}
+					termFactory.addUncommittedNoChecks(refsetConcept);
+					termFactory.addUncommittedNoChecks(component);
+					termFactory.addUncommittedNoChecks(promotionStatusMember);
+					//				termFactory.commit();
 				}
-				termFactory.addUncommittedNoChecks(refsetConcept);
-				termFactory.addUncommittedNoChecks(component);
-				termFactory.addUncommittedNoChecks(promotionStatusMember);
-				//				termFactory.commit();
 			}
 		}
 
 		if (!statusAlreadyPresent) {
 			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
 			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
-			
+
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
 					statusConceptId);
@@ -208,7 +213,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 
 		return;
 	}
-	
+
 	public void setDestination(int componentId, int destinationUserConceptId) throws Exception {
 		I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 		I_GetConceptData component = termFactory.getConcept(componentId);
@@ -225,27 +230,31 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 						promotionStatusExtensionPart = (I_ExtendByRefPartCidCid) loopPart;
 					}
 				}
-				for (PathBI editPath : config.getEditingPathSet()) {
-					I_ExtendByRefPartCidCid newPromotionStatusPart =(I_ExtendByRefPartCidCid) 
-					promotionStatusExtensionPart.makeAnalog(
-							SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
-							config.getDbConfig().getUserConcept().getNid(),
-							editPath.getConceptNid(), 
-							Long.MAX_VALUE);
-					newPromotionStatusPart.setC2id(destinationUserConceptId);
-					promotionStatusMember.addVersion(newPromotionStatusPart);
+				if (promotionStatusExtensionPart!=null 
+						&& (promotionStatusExtensionPart.getStatusNid()!=SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()
+								|| promotionStatusExtensionPart.getC2id() != destinationUserConceptId)){
+					for (PathBI editPath : config.getEditingPathSet()) {
+						I_ExtendByRefPartCidCid newPromotionStatusPart =(I_ExtendByRefPartCidCid) 
+						promotionStatusExtensionPart.makeAnalog(
+								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+								config.getDbConfig().getUserConcept().getNid(),
+								editPath.getConceptNid(), 
+								Long.MAX_VALUE);
+						newPromotionStatusPart.setC2id(destinationUserConceptId);
+						promotionStatusMember.addVersion(newPromotionStatusPart);
+					}
+					termFactory.addUncommittedNoChecks(refsetConcept);
+					termFactory.addUncommittedNoChecks(component);
+					termFactory.addUncommittedNoChecks(promotionStatusMember);
+					//				termFactory.commit();
 				}
-				termFactory.addUncommittedNoChecks(refsetConcept);
-				termFactory.addUncommittedNoChecks(component);
-				termFactory.addUncommittedNoChecks(promotionStatusMember);
-				//				termFactory.commit();
 			}
 		}
 
 		if (!statusAlreadyPresent) {
 			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
 			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
-			
+
 			RefsetPropertyMap propMap = new RefsetPropertyMap();
 			propMap.put(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
 					SnomedMetadataRfx.getSTATUS_CURRENT_NID());

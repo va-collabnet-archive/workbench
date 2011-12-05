@@ -8,19 +8,18 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.Partition;
-import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 public class UserQueuesManager {
 
@@ -116,28 +115,27 @@ public class UserQueuesManager {
 		List<WfInstance> items = new ArrayList<WfInstance>();
 		try {
 			int userNid = tf.uuidToNative(user.getId());
+			I_GetConceptData workListRefset = tf.getConcept(
+					ArchitectonicAuxiliary.Concept.WORKLISTS_EXTENSION_REFSET.getUids());
+			WorkList deserializedWorkListWithMetadata = null;
+			for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
+				I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(extension);
+				I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
+				String metadata = part.getStringValue();
+				deserializedWorkListWithMetadata = (WorkList) TerminologyProjectDAO.deserialize(metadata);
 
-			for (I_TerminologyProject loopProject : TerminologyProjectDAO.getAllProjects(config)) {
-				for (WorkSet loopWorkSet : loopProject.getWorkSets(config)) {
-					for (PartitionScheme loopPartitionScheme : loopWorkSet.getPartitionSchemes(config)) {
-						for (Partition loopPartition : loopPartitionScheme.getPartitions()) {
-							for (WorkList loopWorkList : loopPartition.getWorkLists()) {
-								if (loopWorkList.getUsers().contains(user)) {
-									PromotionAndAssignmentRefset promDestRefset = loopWorkList.getPromotionRefset(config);
-									for (WorkListMember loopMember : loopWorkList.getWorkListMembers()) {
-										I_GetConceptData destination = promDestRefset.getDestination(loopMember.getId(), config);
-										if (userNid == destination.getNid()) {
-											WfInstance instance = new WfInstance();
-											instance.setComponentId(loopMember.getUids().iterator().next());
-											instance.setState(getState(promDestRefset.getPromotionStatus(loopMember.getId(), config).getNid()));
-											instance.setWfDefinition(loopWorkList.getWorkflowDefinition());
-											instance.setWorkListId(loopWorkList.getRefsetConcept().getPrimUuid());
-											instance.setDestination(user);
-											items.add(instance);
-										}
-									}
-								}
-							}
+				if (deserializedWorkListWithMetadata.getUsers().contains(user)) {
+					PromotionAndAssignmentRefset promDestRefset = deserializedWorkListWithMetadata.getPromotionRefset(config);
+					for (WorkListMember loopMember : deserializedWorkListWithMetadata.getWorkListMembers()) {
+						I_GetConceptData destination = promDestRefset.getDestination(loopMember.getId(), config);
+						if (userNid == destination.getNid()) {
+							WfInstance instance = new WfInstance();
+							instance.setComponentId(loopMember.getUids().iterator().next());
+							instance.setState(getState(promDestRefset.getPromotionStatus(loopMember.getId(), config).getNid()));
+							instance.setWfDefinition(deserializedWorkListWithMetadata.getWorkflowDefinition());
+							instance.setWorkListId(deserializedWorkListWithMetadata.getRefsetConcept().getPrimUuid());
+							instance.setDestination(user);
+							items.add(instance);
 						}
 					}
 				}

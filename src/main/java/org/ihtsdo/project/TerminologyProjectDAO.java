@@ -3631,7 +3631,7 @@ public class TerminologyProjectDAO {
 	 * 
 	 * @return the object
 	 */
-	private static Object deserialize(String string) {
+	public static Object deserialize(String string) {
 		Object object = null;
 		try {
 			ByteArrayInputStream bios = new ByteArrayInputStream(Base64.decodeBase64(string));
