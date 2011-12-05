@@ -1,6 +1,7 @@
 package org.ihtsdo.bdb.mojo;
 
 import java.io.File;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -11,10 +12,13 @@ import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
 import org.dwfa.tapi.spec.ConceptSpec;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.helper.econcept.transfrom.RF2UuidTransformer;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 
 /**
@@ -113,6 +117,11 @@ public class GenerateIECFile extends AbstractMojo {
             boolean timeStampEnabled = format.toLowerCase().equals("eccs");
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile),
                     new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), timeStampEnabled);
+            writer.getExtraWriters().add(new RF2UuidTransformer(output, 
+                    RF2UuidTransformer.ReleaseType.DELTA, 
+                    LANG_CODE.EN, 
+                    COUNTRY_CODE.ZZ, 
+                    startDate, new Date()));
             String key = UUID.randomUUID().toString();
             ChangeSetWriterHandler.addWriter(key, writer);
             IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, TimeHelper.getFileDateFormat().parse(startDate).getTime(),

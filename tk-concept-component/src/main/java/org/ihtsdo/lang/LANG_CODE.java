@@ -24,7 +24,7 @@ public enum LANG_CODE {
     LIT, ES, ES_AR, ES_BO, ES_CL, ES_CO, ES_CR, ES_DO, ES_EC, ES_ES, ES_GT,
     ES_HN, EX_MX, ES_NI, ES_PA, ES_PE, ES_ER, ES_PY, ES_SV, ES_UY, ES_VE, FR,
     FR_BE, FR_CA, FR_FR, FR_CH, FR_LU, FR_MC, DA, DA_DK, PL, SV, SV_FI, SV_SE,
-    LT, LT_LT, ZH, ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW;
+    LT, LT_LT, ZH, ZH_CN, ZH_HK, ZH_CHS, ZH_CHT, ZH_MO, ZH_SG, ZH_TW, EN_ZZ;
 
     public String getFormatedLanguageCode() {
         String result = "";

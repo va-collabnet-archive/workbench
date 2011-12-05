@@ -16,11 +16,11 @@
 package org.ihtsdo.country;
 
 /**
- *
+ * Add country codes from: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#ZZ
  * @author kec
  */
 public enum COUNTRY_CODE {
-    US;
+    US, ZZ;
     
     public String getFormatedCountryCode() {
         return US.name();
