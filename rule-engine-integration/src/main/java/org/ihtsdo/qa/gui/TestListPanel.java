@@ -324,7 +324,7 @@ public class TestListPanel extends JPanel {
             checkTask.setConcept(loopConcept);
             checkTask.setConfig(config);
             checkTask.setContextHelper(contextHelper);
-            checkTask.setInferredOrigin(INFERRED_VIEW_ORIGIN.INFERRED);
+            checkTask.setInferredOrigin(INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM);
             checkTask.setOnlyUncommittedContent(false);
 
             PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
