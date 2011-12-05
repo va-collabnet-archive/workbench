@@ -220,7 +220,8 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
             for (File f : dir.listFiles()) {
                 if (f.isDirectory()) {
                     getProfiles(profiles, f);
-                } else if (f.getName().toLowerCase().endsWith(".ace")) {
+                } else if (f.getName().toLowerCase().endsWith(".ace") || f.getName().toLowerCase().endsWith(".wb") 
+                        || f.getName().toLowerCase().endsWith(".wbp") ) {
                     profiles.add(f);
                 }
             }

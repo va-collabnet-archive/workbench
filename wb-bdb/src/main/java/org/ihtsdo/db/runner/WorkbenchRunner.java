@@ -309,7 +309,7 @@ public class WorkbenchRunner {
 
                         @Override
                         public boolean accept(File dir, String name) {
-                            return name.endsWith(".ace");
+                            return name.endsWith(".ace") || name.endsWith(".wb") || name.endsWith(".wbp");
                         }
                     });
 
@@ -371,7 +371,7 @@ public class WorkbenchRunner {
                 AceConfig.config = new AceConfig(dbFolder);
 
                 String username = "username";
-                File profileFile = new File("profiles/" + username, username + ".ace");
+                File profileFile = new File("profiles/" + username, username + ".wb");
 
                 AceConfig.config.setProfileFile(profileFile);
                 AceConfig.setupAceConfig(AceConfig.config, null, null, false);
