@@ -61,10 +61,10 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
 			
 			for (ConceptVersionBI modeler : inactiveModelers)
 			{
-				List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+				List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
 				boolean foundDefaultModeler = false;
-				for (RelationshipVersionBI  rel : relList)
+				for (RelationshipVersionBI<?>  rel : relList)
 				{
 					if (rel != null &&
 						rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid()) 
@@ -101,9 +101,9 @@ public class WorkflowModelerEditor extends AbstractComboEditor {
     }
 
 	private boolean isLeadModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
-		List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+		List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (RelationshipVersionBI rel : relList)
+		for (RelationshipVersionBI<?> rel : relList)
 		{
 			if (rel != null &&
 				rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())

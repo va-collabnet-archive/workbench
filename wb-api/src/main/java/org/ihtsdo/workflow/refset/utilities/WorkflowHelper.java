@@ -23,7 +23,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -40,6 +39,7 @@ import org.ihtsdo.tk.api.ContraditionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -49,10 +49,18 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetReader;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetReader;
+import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetReader;
+import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetWriter;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetReader;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetSearcher;
+import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
 
 
 
@@ -116,9 +124,7 @@ public class WorkflowHelper {
 		
 		if (modelers != null) {
 			
-			I_GetConceptData userCon = null;
 			String prefTerm = null;
-			
 			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			
 			for (I_GetConceptData con : getChildren(parentEditorConcept)) {
@@ -168,7 +174,7 @@ public class WorkflowHelper {
 			UUID currentWfId = bean.getWorkflowId();
 			boolean precedingCommitExists = isCommitWorkflowAction(Terms.get().getConcept(bean.getAction()).getVersion(vc));
 			
-			I_ExtendByRef ref = retireRow(bean);
+			I_ExtendByRef ref = retireWfHxRow(bean);
 
 			if (ref != null && precedingCommitExists) {
 				// Just retired preceding commit
@@ -176,7 +182,7 @@ public class WorkflowHelper {
 
 		    	// Retire original Row as previously retired original
 				if (latestBean != null && currentWfId.equals(latestBean.getWorkflowId())) {
-					retireRow(latestBean);
+					retireWfHxRow(latestBean);
 				}
 			}
 		} catch (Exception e) {
@@ -184,7 +190,7 @@ public class WorkflowHelper {
 		}
 	}
 
-	public static I_ExtendByRef retireRow(WorkflowHistoryJavaBean bean) throws Exception {
+	public static I_ExtendByRef retireWfHxRow(WorkflowHistoryJavaBean bean) throws Exception {
 		WorkflowHistoryRefsetWriter writer;
 		writer = new WorkflowHistoryRefsetWriter();
 
@@ -289,9 +295,9 @@ public class WorkflowHelper {
 	
 					for (ConceptVersionBI modeler : modelers.values())
 					{
-						List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+						List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
-						for (RelationshipVersionBI rel : relList)
+						for (RelationshipVersionBI<?> rel : relList)
 						{
 							if (rel != null &&
 							    rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
@@ -319,9 +325,9 @@ public class WorkflowHelper {
 	
 				for (ConceptVersionBI modeler : modelers.values())
 				{
-					List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+					List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 	
-					for (RelationshipVersionBI rel : relList)
+					for (RelationshipVersionBI<?> rel : relList)
 					{
 						if (rel != null &&
 						    rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_LEAD_MODELER.getPrimoridalUid()).getConceptNid())
@@ -426,10 +432,10 @@ public class WorkflowHelper {
     		for (ConceptVersionBI action : workflowActions)
     		{
     			// Only add non-Commit actions
-    			List<RelationshipVersionBI> relList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+    			List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
     			boolean foundCommitValue = false;
-				for (RelationshipVersionBI rel : relList)
+				for (RelationshipVersionBI<?> rel : relList)
 				{
 					if (rel != null &&
 						(rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid() ||
@@ -501,7 +507,7 @@ public class WorkflowHelper {
 					is_a_relType = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
 				}
 	
-		    	for (I_RelVersioned rel : rels) {
+		    	for (I_RelVersioned<?> rel : rels) {
 		    		if ((rel.getTypeNid() == is_a_relType) &&
 						((rel.getStatusNid() == activeNidRf1) || (rel.getStatusNid() == activeNidRf2))) {
 		    			resultSet.addAll(getChildren(Terms.get().getConcept(rel.getC1Id())));
@@ -587,24 +593,21 @@ public class WorkflowHelper {
 		return null;
 	}
 
-	public static List<RelationshipVersionBI> getWorkflowRelationship(ConceptVersionBI concept, Concept desiredRelationship) 
+	public static List<RelationshipVersionBI<?>> getWorkflowRelationship(ConceptVersionBI concept, Concept desiredRelationship) 
 	{
-		List<RelationshipVersionBI> rels = new LinkedList<RelationshipVersionBI>();
+		List<RelationshipVersionBI<?>> rels = new LinkedList<RelationshipVersionBI<?>>();
 
 		if (concept != null && desiredRelationship != null) {
 			try 
 			{
 				int searchRelId = Terms.get().uuidToNative(desiredRelationship.getPrimoridalUid());
 				
-				I_IntSet relType = Terms.get().newIntSet();
-				int relTypeNid = Terms.get().getConcept(desiredRelationship.getPrimoridalUid()).getConceptNid();
-		
 				I_GetConceptData con = Terms.get().getConcept(concept.getPrimUuid());
 				
 				Collection<? extends I_RelVersioned> allRels = con.getSourceRels();
-				for (I_RelVersioned rel : allRels)
+				for (I_RelVersioned<?> rel : allRels)
 				{
-					RelationshipVersionBI relVersion = (RelationshipVersionBI) rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+					RelationshipVersionBI<?> relVersion = (RelationshipVersionBI<?>) rel.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 					if (relVersion != null && 
 						relVersion.getTypeNid() == searchRelId &&
 						relVersion.isActive(Terms.get().getActiveAceFrameConfig().getAllowedStatus())) {
@@ -632,7 +635,7 @@ public class WorkflowHelper {
 	    	{
     	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
     	    	{
-					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
+					for (RelationshipVersionBI<?> rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
 					{
 						if (rel != null &&
 			    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_BEGIN_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
@@ -667,7 +670,7 @@ public class WorkflowHelper {
 	    	{
     	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
     	    	{
-					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE))
+					for (RelationshipVersionBI<?> rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE))
 					{
 						if (rel != null) {
     						commitWorkflowActions.add(action.getPrimUuid());
@@ -698,7 +701,7 @@ public class WorkflowHelper {
 	    	{
     	    	for (ConceptVersionBI action : Terms.get().getActiveAceFrameConfig().getWorkflowActions())
     	    	{
-					for (RelationshipVersionBI rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
+					for (RelationshipVersionBI<?> rel : getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE))
 					{
 						if (rel != null &&
 			    			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_END_WF_CONCEPT.getPrimoridalUid()).getConceptNid())
@@ -721,9 +724,9 @@ public class WorkflowHelper {
 	}
 
 	public static boolean isActiveModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
-		List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+		List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (RelationshipVersionBI rel : relList)
+		for (RelationshipVersionBI<?> rel : relList)
 		{
 			if (rel != null &&
     			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid()).getConceptNid())
@@ -734,9 +737,9 @@ public class WorkflowHelper {
 	}
 
 	public static boolean isDefaultModeler(ConceptVersionBI modeler) throws TerminologyException, IOException {
-		List<RelationshipVersionBI> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
+		List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(modeler, ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS);
 
-		for (RelationshipVersionBI rel : relList)
+		for (RelationshipVersionBI<?> rel : relList)
 		{
 			if (rel != null &&
     			rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_DEFAULT_MODELER.getPrimoridalUid()).getConceptNid())
@@ -769,7 +772,6 @@ public class WorkflowHelper {
         		WorkflowHistoryRefsetWriter writer = new WorkflowHistoryRefsetWriter();
 
 				// Path
-				// TODO: Update Path properly
 	            writer.setPathUid(Terms.get().nidToUuid(concept.getConceptAttributes().getPathNid()));
 
 	            // Modeler
@@ -834,9 +836,9 @@ public class WorkflowHelper {
 				
 				for (ConceptVersionBI state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
 				{
-					List<RelationshipVersionBI> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+					List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 		
-		    		for (RelationshipVersionBI rel : relList)
+		    		for (RelationshipVersionBI<?> rel : relList)
 		    		{
 		    			if ((rel != null) &&
 							((existsInDb && (rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid())) ||
@@ -885,9 +887,9 @@ public class WorkflowHelper {
 	    	{
 	    		if (isBeginWorkflowAction(action))
 	    		{
-	    			List<RelationshipVersionBI> commitRelList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
+	    			List<RelationshipVersionBI<?>> commitRelList = getWorkflowRelationship(action, ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_VALUE);
 
-    	    		for (RelationshipVersionBI commitRel : commitRelList)
+    	    		for (RelationshipVersionBI<?> commitRel : commitRelList)
     	    		{
 						if (commitRel != null &&
 							commitRel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_SINGLE_COMMIT.getPrimoridalUid()).getConceptNid())
@@ -962,9 +964,9 @@ public class WorkflowHelper {
     				
 			for (ConceptVersionBI state : Terms.get().getActiveAceFrameConfig().getWorkflowStates())
 			{
-				List<RelationshipVersionBI> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+				List<RelationshipVersionBI<?>> relList = getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 	
-	    		for (RelationshipVersionBI rel : relList)
+	    		for (RelationshipVersionBI<?> rel : relList)
 	    		{
 	    			if (rel != null) {
 	    				beginWorkflowStateUids.add(state.getPrimUuid());
@@ -1003,13 +1005,13 @@ public class WorkflowHelper {
 		return endWorkflowActionUid;
     }
 
-	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(RefexVersionBI version) {
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(RefexVersionBI<?> version) {
 		WorkflowHistoryJavaBean bean = null;
 		
 		try {
 			bean = populateWorkflowHistoryJavaBean(version.getNid(), 
 												   Terms.get().nidToUuid(version.getReferencedComponentNid()), 
-												   ((RefexStrVersionBI)version).getStr1(), 
+												   ((RefexStrVersionBI<?>)version).getStr1(), 
 												   version.getTime());
 
 		} catch (Exception e) {
@@ -1028,7 +1030,7 @@ public class WorkflowHelper {
 			
 			bean = populateWorkflowHistoryJavaBean(ref.getMemberId(), 
 												   Terms.get().nidToUuid(ref.getComponentNid()), 
-												   ((I_ExtendByRefPartStr)ref).getStringValue(), 
+												   ((I_ExtendByRefPartStr<?>)ref).getStringValue(), 
 												   new Long(time));
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ref);
@@ -1037,14 +1039,14 @@ public class WorkflowHelper {
 		return bean;
 	}
 
-	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(TkRefsetAbstractMember<?> ref) throws NumberFormatException, TerminologyException, IOException {
-		TkRefsetStrMember member = (TkRefsetStrMember) ref;
-
-		int memberNid = Terms.get().uuidToNative(member.getPrimordialComponentUuid());
-		WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(memberNid, member.getComponentUuid(), 
-																					  member.getStrValue(), member.getTime());
-	
-		return bean;
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(TkRefsetAbstractMember<?> mem) throws NumberFormatException, TerminologyException, IOException {
+		TkRefsetStrMember member = (TkRefsetStrMember) mem;
+		
+		// Primordial is RefsetMember & membercomponentUid is RefComp
+		return  populateWorkflowHistoryJavaBean(Terms.get().uuidToNative(member.getPrimordialComponentUuid()), 
+												member.componentUuid, 
+												member.getStrValue(),
+												member.getTime());	
 	}
 
 	public static String parseSemanticTag(ConceptVersionBI conceptVersionBI) throws ContraditionException, IOException {
@@ -1150,31 +1152,34 @@ public class WorkflowHelper {
 			activeNidRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
 		}		
 
-		if (Terms.get().getActiveAceFrameConfig() == null) {
-			List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
-
-			for (I_ExtendByRef member : members) {
-				I_ExtendByRefPart part = member.getMutableParts().get(member.getTuples().size() - 1);
-				if (part.getStatusNid() == activeNidRf1 ||
-					part.getStatusNid() == activeNidRf2) {
-					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
-					retSet.add(bean);
-				}
-			}
-		} else {
-			ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-			Collection<? extends RefexVersionBI<?>> members = con.getCurrentAnnotationMembers(vc, getWorkflowRefsetNid());
-		
-			for (RefexVersionBI m : members) {
-				RefexStrVersionBI member = (RefexStrVersionBI) m;
-				if (member.getStatusNid() == activeNidRf1 ||
-					member.getStatusNid() == activeNidRf2) {
-					WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member.getNid(), 
-																				   Terms.get().nidToUuid(member.getReferencedComponentNid()), 
-																				   member.getStr1(),
-																				   member.getTime());
+		if (con != null) {
+			if (con.getConAttrs() != null) {
+				// From Annotations
+				Collection<? extends RefexChronicleBI<?>> annotations = con.getConAttrs().getAnnotations();
 				
-					retSet.add(bean);
+				for (RefexChronicleBI<?> annot : annotations) {
+					if (annot.getCollectionNid() == getWorkflowRefsetNid()) {
+						try {
+							RefexStrVersionBI<?> version = (RefexStrVersionBI<?>)annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+			
+							if (version.getStatusNid() == activeNidRf1 || version.getStatusNid() == activeNidRf2) {
+								WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(version);
+								retSet.add(bean);
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+			
+				// From WfHx Concept's Refset Members (till update Import mechanism)
+				List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
+				for (I_ExtendByRef member : members) {
+					I_ExtendByRefPart<?> part = member.getMutableParts().get(member.getTuples().size() - 1);
+					if (part.getStatusNid() == activeNidRf1 || part.getStatusNid() == activeNidRf2) {
+						WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
+						retSet.add(bean);
+					}
 				}
 			}
 		}
@@ -1274,11 +1279,11 @@ public class WorkflowHelper {
     	return true;
     }
 
-	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRefVersion refsetVersion) {
+	public static WorkflowHistoryJavaBean populateWorkflowHistoryJavaBean(I_ExtendByRefVersion<?> refsetVersion) {
 		WorkflowHistoryJavaBean bean = null;
 
 		try {
-			I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr)refsetVersion.getMutablePart(); 
+			I_ExtendByRefPartStr<?> strPart = (I_ExtendByRefPartStr<?>)refsetVersion.getMutablePart(); 
 
 			bean = populateWorkflowHistoryJavaBean(refsetVersion.getMemberId(), 
 												   Terms.get().nidToUuid(refsetVersion.getComponentId()), 
@@ -1513,7 +1518,7 @@ public class WorkflowHelper {
 	public static long getLatestApprovedTimeStamp(int conceptNid) {
 		try {
 			TreeSet<WorkflowHistoryJavaBean> members = getWfHxMembersAsBeans(Terms.get().getConcept(conceptNid));
-			Iterator itr = members.descendingIterator();
+			Iterator<WorkflowHistoryJavaBean> itr = members.descendingIterator();
 
 			while (itr.hasNext()) {
 				WorkflowHistoryJavaBean bean = (WorkflowHistoryJavaBean) itr.next();
@@ -1530,13 +1535,79 @@ public class WorkflowHelper {
 		return 0;
 	}
 
+	public static TkRefsetAbstractMember<?> retireWorkflowRefsetRow(TkRefsetAbstractMember<?> member) throws NumberFormatException, Exception {
+		wfRefsetUidList.add(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid());
+		wfRefsetUidList.add(RefsetAuxiliary.Concept.EDITOR_CATEGORY.getPrimoridalUid());
+		wfRefsetUidList.add(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid());
+		wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid());
+		wfRefsetUidList.add(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid());
+
+		if (member.getRefsetUuid().equals(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid())) {
+			retireWfHxRow(populateWorkflowHistoryJavaBean(member));
+		} else {
+			WorkflowRefsetWriter writer = null;
+			if (member.getRefsetUuid().equals(RefsetAuxiliary.Concept.EDITOR_CATEGORY.getPrimoridalUid())) {
+				EditorCategoryRefsetWriter edCatWriter = new EditorCategoryRefsetWriter();
+				edCatWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
+
+				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				
+				EditorCategoryRefsetReader reader = new EditorCategoryRefsetReader();
+				edCatWriter.setCategory(reader.getEditorCategoryUid(s));
+				edCatWriter.setSemanticArea(reader.getSemanticTag(s));
+				writer = edCatWriter;
+			} else if (member.getRefsetUuid().equals(RefsetAuxiliary.Concept.STATE_TRANSITION.getPrimoridalUid())) {
+				StateTransitionRefsetWriter stateTransWriter = new StateTransitionRefsetWriter();
+				stateTransWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
+
+				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				
+				StateTransitionRefsetReader reader = new StateTransitionRefsetReader();
+				stateTransWriter.setWorkflowType(ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE.getPrimoridalUid());
+				stateTransWriter.setInitialState(reader.getInitialState(s));
+				stateTransWriter.setAction(reader.getAction(s));
+				stateTransWriter.setFinalState(reader.getFinalState(s));
+
+				writer = stateTransWriter;
+			} else if (member.getRefsetUuid().equals(RefsetAuxiliary.Concept.SEMANTIC_HIERARCHY.getPrimoridalUid())) {
+				SemanticHierarchyRefsetWriter semHierWriter = new SemanticHierarchyRefsetWriter();
+				semHierWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
+
+				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				
+				SemanticHierarchyRefsetReader reader = new SemanticHierarchyRefsetReader();
+				semHierWriter.setChildSemanticArea(reader.getChildSemanticTag(s));
+				semHierWriter.setParentSemanticArea(reader.getParentSemanticTag(s));
+
+				writer = semHierWriter;
+			} else if (member.getRefsetUuid().equals(RefsetAuxiliary.Concept.SEMANTIC_TAGS.getPrimoridalUid())) {
+				SemanticTagsRefsetWriter semTagWriter = new SemanticTagsRefsetWriter();
+				semTagWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
+
+				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				
+				SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
+				semTagWriter.setSemanticTag(reader.getSemanticTag(s));
+
+				writer = semTagWriter;
+			}
+			
+			writer.retireMember();
+		}
+		
+		TkRefsetAbstractMember<?> retiree = member;
+		retiree.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids()[0]);
+		
+		return retiree;
+	}
+
 	public static String getPrefTerm(I_GetConceptData con) throws IOException, TerminologyException {
 		int descTypeNid = ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid();
 		int rf2DescTypeNid = Terms.get().uuidToNative(SnomedMetadataRf2.PREFERRED_RF2.getUuids()[0]);
 
 		Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
 		
-		for (I_DescriptionVersioned desc : descs) {
+		for (I_DescriptionVersioned<?> desc : descs) {
 			if ((desc.getTypeNid() == descTypeNid || desc.getTypeNid() == rf2DescTypeNid) &&
 			    (desc.getLang().equals("en") || desc.getLang().equals("en-us"))) {
 				return desc.getText();
@@ -1552,7 +1623,7 @@ public class WorkflowHelper {
 
 		Collection<? extends I_DescriptionVersioned> descs = con.getDescriptions();
 			
-		for (I_DescriptionVersioned desc : descs) {
+		for (I_DescriptionVersioned<?> desc : descs) {
 			if (desc.getTypeNid() == descTypeNid || desc.getTypeNid() == rf2DescTypeNid) {
 				return desc.getText();
 			}
