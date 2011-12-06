@@ -222,7 +222,19 @@ public class BdbCommitManager {
       addUncommittedNoChecks(member.getEnclosingConcept());
 
       if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
-          handleWorkflowHistoryExtensions(extension);
+           HashSet<I_ExtendByRef> singleMemberSet = new HashSet<I_ExtendByRef>();
+           singleMemberSet.add(extension);
+           
+			try {
+				Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(singleMemberSet);
+				
+				if (luceneWriter != null) {
+	               luceneWriterService.execute(luceneWriter);
+	            }
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
        }
    }
 
