@@ -9,7 +9,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
@@ -24,7 +23,6 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
 import org.dwfa.ace.task.commit.I_TestDataConstraints;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.util.OpenFrames;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.svn.Svn;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
@@ -53,9 +51,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -77,10 +73,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
@@ -97,7 +91,6 @@ import javax.swing.SwingWorker;
 public class BdbCommitManager {
    private static final int                   PERMIT_COUNT             = 50;
    public static String                       pluginRoot               = "plugins";
-   private static int                         wfHistoryRefsetId        = 0;
    private static final AtomicInteger         writerCount              = new AtomicInteger(0);
    private static boolean                     writeChangeSets          = true;
    private static Set<I_ExtendByRef>          uncommittedWfMemberIds   = new HashSet<I_ExtendByRef>();
@@ -207,7 +200,7 @@ public class BdbCommitManager {
 
       addUncommitted(member.getEnclosingConcept());
 
-      if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+      if (WorkflowHelper.isWorkflowCapabilityAvailable() && extension.getRefsetId() == WorkflowHelper.getWorkflowRefsetNid()) {
          handleWorkflowHistoryExtensions(extension);
       }
    }
@@ -221,7 +214,7 @@ public class BdbCommitManager {
 
       addUncommittedNoChecks(member.getEnclosingConcept());
 
-      if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+      if (WorkflowHelper.isWorkflowCapabilityAvailable() && extension.getRefsetId() == WorkflowHelper.getWorkflowRefsetNid()) {
            HashSet<I_ExtendByRef> singleMemberSet = new HashSet<I_ExtendByRef>();
            singleMemberSet.add(extension);
            
@@ -640,9 +633,9 @@ public class BdbCommitManager {
             Bdb.getConceptDb().writeConcept(c);
 
             if (uncommittedWfMemberIds.size() > 0) {
-               commitSet.setMember(wfHistoryRefsetId);
+               commitSet.setMember(WorkflowHelper.getWorkflowRefsetNid());
 
-               Concept wfRefset = (Concept) Ts.get().getConcept(wfHistoryRefsetId);
+               Concept wfRefset = (Concept) Ts.get().getConcept(WorkflowHelper.getWorkflowRefsetNid());
 
                sapNidsFromCommit.addAll(wfRefset.setCommitTime(commitTime).getSetValues());
                wfRefset.modified();
@@ -974,8 +967,7 @@ public class BdbCommitManager {
          m.setStatusAtPositionNid(-1);
       }
 
-      if (WorkflowHelper.isWorkflowCapabilityAvailable() && (wfHistoryRefsetId != 0)
-              && (wfHistoryRefsetId == extension.getRefsetId())) {
+      if (WorkflowHelper.isWorkflowCapabilityAvailable() && (WorkflowHelper.getWorkflowRefsetNid() == extension.getRefsetId())) {
          uncommittedWfMemberIds.remove(extension);
       }
 
@@ -1062,11 +1054,7 @@ public class BdbCommitManager {
    }
 
    private static void handleWorkflowHistoryExtensions(I_ExtendByRef extension) {
-      if (wfHistoryRefsetId == 0) {
-         wfHistoryRefsetId = WorkflowHelper.getWorkflowRefsetNid();
-      }
-
-      if ((wfHistoryRefsetId != 0) && (wfHistoryRefsetId == extension.getRefsetId())) {
+       if ((WorkflowHelper.getWorkflowRefsetNid() == extension.getRefsetId())) {
          uncommittedWfMemberIds.add(extension);
       }
    }
