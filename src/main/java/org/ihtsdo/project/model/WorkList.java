@@ -57,6 +57,11 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	
 	private List<WfMembership> workflowMembers;
 	
+	
+	public WorkList() {
+		super();
+	}
+	
 	/**
 	 * Instantiates a new work list.
 	 * 

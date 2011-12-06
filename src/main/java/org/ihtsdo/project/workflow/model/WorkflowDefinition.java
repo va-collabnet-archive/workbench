@@ -10,7 +10,7 @@ public class WorkflowDefinition {
 	
 	private List<WfRole> roles;
 	private List<WfState> states;
-	private Map<String,WfAction> actions;
+	private Map<String,? extends WfAction> actions;
 	private String stateTransitionKBFileName;
 	private String name ;
 
@@ -19,7 +19,7 @@ public class WorkflowDefinition {
 	}
 
 	public WorkflowDefinition(List<WfRole> roles, List<WfState> states,
-			Map<String,WfAction> actions) {
+			Map<String,? extends WfAction> actions) {
 		super();
 		this.roles = roles;
 		this.states = states;
@@ -42,11 +42,11 @@ public class WorkflowDefinition {
 		this.states = states;
 	}
 
-	public Map<String,WfAction> getActions() {
+	public Map<String,? extends WfAction> getActions() {
 		return actions;
 	}
 
-	public void setActions(Map<String,WfAction> actions) {
+	public void setActions(Map<String,? extends WfAction> actions) {
 		this.actions = actions;
 	}
 

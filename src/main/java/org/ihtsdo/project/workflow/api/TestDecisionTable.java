@@ -50,12 +50,6 @@ public class TestDecisionTable {
 		kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 		StatelessKnowledgeSession ksession = kbase.newStatelessKnowledgeSession();
 
-		for (KnowledgePackage loopPackage : kbuilder.getKnowledgePackages()) {
-			for (org.drools.definition.rule.Rule loopRule : loopPackage.getRules()) {
-				System.out.println(loopRule.toString());
-			}
-		}
-
 		// Prepare test data
 		WfState escalated = new WfState("Escalated", UUID.randomUUID());
 		WfState delivered = new WfState("Delivered", UUID.randomUUID());

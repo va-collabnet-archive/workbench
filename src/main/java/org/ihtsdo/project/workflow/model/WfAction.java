@@ -40,5 +40,9 @@ public abstract class WfAction {
 	public void setPermissions(List<WfRole> permissions) {
 		this.permissions = permissions;
 	}
+	
+	public String toString() {
+		return name;
+	}
 
 }

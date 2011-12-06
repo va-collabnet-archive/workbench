@@ -51,5 +51,9 @@ public class WfUser {
 	public void setPermissions(List<WfPermission> permissions) {
 		this.permissions = permissions;
 	}
+	
+	public String toString() {
+		return username;
+	}
 
 }

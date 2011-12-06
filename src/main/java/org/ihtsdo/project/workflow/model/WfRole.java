@@ -29,5 +29,9 @@ public class WfRole {
 	public void setId(UUID id) {
 		this.id = id;
 	}
+	
+	public String toString() {
+		return name;
+	}
 
 }

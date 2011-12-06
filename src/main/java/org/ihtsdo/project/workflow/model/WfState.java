@@ -33,4 +33,8 @@ public class WfState {
 		this.id = id;
 	}
 	
+	public String toString() {
+		return name;
+	}
+	
 }

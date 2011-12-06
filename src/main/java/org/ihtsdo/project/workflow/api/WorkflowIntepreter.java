@@ -13,9 +13,16 @@ import java.util.UUID;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.DecisionTableConfiguration;
+import org.drools.builder.DecisionTableInputType;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -25,11 +32,11 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class WorkflowIntepreter {
 
 	private WorkflowDefinition wfDefinition;
+	private KnowledgeBase kbase;
 	private StatelessKnowledgeSession ksession;
 	private List<String> actions;
 
@@ -39,29 +46,51 @@ public class WorkflowIntepreter {
 
 		File serializedKbFile = new File("rules/" + wfDefinition.getStateTransitionKBFileName());
 
-		if (serializedKbFile.exists()) {
-			try {
-				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-				// The input stream might contain an individual
-				// package or a collection.
-				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
-				in.close();
-				KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-				kbase.addKnowledgePackages(kpkgs);
-				actions = new ArrayList<String>();
-				ksession.setGlobal("actions", actions);
-				ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
-				ksession = kbase.newStatelessKnowledgeSession();
-			} catch (StreamCorruptedException e0) {
-				serializedKbFile.delete();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+//		if (serializedKbFile.exists()) {
+//			try {
+//				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
+//				// The input stream might contain an individual
+//				// package or a collection.
+//				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
+//				in.close();
+//				kbase = KnowledgeBaseFactory.newKnowledgeBase();
+//				kbase.addKnowledgePackages(kpkgs);
+//				ksession = kbase.newStatelessKnowledgeSession();
+//				actions = new ArrayList<String>();
+//				ksession.setGlobal("actions", actions);
+//				ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
+//			} catch (StreamCorruptedException e0) {
+//				serializedKbFile.delete();
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
+		// Crate knowledge base with decision table
+		DecisionTableConfiguration dtableconfiguration =
+			KnowledgeBuilderFactory.newDecisionTableConfiguration();
+		dtableconfiguration.setInputType( DecisionTableInputType.XLS );
+		
+		kbase = KnowledgeBaseFactory.newKnowledgeBase();
+		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
+
+		//		Resource xlsRes = ResourceFactory.newClassPathResource( "/Users/alo/Desktop/test-dtable.xls",
+		//				TestDecisionTable.class );
+		Resource xlsRes = ResourceFactory.newFileResource("/Users/alo/Desktop/test-dtable.xls");
+		kbuilder.add( xlsRes,
+				ResourceType.DTABLE,
+				dtableconfiguration );
+
+		if ( kbuilder.hasErrors() ) {
+			System.err.print( kbuilder.getErrors() );
 		}
+
+		kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+		ksession = kbase.newStatelessKnowledgeSession();
 
 	}
 
@@ -71,9 +100,12 @@ public class WorkflowIntepreter {
 
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
+		
+		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
+		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
 
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(instance);
