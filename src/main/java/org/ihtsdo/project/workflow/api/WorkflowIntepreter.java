@@ -127,7 +127,7 @@ public class WorkflowIntepreter {
 	public List<WfRole> getNextRole(WfInstance instance, WorkList workList) {
 		List<WfRole> roles = new ArrayList<WfRole>();
 
-		for (WfMembership loopMembership : workList.getWorkflowMembers()) {
+		for (WfMembership loopMembership : workList.getWorkflowUserRoles()) {
 			WfPermission loopPermission = new WfPermission();
 			loopPermission.setId(UUID.randomUUID());
 			loopPermission.setRole(loopMembership.getRole());
@@ -154,7 +154,7 @@ public class WorkflowIntepreter {
 		List<WfRole> nextRoles = getNextRole(instance, workList);
 		WfUser nextUser = null;
 
-		for (WfMembership loopWfMember : workList.getWorkflowMembers()) {
+		for (WfMembership loopWfMember : workList.getWorkflowUserRoles()) {
 			if (nextRoles.contains(loopWfMember.getRole())) {
 				if (getPossibleActions(instance, loopWfMember.getUser()).size() > 0) {
 					if (loopWfMember.isDefaultAssignment()) {

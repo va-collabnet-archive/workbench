@@ -3,6 +3,7 @@ package org.ihtsdo.project.workflow.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -33,4 +34,13 @@ public class WfComponentProvider {
 		
 		return wfState;
 	}
+	
+	public WfState statusConceptToWfState(I_GetConceptData status) {
+		return null;
+	}
+	
+	public WfUser userConceptToWfUser(I_GetConceptData user) {
+		return null;
+	}
+	
 }

@@ -25,8 +25,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
 /**
@@ -48,9 +51,6 @@ public class WorkListMember implements Serializable {
 	
 	/** The work list id. */
 	private UUID workListUUID;
-	
-	/** The destination. */
-	private String destination;
 	
 	/** The activity status. */
 	private UUID activityStatus;
@@ -173,23 +173,6 @@ public class WorkListMember implements Serializable {
 		this.workListUUID = workListUUID;
 	}
 	
-	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public String getDestination() {
-		return destination;
-	}
-	
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination the new destination
-	 */
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
 	
 	/**
 	 * Gets the activity status.
@@ -270,12 +253,31 @@ public class WorkListMember implements Serializable {
 	}
 
 	public WfInstance getWfInstance() {
+		WfComponentProvider provider = new WfComponentProvider();
+		wfInstance = new WfInstance();
+		try {
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(workListUUID), 
+					config);
+			wfInstance.setComponentId(tf.nidToUuid(id));
+			wfInstance.setWfDefinition(workList.getWorkflowDefinition());
+			wfInstance.setWorkListId(workListUUID);
+			
+			PromotionAndAssignmentRefset promAssignRefset = workList.getPromotionRefset(config);
+			
+			wfInstance.setState(provider.statusConceptToWfState(
+					promAssignRefset.getPromotionStatus(id, config)));
+			wfInstance.setDestination(provider.userConceptToWfUser(
+					promAssignRefset.getDestination(id, config)));
+			
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
 		return wfInstance;
 	}
-
-	public void setWfInstance(WfInstance wfInstance) {
-		this.wfInstance = wfInstance;
-	}
-	
 	
 }

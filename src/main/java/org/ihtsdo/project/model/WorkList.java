@@ -55,7 +55,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	
 	private WorkflowDefinition workflowDefinition;
 	
-	private List<WfMembership> workflowMembers;
+	private List<WfMembership> workflowUserRoles;
 	
 	
 	public WorkList() {
@@ -230,12 +230,12 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		}
 	}
 
-	public List<WfMembership> getWorkflowMembers() {
-		return workflowMembers;
+	public List<WfMembership> getWorkflowUserRoles() {
+		return workflowUserRoles;
 	}
 
-	public void setWorkflowMembers(List<WfMembership> workflowMembers) {
-		this.workflowMembers = workflowMembers;
+	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
+		this.workflowUserRoles = workflowUserRoles;
 	}
 	
 }

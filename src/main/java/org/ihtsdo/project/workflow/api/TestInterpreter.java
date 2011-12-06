@@ -44,18 +44,18 @@ public class TestInterpreter {
 	 */
 	public static void main(String[] args) {
 		//saveKB();
-		writeWfDefinition(getWfDefinition());
+		//writeWfDefinition(getWfDefinition());
 		
 		WorkflowDefinition wfDef = readWfDefinition(new File("sampleProcesses/Workflow Canada 1.wfd"));
 		
 		WorkList workList = new WorkList();
 		workList.setWorkflowDefinition(wfDef);
-		workList.setWorkflowMembers(getWorkflowMembers(wfDef));
+		workList.setWorkflowUserRoles(getWorkflowMembers(wfDef));
 		
 		WorkflowIntepreter wfInt = new WorkflowIntepreter(wfDef);
 		
 		for (WfState loopState : wfDef.getStates()) {
-			for (WfMembership loopMember : workList.getWorkflowMembers()) {
+			for (WfMembership loopMember : workList.getWorkflowUserRoles()) {
 				System.out.println("Testing for: " + loopState.getName() + 
 						" and " + loopMember.getUser().getUsername() +
 						" - Role: " + loopMember.getUser().getPermissions().iterator().next().getRoleName());
