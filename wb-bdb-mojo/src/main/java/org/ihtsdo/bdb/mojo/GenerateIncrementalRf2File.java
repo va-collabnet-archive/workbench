@@ -33,6 +33,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -58,15 +59,19 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String[] exportPathFsns;
     /**
-     * Concept for the view path used for export. @parameter
+     * Concept for the view path used for export. 
+     * 
+     * @parameter
      */
     private ConceptSpec viewPathConceptSpec;
     /**
      * Text of view path concept's FSN, to be used when only the FSN is known, and the path concept was
      * generated with the proper type 5 UUID algorithm using the Type5UuidFactory.PATH_ID_FROM_FS_DESC
      * namespace.
+     * 
+     * @parameter
      */
-    private String conceptSpecFsn;
+    private String viewPathConceptSpecFsn;
     /**
      * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
      *
@@ -119,8 +124,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             int viewPathNid;
             if (viewPathConceptSpec != null) {
                 viewPathNid = viewPathConceptSpec.getLenient().getNid();
-            } else if (conceptSpecFsn != null) {
-                UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, conceptSpecFsn);
+            } else if (viewPathConceptSpecFsn != null) {
+                UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, viewPathConceptSpecFsn);
                 viewPathNid = Ts.get().getNidForUuids(pathUuid);
             } else {
                 throw new MojoExecutionException("No view path specified.");
@@ -130,11 +135,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataVC());
-            vc.getPositionSet().clear();
+            
+            
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path, 
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
-            vc.getPositionSet().add(position);
+            vc.setPositionSet(new PositionSet(position));
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
             if (sapsToWrite.size() > 0) {
                 NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
