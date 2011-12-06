@@ -19,7 +19,6 @@
 package org.ihtsdo.helper.econcept.transfrom;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
@@ -36,12 +35,17 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import java.io.*;
 
 import java.util.Date;
+import org.ihtsdo.helper.rf2.Rf2File.ConceptsFileFields;
+import org.ihtsdo.helper.rf2.Rf2File.DescriptionsFileFields;
+import org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields;
+import org.ihtsdo.helper.rf2.Rf2File.RelationshipsFileFields;
+import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 
 /**
  *
  * @author kec
  */
-public class RF2UuidTransformer implements EConceptTransformerBI {
+public class EConceptToRF2UuidTransformer implements EConceptTransformerBI {
    Writer       conceptsWriter;
    COUNTRY_CODE country;
    Writer       descriptionsWriter;
@@ -54,7 +58,7 @@ public class RF2UuidTransformer implements EConceptTransformerBI {
 
    //~--- constructors --------------------------------------------------------
 
-   public RF2UuidTransformer(File directory, ReleaseType releaseType, LANG_CODE language,
+   public EConceptToRF2UuidTransformer(File directory, ReleaseType releaseType, LANG_CODE language,
                              COUNTRY_CODE country, String namespace, Date effectiveDate)
            throws IOException {
       directory.mkdirs();
@@ -127,75 +131,7 @@ public class RF2UuidTransformer implements EConceptTransformerBI {
       }
    }
 
-   //~--- enums ---------------------------------------------------------------
-
-   private enum ConceptsFileFields {
-      ID("id"), EFFECTIVE_TIME("effectiveTime"), ACTIVE("active"), MODULE_ID("moduleId"),
-      DEFINITION_STATUS_ID("definitionStatusId");
-
-      String headerText;
-
-      //~--- constructors -----------------------------------------------------
-
-      private ConceptsFileFields(String headerText) {
-         this.headerText = headerText;
-      }
-   }
-
-   private enum DescriptionsFileFields {
-      ID("id"), EFFECTIVE_TIME("effectiveTime"), ACTIVE("active"), MODULE_ID("moduleId"),
-      CONCEPT_ID("conceptId"), LANGUAGE_CODE("languageCode"), TYPE_ID("typeId"), TERM("term"),
-      CASE_SIGNIFICANCE_ID("caseSignificanceId");
-
-      String headerText;
-
-      //~--- constructors -----------------------------------------------------
-
-      private DescriptionsFileFields(String headerText) {
-         this.headerText = headerText;
-      }
-   }
-
-   private enum IdentifiersFileFields {
-      IDENTIFIER_SCHEME_ID("identifierSchemeId"), ALTERNATE_IDENTIFIER("alternateIdentifier"),
-      EFFECTIVE_TIME("effectiveTime"), ACTIVE("active"), MODULE_ID("moduleId"),
-      REFERENCED_COMPONENT_ID("referencedComponentId");
-
-      String headerText;
-
-      //~--- constructors -----------------------------------------------------
-
-      private IdentifiersFileFields(String headerText) {
-         this.headerText = headerText;
-      }
-   }
-
-   private enum RelationshipsFileFields {
-      ID("id"), EFFECTIVE_TIME("effectiveTime"), ACTIVE("active"), MODULE_ID("moduleId"),
-      SOURCE_ID("sourceId"), DESTINATION_ID("destinationId"), RELATIONSHIP_GROUP("relationshipGroup"),
-      TYPE_ID("typeId"), CHARCTERISTIC_ID("characteristicTypeId"), MODIFIER_ID("modifierId");
-
-      String headerText;
-
-      //~--- constructors -----------------------------------------------------
-
-      private RelationshipsFileFields(String headerText) {
-         this.headerText = headerText;
-      }
-   }
-
-   public enum ReleaseType {
-      DELTA("Delta"), FULL("Full"), SNAPSHOT("Snapshot");
-
-      String suffix;
-
-      //~--- constructors -----------------------------------------------------
-
-      private ReleaseType(String suffix) {
-         this.suffix = suffix;
-      }
-   }
-
+ 
    //~--- methods -------------------------------------------------------------
 
    @Override

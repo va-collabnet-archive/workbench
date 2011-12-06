@@ -16,7 +16,7 @@
 package org.ihtsdo.country;
 
 /**
- * Add country codes from: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#ZZ
+ * TODO Add country codes from: http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#ZZ
  * @author kec
  */
 public enum COUNTRY_CODE {

@@ -16,7 +16,8 @@ import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.helper.econcept.transfrom.RF2UuidTransformer;
+import org.ihtsdo.helper.econcept.transfrom.EConceptToRF2UuidTransformer;
+import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
@@ -117,8 +118,8 @@ public class GenerateIECFile extends AbstractMojo {
             boolean timeStampEnabled = format.toLowerCase().equals("eccs");
             EConceptChangeSetWriter writer = new EConceptChangeSetWriter(new File(output, changeSetFile),
                     new File(output, changeSetFile + ".tmp"), changeSetPolicy.convert(), timeStampEnabled);
-            writer.getExtraWriters().add(new RF2UuidTransformer(output, 
-                    RF2UuidTransformer.ReleaseType.DELTA, 
+            writer.getExtraWriters().add(new EConceptToRF2UuidTransformer(output, 
+                    Rf2File.ReleaseType.DELTA, 
                     LANG_CODE.EN, 
                     COUNTRY_CODE.ZZ, 
                     startDate, new Date()));
