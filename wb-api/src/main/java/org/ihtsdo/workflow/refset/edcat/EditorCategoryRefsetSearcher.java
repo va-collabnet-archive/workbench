@@ -43,9 +43,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		{
 			I_GetConceptData val = reader.getEditorCategory(prop);
 
-			List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(val.getVersion(vc), ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
+			List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(val.getVersion(vc), ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_VALUE);
 
-			for (RelationshipVersionBI<?> rel : relList)
+			for (RelationshipVersionBI rel : relList)
 			{
 				if (rel != null &&
 					rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_AUTOMOTAIC_APPROVAL.getPrimoridalUid()).getConceptNid())
@@ -121,7 +121,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 		for (int i = 0; i < l.size(); i++)
 		{
-			I_ExtendByRefPartStr<?> props = (I_ExtendByRefPartStr<?>)l.get(i);
+			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)l.get(i);
 			results.add(props.getStringValue());
 		}
 
