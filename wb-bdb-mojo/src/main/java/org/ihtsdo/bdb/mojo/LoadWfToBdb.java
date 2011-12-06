@@ -16,41 +16,14 @@ package org.ihtsdo.bdb.mojo;
  * limitations under the License.
  */
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.io.FileIO;
-import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
-import org.ihtsdo.concept.component.description.DescriptionBinder;
-import org.ihtsdo.concept.component.refset.RefsetMemberBinder;
-import org.ihtsdo.concept.component.relationship.RelationshipBinder;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.LuceneManager;
-import org.ihtsdo.lucene.WfHxIndexGenerator;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
