@@ -248,6 +248,15 @@ public class CreateUserAndQueuesInBatchBasedOnCreatorProfile extends AbstractTas
                             tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
                             tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0,
                             creatorConfig);
+         //add workflow relationship
+         
+         tf.newRelationship(UUID.randomUUID(), userConcept,
+                            tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getUids()),
+                            tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getUids()),
+                            tf.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
+                            tf.getConcept(ArchitectonicAuxiliary.Concept.OPTIONAL_REFINABILITY.getUids()),
+                            tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0,
+                            creatorConfig);
          newConfig.getDbConfig().setUserConcept(userConcept);
          tf.addUncommitted(userConcept);
 
