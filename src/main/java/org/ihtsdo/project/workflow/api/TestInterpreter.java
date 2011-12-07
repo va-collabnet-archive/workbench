@@ -44,7 +44,7 @@ public class TestInterpreter {
 	 */
 	public static void main(String[] args) {
 		//saveKB();
-		//writeWfDefinition(getWfDefinition());
+		writeWfDefinition(getWfDefinition());
 		
 		WorkflowDefinition wfDef = readWfDefinition(new File("sampleProcesses/Workflow Canada 1.wfd"));
 		
@@ -176,7 +176,7 @@ public class TestInterpreter {
 		wfdf.setRoles(roles);
 		wfdf.setStates(states);
 		wfdf.setActions(actions);
-		wfdf.setStateTransitionKBFileName("workFlowCanada1.wfkb");
+		wfdf.getXlsFileName().add("/Users/alo/Desktop/test-dtable.xls");
 		
 		return wfdf;
 	}

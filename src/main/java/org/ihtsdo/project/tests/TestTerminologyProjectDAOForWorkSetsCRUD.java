@@ -18,10 +18,14 @@ package org.ihtsdo.project.tests;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.Calendar;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import junit.framework.TestCase;
@@ -29,44 +33,53 @@ import junit.framework.TestCase;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.model.Partition;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfPermission;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfState;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow.model.actions.StubAction;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * The Class TestTerminologyProjectDAOForWorkSetsCRUD.
  */
 public class TestTerminologyProjectDAOForWorkSetsCRUD extends TestCase {
-	
+
 	/** The vodb directory. */
 	File vodbDirectory;
-	
+
 	/** The read only. */
 	boolean readOnly = false;
-	
+
 	/** The cache size. */
 	Long cacheSize = Long.getLong("600000000");
-	
+
 	/** The db setup config. */
 	DatabaseSetupConfig dbSetupConfig;
-	
+
 	/** The config. */
 	I_ConfigAceFrame config;
-	
+
 	/** The tf. */
 	I_TermFactory tf;
-	
+
 	/** The new work set concept. */
 	I_GetConceptData newWorkSetConcept;
-	
+
 	/** The allowed statuses with retired. */
 	I_IntSet allowedStatusesWithRetired;
-	
+
 	/** The project. */
 	I_TerminologyProject project;
 
@@ -75,24 +88,18 @@ public class TestTerminologyProjectDAOForWorkSetsCRUD extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		//TODO get resource with relative path
-		vodbDirectory = new File("/Users/alo/Documents/TermMed/Eclipse/MrcmMaven/project-manager/src/main/java/org/dwfa/termmed/projectmanager/tests/berkeley-db");
+		System.out.println("Deleting test fixture");
+		deleteDirectory(new File("berkeley-db"));
+		System.out.println("Creating test fixture");
+		copyDirectory(new File("/Users/alo/Desktop/berkeley-db"), new File("berkeley-db"));
+		vodbDirectory = new File("berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
-		LocalVersionedTerminology.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
-		tf = LocalVersionedTerminology.get();
-		try {
-		    FileInputStream fin = new FileInputStream(
-    			"/Users/alo/Documents/TermMed/Eclipse/MrcmMaven/project-manager/src/main/java/org/dwfa/termmed/projectmanager/tests/config.dat");
-		    ObjectInputStream ois = new ObjectInputStream(fin);
-		    config = (I_ConfigAceFrame) ois.readObject();
-		    ois.close();
-		    }
-		catch (Exception e) { e.printStackTrace(); }
+		System.out.println("Opening database");
+		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+		tf = (I_ImplementTermFactory) Terms.get();
+		config = getTestConfig();
 		tf.setActiveAceFrameConfig(config);
-		allowedStatusesWithRetired =  tf.newIntSet();
-		allowedStatusesWithRetired.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids()));
-		allowedStatusesWithRetired.addAll(config.getAllowedStatus().getSetValues());
-		
+
 		I_GetConceptData projectConcept = null;
 		try {
 			projectConcept = tf.getConcept(new UUID[] {UUID.fromString("3efb77c9-1369-3728-a001-faa7ac668efd")});
@@ -110,86 +117,186 @@ public class TestTerminologyProjectDAOForWorkSetsCRUD extends TestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
-	
-	/**
-	 * Test get all work sets.
-	 */
-	public void testGetAllWorkSets() {
-		//List<WorkSet> workSets = TerminologyProjectDAO.getAllWorkSetsForProject(project, config);
-		//assertEquals(0, workSets.size());
-		assert(true);
-	}
 
 	/**
-	 * Test create new project.
+	 * Test new workflow.
 	 */
 	public void testCreateNewProject() {
-		String name = "Test WorkSet " + UUID.randomUUID().toString();
-		String description = "Test Metadata";
-		Calendar cal = Calendar.getInstance();
-		waiting(1);
-		
-		//workSet.setDescription("Modified Description");
-		//I_TerminologyProject modifiedProject = TerminologyProjectDAO.updateProjectMetadata(workSet, config);
-		//assertEquals("Modified Description", modifiedProject.getDescription());
-		
-		
-	}
-	
-	/**
-	 * Test get all work sets2.
-	 */
-	public void testGetAllWorkSets2() {
-		List<WorkSet> workSets = TerminologyProjectDAO.getAllWorkSetsForProject(project, config);
-		//assertEquals(1, workSets.size());
-	}
-
-	/**
-	 * Test retire project.
-	 */
-	public void testRetireProject() {
-		List<WorkSet> workSets = TerminologyProjectDAO.getAllWorkSetsForProject(project, config);
-		for (WorkSet workSet : workSets) {
-			System.out.println("||" + workSet.getName().substring(0, 11) + "||");
-			if (workSet.getName().substring(0, 12).equals("Test WorkSet")) {
-				try {
-					I_GetConceptData conceptToRetireUpdatedFromDB = tf.getConcept(workSet.getUids());
-					TerminologyProjectDAO.retireConcept(conceptToRetireUpdatedFromDB, config);
-					I_GetConceptData retiredConcept = tf.getConcept(workSet.getUids());
-					assertEquals(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid(),
-							retiredConcept.getConceptAttributeTuples(allowedStatusesWithRetired, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusId());
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (TerminologyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+		try {
+			I_GetConceptData partitionConcept = tf.getConcept(UUID.fromString("d88283f4-53c2-4b8b-ae37-428264feaeba"));
+			Partition partition = TerminologyProjectDAO.getPartition(partitionConcept, config);
+			WorkflowDefinition wfDef = getWfDefinition();
+			TerminologyProjectDAO.generateWorkListFromPartition(partition, 
+					wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config);
+			
+			
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
-	
-	/**
-	 * Test get all work sets3.
-	 */
-	public void testGetAllWorkSets3() {
-		List<WorkSet> workSets = TerminologyProjectDAO.getAllWorkSetsForProject(project, config);
-		assertEquals(0, workSets.size());
-	}
-	
+
 	/**
 	 * Waiting.
 	 * 
 	 * @param n the n
 	 */
 	public static void waiting(int n){
-        
-        long t0, t1;
-        t0 =  System.currentTimeMillis();
-        do{
-            t1 = System.currentTimeMillis();
-        }
-        while ((t1 - t0) < (n * 1000));
-    }
+
+		long t0, t1;
+		t0 =  System.currentTimeMillis();
+		do{
+			t1 = System.currentTimeMillis();
+		}
+		while ((t1 - t0) < (n * 1000));
+	}
+
+	private I_ConfigAceFrame getTestConfig() {
+		I_ConfigAceFrame config = null;
+		try {
+			config = tf.newAceFrameConfig();
+			config.addViewPosition(tf.newPosition(
+					tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}), 
+					Long.MAX_VALUE));
+			config.addEditingPath( tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}));
+			config.addPromotionPath( tf.getPath(new UUID[] {UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")}));
+
+			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid());
+			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
+			config.getDescTypes().add(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.localize().getNid());
+			config.setDefaultStatus(tf.getConcept((ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid())));
+			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			config.getAllowedStatus().add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+			config.getDestRelTypes().add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+
+			//			BdbTermFactory tfb = (BdbTermFactory) tf;
+			//			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+			//			newDbProfile.setUsername("username");
+			//			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+			//			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			//			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+			//			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+			//			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+			//			config.setDbConfig(newDbProfile);
+
+			config.setPrecedence(Precedence.TIME);
+
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return config;
+	}
 	
+	// If targetLocation does not exist, it will be created.
+	public void copyDirectory(File sourceLocation , File targetLocation)
+	throws IOException {
+
+		if (sourceLocation.isDirectory()) {
+			if (!targetLocation.exists()) {
+				targetLocation.mkdir();
+			}
+
+			String[] children = sourceLocation.list();
+			for (int i=0; i<children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]),
+						new File(targetLocation, children[i]));
+			}
+		} else {
+
+			InputStream in = new FileInputStream(sourceLocation);
+			OutputStream out = new FileOutputStream(targetLocation);
+
+			// Copy the bits from instream to outstream
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+	}
+
+	public boolean deleteDirectory(File path) {
+		if( path.exists() ) {
+			File[] files = path.listFiles();
+			for(int i=0; i<files.length; i++) {
+				if(files[i].isDirectory()) {
+					deleteDirectory(files[i]);
+				}
+				else {
+					files[i].delete();
+				}
+			}
+		}
+		return( path.delete() );
+	}
+	public static WorkflowDefinition getWfDefinition() {
+		WorkflowDefinition wfdf=new WorkflowDefinition();
+		
+		List<WfState> states = new ArrayList<WfState>();
+		states.add(new WfState("Assigned", UUID.randomUUID()));
+		states.add(new WfState("Responded by SME", UUID.randomUUID()));
+		states.add(new WfState("Responded by Super SME", UUID.randomUUID()));
+		states.add(new WfState("Consulted to SME", UUID.randomUUID()));
+		states.add(new WfState("Consulted to Super SME", UUID.randomUUID()));
+		states.add(new WfState("Reviewed", UUID.randomUUID()));
+		states.add(new WfState("Revision rejected", UUID.randomUUID()));
+		states.add(new WfState("Translated", UUID.randomUUID()));
+		states.add(new WfState("Translation rejected", UUID.randomUUID()));
+		
+		List<WfRole> roles = new ArrayList<WfRole>();
+		roles.add(new WfRole("Editorial Board", UUID.randomUUID()));
+		roles.add(new WfRole("TSP Translator", UUID.randomUUID()));
+		roles.add(new WfRole("SME", UUID.randomUUID()));
+		roles.add(new WfRole("Super SME", UUID.randomUUID()));
+		roles.add(new WfRole("TPO Reviewer", UUID.randomUUID()));
+		roles.add(new WfRole("TSP Reviewer", UUID.randomUUID()));
+		
+		Map<String,StubAction> actions = new HashMap<String,StubAction>();
+		actions.put("Approve", new StubAction("Approve"));
+		actions.put("Reject revision with stated reason", new StubAction("Reject revision with stated reason"));
+		actions.put("Consult to Super SME", new StubAction("Consult to Super SME"));
+		actions.put("Translate", new StubAction("Translate"));
+		actions.put("Respond SME consultation", new StubAction("Respond SME consultation"));
+		actions.put("Respond Super SME consultation", new StubAction("Respond Super SME consultation"));
+		actions.put("Reject revision", new StubAction("Reject revision"));
+		actions.put("Escalate", new StubAction("Escalate"));
+		actions.put("Reject translation with stated reason", new StubAction("Reject translation with stated reason"));
+		actions.put("Review", new StubAction("Review"));
+		actions.put("Consult to SME", new StubAction("Consult to SME"));
+		
+		wfdf.setName("Workflow Canada 1");
+		wfdf.setRoles(roles);
+		wfdf.setStates(states);
+		wfdf.setActions(actions);
+		wfdf.getXlsFileName().add("/Users/alo/Desktop/test-dtable.xls");
+		
+		return wfdf;
+	}
+	
+	private static List<WfMembership> getWorkflowMembers(WorkflowDefinition wfDef) {
+		List<WfMembership> members = new ArrayList<WfMembership>();
+		int counter = 0;
+		for (WfRole loopRole : wfDef.getRoles()) {
+			counter++;
+			WfUser loopuser = new WfUser("User " + counter, UUID.randomUUID());
+			WfPermission loopPermission = new WfPermission(UUID.randomUUID(), 
+					loopRole, UUID.randomUUID());
+			List<WfPermission> listPerm = new ArrayList<WfPermission>();
+			listPerm.add(loopPermission);
+			loopuser.setPermissions(listPerm);
+			
+			members.add(new WfMembership(UUID.randomUUID(), 
+					loopuser, loopRole, true));
+		}
+		return members;
+	}
+
 }

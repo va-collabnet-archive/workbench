@@ -30,7 +30,6 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
 import org.ihtsdo.project.workflow.model.WfMembership;
-import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
@@ -54,6 +53,8 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	private UUID partitionUUID;
 	
 	private WorkflowDefinition workflowDefinition;
+	
+	private String workflowDefinitionFileName;
 	
 	private List<WfMembership> workflowUserRoles;
 	
@@ -236,6 +237,14 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
 		this.workflowUserRoles = workflowUserRoles;
+	}
+
+	public String getWorkflowDefinitionFileName() {
+		return workflowDefinitionFileName;
+	}
+
+	public void setWorkflowDefinitionFileName(String workflowDefinitionFileName) {
+		this.workflowDefinitionFileName = workflowDefinitionFileName;
 	}
 	
 }

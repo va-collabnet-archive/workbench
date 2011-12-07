@@ -1,9 +1,8 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.drools.KnowledgeBase;
 
 
 public class WorkflowDefinition {
@@ -11,11 +10,14 @@ public class WorkflowDefinition {
 	private List<WfRole> roles;
 	private List<WfState> states;
 	private Map<String,? extends WfAction> actions;
-	private String stateTransitionKBFileName;
+	private List<String> xlsFileName;
+	private List<String> drlFileName;
 	private String name ;
 
 	public WorkflowDefinition() {
 		super();
+		this.xlsFileName = new ArrayList<String>();
+		this.drlFileName = new ArrayList<String>();
 	}
 
 	public WorkflowDefinition(List<WfRole> roles, List<WfState> states,
@@ -24,6 +26,8 @@ public class WorkflowDefinition {
 		this.roles = roles;
 		this.states = states;
 		this.actions = actions;
+		this.xlsFileName = new ArrayList<String>();
+		this.drlFileName = new ArrayList<String>();
 	}
 
 	public List<WfRole> getRoles() {
@@ -50,20 +54,28 @@ public class WorkflowDefinition {
 		this.actions = actions;
 	}
 
-	public String getStateTransitionKBFileName() {
-		return stateTransitionKBFileName;
-	}
-
-	public void setStateTransitionKBFileName(String stateTransitionKBFileName) {
-		this.stateTransitionKBFileName = stateTransitionKBFileName;
-	}
-
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<String> getXlsFileName() {
+		return xlsFileName;
+	}
+
+	public void setXlsFileName(List<String> xlsFileName) {
+		this.xlsFileName = xlsFileName;
+	}
+
+	public List<String> getDrlFileName() {
+		return drlFileName;
+	}
+
+	public void setDrlFileName(List<String> drlFileName) {
+		this.drlFileName = drlFileName;
 	}
 
 }

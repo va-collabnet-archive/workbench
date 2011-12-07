@@ -66,20 +66,18 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.ProcessID;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -96,7 +94,11 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -2306,15 +2308,19 @@ public class TerminologyProjectDAO {
 
 	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList,
 			I_GetConceptData concept, String destination, I_ConfigAceFrame config) throws IOException {
-		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
-		addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
-		addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
-		WorkListMember workListMember = new WorkListMember(concept.toString(), 
-				concept.getConceptNid(),
-				concept.getUids(), workList.getUids().iterator().next(),  
-				ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
-		addConceptAsWorkListMember(workListMember, config);
 		try {
+			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
+			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
+			addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
+			WorkListMember workListMember = new WorkListMember(concept.toString(), 
+					concept.getConceptNid(),
+					concept.getUids(), workList.getUids().iterator().next(),  
+					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
+			WorkflowIntepreter interpreter = new WorkflowIntepreter(workList.getWorkflowDefinition());
+			addConceptAsWorkListMember(workListMember,
+					Terms.get().uuidToNative(interpreter.getNextDestination(
+							workListMember.getWfInstance(), 
+							workList).getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2336,8 +2342,8 @@ public class TerminologyProjectDAO {
 		WorkList workList = null;
 		I_GetConceptData newConcept = null;
 		String name = workListWithMetadata.getName();
-//		workListWithMetadata.getBusinessProcess().setDestination(
-//				workListWithMetadata.getDestination());
+		//		workListWithMetadata.getBusinessProcess().setDestination(
+		//				workListWithMetadata.getDestination());
 
 		String worklistName = workListWithMetadata.getName() + " (worklist)";
 
@@ -2710,15 +2716,12 @@ public class TerminologyProjectDAO {
 	 * @param member the member
 	 * @param config the config
 	 */
-	public static void addConceptAsWorkListMember(WorkListMember member, I_ConfigAceFrame config) {
+	public static void addConceptAsWorkListMember(WorkListMember member, int assignedUserId, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
 			termFactory.setActiveAceFrameConfig(config);
 			I_GetConceptData newMemberConcept = termFactory.getConcept(member.getUids());
 			I_GetConceptData workListConcept = termFactory.getConcept(member.getWorkListUUID());
-			//			member.getBusinessProcessWithAttachments().writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), member);
-			//			member.getBusinessProcessWithAttachments().setSubject(member.getConcept().toString());
-
 			//String metadata = serialize(member);
 
 			boolean alreadyMember = false;
@@ -2734,25 +2737,20 @@ public class TerminologyProjectDAO {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							part.makeAnalog(
 									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+									config.getDbConfig().getUserConcept().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							//part.setStringValue(metadata); //Removed to minimize changeset footprint
 							extension.addVersion(part);
 						}
 						termFactory.addUncommittedNoChecks(workListConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workListConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
 					}
 				}
 			}
 
 			if (!alreadyMember) {
 				WorkList workList = getWorkList(workListConcept, config);
-				PromotionRefset promotionRefset = workList.getPromotionRefset(config);
+				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 				termFactory.getRefsetHelper(config).newRefsetExtension(
 						workListConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(), 
@@ -2763,16 +2761,11 @@ public class TerminologyProjectDAO {
 					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
 							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
 						termFactory.addUncommittedNoChecks(workListConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workListConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
 					}
 				}
 				I_GetConceptData activityStatusConcept = termFactory.getConcept(member.getActivityStatus());
 				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				promotionRefset.setDestination(member.getId(), assignedUserId);
 				//Translation specific concept level promotion refset
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(
@@ -2917,55 +2910,55 @@ public class TerminologyProjectDAO {
 					+ "OUTBOX");
 		}
 		I_QueueProcesses q = (I_QueueProcesses) service.service;
-//		I_EncodeBusinessProcess process=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-//		String destination=worklist.getDestination();
-////		process.setDestination(destination);
-//		I_TerminologyProject project = getProjectForWorklist(worklist, config);
-//		List<I_GetConceptData> souLanRefsets = ((TranslationProject)project).getSourceLanguageRefsets();
-//		Integer langRefset = null;
-//		for (I_GetConceptData lCon:souLanRefsets){
-//			if (lCon.getConceptNid()==enRefset.getConceptNid()){
-//				langRefset=lCon.getConceptNid();
-//				break;
-//			}
-//		}
-//		if (langRefset==null && souLanRefsets!=null){
-//			langRefset=souLanRefsets.get(0).getConceptNid();
-//		}
-//		Long statusTime=new java.util.Date().getTime();
-//		int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
-//		PromotionRefset promoRefset = worklist.getPromotionRefset(config);
-//		for (WorkListMember workListMember : workListMembers) {
-//			if (ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(workListMember.getActivityStatus())) {
-//				//				I_EncodeBusinessProcess process= workListMember.getBusinessProcessWithAttachments();
-//				try {
-//					if (workListMember.getDestination() != null && !workListMember.getDestination().isEmpty()) {
-//						process.setDestination(workListMember.getDestination());
-//					}
-//					workListMember.setActivityStatus(
-//							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-//					process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-//					updateWorkListMemberMetadata(workListMember, config);
-//					//					Due commit is missing take date from variable
-//					//					statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
-//					String subj=getItemSubject(workListMember,worklist,project,promoRefset,langRefset,statusId,statusTime);
-//
-//					process.setSubject(subj);
-//					process.setProcessID(new ProcessID(UUID.randomUUID()));
-//					worker.getLogger().info(
-//							"Moving process " + process.getProcessID() + " to Queue named: " + queueName);
-//					q.write(process, worker.getActiveTransaction());
-//					bSent = true;
-//					worker.getLogger()
-//					.info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
-//					updateWorkListMemberMetadata(workListMember, config);
-//					//TODO: move to a more generic promotion, not language specific
-//					//					promoteLanguageContent(workListMember, config);
-//				} catch (Exception e) {
-//					throw new TaskFailedException(e);
-//				}
-//			}
-//		}
+		//		I_EncodeBusinessProcess process=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+		//		String destination=worklist.getDestination();
+		////		process.setDestination(destination);
+		//		I_TerminologyProject project = getProjectForWorklist(worklist, config);
+		//		List<I_GetConceptData> souLanRefsets = ((TranslationProject)project).getSourceLanguageRefsets();
+		//		Integer langRefset = null;
+		//		for (I_GetConceptData lCon:souLanRefsets){
+		//			if (lCon.getConceptNid()==enRefset.getConceptNid()){
+		//				langRefset=lCon.getConceptNid();
+		//				break;
+		//			}
+		//		}
+		//		if (langRefset==null && souLanRefsets!=null){
+		//			langRefset=souLanRefsets.get(0).getConceptNid();
+		//		}
+		//		Long statusTime=new java.util.Date().getTime();
+		//		int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
+		//		PromotionRefset promoRefset = worklist.getPromotionRefset(config);
+		//		for (WorkListMember workListMember : workListMembers) {
+		//			if (ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(workListMember.getActivityStatus())) {
+		//				//				I_EncodeBusinessProcess process= workListMember.getBusinessProcessWithAttachments();
+		//				try {
+		//					if (workListMember.getDestination() != null && !workListMember.getDestination().isEmpty()) {
+		//						process.setDestination(workListMember.getDestination());
+		//					}
+		//					workListMember.setActivityStatus(
+		//							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
+		//					process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
+		//					updateWorkListMemberMetadata(workListMember, config);
+		//					//					Due commit is missing take date from variable
+		//					//					statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+		//					String subj=getItemSubject(workListMember,worklist,project,promoRefset,langRefset,statusId,statusTime);
+		//
+		//					process.setSubject(subj);
+		//					process.setProcessID(new ProcessID(UUID.randomUUID()));
+		//					worker.getLogger().info(
+		//							"Moving process " + process.getProcessID() + " to Queue named: " + queueName);
+		//					q.write(process, worker.getActiveTransaction());
+		//					bSent = true;
+		//					worker.getLogger()
+		//					.info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
+		//					updateWorkListMemberMetadata(workListMember, config);
+		//					//TODO: move to a more generic promotion, not language specific
+		//					//					promoteLanguageContent(workListMember, config);
+		//				} catch (Exception e) {
+		//					throw new TaskFailedException(e);
+		//				}
+		//			}
+		//		}
 		if (bSent){
 			worker.getActiveTransaction().commit();
 		}
@@ -3072,7 +3065,7 @@ public class TerminologyProjectDAO {
 				retString[0]=sRetFsn;
 			else
 				retString[0]=sFsn;
-			
+
 			if (sPref.equals(""))
 				retString[1]=sRetPref;
 			else
@@ -3399,7 +3392,7 @@ public class TerminologyProjectDAO {
 					config);
 			List<WorkListMember> workListMembers=getAllWorkListMembers(worklist, config);
 			for (WorkListMember workListMember:workListMembers){
-//				workListMember.setDestination(worklist.getDestination());
+				//				workListMember.setDestination(worklist.getDestination());
 				updateComponentMetadata(workListMember.getConcept(), workListMember, 
 						(UUID[]) worklist.getUids().toArray(),
 						config);
@@ -3940,17 +3933,15 @@ public class TerminologyProjectDAO {
 		return null;
 	}
 
-	public static WorkList generateWorkListFromPartition(Partition partition, String destination,
-			BusinessProcess businessProcess, String name, I_ConfigAceFrame config) throws Exception {
+	public static WorkList generateWorkListFromPartition(Partition partition, 
+			WorkflowDefinition workflowDefinition,
+			List<WfMembership> workflowUserRoles, 
+			String name, I_ConfigAceFrame config) throws Exception {
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
 		for (PartitionMember partitionMember: partitionMembers) {
-			BusinessProcess businessProcessForAttachments = businessProcess;
-			if (businessProcessForAttachments != null) {
-				businessProcessForAttachments.setOriginator(config.getUsername());
-			}
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
 					partitionMember.getId(),
 					partitionMember.getUids(), null,  
@@ -3965,34 +3956,18 @@ public class TerminologyProjectDAO {
 			if(workList != null){
 				for (WorkListMember workListMember: workListMembers) {
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
-					addConceptAsWorkListMember(workListMember, config);
-					//					promoteLanguageContent(workListMember, config);
+					WorkflowIntepreter interpreter = new WorkflowIntepreter(workList.getWorkflowDefinition());
+					addConceptAsWorkListMember(workListMember, 
+							Terms.get().uuidToNative(interpreter.getNextDestination(
+									workListMember.getWfInstance(), 
+									workList).getId()),
+									config);
 				}
 			}
 		}
 		Terms.get().commit();
 		return workList;
 	}
-
-	//	public static void promoteWorkSetMember(WorkSetMember workSetMember, 
-	//			PositionBI positionToExport) throws TerminologyException, IOException {
-	//		I_TermFactory tf = Terms.get();
-	//		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-	//		I_GetConceptData memberConcept = workSetMember.getConcept();
-	//		memberConcept.promote(positionToExport, config.getPromotionPathSetReadOnly(), 
-	//				config.getAllowedStatus(), Precedence.TIME);
-	//	}
-	//
-	//	public static void promoteWorkSetMembers(WorkSet workSet, int statusIdToPromote, 
-	//			PositionBI positionToExport) throws TerminologyException, IOException {
-	//		I_TermFactory tf = Terms.get();
-	//		for (WorkSetMember member : workSet.getWorkSetMembers()) {
-	//			//			I_GetConceptData statusConcept = tf.getConcept(member.getActivityStatus());
-	//			//			if (statusConcept.getConceptId() == statusIdToPromote) {
-	//			//				promoteWorkSetMember(member, positionToExport);
-	//			//			}
-	//		}
-	//	}
 
 	private static List<? extends I_RelTuple> cleanRelTuplesList(List<? extends I_RelTuple> tuples) {
 		HashMap<Integer, I_RelTuple> cleanMap = new HashMap<Integer, I_RelTuple>();

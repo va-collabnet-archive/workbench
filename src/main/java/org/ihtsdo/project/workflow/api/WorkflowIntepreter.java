@@ -44,32 +44,6 @@ public class WorkflowIntepreter {
 		super();
 		this.wfDefinition = wfDefinition;
 
-		File serializedKbFile = new File("rules/" + wfDefinition.getStateTransitionKBFileName());
-
-//		if (serializedKbFile.exists()) {
-//			try {
-//				ObjectInputStream in = new ObjectInputStream(new FileInputStream(serializedKbFile));
-//				// The input stream might contain an individual
-//				// package or a collection.
-//				Collection<KnowledgePackage> kpkgs = (Collection<KnowledgePackage>)in.readObject();
-//				in.close();
-//				kbase = KnowledgeBaseFactory.newKnowledgeBase();
-//				kbase.addKnowledgePackages(kpkgs);
-//				ksession = kbase.newStatelessKnowledgeSession();
-//				actions = new ArrayList<String>();
-//				ksession.setGlobal("actions", actions);
-//				ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
-//			} catch (StreamCorruptedException e0) {
-//				serializedKbFile.delete();
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			} catch (ClassNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//		}
-		
 		// Crate knowledge base with decision table
 		DecisionTableConfiguration dtableconfiguration =
 			KnowledgeBuilderFactory.newDecisionTableConfiguration();
@@ -77,13 +51,18 @@ public class WorkflowIntepreter {
 		
 		kbase = KnowledgeBaseFactory.newKnowledgeBase();
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
-
-		//		Resource xlsRes = ResourceFactory.newClassPathResource( "/Users/alo/Desktop/test-dtable.xls",
-		//				TestDecisionTable.class );
-		Resource xlsRes = ResourceFactory.newFileResource("/Users/alo/Desktop/test-dtable.xls");
-		kbuilder.add( xlsRes,
-				ResourceType.DTABLE,
-				dtableconfiguration );
+		
+		for (String loopXls : wfDefinition.getXlsFileName()) {
+			Resource xlsRes = ResourceFactory.newFileResource(loopXls);
+			kbuilder.add( xlsRes,
+					ResourceType.DTABLE,
+					dtableconfiguration );
+		}
+		
+		for (String loopDrl : wfDefinition.getDrlFileName()) {
+			kbuilder.add(ResourceFactory.newFileResource(loopDrl), 
+					ResourceType.DRL);
+		}
 
 		if ( kbuilder.hasErrors() ) {
 			System.err.print( kbuilder.getErrors() );
