@@ -99,7 +99,7 @@ public class WorkListDetailsPanel extends JPanel {
 			label16.setText("Partition: " + workList.getPartition().getName());
 			label17.setText("Partition: " + workList.getPartition().getName());
 			label18.setText("Partition: " + workList.getPartition().getName());
-			label12.setText(workList.getBusinessProcess().getName());
+			//label12.setText(workList.getBusinessProcess().getName());
 
 			updateMembersTable();
 
@@ -109,7 +109,7 @@ public class WorkListDetailsPanel extends JPanel {
 				}
 			}
 
-			comboBox1.setSelectedItem(workList.getDestination());
+			//comboBox1.setSelectedItem(workList.getDestination());
 
 			ProjectPermissionsAPI permissionApi = new ProjectPermissionsAPI(
 					config);
@@ -221,25 +221,25 @@ public class WorkListDetailsPanel extends JPanel {
 				Thread appThr = new Thread() {
 					public void run() {
 						try {
-							workList.setDestination((String) comboBox1
-									.getSelectedItem());
-							TerminologyProjectDAO.updateWorkListMetadata(
-									workList, config);
-							Terms.get().commit();
-							for (WorkListMember member : workList
-									.getWorkListMembers()) {
-								if (ArchitectonicAuxiliary.Concept.ADJUDICATED
-										.getUids().contains(
-												member.getActivityStatus())) {
-									member.setDestination(workList
-											.getDestination());
-									// member.getBusinessProcessWithAttachments().setDestination(workList.getDestination());
-									TerminologyProjectDAO
-											.updateWorkListMemberMetadata(
-													member, config);
-								}
-							}
-							Terms.get().commit();
+//							workList.setDestination((String) comboBox1
+//									.getSelectedItem());
+//							TerminologyProjectDAO.updateWorkListMetadata(
+//									workList, config);
+//							Terms.get().commit();
+//							for (WorkListMember member : workList
+//									.getWorkListMembers()) {
+//								if (ArchitectonicAuxiliary.Concept.ADJUDICATED
+//										.getUids().contains(
+//												member.getActivityStatus())) {
+//									member.setDestination(workList
+//											.getDestination());
+//									// member.getBusinessProcessWithAttachments().setDestination(workList.getDestination());
+//									TerminologyProjectDAO
+//											.updateWorkListMemberMetadata(
+//													member, config);
+//								}
+//							}
+//							Terms.get().commit();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 							JOptionPane.showMessageDialog(
@@ -309,19 +309,19 @@ public class WorkListDetailsPanel extends JPanel {
 
 						Thread appThr = new Thread() {
 							public void run() {
-								try {
-									workList.setBusinessProcess(businessProcess);
-									TerminologyProjectDAO
-											.updateWorkListMetadata(workList,
-													config);
-									Terms.get().commit();
-								} catch (Exception e) {
-									e.printStackTrace();
-									JOptionPane.showMessageDialog(
-											WorkListDetailsPanel.this,
-											e.getMessage(), "Error",
-											JOptionPane.ERROR_MESSAGE);
-								}
+//								try {
+//									workList.setBusinessProcess(businessProcess);
+//									TerminologyProjectDAO
+//											.updateWorkListMetadata(workList,
+//													config);
+//									Terms.get().commit();
+//								} catch (Exception e) {
+//									e.printStackTrace();
+//									JOptionPane.showMessageDialog(
+//											WorkListDetailsPanel.this,
+//											e.getMessage(), "Error",
+//											JOptionPane.ERROR_MESSAGE);
+//								}
 								pBarBP.setVisible(false);
 								label12.setText(businessProcess.getName());
 								JOptionPane

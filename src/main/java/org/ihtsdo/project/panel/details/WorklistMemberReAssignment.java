@@ -90,7 +90,7 @@ public class WorklistMemberReAssignment extends JPanel {
 				}
 			}
 
-			comboBox1.setSelectedItem(workList.getDestination());
+			//comboBox1.setSelectedItem(workList.getDestination());
 
 			FileLinkAPI flApi = new FileLinkAPI(config);
 			FileLink link1 = new FileLink(new File("sampleProcesses/WrlstMemberReassign.bp"), 

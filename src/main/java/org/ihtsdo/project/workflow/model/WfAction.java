@@ -8,7 +8,6 @@ public abstract class WfAction {
 	private String name;
 	private UUID id;
 	private WfState consequence;
-	private List<WfRole> allowedRoles;
 
 	public WfAction() {
 		super();
@@ -42,14 +41,6 @@ public abstract class WfAction {
 
 	public String toString() {
 		return name;
-	}
-
-	public List<WfRole> getAllowedRoles() {
-		return allowedRoles;
-	}
-
-	public void setAllowedRoles(List<WfRole> allowedRoles) {
-		this.allowedRoles = allowedRoles;
 	}
 
 }

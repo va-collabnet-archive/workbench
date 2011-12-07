@@ -18,6 +18,7 @@ package org.ihtsdo.project.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
 import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
@@ -237,6 +239,16 @@ public class WorkList extends WorkflowRefset implements Serializable{
 
 	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
 		this.workflowUserRoles = workflowUserRoles;
+	}
+	
+	public List<WfUser> getUsers() {
+		List<WfUser> users = new ArrayList<WfUser>();
+		
+		for (WfMembership loopMembership : getWorkflowUserRoles()) {
+			users.add(loopMembership.getUser());
+		}
+		
+		return users;
 	}
 
 	public String getWorkflowDefinitionFileName() {

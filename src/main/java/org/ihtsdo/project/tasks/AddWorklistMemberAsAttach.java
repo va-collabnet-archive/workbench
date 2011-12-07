@@ -101,13 +101,13 @@ public class AddWorklistMemberAsAttach extends AbstractTask {
 				
 				if(conceptName!= null){
 					conc = Terms.get().getConcept(conceptName.ids);
-
-					WorkListMember member= new WorkListMember("the member with concept", 
-							conc.getConceptNid(), 
-							conc.getUids(),null,"",
-							null,null);
-
-					process.writeAttachment("A:WORKLIST_MEMBER", member);
+//
+//					WorkListMember member= new WorkListMember("the member with concept", 
+//							conc.getConceptNid(), 
+//							conc.getUids(),null,"",
+//							null,null);
+//
+//					process.writeAttachment("A:WORKLIST_MEMBER", member);
 				}
 	         } catch (Exception e) {
 	            throw new TaskFailedException(e);

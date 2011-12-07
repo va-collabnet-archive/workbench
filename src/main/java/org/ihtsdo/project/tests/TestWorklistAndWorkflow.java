@@ -42,6 +42,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.Partition;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
@@ -54,7 +58,7 @@ import org.ihtsdo.tk.api.Precedence;
 /**
  * The Class TestTerminologyProjectDAOForWorkSetsCRUD.
  */
-public class TestTerminologyProjectDAOForWorkSetsCRUD extends TestCase {
+public class TestWorklistAndWorkflow extends TestCase {
 
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -126,8 +130,15 @@ public class TestTerminologyProjectDAOForWorkSetsCRUD extends TestCase {
 			I_GetConceptData partitionConcept = tf.getConcept(UUID.fromString("d88283f4-53c2-4b8b-ae37-428264feaeba"));
 			Partition partition = TerminologyProjectDAO.getPartition(partitionConcept, config);
 			WorkflowDefinition wfDef = getWfDefinition();
-			TerminologyProjectDAO.generateWorkListFromPartition(partition, 
+			WorkList workList = TerminologyProjectDAO.generateWorkListFromPartition(partition, 
 					wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config);
+			Terms.get().commit();
+			WorkListMember member = workList.getWorkListMembers().iterator().next();
+			
+			WorkflowIntepreter wfInt = new WorkflowIntepreter(wfDef);
+			
+			System.out.println(wfInt.getNextDestination(member.getWfInstance(), workList));
+			//workList.getPromotionRefset(config).setPromotionStatus(member.getId(), statusConceptId)
 			
 			
 		} catch (TerminologyException e) {
