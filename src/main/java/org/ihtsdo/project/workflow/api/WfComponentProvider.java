@@ -115,7 +115,7 @@ public class WfComponentProvider {
 		return wfUser;
 	}
 	private static final String END_FILE = ".wfd";
-	public static List<File> getWorflowDefinitionFiles(){
+	public static List<File> getWorkflowDefinitionFiles(){
 		File folder=new File("./sampleProcesses");
 		List<File> retFiles=loadFiles( folder,END_FILE);
 		return retFiles;
