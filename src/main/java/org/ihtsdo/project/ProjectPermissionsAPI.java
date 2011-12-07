@@ -2,8 +2,10 @@ package org.ihtsdo.project;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -293,6 +295,39 @@ public class ProjectPermissionsAPI {
 			}
 		}
 
+		return returnRoles;
+	}
+	
+	public Map<I_GetConceptData,I_GetConceptData> getPermissionsForUser(I_GetConceptData user
+	) throws IOException, TerminologyException {
+		
+		Map<I_GetConceptData,I_GetConceptData> returnRoles = new HashMap<I_GetConceptData, I_GetConceptData>();
+		Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
+		allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+		
+		Set<Integer> allRolesNid = new HashSet<Integer>();
+		for (I_GetConceptData loopRole : allRoles) {
+			allRolesNid.add(loopRole.getNid());
+		}
+		
+		I_TermFactory tf = Terms.get();
+
+		I_IntSet isaType = tf.newIntSet();
+		isaType.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+
+		
+		List<? extends I_RelTuple> relationships = user.getSourceRelTuples(
+				config.getAllowedStatus(), 
+				null, config.getViewPositionSetReadOnly(),
+				Precedence.TIME, config.getConflictResolutionStrategy());
+		for (I_RelTuple rel : relationships) {
+			if (allRolesNid.contains(rel.getTypeNid())) {
+				I_GetConceptData role = tf.getConcept(rel.getTypeNid());
+				I_GetConceptData hierarchy = tf.getConcept(rel.getC2Id());
+				returnRoles.put(role, hierarchy);
+			}
+		}
+		
 		return returnRoles;
 	}
 
