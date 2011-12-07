@@ -1,5 +1,6 @@
 package org.ihtsdo.project.workflow.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +113,28 @@ public class WfComponentProvider {
 			e.printStackTrace();
 		}
 		return wfUser;
+	}
+	private static final String END_FILE = ".wfd";
+	public static List<File> getWorflowDefinitionFiles(){
+		File folder=new File("./sampleProcesses");
+		List<File> retFiles=loadFiles( folder,END_FILE);
+		return retFiles;
+	}
+
+	private static List<File> loadFiles(File folder,String endFile) {
+		File[] fileList = folder.listFiles();
+		List<File> retFiles=new ArrayList<File>();
+		for (File file : fileList) {
+			if (file.isDirectory()) {
+				List<File>tmpFiles=loadFiles(file,endFile);
+				retFiles.addAll(tmpFiles);
+			} else {
+				if(!file.isHidden() && file.getName().toLowerCase().endsWith(endFile)){
+					retFiles.add(file);
+				}
+			}
+		}
+		return retFiles;
 	}
 
 }
