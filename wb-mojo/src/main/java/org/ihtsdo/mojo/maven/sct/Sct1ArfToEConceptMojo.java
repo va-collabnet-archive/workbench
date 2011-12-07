@@ -72,6 +72,8 @@ import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision; // import org.ihtsdo.mojo.econcept.ConceptDescriptor;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -291,6 +293,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
      * @parameter default-value="false"
      */
     private boolean rf2Mapping;
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean rf2Metadata;
     /**
      * @parameter default-value="false"
      */
@@ -3205,9 +3211,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #7 COMPLETED -- CREATE eCONCEPTS ***\r\n");
     }
 
-    // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
-    //private static final UUID debugUuid01 = UUID.fromString("cff53f1a-1d11-5ae7-801e-d3301cfdbea0");
     // UUID OF INTEREST
+    // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
+//    private static final UUID debugUuid01 = UUID.fromString("1b90be6e-f625-391a-9e14-08dc8b84392c");
     //private static final UUID debugUuid02 = UUID.fromString("daa9598a-2ddb-5527-beda-ee4303a7656c");
     //private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
@@ -3239,6 +3245,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         Collections.sort(conList);
         Sct1_ConRecord cRec0 = conList.get(0);
         UUID theConUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
+
+//        if (theConUUID.compareTo(debugUuid01) == 0) {
+//            System.out.println(":!!!:DEBUG:");
+//        }
 
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
@@ -3849,9 +3859,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         try {
             ec.writeExternal(dos);
-            //            if (theConUUID.compareTo(debugUuid01) == 0) {
-            //                getLog().info(":DEBUG: "  + ec);
-            //            }
+//            if (theConUUID.compareTo(debugUuid01) == 0) {
+//                getLog().info(":DEBUG: "  + ec);
+//            }
 
             countEConWritten++;
             if (countEConWritten % 50000 == 0) {
@@ -4234,7 +4244,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             uuidInferredRel = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                     uuidWbAuxIsa + uuidInferredDescFs.toString() + uuidInferredDescPt.toString());
 
-            uuidCurrent = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
+            if (rf2Metadata) {
+                uuidCurrent = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
+            } else {
+                uuidCurrent = SnomedMetadataRf1.CURRENT_RF1.getUuids()[0];
+            }
 
             uuidSourceCtv3 = ArchitectonicAuxiliary.Concept.CTV3_ID.getUids().iterator().next();
             uuidSourceSnomedRt = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.getUids().iterator().next();
