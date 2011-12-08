@@ -49,7 +49,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.isActive = active;
 
         /* this.pathStr = path; */
-        this.pathStr = "2faa9260-8fb2-11db-b606-0800200c9a66";
+        this.pathStr = "8c230474-9f11-30ce-9cad-185a96fd03a2"; // SNOMED Core
 
         this.refsetIdL = refsetIdL;
         this.referencedComponentIdL = referencedComponentIdL;
