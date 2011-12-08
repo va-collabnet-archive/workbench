@@ -22,6 +22,10 @@ public class CustomStatics {
 	
     /**The lookup string for configService input file. **/
     public static final String CONFIG_SERVICE_CONFIG_FILE = "configServiceConfigFile";
+    /**The lookup string for the folder containingconfigService 
+     * input files. 
+     * If configServiceConfigFile is also defined then that will be used**/
+    public static final String CONFIG_SERVICE_CONFIG_FOLDER = "configServiceConfigFolder";
     /**The classname for the configService. **/
     public static final String CONFIG_SERVICE_CLASSNAME = "configServiceClassName";
     /**The lookup string for configService. **/
