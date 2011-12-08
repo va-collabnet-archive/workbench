@@ -9,7 +9,12 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,8 +25,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -34,14 +40,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -52,6 +56,13 @@ import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow.wizard.WizardLauncher;
 
 /**
  * @author Guillermo Reynoso
@@ -82,7 +93,7 @@ public class PartitionDetailsPanel extends JPanel {
 		label5.setText(partition.getPartitionScheme(config).getName());
 		partitionMember = label4.getText();
 		updateList3Content();
-		
+
 		button5.setEnabled(false);
 		updateList2Content();
 		I_TermFactory termFactory = Terms.get();
@@ -117,10 +128,10 @@ public class PartitionDetailsPanel extends JPanel {
 		Collections.sort(worklists,
 				new Comparator<WorkList>()
 				{
-					public int compare(WorkList f1, WorkList f2)
-					{
-						return f1.toString().compareTo(f2.toString());
-					}
+			public int compare(WorkList f1, WorkList f2)
+			{
+				return f1.toString().compareTo(f2.toString());
+			}
 				});
 		for (WorkList workList : worklists) {
 			list3Model.addElement(workList);
@@ -136,10 +147,10 @@ public class PartitionDetailsPanel extends JPanel {
 		Collections.sort(members,
 				new Comparator<PartitionMember>()
 				{
-					public int compare(PartitionMember f1, PartitionMember f2)
-					{
-						return f1.toString().compareTo(f2.toString());
-					}
+			public int compare(PartitionMember f1, PartitionMember f2)
+			{
+				return f1.toString().compareTo(f2.toString());
+			}
 				});
 		for (PartitionMember member : members) {
 			list2Model.addElement(member);
@@ -219,188 +230,53 @@ public class PartitionDetailsPanel extends JPanel {
 	List<I_Work> cloneList = new ArrayList<I_Work>();
 	private void button2ActionPerformed(ActionEvent e) {
 		// generate worklist
-//		int n = JOptionPane.showConfirmDialog(
-//				this,
-//				"Would you like to create a worklist?\n\n" + 
-//				"Steps:\n" +
-//				" 1- Select bp file for the workflow\n" +
-//				" 2- Select initial destination\n" +
-//				" 3- Select worklist name\n",
-//				"Confirmation",
-//				JOptionPane.YES_NO_OPTION);
-//
-//		if (n==0) {
-			File businessProcessFile = new File ("sampleProcesses/GenerateWorkList.bp");
-//			JFileChooser chooser = new JFileChooser("sampleProcesses");
-//			chooser.setCurrentDirectory(new File("."));
-//
-//			chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-//				public boolean accept(File f) {
-//					return f.getName().toLowerCase().endsWith(".bp");
-//				}
-//
-//				public String getDescription() {
-//					return "BP Business Process files";
-//				}
-//			});
-//
-			try {
-//				int c = chooser.showDialog(new JFrame(), "Select workflow file.");
-//				if (c == JFileChooser.APPROVE_OPTION) {
-//					businessProcessFile = chooser.getSelectedFile();
-//				}
-//				if (businessProcessFile == null) {
-//					throw new Exception("Generation cancelled...");
-//				}
-
-				businessProcess = getBusinessProcess(businessProcessFile);
+		WfComponentProvider wcp=new WfComponentProvider();
+		List<WfUser> users = wcp.getUsers();
+		WizardLauncher wl=new WizardLauncher();
+		wl.launchWfWizard(users);
+		HashMap<String,Object> hsRes=wl.getResult();
+		List<WfRole> roles=null;
+		String name="no name " + UUID.randomUUID().toString();
+		WorkflowDefinition workflowDefinition=null;
+		for (String key:hsRes.keySet()){
+			Object val=hsRes.get(key );
+			if (key.equals("WDS")){
+				workflowDefinition=WorkflowDefinitionManager.readWfDefinition((File)val);
+				roles = workflowDefinition.getRoles();
 				
-				List<String> inboxes = new ArrayList<String>();
-				for (String address : config.getAddressesList()) {
-					if (address.trim().endsWith(".inbox")) {
-						inboxes.add(address);
-					}
-				}
-				Runnable r = new Runnable() {
-					public void run() {
-						try {
-							I_EncodeBusinessProcess processToExecute = businessProcess;
-							processToExecute.setProperty(ProcessAttachmentKeys.PARTITION.getAttachmentKey(), partition);
-							processToExecute.setProperty(ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey(), partition.getProject());
-							I_Work worker=config.getWorker();
-							if (worker.isExecuting()) {
-								I_Work altWorker = null;
-								for (I_Work alt : cloneList) {
-									if (alt.isExecuting() == false) {
-										altWorker = alt;
-										break;
-									}
-								}
-								if (altWorker == null) {
-									altWorker = worker.getTransactionIndependentClone();
-									altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
-									
-									cloneList.add(altWorker);
-								}
-								altWorker.execute(processToExecute);
-							} else {
-								pBarW.setMinimum(0);
-								pBarW.setMaximum(100);
-								pBarW.setIndeterminate(true);
-								pBarW.setVisible(true);
-								pBarW.repaint();
-								pBarW.revalidate();
-								panel7.repaint();
-								panel7.revalidate();
-								worker.execute(processToExecute);
-								pBarW.setVisible(false);
-							}
-
-//							JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//									"WorkList created!", 
-//									"Message", JOptionPane.INFORMATION_MESSAGE);
-						} catch (Throwable e1) {
-							e1.printStackTrace();
-							JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-							e1.getMessage(),
-							"Error",
-							JOptionPane.ERROR_MESSAGE);
-						}
-
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								TranslationHelperPanel.refreshProjectPanelNode(config);
-							}
-						});
-
-					}
-				};
-				Thread t = new Thread(r);
-				t.start();
-//				
-//				destination = (String) JOptionPane.showInputDialog(null, "Select the initial destination : ", 
-//						"", JOptionPane.PLAIN_MESSAGE, null, inboxes.toArray(), null);
-//				//TODO: validate destination
-//				if (destination == null) {
-//					throw new Exception("Generation cancelled...");
-//				} else if (destination.length() < 3) {
-//					throw new Exception("String must be of at least 3 characters. Canceling...");
-//				}
-//
-//				if (!destination.trim().endsWith(".inbox")) {
-//					destination = destination.trim() + ".inbox";
-//				}
-//
-//				destination = destination.trim();
-//
-//				name = JOptionPane.showInputDialog(null, "Enter the worklist name : ", 
-//						"", 1);
-//				if (destination == null) {
-//					throw new Exception("Generation cancelled...");
-//				} else if (destination.length() < 6) {
-//					throw new Exception("String must be of at least 6 characters. Canceling...");
-//				}
-//
-//				config.getChildrenExpandedNodes().clear();
-//				if (e.getSource().equals(button6)){
-//					pBarW2.setMinimum(0);
-//					pBarW2.setMaximum(100);
-//					pBarW2.setIndeterminate(true);
-//					pBarW2.setVisible(true);
-//					pBarW2.repaint();
-//					pBarW2.revalidate();
-//					panel3.repaint();
-//					panel3.revalidate();
-//				}else{
-//					pBarW.setMinimum(0);
-//					pBarW.setMaximum(100);
-//					pBarW.setIndeterminate(true);
-//					pBarW.setVisible(true);
-//					pBarW.repaint();
-//					pBarW.revalidate();
-//					panel7.repaint();
-//					panel7.revalidate();
-//				}
-//				repaint();
-//				revalidate();
-//				SwingUtilities.invokeLater(new Runnable(){
-//					public void run(){
-//
-//						Thread appThr=new Thread(){
-//							public void run(){
-//								try {
-//									TerminologyProjectDAO.generateWorkListFromPartition(partition, destination, businessProcess, 
-//											name, config);
-//									Terms.get().commit();
-//								} catch (Exception e) {
-//									e.printStackTrace();
-//									JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//											e.getMessage(),
-//											"Error",
-//											JOptionPane.ERROR_MESSAGE);
-//								}
-//								updateList3Content();
-//
-//								pBarW2.setVisible(false);	
-//								pBarW.setVisible(false);
-//								JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//										"WorkList created!", 
-//										"Message", JOptionPane.INFORMATION_MESSAGE);
-//
-//								SwingUtilities.invokeLater(new Runnable(){
-//									public void run(){
-//										TranslationHelperPanel.refreshProjectPanelNode(config);
-//									}
-//								});
-//							}
-//						};
-//						appThr.start();
-//					}
-//				});
-			} catch (Exception e3) {
-				e3.printStackTrace();
 			}
-//		}
+
+			if (key.equals("WORKLIST_NAME")){
+				name=(String)val;
+			}
+		}
+		ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
+		for (WfRole role:roles){
+			DefaultTableModel model=(DefaultTableModel)hsRes.get(role.getName());
+
+			for (int i=0;i<model.getRowCount();i++){
+				Boolean sel=(Boolean)model.getValueAt(i, 0);
+				if ( sel){
+					Boolean def=(Boolean)model.getValueAt(i, 1);
+					WfUser user=(WfUser)model.getValueAt(i, 2);
+					WfMembership workflowUserRole=new WfMembership(UUID.randomUUID(),user,role,def);
+					workflowUserRoles.add(workflowUserRole);
+				}
+			}
+		}
+		try {
+			TerminologyProjectDAO.generateWorkListFromPartition(this.partition, workflowDefinition, workflowUserRoles, name, config);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				TranslationHelperPanel.refreshProjectPanelNode(config);
+			}
+		});
+		
 	}
 	public static void sleep(int n){
 		long t0, t1;
@@ -559,8 +435,8 @@ public class PartitionDetailsPanel extends JPanel {
 						label1.setText("Partition details");
 						label1.setFont(new Font("Lucida Grande", Font.BOLD, 14));
 						panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 5, 0), 0, 0));
 
 						//======== panel11 ========
 						{
@@ -573,8 +449,8 @@ public class PartitionDetailsPanel extends JPanel {
 							//---- label2 ----
 							label2.setText("Name:");
 							panel11.add(label2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 5), 0, 0));
 
 							//---- textField1 ----
 							textField1.addKeyListener(new KeyAdapter() {
@@ -584,28 +460,28 @@ public class PartitionDetailsPanel extends JPanel {
 								}
 							});
 							panel11.add(textField1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 5, 0), 0, 0));
 
 							//---- label3 ----
 							label3.setText("Partition scheme");
 							panel11.add(label3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 5), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 5), 0, 0));
 
 							//---- label5 ----
 							label5.setText("text");
 							panel11.add(label5, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+									new Insets(0, 0, 0, 0), 0, 0));
 						}
 						panel2.add(panel11, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel1.add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 
 					//======== panel10 ========
 					{
@@ -618,16 +494,16 @@ public class PartitionDetailsPanel extends JPanel {
 						//---- label8 ----
 						label8.setText("<html><body>\nClick \u2018Generate a new worklist\u2019 to create a new worklist<br><br>\n\nClick \u2018Retire partition\u2019 to retire the selected partition<br><br>\n\nCreate a new partition scheme by clicking the \u2018Add partition scheme\u2019 button\n</html>");
 						panel10.add(label8, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-							new Insets(0, 0, 0, 0), 0, 0));
+								GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel1.add(panel10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel0.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
 				//======== panel7 ========
 				{
@@ -647,8 +523,8 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel7.add(button2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 
 					//---- button3 ----
 					button3.setText("Retire partition");
@@ -660,8 +536,8 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel7.add(button3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 
 					//---- button4 ----
 					button4.setText("New partition scheme");
@@ -673,8 +549,8 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel7.add(button4, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 
 					//---- button5 ----
 					button5.setText("Save");
@@ -686,11 +562,11 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel7.add(button5, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 					panel7.add(pBarW, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 5), 0, 0));
 
 					//---- label11 ----
 					label11.setText("text");
@@ -701,12 +577,12 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel7.add(label11, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel0.add(panel7, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Partition", panel0);
 
@@ -722,16 +598,16 @@ public class PartitionDetailsPanel extends JPanel {
 				//---- label4 ----
 				label4.setText("Partition members");
 				panel9.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
 				//======== scrollPane2 ========
 				{
 					scrollPane2.setViewportView(list2);
 				}
 				panel9.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
 				//======== panel12 ========
 				{
@@ -745,19 +621,19 @@ public class PartitionDetailsPanel extends JPanel {
 					//---- label9 ----
 					label9.setText("<html><body>\nThe list of partition members is displayed\n</html>");
 					panel12.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-						new Insets(0, 0, 0, 0), 0, 0));
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel9.add(panel12, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
 				//---- label6 ----
 				label6.setText("Control + click for selecting multiple members");
 				label6.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 				panel9.add(label6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
 				//======== panel6 ========
 				{
@@ -777,12 +653,12 @@ public class PartitionDetailsPanel extends JPanel {
 						}
 					});
 					panel6.add(button1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel9.add(panel6, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 5), 0, 0));
+						GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 5), 0, 0));
 
 				//======== panel13 ========
 				{
@@ -793,8 +669,8 @@ public class PartitionDetailsPanel extends JPanel {
 					((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 				}
 				panel9.add(panel13, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
-					GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Members", panel9);
 
@@ -810,16 +686,16 @@ public class PartitionDetailsPanel extends JPanel {
 				//---- label7 ----
 				label7.setText("WorkLists");
 				panel14.add(label7, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
 
 				//======== scrollPane3 ========
 				{
 					scrollPane3.setViewportView(list3);
 				}
 				panel14.add(scrollPane3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
 
 				//======== panel15 ========
 				{
@@ -832,8 +708,8 @@ public class PartitionDetailsPanel extends JPanel {
 					//---- label10 ----
 					label10.setText("<html><body>\nThe list of worklists is displayed\n</html>");
 					panel15.add(label10, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
-						new Insets(0, 0, 5, 0), 0, 0));
+							GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 0), 0, 0));
 
 					//======== panel3 ========
 					{
@@ -853,26 +729,26 @@ public class PartitionDetailsPanel extends JPanel {
 							}
 						});
 						panel3.add(button6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
 						panel3.add(pBarW2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 0), 0, 0));
 					}
 					panel15.add(panel3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 0, 0), 0, 0));
 				}
 				panel14.add(panel15, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("WorkLists", panel14);
 
 		}
 		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		// JFormDesigner - End of component initialization  //GEN-END:initComponents
 	}
 

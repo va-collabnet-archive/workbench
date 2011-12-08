@@ -3,12 +3,19 @@ package org.ihtsdo.project.workflow.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
@@ -20,13 +27,38 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.tk.api.Precedence;
 
 public class WfComponentProvider {
 
 	public List<WfUser> getUsers() {
-		List<WfUser> wfUser = new ArrayList<WfUser>();
+		List<WfUser> wfUsers = new ArrayList<WfUser>();
+		try {
+			I_GetConceptData roleParent =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
 
-		return wfUser;
+			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
+
+			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
+					allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME,
+					Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+
+			for (I_GetConceptData user : allUsers) {
+
+				I_ConceptAttributeVersioned attr = user.getConceptAttributes();
+				if (TerminologyProjectDAO.isActive(attr.getStatusNid())){
+					wfUsers.add(new WfUser(attr.toUserString(),user.getUids().iterator().next(),null));
+
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return wfUsers;
 	}
 
 	public List<WfInstance> getAllWrokflowInstancesForWorklist(List<UUID> wlUuid) throws TerminologyException, IOException {
