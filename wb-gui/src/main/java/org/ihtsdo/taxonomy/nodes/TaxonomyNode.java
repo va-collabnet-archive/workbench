@@ -51,6 +51,18 @@ public abstract class TaxonomyNode implements ConceptContainerBI {
       hash              = Hashcode.compute(cnid, parentNid);
    }
 
+   public TaxonomyNode(TaxonomyNode another) {
+      this.nodeId         = TaxonomyModel.getNodeId(another.getCnid(), another.getParentNid());
+      this.nodesToCompare = another.nodesToCompare;
+      assert nodeId != another.parentNodeId;
+      this.parentNodeId = another.parentNodeId;
+      this.hash              = another.hash;
+      this.pathColors = another.pathColors;
+      this.sortComparable = another.sortComparable;
+      this.text = another.text;
+      this.icon = another.icon;
+   }
+
    //~--- methods -------------------------------------------------------------
 
    public abstract boolean addChild(TaxonomyNode child);

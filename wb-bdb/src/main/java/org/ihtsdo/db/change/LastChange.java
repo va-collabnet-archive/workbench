@@ -222,6 +222,12 @@ public class LastChange {
    public static void touchXref(int nid) {
       touch(nid, Change.XREF);
    }
+   public static void touchXrefs(Collection<Integer> cNidSet) {
+      for (Integer cNid : cNidSet) {
+         touch(cNid, Change.XREF);
+      }
+   }
+
 
    //~--- get methods ---------------------------------------------------------
 

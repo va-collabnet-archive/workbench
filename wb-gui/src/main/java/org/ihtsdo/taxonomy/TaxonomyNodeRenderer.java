@@ -54,10 +54,7 @@ import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -146,7 +143,7 @@ public class TaxonomyNodeRenderer extends JLabel
          Ts.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
 
       viewerImageTypes.add(viewerImageType.getConceptNid());
-
+      
       try {
          viewerImageTypeNid = ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.localize().getNid();
       } catch (TerminologyException ex) {
@@ -346,7 +343,12 @@ public class TaxonomyNodeRenderer extends JLabel
    public void setupTaxonomyNode(TaxonomyNode node, ConceptVersionBI cv) throws IOException {
       List<String> htmlPrefixes = new ArrayList<String>();
       List<String> htmlSuffixes = new ArrayList<String>();
-
+      Set<Color> colors = new HashSet<Color>();
+      for (int sapNid: cv.getAllSapNids()) {
+          colors.add(aceConfig.getColorForPath(Ts.get().getPathNidForSapNid(sapNid)));
+      }
+      List<Color> pathColors = new ArrayList<Color>(colors);
+      node.setPathColors(pathColors);
       if (showViewerImagesInTaxonomy) {
          try {
             for (MediaVersionBI media : cv.getMediaActive()) {
@@ -737,9 +739,9 @@ public class TaxonomyNodeRenderer extends JLabel
          try {
             for (Color pathColor : node.getPathColors()) {
                this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                       BorderFactory.createMatteBorder(0, 2, 0, 0, pathColor)));
+                       BorderFactory.createMatteBorder(0, 3, 0, 0, pathColor)));
                this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                       BorderFactory.createEmptyBorder(0, 2, 0, 0)));
+                       BorderFactory.createEmptyBorder(0, 1, 0, 0)));
             }
 
             if (node.getIcon() != null) {

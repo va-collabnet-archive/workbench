@@ -3000,6 +3000,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setColorForPath(int pathNid, Color pathColor) {
         vc = null;
         pathColorMap.put(pathNid, pathColor);
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);
     }
 
     public Map<Integer, Color> getPathColorMap() {

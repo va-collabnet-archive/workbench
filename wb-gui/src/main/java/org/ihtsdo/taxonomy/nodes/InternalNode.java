@@ -28,6 +28,12 @@ public class InternalNode extends TaxonomyNode {
       children = new ConcurrentSkipListSet<Long>(comparator);
    }
 
+
+   public InternalNode(InternalNodeMultiParent another) {
+      super(another);
+      children = another.getChildren();
+   }
+
    //~--- methods -------------------------------------------------------------
 
    @Override

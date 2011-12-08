@@ -663,4 +663,24 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             // TODO Auto-generated method stub
         }
     }
+
+    @Override
+    public int getAuthorNidForSapNid(int sapNid) {
+        return Bdb.getAuthorNidForSapNid(sapNid);
+    }
+
+    @Override
+    public int getPathNidForSapNid(int sapNid) {
+         return Bdb.getPathNidForSapNid(sapNid);
+   }
+
+    @Override
+    public int getStatusNidForSapNid(int sapNid) {
+         return Bdb.getStatusNidForSapNid(sapNid);
+   }
+
+    @Override
+    public long getTimeForSapNid(int sapNid) {
+         return Bdb.getTimeForSapNid(sapNid);
+   }
 }

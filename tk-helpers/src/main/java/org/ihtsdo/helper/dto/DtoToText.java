@@ -13,7 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
+
 package org.ihtsdo.helper.dto;
+
+//~--- non-JDK imports --------------------------------------------------------
+
+import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.tk.dto.concept.TkConcept;
+
+//~--- JDK imports ------------------------------------------------------------
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -23,50 +33,93 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.ihtsdo.helper.time.TimeHelper;
-import org.ihtsdo.tk.dto.concept.TkConcept;
+
+import java.util.Collection;
+import java.util.UUID;
 
 /**
  *
  * @author kec
  */
 public class DtoToText {
+   private static void convert(File changeSetFile, boolean changeSet, boolean append)
+           throws IOException, FileNotFoundException, ClassNotFoundException {
+      FileInputStream     fis        = new FileInputStream(changeSetFile);
+      BufferedInputStream bis        = new BufferedInputStream(fis);
+      DataInputStream     dataStream = new DataInputStream(bis);
+      File                textFile   = new File(changeSetFile.getParentFile(),
+                                          changeSetFile.getName() + ".txt");
+      FileWriter          textOut    = new FileWriter(textFile, append);
 
-    public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
-        convert(changeSetFile, true, false);
-    }
+      try {
+         int count = 0;
 
-    public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
-        convert(changeSetFile, false, false);
-    }
+         while (dataStream.available() > 0) {
+            if (changeSet) {
+               long nextCommit = dataStream.readLong();
 
-    private static void convert(File changeSetFile, boolean changeSet, boolean append) throws IOException, FileNotFoundException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(changeSetFile);
-        BufferedInputStream bis = new BufferedInputStream(fis);
-        DataInputStream dataStream = new DataInputStream(bis);
-        File textFile = new File(changeSetFile.getParentFile(),
-                changeSetFile.getName() + ".txt");
-        FileWriter textOut = new FileWriter(textFile, append);
-        try {
-            int count = 0;
-            while (dataStream.available() > 0) {
-                if (changeSet) {
-                    long nextCommit = dataStream.readLong();
-                    textOut.append("\n*******************************\n");
-                    textOut.append(Integer.toString(count));
-                    textOut.append(": ");
-                    textOut.append(TimeHelper.formatDateForFile(nextCommit));
-                }
-                TkConcept eConcept = new TkConcept(dataStream);
-                textOut.append("\n*******************************\n");
-                textOut.append(eConcept.toString());
-                count++;
+               textOut.append("\n*******************************\n");
+               textOut.append(Integer.toString(count));
+               textOut.append(": ");
+               textOut.append(TimeHelper.formatDateForFile(nextCommit));
             }
-        } catch (EOFException ex) {
-            // Nothing to do...
-        } finally {
-            dataStream.close();
-            textOut.close();
-        }
-    }
+
+            TkConcept eConcept = new TkConcept(dataStream);
+
+            textOut.append("\n*******************************\n");
+            textOut.append(eConcept.toString());
+            count++;
+         }
+      } catch (EOFException ex) {
+
+         // Nothing to do...
+      } finally {
+         dataStream.close();
+         textOut.close();
+      }
+   }
+
+   public static void convertChangeSet(File changeSetFile) throws IOException, ClassNotFoundException {
+      convert(changeSetFile, true, false);
+   }
+
+   public static void convertDto(File changeSetFile) throws IOException, ClassNotFoundException {
+      convert(changeSetFile, false, false);
+   }
+
+   private static void search(File changeSetFile, Collection<UUID> conceptUuids, boolean append)
+           throws IOException, FileNotFoundException, ClassNotFoundException {
+      FileInputStream     fis        = new FileInputStream(changeSetFile);
+      BufferedInputStream bis        = new BufferedInputStream(fis);
+      DataInputStream     dataStream = new DataInputStream(bis);
+      File                textFile   = new File(changeSetFile.getParentFile(),
+                                          changeSetFile.getName() + "-search.txt");
+      FileWriter          textOut    = new FileWriter(textFile, append);
+
+      try {
+         int count = 0;
+
+         while (dataStream.available() > 0) {
+            TkConcept eConcept = new TkConcept(dataStream);
+
+            if (conceptUuids.contains(eConcept.getPrimordialUuid())) {
+               textOut.append("\n*******************************\n");
+               textOut.append(eConcept.toString());
+            }
+
+            count++;
+         }
+      } catch (EOFException ex) {
+
+         // Nothing to do...
+      } finally {
+         dataStream.close();
+         textOut.close();
+      }
+   }
+
+   public static void searchForDto(File file, Collection<UUID> conceptUuids)
+           throws IOException, ClassNotFoundException {
+      search(file, conceptUuids, false);
+   }
 }

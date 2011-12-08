@@ -44,43 +44,18 @@ public class InternalNodeMultiParent extends InternalNode {
    public TaxonomyNode getFinalNode() {
       if (!this.hasExtraParents) {
          if (this.isLeaf) {
-            LeafNode node = new LeafNode(getCnid(), getParentNid(), parentNodeId);
-
-            node.text = this.text;
-            node.setSortComparable(this.getSortComparable());
-
-            return node;
+            return new LeafNode(this);
          } else {
             if (isSecondaryParentNode()) {
-               LeafNode node = new LeafNode(getCnid(), getParentNid(), parentNodeId);
-
-               node.text = this.text;
-               node.setSortComparable(this.getSortComparable());
-
-               return node;
+               return new LeafNode(this);
             } else {
-               InternalNode node = new InternalNode(getCnid(), getParentNid(), parentNodeId,
-                                      getChildren().comparator());
-
-               node.text = this.text;
-               node.setSortComparable(this.getSortComparable());
-               node.getChildren().addAll(this.getChildren());
-               node.nidNodeMap.putAll(this.nidNodeMap);
-               node.setChildrenAreSet(this.childrenAreSet);
-
-               return node;
+               return new InternalNode(this);
             }
          }
       }
 
       if (this.isLeaf) {
-         LeafNodeMultiParent node = new LeafNodeMultiParent(getCnid(), getParentNid(), parentNodeId);
-
-         node.text = this.text;
-         node.setSortComparable(this.getSortComparable());
-         node.extraParents = this.extraParents;
-
-         return node;
+         return new LeafNodeMultiParent(this);
       }
 
       return this;

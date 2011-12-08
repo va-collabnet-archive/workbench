@@ -114,4 +114,9 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    boolean hasUncommittedChanges();
 
    boolean hasUuid(UUID memberUUID);
+
+   int getPathNidForSapNid(int sapNid);
+   int getAuthorNidForSapNid(int sapNid);
+   int getStatusNidForSapNid(int sapNid);
+   long getTimeForSapNid(int sapNid);
 }

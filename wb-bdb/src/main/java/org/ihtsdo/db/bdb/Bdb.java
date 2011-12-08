@@ -157,6 +157,19 @@ public class Bdb {
         }
     }
 
+    static int getAuthorNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getAuthorNid(sapNid);
+    }
+    static int getPathNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getPathNid(sapNid);
+    }
+    static int getStatusNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getStatusNid(sapNid);
+    }
+    static long getTimeForSapNid(int sapNid) {
+        return statusAtPositionDb.getTime(sapNid);
+    }
+
     private enum HeapSize {
 
         HEAP_1200("je-prop-options/1200.je.properties"),

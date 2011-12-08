@@ -124,6 +124,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         SET_CACHE_SIZE("Set cache size"),
         SET_CACHE_PERCENT("Set cache percent"),
         CHANGE_SET_TO_TEXT("Change set to text..."),
+        PROCESS_ECONCEPT("Process eConcept file..."),
         ALL_CHANGE_SET_TO_TEXT("All change sets in profiles to text"),
         EXTRACT_CHANGE_SETS_FOR_CONCEPT("Extract change sets for concept..."),
         EXTRACT_CHANGE_SETS_FOR_CONCEPT_AND_ASSIGN_NEW_NIDS(
@@ -135,7 +136,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         EXPORT_ACTIVE_ONLY("Export active only from view"),
         PATCH_MSMITH("Patch msmith#80#"),
         TEST_ISA_CACHE("Test isa cache"),
-        LAUNCH_BP("Lunch Business Process...");
+        LAUNCH_BP("Launch Business Process...");
         //J+
         String menuText;
 
@@ -207,6 +208,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             case ALL_CHANGE_SET_TO_TEXT:
                 toText(optionMap.get(e.getActionCommand()));
 
+                break;
+
+            case PROCESS_ECONCEPT:
+                processEConcept();
                 break;
 
             case IMPORT_CHANGE_SET:
@@ -724,6 +729,21 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
 
         Terms.get().removeFromWatchList(igcd);
+    }
+
+    private void processEConcept() {
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showOpenDialog(null);
+
+        HashSet<UUID> conceptsToFind = new HashSet<UUID>();
+        conceptsToFind.add(UUID.fromString("7560feb1-0778-314d-bc76-2d5071def2fa"));
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                DtoToText.searchForDto(fc.getSelectedFile(), conceptsToFind);
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
     }
 
     private void toText(MENU_OPTIONS option) {
