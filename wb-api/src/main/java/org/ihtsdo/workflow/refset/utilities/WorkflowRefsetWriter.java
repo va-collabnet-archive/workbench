@@ -88,6 +88,14 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                     helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
 
                     Terms.get().addUncommittedNoChecks(ref);
+                    
+                    ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
+                    ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
+                    if (refset.isAnnotationStyleRefex()) {
+                        Ts.get().addUncommitted(concept);
+                    } else {
+                        Ts.get().addUncommitted(refset);
+                    }
                 }
             }
         } catch (Exception io) {
