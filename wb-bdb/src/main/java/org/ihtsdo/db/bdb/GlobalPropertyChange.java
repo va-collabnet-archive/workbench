@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.TerminologyStoreDI.PC_EVENT;
+import org.ihtsdo.tk.api.TerminologyStoreDI.CONCEPT_EVENT;
 
 /**
  *
@@ -43,9 +43,14 @@ public class GlobalPropertyChange {
         @Override
         public void propertyChange(PropertyChangeEvent pce) {
             PropertyChangeListener pcl = wr.get();
-            if (pcl != null) {
-                pcl.propertyChange(pce);
-            } else {
+            try {
+                if (pcl != null) {
+                    pcl.propertyChange(pce);
+                } else {
+                    listenerToRemove.add(this);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
                 listenerToRemove.add(this);
             }
         }
@@ -82,9 +87,14 @@ public class GlobalPropertyChange {
         @Override
         public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
             VetoableChangeListener pcl = wr.get();
-            if (pcl != null) {
-                pcl.vetoableChange(pce);
-            } else {
+            try {
+                if (pcl != null) {
+                    pcl.vetoableChange(pce);
+                } else {
+                    vetoListenerToRemove.add(this);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
                 vetoListenerToRemove.add(this);
             }
         }
@@ -116,7 +126,7 @@ public class GlobalPropertyChange {
     private static List<PropertyChangeListener> listenerToRemove = new ArrayList<PropertyChangeListener>();
     private static List<VetoableChangeListener> vetoListenerToRemove = new ArrayList<VetoableChangeListener>();
     
-    public static void addPropertyChangeListener(TerminologyStoreDI.PC_EVENT eventType, PropertyChangeListener listener) {
+    public static void addPropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT eventType, PropertyChangeListener listener) {
         gPcs.addPropertyChangeListener(eventType.toString(), new WeakRefListener(listener));
     }
     
@@ -124,7 +134,7 @@ public class GlobalPropertyChange {
         gPcs.removePropertyChangeListener(listener);
     }
 
-    public static void addVetoableChangeListener(TerminologyStoreDI.PC_EVENT eventType, VetoableChangeListener listener) {
+    public static void addVetoableChangeListener(TerminologyStoreDI.CONCEPT_EVENT eventType, VetoableChangeListener listener) {
         gVcs.addVetoableChangeListener(eventType.toString(), new WeakRefVetoListener(listener));
     }
     
@@ -132,18 +142,23 @@ public class GlobalPropertyChange {
         gVcs.removeVetoableChangeListener(listener);
     }
     
-    public static void firePropertyChange(PC_EVENT pce, Object oldValue, Object newValue){
+    public static void firePropertyChange(CONCEPT_EVENT pce, Object oldValue, Object newValue){
         gPcs.firePropertyChange(pce.toString(), oldValue, oldValue);
         for (PropertyChangeListener l: listenerToRemove) {
             gPcs.removePropertyChangeListener(l);
         }
     }
     
-    public static void fireVetoableChange(PC_EVENT pce, Object oldValue, Object newValue) throws PropertyVetoException{
+    public static void fireVetoableChange(CONCEPT_EVENT pce, Object oldValue, Object newValue) throws PropertyVetoException{
         gVcs.fireVetoableChange(pce.toString(), oldValue, oldValue);
         for (VetoableChangeListener l: vetoListenerToRemove) {
             gVcs.removeVetoableChangeListener(l);
         }
+        gPcs.firePropertyChange(pce.toString(), oldValue, oldValue);
+        for (PropertyChangeListener l: listenerToRemove) {
+            gPcs.removePropertyChangeListener(l);
+        }
+       
    }
 
 }

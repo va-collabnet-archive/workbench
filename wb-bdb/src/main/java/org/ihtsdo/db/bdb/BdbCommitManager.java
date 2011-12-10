@@ -147,6 +147,7 @@ public class BdbCommitManager {
 
         LastChange.touch(concept);
         dataCheckMap.remove(concept);
+        GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.ADD_UNCOMMITTED, null, concept);
 
         if (concept.isUncommitted() == false) {
             if (Bdb.watchList.containsKey(concept.getNid())) {
@@ -359,7 +360,7 @@ public class BdbCommitManager {
                             allUncommitted.setMember(ref.getMemberId());
                         }
                         try {
-                            GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.PC_EVENT.PRE_COMMIT, null, allUncommitted);
+                            GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, null, allUncommitted);
                         } catch (PropertyVetoException ex) {
                             return false;
                         }
@@ -524,6 +525,8 @@ public class BdbCommitManager {
 
                             dataCheckMap.clear();
                         }
+                        GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
+
                     }
                 }
             }
@@ -564,13 +567,9 @@ public class BdbCommitManager {
 
         Svn.rwl.acquireUninterruptibly();
         I_RepresentIdSet allUncommitted = new IdentifierSet();
-        allUncommitted.or(uncommittedCNids);
-        allUncommitted.or(uncommittedCNidsNoChecks);
-        for (I_ExtendByRef ref : uncommittedWfMemberIds) {
-            allUncommitted.setMember(ref.getMemberId());
-        }
+        allUncommitted.setMember(c.getConceptNid());
         try {
-            GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.PC_EVENT.PRE_COMMIT, null, allUncommitted);
+            GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, null, allUncommitted);
         } catch (PropertyVetoException ex) {
             return false;
         }
@@ -727,6 +726,7 @@ public class BdbCommitManager {
             Svn.rwl.release();
         }
 
+        GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
         fireCommit();
 
         if (performCommit) {

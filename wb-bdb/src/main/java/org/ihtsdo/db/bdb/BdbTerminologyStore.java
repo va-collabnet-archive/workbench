@@ -29,7 +29,6 @@ import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
 import org.ihtsdo.db.change.LastChange;
-import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -79,6 +78,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.ihtsdo.tk.api.*;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -587,12 +587,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public void addVetoablePropertyChangeListener(PC_EVENT pce, VetoableChangeListener l) {
+    public void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l) {
         GlobalPropertyChange.addVetoableChangeListener(pce, l);
     } 
 
     @Override
-    public void addPropertyChangeListener(PC_EVENT pce, PropertyChangeListener l) {
+    public void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l) {
         GlobalPropertyChange.addPropertyChangeListener(pce, l);
     }
 

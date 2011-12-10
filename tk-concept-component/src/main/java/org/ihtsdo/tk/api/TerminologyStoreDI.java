@@ -122,10 +122,15 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    int getStatusNidForSapNid(int sapNid);
    long getTimeForSapNid(int sapNid);
    
-   void addVetoablePropertyChangeListener(PC_EVENT pce, VetoableChangeListener l);
-   void addPropertyChangeListener(PC_EVENT pce, PropertyChangeListener l);
+   /**
+    * Only CONCEPT_EVENT.PRE_COMMIT is a vetoable change
+    * @param pce
+    * @param l 
+    */
+   void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l);
+   void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l);
    
-   public enum PC_EVENT {
-    PRE_COMMIT, POST_COMMIT;
+   public enum CONCEPT_EVENT {
+    PRE_COMMIT, POST_COMMIT, ADD_UNCOMMITTED;
    }
 }
