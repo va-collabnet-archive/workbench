@@ -2,6 +2,8 @@ package org.ihtsdo.tk.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeListener;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -119,4 +121,11 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    int getAuthorNidForSapNid(int sapNid);
    int getStatusNidForSapNid(int sapNid);
    long getTimeForSapNid(int sapNid);
+   
+   void addVetoablePropertyChangeListener(PC_EVENT pce, VetoableChangeListener l);
+   void addPropertyChangeListener(PC_EVENT pce, PropertyChangeListener l);
+   
+   public enum PC_EVENT {
+    PRE_COMMIT, POST_COMMIT;
+   }
 }
