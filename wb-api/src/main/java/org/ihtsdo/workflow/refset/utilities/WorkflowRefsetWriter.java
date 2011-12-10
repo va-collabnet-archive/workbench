@@ -21,6 +21,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid_str.RefexCnidStrVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -47,24 +48,26 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
     public I_ExtendByRef addMember() {
         I_ExtendByRef ref = null;
-
         try {
-            ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
-            ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
-            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            ViewCoordinate vc = config.getViewCoordinate();
-            EditCoordinate ec = config.getEditCoordinate();
-            TerminologyConstructorBI builder = Ts.get().getTerminologyConstructor(ec, vc);
-            RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID_STR,
-                    fields.getReferencedComponentNid(),
-                    refsetNid);
-            refexBp.put(RefexCAB.RefexProperty.CNID1, Ts.get().getNidForUuids(fields.getReferencedComponentUid()));
-            RefexCnidStrAnalogBI rv = (RefexCnidStrAnalogBI) builder.construct(refexBp);
-            rv.setStr1(fieldsToRefsetString());
-            if (refset.isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(concept);
-            } else {
-                Ts.get().addUncommitted(refset);
+            if (fields.valuesExist()) {
+                RefsetPropertyMap propMap = new RefsetPropertyMap();
+
+                if (fields.valuesExist()) {
+                    propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
+
+                    ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+
+                    if (ref != null) {
+                        Terms.get().addUncommittedNoChecks(ref);
+                    }
+                }
+                ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
+                ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
+                if (refset.isAnnotationStyleRefex()) {
+                    Ts.get().addUncommitted(concept);
+                } else {
+                    Ts.get().addUncommitted(refset);
+                }
             }
         } catch (Exception io) {
             AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with error: " + io.getMessage());
@@ -87,8 +90,6 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                 if (ref != null) {
                     helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
 
-                    Terms.get().addUncommittedNoChecks(ref);
-                    
                     ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
                     ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
                     if (refset.isAnnotationStyleRefex()) {
