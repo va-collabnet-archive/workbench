@@ -34,6 +34,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
@@ -68,6 +69,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         this.desc = desc;
         t = new Timer(5000, this);
         c = Terms.get().getConcept(desc.getConceptNid());
+        Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.PC_EVENT.PRE_COMMIT, this);
     }
 
     @Override
@@ -146,9 +148,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
                     config.getViewCoordinate());
             if (update) { //create new
-
-                update = false;
-
+                
                 refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
                 int type = desc.getTypeNid();
                 int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
@@ -205,8 +205,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 }
                 I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
                 Terms.get().addUncommitted(concept);
-
             }
+            update = false;
     }
 
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
@@ -356,7 +356,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
         try {
-            doAction();
+                doAction();
         } catch (IOException ex) {
             throw new PropertyVetoException(ex.toString(), pce);
         } catch (TerminologyException ex) {
