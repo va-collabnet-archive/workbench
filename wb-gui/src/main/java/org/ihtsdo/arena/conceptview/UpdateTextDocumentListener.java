@@ -69,7 +69,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         this.desc = desc;
         t = new Timer(5000, this);
         c = Terms.get().getConcept(desc.getConceptNid());
-        Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.PC_EVENT.PRE_COMMIT, this);
+        Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
     }
 
     @Override
