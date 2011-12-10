@@ -1,6 +1,9 @@
 package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeListener;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
@@ -581,6 +584,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         assert memberUUID != null;
 
         return Bdb.hasUuid(memberUUID);
+    }
+
+    @Override
+    public void addVetoablePropertyChangeListener(PC_EVENT pce, VetoableChangeListener l) {
+        GlobalPropertyChange.addVetoableChangeListener(pce, l);
+    } 
+
+    @Override
+    public void addPropertyChangeListener(PC_EVENT pce, PropertyChangeListener l) {
+        GlobalPropertyChange.addPropertyChangeListener(pce, l);
     }
 
     //~--- inner classes -------------------------------------------------------
