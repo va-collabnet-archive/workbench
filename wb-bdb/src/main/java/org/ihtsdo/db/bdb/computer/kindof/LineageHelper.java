@@ -31,6 +31,9 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
 public class LineageHelper implements I_HelpLineage {
 
@@ -38,6 +41,8 @@ public class LineageHelper implements I_HelpLineage {
     protected I_ConfigAceFrame config;
     private long lastAccess = System.currentTimeMillis();
     private boolean clone = false;
+    protected TerminologySnapshotDI ts;
+    protected TerminologyConstructorBI builder;
 
     public LineageHelper(I_ConfigAceFrame config) {
         this(config, null);
@@ -45,6 +50,8 @@ public class LineageHelper implements I_HelpLineage {
 
     public LineageHelper(I_ConfigAceFrame config, I_IntSet isARelTypes) {
         this.config = config;
+        this.ts = Ts.get().getSnapshot(config.getViewCoordinate());
+        this.builder = ts.getBuilder(config.getEditCoordinate());
         if (isARelTypes != null) {
             useConfigClone();
             this.config.getDestRelTypes().clear();

@@ -14,6 +14,7 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -48,7 +49,7 @@ public class VodbMutableToReadOnly extends AbstractMojo {
             new File(berkeleyDir, "mutable").mkdir();
             Terms.createFactory(berkeleyDir, false, 0L, new DatabaseSetupConfig());
             LuceneManager.writeToLucene((Collection<Description>) 
-                    Ts.get().getConcept(ReferenceConcepts.CURRENT.getNid()).getDescs(), LuceneSearchType.DESCRIPTION);
+                    Ts.get().getConcept(SnomedMetadataRfx.getSTATUS_CURRENT_NID()).getDescs(), LuceneSearchType.DESCRIPTION);
             I_ImplementTermFactory termFactoryImpl = (I_ImplementTermFactory) Terms.get();
             termFactoryImpl.close();
 

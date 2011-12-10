@@ -19,7 +19,16 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
     
    PositionBI newPosition(PathBI path, long time) throws IOException;
 
+   /**
+    * 
+    * @param ec
+    * @return
+    * @deprecated use getBuilder
+    */
+   @Deprecated
    TerminologyConstructorBI getAmender(EditCoordinate ec);
+
+   TerminologyConstructorBI getBuilder(EditCoordinate ec);
 
    ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
 

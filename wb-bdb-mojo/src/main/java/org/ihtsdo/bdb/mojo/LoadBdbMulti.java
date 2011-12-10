@@ -285,7 +285,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             ReferenceConcepts.PATH.getNid(),
                             ReferenceConcepts.REFSET_PATHS.getNid());
                     newPathSpec.with(RefexProperty.CNID1, path.getNid());
-                    newPathSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                    newPathSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                     newPathSpec.setMemberContentUuid();
 
                     RefexCAB newOriginSpec =
@@ -294,7 +294,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
                     newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
                     newOriginSpec.with(RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                    newOriginSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                    newOriginSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                     newOriginSpec.setMemberContentUuid();
 
                     int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());

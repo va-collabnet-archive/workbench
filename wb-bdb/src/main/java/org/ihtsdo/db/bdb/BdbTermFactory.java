@@ -173,6 +173,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
    private int                                         authorNid = Integer.MAX_VALUE;
@@ -1519,7 +1520,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       member.setPrimordialUuid(primordialUuid);
       member.primordialSapNid = Integer.MIN_VALUE;
 
-      int  statusNid = ReferenceConcepts.CURRENT.getNid();
+      int  statusNid = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
       long time      = Long.MAX_VALUE;
 
       if (propMap.containsKey(REFSET_PROPERTY.TIME)) {

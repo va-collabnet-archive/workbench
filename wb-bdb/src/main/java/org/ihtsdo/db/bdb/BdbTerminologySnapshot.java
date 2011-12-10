@@ -106,6 +106,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
 
    @Override
+   public TerminologyConstructorBI getBuilder(EditCoordinate ec) {
+      return store.getTerminologyConstructor(ec, vc);
+   }
+
+   @Override
    public ComponentVersionBI getComponentVersion(Collection<UUID> uuids)
            throws IOException, ContraditionException {
       return store.getComponentVersion(vc, uuids);

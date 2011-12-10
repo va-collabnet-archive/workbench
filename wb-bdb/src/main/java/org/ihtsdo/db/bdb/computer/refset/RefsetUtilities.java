@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -51,6 +53,7 @@ import org.dwfa.tapi.spec.ConceptSpec;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.LineageHelper;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ValidationException;
 
 public abstract class RefsetUtilities extends LineageHelper implements
@@ -88,16 +91,24 @@ public abstract class RefsetUtilities extends LineageHelper implements
         for (I_ExtendByRefPart version : versions) {
 
             if (latest == null) {
-                if (version.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
-                    latest = version;
+                try {
+                    if (version.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                        latest = version;
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
             } else {
                 if (latest.getTime() < version.getTime()) {
-                    if (version.getStatusNid() == ReferenceConcepts.RETIRED.getNid()) {
-                        // member has a later retirement so exclude
-                        latest = null;
-                    } else {
-                        latest = version;
+                    try {
+                        if (version.getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID()) {
+                            // member has a later retirement so exclude
+                            latest = null;
+                        } else {
+                            latest = version;
+                        }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
                 }
             }
@@ -349,7 +360,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
         if (extensionPart != null) {
             I_ExtendByRefPart latestVersion = getLatestVersion(extensionPart);
 
-            I_ExtendByRefPart clone = (I_ExtendByRefPart) latestVersion.makeAnalog(ReferenceConcepts.RETIRED.getNid(),
+            I_ExtendByRefPart clone = (I_ExtendByRefPart) latestVersion.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                     latestVersion.getPathNid(), Long.MAX_VALUE);
             extensionPart.addVersion(clone);
 
@@ -406,7 +417,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
                 refsetId);
         if (ext != null) {
             I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
-                    ext).makeAnalog(ReferenceConcepts.CURRENT.getNid(),
+                    ext).makeAnalog(SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                     pathConcept.getConceptNid(), Long.MAX_VALUE);
             I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
             conceptClone.setC1id(getMembershipType(includeTypeConceptId));
@@ -440,7 +451,7 @@ public abstract class RefsetUtilities extends LineageHelper implements
                 memberSetId);
         if (ext != null) {
             I_ExtendByRefPart clone = (I_ExtendByRefPart) getLatestVersion(
-                    ext).makeAnalog(ReferenceConcepts.CURRENT.getNid(),
+                    ext).makeAnalog(SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                     pathConcept.getConceptNid(), Long.MAX_VALUE);
             I_ExtendByRefPartCid conceptClone = (I_ExtendByRefPartCid) clone;
             conceptClone.setC1id(parentMarker);

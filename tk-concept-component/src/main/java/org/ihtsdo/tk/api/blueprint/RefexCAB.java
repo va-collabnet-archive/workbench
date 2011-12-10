@@ -240,6 +240,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     public void setMemberUuid(UUID memberUuid) {
         setComponentUuid(memberUuid);
+        properties.put(RefexProperty.MEMBER_UUID, memberUuid);
     }
 
     public boolean containsKey(RefexProperty key) {
@@ -542,6 +543,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID getMemberUUID() {
+        if (this.getComponentUuid() != null) {
+            return this.getComponentUuid();
+        }
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 

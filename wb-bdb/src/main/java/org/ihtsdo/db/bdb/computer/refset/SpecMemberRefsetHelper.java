@@ -38,6 +38,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.NoMappingException;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * Utility class providing refset membership operations.
@@ -285,7 +286,7 @@ public class SpecMemberRefsetHelper extends SpecRefsetHelper implements I_HelpMe
         HashSet<Integer> memberRefsets = new HashSet<Integer>();
 
         I_IntSet statuses = Terms.get().newIntSet();
-        statuses.add(ReferenceConcepts.CURRENT.getNid());
+        statuses.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
 
         I_IntSet purposeTypes = Terms.get().newIntSet();
         purposeTypes.add(RefsetAuxiliary.Concept.REFSET_PURPOSE.localize().getNid());

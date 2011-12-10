@@ -61,6 +61,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * Path management.
@@ -172,7 +173,7 @@ public class BdbPathManager implements I_Manage<PathBI> {
                                         path.getConceptNid());
 
          propMap.with(RefsetPropertyMap.REFSET_PROPERTY.PATH, ReferenceConcepts.PATH.getNid());
-         propMap.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+         propMap.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
          helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
                           ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
 
