@@ -354,9 +354,11 @@ public class TaxonomyNodeRenderer extends JLabel
     public void setupTaxonomyNode(TaxonomyNode node, ConceptVersionBI cv) throws IOException {
         List<String> htmlPrefixes = new ArrayList<String>();
         List<String> htmlSuffixes = new ArrayList<String>();
-        boolean defined;
+        boolean defined = false;
         try {
-            defined = cv.getConAttrsActive().isDefined();
+            if (cv.getConAttrsActive() != null) {
+                defined = cv.getConAttrsActive().isDefined();
+            }
         } catch (ContraditionException ex) {
             defined = cv.getConAttrs().getVersions(cv.getViewCoordinate()).iterator().next().isDefined();
         }
