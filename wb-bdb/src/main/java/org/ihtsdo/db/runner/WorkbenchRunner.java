@@ -7,23 +7,16 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -81,7 +74,6 @@ import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.objectCache.ObjectCacheClassHandler;
 import org.ihtsdo.taxonomy.model.NodeFactory;
-import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
@@ -831,7 +823,6 @@ public class WorkbenchRunner {
             }
 
             loginDialog = new AceLoginDialog(parentFrame);
-            loginDialog.setConnectToSvn(initializeFromSubversion);
             loginDialog.setLocation((d.width / 2) - (loginDialog.getWidth() / 2),
                     (d.height / 2) - (loginDialog.getHeight() / 2));
             this.latch = latch;
@@ -892,7 +883,6 @@ public class WorkbenchRunner {
                 // shows the AceLoginDialog
                 userProfile = loginDialog.getUserProfile(lastProfileDir);
                 password = new String(loginDialog.getPassword());
-                Svn.setConnectedToSvn(loginDialog.connectToSvn());
                 wbProperties.setProperty("last-profile-dir", FileIO.getRelativePath(userProfile));
 
                 if (newFrame) {

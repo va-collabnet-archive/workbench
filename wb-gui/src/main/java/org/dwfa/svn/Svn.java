@@ -72,7 +72,7 @@ public class Svn implements I_HandleSubversion {
         NATIVE,
         SVN_KIT;
     };
-    private static boolean connectedToSvn = false;
+    private static boolean connectedToSvn = true;
     private static int svnNotConnectedWarningCount = 0;
     public static int maxSvnNotConnectedWarningCount = 1;
     protected static boolean useCachedCredentials = false;

@@ -36,7 +36,6 @@ import javax.swing.SwingConstants;
 
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.svn.Svn;
 
 /**
  * Login Dialog for ace.
@@ -45,7 +44,7 @@ import org.dwfa.svn.Svn;
  * 
  * @author steve crow, ean dungey, keith campbell
  */
-public class AceLoginDialog extends javax.swing.JDialog implements ActionListener {
+public class AceLoginDialog extends javax.swing.JDialog  {
     private static final long serialVersionUID = -4458854470566944865L;
     private File profile;
 
@@ -66,7 +65,6 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         passwordField.setText("");
         passwordField.setColumns(20);
         profileSelectionBox = new javax.swing.JComboBox();
-        svnConnectCheckBox = new javax.swing.JCheckBox();
 
         cancelButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
@@ -77,10 +75,6 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         setModal(true);
 
         profileSelectionBox.setBorder(null);
-
-        svnConnectCheckBox.setSelected(true);
-        svnConnectCheckBox.setText("Connect to subversion");
-        svnConnectCheckBox.addActionListener(this);
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -121,7 +115,6 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
-        content.add(svnConnectCheckBox, gbc);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridy++;
         gbc.gridx = 0;
@@ -236,21 +229,6 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
     public char[] getPassword() {
         return passwordField.getPassword();
     }
-
-    public void setConnectToSvn(boolean connect) {
-        svnConnectCheckBox.setSelected(connect);
-        Svn.setConnectedToSvn(connect);
-    }
-
-    /**
-     * True if the user is connecting to SVN
-     * 
-     * @return boolean
-     */
-    public boolean connectToSvn() {
-        return svnConnectCheckBox.getModel().isSelected();
-    }
-
     /**
      * Get the profile file to use.
      * 
@@ -275,10 +253,5 @@ public class AceLoginDialog extends javax.swing.JDialog implements ActionListene
     private javax.swing.JButton loginButton;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JComboBox profileSelectionBox;
-    private javax.swing.JCheckBox svnConnectCheckBox;
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Svn.setConnectedToSvn(connectToSvn());
-    }
-}
+ }
