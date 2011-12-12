@@ -45,14 +45,13 @@ import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
-import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow.model.actions.StubAction;
 import org.ihtsdo.tk.api.Precedence;
 
 /**
@@ -270,18 +269,18 @@ public class TestWorklistAndWorkflow extends TestCase {
 		roles.add(new WfRole("TPO Reviewer", UUID.randomUUID()));
 		roles.add(new WfRole("TSP Reviewer", UUID.randomUUID()));
 		
-		Map<String,StubAction> actions = new HashMap<String,StubAction>();
-		actions.put("Approve", new StubAction("Approve"));
-		actions.put("Reject revision with stated reason", new StubAction("Reject revision with stated reason"));
-		actions.put("Consult to Super SME", new StubAction("Consult to Super SME"));
-		actions.put("Translate", new StubAction("Translate"));
-		actions.put("Respond SME consultation", new StubAction("Respond SME consultation"));
-		actions.put("Respond Super SME consultation", new StubAction("Respond Super SME consultation"));
-		actions.put("Reject revision", new StubAction("Reject revision"));
-		actions.put("Escalate", new StubAction("Escalate"));
-		actions.put("Reject translation with stated reason", new StubAction("Reject translation with stated reason"));
-		actions.put("Review", new StubAction("Review"));
-		actions.put("Consult to SME", new StubAction("Consult to SME"));
+		Map<String,WfAction> actions = new HashMap<String,WfAction>();
+//		actions.put("Approve", new StubAction("Approve"));
+//		actions.put("Reject revision with stated reason", new StubAction("Reject revision with stated reason"));
+//		actions.put("Consult to Super SME", new StubAction("Consult to Super SME"));
+//		actions.put("Translate", new StubAction("Translate"));
+//		actions.put("Respond SME consultation", new StubAction("Respond SME consultation"));
+//		actions.put("Respond Super SME consultation", new StubAction("Respond Super SME consultation"));
+//		actions.put("Reject revision", new StubAction("Reject revision"));
+//		actions.put("Escalate", new StubAction("Escalate"));
+//		actions.put("Reject translation with stated reason", new StubAction("Reject translation with stated reason"));
+//		actions.put("Review", new StubAction("Review"));
+//		actions.put("Consult to SME", new StubAction("Consult to SME"));
 		
 		wfdf.setName("Workflow Canada 1");
 		wfdf.setRoles(roles);

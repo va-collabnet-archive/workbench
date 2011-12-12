@@ -32,7 +32,6 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.project.workflow.model.actions.StubAction;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -159,24 +158,24 @@ public class TestInterpreter {
 		roles.add(new WfRole("TPO Reviewer", UUID.randomUUID()));
 		roles.add(new WfRole("TSP Reviewer", UUID.randomUUID()));
 		
-		Map<String,StubAction> actions = new HashMap<String,StubAction>();
-		actions.put("Approve", new StubAction("Approve"));
-		actions.put("Reject revision with stated reason", new StubAction("Reject revision with stated reason"));
-		actions.put("Consult to Super SME", new StubAction("Consult to Super SME"));
-		actions.put("Translate", new StubAction("Translate"));
-		actions.put("Respond SME consultation", new StubAction("Respond SME consultation"));
-		actions.put("Respond Super SME consultation", new StubAction("Respond Super SME consultation"));
-		actions.put("Reject revision", new StubAction("Reject revision"));
-		actions.put("Escalate", new StubAction("Escalate"));
-		actions.put("Reject translation with stated reason", new StubAction("Reject translation with stated reason"));
-		actions.put("Review", new StubAction("Review"));
-		actions.put("Consult to SME", new StubAction("Consult to SME"));
+		Map<String,WfAction> actions = new HashMap<String,WfAction>();
+		actions.put("Approve", new WfAction("Approve"));
+		actions.put("Reject revision with stated reason", new WfAction("Reject revision with stated reason"));
+		actions.put("Consult to Super SME", new WfAction("Consult to Super SME"));
+		actions.put("Translate", new WfAction("Translate"));
+		actions.put("Respond SME consultation", new WfAction("Respond SME consultation"));
+		actions.put("Respond Super SME consultation", new WfAction("Respond Super SME consultation"));
+		actions.put("Reject revision", new WfAction("Reject revision"));
+		actions.put("Escalate", new WfAction("Escalate"));
+		actions.put("Reject translation with stated reason", new WfAction("Reject translation with stated reason"));
+		actions.put("Review", new WfAction("Review"));
+		actions.put("Consult to SME", new WfAction("Consult to SME"));
 		
 		wfdf.setName("Workflow Canada 1");
 		wfdf.setRoles(roles);
 		wfdf.setStates(states);
 		wfdf.setActions(actions);
-		wfdf.getXlsFileName().add("/Users/alo/Desktop/test-dtable.xls");
+		wfdf.getXlsFileName().add("rules/test-dtable.xls");
 		
 		return wfdf;
 	}

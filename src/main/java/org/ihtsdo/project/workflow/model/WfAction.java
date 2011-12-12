@@ -1,19 +1,32 @@
 package org.ihtsdo.project.workflow.model;
 
-import java.util.List;
+import java.io.File;
 import java.util.UUID;
 
-public abstract class WfAction {
+public class WfAction {
 
 	private String name;
 	private UUID id;
 	private WfState consequence;
+	private File businessProcess;
+	
+	public WfAction(String name) {
+		super();
+		this.name = name;
+	}
+	
+	public WfAction(String name, UUID id, WfState consequence,
+			File businessProcess) {
+		super();
+		this.name = name;
+		this.id = id;
+		this.consequence = consequence;
+		this.businessProcess = businessProcess;
+	}
 
 	public WfAction() {
 		super();
 	}
-
-	public abstract WfInstance doAction(WfInstance instance) throws Exception;
 
 	public String getName() {
 		return name;
@@ -41,6 +54,14 @@ public abstract class WfAction {
 
 	public String toString() {
 		return name;
+	}
+
+	public File getBusinessProcess() {
+		return businessProcess;
+	}
+
+	public void setBusinessProcess(File businessProcess) {
+		this.businessProcess = businessProcess;
 	}
 
 }
