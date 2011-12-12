@@ -174,6 +174,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.db.bdb.computer.refset.*;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -324,7 +325,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
       if (query == null) {
           MarkedParentComputer mpc = new MarkedParentComputer(refsetConcept, members, frameConfig, activities);
-           return Condition.ITEM_COMPLETE;
+          mpc.addUncommitted();
+          Ts.get().commit();
+          return Condition.ITEM_COMPLETE;
        }
       AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
 
