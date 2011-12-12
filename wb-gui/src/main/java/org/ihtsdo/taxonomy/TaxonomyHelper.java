@@ -656,9 +656,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                for (int i = 0; i < removedNodeIndices.length; i++) {
                   removedNodeIndices[i] = i;
                }
-
                model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
-               model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
 
                break;
 
