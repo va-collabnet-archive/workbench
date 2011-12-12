@@ -4,7 +4,11 @@ public class WorklistPage {
 	private Integer startLine;
 	private Integer pageLenght;
 
-	private WorklistPage(Integer startLine, Integer pageLenght) {
+	public WorklistPage() {
+		super();
+	}
+
+	public WorklistPage(Integer startLine, Integer pageLenght) {
 		super();
 		this.startLine = startLine;
 		this.pageLenght = pageLenght;

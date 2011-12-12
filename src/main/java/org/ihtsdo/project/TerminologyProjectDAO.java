@@ -103,6 +103,8 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -2312,6 +2314,8 @@ public class TerminologyProjectDAO {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
 			addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
+			Terms.get().addUncommitted(workList.getPartition().getConcept());
+			workList.getPartition().getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			WorkListMember workListMember = new WorkListMember(concept.toString(), 
 					concept.getConceptNid(),
 					concept.getUids(), workList.getUids().iterator().next(),  
@@ -2495,6 +2499,9 @@ public class TerminologyProjectDAO {
 			}
 
 		}
+		Terms.get().addUncommittedNoChecks(newPartition.getConcept());
+		newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+		
 
 		for (Partition loopPartition : partitions) {
 			retirePartition(loopPartition, config);
@@ -2557,6 +2564,8 @@ public class TerminologyProjectDAO {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
 						newPartition.getUids().iterator().next(), config);
 			}
+			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
+			newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -2822,8 +2831,6 @@ public class TerminologyProjectDAO {
 									Long.MAX_VALUE);
 							extension.addVersion(part);
 						}
-						termFactory.addUncommittedNoChecks(partitionConcept);
-						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 						//						promote(extension, config);
 						//						termFactory.addUncommittedNoChecks(partitionConcept);
@@ -2840,18 +2847,11 @@ public class TerminologyProjectDAO {
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""),
 						config); 
-				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
-					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-						termFactory.addUncommittedNoChecks(partitionConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(partitionConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-					}
-				}
+//				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
+//					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
+//							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+//					}
+//				}
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
