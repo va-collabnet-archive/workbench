@@ -28,6 +28,7 @@ public class WizardLauncher {
 		stc.setKey("WORKLIST_NAME");
 		panels[0]=stc;
 		WorkflowDefinitionSelection wds = new WorkflowDefinitionSelection();
+		wds.setKey("WDS");
 		panels[1]=wds;
 		DataCollectorFromList uc=new DataCollectorFromList();
 		uc.setLabel("Set Users for Role: " );
