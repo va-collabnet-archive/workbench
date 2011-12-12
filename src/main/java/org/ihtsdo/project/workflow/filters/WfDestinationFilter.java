@@ -3,7 +3,7 @@ package org.ihtsdo.project.workflow.filters;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 
-public class WfDestinationFilter implements WorkflowSearchFilterBI {
+public class WfDestinationFilter implements WfSearchFilterBI {
 
 	private WfUser destination;
 

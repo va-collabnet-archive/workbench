@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfInstance;
 
-public class WfWorklistFilter implements WorkflowSearchFilterBI {
+public class WfWorklistFilter implements WfSearchFilterBI {
 
 	private List<UUID> worklistUUID;
 

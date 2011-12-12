@@ -7,7 +7,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
-public class WfComponentFilter implements WorkflowSearchFilterBI {
+public class WfComponentFilter implements WfSearchFilterBI {
 
 	private String wfInstanceTextFilter;
 

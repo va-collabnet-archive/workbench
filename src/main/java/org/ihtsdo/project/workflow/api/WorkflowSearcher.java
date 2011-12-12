@@ -15,14 +15,14 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.filters.WfWorklistFilter;
-import org.ihtsdo.project.workflow.filters.WorkflowSearchFilterBI;
+import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WorklistPage;
 
 public class WorkflowSearcher {
 
 	private static I_TermFactory tf;
-	private List<WorkflowSearchFilterBI> filters;
+	private List<WfSearchFilterBI> filters;
 	private WorklistPage page;
 	private I_ConfigAceFrame config;
 	private WfComponentProvider provider;
@@ -40,13 +40,13 @@ public class WorkflowSearcher {
 		}
 	}
 
-	public List<WfInstance> searchWfInstances(List<WorkflowSearchFilterBI> filters) throws TerminologyException, IOException {
+	public List<WfInstance> searchWfInstances(List<WfSearchFilterBI> filters) throws TerminologyException, IOException {
 
 		List<WfInstance> candidates = new ArrayList<WfInstance>();
 		List<WfInstance> results = new ArrayList<WfInstance>();
 
 		List<UUID> wlUuid = null;
-		for (WorkflowSearchFilterBI loopFilter : filters) {
+		for (WfSearchFilterBI loopFilter : filters) {
 			if (loopFilter instanceof WfWorklistFilter) {
 				WfWorklistFilter wlFilter = (WfWorklistFilter) loopFilter;
 				wlUuid = wlFilter.getWorklistUUID();
@@ -61,7 +61,7 @@ public class WorkflowSearcher {
 
 		for (WfInstance loopInstance : candidates) {
 			boolean accepted = true;
-			for (WorkflowSearchFilterBI loopFilter : filters) {
+			for (WfSearchFilterBI loopFilter : filters) {
 				if (!loopFilter.filter(loopInstance)) {
 					accepted = false;
 					break;

@@ -3,7 +3,7 @@ package org.ihtsdo.project.workflow.filters;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 
-public class WfStateFilter implements WorkflowSearchFilterBI{
+public class WfStateFilter implements WfSearchFilterBI{
 	private WfState state;
 
 	private WfStateFilter(WfState state) {
