@@ -9,7 +9,7 @@ public class WorkflowDefinition {
 	
 	private List<WfRole> roles;
 	private List<WfState> states;
-	private Map<String,? extends WfAction> actions;
+	private Map<String,WfAction> actions;
 	private List<String> xlsFileName;
 	private List<String> drlFileName;
 	private String name ;
@@ -21,7 +21,7 @@ public class WorkflowDefinition {
 	}
 
 	public WorkflowDefinition(List<WfRole> roles, List<WfState> states,
-			Map<String,? extends WfAction> actions) {
+			Map<String,WfAction> actions) {
 		super();
 		this.roles = roles;
 		this.states = states;
@@ -46,11 +46,11 @@ public class WorkflowDefinition {
 		this.states = states;
 	}
 
-	public Map<String,? extends WfAction> getActions() {
+	public Map<String,WfAction> getActions() {
 		return actions;
 	}
 
-	public void setActions(Map<String,? extends WfAction> actions) {
+	public void setActions(Map<String,WfAction> actions) {
 		this.actions = actions;
 	}
 

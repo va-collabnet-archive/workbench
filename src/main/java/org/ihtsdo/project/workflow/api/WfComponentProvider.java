@@ -3,6 +3,7 @@ package org.ihtsdo.project.workflow.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +24,13 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
 
 public class WfComponentProvider {
@@ -108,6 +111,10 @@ public class WfComponentProvider {
 				result.add(workListMember.getWfInstance());
 			}
 		}
+	}
+	
+	public Collection<WfAction> getActions(WorkflowDefinition wfDef) {
+		return wfDef.getActions().values();
 	}
 
 	public List<WfRole> getRoles() {
