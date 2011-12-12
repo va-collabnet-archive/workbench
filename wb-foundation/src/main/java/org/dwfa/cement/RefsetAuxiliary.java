@@ -346,6 +346,11 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         GB(new String[]{"GB", "GB"}, new I_ConceptualizeUniversally[]{
     REFSET_IDENTITY, ANCILLARY_DATA}, new I_ConceptualizeUniversally[]{
     ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL}),
+        
+        COMMIT_RECORD(new String[]{"Commit Time and Author Record", "Commit Record"},
+            new I_ConceptualizeUniversally[]{REFSET_IDENTITY}),
+        
+        
         GB_NON_UKTC(new String[]{"Non UKTC", "Non UKTC"},
         new I_ConceptualizeUniversally[]{GB, ANCILLARY_DATA},
         new I_ConceptualizeUniversally[]{ArchitectonicAuxiliary.Concept.IS_A_REL, REFSET_PURPOSE_REL}),
