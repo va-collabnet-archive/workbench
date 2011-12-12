@@ -147,5 +147,20 @@ public class WorkflowIntepreter {
 
 		return nextUser;
 	}
+	
+	public List<WfUser> getPossibleDestinations(WfInstance instance, WorkList workList) {
+		List<WfUser> possibleUsers = new ArrayList<WfUser>();
+		List<WfRole> nextRoles = getNextRole(instance, workList);
+
+		for (WfMembership loopWfMember : workList.getWorkflowUserRoles()) {
+			if (nextRoles.contains(loopWfMember.getRole())) {
+				if (getPossibleActions(instance, loopWfMember.getUser()).size() > 0) {
+					possibleUsers.add(loopWfMember.getUser());
+				}
+			}
+		}
+
+		return possibleUsers;
+	}
 
 }

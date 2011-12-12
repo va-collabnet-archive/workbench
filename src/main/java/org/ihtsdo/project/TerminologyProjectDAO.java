@@ -3691,111 +3691,120 @@ public class TerminologyProjectDAO {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
 
-		if (!workSet.getPartitionSchemes(config).isEmpty()) {
-			JOptionPane.showMessageDialog(new JDialog(), "Not empty!, can't sync a workset once it has partition schemes...", 
-					"Warning", JOptionPane.WARNING_MESSAGE);
-			throw new Exception("Not empty!, can't sync a workset once it has partition schemes...");
-		}
-		I_TermFactory termFactory = Terms.get();
-		I_GetConceptData refsetConc = getSourceRefsetForWorkSet(workSet, config);
-		if (refsetConc == null) {
-			throw new Exception("No Refset Spec associated with this WorkSet");
-		}
-
-		List<Integer> excludedConcepts = new ArrayList<Integer>();
-		List<Integer> includedConcepts = new ArrayList<Integer>();
-
-		List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
-
-		for (I_GetConceptData loopRefset : exclusionRefsets) {
-			Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
-				termFactory.getRefsetExtensionMembers(
-						loopRefset.getConceptNid());
-			for (I_ExtendByRef loopRefsetMember : loopRefsetMembers) {
-				I_ExtendByRefPart lastPart = getLastExtensionPart(loopRefsetMember);
-				if (isActive(lastPart.getStatusNid())) {
-					excludedConcepts.add(loopRefsetMember.getComponentNid());
-				}
+		try {
+			if (!workSet.getPartitionSchemes(config).isEmpty()) {
+				JOptionPane.showMessageDialog(new JDialog(), "Not empty!, can't sync a workset once it has partition schemes...", 
+						"Warning", JOptionPane.WARNING_MESSAGE);
+				throw new Exception("Not empty!, can't sync a workset once it has partition schemes...");
 			}
-		}
+			I_TermFactory termFactory = Terms.get();
+			I_GetConceptData refsetConc = getSourceRefsetForWorkSet(workSet, config);
+			if (refsetConc == null) {
+				throw new Exception("No Refset Spec associated with this WorkSet");
+			}
 
-		Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
-				refsetConc.getConceptNid());
-		int countIncluded = 0;
-		int countExcluded = 0;
-		int countRetired = 0;
-		int countNotUnique = 0;
-		for (I_ExtendByRef refsetMember : refsetMembers) {
-			I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
-			if (isActive(lastPart.getStatusNid())) {
-				I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
-				// TODO: Unique in project clause
-				boolean uniqueInProject = true;
-				for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
-					if (loopWorkSet.getId() != workSet.getId() &&
-							loopWorkSet.hasMember(memberConcept)) {
-						uniqueInProject = false;
+			List<Integer> excludedConcepts = new ArrayList<Integer>();
+			List<Integer> includedConcepts = new ArrayList<Integer>();
+
+			List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
+
+			for (I_GetConceptData loopRefset : exclusionRefsets) {
+				Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
+					termFactory.getRefsetExtensionMembers(
+							loopRefset.getConceptNid());
+				for (I_ExtendByRef loopRefsetMember : loopRefsetMembers) {
+					I_ExtendByRefPart lastPart = getLastExtensionPart(loopRefsetMember);
+					if (isActive(lastPart.getStatusNid())) {
+						excludedConcepts.add(loopRefsetMember.getComponentNid());
 					}
 				}
+			}
 
-				if (uniqueInProject) {
-					if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
-						includedConcepts.add(refsetMember.getComponentNid());
-						WorkSetMember newWorkSetMember;
-						newWorkSetMember = new WorkSetMember(memberConcept.getInitialText(),
-								memberConcept.getConceptNid(),
-								memberConcept.getUids(),
-								workSet.getUids().iterator().next());
-						addConceptAsWorkSetMember(newWorkSetMember, config);
-						countIncluded++;
+			Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
+					refsetConc.getConceptNid());
+			int countIncluded = 0;
+			int countExcluded = 0;
+			int countRetired = 0;
+			int countNotUnique = 0;
+			for (I_ExtendByRef refsetMember : refsetMembers) {
+				I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
+				if (isActive(lastPart.getStatusNid())) {
+					I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
+					// TODO: Unique in project clause
+					boolean uniqueInProject = true;
+					for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
+						if (loopWorkSet.getId() != workSet.getId() &&
+								loopWorkSet.hasMember(memberConcept)) {
+							uniqueInProject = false;
+						}
+					}
+
+					if (uniqueInProject) {
+						if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
+							includedConcepts.add(refsetMember.getComponentNid());
+							WorkSetMember newWorkSetMember;
+							newWorkSetMember = new WorkSetMember(memberConcept.getInitialText(),
+									memberConcept.getConceptNid(),
+									memberConcept.getUids(),
+									workSet.getUids().iterator().next());
+							addConceptAsWorkSetMember(newWorkSetMember, config);
+							countIncluded++;
+						} else {
+							countExcluded++;
+						} 
 					} else {
-						countExcluded++;
-					} 
-				} else {
-					countNotUnique++;
+						countNotUnique++;
+					}
 				}
 			}
-		}
 
-		List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
+			List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
 
-		for (WorkSetMember loopMember : workSetMembers) {
-			if (excludedConcepts.contains(loopMember.getId())) {
-				retireWorkSetMember(loopMember);
-				countRetired++;
-			} else if (!includedConcepts.contains(loopMember.getId())) {
-				retireWorkSetMember(loopMember);
-				countRetired++;
+			for (WorkSetMember loopMember : workSetMembers) {
+				if (excludedConcepts.contains(loopMember.getId())) {
+					retireWorkSetMember(loopMember);
+					countRetired++;
+				} else if (!includedConcepts.contains(loopMember.getId())) {
+					retireWorkSetMember(loopMember);
+					countRetired++;
+				}
 			}
+
+			//		for (WorkSetMember loopMember : workSetMembers) {
+			//			boolean isCurrentMemberOfRefset = false;
+			//			if (!excludedConcepts.contains(loopMember.getId())) {
+			//				I_GetConceptData loopConcept = termFactory.getConcept(loopMember.getId());
+			//				Collection<? extends I_ExtendByRef> conceptExtensions = loopConcept.getExtensions();
+			//				for (I_ExtendByRef extension : conceptExtensions) {
+			//					if (refsetConc.getConceptId() == extension.getRefsetId()) {
+			//						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
+			//						if (isActive(lastPart.getStatusNid())) {
+			//							isCurrentMemberOfRefset = true;
+			//						}
+			//					}
+			//				}
+			//			}
+			//			if (!isCurrentMemberOfRefset) {
+			//				retireWorkSetMember(loopMember);
+			//			}
+			//		}
+
+			termFactory.commit();
+
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
+					" , ret = " + countRetired + " , not unique = " + countNotUnique);
+			activity.complete();
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error ");
+			activity.complete();
+			e.printStackTrace();
 		}
-
-		//		for (WorkSetMember loopMember : workSetMembers) {
-		//			boolean isCurrentMemberOfRefset = false;
-		//			if (!excludedConcepts.contains(loopMember.getId())) {
-		//				I_GetConceptData loopConcept = termFactory.getConcept(loopMember.getId());
-		//				Collection<? extends I_ExtendByRef> conceptExtensions = loopConcept.getExtensions();
-		//				for (I_ExtendByRef extension : conceptExtensions) {
-		//					if (refsetConc.getConceptId() == extension.getRefsetId()) {
-		//						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-		//						if (isActive(lastPart.getStatusNid())) {
-		//							isCurrentMemberOfRefset = true;
-		//						}
-		//					}
-		//				}
-		//			}
-		//			if (!isCurrentMemberOfRefset) {
-		//				retireWorkSetMember(loopMember);
-		//			}
-		//		}
-
-		termFactory.commit();
-
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
-				" , ret = " + countRetired + " , not unique = " + countNotUnique);
-		activity.complete();
 
 
 	}

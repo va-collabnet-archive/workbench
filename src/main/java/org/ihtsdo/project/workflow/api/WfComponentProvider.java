@@ -5,18 +5,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
@@ -110,23 +111,86 @@ public class WfComponentProvider {
 	}
 
 	public List<WfRole> getRoles() {
-		List<WfRole> wfRole = new ArrayList<WfRole>();
+		List<WfRole> returnRoles = new ArrayList<WfRole>();
+		
+		try {
+			Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
+			allRoles = ProjectPermissionsAPI.getDescendants(allRoles, 
+					Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
 
-		return wfRole;
+			for (I_GetConceptData role : allRoles) {
+				returnRoles.add(roleConceptToWfRole(role));
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return returnRoles;
+
 	}
 
 	public List<WfPermission> getPermissions() {
-		List<WfPermission> wfPermission = new ArrayList<WfPermission>();
+		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
 
-		return wfPermission;
+		I_ConfigAceFrame config;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
+			for (WfUser loopUser : getUsers()) {
+				Map<I_GetConceptData, I_GetConceptData> permissions = 
+					permissionsApi.getPermissionsForUser(Terms.get().getConcept(loopUser.getId()));
+				
+				for (I_GetConceptData loopRole : permissions.keySet()) {
+					I_GetConceptData loopHierarchy = permissions.get(loopRole);
+					WfPermission loopPerm = new WfPermission();
+					loopPerm.setId(UUID.randomUUID());
+					loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
+					loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
+					wfPermissions.add(loopPerm);
+				}
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		return wfPermissions;
 	}
 
 	public List<WfState> getStates() {
-		List<WfState> wfState = new ArrayList<WfState>();
+		List<WfState> returnStates = new ArrayList<WfState>();
+		
+		try {
+			Set<I_GetConceptData> allStates = new HashSet<I_GetConceptData>();
+			allStates = ProjectPermissionsAPI.getDescendants(allStates, 
+					Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids()));
 
-		return wfState;
+			for (I_GetConceptData state : allStates) {
+				returnStates.add(statusConceptToWfState(state));
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return returnStates;
 	}
 
+	public WfRole roleConceptToWfRole(I_GetConceptData role) {
+		WfRole wfrole = null;
+		try {
+			wfrole = new WfRole(role.getInitialText(), role.getPrimUuid());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return wfrole;
+	}
+	
 	public WfState statusConceptToWfState(I_GetConceptData status) {
 		WfState state = null;
 		try {

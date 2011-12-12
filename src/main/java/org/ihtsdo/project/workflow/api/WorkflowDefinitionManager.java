@@ -31,10 +31,8 @@ public class WorkflowDefinitionManager {
 			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
 			xStream.toXML(wfDefinition,rosw);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
