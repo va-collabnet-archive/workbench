@@ -598,18 +598,15 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
                   model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getCnid()),
                                                   oldNode.getParentNid(),
                                                   model.getNodeStore().get(oldNode.parentNodeId));
-               boolean childrenChanged = false;
+               
 
-               if (oldNode.childrenAreSet()) {
-                  CountDownLatch latch = model.getNodeFactory().makeChildNodes(newNode);
-
-                  latch.await();
-               }
-
+               CountDownLatch latch = model.getNodeFactory().makeChildNodes(newNode);
+               latch.await();
+               boolean childrenChanged = !newNode.getChildren().equals(oldNode.getChildren());
                boolean contentChanged = !newNode.getText().equals(oldNode.getText());
                boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
                                         ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
-
+                
                if (parentsChanged) {
 
                   //
