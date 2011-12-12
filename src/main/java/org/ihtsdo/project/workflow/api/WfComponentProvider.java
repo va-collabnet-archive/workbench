@@ -71,7 +71,7 @@ public class WfComponentProvider {
 	private List<WorkList> getWorklistForUUID(List<UUID> wlUuid) throws TerminologyException, IOException {
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-		List<WorkList> worklist = null;
+		List<WorkList> worklist = new ArrayList<WorkList>();
 		for (I_TerminologyProject i_TerminologyProject : projects) {
 			List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
 			for (WorkSet workSet : worksets) {

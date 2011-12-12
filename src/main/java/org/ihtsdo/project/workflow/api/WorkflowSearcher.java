@@ -1,39 +1,64 @@
 package org.ihtsdo.project.workflow.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.lucene.index.Term;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.workflow.filters.WfWorklistFilter;
+import org.ihtsdo.project.workflow.filters.WorkflowSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WorklistPage;
 
 public class WorkflowSearcher {
 
+	private static I_TermFactory tf;
+	private List<WorkflowSearchFilterBI> filters;
+	private WorklistPage page;
+	private I_ConfigAceFrame config;
+	private WfComponentProvider provider;
+
 	public WorkflowSearcher() {
 		super();
+		try {
+			provider = new WfComponentProvider();
+			tf = Terms.get();
+			config = tf.getActiveAceFrameConfig();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	public List<WfInstance> searchWfInstances(List<WorkflowSearchFilterBI> filters) {
+	public List<WfInstance> searchWfInstances(List<WorkflowSearchFilterBI> filters) throws TerminologyException, IOException {
 
 		List<WfInstance> candidates = new ArrayList<WfInstance>();
 		List<WfInstance> results = new ArrayList<WfInstance>();
 
-		boolean thereIsAUserFilter = false;
-
+		List<UUID> wlUuid = null;
 		for (WorkflowSearchFilterBI loopFilter : filters) {
-			if (loopFilter instanceof DestinationFilter) {
-				thereIsAUserFilter = true;
+			if (loopFilter instanceof WfWorklistFilter) {
+				WfWorklistFilter wlFilter = (WfWorklistFilter) loopFilter;
+				wlUuid = wlFilter.getWorklistUUID();
 			}
 		}
 
-		if (thereIsAUserFilter) {
-			//TODO: filter bu user, worklist tiene una propiedad que son los WorkflowMemebrs, 
-			//esos tienen un user y eso permite saltear el worklist sin pasar por todos
-			//los miembros el worklist
+		if (wlUuid != null) {
+			candidates = provider.getAllWrokflowInstancesForWorklist(wlUuid);
+		} else {
+			candidates = provider.getAllWrokflowInstances();
 		}
 
-		// Hay que armar candidates con todos los candidatos, recorriendo lo menos posible
-		// usando el metodo worklistmember.getInstance();
-
-		//Filtrar
 		for (WfInstance loopInstance : candidates) {
 			boolean accepted = true;
 			for (WorkflowSearchFilterBI loopFilter : filters) {
@@ -46,10 +71,7 @@ public class WorkflowSearcher {
 				results.add(loopInstance);
 			}
 		}
-
 		return results;
-
 	}
-
 
 }

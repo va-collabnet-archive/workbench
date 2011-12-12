@@ -55,5 +55,15 @@ public class WfUser {
 	public String toString() {
 		return username;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof WfUser){
+			WfUser user = (WfUser) obj;
+			return user.getId().equals(id);
+		}else{
+			return false;
+		}
+	}
 
 }
