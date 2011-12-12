@@ -128,7 +128,7 @@ public class WorkflowHelper {
 			I_GetConceptData parentEditorConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			
 			for (I_GetConceptData con : getChildren(parentEditorConcept)) {
-				if (Terms.get().getActiveAceFrameConfig().getUsername().endsWith(WorkflowHelper.getPrefTerm(con))) {
+				if (Terms.get().getActiveAceFrameConfig().getUsername().equalsIgnoreCase(WorkflowHelper.getPrefTerm(con))) {
 					prefTerm = WorkflowHelper.getPrefTerm(con);
 					break;
 				}
