@@ -3,7 +3,6 @@ package org.ihtsdo.project.workflow.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,17 +19,10 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.model.WorkSet;
-import org.ihtsdo.project.workflow.model.WfAction;
-import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
 
 public class WfComponentProvider {
@@ -64,57 +56,34 @@ public class WfComponentProvider {
 
 		return wfUsers;
 	}
+	
+	public WfUser getUserByUUID(UUID id){
+		WfUser wfUser = null;
+		try {
+			I_GetConceptData roleParent =
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
 
-	public List<WfInstance> getAllWrokflowInstancesForWorklist(List<UUID> wlUuid) throws TerminologyException, IOException {
-		List<WorkList> worklist = getWorklistForUUID(wlUuid);
-		List<WfInstance> result = new ArrayList<WfInstance>();
-		convertWlMembers(worklist, result);
-		return result;
-	}
+			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-	private List<WorkList> getWorklistForUUID(List<UUID> wlUuid) throws TerminologyException, IOException {
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-		List<WorkList> worklist = new ArrayList<WorkList>();
-		for (I_TerminologyProject i_TerminologyProject : projects) {
-			List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
-			for (WorkSet workSet : worksets) {
-				List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
-				for (WorkList loopWorkList : worklists) {
-					if (loopWorkList.getUids().contains(wlUuid)) {
-						worklist.add(loopWorkList);
-					}
+			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
+					allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME,
+					Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+
+			for (I_GetConceptData user : allUsers) {
+				I_ConceptAttributeVersioned attr = user.getConceptAttributes();
+				if (TerminologyProjectDAO.isActive(attr.getStatusNid()) && user.getUids().contains(id)){
+					wfUser = new WfUser();
+					wfUser = new WfUser(attr.toUserString(),user.getUids().iterator().next(),null);
+					break;
 				}
 			}
-		}
-		return worklist;
-	}
 
-	public List<WfInstance> getAllWrokflowInstances() throws TerminologyException, IOException {
-		List<WfInstance> result = new ArrayList<WfInstance>();
-		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
-		for (I_TerminologyProject i_TerminologyProject : projects) {
-			List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
-			for (WorkSet workSet : worksets) {
-				List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
-				convertWlMembers(worklists, result);
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return result;
-	}
-
-	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
-		for (WorkList wl : worklist) {
-			List<WorkListMember> wlMembers = wl.getWorkListMembers();
-			for (WorkListMember workListMember : wlMembers) {
-				result.add(workListMember.getWfInstance());
-			}
-		}
-	}
-	
-	public Collection<WfAction> getActions(WorkflowDefinition wfDef) {
-		return wfDef.getActions().values();
+		return wfUser;
 	}
 
 	public List<WfRole> getRoles() {
