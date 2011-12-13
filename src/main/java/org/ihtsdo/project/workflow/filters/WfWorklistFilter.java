@@ -9,7 +9,7 @@ public class WfWorklistFilter implements WfSearchFilterBI {
 
 	private List<UUID> worklistUUID;
 
-	private WfWorklistFilter(List<UUID> worklistUUID) {
+	public WfWorklistFilter(List<UUID> worklistUUID) {
 		super();
 		this.worklistUUID = worklistUUID;
 	}

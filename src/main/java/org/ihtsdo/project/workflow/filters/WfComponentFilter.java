@@ -11,7 +11,7 @@ public class WfComponentFilter implements WfSearchFilterBI {
 
 	private String wfInstanceTextFilter;
 
-	private WfComponentFilter(String wfInstanceTextFilter) {
+	public WfComponentFilter(String wfInstanceTextFilter) {
 		super();
 		this.wfInstanceTextFilter = wfInstanceTextFilter;
 	}
