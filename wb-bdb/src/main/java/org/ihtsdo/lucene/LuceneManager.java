@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.search.DefaultSimilarity;
@@ -193,6 +194,10 @@ public abstract class LuceneManager {
 		}
 		public float tf(int freq) {
 			return 1.0f;
+		}
+		
+		public float computeNorm(String field, FieldInvertState state) {
+			return (float)(1.0/(state.getLength() *5));
 		}
 
 	} 
