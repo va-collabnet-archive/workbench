@@ -963,7 +963,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public static boolean addRefsetMetadata(boolean markedParentOnly, I_GetConceptData memberRefset) {
         try {
             if (memberRefset == null) {
-                return true;
+                return false;
             }
             I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
             String name = Ts.get().getConceptVersion(aceConfig.getViewCoordinate(),
@@ -1038,6 +1038,19 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 newDescription(computeTimeRefset, ptConcept, computeTimeName, aceConfig, status);
                 newDescription(commentsRefset, fsnConcept, commentsName, aceConfig, status);
                 newDescription(commentsRefset, ptConcept, commentsName, aceConfig, status);
+                I_GetConceptData refsetSpec = null;
+                if (!markedParentOnly) {
+                    refsetSpec = newConcept(aceConfig, status);
+                    newDescription(refsetSpec, fsnConcept, refsetSpecName, aceConfig, status);
+                    newDescription(refsetSpec, ptConcept, refsetSpecName, aceConfig, status);
+                    newRelationship(refsetSpec, specifiesRefsetRel, memberRefset, aceConfig);
+                    newRelationship(refsetSpec, isA, supportingRefset, aceConfig);
+                    newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
+                    // supporting refsets purpose relationships
+                    newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
+                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
+                    spec.modifyOverallSpecStatus(status);
+                }
                 newRelationship(markedParent, isA, supportingRefset, aceConfig);
                 newRelationship(commentsRefset, purposeRel, stringAnnotation, aceConfig);
                 newRelationship(editTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
@@ -1052,28 +1065,17 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 Terms.get().addUncommittedNoChecks(commentsRefset);
                 Terms.get().addUncommittedNoChecks(editTimeRefset);
                 Terms.get().addUncommittedNoChecks(computeTimeRefset);
+                Terms.get().addUncommittedNoChecks(memberRefset);
                 Ts.get().commit(markedParent);
                 Ts.get().commit(commentsRefset);
                 Ts.get().commit(editTimeRefset);
                 Ts.get().commit(computeTimeRefset);
+                Ts.get().commit(memberRefset);
                 if (!markedParentOnly) {
-                    I_GetConceptData refsetSpec = newConcept(aceConfig, status);
-                    I_GetConceptData promotionRefset = newConcept(aceConfig, status);
-                    newDescription(refsetSpec, fsnConcept, refsetSpecName, aceConfig, status);
-                    newDescription(refsetSpec, ptConcept, refsetSpecName, aceConfig, status);
-                    newRelationship(refsetSpec, specifiesRefsetRel, memberRefset, aceConfig);
-                    newRelationship(refsetSpec, isA, supportingRefset, aceConfig);
-                    newRelationship(promotionRefset, isA, supportingRefset, aceConfig);
-                    newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
-                    // supporting refsets purpose relationships
-                    newRelationship(promotionRefset, purposeRel, enumeratedAnnotation, aceConfig);
-                    newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
-                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
-                    spec.modifyOverallSpecStatus(status);
                     Terms.get().addUncommittedNoChecks(refsetSpec);
                     Ts.get().commit(refsetSpec);
-                    Terms.get().addUncommittedNoChecks(promotionRefset);
-                    Ts.get().commit(promotionRefset);
+                    Terms.get().addUncommittedNoChecks(memberRefset);
+                    Ts.get().commit(memberRefset);
                 }
                 // create FSN and PT for each
 
@@ -1082,7 +1084,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "Refset wizard cannot be completed. " + ex.getMessage(), "",
                         JOptionPane.ERROR_MESSAGE);
-                return true;
+                return false;
             }
             I_IntSet availableIsATypes = aceConfig.getDestRelTypes();
             for (int isAType : availableIsATypes.getSetValues()) {
@@ -1094,7 +1096,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         } catch (Exception exception) {
             AceLog.getAppLog().alertAndLogException(exception);
         }
-        return false;
+        return true;
     }
 
     public static I_GetConceptData newConcept(I_ConfigAceFrame aceConfig, I_GetConceptData status)
@@ -1133,16 +1135,20 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     continue;
                 }
 
-                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
-                if (potential_fsn != null && potential_fsn.getMutableParts() != null) {
-                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                        if (actives.contains(part_search.getStatusNid())
-                                && (part_search.getTypeNid()
-                                == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) && part_search.getText().equals(description)) {
-                            throw new TerminologyException("Concept already exists in database with FSN: "
-                                    + description);
+                try {
+                    I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                    if (potential_fsn != null && potential_fsn.getMutableParts() != null) {
+                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                            if (actives.contains(part_search.getStatusNid())
+                                    && (part_search.getTypeNid()
+                                    == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) && part_search.getText().equals(description)) {
+                                throw new TerminologyException("Concept already exists in database with FSN: "
+                                        + description);
+                            }
                         }
                     }
+                } catch (IOException ioe) {
+                    AceLog.getAppLog().warning("unique fsn check. Doc: \n" + doc + "\nex:\n" + ioe.toString());
                 }
             }
         }

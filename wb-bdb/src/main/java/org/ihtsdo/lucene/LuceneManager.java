@@ -194,9 +194,6 @@ public abstract class LuceneManager {
 		public float tf(int freq) {
 			return 1.0f;
 		}
-		public float lengthNorm(String fieldName, int numTerms) {
-			return (float)(1.0/(numTerms*5));
-		}
 
 	} 
 
