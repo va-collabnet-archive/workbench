@@ -62,6 +62,7 @@ public class TestInterpreter {
 				WfInstance loopInstance = new WfInstance(UUID.randomUUID(), 
 						wfDef, loopState, null, null);
 				List<WfAction> resultActions = wfInt.getPossibleActions(loopInstance, loopMember.getUser());
+				WfAction prepAction = wfInt.getPreparationAction(loopMember.getUser());
 				List<WfRole> nextRoles = wfInt.getNextRole(loopInstance, workList);
 				WfUser nextUser = wfInt.getNextDestination(loopInstance, workList);
 				
@@ -79,6 +80,11 @@ public class TestInterpreter {
 				System.out.print("- Next User: ");
 				if (nextUser != null) {
 					System.out.println(nextUser.getUsername() + " - " + nextUser.getPermissions().iterator().next().getRoleName());
+				}
+				System.out.println("");
+				System.out.print("- Prep action: ");
+				if (prepAction != null) {
+					System.out.println(prepAction.getName());
 				}
 				System.out.println("");
 				System.out.println("");
@@ -140,23 +146,24 @@ public class TestInterpreter {
 		WorkflowDefinition wfdf=new WorkflowDefinition();
 		
 		List<WfState> states = new ArrayList<WfState>();
-		states.add(new WfState("Assigned", UUID.randomUUID()));
-		states.add(new WfState("Responded by SME", UUID.randomUUID()));
-		states.add(new WfState("Responded by Super SME", UUID.randomUUID()));
-		states.add(new WfState("Consulted to SME", UUID.randomUUID()));
-		states.add(new WfState("Consulted to Super SME", UUID.randomUUID()));
-		states.add(new WfState("Reviewed", UUID.randomUUID()));
-		states.add(new WfState("Revision rejected", UUID.randomUUID()));
-		states.add(new WfState("Translated", UUID.randomUUID()));
-		states.add(new WfState("Translation rejected", UUID.randomUUID()));
+		states.add(new WfState("worklist item assigned", UUID.randomUUID()));
+		states.add(new WfState("SME feedback complete status", UUID.randomUUID()));
+		states.add(new WfState("Super SME feedback complete status", UUID.randomUUID()));
+		states.add(new WfState("referred to SME status", UUID.randomUUID()));
+		states.add(new WfState("referred to Super SME status", UUID.randomUUID()));
+		states.add(new WfState("reviewed by TSP reviewer status", UUID.randomUUID()));
+		states.add(new WfState("rejected by TPO reviewer status", UUID.randomUUID()));
+		states.add(new WfState("translated status", UUID.randomUUID()));
+		states.add(new WfState("rejected by TSP reviewer status", UUID.randomUUID()));
+		states.add(new WfState("escalated to editorial board status", UUID.randomUUID()));
 		
 		List<WfRole> roles = new ArrayList<WfRole>();
-		roles.add(new WfRole("Editorial Board", UUID.randomUUID()));
-		roles.add(new WfRole("TSP Translator", UUID.randomUUID()));
-		roles.add(new WfRole("SME", UUID.randomUUID()));
-		roles.add(new WfRole("Super SME", UUID.randomUUID()));
-		roles.add(new WfRole("TPO Reviewer", UUID.randomUUID()));
-		roles.add(new WfRole("TSP Reviewer", UUID.randomUUID()));
+		roles.add(new WfRole("translation editorial board role", UUID.randomUUID()));
+		roles.add(new WfRole("tsp translator one role", UUID.randomUUID()));
+		roles.add(new WfRole("translation sme role", UUID.randomUUID()));
+		roles.add(new WfRole("translation super sme role", UUID.randomUUID()));
+		roles.add(new WfRole("tpo reviewer role", UUID.randomUUID()));
+		roles.add(new WfRole("tsp reviewer role", UUID.randomUUID()));
 		
 		Map<String,WfAction> actions = new HashMap<String,WfAction>();
 		actions.put("Approve", new WfAction("Approve"));
@@ -170,12 +177,15 @@ public class TestInterpreter {
 		actions.put("Reject translation with stated reason", new WfAction("Reject translation with stated reason"));
 		actions.put("Review", new WfAction("Review"));
 		actions.put("Consult to SME", new WfAction("Consult to SME"));
+		actions.put("Open Edit Translation Panel", new WfAction("Open Edit Translation Panel"));
+		actions.put("Open Read Only Translation Panel", new WfAction("Open Read Only Translation Panel"));
 		
 		wfdf.setName("Workflow Canada 1");
 		wfdf.setRoles(roles);
 		wfdf.setStates(states);
 		wfdf.setActions(actions);
-		wfdf.getXlsFileName().add("rules/test-dtable.xls");
+		//wfdf.getXlsFileName().add("rules/test-dtable.xls");
+		wfdf.getXlsFileName().add("/Users/alo/Desktop/test-dtable.xls");
 		
 		return wfdf;
 	}

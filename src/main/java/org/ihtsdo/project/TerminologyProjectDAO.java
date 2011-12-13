@@ -96,7 +96,9 @@ import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.time.TimeUtil;
@@ -3967,11 +3969,19 @@ public class TerminologyProjectDAO {
 				WorkflowIntepreter interpreter = new WorkflowIntepreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
+					WfInstance instance = new WfInstance();
+					WfComponentProvider prov = new WfComponentProvider();
+					instance.setComponentId(workListMember.getUids().iterator().next());
+					instance.setState(prov.statusConceptToWfState(
+							Terms.get().getConcept(
+									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+					instance.setWfDefinition(workflowDefinition);
+					instance.setWorkListId(workList.getUids().iterator().next());
+					instance.setDestination(interpreter.getNextDestination(instance, workList));
+					
 					addConceptAsWorkListMember(workListMember, 
-							Terms.get().uuidToNative(interpreter.getNextDestination(
-									workListMember.getWfInstance(), 
-									workList).getId()),
-									config);
+							Terms.get().uuidToNative(instance.getDestination().getId()),
+							config);
 				}
 			}
 		}

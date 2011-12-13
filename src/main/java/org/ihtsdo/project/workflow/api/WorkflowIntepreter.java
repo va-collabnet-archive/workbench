@@ -39,6 +39,7 @@ public class WorkflowIntepreter {
 	private KnowledgeBase kbase;
 	private StatelessKnowledgeSession ksession;
 	private List<String> actions;
+	private List<String> prepActions;
 
 	public WorkflowIntepreter(WorkflowDefinition wfDefinition) {
 		super();
@@ -76,7 +77,7 @@ public class WorkflowIntepreter {
 	public WorkflowDefinition getWfDefinition() {
 		return wfDefinition;
 	}
-
+	
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
 		
@@ -84,6 +85,8 @@ public class WorkflowIntepreter {
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
+		prepActions = new ArrayList<String>();
+		ksession.setGlobal("prepActions", prepActions);
 		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
 
 		ArrayList<Object> facts = new ArrayList<Object>();
@@ -103,6 +106,43 @@ public class WorkflowIntepreter {
 		return possibleActions;
 	}
 
+	public WfAction getPreparationAction(WfUser user) {
+		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
+		
+		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+
+		actions = new ArrayList<String>();
+		ksession.setGlobal("actions", actions);
+		prepActions = new ArrayList<String>();
+		ksession.setGlobal("prepActions", prepActions);
+		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
+
+		ArrayList<Object> facts = new ArrayList<Object>();
+		facts.add(user);
+		facts.addAll(user.getPermissions());
+		ksession.execute(facts);
+
+		for (String returnedActionName : prepActions) {
+			for (String loopActionName : wfDefinition.getActions().keySet()) {
+				if (loopActionName.equals(returnedActionName)) {
+					candidatePrepActions.add(wfDefinition.getActions().get(loopActionName));
+				}
+			}
+		}
+		
+		if (candidatePrepActions.isEmpty()) {
+			return null;
+		} else if (candidatePrepActions.size() ==  1) {
+			return candidatePrepActions.iterator().next();
+		} else if (candidatePrepActions.size() > 1) {
+			// raise exception?
+			return candidatePrepActions.iterator().next();
+		} else {
+			return null;
+		}
+
+	}
+
 	public List<WfRole> getNextRole(WfInstance instance, WorkList workList) {
 		List<WfRole> roles = new ArrayList<WfRole>();
 
@@ -114,6 +154,8 @@ public class WorkflowIntepreter {
 
 			actions = new ArrayList<String>();
 			ksession.setGlobal("actions", actions);
+			prepActions = new ArrayList<String>();
+			ksession.setGlobal("prepActions", prepActions);
 
 			ArrayList<Object> facts = new ArrayList<Object>();
 			facts.add(instance);
