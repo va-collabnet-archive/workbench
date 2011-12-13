@@ -267,8 +267,11 @@ public class PartitionDetailsPanel extends JPanel {
 		try {
 			TerminologyProjectDAO.generateWorkListFromPartition(this.partition, workflowDefinition, workflowUserRoles, name, config);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			JOptionPane.showMessageDialog(this,
+					e1.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 		SwingUtilities.invokeLater(new Runnable() {

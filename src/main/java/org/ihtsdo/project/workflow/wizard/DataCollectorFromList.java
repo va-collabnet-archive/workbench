@@ -245,6 +245,7 @@ public class DataCollectorFromList extends JPanel implements I_fastWizard{
 
 			//---- tblObjs ----
 			tblObjs.setColumnSelectionAllowed(true);
+			tblObjs.setAutoCreateRowSorter(true);
 			scrollPane1.setViewportView(tblObjs);
 		}
 		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,

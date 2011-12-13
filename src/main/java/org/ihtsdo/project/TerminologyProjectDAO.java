@@ -51,6 +51,7 @@ import net.jini.lookup.entry.Name;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
+import org.drools.command.runtime.rule.GetObjectCommand;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -100,6 +101,7 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
@@ -108,6 +110,9 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
  * The Class TerminologyProjectDAO.
@@ -2251,7 +2256,8 @@ public class TerminologyProjectDAO {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 						String metadata = part.getStringValue();
-						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
+//						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
+						deserializedWorkListWithMetadata = (WorkList) getObjectFromJSon (metadata);
 					}
 				}
 				if (deserializedWorkListWithMetadata != null) {
@@ -2425,8 +2431,11 @@ public class TerminologyProjectDAO {
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
 				workListWithMetadata.getPartitionUUID());
-
-		String metadata = serialize(workList);
+		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
+		workList.setWorkflowDefinitionFileName(workListWithMetadata.getWorkflowDefinitionFileName());
+		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
+//		String metadata = serialize(workList);
+		String metadata =getJSonForm(workList);
 
 		termFactory.addUncommittedNoChecks(newConcept);
 		termFactory.addUncommittedNoChecks(newCommentsConcept);
@@ -2467,6 +2476,22 @@ public class TerminologyProjectDAO {
 		return createNewPartition(newPartition, config);
 	}
 
+	public static String getJSonForm (Object obj){
+
+		XStream xstream = new XStream(new JettisonMappedXmlDriver());
+		String str=xstream.toXML(obj);
+		return str;
+//		//xstream.setMode(XStream.NO_REFERENCES);
+//		//xstream.alias("action", WfAction.class);
+//		System.out.println("JSON Len: " + xstream.toXML(role2).length());
+//		System.out.println(xstream.toXML(role2));
+	}
+	
+	public static Object getObjectFromJSon(String jSon){
+		XStream xstream = new XStream(new JettisonMappedXmlDriver());
+		Object obj=xstream.fromXML(jSon);
+		return obj;
+	}
 	public static Partition combinePartitions(List<Partition> partitions, 
 			String name, I_ConfigAceFrame config) throws Exception {
 
@@ -3344,8 +3369,8 @@ public class TerminologyProjectDAO {
 
 			I_GetConceptData componentConcept = termFactory.getConcept(component.getUids());
 
-			String metadata = serialize(objectWithMetadata);
-
+//			String metadata = serialize(objectWithMetadata);
+			String metadata =getJSonForm(objectWithMetadata);
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					componentConcept.getConceptNid());
 			for (I_ExtendByRef extension : extensions) {
@@ -3964,6 +3989,7 @@ public class TerminologyProjectDAO {
 			throw new Exception("No concepts found for the worklist!");
 		} else {
 			workList.setWorkflowDefinition(workflowDefinition);
+			workList.setWorkflowUserRoles(workflowUserRoles);
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
 				WorkflowIntepreter interpreter = new WorkflowIntepreter(workflowDefinition);
@@ -3977,7 +4003,11 @@ public class TerminologyProjectDAO {
 									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 					instance.setWfDefinition(workflowDefinition);
 					instance.setWorkListId(workList.getUids().iterator().next());
-					instance.setDestination(interpreter.getNextDestination(instance, workList));
+					WfUser user=interpreter.getNextDestination(instance, workList);
+					if (user ==null){
+						throw new Exception("Cannot set next destination for component:\n" + workListMember.getConcept().toUserString());
+					}
+					instance.setDestination(user);
 					
 					addConceptAsWorkListMember(workListMember, 
 							Terms.get().uuidToNative(instance.getDestination().getId()),
