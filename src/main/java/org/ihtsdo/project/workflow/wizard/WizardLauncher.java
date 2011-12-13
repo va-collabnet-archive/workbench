@@ -1,5 +1,6 @@
 package org.ihtsdo.project.workflow.wizard;
 
+import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,10 +37,11 @@ public class WizardLauncher {
 
 		panels[2]=uc;
 		WizardFrame ww=new WizardFrame(panels, resultWizard,notifier);
+		ww.setModalityType(ModalityType.APPLICATION_MODAL);
 		ww.setSize(500,300);
 		ww.setPanel(0);
-
 		ww.setVisible(true);
+		
 
 	}
 

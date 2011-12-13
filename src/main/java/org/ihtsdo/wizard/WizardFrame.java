@@ -10,9 +10,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,7 +24,7 @@ import javax.swing.border.SoftBevelBorder;
 /**
  * @author Guillermo Reynoso
  */
-public class WizardFrame extends JFrame {
+public class WizardFrame extends JDialog {
 	private I_fastWizard[] panels;
 	private int index;
 	private I_fastWizard actualPanel;
@@ -36,9 +39,17 @@ public class WizardFrame extends JFrame {
 		this.result=result;
 		isNotifiying=false;
 		this.mapCollector=new HashMap<String,Object>();
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 
-
+		this.addWindowListener(new WindowAdapter(){
+			  public void windowClosing(WindowEvent we){
+					setVisible(false);
+					removeAll();
+					dispose();
+					System.gc();
+				  
+			  }
+			});
 	}
 	public void addPanels(I_fastWizard[] addPanels){
 		int newLen=panels.length + addPanels.length; 
@@ -194,12 +205,22 @@ public class WizardFrame extends JFrame {
 			notifyLauncher();
 			isNotifiying=false;
 		}
+		((JPanel)panels[index]).revalidate();
+		((JPanel)panels[index]).validate();
 		actualPanel=panels[index];
 		panel1.add((JPanel)actualPanel, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
+		((JPanel)actualPanel).repaint();
 		panel1.revalidate();
+		((JPanel)actualPanel).revalidate();
+		((JPanel)actualPanel).validate();
+
+		panel1.repaint();
+		this.setSize(this.getWidth()-1, this.getHeight()-1);
 		this.validate();
+		this.setSize(this.getWidth()+1, this.getHeight()+1);
+	
 	}
 
 	private void notifyLauncher() {

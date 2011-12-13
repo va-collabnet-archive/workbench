@@ -3961,11 +3961,12 @@ public class TerminologyProjectDAO {
 		if (workListMembers.size() == 0) {
 			throw new Exception("No concepts found for the worklist!");
 		} else {
+			workList.setWorkflowDefinition(workflowDefinition);
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
+				WorkflowIntepreter interpreter = new WorkflowIntepreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
-					WorkflowIntepreter interpreter = new WorkflowIntepreter(workList.getWorkflowDefinition());
 					addConceptAsWorkListMember(workListMember, 
 							Terms.get().uuidToNative(interpreter.getNextDestination(
 									workListMember.getWfInstance(), 

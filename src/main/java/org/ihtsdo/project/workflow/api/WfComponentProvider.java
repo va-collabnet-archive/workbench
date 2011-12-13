@@ -53,7 +53,7 @@ public class WfComponentProvider {
 
 				I_ConceptAttributeVersioned attr = user.getConceptAttributes();
 				if (TerminologyProjectDAO.isActive(attr.getStatusNid())){
-					wfUsers.add(new WfUser(attr.toUserString(),user.getUids().iterator().next(),null));
+					wfUsers.add(new WfUser(user.toUserString(),user.getUids().iterator().next(),null));
 
 				}
 			}
