@@ -17,7 +17,7 @@ import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -45,7 +45,7 @@ public class MakeNotAcceptableAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         try {
             I_AmPart componentVersion;
-            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes =

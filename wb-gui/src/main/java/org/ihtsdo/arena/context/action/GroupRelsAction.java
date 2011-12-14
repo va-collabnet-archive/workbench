@@ -12,7 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -85,7 +85,7 @@ public class GroupRelsAction extends AbstractAction {
             Terms.get().addUncommitted(concept);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContraditionException e1) {
+        } catch (ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (PropertyVetoException e1) {
             AceLog.getAppLog().alertAndLogException(e1);

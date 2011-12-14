@@ -19,6 +19,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
    void addTermChangeListener(TermChangeListener cl);
@@ -50,13 +54,13 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    ComponentChroncileBI<?> getComponent(UUID... uuids) throws IOException;
 
    ComponentVersionBI getComponentVersion(ViewCoordinate vc, Collection<UUID> uuids)
-           throws IOException, ContraditionException;
+           throws IOException, ContradictionException;
 
    ComponentVersionBI getComponentVersion(ViewCoordinate vc, int nid)
-           throws IOException, ContraditionException;
+           throws IOException, ContradictionException;
 
    ComponentVersionBI getComponentVersion(ViewCoordinate vc, UUID... uuids)
-           throws IOException, ContraditionException;
+           throws IOException, ContradictionException;
 
    ConceptChronicleBI getConcept(Collection<UUID> uuids) throws IOException;
 
@@ -100,7 +104,7 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
 
    TerminologySnapshotDI getSnapshot(ViewCoordinate vc);
 
-   TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc);
+   TerminologyBuilderBI getTerminologyBuilder(EditCoordinate ec, ViewCoordinate vc);
 
    Collection<? extends ConceptChronicleBI> getUncommittedConcepts();
    /**
@@ -116,6 +120,16 @@ public interface TerminologyStoreDI extends TerminologyTransactionDI {
    boolean hasUncommittedChanges();
 
    boolean hasUuid(UUID memberUUID);
+   
+   void forget(RelationshipVersionBI rel) throws IOException;
+   
+   void forget(DescriptionVersionBI desc) throws IOException;
+   
+   void forget(RefexChronicleBI extension) throws IOException;
+   
+   void forget(ConAttrVersionBI attr) throws IOException;
+   
+   void forget(ConceptChronicleBI concept) throws IOException;
 
    int getPathNidForSapNid(int sapNid);
    int getAuthorNidForSapNid(int sapNid);

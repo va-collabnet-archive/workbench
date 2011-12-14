@@ -18,7 +18,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -210,7 +210,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
     @Override
     public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
             Map<UUID, UUID> conversionMap)
-            throws ContraditionException, IOException {
+            throws ContradictionException, IOException {
         return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
     }
 

@@ -80,6 +80,7 @@ import org.ihtsdo.tk.example.binding.WbDescType;
 import org.ihtsdo.arena.spec.Refsets; 
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.SynonymyType;
+import org.ihtsdo.lang.LANG_CODE;
 
 
 
@@ -170,11 +171,11 @@ rule "rule 5" #template onto concept
    then
    	  if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
          		Language.EN_US.get(vc).getNid())){
-         		actions.add(new AddFromDialectSpecAction("add GB dialect", $dropTarget, $dropObject,"en-gb", config));
+         		actions.add(new AddFromDialectSpecAction("add GB dialect", $dropTarget, $dropObject,LANG_CODE.EN_GB, config));
          		}
       if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescText(),
          		Language.EN_UK.get(vc).getNid())){
-         		actions.add(new AddFromDialectSpecAction("add US dialect", $dropTarget, $dropObject,"en-us", config));
+         		actions.add(new AddFromDialectSpecAction("add US dialect", $dropTarget, $dropObject,LANG_CODE.EN_US, config));
                         }
 end
 
@@ -390,7 +391,7 @@ rule "rule 15" #pref acceptability GB
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb", config));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
 rule "rule 16.1" #pref acceptibility US
@@ -400,7 +401,7 @@ rule "rule 16.1" #pref acceptibility US
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us", config));
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
 end
 
 rule "rule 17.1" #acceptable acceptability GB
@@ -410,7 +411,7 @@ rule "rule 17.1" #acceptable acceptability GB
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb", config));
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
 rule "rule 18.1" #aceptable acceptibility US
@@ -420,7 +421,7 @@ rule "rule 18.1" #aceptable acceptibility US
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
-		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us", config));
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, LANG_CODE.EN_US, config));
 end
 
 rule "rule 19" #not acceptable acceptability GB
@@ -430,8 +431,8 @@ rule "rule 19" #not acceptable acceptability GB
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, "en-gb", config));
-		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, "en-gb", config));
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, LANG_CODE.EN_GB, config));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
 rule "rule 20" #not acceptable acceptibility US
@@ -441,8 +442,8 @@ rule "rule 20" #not acceptable acceptibility US
 							  context == Context.DROP_TARGET)
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
 	then
-		actions.add(new MakePreferredAction("US Preferred", $dropTarget, "en-us", config));
-		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, "en-us", config));
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, LANG_CODE.EN_US, config));
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
 end
 
 rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"

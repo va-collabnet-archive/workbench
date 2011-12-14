@@ -99,7 +99,7 @@ public class BatchActionTaskRefsetMoveMember extends BatchActionTask {
         ConceptChronicleBI collectionToConcept = ts.getConcept(collectionToNid);
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getCollectionNid() == collectionFromNid) {
-                RefexCAB specFrom = rvbi.getRefexEditSpec();
+                RefexCAB specFrom = rvbi.makeBlueprint(vc);
                 TK_REFSET_TYPE refsetFromType = specFrom.getMemberType();
                 if (matchValue == null) {
 

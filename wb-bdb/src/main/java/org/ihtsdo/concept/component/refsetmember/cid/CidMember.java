@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -200,7 +200,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    }
 
    @Override
-   public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+   public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
       ComponentVersionBI c1Component = snapshot.getComponentVersion(c1Nid);
 
       return super.toUserString(snapshot) + " c1: " + c1Component.toUserString(snapshot);
@@ -231,7 +231,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

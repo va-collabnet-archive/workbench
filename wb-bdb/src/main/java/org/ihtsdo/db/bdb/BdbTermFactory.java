@@ -599,7 +599,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
    @Override
    public void forget(I_ExtendByRef extension) throws IOException {
-      BdbCommitManager.forget(extension);
+      BdbCommitManager.forget((RefexChronicleBI) extension);
    }
 
    @Override

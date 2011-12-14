@@ -2,7 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.Boolean;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -65,7 +65,7 @@ public class TkRefsetBooleanMember extends TkRefsetAbstractMember<TkRefsetBoolea
 
    public TkRefsetBooleanMember(RefexBooleanVersionBI another, NidBitSetBI exclusions,
                                 Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
       this.booleanValue = another.getBoolean1();
    }

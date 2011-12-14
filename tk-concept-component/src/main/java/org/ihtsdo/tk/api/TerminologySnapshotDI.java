@@ -26,17 +26,17 @@ public interface TerminologySnapshotDI extends TerminologyTransactionDI {
     * @deprecated use getBuilder
     */
    @Deprecated
-   TerminologyConstructorBI getAmender(EditCoordinate ec);
+   TerminologyBuilderBI getAmender(EditCoordinate ec);
 
-   TerminologyConstructorBI getBuilder(EditCoordinate ec);
+   TerminologyBuilderBI getBuilder(EditCoordinate ec);
 
-   ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException;
 
    ConceptVersionBI getConceptForNid(int nid) throws IOException;
 

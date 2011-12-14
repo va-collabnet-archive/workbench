@@ -55,7 +55,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.RelAssertionType;
@@ -234,7 +234,7 @@ public class CheckForChildrenUuidList extends AbstractTask {
                     uuidList.add(list);
                 }
             }
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             Logger.getLogger(CheckForChildrenUuidList.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException e) {
             e.printStackTrace();

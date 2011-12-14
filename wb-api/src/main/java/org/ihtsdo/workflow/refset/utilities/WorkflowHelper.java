@@ -35,7 +35,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -248,7 +248,7 @@ public class WorkflowHelper {
     }
 	
 
-	private static String getLoginId(ConceptVersionBI con) throws ContraditionException, IOException {
+	private static String getLoginId(ConceptVersionBI con) throws ContradictionException, IOException {
     	return con.getPreferredDescription().getText();
 	}
 
@@ -462,7 +462,7 @@ public class WorkflowHelper {
     	}
     }
 
-	public static Set<ConceptVersionBI> getChildren(ConceptVersionBI concept) throws IOException, ContraditionException 
+	public static Set<ConceptVersionBI> getChildren(ConceptVersionBI concept) throws IOException, ContradictionException 
     {
 		Set<ConceptVersionBI> resultSet = new HashSet<ConceptVersionBI>();
 
@@ -522,7 +522,7 @@ public class WorkflowHelper {
 	}
 
 
-	public static ConceptVersionBI lookupEditorCategory(String role, ViewCoordinate vc) throws TerminologyException, IOException, ContraditionException {
+	public static ConceptVersionBI lookupEditorCategory(String role, ViewCoordinate vc) throws TerminologyException, IOException, ContradictionException {
 		Set<? extends ConceptVersionBI> allRoles = Terms.get().getActiveAceFrameConfig().getWorkflowRoles();
 
 		if (role != null) {
@@ -1049,7 +1049,7 @@ public class WorkflowHelper {
 												member.getTime());	
 	}
 
-	public static String parseSemanticTag(ConceptVersionBI conceptVersionBI) throws ContraditionException, IOException {
+	public static String parseSemanticTag(ConceptVersionBI conceptVersionBI) throws ContradictionException, IOException {
 		if (conceptVersionBI != null) {
 			String s = conceptVersionBI.getPreferredDescription().getText();
 	
@@ -1318,7 +1318,7 @@ public class WorkflowHelper {
 		return null;
 	}
 
-	public static Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContraditionException {
+	public static Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContradictionException {
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
 		
 		try {

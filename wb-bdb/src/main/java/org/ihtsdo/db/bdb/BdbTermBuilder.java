@@ -2,7 +2,9 @@ package org.ihtsdo.db.bdb;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.Concept;
@@ -20,6 +22,7 @@ import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 
@@ -27,7 +30,7 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
@@ -45,24 +48,27 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
-public class BdbTermConstructor implements TerminologyConstructorBI {
+public class BdbTermBuilder implements TerminologyBuilderBI {
 
     EditCoordinate ec;
     ViewCoordinate vc;
 
-    public BdbTermConstructor(EditCoordinate ec, ViewCoordinate vc) {
+    public BdbTermBuilder(EditCoordinate ec, ViewCoordinate vc) {
         this.ec = ec;
         this.vc = vc;
     }
 
     @Override
     public RefexChronicleBI<?> construct(RefexCAB blueprint)
-            throws IOException, InvalidCAB {
+            throws IOException, InvalidCAB, ContradictionException {
         RefsetMember<?, ?> refex = getRefex(blueprint);
         if (refex != null) {
             return updateRefex(refex, blueprint);
         }
-        return createRefex(blueprint);
+        RefexChronicleBI<?> annot = createRefex(blueprint);
+        ComponentChroncileBI<?> component = Ts.get().getComponent(annot.getReferencedComponentNid());
+        component.addAnnotation(annot);
+        return annot;
     }
 
     public ConceptAttributes getConAttr(ConAttrAB blueprint) throws IOException, InvalidCAB {
@@ -74,20 +80,23 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
         return cac;
     }
 
-    private RefexChronicleBI<?> updateRefex(RefsetMember<?, ?> blueprint,
-            RefexCAB res) throws InvalidCAB {
+    private RefexChronicleBI<?> updateRefex(RefsetMember<?, ?> member,
+            RefexCAB blueprint) throws InvalidCAB, IOException, ContradictionException {
         for (int pathNid : ec.getEditPaths()) {
             RefsetRevision refexRevision =
-                    blueprint.makeAnalog(res.getInt(RefexProperty.STATUS_NID),
+                    member.makeAnalog(blueprint.getInt(RefexProperty.STATUS_NID),
                     ec.getAuthorNid(), pathNid, Long.MAX_VALUE);
             try {
-                res.setPropertiesExceptSap(refexRevision);
+                blueprint.setPropertiesExceptSap(refexRevision);
             } catch (PropertyVetoException ex) {
-                throw new InvalidCAB("Refex: " + blueprint
-                        + "\n\nRefexAmendmentSpec: " + res, ex);
+                throw new InvalidCAB("Refex: " + member
+                        + "\n\nRefexAmendmentSpec: " + blueprint, ex);
             }
         }
-        return blueprint;
+        for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+            construct(annotBp);
+        }
+        return member;
     }
 
     private RefsetMember<?, ?> getRefex(RefexCAB blueprint)
@@ -112,7 +121,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
 
     @Override
     public RefexChronicleBI<?> constructIfNotCurrent(RefexCAB blueprint)
-            throws IOException, InvalidCAB {
+            throws IOException, InvalidCAB, ContradictionException {
         RefsetMember<?, ?> refex = getRefex(blueprint);
         if (refex != null) {
             if (refex.getSapNid() == -1) {
@@ -142,7 +151,10 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     private RefexChronicleBI<?> createRefex(RefexCAB blueprint)
-            throws IOException, InvalidCAB {
+            throws IOException, InvalidCAB, ContradictionException {
+        for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+            construct(annotBp);
+        }
         return RefsetMemberFactory.create(blueprint, ec);
     }
 
@@ -166,7 +178,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public RelationshipChronicleBI construct(RelCAB blueprint) throws IOException, InvalidCAB {
+    public RelationshipChronicleBI construct(RelCAB blueprint) throws IOException, InvalidCAB, ContradictionException {
         RelationshipChronicleBI relc = getRel(blueprint);
 
         if (relc == null) {
@@ -202,6 +214,11 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 }
             }
             c.getSourceRels().add(r);
+            for (int p : ec.getEditPaths()) {
+                for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                    construct(annotBp);
+                }
+            }
             return r;
         } else {
             Relationship r = (Relationship) relc;
@@ -219,12 +236,15 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 rv.setRefinabilityNid(blueprint.getRefinabilityNid());
                 rv.setCharacteristicNid(blueprint.getCharacteristicNid());
             }
+            for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                construct(annotBp);
+            }
         }
         return relc;
     }
 
     @Override
-    public RelationshipChronicleBI constructIfNotCurrent(RelCAB blueprint) throws IOException, InvalidCAB {
+    public RelationshipChronicleBI constructIfNotCurrent(RelCAB blueprint) throws IOException, InvalidCAB, ContradictionException {
         RelationshipChronicleBI relc = getRel(blueprint);
         if (relc == null) {
             return construct(blueprint);
@@ -258,7 +278,8 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public DescriptionChronicleBI constructIfNotCurrent(DescCAB blueprint) throws IOException, InvalidCAB {
+    public DescriptionChronicleBI constructIfNotCurrent(DescCAB blueprint) throws IOException,
+            InvalidCAB, ContradictionException {
         DescriptionChronicleBI desc = getDesc(blueprint);
         if (desc == null) {
             return construct(blueprint);
@@ -273,10 +294,11 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public DescriptionChronicleBI construct(DescCAB blueprint) throws IOException, InvalidCAB {
+    public DescriptionChronicleBI construct(DescCAB blueprint) throws IOException, InvalidCAB, ContradictionException {
         DescriptionChronicleBI desc = getDesc(blueprint);
 
         if (desc == null) {
+            int conceptNid = blueprint.getConceptNid();
             Concept c = (Concept) Ts.get().getConcept(blueprint.getConceptNid());
             Description d = new Description();
             desc = d;
@@ -304,6 +326,11 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 }
             }
             c.getDescriptions().add(d);
+            for (int p : ec.getEditPaths()) {
+                for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                    construct(annotBp);
+                }
+            }
             return d;
         } else {
             Description d = (Description) desc;
@@ -316,6 +343,9 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 dr.setText(blueprint.getText());
                 dr.setLang(blueprint.getLang());
                 dr.setInitialCaseSignificant(blueprint.isInitialCaseSignificant());
+                for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                    construct(annotBp);
+                }
             }
         }
         return desc;
@@ -341,7 +371,8 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB {
+    public MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException,
+            InvalidCAB, ContradictionException {
         MediaChronicleBI mediaC = getMedia(blueprint);
         if (mediaC == null) {
             return construct(blueprint);
@@ -356,7 +387,7 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB {
+    public MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB, ContradictionException {
         MediaChronicleBI imgC = getMedia(blueprint);
 
         if (imgC == null) {
@@ -387,6 +418,11 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 }
             }
             c.getMedia().add(img);
+            for (int p : ec.getEditPaths()) {
+                for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                    construct(annotBp);
+                }
+            }
             return img;
         } else {
             Image img = (Image) imgC;
@@ -397,8 +433,12 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                         Long.MAX_VALUE);
                 imgR.setTypeNid(blueprint.getTypeNid());
                 imgR.setTextDescription(blueprint.getTextDescription());
+                for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                    construct(annotBp);
+                }
             }
         }
+
         return imgC;
     }
 
@@ -422,28 +462,31 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
     }
 
     @Override
-    public ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint) throws IOException, InvalidCAB {
+    public ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint)
+            throws IOException, InvalidCAB, ContradictionException {
         ConceptChronicleBI cc = getConcept(blueprint);
         if (cc == null) {
             return construct(blueprint);
         } else {
             I_GetConceptData concept = Terms.get().getConceptForNid(cc.getNid());
-            if (concept.isCanceled() || concept.getPrimUuid().toString().length() == 0 ||
-                    concept.getConAttrs().getVersions().isEmpty()) {
+            if (concept.isCanceled() || concept.getPrimUuid().toString().length() == 0
+                    || concept.getConAttrs().getVersions().isEmpty()) {
                 return construct(blueprint);
-            }else{
+            } else {
                 throw new InvalidCAB(
-                    "Concept already exists: "
-                    + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
+                        "Concept already exists: "
+                        + cc + "\n\nConceptCAB cannot be used for update: " + blueprint);
             }
         }
     }
 
     @Override
-    public ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB {
+    public ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB, ContradictionException {
+
         int cNid = Bdb.uuidToNid(blueprint.getComponentUuid());
         Bdb.getNidCNidMap().setCNidForNid(cNid, cNid);
         Concept newC = Concept.get(cNid);
+
         ConceptAttributes a = null;
         if (newC.getConceptAttributes() == null) {
             a = new ConceptAttributes();
@@ -473,23 +516,49 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                         ec.getAuthorNid(), p, Long.MAX_VALUE);
             } else {
                 if (a.revisions == null) {
-                    a.revisions =new RevisionSet(a.primordialSapNid);
+                    a.revisions = new RevisionSet(a.primordialSapNid);
                 }
                 a.revisions.add((ConceptAttributesRevision) a.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE));
             }
         }
 
-        construct(blueprint.getFsnCAB());
-        construct(blueprint.getPreferredCAB());
-        for (RelCAB parentCAB : blueprint.getParentCABs()) {
-            construct(parentCAB);
+        List<DescCAB> fsnBps = blueprint.getFsnCABs();
+        List<DescCAB> prefBps = blueprint.getPrefCABs();
+        List<DescCAB> descBps = blueprint.getDescCABs();
+        List<RelCAB> relBps = blueprint.getRelCABs();
+        List<MediaCAB> mediaBps = blueprint.getMediaCABs();
+
+        if (blueprint.getConAttrAB() != null) {
+            for (RefexCAB annot : blueprint.getConAttrAB().getAnnotationBlueprints()) {
+                this.construct(annot);
+            }
+        }
+
+        for (DescCAB fsnBp : fsnBps) {
+            this.construct(fsnBp);
+        }
+        for (DescCAB prefBp : prefBps) {
+            this.construct(prefBp);
+        }
+        for (DescCAB descBp : descBps) {
+            if (fsnBps.contains(descBp) || prefBps.contains(descBp)) {
+                continue;
+            } else {
+                this.construct(descBp);
+            }
+        }
+        for (RelCAB relBp : relBps) {
+            this.construct(relBp);
+        }
+        for (MediaCAB mediaBp : mediaBps) {
+            this.construct(mediaBp);
         }
         return newC;
     }
 
     @Override
-    public ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB {
+    public ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB, ContradictionException {
         ConceptAttributes cac = getConAttr(blueprint);
         for (ConAttrVersionBI cav : cac.getVersions(vc)) {
             for (int p : ec.getEditPaths()) {
@@ -501,7 +570,11 @@ public class BdbTermConstructor implements TerminologyConstructorBI {
                 ConceptAttributesRevision r = (ConceptAttributesRevision) cac.makeAnalog(blueprint.getStatusNid(),
                         ec.getAuthorNid(), p, Long.MAX_VALUE);
                 cac.revisions.add(r);
-
+            }
+        }
+        for (int p : ec.getEditPaths()) {
+            for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
+                construct(annotBp);
             }
         }
 

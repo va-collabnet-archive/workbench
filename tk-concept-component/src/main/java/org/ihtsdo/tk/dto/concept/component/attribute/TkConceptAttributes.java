@@ -2,7 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.attribute;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
@@ -64,7 +64,7 @@ public class TkConceptAttributes extends TkComponent<TkConceptAttributesRevision
 
    public TkConceptAttributes(ConAttrVersionBI another, NidBitSetBI exclusions,
                               Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
       this.defined = another.isDefined();
    }

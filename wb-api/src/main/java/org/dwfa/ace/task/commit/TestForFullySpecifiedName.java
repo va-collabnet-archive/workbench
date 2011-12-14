@@ -70,16 +70,17 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     @Override
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
-
-            ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
-            for (I_DescriptionTuple desc : descriptionTupleList) {
-                descriptions.add(desc.getDescVersioned());
+            ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
+            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
+            ArrayList<DescriptionVersionBI> descriptions = new ArrayList<DescriptionVersionBI>();
+            for (DescriptionVersionBI desc : descsActive) {
+                descriptions.add(desc);
             }
             
             // only test of concepts have been added to the description. 
             if (descriptions.size() > 0) {
-                return testDescriptions(concept, descriptions, forCommit);
+                return testDescriptions(cv, descsActive, forCommit);
             }
             return new ArrayList<AlertToDataConstraintFailure>();
         } catch (Exception e) {
@@ -87,23 +88,11 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         }
     }
 
-    private List<? extends I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
-            final I_ConfigAceFrame activeProfile) throws IOException {
-
-        PositionSetReadOnly allPositions = null;
-        I_IntSet allTypes = null;
-        return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), allTypes, allPositions, getFrameConfig()
-            .getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
-    }
-
-    private List<AlertToDataConstraintFailure> testDescriptions(I_GetConceptData concept,
-            ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit) throws Exception {
+    private List<AlertToDataConstraintFailure> testDescriptions(ConceptVersionBI cv,
+            Collection<? extends DescriptionVersionBI> descsActive, boolean forCommit) throws Exception {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
         I_IntSet actives = getActiveStatus(Terms.get());
         HashMap<String, ArrayList<DescriptionVersionBI>> langs = new HashMap<String, ArrayList<DescriptionVersionBI>>();
-        ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
-        ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
-        Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
         
         NidSet fsnSet = new NidSet();
         fsnSet.add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
@@ -111,13 +100,13 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         fsnSet.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
         fsnSet.add(Ts.get().getNidForUuids(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")));
         
-        for (DescriptionVersionBI<?> desc : cv.getDescsActive()) {
+        for (DescriptionVersionBI<?> desc : descsActive) {
                 if (fsnSet.contains(desc.getTypeNid())) {
                     if (desc.getText().matches(".*\\(\\?+\\).*") && desc.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                       : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
-                                + desc.getText(), concept));
+                                + desc.getText(), cv));
                     }
                     String lang = desc.getLang();
                     if (langs.get(lang) != null) {
@@ -126,7 +115,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                                 alertList.add(new AlertToDataConstraintFailure(
                                     (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                               : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                    "<html>More than one FSN for " + lang, concept));
+                                    "<html>More than one FSN for " + lang, cv));
                             }
                         }
                         langs.get(lang).add(desc);
@@ -144,7 +133,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                             Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
-                            if (cnid == concept.getConceptNid())
+                            if (cnid == cv.getConceptNid())
                                 continue;
                             try {
                                 I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
@@ -157,7 +146,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                                             alertList.add(new AlertToDataConstraintFailure(
                                                 (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                           : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                                "<html>FSN already used: " + desc.getText(), concept));
+                                                "<html>FSN already used: " + desc.getText(), cv));
                                             break search;
                                         }
                                     }
@@ -173,7 +162,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
         if (langs.get("en") == null)
             alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                "<html>No FSN for en", concept));
+                "<html>No FSN for en", cv));
         return alertList;
     }
 }

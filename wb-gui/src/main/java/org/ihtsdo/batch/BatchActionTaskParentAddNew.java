@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.UUID;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -66,7 +66,7 @@ public class BatchActionTaskParentAddNew extends BatchActionTask {
     }
 
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContraditionException, InvalidCAB {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         // Check if parent already exists and is active.
         Collection<? extends RelationshipVersionBI> checkParents = c.getRelsOutgoingActive();
         for (RelationshipVersionBI rvbi : checkParents) {

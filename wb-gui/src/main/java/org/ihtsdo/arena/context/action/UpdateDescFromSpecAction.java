@@ -19,7 +19,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;//THIS
+import org.ihtsdo.tk.api.ContradictionException;//THIS
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -58,7 +58,7 @@ public class UpdateDescFromSpecAction extends AbstractAction {
         }
     }
 
-    private void updateDesc() throws TerminologyException, IOException, ContraditionException {
+    private void updateDesc() throws TerminologyException, IOException, ContradictionException {
         I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
 
         Collection descriptions = component.getDescsActive();

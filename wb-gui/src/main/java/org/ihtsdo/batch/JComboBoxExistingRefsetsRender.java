@@ -22,7 +22,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -65,7 +65,7 @@ class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer 
             }
         } catch (IOException ex) {
             setText(cvbi.toUserString() + " -- FSN missing");
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             setText(cvbi.toUserString() + " -- FSN missing");
         }
 

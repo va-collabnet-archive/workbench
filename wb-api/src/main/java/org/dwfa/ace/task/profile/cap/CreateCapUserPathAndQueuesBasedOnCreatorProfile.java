@@ -68,7 +68,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -376,7 +376,7 @@ public class CreateCapUserPathAndQueuesBasedOnCreatorProfile extends AbstractTas
         return Condition.TRUE;
     }
 
-    private boolean userWithoutActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame newConfig) throws TerminologyException, IOException, ContraditionException {
+    private boolean userWithoutActiveModeler(I_GetConceptData userConcept, I_ConfigAceFrame newConfig) throws TerminologyException, IOException, ContradictionException {
     	return !WorkflowHelper.isActiveModeler(userConcept.getVersion(newConfig.getViewCoordinate()));
 	}
 

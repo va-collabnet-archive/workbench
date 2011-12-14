@@ -19,7 +19,7 @@ package org.ihtsdo.batch;
 import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -58,7 +58,7 @@ public class BatchActionTaskRoleReplaceValue extends BatchActionTask {
 
     //
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContraditionException, InvalidCAB {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
         int conceptNid = c.getNid();
         boolean changed = false;
         Collection<? extends RelationshipVersionBI> rels = c.getRelsOutgoingActive();

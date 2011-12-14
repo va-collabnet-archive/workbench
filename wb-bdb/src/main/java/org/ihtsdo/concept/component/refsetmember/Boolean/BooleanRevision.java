@@ -16,7 +16,7 @@ import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember.Version;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -192,7 +192,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetBooleanMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
@@ -215,7 +215,7 @@ public class BooleanRevision extends RefsetRevision<BooleanRevision, BooleanMemb
    }
 
    @Override
-   public BooleanMember.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public BooleanMember.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return (Version) ((BooleanMember) primordialComponent).getVersion(c);
    }
 

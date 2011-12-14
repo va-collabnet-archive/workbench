@@ -25,12 +25,13 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -46,6 +47,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class Description extends ConceptComponent<DescriptionRevision, Description>
         implements I_DescriptionVersioned<DescriptionRevision>, I_DescriptionPart<DescriptionRevision>,
@@ -416,6 +421,14 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     }
 
     @Override
+    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        DescCAB descBp = new DescCAB(getConceptNid(), getTypeNid(),
+                LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
+                getVersion(vc), vc);
+        return descBp;
+    }
+
+    @Override
     public Version getFirstTuple() {
         return getTuples().get(0);
     }
@@ -493,7 +506,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     }
 
     @Override
-    public Description.Version getVersion(ViewCoordinate c) throws ContraditionException {
+    public Description.Version getVersion(ViewCoordinate c) throws ContradictionException {
         List<Description.Version> vForC = getVersions(c);
 
         if (vForC.isEmpty()) {
@@ -505,7 +518,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         }
 
         if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
+            throw new ContradictionException(vForC.toString());
         }
 
         if (!vForC.isEmpty()) {
@@ -671,7 +684,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
             if (this.getTypeNid() != anotherVersion.getTypeNid()) {
                 return false;
             }
-            
+
             return true;
         }
 
@@ -693,6 +706,11 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         @Override
         public I_DescriptionVersioned getDescVersioned() {
             return Description.this;
+        }
+
+        @Override
+        public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc);
         }
 
         @Override
@@ -735,7 +753,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         }
 
         @Override
-        public Description.Version getVersion(ViewCoordinate c) throws ContraditionException {
+        public Description.Version getVersion(ViewCoordinate c) throws ContradictionException {
             return Description.this.getVersion(c);
         }
 

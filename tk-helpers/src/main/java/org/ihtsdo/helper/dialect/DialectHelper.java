@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -88,7 +88,7 @@ public class DialectHelper {
                             ts, initialVariantMap);
                     DialectHelper.variantMap = initialVariantMap;
                 }
-            } catch (ContraditionException ex) {
+            } catch (ContradictionException ex) {
                 throw new IOException(ex);
             } finally {
                 initLock.unlock();
@@ -104,7 +104,7 @@ public class DialectHelper {
             ViewCoordinate vc,
             ConceptSpec varientsSpec,
             TerminologySnapshotDI ts,
-            HashMap<Integer, Map<String, String>> initialVariantMap) throws ContraditionException, IOException {
+            HashMap<Integer, Map<String, String>> initialVariantMap) throws ContradictionException, IOException {
         ConceptVersionBI dialectC = dialectSpec.get(vc);
         ConceptVersionBI variantTextRefsetC = varientsSpec.get(vc);
 
@@ -123,7 +123,7 @@ public class DialectHelper {
 
     public static boolean isMissingDescForDialect(DescriptionVersionBI desc,
             int dialectNid, ViewCoordinate vc) throws IOException,
-            ContraditionException, UnsupportedDialectOrLanguage {
+            ContradictionException, UnsupportedDialectOrLanguage {
         lazyInit(dialectNid);
         if (isTextForDialect(desc.getText(), dialectNid)) {
             return false;

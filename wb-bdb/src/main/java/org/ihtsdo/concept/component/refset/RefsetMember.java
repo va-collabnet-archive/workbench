@@ -32,7 +32,7 @@ import org.ihtsdo.etypes.ERefsetRevision;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -54,6 +54,9 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends RefsetMember<R, C>>
@@ -335,7 +338,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
         ComponentVersionBI c1Component = snapshot.getConceptVersion(refsetNid);
 
         return "refex: " + c1Component.toUserString(snapshot);
@@ -440,9 +443,12 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public RefexCAB getRefexEditSpec() throws IOException {
-        RefexCAB rcs = new RefexCAB(getTkRefsetType(), getReferencedComponentNid(), getRefsetId(),
-                getPrimUuid());
+    public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException,
+        InvalidCAB, ContradictionException {
+        RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
+                Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
+                getCollectionNid(),
+                getVersion(vc), vc);
 
         addSpecProperties(rcs);
 
@@ -495,7 +501,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
+    public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContradictionException {
         List<RefsetMember<R, C>.Version> vForC = getVersions(c);
 
         if (vForC.isEmpty()) {
@@ -507,7 +513,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
+            throw new ContradictionException(vForC.toString());
         }
 
         if (!vForC.isEmpty()) {
@@ -770,8 +776,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public RefexCAB getRefexEditSpec() throws IOException {
-            return getCv().getRefexEditSpec();
+        public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+            return getCv().makeBlueprint(vc);
         }
 
         @Override
@@ -788,7 +794,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         @Override
         public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc,
                 NidBitSetBI exclusionSet, Map<UUID, UUID> conversionMap)
-                throws ContraditionException, IOException {
+                throws ContradictionException, IOException {
             return getCv().getTkRefsetMemberActiveOnly(vc, exclusionSet, conversionMap);
         }
 
@@ -816,7 +822,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContraditionException {
+        public RefsetMember<R, C>.Version getVersion(ViewCoordinate c) throws ContradictionException {
             return RefsetMember.this.getVersion(c);
         }
 

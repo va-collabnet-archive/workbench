@@ -19,6 +19,8 @@ package org.ihtsdo.batch;
 import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -58,7 +60,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
 
     // BatchActionTask
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
 
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
         boolean changed = false;
@@ -84,7 +86,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
                             "retired member of: " + nidToName(collectionNid)));
                 } else {
                     // CHECK FILTER
-                    RefexCAB spec = rvbi.getRefexEditSpec();
+                    RefexCAB spec = rvbi.makeBlueprint(vc);
                     boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:

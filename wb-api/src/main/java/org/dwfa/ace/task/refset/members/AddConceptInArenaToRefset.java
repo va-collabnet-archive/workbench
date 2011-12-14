@@ -43,7 +43,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
@@ -116,8 +116,8 @@ public class AddConceptInArenaToRefset extends AbstractTask {
                 throw new TerminologyException("A working refset has not been selected.");
             }
             
-            TerminologyConstructorBI ammender = 
-                    Ts.get().getTerminologyConstructor(config.getEditCoordinate(), 
+            TerminologyBuilderBI ammender = 
+                    Ts.get().getTerminologyBuilder(config.getEditCoordinate(), 
                     config.getViewCoordinate()); 
             
             //add to refset

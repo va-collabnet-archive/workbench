@@ -62,7 +62,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.arena.conceptview.FixedWidthJEditorPane;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
@@ -78,7 +78,13 @@ import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -140,9 +146,9 @@ public class NewConcept extends PreviousNextOrCancel {
     private RefexCAB refexSpecUsPref;
     private RefexCAB refexSpecUsAcct;
     private RefexCAB refexSpecGbAcct;
-    private TerminologyConstructorBI tc;
+    private TerminologyBuilderBI tc;
     private ConceptChronicleBI newConcept;
-    private String lang;
+    private LANG_CODE lang;
     private ConceptChronicleBI gbRefexConcept;
     private ConceptChronicleBI usRefexConcept;
     private UUID gbUuid;
@@ -249,44 +255,47 @@ public class NewConcept extends PreviousNextOrCancel {
                 preferredConcept = Ts.get().getConcept(SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 fsnConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
                 synConcept = Ts.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
+                ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), newConcept.getConceptNid());   
+                ComponentVersionBI fsn = cv.getFullySpecifiedDescription();
+                ComponentVersionBI pref = cv.getPreferredDescription();
+                
                 //create blueprints
-                if (lang.equals("en")) {
-                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-                }
-                if (lang.equals("en-us")) {
-                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintUsPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-//                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
-                }
-                if (lang.equals("en-gb")) {
-//                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid()); //only using one fsn
-                    createBlueprintGbPrefRefex(conceptSpec.getPreferredCAB().getComponentNid());
-//                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
-                }
                 if (addUsDescFsn) {
 //                    createBlueprintUsFsnDesc();
-                    createBlueprintUsFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintUsFsnRefex(fsn);
                 }
                 if (addGbDescFsn) {
 //                    createBlueprintGbFsnDesc();
 //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid()); //only using one fsn (US)
+                    createBlueprintGbFsnRefex(fsn); //only using one fsn (US)
                 }
                 if (addUsDescPref) {
-                    createBlueprintUsPrefDesc();
-                    createBlueprintUsPrefRefex(descSpecUsPref.getComponentNid());
+                    ComponentVersionBI usPrefCv = createBlueprintUsPrefDesc();
+                    createBlueprintUsPrefRefex(usPrefCv);
 //                    createBlueprintGbAcctRefex(descSpecUsPref.getComponentNid()); //removed for rf2
                 }
                 if (addGbDescPref) {
-                    createBlueprintGbPrefDesc();
-                    createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
+                    ComponentVersionBI gbPrefCv = createBlueprintGbPrefDesc();
+                    createBlueprintGbPrefRefex(gbPrefCv);
 //                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
                 }
-
+                if (lang.equals(LANG_CODE.EN)) {
+                    createBlueprintUsFsnRefex(fsn);
+                    createBlueprintGbFsnRefex(fsn);
+                    createBlueprintUsPrefRefex(pref);
+                    createBlueprintGbPrefRefex(pref);
+                }
+                if (lang.equals(LANG_CODE.EN_US)) {
+                    createBlueprintUsFsnRefex(fsn);
+                    createBlueprintUsPrefRefex(pref);
+//                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                }
+                if (lang.equals(LANG_CODE.EN_GB)) {
+//                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
+                    createBlueprintGbFsnRefex(fsn); //only using one fsn
+                    createBlueprintGbPrefRefex(pref);
+//                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
+                }
             }
             return null;
         }
@@ -686,7 +695,7 @@ public class NewConcept extends PreviousNextOrCancel {
         try {
             if (DialectHelper.isTextForDialect(prefText, Language.EN_US.getLenient().getNid())
                     && DialectHelper.isTextForDialect(prefText, Language.EN_UK.getLenient().getNid())) {
-                lang = "en";
+                lang = LANG_CODE.EN;
 
                 this.inputFsnLabel.setText("fsn en-GB / en-US");
                 this.inputFsnLabel.setVisible(true);
@@ -713,7 +722,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.usFsn.setVisible(false);
                 this.usLabelFsn.setVisible(false);
             } else if (DialectHelper.isTextForDialect(prefText, Language.EN_UK.getLenient().getNid())) { //check if lang is en-us
-                lang = "en-us";
+                lang = LANG_CODE.EN_US;
 
                 this.inputFsnLabel.setText("fsn en-US");
                 this.inputFsnLabel.setVisible(true);
@@ -744,7 +753,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.usLabelPref.setVisible(false);
 
             } else if (DialectHelper.isTextForDialect(prefText, Language.EN_US.getLenient().getNid())) { //check if lang is en-gb
-                lang = "en-gb";
+                lang = LANG_CODE.EN_GB;
 
                 this.inputFsnLabel.setText("fsn en-GB");
                 this.inputFsnLabel.setVisible(true);
@@ -782,8 +791,8 @@ public class NewConcept extends PreviousNextOrCancel {
 
     }
 
-    private void createBlueprintConcept() {
-        tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+    private void createBlueprintConcept() throws ContradictionException {
+        tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         try {
@@ -797,13 +806,14 @@ public class NewConcept extends PreviousNextOrCancel {
 
 
             //create concept blue print
-            if (lang.equals("en-gb")) {
-                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
+            if (lang.equals(LANG_CODE.EN_GB)) {
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
             } else {
-                conceptSpec = new ConceptCB(fsnText, prefText, "en", isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
             }
             conceptSpec.setComponentUuid(UUID.randomUUID());
             newConcept = tc.constructIfNotCurrent(conceptSpec);
+            
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (InvalidCAB e) {
@@ -811,7 +821,7 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintGbFsnDesc() {
+    private void createBlueprintGbFsnDesc() throws ContradictionException {
         String text = gbFsn.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
@@ -819,7 +829,7 @@ public class NewConcept extends PreviousNextOrCancel {
             descSpecGbFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
-                    "en-gb",
+                    LANG_CODE.EN_GB,
                     text,
                     false);
 
@@ -831,14 +841,14 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintGbFsnRefex(int componentNid) {
+    private void createBlueprintGbFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
-            tc.construct(refexSpecGbFsn);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecGbFsn);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
@@ -849,35 +859,37 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintGbPrefDesc() {
+    private ComponentVersionBI  createBlueprintGbPrefDesc() throws ContradictionException {
         String text = gbPref.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
+        ComponentVersionBI cv = null;
         try {
             descSpecGbPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
-                    "en-gb",
+                    LANG_CODE.EN_GB,
                     text,
                     false);
 
-            tc.construct(descSpecGbPref);
+            DescriptionChronicleBI dc = tc.construct(descSpecGbPref);
+            cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
+        return cv;
     }
 
-    private void createBlueprintGbPrefRefex(int componentNid) {
+    private void createBlueprintGbPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
-
-            tc.construct(refexSpecGbPref);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecGbPref);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
@@ -888,15 +900,14 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintGbAcctRefex(int componentNid) {
+    private void createBlueprintGbAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecGbAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(gbUuid));
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-
-            tc.construct(refexSpecGbAcct);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecGbAcct);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
@@ -907,7 +918,7 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintUsFsnDesc() {
+    private void createBlueprintUsFsnDesc() throws ContradictionException {
         String text = usFsn.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
@@ -915,7 +926,7 @@ public class NewConcept extends PreviousNextOrCancel {
             descSpecUsFsn = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     fsnConcept.getPrimUuid(),
-                    "en-us",
+                    LANG_CODE.EN_US,
                     text,
                     false);
 
@@ -927,16 +938,15 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintUsFsnRefex(int componentNid) {
+    private void createBlueprintUsFsnRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsFsn = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
             refexSpecUsFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
-
-            tc.construct(refexSpecUsFsn);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecUsFsn);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
@@ -947,36 +957,38 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintUsPrefDesc() {
+    private ComponentVersionBI createBlueprintUsPrefDesc() throws ContradictionException {
         String text = usPref.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
+        ComponentVersionBI cv = null;
         try {
             descSpecUsPref = new DescCAB(
                     conceptSpec.getComponentUuid(),
                     synConcept.getPrimUuid(),
-                    "en-us",
+                    LANG_CODE.EN_US,
                     text,
                     false);
 
-            tc.construct(descSpecUsPref);
+            DescriptionChronicleBI dc = tc.construct(descSpecUsPref);
+            cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
+        return cv;
     }
 
-    private void createBlueprintUsPrefRefex(int componentNid) {
+    private void createBlueprintUsPrefRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsPref = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
             refexSpecUsPref.put(RefexProperty.CNID1, preferredConcept.getNid());
-
-            tc.construct(refexSpecUsPref);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecUsPref);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
@@ -987,16 +999,15 @@ public class NewConcept extends PreviousNextOrCancel {
         }
     }
 
-    private void createBlueprintUsAcctRefex(int componentNid) {
+    private void createBlueprintUsAcctRefex(ComponentVersionBI cv) throws ContradictionException {
         try {
             refexSpecUsAcct = new RefexCAB(
                     TK_REFSET_TYPE.CID,
-                    componentNid,
+                    cv.getNid(),
                     Ts.get().getNidForUuids(usUuid));
 
             refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
-
-            tc.construct(refexSpecUsAcct);
+            RefexChronicleBI<?> annot = tc.construct(refexSpecUsAcct);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }

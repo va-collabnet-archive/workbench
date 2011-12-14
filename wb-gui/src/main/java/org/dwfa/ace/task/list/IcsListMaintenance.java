@@ -44,7 +44,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -73,7 +74,7 @@ public class IcsListMaintenance extends AbstractTask {
     private static final int dataVersion = 1;
     private String icsListFileNameProp = ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey();;
     private ConceptChronicleBI caseSensitiveRefexColl;
-    private TerminologyConstructorBI tc;
+    private TerminologyBuilderBI tc;
     private ViewCoordinate vc;
     private EditCoordinate ec;
 
@@ -104,7 +105,7 @@ public class IcsListMaintenance extends AbstractTask {
             vc = Ts.get().getMetadataVC();
             ec = new EditCoordinate(config.getDbConfig().getUserConcept().getNid(),
                     vc.getPositionSet().getViewPathNidSet());
-            tc = Ts.get().getTerminologyConstructor(ec, vc);
+            tc = Ts.get().getTerminologyBuilder(ec, vc);
             caseSensitiveRefexColl = Ts.get().getConcept(RefsetAuxiliary.Concept.CASE_SENSITIVE_WORDS.getUids());
 
             InputStreamReader isr =
@@ -179,7 +180,7 @@ public class IcsListMaintenance extends AbstractTask {
         }
     }
 
-    private void addMember(String word, int icsTypeNid) throws IOException, InvalidCAB {
+    private void addMember(String word, int icsTypeNid) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB wordRefexSpec = new RefexCAB(TK_REFSET_TYPE.CID_STR,
                 caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
         wordRefexSpec.with(RefexProperty.STRING1, word);

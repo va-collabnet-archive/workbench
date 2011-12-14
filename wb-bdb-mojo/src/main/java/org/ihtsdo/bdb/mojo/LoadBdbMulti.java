@@ -59,7 +59,7 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -427,7 +427,7 @@ public class LoadBdbMulti extends AbstractMojo {
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
-            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
+            TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File df : dialectFiles) {
                 getLog().info("processing dialectFile: " + df.getName());
@@ -520,7 +520,7 @@ public class LoadBdbMulti extends AbstractMojo {
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
-            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
+            TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File cf : caseFiles) {
                 getLog().info("processing dialectFile: " + cf.getName());

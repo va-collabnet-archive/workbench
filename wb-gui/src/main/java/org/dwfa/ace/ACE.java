@@ -3202,7 +3202,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
             @Override
             public void mouseReleased(MouseEvent e) {
                for (TermComponentDataCheckSelectionListener l : dataCheckListeners) {
-                  l.setSelection(alert.getConceptWithAlert());
+                  l.setSelection(alert.getConceptDataWithAlert());
                }
             }
          });

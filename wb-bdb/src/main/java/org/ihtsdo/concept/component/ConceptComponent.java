@@ -44,7 +44,7 @@ import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -1016,7 +1016,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public abstract String toUserString();
 
     @Override
-    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
         return toUserString();
     }
 
@@ -2371,7 +2371,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         @Override
-        public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+        public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
             return cv.toUserString(snapshot);
         }
 

@@ -32,7 +32,7 @@ import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 
 public class LineageHelper implements I_HelpLineage {
@@ -42,7 +42,7 @@ public class LineageHelper implements I_HelpLineage {
     private long lastAccess = System.currentTimeMillis();
     private boolean clone = false;
     protected TerminologySnapshotDI ts;
-    protected TerminologyConstructorBI builder;
+    protected TerminologyBuilderBI builder;
 
     public LineageHelper(I_ConfigAceFrame config) {
         this(config, null);

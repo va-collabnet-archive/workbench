@@ -37,6 +37,7 @@ import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -49,9 +50,10 @@ public class RefsetMemberFactory {
         member.refsetNid = refexColCon.getNid();
         member.nid = Bdb.uuidToNid(res.getMemberUUID());
         if (refexColCon.isAnnotationStyleRefex()) {
-            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
-            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+            ComponentChroncileBI<?> component = Ts.get().getComponent(res.getRcUuid());
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
@@ -170,9 +172,10 @@ public class RefsetMemberFactory {
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
         member.nid = refexNid;
         if (refexColCon.isAnnotationStyleRefex()) {
-            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
-            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+            Ts.get().getComponent(res.getRcUuid()).addAnnotation(member);
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
@@ -201,8 +204,9 @@ public class RefsetMemberFactory {
 
         }
         if (refexColCon.isAnnotationStyleRefex()) {
+            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
             Bdb.getConceptDb().writeConcept(
-                    Bdb.getConcept(Bdb.getNidCNidMap().getCNid(res.getRcNid())));
+                    Bdb.getConcept(Bdb.getNidCNidMap().getCNid(rcNid)));
         } else {
             Bdb.getConceptDb().writeConcept(refexColCon);
         }

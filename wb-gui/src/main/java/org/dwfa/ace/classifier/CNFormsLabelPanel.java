@@ -48,10 +48,12 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
 
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.blueprint.ConAttrAB;
+import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -1590,7 +1592,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public ConAttrVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+      public ConAttrVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
          return core.getVersion(c);
       }
 
@@ -1725,6 +1727,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }
@@ -2201,7 +2208,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       }
 
       @Override
-      public RelationshipVersionBI<?> getVersion(ViewCoordinate c) throws ContraditionException {
+      public RelationshipVersionBI<?> getVersion(ViewCoordinate c) throws ContradictionException {
          return fixedPart.getVersion(c);
       }
 
@@ -2377,6 +2384,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
         @Override
         public boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }

@@ -16,7 +16,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -29,6 +31,7 @@ import java.nio.charset.Charset;
 
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.lang.LANG_CODE;
 
 public class DescriptionRevision extends Revision<DescriptionRevision, Description>
         implements I_DescriptionPart<DescriptionRevision>, DescriptionAnalogBI<DescriptionRevision> {
@@ -287,6 +290,14 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
    public int getConceptNid() {
       return primordialComponent.getConceptNid();
    }
+   
+   @Override
+    public DescCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        DescCAB descBp = new DescCAB(getConceptNid(), getTypeNid(),
+                LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
+                getVersion(vc), vc);
+        return descBp;
+    }
 
    @Override
    public String getLang() {
@@ -324,7 +335,7 @@ public class DescriptionRevision extends Revision<DescriptionRevision, Descripti
    }
 
    @Override
-   public Description.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public Description.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return primordialComponent.getVersion(c);
    }
 

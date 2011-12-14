@@ -32,7 +32,7 @@ import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -151,7 +151,7 @@ public class IsMissingDescForDialectEvaluatorDefinition implements EvaluatorDefi
                     log(Level.SEVERE, "Cannot test secondary to "
                     + "unsupported dialect: " + dialectCV, ex);
             return false;
-         } catch (ContraditionException ex) {
+         } catch (ContradictionException ex) {
             Logger.getLogger(
                     IsMissingDescForDialectEvaluatorDefinition.class.getName()).
                     log(Level.SEVERE, "Cannot test secondary to contradiction", ex);

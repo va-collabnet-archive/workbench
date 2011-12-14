@@ -2,7 +2,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.str;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -66,7 +66,7 @@ public class TkRefsetStrMember extends TkRefsetAbstractMember<TkRefsetStrRevisio
 
    public TkRefsetStrMember(RefexStrVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
                             long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
       this.strValue = another.getStr1();
    }

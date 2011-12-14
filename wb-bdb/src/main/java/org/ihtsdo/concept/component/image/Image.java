@@ -24,7 +24,7 @@ import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -43,6 +43,9 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.MediaCAB;
 
 public class Image extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>, I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -364,6 +367,18 @@ public class Image extends ConceptComponent<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImageVersioned#getFormat()
      */
     @Override
+    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        MediaCAB mediaBp = new MediaCAB(getConceptNid(),
+                getTypeNid(),
+                getFormat(),
+                getTextDescription(),
+                getMedia(),
+                getVersion(vc),
+                vc);
+        return mediaBp;
+    }
+
+    @Override
     public String getFormat() {
         return format;
     }
@@ -474,7 +489,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
     }
 
     @Override
-    public Image.Version getVersion(ViewCoordinate c) throws ContraditionException {
+    public Image.Version getVersion(ViewCoordinate c) throws ContradictionException {
         List<Image.Version> vForC = getVersions(c);
 
         if (vForC.isEmpty()) {
@@ -486,7 +501,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         }
 
         if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
+            throw new ContradictionException(vForC.toString());
         }
 
         return vForC.get(0);
@@ -647,6 +662,11 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         }
 
         @Override
+        public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc);
+        }
+
+        @Override
         public String getFormat() {
             return format;
         }
@@ -702,7 +722,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         }
 
         @Override
-        public Image.Version getVersion(ViewCoordinate c) throws ContraditionException {
+        public Image.Version getVersion(ViewCoordinate c) throws ContradictionException {
             return Image.this.getVersion(c);
         }
 

@@ -56,7 +56,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -151,7 +151,7 @@ public class CheckForChildren extends AbstractTask implements ActionListener{
 
         } catch (IOException e) {
         	throw new TaskFailedException(e);
-        } catch (ContraditionException e) {
+        } catch (ContradictionException e) {
         	throw new TaskFailedException(e);
 		}
     }

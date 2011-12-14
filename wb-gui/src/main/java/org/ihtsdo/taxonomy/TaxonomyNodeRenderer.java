@@ -23,7 +23,7 @@ import org.dwfa.vodb.types.IntSet;
 
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -359,7 +359,7 @@ public class TaxonomyNodeRenderer extends JLabel
             if (cv.getConAttrsActive() != null) {
                 defined = cv.getConAttrsActive().isDefined();
             }
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             defined = cv.getConAttrs().getVersions(cv.getViewCoordinate()).iterator().next().isDefined();
         }
         Set<Color> colors = new HashSet<Color>();
@@ -376,7 +376,7 @@ public class TaxonomyNodeRenderer extends JLabel
                                 + "' align=center>");
                     }
                 }
-            } catch (ContraditionException ex) {
+            } catch (ContradictionException ex) {
                 htmlPrefixes.add("media in conflict");
             }
         }
@@ -414,7 +414,7 @@ public class TaxonomyNodeRenderer extends JLabel
                         conceptDesc = "no fsn";
                         node.setSortComparable(conceptDesc.toLowerCase());
                     }
-                } catch (ContraditionException ex) {
+                } catch (ContradictionException ex) {
                     conceptDesc = cv.getFsnDescsActive().iterator().next().getText();
                     node.setSortComparable(conceptDesc.toLowerCase());
                 }
@@ -434,7 +434,7 @@ public class TaxonomyNodeRenderer extends JLabel
                     }
 
                     node.setSortComparable(conceptDesc.toLowerCase());
-                } catch (ContraditionException ex) {
+                } catch (ContradictionException ex) {
                     conceptDesc = cv.getPrefDescsActive().iterator().next().getText();
                     node.setSortComparable(conceptDesc.toLowerCase());
                 }
@@ -621,8 +621,8 @@ public class TaxonomyNodeRenderer extends JLabel
                                 for (MediaChronicleBI imageTuple : ebrCb.getMediaActive()) {
                                     htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
                                             + imageTuple.getConceptNid() + "' align=center>");
-                                }
-                            } catch (ContraditionException ex) {
+                        }
+                            } catch (ContradictionException ex) {
                                 for (MediaChronicleBI imageTuple : ebrCb.getMedia()) {
                                     htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
                                             + imageTuple.getConceptNid() + "' align=center>");
@@ -679,13 +679,13 @@ public class TaxonomyNodeRenderer extends JLabel
             case FSN:
                 try {
                     return cv.getFullySpecifiedDescription().getText() + '\u039A';
-                } catch (ContraditionException ex) {
+                } catch (ContradictionException ex) {
                     return cv.getFsnDescsActive().iterator().next().getText() + '\u039A';
                 }
             case PREFERRED:
                 try {
                     return cv.getPreferredDescription().getText() + '\u039A';
-                } catch (ContraditionException ex) {
+                } catch (ContradictionException ex) {
                     return cv.getPrefDescsActive().iterator().next().getText() + '\u039A';
                 }
             default:

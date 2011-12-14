@@ -11,8 +11,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -33,7 +35,7 @@ public class AddFromDialectSpecAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
     ConceptVersionBI concept;
     SpecFact<?> spec;
-    String dialect;
+    LANG_CODE dialect;
     DescriptionSpec descSpec;
     I_ConfigAceFrame config;
     UUID dialectUuid;
@@ -41,7 +43,7 @@ public class AddFromDialectSpecAction extends AbstractAction {
     RefexChronicleBI<?> newRefex;
 
     public AddFromDialectSpecAction(String actionName,
-            ConceptFact concept, SpecFact<?> spec, String dialect, I_ConfigAceFrame config) throws IOException {
+            ConceptFact concept, SpecFact<?> spec, LANG_CODE dialect, I_ConfigAceFrame config) throws IOException {
         super(actionName);
         this.concept = concept.getConcept();
         this.spec = spec;
@@ -73,26 +75,26 @@ public class AddFromDialectSpecAction extends AbstractAction {
             int usRefexNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
             int gbRefexNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
             int refexNid = 0;
-            if (dialect.equals("en-gb")) {
+            if (dialect.equals(LANG_CODE.EN_GB)) {
                 dialectUuid = Language.EN_UK.getLenient().getPrimUuid();
                 refexNid = gbRefexNid;
-            } else if (dialect.equals("en-us")) {
+            } else if (dialect.equals(LANG_CODE.EN_US)) {
                 dialectUuid = Language.EN_US.getLenient().getPrimUuid();
                 refexNid = usRefexNid;
             }
             
-            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
 
             if (type == syn) {
                 DescCAB descSpecPref = new DescCAB(
                         concept.getNid(),
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
-                        "en",
+                        LANG_CODE.EN,
                         descSpec.getDescText(),
                         false);
                 newDesc = tc.constructIfNotCurrent(descSpecPref);
-                if (dialect.equals("en-gb")) {
+                if (dialect.equals(LANG_CODE.EN_GB)) {
                     RefexCAB refexSpecPrefGb = new RefexCAB(
                         TK_REFSET_TYPE.CID,
                         descSpecPref.getComponentNid(),
@@ -127,11 +129,11 @@ public class AddFromDialectSpecAction extends AbstractAction {
             Ts.get().addUncommitted(desc);
             Ts.get().addUncommitted(refex);
         } catch (IOException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+            AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (ContradictionException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
 }

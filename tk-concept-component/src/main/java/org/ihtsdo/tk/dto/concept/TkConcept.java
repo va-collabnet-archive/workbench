@@ -2,7 +2,7 @@ package org.ihtsdo.tk.dto.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -199,7 +199,7 @@ public class TkConcept {
 
     public TkConcept(ConceptVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
             long offset, boolean mapAll, ViewCoordinate vc)
-            throws IOException, ContraditionException {
+            throws IOException, ContradictionException {
         this(another, exclusions, conversionMap,
                 offset, mapAll, vc, vc, vc);
     }
@@ -209,7 +209,7 @@ public class TkConcept {
             ViewCoordinate conceptVc,
             ViewCoordinate descVc,
             ViewCoordinate relVc)
-            throws IOException, ContraditionException {
+            throws IOException, ContradictionException {
         super();
         this.primordialUuid = conversionMap.get(another.getPrimUuid());
         this.annotationStyleRefex = another.isAnnotationStyleRefex();

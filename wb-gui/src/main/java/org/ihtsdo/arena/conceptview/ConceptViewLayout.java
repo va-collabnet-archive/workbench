@@ -22,7 +22,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.conceptview.ConceptView.PanelSection;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.RelAssertionType;
@@ -168,7 +168,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     //~--- methods -------------------------------------------------------------
     private void addRelGroups(Collection<RelGroupVersionBI> relGroups, boolean cprAdded, CollapsePanel cpr,
             GridBagConstraints gbc)
-            throws IOException, TerminologyException, ContraditionException {
+            throws IOException, TerminologyException, ContradictionException {
         int currentRgRels = 0;
         boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
 
@@ -494,7 +494,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     ConAttrAnalogBI cav = null;
                     try {
                         cav = (ConAttrAnalogBI) cv.getConAttrsActive();
-                    } catch (ContraditionException ex) {
+                    } catch (ContradictionException ex) {
                         Collection<? extends ComponentVersionBI> versions = cv.getConAttrs().getVersions(cv.getViewCoordinate());
                         if (!versions.isEmpty()) {
                             removeContradictions(versions);
@@ -757,7 +757,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
 
                             addRelGroups(inferredRelGroups, cprAdded, cpr, gbc);
                         }
-                    } catch (ContraditionException e) {
+                    } catch (ContradictionException e) {
                         AceLog.getAppLog().alertAndLogException(e);
                     }
 
@@ -999,7 +999,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         }
     }
 
-    protected void setupHistoryPane() throws IOException, ContraditionException {
+    protected void setupHistoryPane() throws IOException, ContradictionException {
         JPanel historyPanel = cView.getHistoryPanel();
         historyPanel.removeAll();
         historyPanel.setLayout(new GridBagLayout());
@@ -1270,7 +1270,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     }
 
     public DragPanelRelGroup getRelGroupComponent(RelGroupVersionBI group, CollapsePanel parentCollapsePanel)
-            throws TerminologyException, IOException, ContraditionException {
+            throws TerminologyException, IOException, ContradictionException {
         DragPanelRelGroup relGroupPanel = new DragPanelRelGroup(new GridBagLayout(), this, parentCollapsePanel,
                 group);
 

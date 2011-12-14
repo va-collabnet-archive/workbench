@@ -4,7 +4,7 @@ package org.ihtsdo.tk.api.coordinate;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -300,7 +300,7 @@ public class ViewCoordinate implements Serializable {
          }
       } catch (IOException ex) {
          sb.append(ex.getLocalizedMessage());
-      } catch (ContraditionException ex) {
+      } catch (ContradictionException ex) {
          sb.append(ex.getLocalizedMessage());
       }
    }

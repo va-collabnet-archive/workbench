@@ -16,7 +16,7 @@ import org.ihtsdo.tk.api.media.MediaChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
-public interface TerminologyConstructorBI {
+public interface TerminologyBuilderBI {
 
     /**
      *  
@@ -26,7 +26,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> construct(RefexCAB blueprint) throws IOException, InvalidCAB;
+    RefexChronicleBI<?> construct(RefexCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -36,7 +36,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RefexChronicleBI<?> constructIfNotCurrent(RefexCAB blueprint) throws IOException, InvalidCAB;
+    RefexChronicleBI<?> constructIfNotCurrent(RefexCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  
@@ -46,7 +46,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI construct(RelCAB blueprint) throws IOException, InvalidCAB;
+    RelationshipChronicleBI construct(RelCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -56,7 +56,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    RelationshipChronicleBI constructIfNotCurrent(RelCAB blueprint) throws IOException, InvalidCAB;
+    RelationshipChronicleBI constructIfNotCurrent(RelCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  
@@ -66,7 +66,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI construct(DescCAB blueprint) throws IOException, InvalidCAB;
+    DescriptionChronicleBI construct(DescCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -76,7 +76,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    DescriptionChronicleBI constructIfNotCurrent(DescCAB blueprint) throws IOException, InvalidCAB;
+    DescriptionChronicleBI constructIfNotCurrent(DescCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  
@@ -86,7 +86,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB;
+    MediaChronicleBI construct(MediaCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -96,7 +96,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB;
+    MediaChronicleBI constructIfNotCurrent(MediaCAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  
@@ -106,7 +106,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB;
+    ConceptChronicleBI construct(ConceptCB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version 
@@ -117,7 +117,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint) throws IOException, InvalidCAB;
+    ConceptChronicleBI constructIfNotCurrent(ConceptCB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  
@@ -126,7 +126,7 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB;
+    ConAttrChronicleBI construct(ConAttrAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      *  This method incurs an extra cost to determine if a current version already meets the specification. 
@@ -135,5 +135,5 @@ public interface TerminologyConstructorBI {
      * @throws IOException
      * @throws InvalidAmendmentSpec
      */
-    ConAttrChronicleBI constructIfNotCurrent(ConAttrAB blueprint) throws IOException, InvalidCAB;
+    ConAttrChronicleBI constructIfNotCurrent(ConAttrAB blueprint) throws IOException, InvalidCAB, ContradictionException;
 }

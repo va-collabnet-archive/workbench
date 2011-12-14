@@ -9,11 +9,13 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import java.io.IOException;
 
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 public interface ComponentVersionBI extends ComponentBI {
    boolean sapIsInRange(int min, int max);
 
-   String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException;
+   String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException;
 
    //~--- get methods ---------------------------------------------------------
 
@@ -58,4 +60,7 @@ public interface ComponentVersionBI extends ComponentBI {
     * @return <code>true</code> if the versions are equal. <code>false</code> otherwise.
     */
    boolean versionsEqual(ViewCoordinate vc1, ViewCoordinate vc2, Boolean compareAuthoring);
+   
+   CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc) 
+           throws IOException, ContradictionException, InvalidCAB;
 }

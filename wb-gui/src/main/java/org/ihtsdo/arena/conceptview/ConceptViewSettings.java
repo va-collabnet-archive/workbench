@@ -16,7 +16,7 @@ import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
 import org.ihtsdo.taxonomy.path.PathExpander;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
@@ -509,7 +509,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
                      view.getCvLayout().setupHistoryPane();
                   } catch (IOException ex) {
                      AceLog.getAppLog().alertAndLogException(ex);
-                  } catch (ContraditionException ex) {
+                  } catch (ContradictionException ex) {
                      AceLog.getAppLog().alertAndLogException(ex);
                   }
                }

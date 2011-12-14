@@ -3,7 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.description;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -89,7 +89,7 @@ public class TkDescription extends TkComponent<TkDescriptionRevision> implements
 
    public TkDescription(DescriptionVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
                         long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
 
       if (mapAll) {

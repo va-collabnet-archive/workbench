@@ -34,7 +34,7 @@ import org.drools.spi.Evaluator;
 import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
@@ -147,7 +147,7 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
             } catch (IOException e) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);
                 return this.getOperator().isNegated() ^ (false);
-            } catch (ContraditionException e) {
+            } catch (ContradictionException e) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);
                 return this.getOperator().isNegated() ^ (false);
             }
@@ -167,7 +167,7 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
             } catch (IOException e) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
                 return parentMember;
-            } catch (ContraditionException e) {
+            } catch (ContradictionException e) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
                 return parentMember;
             }

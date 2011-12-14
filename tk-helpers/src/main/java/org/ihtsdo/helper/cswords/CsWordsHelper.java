@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -76,7 +76,7 @@ public class CsWordsHelper {
                     csWordSetMap.put(maybeSigNid, maybeCsWordSet);
                     CsWordsHelper.csWordSetMap = csWordSetMap;
                 }
-            } catch (ContraditionException ex) {
+            } catch (ContradictionException ex) {
                 throw new IOException(ex);
             } finally {
                 initLock.unlock();

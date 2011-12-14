@@ -27,7 +27,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -48,6 +48,9 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.blueprint.ConAttrAB;
+import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
@@ -172,7 +175,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
         return false;
     }
-    
+
     @Override
     public int hashCode() {
         return Hashcode.compute(new int[]{nid});
@@ -341,6 +344,13 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         return nid;
     }
 
+    @Override
+    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        ConAttrAB conAttrBp = new ConAttrAB(getConId(), defined,
+                getVersion(vc), vc);
+        return conAttrBp;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -434,7 +444,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     @Override
-    public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContraditionException {
+    public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContradictionException {
         List<ConceptAttributes.Version> vForC = getVersions(c);
 
         if (vForC.isEmpty()) {
@@ -446,7 +456,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         if (vForC.size() > 1) {
-            throw new ContraditionException(vForC.toString());
+            throw new ContradictionException(vForC.toString());
         }
 
         if (!vForC.isEmpty()) {
@@ -612,6 +622,11 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
+        public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
+            return getCv().makeBlueprint(vc);
+        }
+
+        @Override
         public I_ConceptAttributePart getMutablePart() {
             return (I_ConceptAttributePart) super.getMutablePart();
         }
@@ -632,7 +647,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContraditionException {
+        public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContradictionException {
             return ConceptAttributes.this.getVersion(c);
         }
 

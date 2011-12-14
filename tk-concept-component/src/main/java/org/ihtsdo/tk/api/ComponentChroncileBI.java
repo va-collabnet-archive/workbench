@@ -11,7 +11,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 public interface ComponentChroncileBI<T extends ComponentVersionBI>
         extends ComponentBI {
 
-    T getVersion(ViewCoordinate c) throws ContraditionException;
+    T getVersion(ViewCoordinate c) throws ContradictionException;
 
     Collection<? extends T> getVersions(ViewCoordinate c);
 

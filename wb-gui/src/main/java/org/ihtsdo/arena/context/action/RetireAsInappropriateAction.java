@@ -34,8 +34,9 @@ import org.ihtsdo.arena.WizardPanel;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -274,7 +275,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     analogComponent.getNid(),
                     refexConcept.getNid());
             newSpec.put(RefexProperty.CNID1, nid);
-            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             tc.construct(newSpec);
             if (!refexConcept.isAnnotationStyleRefex()) {
@@ -285,6 +286,8 @@ public class RetireAsInappropriateAction extends AbstractAction {
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InvalidCAB e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        } catch (ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }

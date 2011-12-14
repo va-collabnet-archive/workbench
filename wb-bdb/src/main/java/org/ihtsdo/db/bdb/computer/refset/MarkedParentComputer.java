@@ -53,7 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.JOptionPane;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -81,7 +81,7 @@ public class MarkedParentComputer {
    private RefsetSpec                          specHelper;
    private StopActionListener                  stopListener;
    private ViewCoordinate                      viewCoordinate;
-    private final TerminologyConstructorBI builder;
+    private final TerminologyBuilderBI builder;
 
    //~--- constructors --------------------------------------------------------
 
@@ -177,7 +177,7 @@ public class MarkedParentComputer {
          for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getCurrentRefsetMembers(viewCoordinate)) {
             RefexCnidVersionBI<?> cnidMpv = (RefexCnidVersionBI) mpv;
             if (!allParents.isMember(cnidMpv.getCnid1())) {
-                RefexCAB rcBp = cnidMpv.getRefexEditSpec();
+                RefexCAB rcBp = cnidMpv.makeBlueprint(viewCoordinate);
                 rcBp.setStatusUuid(SnomedMetadataRfx.getSTATUS_RETIRED().getUuids()[0]);
                 builder.constructIfNotCurrent(rcBp);
             } else {

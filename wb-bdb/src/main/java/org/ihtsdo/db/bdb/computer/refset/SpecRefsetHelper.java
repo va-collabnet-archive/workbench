@@ -425,7 +425,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
                 
                 RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getVcWithAllStatusValues());
-                RefexCAB bluePrint = existingVersion.getRefexEditSpec();
+                RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate());
                 bluePrint.setStatusUuid(SnomedMetadataRfx.getSTATUS_CURRENT().getUuids()[0]);
                 bluePrint.setMemberUuid(memberUuid);
                 builder.constructIfNotCurrent(bluePrint);

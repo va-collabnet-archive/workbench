@@ -101,34 +101,34 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public TerminologyConstructorBI getAmender(EditCoordinate ec) {
-      return store.getTerminologyConstructor(ec, vc);
+   public TerminologyBuilderBI getAmender(EditCoordinate ec) {
+      return store.getTerminologyBuilder(ec, vc);
    }
 
    @Override
-   public TerminologyConstructorBI getBuilder(EditCoordinate ec) {
-      return store.getTerminologyConstructor(ec, vc);
+   public TerminologyBuilderBI getBuilder(EditCoordinate ec) {
+      return store.getTerminologyBuilder(ec, vc);
    }
 
    @Override
    public ComponentVersionBI getComponentVersion(Collection<UUID> uuids)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       return store.getComponentVersion(vc, uuids);
    }
 
    @Override
    public ComponentVersionBI getComponentVersion(ComponentContainerBI cc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       return getComponentVersion(cc.getNid());
    }
 
    @Override
-   public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException {
+   public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException {
       return store.getComponentVersion(vc, nid);
    }
 
    @Override
-   public ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException {
+   public ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException {
       return store.getComponentVersion(vc, uuids);
    }
 

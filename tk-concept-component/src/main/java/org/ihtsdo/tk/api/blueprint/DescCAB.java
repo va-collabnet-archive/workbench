@@ -16,9 +16,15 @@
 package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
@@ -31,44 +37,56 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public static final UUID descSpecNamespace =
             UUID.fromString("457e4a20-5284-11e0-b8af-0800200c9a66");
     private UUID conceptUuid;
-
     private UUID typeUuid;
     public String lang;
     public String text;
     public boolean initialCaseSignificant;
 
     public DescCAB(
-            int conceptNid, int typeNid, String lang, String text,
-            boolean initialCaseSignificant)
-            throws IOException {
+            int conceptNid, int typeNid, LANG_CODE lang, String text, boolean initialCaseSignificant)
+            throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 lang, text, initialCaseSignificant);
     }
 
     public DescCAB(
-            UUID conceptUuid, UUID typeUuid, String lang, String text,
-            boolean initialCaseSignificant)
-            throws IOException {
-        this(conceptUuid, typeUuid, lang, text, initialCaseSignificant, null);
+            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text, boolean initialCaseSignificant)
+            throws IOException, InvalidCAB, ContradictionException {
+        this(conceptUuid, typeUuid, lang, text, initialCaseSignificant,
+                null, null, null);
     }
 
     public DescCAB(
-            UUID conceptUuid, UUID typeUuid, String lang, String text,
-            boolean initialCaseSignificant, UUID componentUuid) throws IOException {
-        super(componentUuid);
+            int conceptNid, int typeNid, LANG_CODE lang, String text, boolean initialCaseSignificant,
+            DescriptionVersionBI dv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        this(Ts.get().getComponent(conceptNid).getPrimUuid(),
+                Ts.get().getComponent(typeNid).getPrimUuid(),
+                lang, text, initialCaseSignificant, dv, vc);
+    }
+
+    public DescCAB(
+            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text, 
+            boolean initialCaseSignificant, DescriptionVersionBI dv, ViewCoordinate vc) throws
+            IOException, InvalidCAB, ContradictionException {
+        this(conceptUuid, typeUuid, lang, text, initialCaseSignificant,
+                null, dv, vc);
+    }
+
+    public DescCAB(
+            UUID conceptUuid, UUID typeUuid, LANG_CODE lang, String text,
+            boolean initialCaseSignificant, UUID componentUuid,
+            DescriptionVersionBI dv, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, dv, vc);
 
         this.conceptUuid = conceptUuid;
-        this.lang = lang;
+        this.lang = lang.getFormatedLanguageCode();
         this.text = text;
         this.initialCaseSignificant = initialCaseSignificant;
         this.typeUuid = typeUuid;
         if (getComponentUuid() == null) {
             try {
-                setComponentUuid(UuidT5Generator.get(descSpecNamespace,
-                        getPrimoridalUuidStr(conceptUuid)
-                        + lang
-                        + text));
+                recomputeUuid();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             } catch (InvalidCAB ex) {
@@ -79,6 +97,21 @@ public class DescCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    @Override
+    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
+            IOException, InvalidCAB, ContradictionException {
+        setComponentUuid(UuidT5Generator.get(descSpecNamespace,
+                getPrimoridalUuidStr(conceptUuid)
+                + lang
+                + text));
+        for(RefexCAB annotBp: getAnnotationBlueprints()){
+            annotBp.setReferencedComponentUuid(getComponentUuid());
+            annotBp.recomputeUuid();
+            
+        }
+
+    }
+
     public UUID getTypeUuid() {
         return typeUuid;
     }
@@ -86,11 +119,11 @@ public class DescCAB extends CreateOrAmendBlueprint {
     public int getTypeNid() throws IOException {
         return Ts.get().getNidForUuids(typeUuid);
     }
-    
+
     public int getConceptNid() throws IOException {
         return Ts.get().getNidForUuids(conceptUuid);
     }
-    
+
     public UUID getConceptUuid() {
         return conceptUuid;
     }
@@ -107,6 +140,14 @@ public class DescCAB extends CreateOrAmendBlueprint {
         return text;
     }
     
+    protected void setConceptUuid(UUID conceptNewUuid){
+        this.conceptUuid = conceptNewUuid;
+    }
+    
+    protected void setText(String newText){
+        this.text = newText;
+    }
+
     public boolean validate(DescriptionVersionBI version) throws IOException {
         if (version.getStatusNid() != getStatusNid()) {
             return false;
@@ -132,5 +173,3 @@ public class DescCAB extends CreateOrAmendBlueprint {
         return true;
     }
 }
-
-

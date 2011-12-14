@@ -16,7 +16,7 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
@@ -209,7 +209,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public abstract String toUserString();
 
     @Override
-    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+    public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
         return toUserString();
     }
 

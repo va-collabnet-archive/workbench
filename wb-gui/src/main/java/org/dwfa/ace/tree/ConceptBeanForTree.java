@@ -47,7 +47,7 @@ import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -694,7 +694,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
 
    @Override
    public Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       return bean.getRelGroups(vc);
    }
 
@@ -844,7 +844,7 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    }
 
    @Override
-   public ConceptVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+   public ConceptVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
       return bean.getVersion(c);
    }
 

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -109,7 +109,7 @@ public class ConceptSpec implements SpecBI {
             validateDescription(local);
             validateRelationships(local);
             return local;
-        } catch (ContraditionException e) {
+        } catch (ContradictionException e) {
             throw new ValidationException(e);
         }
     }
@@ -131,7 +131,7 @@ public class ConceptSpec implements SpecBI {
             validateDescription(local, c);
             validateRelationships(local, c);
             return local;
-        } catch (ContraditionException e) {
+        } catch (ContradictionException e) {
             throw new ValidationException(e);
         }
     }
@@ -195,7 +195,7 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    private void validateDescription(ConceptChronicleBI local) throws IOException, ContraditionException {
+    private void validateDescription(ConceptChronicleBI local) throws IOException, ContradictionException {
         boolean found = false;
         for (DescriptionChronicleBI desc : local.getDescs()) {
             for (DescriptionVersionBI descv : desc.getVersions()) {
@@ -213,7 +213,7 @@ public class ConceptSpec implements SpecBI {
         }
     }
 
-    private void validateDescription(ConceptVersionBI local, ViewCoordinate c) throws IOException, ContraditionException {
+    private void validateDescription(ConceptVersionBI local, ViewCoordinate c) throws IOException, ContradictionException {
         boolean found = false;
         for (DescriptionVersionBI desc : local.getDescsActive()) {
             if (desc.getText().equals(description)) {

@@ -5,6 +5,7 @@ package org.ihtsdo.concept.component.attributes;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
+import java.io.IOException;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
@@ -12,7 +13,8 @@ import org.dwfa.ace.api.Terms;
 
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
@@ -21,6 +23,7 @@ import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributePart<ConceptAttributesRevision>,
@@ -181,7 +184,7 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    }
 
    @Override
-   public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public ConceptAttributes.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return primordialComponent.getVersion(c);
    }
 
@@ -207,4 +210,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
       this.defined = defined;
       modified();
    }
+
+    @Override
+    public ConAttrAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        ConAttrAB conAttrBp = new ConAttrAB(primordialComponent.getConceptNid(), defined, getVersion(vc), vc);
+        return conAttrBp;
+    }
 }

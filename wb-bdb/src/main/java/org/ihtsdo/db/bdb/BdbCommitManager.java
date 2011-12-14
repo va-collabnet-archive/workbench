@@ -88,6 +88,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 public class BdbCommitManager {
@@ -858,9 +864,9 @@ public class BdbCommitManager {
         }
     }
 
-    public static boolean forget(I_ConceptAttributeVersioned attr) throws IOException {
-        Concept c = Bdb.getConcept(attr.getConId());
-        ConceptAttributes a = (ConceptAttributes) attr;
+    public static boolean forget(ConAttrVersionBI attr) throws IOException {
+        Concept c = Bdb.getConcept(attr.getConceptNid());
+      ConceptAttributes a = (ConceptAttributes) attr;
 
         if ((a.getTime() != Long.MAX_VALUE) && (a.getTime() != Long.MIN_VALUE)) {
 
@@ -901,8 +907,9 @@ public class BdbCommitManager {
         return false;
     }
 
-    public static void forget(I_DescriptionVersioned desc) throws IOException {
-        Description d = (Description) desc;
+
+   public static void forget(DescriptionVersionBI desc) throws IOException {
+      Description d = (Description) desc;
         Concept c = Bdb.getConcept(d.getConceptNid());
 
         if (d.getTime() != Long.MAX_VALUE) {
@@ -941,11 +948,11 @@ public class BdbCommitManager {
         Terms.get().addUncommittedNoChecks(c);
     }
 
-    @SuppressWarnings("unchecked")
-    public static void forget(I_ExtendByRef extension) throws IOException {
-        RefsetMember m = (RefsetMember) extension;
-        Concept c = Bdb.getConcept(m.getRefsetId());
-        ComponentBI component = Bdb.getComponent(m.getComponentNid());
+   @SuppressWarnings("unchecked")
+   public static void forget(RefexChronicleBI extension) throws IOException {
+      RefsetMember m         = (RefsetMember) extension;
+      Concept      c         = Bdb.getConcept(m.getRefsetId());
+      ComponentBI  component = Bdb.getComponent(m.getComponentNid());
 
         if (component instanceof Concept) {
             component = ((Concept) component).getConAttrs();
@@ -990,7 +997,7 @@ public class BdbCommitManager {
             m.setStatusAtPositionNid(-1);
         }
 
-        if (WorkflowHelper.isWorkflowCapabilityAvailable() && (WorkflowHelper.getWorkflowRefsetNid() == extension.getRefsetId())) {
+        if (WorkflowHelper.isWorkflowCapabilityAvailable() && (WorkflowHelper.getWorkflowRefsetNid() == extension.getCollectionNid())) {
             uncommittedWfMemberIds.remove(extension);
         }
 
@@ -998,15 +1005,17 @@ public class BdbCommitManager {
         Terms.get().addUncommittedNoChecks(c);
     }
 
-    public static void forget(I_GetConceptData concept) throws IOException {
-        Concept c = (Concept) concept;
+
+   public static void forget(ConceptChronicleBI concept) throws IOException {
+      Concept c = (Concept) concept;
 
         c.cancel();
     }
 
-    public static void forget(I_RelVersioned rel) throws IOException {
-        Concept c = Bdb.getConcept(rel.getC1Id());
-        Relationship r = (Relationship) rel;
+
+   public static void forget(RelationshipVersionBI rel) throws IOException {
+      Concept      c = Bdb.getConcept(rel.getOriginNid());
+      Relationship r = (Relationship) rel;
 
         if (r.getTime() != Long.MAX_VALUE) {
 

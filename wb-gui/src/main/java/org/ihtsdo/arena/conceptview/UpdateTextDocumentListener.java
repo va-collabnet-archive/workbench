@@ -24,7 +24,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -59,7 +60,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     ConceptChronicleBI usConcept;
     int prefNid;
     int acceptNid;
-    TerminologyConstructorBI tc;
+    TerminologyBuilderBI tc;
     String text;
 
     public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
@@ -140,12 +141,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (UnsupportedDialectOrLanguage ex) {
             AceLog.getAppLog().alertAndLogException(ex);
+        }catch (ContradictionException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
     }
     
-    private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException{
+    private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException{
         config = Terms.get().getActiveAceFrameConfig();
-            tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             if (update) { //create new
                 
@@ -209,7 +212,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             update = false;
     }
 
-    private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
+    private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage,
+            ContradictionException {
 
         desc.setText(text);
         RefexCAB refexSpecUs = new RefexCAB(
@@ -232,7 +236,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         Ts.get().addUncommitted(refexUs);
     }
 
-    private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
+    private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
         desc.setText(text);
 
         if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
@@ -281,7 +285,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     private void doFsnUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex)
             throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
-        TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+        TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         desc.setText(text);
@@ -291,8 +295,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     }
 
     private void doSynUpdate(RefexCnidAnalogBI gbRefex, RefexCnidAnalogBI usRefex) throws PropertyVetoException,
-            IOException, InvalidCAB, UnsupportedDialectOrLanguage {
-        TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
+        TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
 
         desc.setText(text);
@@ -364,6 +368,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         } catch (InvalidCAB ex) {
             throw new PropertyVetoException(ex.toString(), pce);
         } catch (UnsupportedDialectOrLanguage ex) {
+            throw new PropertyVetoException(ex.toString(), pce);
+        } catch (ContradictionException ex) {
             throw new PropertyVetoException(ex.toString(), pce);
         }
     }

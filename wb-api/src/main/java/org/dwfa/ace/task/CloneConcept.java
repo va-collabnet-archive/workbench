@@ -19,39 +19,41 @@ package org.dwfa.ace.task;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
-
+import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PositionSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
-@BeanList(specs = { @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN)})
 public class CloneConcept extends AbstractTask {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -70,76 +72,72 @@ public class CloneConcept extends AbstractTask {
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
-
     }
 
-    /**
-     * @TODO use a type 1 uuid generator instead of a random uuid...
-     */
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        I_GetConceptData newConcept = null;
+        ConceptChronicleBI newConcept = null;
         try {
-            I_TermFactory tf = Terms.get();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            Set<PositionBI> positionSet = new HashSet<PositionBI>();
-            for (PathBI path : config.getEditingPathSet()) {
-            	positionSet.add(tf.newPosition(path, Long.MAX_VALUE));
-            }
-            PositionSetReadOnly clonePositions = new PositionSetReadOnly(positionSet);
+            ViewCoordinate vc = config.getViewCoordinate();
+            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), vc);
             I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
 
-            I_GetConceptData conceptToClone = (I_GetConceptData) host.getTermComponent();
-            if (conceptToClone == null) {
+            I_GetConceptData c = (I_GetConceptData) host.getTermComponent();
+            ConceptVersionBI original = Ts.get().getConceptVersion(vc, c.getNid());
+            if (original == null) {
                 throw new TaskFailedException("There is no concept in the component view to clone...");
             }
-
-            newConcept = Terms.get().newConcept(UUID.randomUUID(), false, config);
-
-            for (I_DescriptionTuple desc : conceptToClone.getDescriptionTuples(config.getAllowedStatus(), null,
-                clonePositions, config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                tf.newDescription(UUID.randomUUID(), newConcept, desc.getLang(), "Clone of " + desc.getText(),
-                    tf.getConcept(desc.getTypeId()), config);
+            ConceptCB conceptBp = original.makeBlueprint();
+            conceptBp.setComponentUuid(UUID.randomUUID());
+            List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
+            for(DescCAB fsnBp : fsnCABs){
+                String text = fsnBp.getText();
+                conceptBp.updateFsn("Clone of " + text, fsnBp, null);
             }
-
-            for (I_RelTuple rel : conceptToClone.getSourceRelTuples(config.getAllowedStatus(), null, clonePositions,
-                config.getPrecedence(), config.getConflictResolutionStrategy())) {
-                tf.newRelationship(UUID.randomUUID(), newConcept, tf.getConcept(rel.getTypeId()),
-                    tf.getConcept(rel.getC2Id()), tf.getConcept(rel.getCharacteristicId()),
-                    tf.getConcept(rel.getRefinabilityId()), tf.getConcept(rel.getStatusId()), rel.getGroup(), config);
+            List<DescCAB> prefCABs = conceptBp.getPrefCABs();
+            for(DescCAB prefBp : prefCABs){
+                String text = prefBp.getText();
+                conceptBp.updatePreferredName("Clone of " + text, prefBp, null);
             }
-
+            
+            newConcept = builder.construct(conceptBp);
             host.unlink();
-            host.setTermComponent(newConcept);
-            Terms.get().addUncommitted(newConcept);
+            I_AmTermComponent newTerm = (I_AmTermComponent) newConcept;
+            host.setTermComponent(newTerm);
+            Ts.get().addUncommitted(newConcept);
 
             return Condition.CONTINUE;
-        } catch (TerminologyException e) {
-            undoEdits(newConcept, Terms.get());
+        } catch (NoSuchAlgorithmException e) {
+            undoEdits(newConcept);
+            throw new TaskFailedException(e);
+        } catch (UnsupportedEncodingException e) {
+            undoEdits(newConcept);
+            throw new TaskFailedException(e);
+        } catch (InvalidCAB e) {
+            undoEdits(newConcept);
+            throw new TaskFailedException(e);
+        } catch (ContradictionException e) {
+            undoEdits(newConcept);
             throw new TaskFailedException(e);
         } catch (IOException e) {
-            undoEdits(newConcept, Terms.get());
+            undoEdits(newConcept);
             throw new TaskFailedException(e);
         }
     }
 
-    private void undoEdits(I_GetConceptData newConcept, I_TermFactory termFactory) {
-        if (termFactory != null) {
-            if (newConcept != null) {
-                try {
-					termFactory.forget(newConcept);
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-            }
+    private void undoEdits(ConceptChronicleBI concept) {
+        try {
+            Ts.get().forget(concept);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
-
+    
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
-
 }
