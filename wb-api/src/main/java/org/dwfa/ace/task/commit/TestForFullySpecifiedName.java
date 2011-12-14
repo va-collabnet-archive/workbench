@@ -19,20 +19,13 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -49,10 +42,14 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+/*
+ * See TestForPreferredTermValue for comments first.
+ */
 public class TestForFullySpecifiedName extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
+    private ViewCoordinate vc;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -70,7 +67,7 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     @Override
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
-            ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
             ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
             Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
             ArrayList<DescriptionVersionBI> descriptions = new ArrayList<DescriptionVersionBI>();
@@ -124,7 +121,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         dl.add(desc);
                         langs.put(lang, dl);
                     }
-                    if (desc.getTime() == Long.MAX_VALUE && !desc.getText().equals("New Fully Specified Description")) {
+                    /*
+                     * If desc.getTime() == Long.MAX_VALUE, it means the description is
+                     * uncommitted. For any component you can use the isUncommitted() method
+                     * instead.
+                     */
+                    if (desc.isUncommitted() && !desc.getText().equals("New Fully Specified Description")) {
                         String filteredDescription = desc.getText();
                         // new removal using native lucene escaping
                         filteredDescription = QueryParser.escape(filteredDescription);
@@ -136,20 +138,22 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                             if (cnid == cv.getConceptNid())
                                 continue;
                             try {
-                                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                                /*
+                                 * Using dnid since we want the description not the concept the
+                                 * description is on.
+                                 */
+                                DescriptionVersionBI potential_fsn = (DescriptionVersionBI) Ts.get().getComponentVersion(vc, dnid);
                                 if (potential_fsn != null) {
-                                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                                        if (actives.contains(part_search.getStatusNid())
-                                            && fsnSet.contains(part_search.getTypeNid())
-                                            && part_search.getText().equals(desc.getText())
-                                            && part_search.getLang().equals(desc.getLang())) {
+                                        if (actives.contains(potential_fsn.getStatusNid())
+                                            && fsnSet.contains(potential_fsn.getTypeNid())
+                                            && potential_fsn.getText().equals(desc.getText())
+                                            && potential_fsn.getLang().equals(desc.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(
                                                 (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                           : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
                                                 "<html>FSN already used: " + desc.getText(), cv));
                                             break search;
                                         }
-                                    }
                                 }
                             } catch (Exception e) {
                                 AceLog.getAppLog().alertAndLogException(e);

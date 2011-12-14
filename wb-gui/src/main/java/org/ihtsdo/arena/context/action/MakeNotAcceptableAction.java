@@ -14,6 +14,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.spec.AcceptabilityType;
 import org.ihtsdo.arena.spec.Refsets;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -31,10 +32,10 @@ public class MakeNotAcceptableAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     DescriptionVersionBI desc;
-    String dialect;
+    LANG_CODE dialect;
     I_ConfigAceFrame config;
 
-    public MakeNotAcceptableAction(String actionName, DescFact fact, String dialect, I_ConfigAceFrame config) {
+    public MakeNotAcceptableAction(String actionName, DescFact fact, LANG_CODE dialect, I_ConfigAceFrame config) {
         super(actionName);
         this.desc = fact.getComponent();
         this.dialect = dialect;
@@ -51,7 +52,7 @@ public class MakeNotAcceptableAction extends AbstractAction {
             Collection<? extends RefexChronicleBI> refexes =
                     desc.getCurrentRefexes(vc);
 
-            if (dialect.equals("en-us")) {
+            if (dialect.equals(LANG_CODE.EN_US)) {
                 int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_US_LANG.getLenient().getPrimUuid());
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {
@@ -89,7 +90,7 @@ public class MakeNotAcceptableAction extends AbstractAction {
                         }
                     }
                 }
-            } else if (dialect.equals("en-gb")) {
+            } else if (dialect.equals(LANG_CODE.EN_GB)) {
                 int evalRefsetNid = Ts.get().getNidForUuids(Refsets.EN_GB_LANG.getLenient().getPrimUuid());
                 if (refexes != null) {
                     for (RefexChronicleBI refex : refexes) {

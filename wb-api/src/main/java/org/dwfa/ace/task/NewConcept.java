@@ -23,17 +23,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.dwfa.ace.api.*;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
@@ -78,31 +73,67 @@ public class NewConcept extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         ConceptChronicleBI newConcept = null;
 
-        try {@SuppressWarnings("unused")
-            // here to demo how to get the configuration.
+        try {
+            @SuppressWarnings("unused")
+            /*
+             * Get config from worker.
+             */
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+            
+            /*
+             * Get builder to create concepts from blueprints.
+             */
             TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
-
-            I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
-            ConceptChronicleBI concept = Ts.get().getConcept(host.getTermComponent().getConceptNid());
             
+            /*
+             * Get concept which is displayed in the classic view when NewConcept task
+             * is executed. This will be the parent concept for the new concept.
+             */
+            I_HostConceptPlugins host = (I_HostConceptPlugins) worker.readAttachement(WorkerAttachmentKeys.I_HOST_CONCEPT_PLUGINS.name());
+            ConceptChronicleBI parentConcept = Ts.get().getConcept(host.getTermComponent().getConceptNid());
+
+            /*
+             * Create the bluprint for the new concept. Provide fsn and pref
+             * term text. Language is EN. Use Snomed Is a (not: is a).
+             */
             ConceptCB conceptBp = new ConceptCB("new concept (tag)",
                     "new concept",
                     LANG_CODE.EN,
                     Snomed.IS_A.getLenient().getPrimUuid(),
-                    concept.getPrimUuid());
+                    parentConcept.getPrimUuid());
+            
+            /*
+             * Set UUID to be random. Normally computed with a hash of fsn, pref
+             * term and parents. Since text is alwasy 'new concept' for a clone,
+             * this would result in concepts with the same UUID. No need to set
+             * to random if creating a unique concept.
+             */
             conceptBp.setComponentUuid(UUID.randomUUID());
+
+            /*
+             * Get fsn and pref blueprints. This creates the blueprints if they
+             * don't already exist.
+             */
             List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
             List<DescCAB> prefCABs = conceptBp.getPrefCABs();
-            
-            for(DescCAB fsn : fsnCABs){
+
+            /*
+             * Add fsn and add pref term. This adds them with the appropriate
+             * dialect annotations.
+             */
+            for (DescCAB fsn : fsnCABs) {
                 conceptBp.addFsn(fsn, LANG_CODE.EN);
             }
-            
-            for(DescCAB pref : prefCABs){
+
+            for (DescCAB pref : prefCABs) {
                 conceptBp.addFsn(pref, LANG_CODE.EN);
             }
+
+            /*
+             * Construct new concept. This will construct all of the blueprints
+             * within the concept as well.
+             */
             newConcept = builder.construct(conceptBp);
 
             host.unlink();

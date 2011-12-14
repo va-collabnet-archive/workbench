@@ -50,8 +50,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
     @Spec(directory = "tasks/ide", type = BeanType.TASK_BEAN)})
 public class CloneConcept extends AbstractTask {
 
-    /**
-     * 
+    /*
+     *See notes in NewConcept first.
      */
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
@@ -87,8 +87,16 @@ public class CloneConcept extends AbstractTask {
             if (original == null) {
                 throw new TaskFailedException("There is no concept in the component view to clone...");
             }
+            
+            /*
+             * Make blueprint from the orginal concept. Copies exactly.
+             */
             ConceptCB conceptBp = original.makeBlueprint();
-            conceptBp.setComponentUuid(UUID.randomUUID());
+            
+            /*
+             * Add clone of to the text for descriptons. Update fsn or pref term will also
+             * recompute UUID to match based on the new hash.
+             */
             List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
             for(DescCAB fsnBp : fsnCABs){
                 String text = fsnBp.getText();
@@ -99,6 +107,10 @@ public class CloneConcept extends AbstractTask {
                 String text = prefBp.getText();
                 conceptBp.updatePreferredName("Clone of " + text, prefBp, null);
             }
+            /*
+             * Set to random since text will be generated with 'Clone of'
+             */
+            conceptBp.setComponentUuid(UUID.randomUUID());
             
             newConcept = builder.construct(conceptBp);
             host.unlink();
