@@ -44,7 +44,7 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.workflow.api.WorkflowIntepreter;
+import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfPermission;
@@ -134,7 +134,7 @@ public class TestWorklistAndWorkflow extends TestCase {
 			Terms.get().commit();
 			WorkListMember member = workList.getWorkListMembers().iterator().next();
 			
-			WorkflowIntepreter wfInt = new WorkflowIntepreter(wfDef);
+			WorkflowInterpreter wfInt = new WorkflowInterpreter(wfDef);
 			
 			System.out.println(wfInt.getNextDestination(member.getWfInstance(), workList));
 			//workList.getPromotionRefset(config).setPromotionStatus(member.getId(), statusConceptId)

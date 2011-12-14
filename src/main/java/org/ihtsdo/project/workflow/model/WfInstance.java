@@ -1,8 +1,17 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 
 public class WfInstance {
 	
@@ -82,6 +91,26 @@ public class WfInstance {
 
 	public void setDestination(WfUser destination) {
 		this.destination = destination;
+	}
+	
+	public static void updateInstanceState(WfInstance instance, WfState newState) throws Exception {
+		I_TermFactory tf = Terms.get();
+		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+		WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.workListId), config);
+		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
+		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), 
+				tf.uuidToNative(newState.getId()));
+		instance.setState(newState);
+	}
+	
+	public static void updateInstanceUser(WfInstance instance, WfUser user) throws Exception {
+		I_TermFactory tf = Terms.get();
+		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+		WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.workListId), config);
+		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
+		pormAssigRefset.setDestination(tf.uuidToNative(instance.componentId), 
+				tf.uuidToNative(user.getId()));
+		instance.setDestination(user);
 	}
 
 }
