@@ -47,6 +47,17 @@ public class WfComponentProvider {
 				if (TerminologyProjectDAO.isActive(attr.getStatusNid())){
 					wfUsers.add(new WfUser(user.toUserString(),user.getUids().iterator().next(),null));
 
+					Set<? extends I_GetConceptData> allDescUsers = user.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
+							allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME,
+							Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+					for (I_GetConceptData descUser : allDescUsers) {
+
+						attr = descUser.getConceptAttributes();
+						if (TerminologyProjectDAO.isActive(attr.getStatusNid())){
+							wfUsers.add(new WfUser(descUser.toUserString(),descUser.getUids().iterator().next(),null));
+
+						}
+					}
 				}
 			}
 

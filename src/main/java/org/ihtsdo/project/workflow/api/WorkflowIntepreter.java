@@ -156,6 +156,7 @@ public class WorkflowIntepreter {
 			ksession.setGlobal("actions", actions);
 			prepActions = new ArrayList<String>();
 			ksession.setGlobal("prepActions", prepActions);
+			ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
 
 			ArrayList<Object> facts = new ArrayList<Object>();
 			facts.add(instance);
