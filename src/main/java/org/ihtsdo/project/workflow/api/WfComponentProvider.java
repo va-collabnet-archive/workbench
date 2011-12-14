@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
@@ -67,7 +68,34 @@ public class WfComponentProvider {
 
 		return wfUsers;
 	}
+	private String getPreferredTermFromAuxiliaryHier(I_GetConceptData concept){
 
+		I_ConfigAceFrame config;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			List<? extends I_DescriptionTuple> descTuples;
+
+			descTuples = concept.getDescriptionTuples(
+					config.getAllowedStatus(), 
+					(config.getDescTypes().getSetValues().length == 0)?null:config.getDescTypes(), 
+							config.getViewPositionSetReadOnly(), 
+							Precedence.TIME, config.getConflictResolutionStrategy());
+
+			for (I_DescriptionTuple tuple : descTuples) {
+				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()
+						&& TerminologyProjectDAO.isActive( tuple.getStatusNid())) {
+					return  tuple.getText();
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "";
+	}
 	public WfUser getUserByUUID(UUID id){
 		WfUser wfUser = null;
 		try {
@@ -197,11 +225,7 @@ public class WfComponentProvider {
 
 	public WfRole roleConceptToWfRole(I_GetConceptData role) {
 		WfRole wfrole = null;
-		try {
-			wfrole = new WfRole(role.getInitialText(), role.getPrimUuid());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		wfrole = new WfRole(getPreferredTermFromAuxiliaryHier(role), role.getPrimUuid());
 		return wfrole;
 	}
 
