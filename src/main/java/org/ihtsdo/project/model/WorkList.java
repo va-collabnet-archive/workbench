@@ -84,9 +84,18 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		if (uids!=null)
 			this.refsetConcept=Terms.get().getConcept(uids);
 		this.id = id;
+		this.refsetId=id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
 		
+	}
+	
+	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
+		WorkList worklist=new WorkList(worklistMetadata.getName(),worklistMetadata.getId(),worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
+		worklist.setWorkflowDefinition(worklistMetadata.getWorkflowDefinition());
+		worklist.setWorkflowDefinitionFileName(worklistMetadata.getWorkflowDefinitionFileName());
+		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
+		return worklist;
 	}
 	
 	/**

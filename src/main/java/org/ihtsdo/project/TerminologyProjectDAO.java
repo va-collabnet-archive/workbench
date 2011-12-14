@@ -51,7 +51,6 @@ import net.jini.lookup.entry.Name;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.drools.command.runtime.rule.GetObjectCommand;
 import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -67,8 +66,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -94,6 +93,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
+import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
@@ -2250,21 +2250,18 @@ public class TerminologyProjectDAO {
 				allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 				I_IntSet descriptionTypes =  termFactory.newIntSet();
 				descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-				WorkList deserializedWorkListWithMetadata = null;
+				WorklistMetadata deserializedWorkListMetadata = null;
 				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
 					if (extension.getComponentNid() == workListConcept.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 						String metadata = part.getStringValue();
-//						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
-						deserializedWorkListWithMetadata = (WorkList) getObjectFromJSon (metadata);
+						//						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
+						deserializedWorkListMetadata = (WorklistMetadata) getObjectFromJSon (metadata);
 					}
 				}
-				if (deserializedWorkListWithMetadata != null) {
-					workList = new WorkList(name, workListConcept.getConceptNid(), 
-							workListConcept.getUids(),
-							deserializedWorkListWithMetadata.getPartitionUUID());
-				}
+				if (deserializedWorkListMetadata != null) {
+					workList =  WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);				}
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2434,8 +2431,11 @@ public class TerminologyProjectDAO {
 		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
 		workList.setWorkflowDefinitionFileName(workListWithMetadata.getWorkflowDefinitionFileName());
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
-//		String metadata = serialize(workList);
-		String metadata =getJSonForm(workList);
+		//		String metadata = serialize(workList);
+		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
+				workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+				workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
+		String metadata =getJSonForm(worklistMetadata);
 
 		termFactory.addUncommittedNoChecks(newConcept);
 		termFactory.addUncommittedNoChecks(newCommentsConcept);
@@ -2481,12 +2481,12 @@ public class TerminologyProjectDAO {
 		XStream xstream = new XStream(new JettisonMappedXmlDriver());
 		String str=xstream.toXML(obj);
 		return str;
-//		//xstream.setMode(XStream.NO_REFERENCES);
-//		//xstream.alias("action", WfAction.class);
-//		System.out.println("JSON Len: " + xstream.toXML(role2).length());
-//		System.out.println(xstream.toXML(role2));
+		//		//xstream.setMode(XStream.NO_REFERENCES);
+		//		//xstream.alias("action", WfAction.class);
+		//		System.out.println("JSON Len: " + xstream.toXML(role2).length());
+		//		System.out.println(xstream.toXML(role2));
 	}
-	
+
 	public static Object getObjectFromJSon(String jSon){
 		XStream xstream = new XStream(new JettisonMappedXmlDriver());
 		Object obj=xstream.fromXML(jSon);
@@ -2528,7 +2528,7 @@ public class TerminologyProjectDAO {
 		}
 		Terms.get().addUncommittedNoChecks(newPartition.getConcept());
 		newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-		
+
 
 		for (Partition loopPartition : partitions) {
 			retirePartition(loopPartition, config);
@@ -2874,11 +2874,11 @@ public class TerminologyProjectDAO {
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""),
 						config); 
-//				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
-//					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-//							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-//					}
-//				}
+				//				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
+				//					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
+				//							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+				//					}
+				//				}
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
@@ -3369,8 +3369,17 @@ public class TerminologyProjectDAO {
 
 			I_GetConceptData componentConcept = termFactory.getConcept(component.getUids());
 
-//			String metadata = serialize(objectWithMetadata);
-			String metadata =getJSonForm(objectWithMetadata);
+			String metadata;
+			//			String metadata = serialize(objectWithMetadata);
+			if (objectWithMetadata instanceof WorkList){
+				WorkList workList=(WorkList)objectWithMetadata;
+				WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
+						workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+						workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
+				metadata =getJSonForm(worklistMetadata);
+			}else{
+				metadata =getJSonForm(objectWithMetadata);
+			}
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					componentConcept.getConceptNid());
 			for (I_ExtendByRef extension : extensions) {
@@ -4008,7 +4017,7 @@ public class TerminologyProjectDAO {
 						throw new Exception("Cannot set next destination for component:\n" + workListMember.getConcept().toUserString());
 					}
 					instance.setDestination(user);
-					
+
 					addConceptAsWorkListMember(workListMember, 
 							Terms.get().uuidToNative(instance.getDestination().getId()),
 							config);
