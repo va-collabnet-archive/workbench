@@ -348,7 +348,7 @@ public class GenerateScripts extends AbstractMojo {
             // write OS X specific options
             if (isOSX()) {
                 writeLine(fw, String.format("-Xdock:name=\"%1$s\"", xdockName));
-                writeFileLine(fw, "-Xdock:icon=config/icon/bundle.gif");
+                writeFileLine(fw, "-Xdock:icon=config/icons/app-icon-256.png");
                 writeLine(fw, "-Dapple.laf.useScreenMenuBar=true");
             }
 
