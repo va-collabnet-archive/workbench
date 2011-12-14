@@ -67,7 +67,7 @@ public class WfComponentProvider {
 
 		return wfUsers;
 	}
-	
+
 	public WfUser getUserByUUID(UUID id){
 		WfUser wfUser = null;
 		try {
@@ -99,7 +99,7 @@ public class WfComponentProvider {
 
 	public List<WfRole> getRoles() {
 		List<WfRole> returnRoles = new ArrayList<WfRole>();
-		
+
 		try {
 			Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
 			allRoles = ProjectPermissionsAPI.getDescendants(allRoles, 
@@ -118,6 +118,33 @@ public class WfComponentProvider {
 
 	}
 
+
+	public List<WfPermission> getPermissionsForUser(WfUser user) {
+		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
+
+		I_ConfigAceFrame config;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
+			Map<I_GetConceptData, I_GetConceptData> permissions = 
+				permissionsApi.getPermissionsForUser(Terms.get().getConcept(user.getId()));
+
+			for (I_GetConceptData loopRole : permissions.keySet()) {
+				I_GetConceptData loopHierarchy = permissions.get(loopRole);
+				WfPermission loopPerm = new WfPermission();
+				loopPerm.setId(UUID.randomUUID());
+				loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
+				loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
+				wfPermissions.add(loopPerm);
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return wfPermissions;
+	}
+
 	public List<WfPermission> getPermissions() {
 		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
 
@@ -128,7 +155,7 @@ public class WfComponentProvider {
 			for (WfUser loopUser : getUsers()) {
 				Map<I_GetConceptData, I_GetConceptData> permissions = 
 					permissionsApi.getPermissionsForUser(Terms.get().getConcept(loopUser.getId()));
-				
+
 				for (I_GetConceptData loopRole : permissions.keySet()) {
 					I_GetConceptData loopHierarchy = permissions.get(loopRole);
 					WfPermission loopPerm = new WfPermission();
@@ -150,7 +177,7 @@ public class WfComponentProvider {
 
 	public List<WfState> getStates() {
 		List<WfState> returnStates = new ArrayList<WfState>();
-		
+
 		try {
 			Set<I_GetConceptData> allStates = new HashSet<I_GetConceptData>();
 			allStates = ProjectPermissionsAPI.getDescendants(allStates, 
@@ -177,7 +204,7 @@ public class WfComponentProvider {
 		}
 		return wfrole;
 	}
-	
+
 	public WfState statusConceptToWfState(I_GetConceptData status) {
 		WfState state = null;
 		try {

@@ -1,13 +1,6 @@
 package org.ihtsdo.project.workflow.api;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,10 +11,8 @@ import org.drools.builder.DecisionTableInputType;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
-import org.drools.definition.KnowledgePackage;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.project.model.WorkList;
@@ -80,7 +71,7 @@ public class WorkflowIntepreter {
 	
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
-		
+		WfComponentProvider cp=new WfComponentProvider();
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
@@ -92,7 +83,7 @@ public class WorkflowIntepreter {
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(instance);
 		facts.add(user);
-		facts.addAll(user.getPermissions());
+		facts.addAll(cp.getPermissionsForUser(user));
 		ksession.execute(facts);
 
 		for (String returnedActionName : actions) {
@@ -108,7 +99,7 @@ public class WorkflowIntepreter {
 
 	public WfAction getPreparationAction(WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
-		
+		WfComponentProvider cp=new WfComponentProvider();
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
@@ -119,7 +110,7 @@ public class WorkflowIntepreter {
 
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(user);
-		facts.addAll(user.getPermissions());
+		facts.addAll(cp.getPermissionsForUser(user));
 		ksession.execute(facts);
 
 		for (String returnedActionName : prepActions) {
