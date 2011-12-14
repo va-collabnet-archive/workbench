@@ -1,7 +1,6 @@
 package org.ihtsdo.project.workflow.api;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -47,17 +46,17 @@ public class WorkflowInterpreter {
 		DecisionTableConfiguration dtableconfiguration =
 			KnowledgeBuilderFactory.newDecisionTableConfiguration();
 		dtableconfiguration.setInputType( DecisionTableInputType.XLS );
-		
+
 		kbase = KnowledgeBaseFactory.newKnowledgeBase();
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
-		
+
 		for (String loopXls : wfDefinition.getXlsFileName()) {
 			Resource xlsRes = ResourceFactory.newFileResource(loopXls);
 			kbuilder.add( xlsRes,
 					ResourceType.DTABLE,
 					dtableconfiguration );
 		}
-		
+
 		for (String loopDrl : wfDefinition.getDrlFileName()) {
 			kbuilder.add(ResourceFactory.newFileResource(loopDrl), 
 					ResourceType.DRL);
@@ -75,10 +74,11 @@ public class WorkflowInterpreter {
 	public WorkflowDefinition getWfDefinition() {
 		return wfDefinition;
 	}
-	
+
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
-		
+		WfComponentProvider cp=new WfComponentProvider();
+
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
@@ -90,7 +90,7 @@ public class WorkflowInterpreter {
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(instance);
 		facts.add(user);
-		facts.addAll(user.getPermissions());
+		facts.addAll(cp.getPermissionsForUser(user));
 		ksession.execute(facts);
 
 		for (String returnedActionName : actions) {
@@ -106,6 +106,7 @@ public class WorkflowInterpreter {
 
 	public WfAction getPreparationAction(WfInstance instance, WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
+		WfComponentProvider cp=new WfComponentProvider();
 		
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
@@ -118,7 +119,7 @@ public class WorkflowInterpreter {
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(instance);
 		facts.add(user);
-		facts.addAll(user.getPermissions());
+		facts.addAll(cp.getPermissionsForUser(user));
 		ksession.execute(facts);
 
 		for (String returnedActionName : prepActions) {
@@ -128,7 +129,7 @@ public class WorkflowInterpreter {
 				}
 			}
 		}
-		
+
 		if (candidatePrepActions.isEmpty()) {
 			return null;
 		} else if (candidatePrepActions.size() ==  1) {
@@ -155,6 +156,7 @@ public class WorkflowInterpreter {
 			ksession.setGlobal("actions", actions);
 			prepActions = new ArrayList<String>();
 			ksession.setGlobal("prepActions", prepActions);
+			ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
 
 			ArrayList<Object> facts = new ArrayList<Object>();
 			facts.add(instance);
@@ -188,7 +190,7 @@ public class WorkflowInterpreter {
 
 		return nextUser;
 	}
-	
+
 	public List<WfUser> getPossibleDestinations(WfInstance instance, WorkList workList) {
 		List<WfUser> possibleUsers = new ArrayList<WfUser>();
 		List<WfRole> nextRoles = getNextRole(instance, workList);
@@ -203,7 +205,7 @@ public class WorkflowInterpreter {
 
 		return possibleUsers;
 	}
-	
+
 	public void doAction(WfInstance instance, WfAction action) {
 		// TODO: decide if should check for action is possible
 		try {
@@ -212,9 +214,9 @@ public class WorkflowInterpreter {
 			bp = (BusinessProcess) ois.readObject();
 			bp.writeAttachment("WfInstance", instance);
 			bp.writeAttachment("consequenceState", action.getConsequence());
-			
-			
-			
+
+
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
