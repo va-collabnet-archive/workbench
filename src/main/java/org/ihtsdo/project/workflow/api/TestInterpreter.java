@@ -62,7 +62,7 @@ public class TestInterpreter {
 				WfInstance loopInstance = new WfInstance(UUID.randomUUID(), 
 						wfDef, loopState, null, null);
 				List<WfAction> resultActions = wfInt.getPossibleActions(loopInstance, loopMember.getUser());
-				WfAction prepAction = wfInt.getPreparationAction(loopMember.getUser());
+				WfAction prepAction = wfInt.getPreparationAction(loopInstance, loopMember.getUser());
 				List<WfRole> nextRoles = wfInt.getNextRole(loopInstance, workList);
 				WfUser nextUser = wfInt.getNextDestination(loopInstance, workList);
 				

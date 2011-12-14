@@ -104,7 +104,7 @@ public class WorkflowInterpreter {
 		return possibleActions;
 	}
 
-	public WfAction getPreparationAction(WfUser user) {
+	public WfAction getPreparationAction(WfInstance instance, WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
 		
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
@@ -116,6 +116,7 @@ public class WorkflowInterpreter {
 		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
 
 		ArrayList<Object> facts = new ArrayList<Object>();
+		facts.add(instance);
 		facts.add(user);
 		facts.addAll(user.getPermissions());
 		ksession.execute(facts);
