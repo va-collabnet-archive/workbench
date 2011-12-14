@@ -31,7 +31,7 @@ public class WfComponentProvider {
 		List<WfUser> wfUsers = new ArrayList<WfUser>();
 		try {
 			I_GetConceptData roleParent =
-				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
+				Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
 			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
