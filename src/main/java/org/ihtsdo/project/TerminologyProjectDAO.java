@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -118,6 +119,8 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  * The Class TerminologyProjectDAO.
  */
 public class TerminologyProjectDAO {
+	
+	public static Map<UUID, WorkList> workListCache = new HashMap<UUID,WorkList>();
 
 	//I_TerminologyProjects CRUD **********************************
 
@@ -1758,7 +1761,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
 
@@ -2215,7 +2218,11 @@ public class TerminologyProjectDAO {
 	 * @return the work list
 	 */
 	public static WorkList getWorkList(I_GetConceptData workListConcept, I_ConfigAceFrame config) {
-		WorkList workList = null;
+		WorkList workList = TerminologyProjectDAO.workListCache.get(workListConcept.getPrimUuid());
+		if (workList != null) {
+			return workList;
+		}
+		
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -2272,6 +2279,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
 
@@ -2468,7 +2476,7 @@ public class TerminologyProjectDAO {
 			}
 		}
 
-
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
 
@@ -3435,6 +3443,7 @@ public class TerminologyProjectDAO {
 						(UUID[]) worklist.getUids().toArray(),
 						config);
 			}
+			TerminologyProjectDAO.workListCache.remove(worklist.getUids().iterator().next());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -4027,6 +4036,9 @@ public class TerminologyProjectDAO {
 			}
 		}
 		Terms.get().commit();
+		
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
+		
 		return workList;
 	}
 
