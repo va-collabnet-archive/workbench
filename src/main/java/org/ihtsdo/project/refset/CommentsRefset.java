@@ -258,4 +258,18 @@ public class CommentsRefset extends Refset {
 		}
 		return urls;
 	}
+
+	public void addComment(UUID componentId, int conceptNid, int conceptNid2,
+			String comment2) throws TerminologyException, IOException, Exception {
+		addComment(termFactory.uuidToNative(componentId),conceptNid,  conceptNid2,
+				 comment2);
+		
+	}
+
+	public void addComment(UUID componentId, int conceptNid, String comment2) throws TerminologyException, IOException, Exception {
+
+		addComment(termFactory.uuidToNative(componentId),conceptNid,
+				 comment2);
+		
+	}
 }

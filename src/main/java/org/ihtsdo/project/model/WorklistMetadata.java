@@ -1,12 +1,13 @@
 package org.ihtsdo.project.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
-public class WorklistMetadata {
+public class WorklistMetadata implements Serializable{
 	/** The name. */
 	private String name;
 	
