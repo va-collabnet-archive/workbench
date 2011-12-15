@@ -242,6 +242,7 @@ public class WfComponentProvider {
 			return wfrole;
 		}
 		wfrole = new WfRole(getPreferredTermFromAuxiliaryHier(role), role.getPrimUuid());
+		WfComponentProvider.rolesCache.put(wfrole.getId(), wfrole);
 		return wfrole;
 	}
 
@@ -256,6 +257,7 @@ public class WfComponentProvider {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		WfComponentProvider.statesCache.put(state.getId(), state);
 		return state;
 	}
 
@@ -270,6 +272,8 @@ public class WfComponentProvider {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		WfComponentProvider.usersCache.put(wfUser.getId(), wfUser);
 		return wfUser;
 	}
 	private static final String END_FILE = ".wfd";
