@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class WfComponentProvider {
+	
+	public static Map<UUID, WfUser> usersCache = new HashMap<UUID,WfUser>();
+	public static Map<UUID, WfState> statesCache = new HashMap<UUID,WfState>();
+	public static Map<UUID, WfRole> rolesCache = new HashMap<UUID,WfRole>();
 
 	public List<WfUser> getUsers() {
 		List<WfUser> wfUsers = new ArrayList<WfUser>();
@@ -232,13 +237,20 @@ public class WfComponentProvider {
 	}
 
 	public WfRole roleConceptToWfRole(I_GetConceptData role) {
-		WfRole wfrole = null;
+		WfRole wfrole = WfComponentProvider.rolesCache.get(role.getPrimUuid());
+		if (wfrole != null) {
+			return wfrole;
+		}
 		wfrole = new WfRole(getPreferredTermFromAuxiliaryHier(role), role.getPrimUuid());
 		return wfrole;
 	}
 
 	public WfState statusConceptToWfState(I_GetConceptData status) {
-		WfState state = null;
+		WfState state = WfComponentProvider.statesCache.get(status.getPrimUuid());
+		if (state != null) {
+			return state;
+		}
+		
 		try {
 			state = new WfState(status.getInitialText(), status.getPrimUuid());
 		} catch (IOException e) {
@@ -248,7 +260,11 @@ public class WfComponentProvider {
 	}
 
 	public WfUser userConceptToWfUser(I_GetConceptData user) {
-		WfUser wfUser = null;
+		WfUser wfUser = WfComponentProvider.usersCache.get(user.getPrimUuid());
+		if (wfUser != null) {
+			return wfUser;
+		}
+		
 		try {
 			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid(), getPermissions());
 		} catch (IOException e) {
