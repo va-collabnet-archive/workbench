@@ -1,6 +1,8 @@
 package org.ihtsdo.project.workflow.model;
 
-public class WorklistPage {
+import java.io.Serializable;
+
+public class WorklistPage implements Serializable{
 	private Integer startLine;
 	private Integer pageLenght;
 

@@ -1,8 +1,9 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class WfHistoryEntry {
+public class WfHistoryEntry implements Serializable{
 	
 	private Long time;
 	private UUID userId;

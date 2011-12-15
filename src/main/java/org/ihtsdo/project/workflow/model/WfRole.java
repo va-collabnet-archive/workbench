@@ -1,8 +1,9 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class WfRole {
+public class WfRole implements Serializable {
 	
 	private String name;
 	private UUID id;

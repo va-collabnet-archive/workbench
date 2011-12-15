@@ -1,10 +1,11 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class WfUser {
+public class WfUser implements Serializable{
 	
 	private String username;
 	private UUID id;

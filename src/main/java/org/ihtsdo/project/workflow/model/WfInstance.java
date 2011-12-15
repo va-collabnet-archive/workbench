@@ -1,6 +1,7 @@
 package org.ihtsdo.project.workflow.model;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -13,7 +14,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 
-public class WfInstance {
+public class WfInstance implements Serializable{
 	
 	private UUID componentId = null;
 	private UUID workListId;

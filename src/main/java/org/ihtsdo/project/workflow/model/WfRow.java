@@ -1,5 +1,7 @@
 package org.ihtsdo.project.workflow.model;
 
-public class WfRow {
+import java.io.Serializable;
+
+public class WfRow implements Serializable{
 	
 }

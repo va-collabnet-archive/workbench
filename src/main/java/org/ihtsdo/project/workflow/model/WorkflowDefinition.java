@@ -1,11 +1,12 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
-public class WorkflowDefinition {
+public class WorkflowDefinition implements Serializable{
 	
 	private List<WfRole> roles;
 	private List<WfState> states;

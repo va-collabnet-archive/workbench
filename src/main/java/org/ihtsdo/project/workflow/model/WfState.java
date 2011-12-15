@@ -1,8 +1,9 @@
 package org.ihtsdo.project.workflow.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class WfState {
+public class WfState implements Serializable{
 
 	private String name;
 	private UUID id;
