@@ -8,6 +8,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import javax.swing.*;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -29,7 +31,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.apache.tools.ant.taskdefs.Sleep;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -41,7 +42,6 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.translation.ui.config.InboxItemConfigurationPanel;
 
 /**
  * @author Vahram Manukyan
@@ -55,6 +55,7 @@ public class InboxTreePanel extends JPanel {
 	private I_ConfigAceFrame config;
 	private Object inboxItem;
 	private WorklistItemsWorker worklistItemsWorker;
+	private I_GetConceptData user;
 
 	public InboxTreePanel() {
 		initComponents();
@@ -72,7 +73,17 @@ public class InboxTreePanel extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		user = config.getDbConfig().getUserConcept();
 		updateTree();
+		updateDestinationCombo();
+	}
+	
+	private void updateDestinationCombo() {
+		List<WfUser> users = provider.getUsers();
+		userCombo.addItem("");
+		for (WfUser wfUser : users) {
+			userCombo.addItem(wfUser);
+		}
 	}
 
 	public void setInboxItem(Object newInboxItem) {
@@ -92,18 +103,21 @@ public class InboxTreePanel extends JPanel {
 		DefaultMutableTreeNode wNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.WORKLIST_NODE_ROOT, IconUtilities.WORKLIST_NODE,
 				new FolderMetadata(IconUtilities.WORKLIST_NODE, true)));
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-		updateWorkflowNodes(wNode, sNode);
 
+		model = new DefaultTreeModel(root);
+		inboxFolderTree.setModel(model);
+		inboxFolderTree.revalidate();
+		inboxFolderTree.repaint();
 		root.add(iNode);
 		root.add(wNode);
 		root.add(sNode);
 		root.add(cNode);
-		model = new DefaultTreeModel(root);
-
-		inboxFolderTree.setModel(model);
 		inboxFolderTree.expandRow(3);
 		inboxFolderTree.expandRow(2);
 		inboxFolderTree.expandRow(1);
+		
+		model.reload();
+		updateWorkflowNodes(wNode, sNode);
 	}
 
 	private void updateWorkflowNodes(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode) {
@@ -111,7 +125,7 @@ public class InboxTreePanel extends JPanel {
 			worklistItemsWorker.cancel(true);
 			worklistItemsWorker = null;
 		}
-		worklistItemsWorker = new WorklistItemsWorker(wNode, sNode, config, searcher);
+		worklistItemsWorker = new WorklistItemsWorker(wNode, sNode, config, searcher, model, user);
 		worklistItemsWorker.addPropertyChangeListener(new ProgressListener(progressBar));
 		worklistItemsWorker.execute();
 	}
@@ -122,27 +136,71 @@ public class InboxTreePanel extends JPanel {
 	}
 
 	private void inboxFolderTreeValueChanged(TreeSelectionEvent e) {
-		setInboxItem(inboxFolderTree.getLastSelectedPathComponent());
+		Object node = inboxFolderTree.getLastSelectedPathComponent();
+		if(node instanceof DefaultMutableTreeNode){
+			DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)node;
+			Object userObject = treeNode.getUserObject();
+			if(userObject instanceof InboxTreeItem){
+				InboxTreeItem inboxItem = (InboxTreeItem) userObject;
+				setInboxItem(inboxItem.getUserObject());
+			}
+		}
+	}
+
+	private void userComboItemStateChanged(ItemEvent e) {
+		if(e.getStateChange() == ItemEvent.SELECTED){
+			Object item = e.getItem();
+			if(item instanceof WfUser){
+				WfUser wfUser = (WfUser)item;
+				try {
+					user = Terms.get().getConcept(wfUser.getId());
+				} catch (TerminologyException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				updateTree();
+			}
+		}
 	}
 
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
+		label1 = new JLabel();
+		userCombo = new JComboBox();
 		scrollPane1 = new JScrollPane();
 		inboxFolderTree = new JTree();
 		progressBar = new JProgressBar();
 
-		// ======== this ========
+		//======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
 
-		// ======== scrollPane1 ========
+		//---- label1 ----
+		label1.setText("Users");
+		add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 5), 0, 0));
+
+		//---- userCombo ----
+		userCombo.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				userComboItemStateChanged(e);
+			}
+		});
+		add(userCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
+
+		//======== scrollPane1 ========
 		{
 
-			// ---- inboxFolderTree ----
+			//---- inboxFolderTree ----
 			inboxFolderTree.addTreeSelectionListener(new TreeSelectionListener() {
 				@Override
 				public void valueChanged(TreeSelectionEvent e) {
@@ -151,21 +209,26 @@ public class InboxTreePanel extends JPanel {
 			});
 			scrollPane1.setViewportView(inboxFolderTree);
 		}
-		add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(scrollPane1, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ---- progressBar ----
+		//---- progressBar ----
 		progressBar.setIndeterminate(true);
 		progressBar.setVisible(false);
-		add(progressBar, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(progressBar, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	private JLabel label1;
+	private JComboBox userCombo;
 	private JScrollPane scrollPane1;
 	private JTree inboxFolderTree;
 	private JProgressBar progressBar;
-
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 	public JTree getTree() {
 		return inboxFolderTree;
@@ -257,13 +320,18 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 	private DefaultMutableTreeNode sNode;
 	private I_ConfigAceFrame config;
 	private WorkflowSearcher searcher;
+	private DefaultTreeModel model;
+	private I_GetConceptData user;
 
-	public WorklistItemsWorker(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, I_ConfigAceFrame config, WorkflowSearcher searcher) {
+	public WorklistItemsWorker(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode,
+			I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model, I_GetConceptData user) {
 		super();
 		this.wNode = wNode;
 		this.sNode = sNode;
 		this.config = config;
 		this.searcher = searcher;
+		this.model = model;
+		this.user = user;
 	}
 
 	@Override
@@ -284,12 +352,6 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 				partialRes.put(sNode, statusTreeItems);
 				chunks.add(partialRes);
 				process(chunks);
-			}else{
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -300,7 +362,6 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 	private List<InboxTreeItem> getStatusNodesAndSize() {
 		List<InboxTreeItem> inboxTreeItems = new ArrayList<InboxTreeItem>();
 		try {
-			I_GetConceptData user = config.getDbConfig().getUserConcept();
 			WfUser wfUser;
 			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
 			HashMap<WfState, Integer> worklists = searcher.getUserStatusList(wfUser);
@@ -318,7 +379,6 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 	
 	private List<InboxTreeItem> getWorklistsAndSize() throws IOException {
 		List<InboxTreeItem> inboxTreeItems;
-		I_GetConceptData user = config.getDbConfig().getUserConcept();
 		WfUser wfUser;
 		wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
 		HashMap<WorkList, Integer> worklists = searcher.getUserWorklists(wfUser);
@@ -350,6 +410,7 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 				for (InboxTreeItem inboxTreeItem : childInfo) {
 					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
 					parentTreeNode.add(chldNode);
+					model.reload(parentTreeNode);
 				}
 			}
 		}
