@@ -23,12 +23,9 @@ import java.util.Collection;
 
 import javax.swing.JTabbedPane;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -38,20 +35,15 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.translation.ui.TranslationConceptEditor2;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.translation.ui.TranslationPanel;
 
 /**
  * The Class OpenTranslationForSelectedConcept.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
-public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
-	
-	/** The source lang code. */
-	private String sourceLangCode;
-	
-	/** The target lang code. */
-	private String targetLangCode;
+public class OpenTranslationPanel extends AbstractTask {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
@@ -68,8 +60,6 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(sourceLangCode);
-		out.writeObject(targetLangCode);
 	}
 
 	/**
@@ -84,8 +74,6 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
-			sourceLangCode = (String) in.readObject();
-			targetLangCode = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);   
 		}
@@ -97,7 +85,7 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	 * 
 	 * @throws MalformedURLException the malformed url exception
 	 */
-	public OpenTranslationForSelectedConceptToMP() throws MalformedURLException {
+	public OpenTranslationPanel() throws MalformedURLException {
 		super();
 	}
 
@@ -107,17 +95,13 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
+			WfInstance instance=(WfInstance)process.readAttachement("WfInstance");
 			AceFrameConfig config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
-
-			if (sourceLangCode == null) {
-				sourceLangCode = "en";
-			}
 			
-			if (targetLangCode == null) {
-				targetLangCode = "es";
-			}
+			
 			AceFrame ace=config.getAceFrame();
 			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
+			TranslationPanel uiPanel=null;
 			if (tp!=null){
 				int tabCount=tp.getTabCount();
 				for (int i=0;i<tabCount;i++){
@@ -125,17 +109,17 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 						tp.setSelectedIndex(i);
 						tp.revalidate();
 						tp.repaint();
-						return Condition.CONTINUE;
+						uiPanel=(TranslationPanel)tp.getComponentAt(i);
 					}
 				}
-
-		        I_GetConceptData concept = Terms.get().getConcept(config.getHierarchySelection().getUids());
-		        TranslationConceptEditor2 uiPanel = new TranslationConceptEditor2(concept, config, sourceLangCode, targetLangCode);
-			
-		        tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-				tp.setSelectedIndex(tabCount);
-				tp.revalidate();
-				tp.repaint();
+				if (uiPanel==null){
+					uiPanel = new TranslationPanel();
+					tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+					tp.setSelectedIndex(tabCount);
+					tp.revalidate();
+					tp.repaint();
+				}
+				uiPanel.updateUI(instance,false);
 			}
 			
 			return Condition.CONTINUE;
@@ -165,43 +149,6 @@ public class OpenTranslationForSelectedConceptToMP extends AbstractTask {
 	public int[] getDataContainerIds() {
 		return new int[] {  };
 	}
-	
-	/**
-	 * Gets the source lang code.
-	 * 
-	 * @return the source lang code
-	 */
-	public String getSourceLangCode() {
-		return sourceLangCode;
-	}
-
-	/**
-	 * Sets the source lang code.
-	 * 
-	 * @param sourceLangCode the new source lang code
-	 */
-	public void setSourceLangCode(String sourceLangCode) {
-		this.sourceLangCode = sourceLangCode;
-	}
-
-	/**
-	 * Gets the target lang code.
-	 * 
-	 * @return the target lang code
-	 */
-	public String getTargetLangCode() {
-		return targetLangCode;
-	}
-
-	/**
-	 * Sets the target lang code.
-	 * 
-	 * @param targetLangCode the new target lang code
-	 */
-	public void setTargetLangCode(String targetLangCode) {
-		this.targetLangCode = targetLangCode;
-	}
-	
 	
 
 }
