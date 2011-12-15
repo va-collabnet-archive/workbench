@@ -1,7 +1,11 @@
 package org.ihtsdo.project.workflow.api;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +28,11 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class WfComponentProvider {
 
@@ -253,6 +261,34 @@ public class WfComponentProvider {
 		File folder=new File("./sampleProcesses");
 		List<File> retFiles=loadFiles( folder,END_FILE);
 		return retFiles;
+	}
+	
+
+	public static WorkflowDefinition readWfDefinition(File file){
+
+		XStream xStream = new XStream(new DomDriver());
+		WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
+		return wfDef;
+
+	}
+
+	public static void writeWfDefinition(WorkflowDefinition wfDefinition){
+
+		XStream xStream = new XStream(new DomDriver());
+
+		FileOutputStream rfos;
+		try {
+			rfos = new FileOutputStream("sampleProcesses/" +  wfDefinition.getName() + ".wfd");
+			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
+			xStream.toXML(wfDefinition,rosw);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private static List<File> loadFiles(File folder,String endFile) {
