@@ -1720,8 +1720,10 @@ public class TerminologyProjectDAO {
 			if (!currentVersionOfWorkList.getName().equals(workListWithMetadata.getName())) {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
-
-			String metadata = serialize(workListWithMetadata);
+			WorklistMetadata worklistMetadata=new WorklistMetadata(workListWithMetadata.getName(),workListWithMetadata.getId(),
+					workListWithMetadata.getUids(),workListWithMetadata.getPartitionUUID(),workListWithMetadata.getWorkflowDefinition(),
+					workListWithMetadata.getWorkflowDefinitionFileName(),workListWithMetadata.getWorkflowUserRoles());
+			String metadata =serialize(worklistMetadata);
 
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					workListConcept.getConceptNid());
@@ -2257,7 +2259,7 @@ public class TerminologyProjectDAO {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 						String metadata = part.getStringValue();
 						//						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
-						deserializedWorkListMetadata = (WorklistMetadata) getObjectFromJSon (metadata);
+						deserializedWorkListMetadata = (WorklistMetadata) deserialize (metadata);
 					}
 				}
 				if (deserializedWorkListMetadata != null) {
@@ -2435,7 +2437,7 @@ public class TerminologyProjectDAO {
 		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
 				workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
 				workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
-		String metadata =getJSonForm(worklistMetadata);
+		String metadata =serialize(worklistMetadata);
 
 		termFactory.addUncommittedNoChecks(newConcept);
 		termFactory.addUncommittedNoChecks(newCommentsConcept);
@@ -3376,9 +3378,9 @@ public class TerminologyProjectDAO {
 				WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
 						workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
 						workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
-				metadata =getJSonForm(worklistMetadata);
+				metadata =serialize(worklistMetadata);
 			}else{
-				metadata =getJSonForm(objectWithMetadata);
+				metadata =serialize(objectWithMetadata);
 			}
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					componentConcept.getConceptNid());
