@@ -16,6 +16,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -122,8 +123,8 @@ public class UserQueuesManager {
 				I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(extension);
 				I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 				String metadata = part.getStringValue();
-				deserializedWorkListWithMetadata = (WorkList) TerminologyProjectDAO.deserialize(metadata);
-
+				WorklistMetadata deserializedWorkListMetadata = (WorklistMetadata) TerminologyProjectDAO.deserialize(metadata);
+				deserializedWorkListWithMetadata=WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);
 				if (deserializedWorkListWithMetadata.getUsers().contains(user)) {
 					PromotionAndAssignmentRefset promDestRefset = deserializedWorkListWithMetadata.getPromotionRefset(config);
 					for (WorkListMember loopMember : deserializedWorkListWithMetadata.getWorkListMembers()) {
