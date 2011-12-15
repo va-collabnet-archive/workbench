@@ -123,8 +123,7 @@ public class GenerateWorklistFromAttachments extends AbstractTask {
 			
 
 			String name = (String) process.getProperty(getWorklistNamePropName());
-
-			TerminologyProjectDAO.generateWorkListFromPartition(partition, destination, selectedWorkFlow, name, config);
+			//TerminologyProjectDAO.generateWorkListFromPartition(partition, destination, selectedWorkFlow, name, config);
 		} catch (Exception e) {
 			throw new TaskFailedException(e.getMessage());
 		}

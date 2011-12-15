@@ -1123,7 +1123,9 @@ public class LanguageUtil {
 			List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
 			for (ContextualizedDescription loopDescription : sourceDescriptions) {
-				if (loopDescription.getTypeId() == fsn.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageExtension() != null) {
+				if (loopDescription.getTypeId() == fsn.getConceptNid() 
+						&& isActive(loopDescription.getDescriptionStatusId()) 
+						&& loopDescription.getLanguageExtension() != null) {
 					sourceFSN = loopDescription;
 				}
 			}
@@ -1283,6 +1285,7 @@ public class LanguageUtil {
 		I_TermFactory tf = Terms.get();
 		try {
 			activeStatuses.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			activeStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			activeStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()));
 			activeStatuses.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()));
 		} catch (IOException e) {

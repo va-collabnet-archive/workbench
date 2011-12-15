@@ -284,15 +284,12 @@ public class CreateNewProject extends AbstractTask {
 				}
 			});
 
-			BusinessProcess bp = getBusinessProcess( bpFile);
+			BusinessProcess bp = getBusinessProcess(bpFile);
 
-			 workList1 = TerminologyProjectDAO.generateWorkListFromPartition(
-					partition1, "author.inbox", bp, "worklist "  + seq + ".1", config);
+			//workList1 = TerminologyProjectDAO.generateWorkListFromPartition(partition1, "author.inbox", bp, "worklist "  + seq + ".1", config);
 			sleep(1);
 
-
-			 workList2 = TerminologyProjectDAO.generateWorkListFromPartition(
-					partition2, "author.inbox", bp, "worklist "  + seq + ".2", config);
+			//workList2 = TerminologyProjectDAO.generateWorkListFromPartition(partition2, "author.inbox", bp, "worklist "  + seq + ".2", config);
 			sleep(1);
 
 

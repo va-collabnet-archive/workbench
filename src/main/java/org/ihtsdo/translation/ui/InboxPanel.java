@@ -4,6 +4,7 @@
 
 package org.ihtsdo.translation.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -64,9 +65,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -113,6 +114,7 @@ import org.dwfa.queue.SelectAll;
 import org.dwfa.queue.bpa.worker.OnDemandOutboxQueueWorker;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.document.report.ReportPanel;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
@@ -121,9 +123,11 @@ import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
@@ -2894,6 +2898,39 @@ public class InboxPanel extends JPanel {
 		}
 	}
 
+	private void openNewInboxActionPerformed(ActionEvent e) {
+		WfInboxPanel inboxPanel = new WfInboxPanel();
+		TranslationHelperPanel thp;
+		try {
+			thp = PanelHelperFactory.getTranslationHelperPanel();
+			JTabbedPane tp = thp.getTabbedPanel();
+			if (tp != null) {
+				int tabCount = tp.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tp.getTitleAt(i).equals("NEW INBOX")) {
+						tp.setSelectedIndex(i);
+						thp.showTabbedPanel();
+					}
+				}
+				JPanel panel = new JPanel();
+				panel.setLayout(new BorderLayout());
+				panel.add(inboxPanel, BorderLayout.CENTER);
+
+				tp.addTab("NEW INBOX", panel);
+				tp.setSelectedIndex(tp.getTabCount() - 1);
+				thp.showTabbedPanel();
+			}
+		} catch (TerminologyException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void rndModifyWlMembersActionPerformed(ActionEvent e) {
+		WorkflowSearcher.randomModifyWlMembers();
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -2914,42 +2951,48 @@ public class InboxPanel extends JPanel {
 		panel11 = new JPanel();
 		scrollPane2 = new JScrollPane();
 		itemsTable = new JTable();
+		openNewInbox = new JButton();
+		rndModifyWlMembers = new JButton();
 
-		// ======== this ========
+		//======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-		// ======== panel2 ========
+		//======== panel2 ========
 		{
 			panel2.setBackground(new Color(238, 238, 238));
 			panel2.setBorder(new EmptyBorder(5, 15, 5, 5));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 205, 0, 0, 0 };
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
+			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 205, 0, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0E-4};
 
-			// ======== panel1 ========
+			//======== panel1 ========
 			{
 				panel1.setBackground(new Color(238, 238, 238));
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-				// ---- label1 ----
+				//---- label1 ----
 				label1.setText("Assignments");
-				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- label2 ----
+				//---- label2 ----
 				label2.setText("(-)");
-				panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel1.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- refreshButton ----
+				//---- refreshButton ----
 				refreshButton.setText("Refresh");
 				refreshButton.addActionListener(new ActionListener() {
 					@Override
@@ -2957,9 +3000,11 @@ public class InboxPanel extends JPanel {
 						refreshButtonActionPerformed(e);
 					}
 				});
-				panel1.add(refreshButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel1.add(refreshButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- button1 ----
+				//---- button1 ----
 				button1.setText("[C]lose");
 				button1.setIcon(null);
 				button1.setMnemonic('C');
@@ -2969,18 +3014,22 @@ public class InboxPanel extends JPanel {
 						button1ActionPerformed(e);
 					}
 				});
-				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 5), 0, 0));
 
-				// ---- label4 ----
+				//---- label4 ----
 				label4.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
 						label4MouseClicked(e);
 					}
 				});
-				panel1.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel1.add(label4, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
-				// ---- inboxItemCheckbox ----
+				//---- inboxItemCheckbox ----
 				inboxItemCheckbox.setText("Automatically [o]pen next item in inbox after finishing with current item");
 				inboxItemCheckbox.setMnemonic('O');
 				inboxItemCheckbox.addActionListener(new ActionListener() {
@@ -2989,9 +3038,11 @@ public class InboxPanel extends JPanel {
 						inboxItemCheckboxActionPerformed();
 					}
 				});
-				panel1.add(inboxItemCheckbox, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(inboxItemCheckbox, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- bSendItems ----
+				//---- bSendItems ----
 				bSendItems.setText("Se[n]d");
 				bSendItems.setMnemonic('N');
 				bSendItems.addActionListener(new ActionListener() {
@@ -3000,14 +3051,18 @@ public class InboxPanel extends JPanel {
 						bSendItemsActionPerformed();
 					}
 				});
-				panel1.add(bSendItems, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(bSendItems, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 			}
-			panel2.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel2.add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== scrollPane1 ========
+			//======== scrollPane1 ========
 			{
 
-				// ---- foldTree ----
+				//---- foldTree ----
 				foldTree.setVisibleRowCount(4);
 				foldTree.addTreeSelectionListener(new TreeSelectionListener() {
 					@Override
@@ -3017,46 +3072,83 @@ public class InboxPanel extends JPanel {
 				});
 				scrollPane1.setViewportView(foldTree);
 			}
-			panel2.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel2.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== panel3 ========
+			//======== panel3 ========
 			{
 				panel3.setLayout(new GridBagLayout());
-				((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0 };
-				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0};
+				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label3 ----
+				//---- label3 ----
 				label3.setText("Now viewing:");
 				label3.setBackground(new Color(220, 233, 249));
-				panel3.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(label3, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- lViewing ----
+				//---- lViewing ----
 				lViewing.setBackground(new Color(220, 233, 249));
-				panel3.add(lViewing, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel3.add(lViewing, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel2.add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== panel11 ========
+			//======== panel11 ========
 			{
 				panel11.setBackground(new Color(220, 233, 249));
 				panel11.setLayout(new GridBagLayout());
-				((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
-				((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-				((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+				((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
+				((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
+				((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+				((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
 
-				// ======== scrollPane2 ========
+				//======== scrollPane2 ========
 				{
 					scrollPane2.setViewportView(itemsTable);
 				}
-				panel11.add(scrollPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel11.add(scrollPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
+				//---- openNewInbox ----
+				openNewInbox.setText("OPEN NEW INBOX PANEL");
+				openNewInbox.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						openNewInboxActionPerformed(e);
+					}
+				});
+				panel11.add(openNewInbox, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+
+				//---- rndModifyWlMembers ----
+				rndModifyWlMembers.setText("RANDOM MODIFY WORKLIST MEMBERS");
+				rndModifyWlMembers.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						rndModifyWlMembersActionPerformed(e);
+					}
+				});
+				panel11.add(rndModifyWlMembers, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel11, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(panel11, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization
+		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -3079,5 +3171,7 @@ public class InboxPanel extends JPanel {
 	private JPanel panel11;
 	private JScrollPane scrollPane2;
 	private JTable itemsTable;
+	private JButton openNewInbox;
+	private JButton rndModifyWlMembers;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

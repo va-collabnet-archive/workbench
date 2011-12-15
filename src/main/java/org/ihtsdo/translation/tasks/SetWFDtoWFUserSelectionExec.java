@@ -109,17 +109,16 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 			
 			WorkList worklist = TerminologyProjectDAO.getWorkList(
 					tf.getConcept(workListMember.getWorkListUUID()), config);
-					
-			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+			//I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
 			
 			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 			
-			UsersSelectionForWorkflowPanelExec newPanel = new UsersSelectionForWorkflowPanelExec(wfProcess, config);
+			//UsersSelectionForWorkflowPanelExec newPanel = new UsersSelectionForWorkflowPanelExec(wfProcess, config);
 			
 			workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-			workflowDetailsSheet.add(newPanel);
+			//workflowDetailsSheet.add(newPanel);
 			
-			workflowDetailsSheet.setSize(newPanel.getPreferredSize().width, newPanel.getPreferredSize().height);
+			//workflowDetailsSheet.setSize(newPanel.getPreferredSize().width, newPanel.getPreferredSize().height);
 			
 			
 		} catch (TerminologyException e) {
