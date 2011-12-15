@@ -5,9 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.UUID;
+
+import javax.security.auth.login.LoginException;
+
+import net.jini.config.ConfigurationException;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -19,8 +25,15 @@ import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.QueueItemsReviewer;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -206,7 +219,7 @@ public class WorkflowInterpreter {
 		return possibleUsers;
 	}
 
-	public void doAction(WfInstance instance, WfAction action) {
+	public void doAction(WfInstance instance, WfAction action, I_Work worker) {
 		// TODO: decide if should check for action is possible
 		try {
 			BusinessProcess bp;
@@ -214,14 +227,39 @@ public class WorkflowInterpreter {
 			bp = (BusinessProcess) ois.readObject();
 			bp.writeAttachment("WfInstance", instance);
 			bp.writeAttachment("consequenceState", action.getConsequence());
+			final I_Work tworker;
+			if (worker.isExecuting()) {
+				tworker = worker.getTransactionIndependentClone();
+				tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+			} else {
+				tworker = worker;
+				
+			}
 
-
+			tworker.execute(bp);
+			
+			
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (TaskFailedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (LoginException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivilegedActionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
