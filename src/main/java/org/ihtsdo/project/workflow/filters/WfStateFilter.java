@@ -6,7 +6,7 @@ import org.ihtsdo.project.workflow.model.WfState;
 public class WfStateFilter implements WfSearchFilterBI{
 	private WfState state;
 
-	private WfStateFilter(WfState state) {
+	public WfStateFilter(WfState state) {
 		super();
 		this.state = state;
 	}
