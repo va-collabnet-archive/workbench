@@ -11,6 +11,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
@@ -34,6 +36,10 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrame;
+import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfRole;
@@ -231,6 +237,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 
 	private void saveButtonActionPerformed(ActionEvent e) {
 		if(workflowNameTextField.getText()!=null || workflowNameTextField.getText().length()>0){
+			selRoles= new ArrayList<WfRole>();
+			selStates= new ArrayList<WfState>();
 			for (int i = 0; i < rolesTable.getRowCount(); i++) {
 				if(((Boolean)rolesTable.getValueAt(i, 0))==true)
 					selRoles.add(roles.get((String)rolesTable.getValueAt(i, 1)));
@@ -278,7 +286,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			
 			@Override
 			public String getDescription() {
-				return "Extension must be \"wfd\"";
+				return "*.wfd";
 			}
 			
 			@Override
@@ -358,6 +366,29 @@ public class WorkflowDefinitionPanel extends JPanel {
 		
 		consequenceComboBox.setSelectedIndex(-1);
 	}
+
+	private void button1ActionPerformed(ActionEvent e) {
+		try {
+				AceFrameConfig config;
+				config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
+				AceFrame ace=config.getAceFrame();
+				JTabbedPane tp=ace.getCdePanel().getLeftTabs();
+				if (tp != null) {
+					int tabCount = tp.getTabCount();
+					for (int i = 0; i < tabCount; i++) {
+						if (tp.getTitleAt(i).equals(TranslationHelperPanel.WORKFLOWDEFINITION_TAB_NAME)) {
+							tp.remove(i);
+							tp.revalidate();
+							tp.repaint();
+						}
+					}
+				}
+			} catch (TerminologyException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+	}
 	
 
 	private void initComponents() {
@@ -401,6 +432,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		panel7 = new JPanel();
 		openButton = new JButton();
 		saveButton = new JButton();
+		button1 = new JButton();
 
 		//======== this ========
 		setLayout(new GridBagLayout());
@@ -731,9 +763,9 @@ public class WorkflowDefinitionPanel extends JPanel {
 		//======== panel7 ========
 		{
 			panel7.setLayout(new GridBagLayout());
-			((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+			((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
 			((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {1.0, 0.0, 0.0, 0.0, 1.0E-4};
 			((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 			//---- openButton ----
@@ -757,6 +789,18 @@ public class WorkflowDefinitionPanel extends JPanel {
 				}
 			});
 			panel7.add(saveButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 5), 0, 0));
+
+			//---- button1 ----
+			button1.setText("Close");
+			button1.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					button1ActionPerformed(e);
+				}
+			});
+			panel7.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -806,5 +850,6 @@ public class WorkflowDefinitionPanel extends JPanel {
 	private JPanel panel7;
 	private JButton openButton;
 	private JButton saveButton;
+	private JButton button1;
 	// JFormDesigner - End of variables declaration  //GEN-END:variables
 }
