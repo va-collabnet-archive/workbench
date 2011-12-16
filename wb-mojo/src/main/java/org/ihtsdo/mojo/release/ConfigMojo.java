@@ -146,6 +146,39 @@ public class ConfigMojo extends AbstractMojo {
 	 */
 	private String componentType;
 	
+	
+	/**
+	 * changesetUserName
+	 * 
+	 * @parameter default-value="testvp"
+	 * 
+	 */
+	private String changesetUserName;
+	
+	
+	
+	
+	/**
+	 * changesetUserConcept
+	 * 
+	 * @parameter default-value="f7495b58-6630-3499-a44e-2052b5fcf06c"
+	 * 
+	 */
+	private String changesetUserConcept;
+	
+	
+	
+	
+	/**
+	 * changesetRoot
+	 * 
+	 * @parameter default-value="E:/Workbench_Bundle/Prod/SyncPRODNov06/profiles/testvp"
+	 * 
+	 */
+	private String changesetRoot;
+	
+	
+	
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -157,12 +190,12 @@ public class ConfigMojo extends AbstractMojo {
 		config.setReleaseDate(releaseDate);
 		config.setOutputFolderName(exportFolder);
 		
-		// set these for text-definiton
+		// set below properties for text-definiton
 		config.setEndPoint(endpointURL);
 		config.setUsername(username);
 		config.setPassword(password);
 
-		// defaults set in the mojo declaratons, overrriden from POM
+		// defaults set in the mojo declarations, overrriden from POM
 		config.setRf2Format(rF2Format);
 		config.setInvokeDroolRules(invokeDroolsRules);
 		config.setIncrementalRelease(incrementalRelease);
@@ -177,6 +210,12 @@ public class ConfigMojo extends AbstractMojo {
 		config.setModuleId(moduleId);
 		config.setReleaseId(releaseId);
 		config.setComponentType(componentType);
+		
+		
+		//Below Parameters are required for ID-Insertion
+		config.setChangesetUserName(changesetUserName);
+		config.setChangesetUserConcept(changesetUserConcept);
+		config.setChangesetRoot(changesetRoot);
 		
 	}
 

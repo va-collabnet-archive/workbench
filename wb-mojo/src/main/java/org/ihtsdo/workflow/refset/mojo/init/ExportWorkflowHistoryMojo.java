@@ -1,22 +1,23 @@
-package org.ihtsdo.rf2.identifier.mojo;
+package org.ihtsdo.workflow.refset.mojo.init;
 
 import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.rf2.identifier.factory.RF2IdInsertionFactory;
+
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
+import org.ihtsdo.rf2.workflow.factory.RF2WorkflowHistoryFactory;
 
 /**
  * @author Varsha Parekh
  * 
- * @goal identifier-insertion
+ * @goal export-workflow-history
  * @requiresDependencyResolution compile
  */
 
-public class RF2IdInsertionMojo extends AbstractMojo {
+public class ExportWorkflowHistoryMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -137,52 +138,13 @@ public class RF2IdInsertionMojo extends AbstractMojo {
 	 * 
 	 */
 	private String componentType;
-	
-	
-	
-	/**
-	 * changesetUserName
-	 * 
-	 * @parameter default-value="testvp"
-	 * 
-	 */
-	private String changesetUserName;
-	
-	
-	/**
-	 * changesetUserConcept
-	 * 
-	 * @parameter default-value="f7495b58-6630-3499-a44e-2052b5fcf06c"
-	 * 
-	 */
-	private String changesetUserConcept;
-	
-	
-	/**
-	 * changesetRoot
-	 * 
-	 * @parameter default-value="E:/Workbench_Bundle/Prod/SyncPRODNov06/profiles/testvp"
-	 * 
-	 */
-	private String changesetRoot;
-	
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			Config config;
-			
-			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/snapshotqa.xml");
-			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/snapshotqa.xml");
+		try {			
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/workflowHistory.xml");
 				
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
-			
-//			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-//			Date time = df.parse(releaseDate);
-//			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-//			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
@@ -201,16 +163,10 @@ public class RF2IdInsertionMojo extends AbstractMojo {
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
 			
-			//Below Parameters are required for ID-Insertion
-			config.setChangesetUserName(changesetUserName);
-			config.setChangesetUserConcept(changesetUserConcept);
-			config.setChangesetRoot(changesetRoot);
-			
-			
 			// initialize meta hierarchy
 			ExportUtil.init();
 
-			RF2IdInsertionFactory factory = new RF2IdInsertionFactory(config);
+			RF2WorkflowHistoryFactory factory = new RF2WorkflowHistoryFactory(config);
 			factory.export();
 
 		} catch (Exception e) {
