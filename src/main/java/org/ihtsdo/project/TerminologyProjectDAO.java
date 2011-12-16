@@ -3884,7 +3884,7 @@ public class TerminologyProjectDAO {
 		return lastPart;
 	}
 
-	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
+	public static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;
 		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
