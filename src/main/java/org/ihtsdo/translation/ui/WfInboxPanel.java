@@ -12,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -26,6 +26,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.filters.FilterFactory;
 import org.ihtsdo.project.workflow.filters.WfComponentFilter;
@@ -35,25 +39,46 @@ import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.translation.model.InboxTableModel;
 
 public class WfInboxPanel extends JPanel {
+	private static final I_TermFactory tf = Terms.get();
+	private static I_ConfigAceFrame config;
 	private static final long serialVersionUID = -4013056429939416545L;
 	private InboxTableModel model;
 	private WfComponentProvider provider;
+	private WfUser user;
+	protected HashMap<String, WfSearchFilterBI> filterList;
 
 	public WfInboxPanel() {
 		initComponents();
-		provider = new WfComponentProvider();
-		model = new InboxTableModel();
-		inboxTable.setModel(model);
-		inboxTreePanel1.addPropertyChangeListener(InboxTreePanel.INBOX_ITEM_SELECTED, new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent arg0) {
-				WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(arg0.getNewValue());
-				List<WfSearchFilterBI> filterList = new ArrayList<WfSearchFilterBI>();
-				filterList.add(filter);
-				model.updatePage(filterList);
+		try {
+			provider = new WfComponentProvider();
+			model = new InboxTableModel();
+			inboxTable.setModel(model);
+			filterList = new HashMap<String, WfSearchFilterBI>();
+			if (tf != null) {
+				config = tf.getActiveAceFrameConfig();
 			}
-		});
-		updateDestinationCombo();
+			if (config != null) {
+				I_GetConceptData userConcept = config.getDbConfig().getUserConcept();
+				user = new WfUser(userConcept.getInitialText(), userConcept.getPrimUuid());
+			}
+			inboxTreePanel1.addPropertyChangeListener(InboxTreePanel.INBOX_ITEM_SELECTED, new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent arg0) {
+					WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(arg0.getNewValue());
+					Object oldValue = arg0.getOldValue();
+					if(oldValue != null){
+						WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
+						filterList.remove(oldFilter.getType());
+					}
+					filterList.put(filter.getType(), filter);
+					model.updatePage(filterList);
+				}
+			});
+			updateDestinationCombo();
+			updateFilters();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void updateDestinationCombo() {
@@ -91,27 +116,34 @@ public class WfInboxPanel extends JPanel {
 	}
 
 	private void filterButtonActionPerformed(ActionEvent e) {
-		List<WfSearchFilterBI> filterList = new ArrayList<WfSearchFilterBI>();
+		updateFilters();
+		updateTable();
+	}
 
+	private void updateTable() {
+		model.updatePage(filterList);
+	}
+
+	private void updateFilters() {
 		String componentFilter = this.componentFilter.getText();
-
 		WfUser destinationFilter = null;
 		try {
 			destinationFilter = (WfUser) destinationCombo.getSelectedItem();
 		} catch (ClassCastException cce) {
+			destinationFilter = user;
 		}
-
+		WfComponentFilter wfCompFilter = new WfComponentFilter(""); 
 		if (!componentFilter.equals("")) {
-			WfComponentFilter wfCompFilter = new WfComponentFilter(componentFilter);
-			filterList.add(wfCompFilter);
+			wfCompFilter = new WfComponentFilter(componentFilter);
+			filterList.put(wfCompFilter.getType(), wfCompFilter);
+		}else{
+			filterList.remove(wfCompFilter.getType());
 		}
 
 		if (destinationFilter != null) {
 			WfDestinationFilter df = new WfDestinationFilter(destinationFilter);
-			filterList.add(df);
+			filterList.put(df.getType(), df);
 		}
-
-		model.updatePage(filterList);
 	}
 
 	private void initComponents() {

@@ -2,6 +2,7 @@ package org.ihtsdo.translation.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -53,10 +54,10 @@ public class InboxTableModel extends AbstractTableModel {
 		fireTableDataChanged();
 	}
 
-	public boolean updatePage(List<WfSearchFilterBI> filters) {
+	public boolean updatePage(HashMap<String, WfSearchFilterBI> filterList) {
 		boolean morePages = false;
 		try {
-			List<WfInstance> wfInstances = searcher.searchWfInstances(filters);
+			List<WfInstance> wfInstances = searcher.searchWfInstances(filterList.values());
 			this.data = new Object[wfInstances.size()][columnNames.length];
 			int i = 0;
 			for (WfInstance wfInstance : wfInstances) {
