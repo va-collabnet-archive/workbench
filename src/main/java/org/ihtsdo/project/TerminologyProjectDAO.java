@@ -2270,7 +2270,8 @@ public class TerminologyProjectDAO {
 					}
 				}
 				if (deserializedWorkListMetadata != null) {
-					workList =  WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);				}
+					workList = WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);
+				}
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2279,7 +2280,9 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
+		if (workList != null) {
+			TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
+		}
 		return workList;
 	}
 

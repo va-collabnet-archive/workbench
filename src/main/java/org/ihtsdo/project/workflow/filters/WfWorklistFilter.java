@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
 public class WfWorklistFilter implements WfSearchFilterBI {
-
+	private final String TYPE = "WF_WORKLIST_FILTER";
 	private List<UUID> worklistUUID;
 
 	public WfWorklistFilter(List<UUID> worklistUUID) {
@@ -25,6 +25,11 @@ public class WfWorklistFilter implements WfSearchFilterBI {
 
 	public void setWorklistUUID(List<UUID> worklistUUID) {
 		this.worklistUUID = worklistUUID;
+	}
+
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 	
 }

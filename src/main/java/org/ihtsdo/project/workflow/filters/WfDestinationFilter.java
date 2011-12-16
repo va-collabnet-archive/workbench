@@ -4,7 +4,7 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 
 public class WfDestinationFilter implements WfSearchFilterBI {
-
+	private final String TYPE = "WF_DESTIANTION_FILTER";
 	private WfUser destination;
 
 	public WfDestinationFilter(WfUser destination) {
@@ -23,6 +23,11 @@ public class WfDestinationFilter implements WfSearchFilterBI {
 	@Override
 	public boolean filter(WfInstance instance) {
 		return instance.getDestination().equals(destination);
+	}
+
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }

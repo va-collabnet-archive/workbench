@@ -10,6 +10,7 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 public class WfComponentFilter implements WfSearchFilterBI {
 
 	private String wfInstanceTextFilter;
+	private final String TYPE = "WF_COMPONENT_FILTER";
 
 	public WfComponentFilter(String wfInstanceTextFilter) {
 		super();
@@ -35,6 +36,11 @@ public class WfComponentFilter implements WfSearchFilterBI {
 
 	public String getWfInstanceTextFilter() {
 		return wfInstanceTextFilter;
+	}
+
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }
