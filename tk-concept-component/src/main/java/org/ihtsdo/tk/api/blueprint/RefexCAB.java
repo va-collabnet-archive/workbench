@@ -64,7 +64,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         try {
             return UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
-                    + getPrimUuidStrForNidProp(RefexProperty.COLLECTION_NID)
+                    + getPrimUuidStrForProp(RefexProperty.COLLECTION_NID)
                     + getRcUuid().toString());
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
@@ -107,8 +107,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             }
             return UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
-                    + getPrimUuidStrForNidProp(RefexProperty.COLLECTION_NID)
-                    + getPrimUuidStrForNidProp(RefexProperty.RC_UUID)
+                    + getPrimUuidStrForProp(RefexProperty.COLLECTION_NID)
+                    + getPrimUuidStrForProp(RefexProperty.RC_UUID)
                     + sb.toString());
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
@@ -126,21 +126,35 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    private String getPrimUuidStrForNidProp(RefexProperty prop)
+    private String getPrimUuidStrForProp(RefexProperty prop)
             throws IOException, InvalidCAB {
-        Object nidObj = properties.get(prop);
-        if (nidObj == null) {
+        Object obj = properties.get(prop);
+        if (obj == null) {
             throw new InvalidCAB(
                     "No data for: " + prop);
         }
-        int nid = (Integer) nidObj;
-        ComponentBI component = Ts.get().getComponent(nid);
-        if (component != null) {
-            return component.getPrimUuid().toString();
+        Integer nid = null;
+        UUID uuid = null;
+        if (Integer.class.isAssignableFrom(obj.getClass())) {
+            nid = (Integer) obj;
+        } else if (UUID.class.isAssignableFrom(obj.getClass())) {
+            uuid = (UUID) obj;
         }
-        List<UUID> uuids = Ts.get().getUuidsForNid(nid);
-        if (uuids.size() == 1) {
-            return uuids.get(0).toString();
+        if (nid != null) {
+            ComponentBI component = Ts.get().getComponent(nid);
+            if (component != null) {
+                return component.getPrimUuid().toString();
+            }
+            List<UUID> uuids = Ts.get().getUuidsForNid(nid);
+            if (uuids.size() == 1) {
+                return uuids.get(0).toString();
+            }
+        } else if (uuid != null) {
+            ComponentBI component = Ts.get().getComponent(uuid);
+            if (component != null) {
+                return component.getPrimUuid().toString();
+            }
+            return uuid.toString();
         }
         throw new InvalidCAB("Can't find nid for: " + prop
                 + " props: " + this.properties);
@@ -262,8 +276,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         INTEGER1,
         STRING1,
         LONG1,
-        FLOAT1,
-    }
+        FLOAT1,}
 
     public UUID getMemberUuid() {
         return getComponentUuid();
