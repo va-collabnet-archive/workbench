@@ -123,6 +123,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
@@ -397,37 +398,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
 
             try {
-                Collection<? extends I_ExtendByRef> extensions =
-                        Terms.get().getRefsetExtensionMembers(refset.getConceptNid());
-                int count = 0;
-                I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(ace.getAceFrameConfig());
-
-                for (I_ExtendByRef ext : extensions) {
-                    List<? extends I_ExtendByRefVersion> tuples =
-                            ext.getTuples(helper.getCurrentStatusIntSet(),
-                            ace.getAceFrameConfig().getViewPositionSetReadOnly(),
-                            ace.getAceFrameConfig().getPrecedence(),
-                            ace.getAceFrameConfig().getConflictResolutionStrategy());
-                    I_ExtendByRefVersion latestTuple = null;
-
-                    for (I_ExtendByRefVersion currentTuple : tuples) {
-                        if ((latestTuple == null) || (latestTuple.getVersion() > currentTuple.getVersion())) {
-                            latestTuple = currentTuple;
-                        }
-                    }
-
-                    if (latestTuple != null) {
-                        if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
-                            if (latestTuple.getRefsetId() == refset.getConceptNid()) {
-                                if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusId())) {
-                                    count++;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                memberCountValueLabel.setText("" + count);
+                ConceptVersionBI refsetVersion = Ts.get().getConceptVersion(getConfig().getViewCoordinate(), refset.getConceptNid());
+                memberCountValueLabel.setText("" + refsetVersion.getRefsetMembersActive().size());
+                
             } catch (Exception e) {
                 memberCountValueLabel.setText("Error computing member count");
                 e.printStackTrace();

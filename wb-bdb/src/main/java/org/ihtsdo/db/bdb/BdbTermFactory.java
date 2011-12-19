@@ -174,6 +174,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.db.bdb.computer.refset.*;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -574,6 +575,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       default :
          throw new UnsupportedOperationException("Can't handle refset type: " + type);
       }
+      ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
 
       return member;
    }

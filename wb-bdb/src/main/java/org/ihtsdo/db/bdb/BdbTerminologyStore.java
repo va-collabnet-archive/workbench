@@ -28,7 +28,7 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
-import org.ihtsdo.db.change.LastChange;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -109,7 +109,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void addTermChangeListener(TermChangeListener cl) {
-        LastChange.addTermChangeListener(cl);
+        ChangeNotifier.addTermChangeListener(cl);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void removeTermChangeListener(TermChangeListener cl) {
-        LastChange.removeTermChangeListener(cl);
+        ChangeNotifier.removeTermChangeListener(cl);
     }
 
     @Override

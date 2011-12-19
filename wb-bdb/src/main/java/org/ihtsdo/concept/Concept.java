@@ -55,7 +55,7 @@ import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper;
-import org.ihtsdo.db.change.LastChange;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.db.util.NidPairForRel;
@@ -227,7 +227,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     
     @Override
     public void cancel() throws IOException {
-        LastChange.touchComponents(getConceptNidsAffectedByCommit());
+        ChangeNotifier.touchComponents(getConceptNidsAffectedByCommit());
         data.cancel();
         
         if (BdbCommitManager.forget(getConceptAttributes())) {
@@ -518,12 +518,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         RefsetMember r = (RefsetMember) Ts.get().getComponent(er.getPrimordialComponentUuid());
                         
                         if (r == null) {
-                            cc.addAnnotation(RefsetMemberFactory.create(er,
-                                    Ts.get().getConceptNidForNid(cc.getNid())));
+                            r = RefsetMemberFactory.create(er,
+                                    Ts.get().getConceptNidForNid(cc.getNid()));
+                            cc.addAnnotation(r);
                         } else {
                             r.merge((RefsetMember) RefsetMemberFactory.create(er,
                                     Ts.get().getConceptNidForNid(cc.getNid())));
                         }
+                        ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
+
                     } else {
                         unresolvedAnnotations.add(er);
                     }
@@ -541,8 +544,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         if (currentMemberNids.contains(rNid) && (r != null)) {
                             r.merge((RefsetMember) RefsetMemberFactory.create(er, c.getNid()));
                         } else {
-                            c.getRefsetMembers().add(RefsetMemberFactory.create(er, c.getNid()));
+                            r = RefsetMemberFactory.create(er, c.getNid());
+                            c.getRefsetMembers().add(r);
                         }
+                        ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
                     }
                 }
             }
@@ -693,11 +698,14 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 RefsetMember r = (RefsetMember) Ts.get().getComponent(er.getPrimordialComponentUuid());
                 
                 if (r == null) {
-                    cc.addAnnotation(RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                    r = RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid()));
+                    cc.addAnnotation(r);
                 } else {
                     r.merge((RefsetMember) RefsetMemberFactory.create(er,
                             Ts.get().getConceptNidForNid(cc.getNid())));
                 }
+                ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
+
             } else {
 
                 // tmp fix hook
@@ -2598,6 +2606,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     private static void setRefsetMembersFromEConcept(EConcept eConcept, Concept c) throws IOException {
         for (TkRefsetAbstractMember<?> eRefsetMember : eConcept.getRefsetMembers()) {
             RefsetMember<?, ?> refsetMember = RefsetMemberFactory.create(eRefsetMember, c.getConceptNid());
+            ChangeNotifier.touchRefexRC(refsetMember.getReferencedComponentNid());
             
             c.data.add(refsetMember);
         }

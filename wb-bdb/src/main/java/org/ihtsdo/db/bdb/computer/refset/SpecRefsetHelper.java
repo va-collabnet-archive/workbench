@@ -166,18 +166,22 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         }
         return statuses;
     }
-
+    private I_IntSet currentStatusIntSet;
     /*
      * (non-Javadoc)
      *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentStatusIntSet()
      */
+
     public I_IntSet getCurrentStatusIntSet() {
-        I_IntSet statuses = Terms.get().newIntSet();
-        for (Integer status : getCurrentStatusIds()) {
-            statuses.add(status);
+        if (currentStatusIntSet == null) {
+            I_IntSet statuses = Terms.get().newIntSet();
+            for (Integer status : getCurrentStatusIds()) {
+                statuses.add(status);
+            }
+            currentStatusIntSet = statuses;
         }
-        return statuses;
+        return currentStatusIntSet;
     }
 
     /*
@@ -423,13 +427,13 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
             if (Ts.get().hasUuid(memberUuid)) {
                 RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
-                
+
                 RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getVcWithAllStatusValues());
                 RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate());
                 bluePrint.setStatusUuid(SnomedMetadataRfx.getSTATUS_CURRENT().getUuids()[0]);
                 bluePrint.setMemberUuid(memberUuid);
                 builder.constructIfNotCurrent(bluePrint);
-                 
+
             } else {
                 RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
                 refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeNid);

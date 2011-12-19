@@ -2,7 +2,6 @@ package org.ihtsdo.db.bdb;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -20,6 +19,7 @@ import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.concept.component.relationship.RelationshipRevision;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -93,6 +93,7 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
                         + "\n\nRefexAmendmentSpec: " + blueprint, ex);
             }
         }
+        ChangeNotifier.touchRefexRC(member.referencedComponentNid);
         for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
             construct(annotBp);
         }
@@ -125,7 +126,10 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         RefsetMember<?, ?> refex = getRefex(blueprint);
         if (refex != null) {
             if (refex.getSapNid() == -1) {
-                return reCreateRefex(refex, blueprint);
+                RefexChronicleBI<?> member = reCreateRefex(refex, blueprint);
+                ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
+                return member;
+
             } else {
                 boolean current = false;
                 for (RefexVersionBI refexv : refex.getVersions(vc)) {
@@ -137,11 +141,15 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
                 if (current) {
                     return refex;
                 }
-                return updateRefex(refex, blueprint);
+                RefexChronicleBI<?> member =  updateRefex(refex, blueprint);
+                ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
+                return member;
             }
         }
 
-        return createRefex(blueprint);
+        RefexChronicleBI<?> member =  createRefex(blueprint);
+        ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
+        return member;
     }
 
     private RefexChronicleBI<?> reCreateRefex(RefsetMember<?, ?> refex,
@@ -155,7 +163,9 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         for (RefexCAB annotBp : blueprint.getAnnotationBlueprints()) {
             construct(annotBp);
         }
-        return RefsetMemberFactory.create(blueprint, ec);
+        RefexChronicleBI<?> member = RefsetMemberFactory.create(blueprint, ec);
+        ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
+        return member;
     }
 
     private RelationshipChronicleBI getRel(RelCAB blueprint)

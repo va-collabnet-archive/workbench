@@ -384,6 +384,9 @@ public class Bdb {
             envConfig.setSharedCache(true);
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
+            //envConfig.setConfigParam(EnvironmentConfig.EVICTOR_LRU_ONLY, "false");
+            envConfig.setConfigParam(EnvironmentConfig.EVICTOR_NODES_PER_SCAN, "4");
+
             /*
              * int primeForLockTable = SieveForPrimeNumbers.largestPrime(
              * Runtime.getRuntime().availableProcessors() - 1);

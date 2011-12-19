@@ -41,7 +41,7 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.change.BdbCommitSequence;
-import org.ihtsdo.db.change.LastChange;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.lucene.WfHxLuceneWriterAccessor;
@@ -151,7 +151,7 @@ public class BdbCommitManager {
 
         Concept concept = (Concept) igcd;
 
-        LastChange.touch(concept);
+        ChangeNotifier.touch(concept);
         dataCheckMap.remove(concept);
         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.ADD_UNCOMMITTED, null, concept);
 
@@ -239,7 +239,7 @@ public class BdbCommitManager {
         Concept c = (Concept) concept;
 
         c.modified();
-        LastChange.touch(c);
+        ChangeNotifier.touch(c);
 
         try {
             KindOfComputer.updateIsaCache(c.getNid());
@@ -312,7 +312,7 @@ public class BdbCommitManager {
                             }
                         }
 
-                        LastChange.touchComponents(cNidSet);
+                        ChangeNotifier.touchComponents(cNidSet);
                         Bdb.getSapDb().commit(Long.MIN_VALUE);
                         Bdb.getSapDb().commit(Long.MIN_VALUE);
                         KindOfComputer.reset();

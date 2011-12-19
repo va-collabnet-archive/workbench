@@ -25,9 +25,11 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.concept.component.refset.RefsetMemberFactory;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 /**
@@ -86,7 +88,10 @@ public class AnnotationAdder implements I_ProcessUnfetchedConceptData {
             for (TkRefsetAbstractMember<?> member : set) {
                 ComponentChroncileBI<?> component = c.getComponent(Bdb.uuidToNid(member.getComponentUuid()));
                 if (component != null) {
-                    component.addAnnotation(RefsetMemberFactory.create(member, cNid));
+                    RefexChronicleBI<?> mem =  RefsetMemberFactory.create(member, cNid);
+                    ChangeNotifier.touchRefexRC(mem.getReferencedComponentNid());
+                    component.addAnnotation(mem);
+                    
                 } else {
                     AceLog.getAppLog().warning("Cannot import annotation. Component is null for: " + member);
                 }

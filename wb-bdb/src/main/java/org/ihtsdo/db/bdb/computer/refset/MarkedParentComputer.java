@@ -34,7 +34,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.db.change.LastChange;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -170,8 +170,6 @@ public class MarkedParentComputer {
 
          while (memberItr.next()) {
             KindOfComputer.getIsaCacheMap().get(viewCoordinate.getIsaCoordinates().iterator().next()).addParents(memberItr.nid(), allParents);
-            LastChange.touchXref(memberItr.nid());
-            LastChange.touchComponent(memberItr.nid());
          }
 
          for (RefexVersionBI<?> mpv : markedParentRefsetConcept.getCurrentRefsetMembers(viewCoordinate)) {
@@ -189,8 +187,7 @@ public class MarkedParentComputer {
          NidBitSetItrBI newParentItr = allParents.iterator();
 
          while (newParentItr.next()) {
-            LastChange.touchXref(newParentItr.nid());
-            LastChange.touchComponent(newParentItr.nid());
+            ChangeNotifier.touchRefexRC(newParentItr.nid());
             memberRefsetHelper.newRefsetExtension(markedParentRefsetConcept.getNid(), newParentItr.nid(),
                     parentMemberTypeNid);
          }

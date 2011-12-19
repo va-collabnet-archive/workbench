@@ -66,6 +66,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.TreeCellRenderer;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -109,6 +110,10 @@ public class TaxonomyNodeRenderer extends JLabel
      */
     private Color treeBGColor;
     private int viewerImageTypeNid;
+
+    ViewCoordinate getViewCoordinate() {
+        return this.aceConfig.getViewCoordinate();
+    }
 
     //~--- constant enums ------------------------------------------------------
     protected enum DescTypeToRender {

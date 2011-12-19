@@ -45,6 +45,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
@@ -146,9 +147,14 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public boolean addVersion(I_RelPart part) {
         this.versions = null;
 
-        return super.addRevision((RelationshipRevision) part);
-    }
+        boolean returnValue = super.addRevision((RelationshipRevision) part);
+        return returnValue;
 
+    }
+    @Override
+    protected void addRevisionHook(boolean returnValue, RelationshipRevision r) {
+        ChangeNotifier.touchRelTarget(getDestinationNid());
+    }
     @Override
     public boolean addVersionNoRedundancyCheck(I_RelPart rel) {
         throw new UnsupportedOperationException();

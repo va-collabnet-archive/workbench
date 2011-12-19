@@ -28,6 +28,7 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import java.util.concurrent.Semaphore;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
 public class ConceptBdb extends ComponentBdb {
@@ -131,45 +132,50 @@ public class ConceptBdb extends ComponentBdb {
         iterateConceptData(processor, processors * 2);
     }
 
-
+    Semaphore iteratePermit = new Semaphore(1, true);
     private void iterateConceptData(ProcessUnfetchedConceptDataBI processor, int executors) throws IOException,
             InterruptedException, ExecutionException {
-    	//AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
-        IdentifierSet ids = (IdentifierSet) processor.getNidSet();
-        int cardinality = ids.cardinality();
-        int idsPerParallelConceptIterator = cardinality / executors;
-    	//AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
-        I_IterateIds idsItr = ids.iterator();
-        List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
-        List<ParallelConceptIterator> pcis = new ArrayList<ParallelConceptIterator>();
-        int sum = 0;
-        while (idsItr.next()) {
-            int first = idsItr.nid();
-            int last = first;
-            int count = 1;
+        try {
+            iteratePermit.acquireUninterruptibly();
+            //AceLog.getAppLog().info("Iterate in parallel. Executors: " + executors);
+            IdentifierSet ids = (IdentifierSet) processor.getNidSet();
+            int cardinality = ids.cardinality();
+            int idsPerParallelConceptIterator = cardinality / executors;
+            //AceLog.getAppLog().info("Iterate in parallel. idsPerParallelConceptIterator: " + idsPerParallelConceptIterator);
+            I_IterateIds idsItr = ids.iterator();
+            List<Future<Boolean>> futures = new ArrayList<Future<Boolean>>(executors + 1);
+            List<ParallelConceptIterator> pcis = new ArrayList<ParallelConceptIterator>();
+            int sum = 0;
             while (idsItr.next()) {
-                last = idsItr.nid();
-                count++;
-                if (count == idsPerParallelConceptIterator) {
-                    break;
+                int first = idsItr.nid();
+                int last = first;
+                int count = 1;
+                while (idsItr.next()) {
+                    last = idsItr.nid();
+                    count++;
+                    if (count == idsPerParallelConceptIterator) {
+                        break;
+                    }
                 }
-            }
-            sum = sum + count;
-            ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
+                sum = sum + count;
+                ParallelConceptIterator pci = new ParallelConceptIterator(first, last, count, processor, readOnly, mutable);
 //        	AceLog.getAppLog().info("Iterate in parallel. first: " + first +
 //        			" last: " + last +
 //        			" count: " + count);
-            Future<Boolean> f = iteratorService.submit(pci);
+                Future<Boolean> f = iteratorService.submit(pci);
 
-            futures.add(f);
-            pcis.add(pci);
-        }
-        if (I_ProcessUnfetchedConceptData.class.isAssignableFrom(processor.getClass())) {
-           ((I_ProcessUnfetchedConceptData) processor).setParallelConceptIterators(pcis);
-        }
+                futures.add(f);
+                pcis.add(pci);
+            }
+            if (I_ProcessUnfetchedConceptData.class.isAssignableFrom(processor.getClass())) {
+                ((I_ProcessUnfetchedConceptData) processor).setParallelConceptIterators(pcis);
+            }
 
-        for (Future<Boolean> f : futures) {
-            f.get();
+            for (Future<Boolean> f : futures) {
+                f.get();
+            }
+        } finally {
+            iteratePermit.release();
         }
     }
 

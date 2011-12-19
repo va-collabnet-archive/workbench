@@ -37,7 +37,6 @@ import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -49,11 +48,10 @@ public class RefsetMemberFactory {
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
         member.refsetNid = refexColCon.getNid();
         member.nid = Bdb.uuidToNid(res.getMemberUUID());
+        int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
         if (refexColCon.isAnnotationStyleRefex()) {
-            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
-            ComponentChroncileBI<?> component = Ts.get().getComponent(res.getRcUuid());
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);

@@ -85,6 +85,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.db.change.ChangeNotifier;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
@@ -180,6 +181,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 RefsetMember<?, ?> annot = RefsetMemberFactory.create(eAnnot, enclosingConceptNid);
 
                 this.annotations.add(annot);
+                ChangeNotifier.touchRefexRC(annot.getReferencedComponentNid());
             }
         }
     }
@@ -326,7 +328,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public final boolean addRevision(R r) {
         assert r != null;
 
-        boolean returnValue = false;
+        boolean returnValue;
         Concept c = getEnclosingConcept();
 
         assert c != null : "Can't find concept for: " + r;
@@ -341,8 +343,12 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         r.primordialComponent = (C) this;
         c.modified();
         clearVersions();
-
+        addRevisionHook(returnValue, r);
         return returnValue;
+    }
+    
+    protected void addRevisionHook(boolean returnValue, R r) {
+        
     }
 
     public final boolean addRevisionNoRedundancyCheck(R r) {

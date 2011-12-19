@@ -32,7 +32,6 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
-import org.ihtsdo.db.change.LastChange;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -281,13 +280,9 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
             while (newMemberItr.next()) {
                 isaCache.addParents(newMemberItr.nid(), newParents);
-                LastChange.touchXref(newMemberItr.nid());
-                LastChange.touchComponent(newMemberItr.nid());
             }
             NidBitSetItrBI newParentItr = newParents.iterator();
             while (newParentItr.next()) {
-                LastChange.touchXref(newParentItr.nid());
-                LastChange.touchComponent(newParentItr.nid());
                 memberRefsetHelper.newRefsetExtension(
                         markedParentRefsetConcept.getNid(), newParentItr.nid(),
                         parentMemberTypeNid);
@@ -308,8 +303,6 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             NidBitSetItrBI retiredMemberItr = retiredMemberNids.iterator();
             while (retiredMemberItr.next()) {
                 isaCache.addParents(retiredMemberItr.nid(), parentsToRetire);
-                LastChange.touchXref(retiredMemberItr.nid());
-                LastChange.touchComponent(retiredMemberItr.nid());
             }
             I_RepresentIdSet currentParents = Bdb.getConceptDb().getEmptyIdSet();
             NidBitSetItrBI currentMemberItr = currentRefsetMemberComponentNids.iterator();
@@ -319,17 +312,11 @@ public class RefsetComputer implements I_ProcessUnfetchedConceptData {
             parentsToRetire.andNot(currentParents);
             NidBitSetItrBI parentToRetireItr = parentsToRetire.iterator();
             while (parentToRetireItr.next()) {
-               LastChange.touchXref(parentToRetireItr.nid());
-                LastChange.touchComponent(parentToRetireItr.nid());
                 memberRefsetHelper.retireRefsetExtension(
                         markedParentRefsetConcept.getNid(),
                         parentToRetireItr.nid(), parentMemberTypeNid);
             }
             NidBitSetItrBI newMemberItr = newMemberNids.iterator();
-            while (newMemberItr.next()) {
-                LastChange.touchXref(newMemberItr.nid());
-                LastChange.touchComponent(newMemberItr.nid());
-            }
         }
         if (!canceled) {
             BdbCommitManager.addUncommittedNoChecks(refsetConcept);
