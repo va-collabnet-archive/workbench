@@ -2430,6 +2430,7 @@ public class TerminologyProjectDAO {
 				current, 0, config);
 
 		I_GetConceptData newPromotionConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+		newPromotionConcept.setAnnotationStyleRefex(true);
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 				name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
