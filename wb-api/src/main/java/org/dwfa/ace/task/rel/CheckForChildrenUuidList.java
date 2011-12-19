@@ -17,6 +17,8 @@
 package org.dwfa.ace.task.rel;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -204,19 +206,37 @@ public class CheckForChildrenUuidList extends AbstractTask {
                 for (int i = 0; i < components.length; i++) {
                     wizardPanel.remove(components[i]);
                 }
+                wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
 
                 //add concepts
-                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept<br>"));
-                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"));
+                c.gridwidth = 2;
+                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept.<br>"), c);
+                c.gridy++;
+                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"), c);
+                c.gridy++;
 
                 //add buttons
-                wizardPanel.add(new JLabel(" "));
+                c.gridwidth = 1;
+                c.weightx = 0;
                 JButton updateButton = new JButton("add to list");
                 updateButton.addActionListener(new UpdateActionListener());
-                wizardPanel.add(updateButton);
+                wizardPanel.add(updateButton, c);
+                c.gridx++;
+                c.weightx = 1;
                 JButton cancelButton = new JButton("cancel");
-                wizardPanel.add(cancelButton);
                 cancelButton.addActionListener(new CancelActionListener());
+                wizardPanel.add(cancelButton, c);
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty = 1;
+                wizardPanel.add(new JLabel(" "), c);
             }
         }
     }
@@ -225,19 +245,29 @@ public class CheckForChildrenUuidList extends AbstractTask {
         try {
             ConceptVersionBI cv = Ts.get().getConceptVersion(tempVc, concept.getNid());
 
-            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOrigins();
-            if (relsIncoming != null) {
+            Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelsIncomingOrigins();
+            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+            if (allRelsIncoming != null) {
                 uuidList = new ArrayList<List<UUID>>();
-                for (ConceptVersionBI rel : relsIncoming) {
-                    if (rel.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()
-                            || rel.isUncommitted()) {
-                        UUID uuid = Terms.get().nidToUuid(rel.getConceptNid());
+                for (ConceptVersionBI relConcept : allRelsIncoming) {
+                    if (relConcept.isUncommitted()) {
+                        UUID uuid = Terms.get().nidToUuid(relConcept.getConceptNid());
                         List<UUID> list = new ArrayList<UUID>();
                         list.add(uuid);
                         uuidList.add(list);
                     }
                 }
             }
+            if (relsIncoming != null) {
+                for (ConceptVersionBI relConcept : relsIncoming) {
+                    UUID uuid = Terms.get().nidToUuid(relConcept.getConceptNid());
+                    List<UUID> list = new ArrayList<UUID>();
+                    list.add(uuid);
+                    uuidList.add(list);
+                }
+            }
+        } catch (ContradictionException ex) {
+            Logger.getLogger(CheckForChildrenUuidList.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException e) {
             e.printStackTrace();
             returnCondition = Condition.ITEM_CANCELED;
