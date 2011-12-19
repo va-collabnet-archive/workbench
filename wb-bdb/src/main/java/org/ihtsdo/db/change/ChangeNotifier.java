@@ -45,9 +45,9 @@ public class ChangeNotifier {
       new Timer("LastChange", true);
    private static AtomicReference<ConcurrentSkipListSet<Integer>> referencedComponentsOfChangedRefexs =
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
-   private static AtomicReference<ConcurrentSkipListSet<Integer>> destinationsOfChangedRels =
-      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
    private static AtomicReference<ConcurrentSkipListSet<Integer>> originsOfChangedRels =
+      new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
+   private static AtomicReference<ConcurrentSkipListSet<Integer>> destinationsOfChangedRels =
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
    private static AtomicReference<ConcurrentSkipListSet<Integer>> changedComponents =
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
@@ -119,18 +119,22 @@ public class ChangeNotifier {
       touch(nid, Change.COMPONENT);
    }
 
-   public static void touchRefexRC(int nid) {
-      touch(nid, Change.REFEX_XREF);
-   }
-
-   public static void touchRelTarget(int nid) {
-      touch(nid, Change.REL_XREF);
-   }
-
    public static void touchComponents(Collection<Integer> cNidSet) {
       for (Integer cNid : cNidSet) {
          touch(cNid, Change.COMPONENT);
       }
+   }
+
+   public static void touchRefexRC(int nid) {
+      touch(nid, Change.REFEX_XREF);
+   }
+
+   public static void touchRelOrigin(int nid) {
+      touch(nid, Change.REL_ORIGIN);
+   }
+
+   public static void touchRelTarget(int nid) {
+      touch(nid, Change.REL_XREF);
    }
 
    //~--- inner classes -------------------------------------------------------
@@ -163,7 +167,8 @@ public class ChangeNotifier {
          ConcurrentSkipListSet<Integer> originsOfChangedRels =
             ChangeNotifier.originsOfChangedRels.getAndSet(new ConcurrentSkipListSet<Integer>());
          ConcurrentSkipListSet<Integer> referencedComponentsOfChangedRefexs =
-            ChangeNotifier.referencedComponentsOfChangedRefexs.getAndSet(new ConcurrentSkipListSet<Integer>());
+            ChangeNotifier.referencedComponentsOfChangedRefexs.getAndSet(
+                new ConcurrentSkipListSet<Integer>());
          ConcurrentSkipListSet<Integer> changedComponents =
             ChangeNotifier.changedComponents.getAndSet(new ConcurrentSkipListSet<Integer>());
          long sequence = BdbCommitSequence.nextSequence();
@@ -179,16 +184,13 @@ public class ChangeNotifier {
                if (cl == null) {
                   toRemove.add(clr);
                } else {
-                   try {
-                       cl.changeNotify(sequence, 
-                               originsOfChangedRels, 
-                               destinationsOfChangedRels, 
-                               referencedComponentsOfChangedRefexs,
-                               changedComponents);
-                   } catch (Throwable e) {
-                       e.printStackTrace();
-                       toRemove.add(clr);
-                   }
+                  try {
+                     cl.changeNotify(sequence, originsOfChangedRels, destinationsOfChangedRels,
+                                     referencedComponentsOfChangedRefexs, changedComponents);
+                  } catch (Throwable e) {
+                     e.printStackTrace();
+                     toRemove.add(clr);
+                  }
                }
             }
 

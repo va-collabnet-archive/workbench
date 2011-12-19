@@ -54,6 +54,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import org.ihtsdo.db.change.ChangeNotifier;
 
 public class ConceptDataSimpleReference extends ConceptDataManager {
    private AtomicReference<ConceptAttributes>              attributes =
@@ -140,11 +141,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
                affectedConceptNids.add(r.getOriginNid());
                affectedConceptNids.add(r.getDestinationNid());
+               ChangeNotifier.touchRelTarget(r.getDestinationNid());
+               ChangeNotifier.touchRelOrigin(r.getOriginNid());
             } else if (cc instanceof RefexChronicleBI) {
                RefexChronicleBI r = (RefexChronicleBI) cc;
 
                affectedConceptNids.add(Ts.get().getConceptNidForNid(r.getReferencedComponentNid()));
                affectedConceptNids.add(r.getCollectionNid());
+               ChangeNotifier.touchRefexRC(r.getReferencedComponentNid());
             } else {
                affectedConceptNids.add(getNid());
             }
