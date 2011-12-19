@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.task.rel;
 
@@ -62,13 +62,14 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.WizardBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = {
     @Spec(directory = "tasks/arena", type = BeanType.TASK_BEAN)})
 public class CheckForChildrenUuidList extends AbstractTask {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
@@ -205,7 +206,7 @@ public class CheckForChildrenUuidList extends AbstractTask {
                 }
 
                 //add concepts
-                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept"));
+                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept<br>"));
                 wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"));
 
                 //add buttons
@@ -224,18 +225,19 @@ public class CheckForChildrenUuidList extends AbstractTask {
         try {
             ConceptVersionBI cv = Ts.get().getConceptVersion(tempVc, concept.getNid());
 
-            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+            Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOrigins();
             if (relsIncoming != null) {
                 uuidList = new ArrayList<List<UUID>>();
                 for (ConceptVersionBI rel : relsIncoming) {
-                    UUID uuid = Terms.get().nidToUuid(rel.getConceptNid());
-                    List<UUID> list = new ArrayList<UUID>();
-                    list.add(uuid);
-                    uuidList.add(list);
+                    if (rel.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()
+                            || rel.isUncommitted()) {
+                        UUID uuid = Terms.get().nidToUuid(rel.getConceptNid());
+                        List<UUID> list = new ArrayList<UUID>();
+                        list.add(uuid);
+                        uuidList.add(list);
+                    }
                 }
             }
-        } catch (ContradictionException ex) {
-            Logger.getLogger(CheckForChildrenUuidList.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException e) {
             e.printStackTrace();
             returnCondition = Condition.ITEM_CANCELED;
