@@ -2807,12 +2807,7 @@ public class TerminologyProjectDAO {
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), //metadata Removed to minimize changeset footprint
 						config); 
-				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListConcept.getConceptNid())) {
-					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-						termFactory.addUncommittedNoChecks(workListConcept);
-					}
-				}
+				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = termFactory.getConcept(member.getActivityStatus());
 				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
 				promotionRefset.setDestination(member.getId(), assignedUserId);
@@ -3261,34 +3256,23 @@ public class TerminologyProjectDAO {
 			} else {
 				name = "No FSN!";
 			}
-			//WorkListMember deserializedWorkListMemberWithMetadata = null;
+			WfComponentProvider provider = new WfComponentProvider();
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					workListMemberConcept.getConceptNid());
 			for (I_ExtendByRef extension : extensions) {
 				if (extension.getRefsetId() == workListRefset.getConceptNid()) {
 					WorkList workList = getWorkList(workListRefset, config);
-					PromotionRefset promotionRefset = workList.getPromotionRefset(config);
+					PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 					I_GetConceptData status = promotionRefset.getPromotionStatus(workListMemberConcept.getConceptNid(), 
+							config);
+					I_GetConceptData destination = promotionRefset.getDestination(workListMemberConcept.getConceptNid(), 
 							config);
 					Long statusDate = promotionRefset.getLastStatusTime(workListMemberConcept.getConceptNid(), 
 							config);
 					workListMember = new WorkListMember(name, workListMemberConcept.getConceptNid(), 
 							workListMemberConcept.getUids(), workList.getUids().iterator().next(), status.getUids().iterator().next(),statusDate);
-					//					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-					//					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
-					//					String metadata = part.getStringValue();
-					//					deserializedWorkListMemberWithMetadata = (WorkListMember) deserialize(metadata);
 				}
 			}
-			//			if (deserializedWorkListMemberWithMetadata != null) {
-			//				workListMember = deserializedWorkListMemberWithMetadata;
-			//				workListMember.setName(name);
-			//				WorkList workList = getWorkList(workListRefset, config);
-			//				PromotionRefset promotionRefset = workList.getPromotionRefset(config);
-			//				I_GetConceptData status = promotionRefset.getPromotionStatus(workListMember.getId(), config);
-			//				workListMember.setActivityStatus(status.getUids().iterator().next());
-			//
-			//			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

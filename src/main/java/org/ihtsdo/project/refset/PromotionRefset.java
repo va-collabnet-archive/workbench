@@ -151,7 +151,6 @@ public class PromotionRefset extends Refset {
 					refsetId);
 			newSpec.put(RefexProperty.CNID1, statusConceptId);
 			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			component.addAnnotation(newRefex);
 			termFactory.addUncommittedNoChecks(component);
 		}
 

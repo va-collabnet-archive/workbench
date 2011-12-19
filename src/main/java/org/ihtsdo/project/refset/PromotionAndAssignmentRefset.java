@@ -7,6 +7,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -22,6 +23,9 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class PromotionAndAssignmentRefset extends PromotionRefset {
+	
+	private int defaultStatusNid;
+	private int defaultUserNid;
 
 	public PromotionAndAssignmentRefset(I_GetConceptData refsetConcept) throws Exception {
 		super(refsetConcept);
@@ -31,6 +35,9 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		this.refsetId = refsetConcept.getConceptNid();
 		this.termFactory = Terms.get();
 		this.activeValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+		this.defaultStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getPrimoridalUid());
+		this.defaultUserNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+		
 	}
 
 	public RefexVersionBI getLastPromotionTuple(int componentId, I_ConfigAceFrame config) throws TerminologyException, IOException {
@@ -40,6 +47,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			if (promotionMember.getCollectionNid() == this.refsetId) {
 				try {
 					RefexVersionBI lastTuple = promotionMember.getVersion(config.getViewCoordinate());
+					return lastTuple;
 				} catch (ContradictionException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
@@ -154,12 +162,12 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			}
 		} else {
 			RefexCAB newSpec = new RefexCAB(
-					TK_REFSET_TYPE.CID,
+					TK_REFSET_TYPE.CID_CID,
 					componentId,
 					refsetId);
 			newSpec.put(RefexProperty.CNID1, statusConceptId);
+			newSpec.put(RefexProperty.CNID2, defaultUserNid);
 			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			component.addAnnotation(newRefex);
 			termFactory.addUncommittedNoChecks(component);
 		}
 
@@ -190,12 +198,12 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			}
 		} else {
 			RefexCAB newSpec = new RefexCAB(
-					TK_REFSET_TYPE.CID,
+					TK_REFSET_TYPE.CID_CID,
 					componentId,
 					refsetId);
+			newSpec.put(RefexProperty.CNID1, defaultStatusNid);
 			newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
 			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			component.addAnnotation(newRefex);
 			termFactory.addUncommittedNoChecks(component);
 		}
 
