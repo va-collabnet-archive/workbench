@@ -7,6 +7,7 @@ package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.dwfa.ace.api.I_IterateIds;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.log.AceLog;
 
@@ -34,7 +35,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.SwingWorker;
-import org.dwfa.ace.api.I_IterateIds;
 
 /**
  *
@@ -121,7 +121,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
             TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
 
             if (currentNode != null) {
-               ParentChangeNodeUpdate pcnu = new ParentChangeNodeUpdate();
+               ParentChangeNodeUpdate pcnu = new ParentChangeNodeUpdate(currentNode);
 
                this.conceptsToRetrieve.setMember(cNid);
 
@@ -156,7 +156,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                      nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
                   }
 
-                  nodesToChange.get(cNid).add(ccnu);
+                  nodesToChange.get(pcNid).add(ccnu);
                }
             }
          }
@@ -177,7 +177,8 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                   possibleChildrenCSLS.add(pcNid);
                }
 
-               ParentAndChildChangeNodeUpdate paccnu = new ParentAndChildChangeNodeUpdate();
+               ParentAndChildChangeNodeUpdate paccnu = new ParentAndChildChangeNodeUpdate(currentNode,
+                                                                                  possibleChildrenCSLS);
 
                for (int pcNid : possibleChildren) {
                   if (!nodesToChange.containsKey(pcNid)) {
@@ -202,16 +203,18 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
    @Override
    protected Object doInBackground() throws Exception {
-       if (conceptsToRetrieve.size() > 100) {
-        Ts.get().iterateConceptDataInParallel(this);
-       } else {
-          I_IterateIds cnidItr = conceptsToRetrieve.iterator();
-          TerminologySnapshotDI tSnap = ts.getSnapshot(vc);
-          while (cnidItr.next()) {
-              processConcept(tSnap.getConceptForNid(cnidItr.nid()));
-          }
-       }
-       latch.await();
+      if (conceptsToRetrieve.size() > 100) {
+         Ts.get().iterateConceptDataInParallel(this);
+      } else {
+         I_IterateIds          cnidItr = conceptsToRetrieve.iterator();
+         TerminologySnapshotDI tSnap   = ts.getSnapshot(vc);
+
+         while (cnidItr.next()) {
+            processConcept(tSnap.getConceptForNid(cnidItr.nid()));
+         }
+      }
+
+      latch.await();
 
       return true;
    }
@@ -258,23 +261,24 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       }
    }
 
+   private void processConcept(ConceptVersionBI concept) throws Exception {
+      int cNid = concept.getNid();
+
+      if (nodesToChange.containsKey(cNid)) {
+         for (UpdateNodeBI un : nodesToChange.get(cNid)) {
+            un.update(concept);
+         }
+      }
+
+      latch.countDown();
+   }
+
    @Override
    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
       if (conceptsToRetrieve.isMember(cNid)) {
-            processConcept(fetcher.fetch(vc));
+         processConcept(fetcher.fetch(vc));
       }
    }
-
-    private void processConcept(ConceptVersionBI concept) throws Exception {
-        int cNid = concept.getNid();
-        if (nodesToChange.containsKey(cNid)) {
-           for (UpdateNodeBI un : nodesToChange.get(cNid)) {
-              un.update(concept);
-           }
-        }
-
-        latch.countDown();
-    }
 
    //~--- get methods ---------------------------------------------------------
 
@@ -293,6 +297,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
    //~--- inner classes -------------------------------------------------------
 
    private class ChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
+      boolean                        rendered = false;
       TaxonomyNode                   currentNode;
       ConcurrentSkipListSet<Integer> possibleChildren;
 
@@ -311,8 +316,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
          try {
             if (cv.getNid() == currentNode.getCnid()) {
                renderer.setupTaxonomyNode(currentNode, cv);
-
-               // publish node somehow...
+               rendered = true;
             } else {
                for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
                   if (rel.getDestinationNid() == currentNode.getCnid()) {
@@ -326,11 +330,12 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                }
 
                possibleChildren.remove(cv.getNid());
+            }
 
-               if (possibleChildren.isEmpty()) {
+            if (possibleChildren.isEmpty() && rendered) {
+               PublishRecord pr = new PublishRecord(currentNode, PublishRecord.UpdateType.CHILD_CHANGE);
 
-                  // publish node somehow...
-               }
+               publish(pr);
             }
          } catch (ContradictionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
@@ -368,17 +373,81 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
 
    private class ParentAndChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
+      boolean                        rendered = false;
+      TaxonomyNode                   currentNode;
+      ConcurrentSkipListSet<Integer> possibleChildren;
+
+      //~--- constructors -----------------------------------------------------
+
+      public ParentAndChildChangeNodeUpdate(TaxonomyNode currentNode,
+              ConcurrentSkipListSet<Integer> possibleChildren) {
+         this.currentNode      = currentNode;
+         this.possibleChildren = possibleChildren;
+      }
+
+      //~--- methods ----------------------------------------------------------
+
       @Override
       public void update(ConceptVersionBI cv) {
-         throw new UnsupportedOperationException("Not supported yet.");
+         try {
+            if (cv.getNid() == currentNode.getCnid()) {
+               renderer.setupTaxonomyNode(currentNode, cv);
+               rendered = true;
+            } else {
+               for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
+                  if (rel.getDestinationNid() == currentNode.getCnid()) {
+                     TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getCnid(),
+                                                 currentNode);
+
+                     currentNode.addChild(childNode);
+
+                     break;
+                  }
+               }
+
+               possibleChildren.remove(cv.getNid());
+            }
+
+            if (possibleChildren.isEmpty() && rendered) {
+               PublishRecord pr = new PublishRecord(currentNode,
+                                     PublishRecord.UpdateType.EXTRA_PARENT_AND_CHILD_CHANGE);
+
+               publish(pr);
+            }
+         } catch (ContradictionException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
       }
    }
 
 
    private class ParentChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
+      TaxonomyNode currentNode;
+
+      //~--- constructors -----------------------------------------------------
+
+      public ParentChangeNodeUpdate(TaxonomyNode currentNode) {
+         this.currentNode = currentNode;
+      }
+
+      //~--- methods ----------------------------------------------------------
+
       @Override
       public void update(ConceptVersionBI cv) {
-         throw new UnsupportedOperationException("Not supported yet.");
+         try {
+            TaxonomyNode newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
+                                      model.getNodeStore().get(currentNode.parentNodeId));
+
+            renderer.setupTaxonomyNode(newNode, cv);
+
+            PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_CHANGE);
+
+            publish(pr);
+         } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+         }
       }
    }
 
