@@ -81,12 +81,6 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
             // TODO use other than termFactory.getActiveAceFrameConfig();
             I_ConfigAceFrame configFrame = termFactory.getActiveAceFrameConfig();
             I_ConfigAceDb configDb = configFrame.getDbConfig();
-            I_GetConceptData userTopHierarchy = termFactory.getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
-
-            I_GetConceptData activeUser = configDb.getUserConcept();
-            if (activeUser == null || activeUser.equals(userTopHierarchy)) {
-                return alertList;
-            }
 
             alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
 
