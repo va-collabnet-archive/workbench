@@ -26,6 +26,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 import java.io.IOException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -102,90 +103,106 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       destinationsOfChangedRels.removeAll(originsAndDestinationsChanged);
 
       for (int cNid : noTaxonomyChange) {
-         for (Long nodeId : model.getNodeStore().getNodeIdsForConcept(cNid)) {
-            TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
-            if (currentNode != null) {
-               if (!nodesToChange.containsKey(cNid)) {
-                  nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+         if (nodeIds != null) {
+            for (Long nodeId : nodeIds) {
+               TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
+
+               if (currentNode != null) {
+                  if (!nodesToChange.containsKey(cNid)) {
+                     nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  }
+
+                  this.conceptsToRetrieve.setMember(cNid);
+                  nodesToChange.get(cNid).add(new NoTaxonomyChangeNodeUpdate(currentNode));
                }
-
-               this.conceptsToRetrieve.setMember(cNid);
-               nodesToChange.get(cNid).add(new NoTaxonomyChangeNodeUpdate(currentNode));
             }
          }
       }
 
       for (int cNid : originsOfChangedRels) {
-         for (Long nodeId : model.getNodeStore().getNodeIdsForConcept(cNid)) {
-            TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
-            if (currentNode != null) {
-               ParentChangeNodeUpdate pcnu = new ParentChangeNodeUpdate(currentNode);
+         if (nodeIds != null) {
+            for (Long nodeId : nodeIds) {
+               TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
 
-               this.conceptsToRetrieve.setMember(cNid);
+               if (currentNode != null) {
+                  ParentChangeNodeUpdate pcnu = new ParentChangeNodeUpdate(currentNode);
 
-               if (!nodesToChange.containsKey(cNid)) {
-                  nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  this.conceptsToRetrieve.setMember(cNid);
+
+                  if (!nodesToChange.containsKey(cNid)) {
+                     nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  }
+
+                  nodesToChange.get(cNid).add(pcnu);
                }
-
-               nodesToChange.get(cNid).add(pcnu);
             }
          }
       }
 
       for (int cNid : destinationsOfChangedRels) {
-         for (Long nodeId : model.getNodeStore().getNodeIdsForConcept(cNid)) {
-            TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
-            if (currentNode != null) {
-               this.conceptsToRetrieve.setMember(cNid);
+         if (nodeIds != null) {
+            for (Long nodeId : nodeIds) {
+               TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
 
-               int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
-                                                                        renderer.getViewCoordinate());
-               ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
+               if (currentNode != null) {
+                  this.conceptsToRetrieve.setMember(cNid);
 
-               for (int pcNid : possibleChildren) {
-                  possibleChildrenCSLS.add(pcNid);
-               }
+                  int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
+                                                                           renderer.getViewCoordinate());
+                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
 
-               ChildChangeNodeUpdate ccnu = new ChildChangeNodeUpdate(currentNode, possibleChildrenCSLS);
-
-               for (int pcNid : possibleChildren) {
-                  if (!nodesToChange.containsKey(pcNid)) {
-                     nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  for (int pcNid : possibleChildren) {
+                     possibleChildrenCSLS.add(pcNid);
                   }
 
-                  nodesToChange.get(pcNid).add(ccnu);
+                  ChildChangeNodeUpdate ccnu = new ChildChangeNodeUpdate(currentNode, possibleChildrenCSLS);
+
+                  for (int pcNid : possibleChildren) {
+                     if (!nodesToChange.containsKey(pcNid)) {
+                        nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                     }
+
+                     nodesToChange.get(pcNid).add(ccnu);
+                  }
                }
             }
          }
       }
 
       for (int cNid : originsAndDestinationsChanged) {
-         for (Long nodeId : model.getNodeStore().getNodeIdsForConcept(cNid)) {
-            TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
+         Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cNid);
 
-            if (currentNode != null) {
-               this.conceptsToRetrieve.setMember(cNid);
+         if (nodeIds != null) {
+            for (Long nodeId : nodeIds) {
+               TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
 
-               int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
-                                                                        renderer.getViewCoordinate());
-               ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
+               if (currentNode != null) {
+                  this.conceptsToRetrieve.setMember(cNid);
 
-               for (int pcNid : possibleChildren) {
-                  possibleChildrenCSLS.add(pcNid);
-               }
+                  int[]                          possibleChildren     = ts.getPossibleChildren(cNid,
+                                                                           renderer.getViewCoordinate());
+                  ConcurrentSkipListSet<Integer> possibleChildrenCSLS = new ConcurrentSkipListSet<Integer>();
 
-               ParentAndChildChangeNodeUpdate paccnu = new ParentAndChildChangeNodeUpdate(currentNode,
-                                                                                  possibleChildrenCSLS);
-
-               for (int pcNid : possibleChildren) {
-                  if (!nodesToChange.containsKey(pcNid)) {
-                     nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  for (int pcNid : possibleChildren) {
+                     possibleChildrenCSLS.add(pcNid);
                   }
 
-                  nodesToChange.get(cNid).add(paccnu);
+                  ParentAndChildChangeNodeUpdate paccnu = new ParentAndChildChangeNodeUpdate(currentNode,
+                                                             possibleChildrenCSLS);
+
+                  for (int pcNid : possibleChildren) {
+                     if (!nodesToChange.containsKey(pcNid)) {
+                        nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                     }
+
+                     nodesToChange.get(cNid).add(paccnu);
+                  }
                }
             }
          }
