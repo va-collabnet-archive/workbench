@@ -134,7 +134,7 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
 
    @Override
    public ConceptVersionBI getConceptForNid(int nid) throws IOException {
-      return getConceptForNid(store.getConceptNidForNid(nid));
+      return store.getConceptVersion(vc, store.getConceptNidForNid(nid));
    }
 
    @Override
