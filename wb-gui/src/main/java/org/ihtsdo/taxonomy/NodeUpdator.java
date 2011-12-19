@@ -163,11 +163,18 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                   ChildChangeNodeUpdate ccnu = new ChildChangeNodeUpdate(currentNode, possibleChildrenCSLS);
 
+                  if (!nodesToChange.containsKey(cNid)) {
+                     nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  }
+
+                  nodesToChange.get(cNid).add(ccnu);
+
                   for (int pcNid : possibleChildren) {
                      if (!nodesToChange.containsKey(pcNid)) {
                         nodesToChange.put(pcNid, new ConcurrentSkipListSet<UpdateNodeBI>());
                      }
 
+                     this.conceptsToRetrieve.setMember(pcNid);
                      nodesToChange.get(pcNid).add(ccnu);
                   }
                }
@@ -195,6 +202,12 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
                   ParentAndChildChangeNodeUpdate paccnu = new ParentAndChildChangeNodeUpdate(currentNode,
                                                              possibleChildrenCSLS);
+
+                  if (!nodesToChange.containsKey(cNid)) {
+                     nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
+                  }
+
+                  nodesToChange.get(cNid).add(paccnu);
 
                   for (int pcNid : possibleChildren) {
                      if (!nodesToChange.containsKey(pcNid)) {
@@ -314,9 +327,10 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
    //~--- inner classes -------------------------------------------------------
 
    private class ChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
-      boolean                        rendered = false;
-      TaxonomyNode                   currentNode;
-      ConcurrentSkipListSet<Integer> possibleChildren;
+      TaxonomyNode                        newNode  = null;
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      TaxonomyNode                        currentNode;
+      ConcurrentSkipListSet<Integer>      possibleChildren;
 
       //~--- constructors -----------------------------------------------------
 
@@ -332,15 +346,15 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       public void update(ConceptVersionBI cv) {
          try {
             if (cv.getNid() == currentNode.getCnid()) {
-               renderer.setupTaxonomyNode(currentNode, cv);
-               rendered = true;
+               newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
+                       model.getNodeStore().get(currentNode.parentNodeId));
             } else {
                for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
                   if (rel.getDestinationNid() == currentNode.getCnid()) {
                      TaxonomyNode childNode = model.getNodeFactory().makeNode(cv, currentNode.getCnid(),
                                                  currentNode);
 
-                     currentNode.addChild(childNode);
+                     children.add(childNode);
 
                      break;
                   }
@@ -349,8 +363,12 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                possibleChildren.remove(cv.getNid());
             }
 
-            if (possibleChildren.isEmpty() && rendered) {
-               PublishRecord pr = new PublishRecord(currentNode, PublishRecord.UpdateType.CHILD_CHANGE);
+            if (possibleChildren.isEmpty() && (newNode != null)) {
+               for (TaxonomyNode child : children) {
+                  newNode.addChild(child);
+               }
+
+               PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.CHILD_CHANGE);
 
                publish(pr);
             }
@@ -390,9 +408,10 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
 
 
    private class ParentAndChildChangeNodeUpdate extends UpdateNode implements UpdateNodeBI {
-      boolean                        rendered = false;
-      TaxonomyNode                   currentNode;
-      ConcurrentSkipListSet<Integer> possibleChildren;
+     TaxonomyNode                        newNode  = null;
+      ConcurrentSkipListSet<TaxonomyNode> children = new ConcurrentSkipListSet<TaxonomyNode>();
+      TaxonomyNode                        currentNode;
+      ConcurrentSkipListSet<Integer>      possibleChildren;
 
       //~--- constructors -----------------------------------------------------
 
@@ -408,8 +427,8 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
       public void update(ConceptVersionBI cv) {
          try {
             if (cv.getNid() == currentNode.getCnid()) {
-               renderer.setupTaxonomyNode(currentNode, cv);
-               rendered = true;
+               newNode = model.getNodeFactory().makeNode(cv, currentNode.getParentNid(),
+                       model.getNodeStore().get(currentNode.parentNodeId));
             } else {
                for (RelationshipVersionBI rel : cv.getRelsOutgoingActiveIsa()) {
                   if (rel.getDestinationNid() == currentNode.getCnid()) {
@@ -425,9 +444,12 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
                possibleChildren.remove(cv.getNid());
             }
 
-            if (possibleChildren.isEmpty() && rendered) {
-               PublishRecord pr = new PublishRecord(currentNode,
-                                     PublishRecord.UpdateType.EXTRA_PARENT_AND_CHILD_CHANGE);
+            if (possibleChildren.isEmpty() && (newNode != null)) {
+               for (TaxonomyNode child : children) {
+                  newNode.addChild(child);
+               }
+
+               PublishRecord pr = new PublishRecord(newNode, PublishRecord.UpdateType.EXTRA_PARENT_AND_CHILD_CHANGE);
 
                publish(pr);
             }

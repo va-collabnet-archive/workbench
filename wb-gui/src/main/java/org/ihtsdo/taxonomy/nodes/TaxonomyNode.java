@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author kec
  */
-public abstract class TaxonomyNode implements ConceptContainerBI {
+public abstract class TaxonomyNode implements ConceptContainerBI, Comparable<TaxonomyNode> {
    static Collection<Long> empty = Collections.unmodifiableCollection(new ArrayList<Long>());
 
    //~--- fields --------------------------------------------------------------
@@ -79,6 +79,17 @@ public abstract class TaxonomyNode implements ConceptContainerBI {
 
       return false;
    }
+
+    @Override
+    public int compareTo(TaxonomyNode o) {
+        if (this.nodeId == o.nodeId) {
+            return 0;
+        }
+        if (this.nodeId > o.nodeId) {
+            return 1;
+        }
+        return -1;
+    }
 
    @Override
    public int hashCode() {
