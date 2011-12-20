@@ -28,9 +28,9 @@ public class IsaCache extends TypeCache {
 			ConceptFetcherBI fcfc) throws Exception {
 		if (isCancelled() == false) {
 			Concept c = (Concept) fcfc.fetch();
-                        if (c.getPrimUuid().equals(UUID.fromString("874ec6f1-5e6d-3478-9dbd-11ee47dac99d"))) {
-                            System.out.println("Found: 874ec6f1-5e6d-3478-9dbd-11ee47dac99d");
-                        }
+//                        if (c.getPrimUuid().equals(UUID.fromString("874ec6f1-5e6d-3478-9dbd-11ee47dac99d"))) {
+//                            System.out.println("Found: 874ec6f1-5e6d-3478-9dbd-11ee47dac99d");
+//                        }
 			NidSet parentSet = getParentSet(c);
 			typeMap.put(cNid, parentSet.getSetValues());
 		}
