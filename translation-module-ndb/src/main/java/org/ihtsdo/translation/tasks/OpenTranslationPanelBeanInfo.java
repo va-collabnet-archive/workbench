@@ -17,19 +17,18 @@
 package org.ihtsdo.translation.tasks;
 
 import java.beans.BeanDescriptor;
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.SimpleBeanInfo;
 
 /**
  * The Class OpenTranslationForSelectedConceptBeanInfo.
  */
-public class OpenTranslationForSelectedConceptToMPBeanInfo extends SimpleBeanInfo {
+public class OpenTranslationPanelBeanInfo extends SimpleBeanInfo {
 
 	/**
 	 * Instantiates a new open translation for selected concept bean info.
 	 */
-	public OpenTranslationForSelectedConceptToMPBeanInfo() {
+	public OpenTranslationPanelBeanInfo() {
 		super();
 	}
 	
@@ -38,25 +37,8 @@ public class OpenTranslationForSelectedConceptToMPBeanInfo extends SimpleBeanInf
 	 */
 	public PropertyDescriptor[] getPropertyDescriptors() {
 
-		try {
-			PropertyDescriptor sourceLangCode = new PropertyDescriptor("sourceLangCode", OpenTranslationForSelectedConceptToMP.class);
-			sourceLangCode.setBound(true);
-			sourceLangCode.setPropertyEditorClass(LangCodeSelectorEditor.class);
-			sourceLangCode.setDisplayName("sourceLangCode");
-			sourceLangCode.setShortDescription("Select a sourceLangCode.");
-			
-			PropertyDescriptor targetLangCode = new PropertyDescriptor("targetLangCode", OpenTranslationForSelectedConceptToMP.class);
-			targetLangCode.setBound(true);
-			targetLangCode.setPropertyEditorClass(LangCodeSelectorEditor.class);
-			targetLangCode.setDisplayName("targetLangCode");
-			targetLangCode.setShortDescription("Select a targetLangCode.");
-			
-			PropertyDescriptor rv[] =
-			{sourceLangCode, targetLangCode};
-			return rv;
-		} catch (IntrospectionException e) {
-			throw new Error(e.toString());
-		}
+		PropertyDescriptor rv[] ={};
+		return rv;
 
 	}        
 	
@@ -64,8 +46,8 @@ public class OpenTranslationForSelectedConceptToMPBeanInfo extends SimpleBeanInf
 	 * @see java.beans.SimpleBeanInfo#getBeanDescriptor()
 	 */
 	public BeanDescriptor getBeanDescriptor() {
-		BeanDescriptor bd = new BeanDescriptor(OpenTranslationForSelectedConceptToMP.class);
-		bd.setDisplayName("<html><font color='green'><center>Open translation<br>for selected concept<BR> to Main Panel");
+		BeanDescriptor bd = new BeanDescriptor(OpenTranslationPanel.class);
+		bd.setDisplayName("<html><font color='green'><center>Open translation<br>Panel");
 		return bd;
 	}
 

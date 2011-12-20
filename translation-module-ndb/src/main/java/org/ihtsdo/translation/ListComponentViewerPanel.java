@@ -124,7 +124,6 @@ public class ListComponentViewerPanel extends JPanel {
 
 							e.printStackTrace();
 						} catch (TaskFailedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
@@ -133,16 +132,12 @@ public class ListComponentViewerPanel extends JPanel {
                 new Thread(r).start();
 
 				} catch (LoginException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (ConfigurationException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (PrivilegedActionException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -278,8 +273,8 @@ public class ListComponentViewerPanel extends JPanel {
 						}
 
 						I_TerminologyProject project = (I_TerminologyProject) projectComboModel.getSelectedItem();
-						WorkListMember worklistMember = new WorkListMember(item.getText(), item.getConceptId(), item.getConcept().getUUIDs(), null, null,
-								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getUUIDs().iterator().next(), new GregorianCalendar().getTimeInMillis());
+						WorkListMember worklistMember = null;//new WorkListMember(item.getText(), item.getConceptId(), item.getConcept().getUUIDs(), null, null,
+								//SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getUUIDs().iterator().next(), new GregorianCalendar().getTimeInMillis());
 
 						if (worklistMember != null) {
 							TranslationConceptEditorRO editorRO = new TranslationConceptEditorRO();

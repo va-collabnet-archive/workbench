@@ -16,52 +16,41 @@
  */
 package org.ihtsdo.translation.tasks;
 
-import java.awt.GridLayout;
-import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 
-import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.config.AceFrame;
+import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
+import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.translation.ui.TranslationPanel;
 
 /**
- * The Class
+ * The Class OpenTranslationForSelectedConcept.
  */
 @BeanList(specs = 
 { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
-public class SetWFDtoWFUserSelectionExec extends AbstractTask {
-
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String memberPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
-
-
-
+public class OpenTranslationPanelReadOnly extends AbstractTask {
+	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
-
 	
-
 	/**
 	 * Write object.
 	 * 
@@ -71,8 +60,6 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(profilePropName);
-		out.writeObject(memberPropName);
 	}
 
 	/**
@@ -87,57 +74,58 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 	ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
-			profilePropName = (String) in.readObject();
-			memberPropName = (String) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);   
 		}
 
 	}
+	
+	/**
+	 * Instantiates a new open translation for selected concept.
+	 * 
+	 * @throws MalformedURLException the malformed url exception
+	 */
+	public OpenTranslationPanelReadOnly() throws MalformedURLException {
+		super();
+	}
 
 	/* (non-Javadoc)
 	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
 	 */
-	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-		I_ConfigAceFrame config;
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
+	throws TaskFailedException {
 		try {
-			I_TermFactory tf = Terms.get();
-
-			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
-
-			WorkListMember workListMember = (WorkListMember) process.getProperty(memberPropName);
-			
-			WorkList worklist = TerminologyProjectDAO.getWorkList(
-					tf.getConcept(workListMember.getWorkListUUID()), config);
-			//I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-			
-			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
-			
-			//UsersSelectionForWorkflowPanelExec newPanel = new UsersSelectionForWorkflowPanelExec(wfProcess, config);
-			
-			workflowDetailsSheet.setLayout(new GridLayout(1, 1));
-			//workflowDetailsSheet.add(newPanel);
-			
-			//workflowDetailsSheet.setSize(newPanel.getPreferredSize().width, newPanel.getPreferredSize().height);
+			WfInstance instance=(WfInstance)process.readAttachement("WfInstance");
+			AceFrameConfig config=(AceFrameConfig)Terms.get().getActiveAceFrameConfig();
 			
 			
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IntrospectionException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			AceFrame ace=config.getAceFrame();
+			JTabbedPane tp=ace.getCdePanel().getConceptTabs();
+			TranslationPanel uiPanel=null;
+			if (tp!=null){
+				int tabCount=tp.getTabCount();
+				for (int i=0;i<tabCount;i++){
+					if (tp.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)){
+						tp.setSelectedIndex(i);
+						tp.revalidate();
+						tp.repaint();
+						uiPanel=(TranslationPanel)tp.getComponentAt(i);
+					}
+				}
+				if (uiPanel==null){
+					uiPanel = new TranslationPanel();
+					tp.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+					tp.setSelectedIndex(tabCount);
+					tp.revalidate();
+					tp.repaint();
+				}
+				uiPanel.updateUI(instance,true);
+			}
+			
+			return Condition.CONTINUE;
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new TaskFailedException(e);
 		}
-
-		return Condition.CONTINUE;
 	}
 
 	/* (non-Javadoc)
@@ -161,21 +149,7 @@ public class SetWFDtoWFUserSelectionExec extends AbstractTask {
 	public int[] getDataContainerIds() {
 		return new int[] {  };
 	}
-
-	public String getProfilePropName() {
-		return profilePropName;
-	}
-
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
-
-	public String getMemberPropName() {
-		return memberPropName;
-	}
-
-	public void setMemberPropName(String memberPropName) {
-		this.memberPropName = memberPropName;
-	}
+	
+	
 
 }

@@ -10,6 +10,7 @@ public abstract class MenuComponentPanel extends JPanel {
 	/**
 	 * 
 	 */
+	
 	private static final long serialVersionUID = 1L;
 	
 	public abstract String getLabelText();

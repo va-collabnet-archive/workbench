@@ -54,7 +54,6 @@ import java.util.UUID;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -86,7 +85,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -107,6 +105,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -131,17 +130,24 @@ import org.ihtsdo.project.refset.Comment;
 import org.ihtsdo.project.refset.CommentsRefset;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfAction;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfPermission;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.FSNGenerationException;
 import org.ihtsdo.translation.LanguageUtil;
-import org.ihtsdo.translation.LanguageUtil.Language;
 import org.ihtsdo.translation.TreeEditorObjectWrapper;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditingPanelOpenMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 
-public class TranslationConceptEditor6 extends JPanel {
+public class TranslationPanel extends JPanel {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -184,7 +190,7 @@ public class TranslationConceptEditor6 extends JPanel {
 	 * @param targetLangCode
 	 *            the target lang code
 	 */
-	public TranslationConceptEditor6() {
+	public TranslationPanel() {
 		sourceIds = new ArrayList<Integer>();
 		I_ConfigAceFrame config = null;
 		try {
@@ -249,9 +255,6 @@ public class TranslationConceptEditor6 extends JPanel {
 		mSpellChk.setEnabled(false);
 		mAddDesc.setEnabled(true && !readOnlyMode);
 		mAddPref.setEnabled(true && !readOnlyMode);
-		bKeep.setEnabled(false);
-		bReview.setEnabled(false);
-		bEscalate.setEnabled(false);
 		label4.setVisible(false);
 
 		tabSou.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -509,7 +512,7 @@ public class TranslationConceptEditor6 extends JPanel {
 						&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 						&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct
 								.isSelected())) && ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor
-						.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
+										.getTypeId() != fsn.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem()))))) {
 					bPendTerm = false;
 				}
 			} else {
@@ -727,17 +730,6 @@ public class TranslationConceptEditor6 extends JPanel {
 	private void bKeepActionPerformed() {
 		clearForm(true);
 
-		bKeep.setEnabled(false);
-		bReview.setEnabled(false);
-		bEscalate.setEnabled(false);
-	}
-
-	private void bReviewActionPerformed() {
-		// clearAndRemove();
-	}
-
-	private void bEscalateActionPerformed() {
-		// clearAndRemove();
 	}
 
 	private void saveComment(String comment, I_GetConceptData commentType, I_GetConceptData commentSubType) {
@@ -821,7 +813,7 @@ public class TranslationConceptEditor6 extends JPanel {
 				// if some is wrong then all to retire
 				if  (rbInact.isSelected()) {
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
-//					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
+					//					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
 
 				} else {
 					// TODO: Discuss how to handle retirement and re-activation
@@ -834,7 +826,7 @@ public class TranslationConceptEditor6 extends JPanel {
 
 				result = descriptionInEditor.persistChanges();
 				try {
-					 LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
+					LanguageUtil.generateFSN(concept, sourceLangRefsets.iterator().next(), targetLangRefset, translationProject, config);
 
 				} catch (FSNGenerationException e1) {
 					e1.printStackTrace();
@@ -1256,6 +1248,29 @@ public class TranslationConceptEditor6 extends JPanel {
 		zoomTextArea.setText("");
 	}
 
+	private void bLaunchActionPerformed() {
+		WfAction action=(WfAction) cmbActions.getSelectedItem();
+		if (action!=null){
+			I_Work worker=null;
+			try {
+				worker = Terms.get().getActiveAceFrameConfig().getWorker();
+				workflowInterpreter.doAction(instance, action, worker);
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this,
+						e.getMessage(),
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
+			} catch (IOException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(this,
+						e.getMessage(),
+						"Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
 	class SelectionListener implements ListSelectionListener {
 
 		/** The table. */
@@ -1307,7 +1322,7 @@ public class TranslationConceptEditor6 extends JPanel {
 		}
 
 	}
-	
+
 	/**
 	 * Inits the components.
 	 */
@@ -1381,9 +1396,8 @@ public class TranslationConceptEditor6 extends JPanel {
 		buttonPanel = new JPanel();
 		label12 = new JLabel();
 		label8 = new JLabel();
-		bKeep = new JButton();
-		bReview = new JButton();
-		bEscalate = new JButton();
+		cmbActions = new JComboBox();
+		bLaunch = new JButton();
 		tabbedPane3 = new JTabbedPane();
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
@@ -1962,7 +1976,7 @@ public class TranslationConceptEditor6 extends JPanel {
 								buttonPanel.setLayout(new GridBagLayout());
 								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
 								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
 								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 								//---- label12 ----
@@ -1982,43 +1996,19 @@ public class TranslationConceptEditor6 extends JPanel {
 								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- bKeep ----
-								bKeep.setText("Keep in inbox");
-								bKeep.setIcon(new ImageIcon("icons/cabinet.gif"));
-								bKeep.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										bKeepActionPerformed();
-									}
-								});
-								buttonPanel.add(bKeep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+								buttonPanel.add(cmbActions, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- bReview ----
-								bReview.setText("Send to reviewer");
-								bReview.setIcon(new ImageIcon("icons/reviewer.gif"));
-								bReview.addActionListener(new ActionListener() {
+								//---- bLaunch ----
+								bLaunch.setText("Launch Action");
+								bLaunch.addActionListener(new ActionListener() {
 									@Override
 									public void actionPerformed(ActionEvent e) {
-										bReviewActionPerformed();
+										bLaunchActionPerformed();
 									}
 								});
-								buttonPanel.add(bReview, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- bEscalate ----
-								bEscalate.setText("Escalate");
-								bEscalate.setIcon(new ImageIcon("icons/editor.gif"));
-								bEscalate.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										bEscalateActionPerformed();
-									}
-								});
-								buttonPanel.add(bEscalate, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+								buttonPanel.add(bLaunch, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 							}
@@ -2218,9 +2208,8 @@ public class TranslationConceptEditor6 extends JPanel {
 	private JPanel buttonPanel;
 	private JLabel label12;
 	private JLabel label8;
-	private JButton bKeep;
-	private JButton bReview;
-	private JButton bEscalate;
+	private JComboBox cmbActions;
+	private JButton bLaunch;
 	private JTabbedPane tabbedPane3;
 	private JScrollPane scrollPane7;
 	private JTree tree3;
@@ -2269,6 +2258,10 @@ public class TranslationConceptEditor6 extends JPanel {
 	private String htmlHeader = "<html><body><font style='color:blue'>";
 	private String endP = "</font>";
 	private JScrollPane scrollp;
+	private WorkflowDefinition workflowDefinition;
+	private WorkflowInterpreter workflowInterpreter;
+	private WfComponentProvider componentProvider;
+	private WfInstance instance;
 
 	/**
 	 * Gets the concept.
@@ -2343,7 +2336,7 @@ public class TranslationConceptEditor6 extends JPanel {
 									|| description.getDescriptionStatusId() == inactive.getConceptNid()) {
 								if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 									rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
-//									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+									//									row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 									termType_Status[1] = inactive;
 									if (description.getTypeId() == fsn.getConceptNid()) {
 										termType_Status[0] = fsn;
@@ -2435,7 +2428,7 @@ public class TranslationConceptEditor6 extends JPanel {
 								bNewNode = true;
 							} else if (sourceCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
-//								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+								//								row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 								termType_Status[0] = this.synonym;
 								termType_Status[1] = inactive;
 								row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
@@ -2666,7 +2659,7 @@ public class TranslationConceptEditor6 extends JPanel {
 								|| description.getDescriptionStatusId() == inactive.getConceptNid()) {
 							if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 								rowClass[0] = TreeEditorObjectWrapper.NOTACCEPTABLE;
-//								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+								//								row[TableTargetColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 								termType_Status[1] = inactive;
 								if (description.getTypeId() == fsn.getConceptNid()) {
 									termType_Status[0] = fsn;
@@ -2707,7 +2700,7 @@ public class TranslationConceptEditor6 extends JPanel {
 							bNewNode = true;
 						} else if (targetCom.contains(ConfigTranslationModule.TreeComponent.RETIRED)) {
 							rowClass[0] = TreeEditorObjectWrapper.SYNONYMN;
-//							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
+							//							row[TableSourceColumn.ACCEPTABILITY.ordinal()] = notAcceptable;
 							termType_Status[0] = this.synonym;
 							termType_Status[1] = inactive;
 							row[TableSourceColumn.TERM_TYPE.ordinal()] = termType_Status;
@@ -3116,14 +3109,14 @@ public class TranslationConceptEditor6 extends JPanel {
 					&& descriptionInEditor.getAcceptabilityId() == ((I_GetConceptData) cmbAccep.getSelectedItem()).getConceptNid()
 					&& ((descriptionInEditor.getExtensionStatusId() == active.getConceptNid() && rbAct.isSelected()) || (descriptionInEditor.getExtensionStatusId() != active.getConceptNid() && !rbAct
 							.isSelected()))
-					&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
-							.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
+							&& ((descriptionInEditor.getTypeId() == fsn.getConceptNid() && fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())) || (descriptionInEditor.getTypeId() != fsn
+									.getConceptNid() && !fsn.equals((I_GetConceptData) comboBox1.getSelectedItem())))) {
 				update = true;
 			} else {
 				Object[] options = { "Discard unsaved data", "Cancel and continue editing" };
 				int n = JOptionPane.showOptionDialog(null, "Do you want to save the change you made to the term in the editor panel?", "Unsaved data", JOptionPane.YES_NO_OPTION,
 						JOptionPane.WARNING_MESSAGE, null, // do not use
-															// a
+						// a
 						// custom Icon
 						options, // the titles of buttons
 						options[1]); // default button title
@@ -3173,7 +3166,7 @@ public class TranslationConceptEditor6 extends JPanel {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					
+
 					if (descrpt.getTypeId() == fsn.getConceptNid() || descrpt.getTypeId() == preferred.getConceptNid() || descrpt.getTypeId() == synonym.getConceptNid()) {
 						try {
 							if (fsn.getConceptNid() == descrpt.getTypeId()) {
@@ -3232,18 +3225,22 @@ public class TranslationConceptEditor6 extends JPanel {
 			translConfig = getTranslationProjectConfig();
 
 			HashMap<UUID, EditorMode> currentRoleConfiguration = translConfig.getTranslatorRoles();
-			List<UUID> uidList = role.getUids();
-			for (UUID uuid : uidList) {
-				if (currentRoleConfiguration.containsKey(uuid)) {
-					EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration.get(uuid);
-					if (selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)) {
-						targetTextField.setEnabled(false);
-						targetTextField.setEditable(false);
-						setReadOnlyMode(true);
-					} else {
-						targetTextField.setEnabled(true);
+			if (role!=null){
+				List<UUID> uidList = role.getUids();
+				for (UUID uuid : uidList) {
+					if (currentRoleConfiguration.containsKey(uuid)) {
+						EditorMode selectedEditorModeForCurrentRole = currentRoleConfiguration.get(uuid);
+						if (selectedEditorModeForCurrentRole.equals(EditorMode.READ_ONLY)) {
+							targetTextField.setEnabled(false);
+							targetTextField.setEditable(false);
+							setReadOnlyMode(true);
+						} else {
+							targetTextField.setEnabled(true);
+						}
 					}
 				}
+			}else{
+				targetTextField.setEnabled(true);
 			}
 
 			this.concept = workListMember.getConcept();
@@ -3506,9 +3503,9 @@ public class TranslationConceptEditor6 extends JPanel {
 						tableModel.addRow(new Object[] { "Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "", formatComment(commentsList.get(i).getComment()) });
 					} else {
 						tableModel
-								.addRow(new Object[] {
-										"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
-										formatComment(commentsList.get(i).getComment()) });
+						.addRow(new Object[] {
+								"Language refset: " + Terms.get().getConcept(commentsList.get(i).getTypeCid()) + "/" + Terms.get().getConcept(commentsList.get(i).getSubTypeCid()),
+								formatComment(commentsList.get(i).getComment()) });
 					}
 				}
 			}
@@ -3733,5 +3730,62 @@ public class TranslationConceptEditor6 extends JPanel {
 
 	public boolean getUnloaded() {
 		return this.unloaded;
+	}
+
+	public void updateUI(WfInstance instance,boolean readOnlyMode) {
+		setReadOnlyMode(readOnlyMode);
+		UUID wlistId = instance.getWorkListId();
+		I_ConfigAceFrame config;
+		try {
+			this.instance=instance;
+			workflowDefinition = instance.getWfDefinition();
+			workflowInterpreter=new WorkflowInterpreter(workflowDefinition);
+			config = Terms.get().getActiveAceFrameConfig();
+			I_GetConceptData workListConcept = Terms.get().getConcept(wlistId);
+			WorkList worklist = TerminologyProjectDAO.getWorkList(workListConcept, config);
+		    List<WfRole> roles = workflowInterpreter.getNextRole(instance, worklist);
+		    componentProvider=new WfComponentProvider();
+		    
+		    WfUser user=componentProvider.userConceptToWfUser(config.getDbConfig().getUserConcept());
+		    List<WfPermission> perms = componentProvider.getPermissionsForUser(user);
+		    WfRole userRole=null;
+		    boolean bExists=false;
+		    I_GetConceptData roleConcept = null;
+		    for (WfRole role:roles){
+		    	for (WfPermission perm:perms){
+		    		if (role.getId().toString().equals(perm.getRole())){
+		    			userRole=role;
+		    			bExists = true;
+		    			break;
+		    		}
+		    	}
+		    	if (bExists) break;
+		    }
+		    if (bExists){
+		    	roleConcept=Terms.get().getConcept(userRole.getId());
+		    }
+		    
+			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(worklist, config);
+
+			I_GetConceptData component = Terms.get().getConcept(instance.getComponentId());
+			WorkListMember workListMember = TerminologyProjectDAO.getWorkListMember(component, workListConcept.getNid(), config);
+			updateUI(translationProject,workListMember,roleConcept);
+			List<WfAction> actions = workflowInterpreter.getPossibleActions(instance, user);
+			setPossibleActions(actions);
+
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public void setPossibleActions(List<WfAction> actions){
+		cmbActions.removeAllItems();
+		for (WfAction action:actions){
+			cmbActions.addItem(action);
+		}
 	}
 }
