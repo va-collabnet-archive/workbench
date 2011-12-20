@@ -342,7 +342,12 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
             if ((concept != null) &&!concept.isCanceled()) {
-               for (RefsetMember<?, ?>.Version mv : member.getTuples()) {
+            for (Object part : member.getVersions()) {
+                if (part.getClass().isAssignableFrom(ConceptComponent.Version.class)) {
+                    System.out.println("Opps: " + member.getVersions());
+                }
+            }
+               for (RefsetMember<?, ?>.Version mv : member.getVersions()) {
                   if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
                           && (mv.getTime() != Long.MAX_VALUE)) {
                      if ((commitSapNids == null) || commitSapNids.contains(mv.getSapNid())) {
