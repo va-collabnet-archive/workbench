@@ -18,8 +18,6 @@ package org.ihtsdo.tk.api.blueprint;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;

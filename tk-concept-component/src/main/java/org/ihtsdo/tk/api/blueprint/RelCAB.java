@@ -26,7 +26,6 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
-import org.ihtsdo.tk.example.binding.TermAux;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
