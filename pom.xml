@@ -26,10 +26,10 @@
 		<module>documents</module>
 		<module>issue-management-ndb</module>
 		<module>issue-repository-integration-ndb</module>
-		<!--<module>project-management-ndb</module>
-		--><!--<module>document-management-ndb</module>
-		--><!--<module>translation-module-ndb</module>
-	--></modules>
+		<module>project-management-ndb</module>
+		<module>document-management-ndb</module>
+		<module>translation-module-ndb</module>
+	</modules>
 
 	<distributionManagement>
 		<snapshotRepository>
