@@ -25,8 +25,12 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.model.WfInstance;
 
 /**
  * The Class WorkListMember.
@@ -48,17 +52,13 @@ public class WorkListMember implements Serializable {
 	/** The work list id. */
 	private UUID workListUUID;
 	
-	/** The destination. */
-	private String destination;
-	
 	/** The activity status. */
 	private UUID activityStatus;
 	
 	/** The status last date */
 	private Long statusDate;
 	
-	/** The business process with attachments. */
-//	private BusinessProcess businessProcessWithAttachments;
+	private WfInstance wfInstance;
 	
 	/**
 	 * Instantiates a new work list member.
@@ -72,14 +72,13 @@ public class WorkListMember implements Serializable {
 	 * @param businessProcessWithAttachments the business process with attachments
 	 */
 	public WorkListMember(String name, int id, List<UUID> uids,
-			UUID workListUUID, String destination,
+			UUID workListUUID,
 			UUID activityStatus, Long statusDate) {
 		super();
 		this.name = name;
 		this.id = id;
 		this.uids = uids;
 		this.workListUUID = workListUUID;
-		this.destination = destination;
 		this.activityStatus = activityStatus;
 		this.statusDate=statusDate;
 //		this.businessProcessWithAttachments = businessProcessWithAttachments;
@@ -174,23 +173,6 @@ public class WorkListMember implements Serializable {
 		this.workListUUID = workListUUID;
 	}
 	
-	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public String getDestination() {
-		return destination;
-	}
-	
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination the new destination
-	 */
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
 	
 	/**
 	 * Gets the activity status.
@@ -269,6 +251,33 @@ public class WorkListMember implements Serializable {
 	public void setStatusDate(Long statusDate) {
 		this.statusDate = statusDate;
 	}
-	
+
+	public WfInstance getWfInstance() {
+		WfComponentProvider provider = new WfComponentProvider();
+		wfInstance = new WfInstance();
+		try {
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(workListUUID), 
+					config);
+			wfInstance.setComponentId(tf.nidToUuid(id));
+			wfInstance.setWfDefinition(workList.getWorkflowDefinition());
+			wfInstance.setWorkListId(workListUUID);
+			
+			PromotionAndAssignmentRefset promAssignRefset = workList.getPromotionRefset(config);
+			
+			wfInstance.setState(provider.statusConceptToWfState(
+					promAssignRefset.getPromotionStatus(id, config)));
+			wfInstance.setDestination(provider.userConceptToWfUser(
+					promAssignRefset.getDestination(id, config)));
+			
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
+		return wfInstance;
+	}
 	
 }

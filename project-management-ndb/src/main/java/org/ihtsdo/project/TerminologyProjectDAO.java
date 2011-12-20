@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -74,12 +75,10 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.ProcessID;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -95,18 +94,33 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
+import org.ihtsdo.project.model.WorklistMetadata;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 
 /**
  * The Class TerminologyProjectDAO.
  */
 public class TerminologyProjectDAO {
+	
+	public static Map<UUID, WorkList> workListCache = new HashMap<UUID,WorkList>();
 
 	//I_TerminologyProjects CRUD **********************************
 
@@ -1709,8 +1723,10 @@ public class TerminologyProjectDAO {
 			if (!currentVersionOfWorkList.getName().equals(workListWithMetadata.getName())) {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
-
-			String metadata = serialize(workListWithMetadata);
+			WorklistMetadata worklistMetadata=new WorklistMetadata(workListWithMetadata.getName(),workListWithMetadata.getId(),
+					workListWithMetadata.getUids(),workListWithMetadata.getPartitionUUID(),workListWithMetadata.getWorkflowDefinition(),
+					workListWithMetadata.getWorkflowDefinitionFileName(),workListWithMetadata.getWorkflowUserRoles());
+			String metadata =serialize(worklistMetadata);
 
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					workListConcept.getConceptNid());
@@ -1745,7 +1761,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
 
@@ -2202,7 +2218,11 @@ public class TerminologyProjectDAO {
 	 * @return the work list
 	 */
 	public static WorkList getWorkList(I_GetConceptData workListConcept, I_ConfigAceFrame config) {
-		WorkList workList = null;
+		WorkList workList = TerminologyProjectDAO.workListCache.get(workListConcept.getPrimUuid());
+		if (workList != null) {
+			return workList;
+		}
+		
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -2239,20 +2259,18 @@ public class TerminologyProjectDAO {
 				allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 				I_IntSet descriptionTypes =  termFactory.newIntSet();
 				descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-				WorkList deserializedWorkListWithMetadata = null;
+				WorklistMetadata deserializedWorkListMetadata = null;
 				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
 					if (extension.getComponentNid() == workListConcept.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 						String metadata = part.getStringValue();
-						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
+						//						deserializedWorkListWithMetadata = (WorkList) deserialize(metadata);
+						deserializedWorkListMetadata = (WorklistMetadata) deserialize (metadata);
 					}
 				}
-				if (deserializedWorkListWithMetadata != null) {
-					workList = new WorkList(name, workListConcept.getConceptNid(), 
-							workListConcept.getUids(),
-							deserializedWorkListWithMetadata.getPartitionUUID(), 
-							deserializedWorkListWithMetadata.getDestination(), deserializedWorkListWithMetadata.getBusinessProcess());
+				if (deserializedWorkListMetadata != null) {
+					workList = WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);
 				}
 			}
 		} catch (TerminologyException e) {
@@ -2261,6 +2279,9 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if (workList != null) {
+			TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		}
 		return workList;
 	}
@@ -2287,7 +2308,7 @@ public class TerminologyProjectDAO {
 				nacWorkSet.getPartitionSchemes(config).iterator().next().getUids().iterator().next(), config);
 
 		newNacWorkList = new WorkList(name,
-				0, null, nacWorkListPartition.getUids().iterator().next(), "no destination", bp);
+				0, null, nacWorkListPartition.getUids().iterator().next());
 
 		WorkList returnWorkList = createNewWorkList(newNacWorkList, config);
 
@@ -2307,15 +2328,21 @@ public class TerminologyProjectDAO {
 
 	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList,
 			I_GetConceptData concept, String destination, I_ConfigAceFrame config) throws IOException {
-		WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
-		addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
-		addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
-		WorkListMember workListMember = new WorkListMember(concept.toString(), 
-				concept.getConceptNid(),
-				concept.getUids(), workList.getUids().iterator().next(), destination, 
-				ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
-		addConceptAsWorkListMember(workListMember, config);
 		try {
+			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
+			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
+			addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
+			Terms.get().addUncommitted(workList.getPartition().getConcept());
+			workList.getPartition().getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			WorkListMember workListMember = new WorkListMember(concept.toString(), 
+					concept.getConceptNid(),
+					concept.getUids(), workList.getUids().iterator().next(),  
+					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
+			WorkflowInterpreter interpreter = new WorkflowInterpreter(workList.getWorkflowDefinition());
+			addConceptAsWorkListMember(workListMember,
+					Terms.get().uuidToNative(interpreter.getNextDestination(
+							workListMember.getWfInstance(), 
+							workList).getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -2337,8 +2364,8 @@ public class TerminologyProjectDAO {
 		WorkList workList = null;
 		I_GetConceptData newConcept = null;
 		String name = workListWithMetadata.getName();
-		workListWithMetadata.getBusinessProcess().setDestination(
-				workListWithMetadata.getDestination());
+		//		workListWithMetadata.getBusinessProcess().setDestination(
+		//				workListWithMetadata.getDestination());
 
 		String worklistName = workListWithMetadata.getName() + " (worklist)";
 
@@ -2403,6 +2430,7 @@ public class TerminologyProjectDAO {
 				current, 0, config);
 
 		I_GetConceptData newPromotionConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+		newPromotionConcept.setAnnotationStyleRefex(true);
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 				name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
@@ -2413,10 +2441,15 @@ public class TerminologyProjectDAO {
 				current, 0, config);
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
-				workListWithMetadata.getPartitionUUID(), 
-				workListWithMetadata.getDestination(), workListWithMetadata.getBusinessProcess());
-
-		String metadata = serialize(workList);
+				workListWithMetadata.getPartitionUUID());
+		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
+		workList.setWorkflowDefinitionFileName(workListWithMetadata.getWorkflowDefinitionFileName());
+		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
+		//		String metadata = serialize(workList);
+		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
+				workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+				workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
+		String metadata =serialize(worklistMetadata);
 
 		termFactory.addUncommittedNoChecks(newConcept);
 		termFactory.addUncommittedNoChecks(newCommentsConcept);
@@ -2447,7 +2480,7 @@ public class TerminologyProjectDAO {
 			}
 		}
 
-
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
 
@@ -2457,6 +2490,22 @@ public class TerminologyProjectDAO {
 		return createNewPartition(newPartition, config);
 	}
 
+	public static String getJSonForm (Object obj){
+
+		XStream xstream = new XStream(new JettisonMappedXmlDriver());
+		String str=xstream.toXML(obj);
+		return str;
+		//		//xstream.setMode(XStream.NO_REFERENCES);
+		//		//xstream.alias("action", WfAction.class);
+		//		System.out.println("JSON Len: " + xstream.toXML(role2).length());
+		//		System.out.println(xstream.toXML(role2));
+	}
+
+	public static Object getObjectFromJSon(String jSon){
+		XStream xstream = new XStream(new JettisonMappedXmlDriver());
+		Object obj=xstream.fromXML(jSon);
+		return obj;
+	}
 	public static Partition combinePartitions(List<Partition> partitions, 
 			String name, I_ConfigAceFrame config) throws Exception {
 
@@ -2491,6 +2540,9 @@ public class TerminologyProjectDAO {
 			}
 
 		}
+		Terms.get().addUncommittedNoChecks(newPartition.getConcept());
+		newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+
 
 		for (Partition loopPartition : partitions) {
 			retirePartition(loopPartition, config);
@@ -2553,6 +2605,8 @@ public class TerminologyProjectDAO {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
 						newPartition.getUids().iterator().next(), config);
 			}
+			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
+			newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -2712,15 +2766,12 @@ public class TerminologyProjectDAO {
 	 * @param member the member
 	 * @param config the config
 	 */
-	public static void addConceptAsWorkListMember(WorkListMember member, I_ConfigAceFrame config) {
+	public static void addConceptAsWorkListMember(WorkListMember member, int assignedUserId, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
 			termFactory.setActiveAceFrameConfig(config);
 			I_GetConceptData newMemberConcept = termFactory.getConcept(member.getUids());
 			I_GetConceptData workListConcept = termFactory.getConcept(member.getWorkListUUID());
-			//			member.getBusinessProcessWithAttachments().writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), member);
-			//			member.getBusinessProcessWithAttachments().setSubject(member.getConcept().toString());
-
 			//String metadata = serialize(member);
 
 			boolean alreadyMember = false;
@@ -2736,45 +2787,30 @@ public class TerminologyProjectDAO {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							part.makeAnalog(
 									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+									config.getDbConfig().getUserConcept().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							//part.setStringValue(metadata); //Removed to minimize changeset footprint
 							extension.addVersion(part);
 						}
 						termFactory.addUncommittedNoChecks(workListConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workListConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
 					}
 				}
 			}
 
 			if (!alreadyMember) {
 				WorkList workList = getWorkList(workListConcept, config);
-				PromotionRefset promotionRefset = workList.getPromotionRefset(config);
+				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 				termFactory.getRefsetHelper(config).newRefsetExtension(
 						workListConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(), 
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), //metadata Removed to minimize changeset footprint
 						config); 
-				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListConcept.getConceptNid())) {
-					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-						termFactory.addUncommittedNoChecks(workListConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workListConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-					}
-				}
+				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = termFactory.getConcept(member.getActivityStatus());
 				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				promotionRefset.setDestination(member.getId(), assignedUserId);
 				//Translation specific concept level promotion refset
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(
@@ -2831,8 +2867,6 @@ public class TerminologyProjectDAO {
 									Long.MAX_VALUE);
 							extension.addVersion(part);
 						}
-						termFactory.addUncommittedNoChecks(partitionConcept);
-						termFactory.addUncommittedNoChecks(extension);
 						//						termFactory.commit();
 						//						promote(extension, config);
 						//						termFactory.addUncommittedNoChecks(partitionConcept);
@@ -2849,18 +2883,11 @@ public class TerminologyProjectDAO {
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""),
 						config); 
-				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
-					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-						termFactory.addUncommittedNoChecks(partitionConcept);
-						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(partitionConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
-					}
-				}
+				//				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
+				//					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
+				//							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
+				//					}
+				//				}
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
@@ -2919,55 +2946,55 @@ public class TerminologyProjectDAO {
 					+ "OUTBOX");
 		}
 		I_QueueProcesses q = (I_QueueProcesses) service.service;
-		I_EncodeBusinessProcess process=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-		String destination=worklist.getDestination();
-		process.setDestination(destination);
-		I_TerminologyProject project = getProjectForWorklist(worklist, config);
-		List<I_GetConceptData> souLanRefsets = ((TranslationProject)project).getSourceLanguageRefsets();
-		Integer langRefset = null;
-		for (I_GetConceptData lCon:souLanRefsets){
-			if (lCon.getConceptNid()==enRefset.getConceptNid()){
-				langRefset=lCon.getConceptNid();
-				break;
-			}
-		}
-		if (langRefset==null && souLanRefsets!=null){
-			langRefset=souLanRefsets.get(0).getConceptNid();
-		}
-		Long statusTime=new java.util.Date().getTime();
-		int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
-		PromotionRefset promoRefset = worklist.getPromotionRefset(config);
-		for (WorkListMember workListMember : workListMembers) {
-			if (ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(workListMember.getActivityStatus())) {
-				//				I_EncodeBusinessProcess process= workListMember.getBusinessProcessWithAttachments();
-				try {
-					if (workListMember.getDestination() != null && !workListMember.getDestination().isEmpty()) {
-						process.setDestination(workListMember.getDestination());
-					}
-					workListMember.setActivityStatus(
-							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-					process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-					updateWorkListMemberMetadata(workListMember, config);
-					//					Due commit is missing take date from variable
-					//					statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
-					String subj=getItemSubject(workListMember,worklist,project,promoRefset,langRefset,statusId,statusTime);
-
-					process.setSubject(subj);
-					process.setProcessID(new ProcessID(UUID.randomUUID()));
-					worker.getLogger().info(
-							"Moving process " + process.getProcessID() + " to Queue named: " + queueName);
-					q.write(process, worker.getActiveTransaction());
-					bSent = true;
-					worker.getLogger()
-					.info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
-					updateWorkListMemberMetadata(workListMember, config);
-					//TODO: move to a more generic promotion, not language specific
-					//					promoteLanguageContent(workListMember, config);
-				} catch (Exception e) {
-					throw new TaskFailedException(e);
-				}
-			}
-		}
+		//		I_EncodeBusinessProcess process=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+		//		String destination=worklist.getDestination();
+		////		process.setDestination(destination);
+		//		I_TerminologyProject project = getProjectForWorklist(worklist, config);
+		//		List<I_GetConceptData> souLanRefsets = ((TranslationProject)project).getSourceLanguageRefsets();
+		//		Integer langRefset = null;
+		//		for (I_GetConceptData lCon:souLanRefsets){
+		//			if (lCon.getConceptNid()==enRefset.getConceptNid()){
+		//				langRefset=lCon.getConceptNid();
+		//				break;
+		//			}
+		//		}
+		//		if (langRefset==null && souLanRefsets!=null){
+		//			langRefset=souLanRefsets.get(0).getConceptNid();
+		//		}
+		//		Long statusTime=new java.util.Date().getTime();
+		//		int statusId = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()).getConceptNid();
+		//		PromotionRefset promoRefset = worklist.getPromotionRefset(config);
+		//		for (WorkListMember workListMember : workListMembers) {
+		//			if (ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(workListMember.getActivityStatus())) {
+		//				//				I_EncodeBusinessProcess process= workListMember.getBusinessProcessWithAttachments();
+		//				try {
+		//					if (workListMember.getDestination() != null && !workListMember.getDestination().isEmpty()) {
+		//						process.setDestination(workListMember.getDestination());
+		//					}
+		//					workListMember.setActivityStatus(
+		//							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
+		//					process.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
+		//					updateWorkListMemberMetadata(workListMember, config);
+		//					//					Due commit is missing take date from variable
+		//					//					statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+		//					String subj=getItemSubject(workListMember,worklist,project,promoRefset,langRefset,statusId,statusTime);
+		//
+		//					process.setSubject(subj);
+		//					process.setProcessID(new ProcessID(UUID.randomUUID()));
+		//					worker.getLogger().info(
+		//							"Moving process " + process.getProcessID() + " to Queue named: " + queueName);
+		//					q.write(process, worker.getActiveTransaction());
+		//					bSent = true;
+		//					worker.getLogger()
+		//					.info("Moved process " + process.getProcessID() + " to queue: " + q.getNodeInboxAddress());
+		//					updateWorkListMemberMetadata(workListMember, config);
+		//					//TODO: move to a more generic promotion, not language specific
+		//					//					promoteLanguageContent(workListMember, config);
+		//				} catch (Exception e) {
+		//					throw new TaskFailedException(e);
+		//				}
+		//			}
+		//		}
 		if (bSent){
 			worker.getActiveTransaction().commit();
 		}
@@ -3074,7 +3101,7 @@ public class TerminologyProjectDAO {
 				retString[0]=sRetFsn;
 			else
 				retString[0]=sFsn;
-			
+
 			if (sPref.equals(""))
 				retString[1]=sRetPref;
 			else
@@ -3229,35 +3256,23 @@ public class TerminologyProjectDAO {
 			} else {
 				name = "No FSN!";
 			}
-			//WorkListMember deserializedWorkListMemberWithMetadata = null;
+			WfComponentProvider provider = new WfComponentProvider();
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					workListMemberConcept.getConceptNid());
 			for (I_ExtendByRef extension : extensions) {
 				if (extension.getRefsetId() == workListRefset.getConceptNid()) {
 					WorkList workList = getWorkList(workListRefset, config);
-					PromotionRefset promotionRefset = workList.getPromotionRefset(config);
+					PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 					I_GetConceptData status = promotionRefset.getPromotionStatus(workListMemberConcept.getConceptNid(), 
+							config);
+					I_GetConceptData destination = promotionRefset.getDestination(workListMemberConcept.getConceptNid(), 
 							config);
 					Long statusDate = promotionRefset.getLastStatusTime(workListMemberConcept.getConceptNid(), 
 							config);
 					workListMember = new WorkListMember(name, workListMemberConcept.getConceptNid(), 
-							workListMemberConcept.getUids(), workList.getUids().iterator().next(), 
-							workList.getDestination(), status.getUids().iterator().next(),statusDate);
-					//					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-					//					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
-					//					String metadata = part.getStringValue();
-					//					deserializedWorkListMemberWithMetadata = (WorkListMember) deserialize(metadata);
+							workListMemberConcept.getUids(), workList.getUids().iterator().next(), status.getUids().iterator().next(),statusDate);
 				}
 			}
-			//			if (deserializedWorkListMemberWithMetadata != null) {
-			//				workListMember = deserializedWorkListMemberWithMetadata;
-			//				workListMember.setName(name);
-			//				WorkList workList = getWorkList(workListRefset, config);
-			//				PromotionRefset promotionRefset = workList.getPromotionRefset(config);
-			//				I_GetConceptData status = promotionRefset.getPromotionStatus(workListMember.getId(), config);
-			//				workListMember.setActivityStatus(status.getUids().iterator().next());
-			//
-			//			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -3352,8 +3367,17 @@ public class TerminologyProjectDAO {
 
 			I_GetConceptData componentConcept = termFactory.getConcept(component.getUids());
 
-			String metadata = serialize(objectWithMetadata);
-
+			String metadata;
+			//			String metadata = serialize(objectWithMetadata);
+			if (objectWithMetadata instanceof WorkList){
+				WorkList workList=(WorkList)objectWithMetadata;
+				WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
+						workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+						workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
+				metadata =serialize(worklistMetadata);
+			}else{
+				metadata =serialize(objectWithMetadata);
+			}
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
 					componentConcept.getConceptNid());
 			for (I_ExtendByRef extension : extensions) {
@@ -3402,11 +3426,12 @@ public class TerminologyProjectDAO {
 					config);
 			List<WorkListMember> workListMembers=getAllWorkListMembers(worklist, config);
 			for (WorkListMember workListMember:workListMembers){
-				workListMember.setDestination(worklist.getDestination());
+				//				workListMember.setDestination(worklist.getDestination());
 				updateComponentMetadata(workListMember.getConcept(), workListMember, 
 						(UUID[]) worklist.getUids().toArray(),
 						config);
 			}
+			TerminologyProjectDAO.workListCache.remove(worklist.getUids().iterator().next());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -3634,7 +3659,7 @@ public class TerminologyProjectDAO {
 	 * 
 	 * @return the object
 	 */
-	private static Object deserialize(String string) {
+	public static Object deserialize(String string) {
 		Object object = null;
 		try {
 			ByteArrayInputStream bios = new ByteArrayInputStream(Base64.decodeBase64(string));
@@ -3701,111 +3726,120 @@ public class TerminologyProjectDAO {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
 
-		if (!workSet.getPartitionSchemes(config).isEmpty()) {
-			JOptionPane.showMessageDialog(new JDialog(), "Not empty!, can't sync a workset once it has partition schemes...", 
-					"Warning", JOptionPane.WARNING_MESSAGE);
-			throw new Exception("Not empty!, can't sync a workset once it has partition schemes...");
-		}
-		I_TermFactory termFactory = Terms.get();
-		I_GetConceptData refsetConc = getSourceRefsetForWorkSet(workSet, config);
-		if (refsetConc == null) {
-			throw new Exception("No Refset Spec associated with this WorkSet");
-		}
-
-		List<Integer> excludedConcepts = new ArrayList<Integer>();
-		List<Integer> includedConcepts = new ArrayList<Integer>();
-
-		List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
-
-		for (I_GetConceptData loopRefset : exclusionRefsets) {
-			Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
-				termFactory.getRefsetExtensionMembers(
-						loopRefset.getConceptNid());
-			for (I_ExtendByRef loopRefsetMember : loopRefsetMembers) {
-				I_ExtendByRefPart lastPart = getLastExtensionPart(loopRefsetMember);
-				if (isActive(lastPart.getStatusNid())) {
-					excludedConcepts.add(loopRefsetMember.getComponentNid());
-				}
+		try {
+			if (!workSet.getPartitionSchemes(config).isEmpty()) {
+				JOptionPane.showMessageDialog(new JDialog(), "Not empty!, can't sync a workset once it has partition schemes...", 
+						"Warning", JOptionPane.WARNING_MESSAGE);
+				throw new Exception("Not empty!, can't sync a workset once it has partition schemes...");
 			}
-		}
+			I_TermFactory termFactory = Terms.get();
+			I_GetConceptData refsetConc = getSourceRefsetForWorkSet(workSet, config);
+			if (refsetConc == null) {
+				throw new Exception("No Refset Spec associated with this WorkSet");
+			}
 
-		Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
-				refsetConc.getConceptNid());
-		int countIncluded = 0;
-		int countExcluded = 0;
-		int countRetired = 0;
-		int countNotUnique = 0;
-		for (I_ExtendByRef refsetMember : refsetMembers) {
-			I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
-			if (isActive(lastPart.getStatusNid())) {
-				I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
-				// TODO: Unique in project clause
-				boolean uniqueInProject = true;
-				for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
-					if (loopWorkSet.getId() != workSet.getId() &&
-							loopWorkSet.hasMember(memberConcept)) {
-						uniqueInProject = false;
+			List<Integer> excludedConcepts = new ArrayList<Integer>();
+			List<Integer> includedConcepts = new ArrayList<Integer>();
+
+			List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
+
+			for (I_GetConceptData loopRefset : exclusionRefsets) {
+				Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
+					termFactory.getRefsetExtensionMembers(
+							loopRefset.getConceptNid());
+				for (I_ExtendByRef loopRefsetMember : loopRefsetMembers) {
+					I_ExtendByRefPart lastPart = getLastExtensionPart(loopRefsetMember);
+					if (isActive(lastPart.getStatusNid())) {
+						excludedConcepts.add(loopRefsetMember.getComponentNid());
 					}
 				}
+			}
 
-				if (uniqueInProject) {
-					if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
-						includedConcepts.add(refsetMember.getComponentNid());
-						WorkSetMember newWorkSetMember;
-						newWorkSetMember = new WorkSetMember(memberConcept.getInitialText(),
-								memberConcept.getConceptNid(),
-								memberConcept.getUids(),
-								workSet.getUids().iterator().next());
-						addConceptAsWorkSetMember(newWorkSetMember, config);
-						countIncluded++;
+			Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
+					refsetConc.getConceptNid());
+			int countIncluded = 0;
+			int countExcluded = 0;
+			int countRetired = 0;
+			int countNotUnique = 0;
+			for (I_ExtendByRef refsetMember : refsetMembers) {
+				I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
+				if (isActive(lastPart.getStatusNid())) {
+					I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
+					// TODO: Unique in project clause
+					boolean uniqueInProject = true;
+					for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
+						if (loopWorkSet.getId() != workSet.getId() &&
+								loopWorkSet.hasMember(memberConcept)) {
+							uniqueInProject = false;
+						}
+					}
+
+					if (uniqueInProject) {
+						if (!excludedConcepts.contains(refsetMember.getComponentNid())) {
+							includedConcepts.add(refsetMember.getComponentNid());
+							WorkSetMember newWorkSetMember;
+							newWorkSetMember = new WorkSetMember(memberConcept.getInitialText(),
+									memberConcept.getConceptNid(),
+									memberConcept.getUids(),
+									workSet.getUids().iterator().next());
+							addConceptAsWorkSetMember(newWorkSetMember, config);
+							countIncluded++;
+						} else {
+							countExcluded++;
+						} 
 					} else {
-						countExcluded++;
-					} 
-				} else {
-					countNotUnique++;
+						countNotUnique++;
+					}
 				}
 			}
-		}
 
-		List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
+			List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
 
-		for (WorkSetMember loopMember : workSetMembers) {
-			if (excludedConcepts.contains(loopMember.getId())) {
-				retireWorkSetMember(loopMember);
-				countRetired++;
-			} else if (!includedConcepts.contains(loopMember.getId())) {
-				retireWorkSetMember(loopMember);
-				countRetired++;
+			for (WorkSetMember loopMember : workSetMembers) {
+				if (excludedConcepts.contains(loopMember.getId())) {
+					retireWorkSetMember(loopMember);
+					countRetired++;
+				} else if (!includedConcepts.contains(loopMember.getId())) {
+					retireWorkSetMember(loopMember);
+					countRetired++;
+				}
 			}
+
+			//		for (WorkSetMember loopMember : workSetMembers) {
+			//			boolean isCurrentMemberOfRefset = false;
+			//			if (!excludedConcepts.contains(loopMember.getId())) {
+			//				I_GetConceptData loopConcept = termFactory.getConcept(loopMember.getId());
+			//				Collection<? extends I_ExtendByRef> conceptExtensions = loopConcept.getExtensions();
+			//				for (I_ExtendByRef extension : conceptExtensions) {
+			//					if (refsetConc.getConceptId() == extension.getRefsetId()) {
+			//						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
+			//						if (isActive(lastPart.getStatusNid())) {
+			//							isCurrentMemberOfRefset = true;
+			//						}
+			//					}
+			//				}
+			//			}
+			//			if (!isCurrentMemberOfRefset) {
+			//				retireWorkSetMember(loopMember);
+			//			}
+			//		}
+
+			termFactory.commit();
+
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
+					" , ret = " + countRetired + " , not unique = " + countNotUnique);
+			activity.complete();
+		} catch (Exception e) {
+			long endTime = System.currentTimeMillis();
+			long elapsed = endTime - startTime;
+			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error ");
+			activity.complete();
+			e.printStackTrace();
 		}
-
-		//		for (WorkSetMember loopMember : workSetMembers) {
-		//			boolean isCurrentMemberOfRefset = false;
-		//			if (!excludedConcepts.contains(loopMember.getId())) {
-		//				I_GetConceptData loopConcept = termFactory.getConcept(loopMember.getId());
-		//				Collection<? extends I_ExtendByRef> conceptExtensions = loopConcept.getExtensions();
-		//				for (I_ExtendByRef extension : conceptExtensions) {
-		//					if (refsetConc.getConceptId() == extension.getRefsetId()) {
-		//						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-		//						if (isActive(lastPart.getStatusNid())) {
-		//							isCurrentMemberOfRefset = true;
-		//						}
-		//					}
-		//				}
-		//			}
-		//			if (!isCurrentMemberOfRefset) {
-		//				retireWorkSetMember(loopMember);
-		//			}
-		//		}
-
-		termFactory.commit();
-
-		long endTime = System.currentTimeMillis();
-		long elapsed = endTime - startTime;
-		String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-		activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
-				" , ret = " + countRetired + " , not unique = " + countNotUnique);
-		activity.complete();
 
 
 	}
@@ -3835,7 +3869,7 @@ public class TerminologyProjectDAO {
 		return lastPart;
 	}
 
-	private static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
+	public static I_ConceptAttributePart getLastestAttributePart(final I_GetConceptData concept) throws IOException {
 		List<? extends I_ConceptAttributePart> refsetAttibuteParts = concept.getConceptAttributes().getMutableParts();
 		I_ConceptAttributePart latestAttributePart = null;
 		for (I_ConceptAttributePart attributePart : refsetAttibuteParts) {
@@ -3943,20 +3977,18 @@ public class TerminologyProjectDAO {
 		return null;
 	}
 
-	public static WorkList generateWorkListFromPartition(Partition partition, String destination,
-			BusinessProcess businessProcess, String name, I_ConfigAceFrame config) throws Exception {
+	public static WorkList generateWorkListFromPartition(Partition partition, 
+			WorkflowDefinition workflowDefinition,
+			List<WfMembership> workflowUserRoles, 
+			String name, I_ConfigAceFrame config) throws Exception {
 		WorkList workList = new WorkList(name,
-				0, null, partition.getUids().iterator().next(), destination, businessProcess);
+				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
 		for (PartitionMember partitionMember: partitionMembers) {
-			BusinessProcess businessProcessForAttachments = businessProcess;
-			if (businessProcessForAttachments != null) {
-				businessProcessForAttachments.setOriginator(config.getUsername());
-			}
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
 					partitionMember.getId(),
-					partitionMember.getUids(), null, destination, 
+					partitionMember.getUids(), null,  
 					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),
 					new java.util.Date().getTime() );
 			workListMembers.add(workListMember);
@@ -3964,38 +3996,39 @@ public class TerminologyProjectDAO {
 		if (workListMembers.size() == 0) {
 			throw new Exception("No concepts found for the worklist!");
 		} else {
+			workList.setWorkflowDefinition(workflowDefinition);
+			workList.setWorkflowUserRoles(workflowUserRoles);
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
+				WorkflowInterpreter interpreter = new WorkflowInterpreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
-					addConceptAsWorkListMember(workListMember, config);
-					//					promoteLanguageContent(workListMember, config);
+					WfInstance instance = new WfInstance();
+					WfComponentProvider prov = new WfComponentProvider();
+					instance.setComponentId(workListMember.getUids().iterator().next());
+					instance.setState(prov.statusConceptToWfState(
+							Terms.get().getConcept(
+									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+					instance.setWfDefinition(workflowDefinition);
+					instance.setWorkListId(workList.getUids().iterator().next());
+					WfUser user=interpreter.getNextDestination(instance, workList);
+					if (user ==null){
+						throw new Exception("Cannot set next destination for component:\n" + workListMember.getConcept().toUserString());
+					}
+					instance.setDestination(user);
+
+					addConceptAsWorkListMember(workListMember, 
+							Terms.get().uuidToNative(instance.getDestination().getId()),
+							config);
 				}
 			}
 		}
 		Terms.get().commit();
+		
+		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
+		
 		return workList;
 	}
-
-	//	public static void promoteWorkSetMember(WorkSetMember workSetMember, 
-	//			PositionBI positionToExport) throws TerminologyException, IOException {
-	//		I_TermFactory tf = Terms.get();
-	//		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-	//		I_GetConceptData memberConcept = workSetMember.getConcept();
-	//		memberConcept.promote(positionToExport, config.getPromotionPathSetReadOnly(), 
-	//				config.getAllowedStatus(), Precedence.TIME);
-	//	}
-	//
-	//	public static void promoteWorkSetMembers(WorkSet workSet, int statusIdToPromote, 
-	//			PositionBI positionToExport) throws TerminologyException, IOException {
-	//		I_TermFactory tf = Terms.get();
-	//		for (WorkSetMember member : workSet.getWorkSetMembers()) {
-	//			//			I_GetConceptData statusConcept = tf.getConcept(member.getActivityStatus());
-	//			//			if (statusConcept.getConceptId() == statusIdToPromote) {
-	//			//				promoteWorkSetMember(member, positionToExport);
-	//			//			}
-	//		}
-	//	}
 
 	private static List<? extends I_RelTuple> cleanRelTuplesList(List<? extends I_RelTuple> tuples) {
 		HashMap<Integer, I_RelTuple> cleanMap = new HashMap<Integer, I_RelTuple>();

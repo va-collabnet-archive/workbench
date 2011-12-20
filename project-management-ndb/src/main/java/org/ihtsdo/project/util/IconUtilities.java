@@ -1,14 +1,18 @@
 package org.ihtsdo.project.util;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.UUID;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.ihtsdo.project.model.WorkSet;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.panel.ProjectsPanel;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 
 public class IconUtilities {
 
@@ -200,27 +204,48 @@ public class IconUtilities {
 		return blackIcon;
 	}
 	public static Icon getIconForTermType_Status(String type,String status){
-		if (status.equalsIgnoreCase("current") || status.equalsIgnoreCase("active")){
-			if (type.equalsIgnoreCase("fully specified name")){
-				return Active_FSN;
+		try {
+			I_GetConceptData fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			I_GetConceptData active = Terms.get().getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+			if (status.equalsIgnoreCase(active.getInitialText()) || status.equalsIgnoreCase("current") || status.equalsIgnoreCase("active")){
+				if (type.equalsIgnoreCase(fsn.getInitialText()) || type.equalsIgnoreCase("fully specified name")){
+					return Active_FSN;
+				}
+				return Active_description;
 			}
-			return Active_description;
-		}
-		if (type.equalsIgnoreCase("fully specified name")){
-			return Inactive_FSN;
+			if (type.equalsIgnoreCase(fsn.getInitialText()) || type.equalsIgnoreCase("fully specified name")){
+				return Inactive_FSN;
+			}
+			return Inactive_description;
+		} catch (ValidationException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return Inactive_description;
 	}
 
 	public static Icon getIconForAcceptability(String type){
-		if (type.equalsIgnoreCase("acceptable") ){
+		try {
+			I_GetConceptData preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			I_GetConceptData acceptable = Terms.get().getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
+			if (type.equalsIgnoreCase("acceptable") || type.equalsIgnoreCase(acceptable.getInitialText())) {
 				return Acceptable_acceptability;
-		}
-		if (type.equalsIgnoreCase("preferred term") ){
+			}
+			if (type.equalsIgnoreCase("preferred term") || type.equalsIgnoreCase(preferred.getInitialText())) {
 				return Preferred_acceptability;
-		}
-		if (type.equalsIgnoreCase("not acceptable") ){
-			return Not_acceptable_acceptability;
+			}
+			if (type.equalsIgnoreCase("not acceptable")) {
+				return Not_acceptable_acceptability;
+			}
+		} catch (ValidationException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return blackIcon;
 	}

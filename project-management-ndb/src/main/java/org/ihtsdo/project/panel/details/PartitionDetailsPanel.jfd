@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void method="setProperty"> 
    <string>i18n.bundlePackage</string> 
@@ -62,6 +62,14 @@
         <object class="com.jformdesigner.model.FormLayoutManager"> 
          <class>javax.swing.JTabbedPane</class> 
         </object> 
+        <void method="addEvent"> 
+         <object class="com.jformdesigner.model.FormEvent"> 
+          <string>javax.swing.event.ChangeListener</string> 
+          <string>stateChanged</string> 
+          <string>tabbedPane1StateChanged</string> 
+          <boolean>true</boolean> 
+         </object> 
+        </void> 
         <void property="name"> 
          <string>tabbedPane1</string> 
         </void> 
@@ -670,13 +678,13 @@ Create a new partition scheme by clicking the ‘Add partition scheme’ button
              <class>javax.swing.JScrollPane</class> 
             </object> 
             <void property="name"> 
-             <string>scrollPane2</string> 
+             <string>scrollPane1</string> 
             </void> 
             <void method="add"> 
              <object class="com.jformdesigner.model.FormComponent"> 
-              <string>javax.swing.JList</string> 
+              <string>javax.swing.JTable</string> 
               <void property="name"> 
-               <string>list2</string> 
+               <string>membersTable</string> 
               </void> 
              </object> 
             </void> 
@@ -786,6 +794,29 @@ The list of partition members is displayed
            </object> 
            <object class="com.jformdesigner.model.FormLayoutConstraints"> 
             <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+            <void method="setProperty"> 
+             <string>gridy</string> 
+             <int>2</int> 
+            </void> 
+           </object> 
+          </void> 
+          <void method="add"> 
+           <object class="com.jformdesigner.model.FormComponent"> 
+            <string>javax.swing.JProgressBar</string> 
+            <void method="setProperty"> 
+             <string>visible</string> 
+             <boolean>false</boolean> 
+            </void> 
+            <void property="name"> 
+             <string>progressBar1</string> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+            <void method="setProperty"> 
+             <string>gridx</string> 
+             <int>1</int> 
+            </void> 
             <void method="setProperty"> 
              <string>gridy</string> 
              <int>2</int> 

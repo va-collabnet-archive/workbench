@@ -408,11 +408,11 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 			
 			BusinessProcess bp = getBusinessProcess(new File("src/test/java/org/ihtsdo/project/sample.bp"));
 			
-			WorkList workList3 = TerminologyProjectDAO.generateWorkListFromPartition(
-					partition3, "user.inbox", bp, "worklist 1", config);
-			tf.commit(); sleep(1);
-			assertEquals(11, workList3.getWorkListMembers().size());
-			
+//			WorkList workList3 = TerminologyProjectDAO.generateWorkListFromPartition(
+//					partition3, "user.inbox", bp, "worklist 1", config);
+//			tf.commit(); sleep(1);
+//			assertEquals(11, workList3.getWorkListMembers().size());
+//			
 			assertEquals(0, partition2.getSubPartitionSchemes(config).size());
 			PartitionScheme partitionScheme2 = TerminologyProjectDAO.createNewPartitionScheme(
 					"partition sub Scheme 2", 
@@ -446,20 +446,20 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 			assertEquals(5, partition21.getPartitionMembers().size());
 			assertEquals(4, partition22.getPartitionMembers().size());
 			
-			WorkList workList21 = TerminologyProjectDAO.generateWorkListFromPartition(
-					partition21, "user.inbox", bp, "worklist 2-1", config);
-			tf.commit(); sleep(1);
-			assertEquals(5, workList21.getWorkListMembers().size());
-			
-			WorkList workList22 = TerminologyProjectDAO.generateWorkListFromPartition(
-					partition22, "user.inbox", bp, "worklist 2-2", config);
-			tf.commit(); sleep(1);
-			assertEquals(4, workList22.getWorkListMembers().size());
-			
-			I_TerminologyProject retrievedProject = TerminologyProjectDAO.getProjectForWorklist(workList3, config);
-			assertEquals(retrievedProject.getId(), project.getId());
-			retrievedProject = TerminologyProjectDAO.getProjectForWorklist(workList22, config);
-			assertEquals(retrievedProject.getId(), project.getId());
+//			WorkList workList21 = TerminologyProjectDAO.generateWorkListFromPartition(
+//					partition21, "user.inbox", bp, "worklist 2-1", config);
+//			tf.commit(); sleep(1);
+//			assertEquals(5, workList21.getWorkListMembers().size());
+//			
+//			WorkList workList22 = TerminologyProjectDAO.generateWorkListFromPartition(
+//					partition22, "user.inbox", bp, "worklist 2-2", config);
+//			tf.commit(); sleep(1);
+//			assertEquals(4, workList22.getWorkListMembers().size());
+//			
+//			I_TerminologyProject retrievedProject = TerminologyProjectDAO.getProjectForWorklist(workList3, config);
+//			assertEquals(retrievedProject.getId(), project.getId());
+//			retrievedProject = TerminologyProjectDAO.getProjectForWorklist(workList22, config);
+//			assertEquals(retrievedProject.getId(), project.getId());
 			
 		} catch (Exception e) {
 			e.printStackTrace();

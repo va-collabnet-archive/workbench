@@ -9,7 +9,14 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,8 +27,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -32,16 +40,21 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -50,8 +63,16 @@ import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.project.workflow.wizard.WizardLauncher;
 
 /**
  * @author Guillermo Reynoso
@@ -63,12 +84,13 @@ public class PartitionDetailsPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Partition partition;
 	private I_ConfigAceFrame config;
-	private DefaultListModel list2Model;
+	private DefaultTableModel tableModel;
 	private DefaultListModel list3Model;
 	private String destination;
 	private BusinessProcess businessProcess;
 	private String name;
 	private String partitionMember;
+	private SwingWorker<String, WorkSetMember> membersWorker;
 
 	public PartitionDetailsPanel(Partition partition, I_ConfigAceFrame config) {
 		initComponents();
@@ -82,17 +104,25 @@ public class PartitionDetailsPanel extends JPanel {
 		label5.setText(partition.getPartitionScheme(config).getName());
 		partitionMember = label4.getText();
 		updateList3Content();
-		
+
 		button5.setEnabled(false);
-		updateList2Content();
+
+		tableModel = new DefaultTableModel();
+		tableModel.addColumn("Member");
+		membersTable.setModel(tableModel);
+		TableRowSorter<DefaultTableModel> trs = new TableRowSorter<DefaultTableModel>(tableModel);
+		List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+		trs.setSortKeys(sortKeys);
+		membersTable.setRowSorter(trs);
+		trs.setSortsOnUpdates(true);
+
 		I_TermFactory termFactory = Terms.get();
 		boolean isPartitioningManager = false;
 		try {
-			isPartitioningManager = TerminologyProjectDAO.checkPermissionForProject(
-					config.getDbConfig().getUserConcept(), 
+			isPartitioningManager = TerminologyProjectDAO.checkPermissionForProject(config.getDbConfig().getUserConcept(),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
-					termFactory.getConcept(ArchitectonicAuxiliary.Concept.PARTITIONING_MANAGER_ROLE.localize().getNid()), 
-					config);
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.PARTITIONING_MANAGER_ROLE.localize().getNid()), config);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -114,14 +144,11 @@ public class PartitionDetailsPanel extends JPanel {
 	private void updateList3Content() {
 		list3Model = new DefaultListModel();
 		List<WorkList> worklists = partition.getWorkLists();
-		Collections.sort(worklists,
-				new Comparator<WorkList>()
-				{
-					public int compare(WorkList f1, WorkList f2)
-					{
-						return f1.toString().compareTo(f2.toString());
-					}
-				});
+		Collections.sort(worklists, new Comparator<WorkList>() {
+			public int compare(WorkList f1, WorkList f2) {
+				return f1.toString().compareTo(f2.toString());
+			}
+		});
 		for (WorkList workList : worklists) {
 			list3Model.addElement(workList);
 		}
@@ -130,22 +157,17 @@ public class PartitionDetailsPanel extends JPanel {
 	}
 
 	private void updateList2Content() {
-		list2Model = new DefaultListModel();
 		List<PartitionMember> members = partition.getPartitionMembers();
 		label4.setText(partitionMember + " (" + members.size() + ")");
-		Collections.sort(members,
-				new Comparator<PartitionMember>()
-				{
-					public int compare(PartitionMember f1, PartitionMember f2)
-					{
-						return f1.toString().compareTo(f2.toString());
-					}
-				});
+		Collections.sort(members, new Comparator<PartitionMember>() {
+			public int compare(PartitionMember f1, PartitionMember f2) {
+				return f1.toString().compareTo(f2.toString());
+			}
+		});
 		for (PartitionMember member : members) {
-			list2Model.addElement(member);
+			tableModel.addRow(new PartitionMember[] { member });
 		}
-		list2.setModel(list2Model);
-		list2.validate();
+		membersTable.revalidate();
 	}
 
 	private void textField1KeyTyped(KeyEvent e) {
@@ -165,34 +187,23 @@ public class PartitionDetailsPanel extends JPanel {
 			e1.printStackTrace();
 		}
 		button5.setEnabled(false);
-		JOptionPane.showMessageDialog(this,
-				"Partition saved!", 
-				"Message", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, "Partition saved!", "Message", JOptionPane.INFORMATION_MESSAGE);
 		TranslationHelperPanel.refreshProjectPanelNode(config);
 	}
 
 	private void button3ActionPerformed(ActionEvent e) {
 		// retire partition
-		int n = JOptionPane.showConfirmDialog(
-				this,
-				"Would you like to retire the partition?",
-				"Confirmation",
-				JOptionPane.YES_NO_OPTION);
+		int n = JOptionPane.showConfirmDialog(this, "Would you like to retire the partition?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-		if (n==0) {
+		if (n == 0) {
 			try {
 				TerminologyProjectDAO.retirePartition(partition, config);
 				Terms.get().commit();
-				JOptionPane.showMessageDialog(this,
-						"Partition retired!", 
-						"Message", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(this, "Partition retired!", "Message", JOptionPane.INFORMATION_MESSAGE);
 				TranslationHelperPanel.refreshProjectPanelParentNode(config);
 				TranslationHelperPanel.closeProjectDetailsTab(config);
 			} catch (Exception e3) {
-				JOptionPane.showMessageDialog(this,
-						e3.getMessage(),
-						"Error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e3.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				e3.printStackTrace();
 			}
 		}
@@ -202,7 +213,7 @@ public class PartitionDetailsPanel extends JPanel {
 		ObjectInputStream in;
 		try {
 			in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
-			BusinessProcess processToLunch=(BusinessProcess) in.readObject();
+			BusinessProcess processToLunch = (BusinessProcess) in.readObject();
 			in.close();
 			return processToLunch;
 
@@ -210,228 +221,86 @@ public class PartitionDetailsPanel extends JPanel {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
 
 	List<I_Work> cloneList = new ArrayList<I_Work>();
+
 	private void button2ActionPerformed(ActionEvent e) {
 		// generate worklist
-//		int n = JOptionPane.showConfirmDialog(
-//				this,
-//				"Would you like to create a worklist?\n\n" + 
-//				"Steps:\n" +
-//				" 1- Select bp file for the workflow\n" +
-//				" 2- Select initial destination\n" +
-//				" 3- Select worklist name\n",
-//				"Confirmation",
-//				JOptionPane.YES_NO_OPTION);
-//
-//		if (n==0) {
-			File businessProcessFile = new File ("sampleProcesses/GenerateWorkList.bp");
-//			JFileChooser chooser = new JFileChooser("sampleProcesses");
-//			chooser.setCurrentDirectory(new File("."));
-//
-//			chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-//				public boolean accept(File f) {
-//					return f.getName().toLowerCase().endsWith(".bp");
-//				}
-//
-//				public String getDescription() {
-//					return "BP Business Process files";
-//				}
-//			});
-//
-			try {
-//				int c = chooser.showDialog(new JFrame(), "Select workflow file.");
-//				if (c == JFileChooser.APPROVE_OPTION) {
-//					businessProcessFile = chooser.getSelectedFile();
-//				}
-//				if (businessProcessFile == null) {
-//					throw new Exception("Generation cancelled...");
-//				}
+		WfComponentProvider wcp = new WfComponentProvider();
+		List<WfUser> users = wcp.getUsers();
+		WizardLauncher wl = new WizardLauncher();
+		wl.launchWfWizard(users);
+		HashMap<String, Object> hsRes = wl.getResult();
+		List<WfRole> roles = null;
+		String name = "no name " + UUID.randomUUID().toString();
+		WorkflowDefinition workflowDefinition = null;
+		for (String key : hsRes.keySet()) {
+			Object val = hsRes.get(key);
+			if (key.equals("WDS")) {
+				workflowDefinition = WorkflowDefinitionManager.readWfDefinition((File) val);
+				roles = workflowDefinition.getRoles();
 
-				businessProcess = getBusinessProcess(businessProcessFile);
-				
-				List<String> inboxes = new ArrayList<String>();
-				for (String address : config.getAddressesList()) {
-					if (address.trim().endsWith(".inbox")) {
-						inboxes.add(address);
-					}
-				}
-				Runnable r = new Runnable() {
-					public void run() {
-						try {
-							I_EncodeBusinessProcess processToExecute = businessProcess;
-							processToExecute.setProperty(ProcessAttachmentKeys.PARTITION.getAttachmentKey(), partition);
-							processToExecute.setProperty(ProcessAttachmentKeys.TERMINOLOGY_PROJECT.getAttachmentKey(), partition.getProject());
-							I_Work worker=config.getWorker();
-							if (worker.isExecuting()) {
-								I_Work altWorker = null;
-								for (I_Work alt : cloneList) {
-									if (alt.isExecuting() == false) {
-										altWorker = alt;
-										break;
-									}
-								}
-								if (altWorker == null) {
-									altWorker = worker.getTransactionIndependentClone();
-									altWorker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
-									
-									cloneList.add(altWorker);
-								}
-								altWorker.execute(processToExecute);
-							} else {
-								pBarW.setMinimum(0);
-								pBarW.setMaximum(100);
-								pBarW.setIndeterminate(true);
-								pBarW.setVisible(true);
-								pBarW.repaint();
-								pBarW.revalidate();
-								panel7.repaint();
-								panel7.revalidate();
-								worker.execute(processToExecute);
-								pBarW.setVisible(false);
-							}
-
-//							JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//									"WorkList created!", 
-//									"Message", JOptionPane.INFORMATION_MESSAGE);
-						} catch (Throwable e1) {
-							e1.printStackTrace();
-							JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-							e1.getMessage(),
-							"Error",
-							JOptionPane.ERROR_MESSAGE);
-						}
-
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								TranslationHelperPanel.refreshProjectPanelNode(config);
-							}
-						});
-
-					}
-				};
-				Thread t = new Thread(r);
-				t.start();
-//				
-//				destination = (String) JOptionPane.showInputDialog(null, "Select the initial destination : ", 
-//						"", JOptionPane.PLAIN_MESSAGE, null, inboxes.toArray(), null);
-//				//TODO: validate destination
-//				if (destination == null) {
-//					throw new Exception("Generation cancelled...");
-//				} else if (destination.length() < 3) {
-//					throw new Exception("String must be of at least 3 characters. Canceling...");
-//				}
-//
-//				if (!destination.trim().endsWith(".inbox")) {
-//					destination = destination.trim() + ".inbox";
-//				}
-//
-//				destination = destination.trim();
-//
-//				name = JOptionPane.showInputDialog(null, "Enter the worklist name : ", 
-//						"", 1);
-//				if (destination == null) {
-//					throw new Exception("Generation cancelled...");
-//				} else if (destination.length() < 6) {
-//					throw new Exception("String must be of at least 6 characters. Canceling...");
-//				}
-//
-//				config.getChildrenExpandedNodes().clear();
-//				if (e.getSource().equals(button6)){
-//					pBarW2.setMinimum(0);
-//					pBarW2.setMaximum(100);
-//					pBarW2.setIndeterminate(true);
-//					pBarW2.setVisible(true);
-//					pBarW2.repaint();
-//					pBarW2.revalidate();
-//					panel3.repaint();
-//					panel3.revalidate();
-//				}else{
-//					pBarW.setMinimum(0);
-//					pBarW.setMaximum(100);
-//					pBarW.setIndeterminate(true);
-//					pBarW.setVisible(true);
-//					pBarW.repaint();
-//					pBarW.revalidate();
-//					panel7.repaint();
-//					panel7.revalidate();
-//				}
-//				repaint();
-//				revalidate();
-//				SwingUtilities.invokeLater(new Runnable(){
-//					public void run(){
-//
-//						Thread appThr=new Thread(){
-//							public void run(){
-//								try {
-//									TerminologyProjectDAO.generateWorkListFromPartition(partition, destination, businessProcess, 
-//											name, config);
-//									Terms.get().commit();
-//								} catch (Exception e) {
-//									e.printStackTrace();
-//									JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//											e.getMessage(),
-//											"Error",
-//											JOptionPane.ERROR_MESSAGE);
-//								}
-//								updateList3Content();
-//
-//								pBarW2.setVisible(false);	
-//								pBarW.setVisible(false);
-//								JOptionPane.showMessageDialog(PartitionDetailsPanel.this,
-//										"WorkList created!", 
-//										"Message", JOptionPane.INFORMATION_MESSAGE);
-//
-//								SwingUtilities.invokeLater(new Runnable(){
-//									public void run(){
-//										TranslationHelperPanel.refreshProjectPanelNode(config);
-//									}
-//								});
-//							}
-//						};
-//						appThr.start();
-//					}
-//				});
-			} catch (Exception e3) {
-				e3.printStackTrace();
 			}
-//		}
-	}
-	public static void sleep(int n){
-		long t0, t1;
-		t0 =  System.currentTimeMillis();
-		do{
-			t1 = System.currentTimeMillis();
+
+			if (key.equals("WORKLIST_NAME")) {
+				name = (String) val;
+			}
 		}
-		while ((t1 - t0) < (n * 1000));
+		ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
+		for (WfRole role : roles) {
+			DefaultTableModel model = (DefaultTableModel) hsRes.get(role.getName());
+
+			for (int i = 0; i < model.getRowCount(); i++) {
+				Boolean sel = (Boolean) model.getValueAt(i, 0);
+				if (sel) {
+					Boolean def = (Boolean) model.getValueAt(i, 1);
+					WfUser user = (WfUser) model.getValueAt(i, 2);
+					WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
+					workflowUserRoles.add(workflowUserRole);
+				}
+			}
+		}
+		try {
+			TerminologyProjectDAO.generateWorkListFromPartition(this.partition, workflowDefinition, workflowUserRoles, name, config);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				TranslationHelperPanel.refreshProjectPanelNode(config);
+			}
+		});
+
+	}
+
+	public static void sleep(int n) {
+		long t0, t1;
+		t0 = System.currentTimeMillis();
+		do {
+			t1 = System.currentTimeMillis();
+		} while ((t1 - t0) < (n * 1000));
 	}
 
 	private void button1ActionPerformed(ActionEvent e) {
 		// retire members
-		if(list2.getSelectedIndices().length > 0) {
-			int[] selectedIndices = list2.getSelectedIndices();
+		if (membersTable.getSelectedRowCount() > 0) {
+			int[] selectedIndices = membersTable.getSelectedRows();
 
-			int n = JOptionPane.showConfirmDialog(
-					this,
-					"Would you like to retire these partition members?",
-					"Confirmation",
-					JOptionPane.YES_NO_OPTION);
+			int n = JOptionPane.showConfirmDialog(this, "Would you like to retire these partition members?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
-			if (n==0) {
+			if (n == 0) {
 				for (int i : selectedIndices) {
 					try {
-						TerminologyProjectDAO.retirePartitionMember((PartitionMember)
-								list2Model.getElementAt(i), config);
+						TerminologyProjectDAO.retirePartitionMember((PartitionMember) tableModel.getValueAt(i, 0), config);
 					} catch (Exception e1) {
-						JOptionPane.showMessageDialog(this,
-								e1.getMessage(),
-								"Error",
-								JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						e1.printStackTrace();
 					}
 				}
@@ -448,22 +317,16 @@ public class PartitionDetailsPanel extends JPanel {
 
 	private void button4ActionPerformed(ActionEvent e) {
 		// add partition scheme
-		String partitionSchemeName = JOptionPane.showInputDialog(null, "Enter Partition Scheme Name : ", 
-				"", 1);
+		String partitionSchemeName = JOptionPane.showInputDialog(null, "Enter Partition Scheme Name : ", "", 1);
 		if (partitionSchemeName != null) {
 			try {
-				if(TerminologyProjectDAO.createNewPartitionScheme(partitionSchemeName, partition.getUids().iterator().next(), config) != null){
+				if (TerminologyProjectDAO.createNewPartitionScheme(partitionSchemeName, partition.getUids().iterator().next(), config) != null) {
 					Terms.get().commit();
 					TranslationHelperPanel.refreshProjectPanelNode(config);
-					JOptionPane.showMessageDialog(this,
-							"Partition scheme created!", 
-							"Message", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(this, "Partition scheme created!", "Message", JOptionPane.INFORMATION_MESSAGE);
 				}
 			} catch (Exception e3) {
-				JOptionPane.showMessageDialog(this,
-						e3.getMessage(),
-						"Error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this, e3.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				e3.printStackTrace();
 			}
 		}
@@ -479,8 +342,24 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 	}
 
+	private void tabbedPane1StateChanged(ChangeEvent e) {
+		if (e.getSource() instanceof JTabbedPane) {
+			JTabbedPane panel = (JTabbedPane) e.getSource();
+			int index = panel.getSelectedIndex();
+			String title = panel.getTitleAt(index);
+			if (title.equals("Members")) {
+				if (membersWorker == null || membersWorker.isDone()) {
+					membersWorker = new MembersWorker();
+					membersWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
+					membersWorker.execute();
+				}
+			}
+		}
+	}
+
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		tabbedPane1 = new JTabbedPane();
 		panel0 = new JPanel();
 		panel1 = new JPanel();
@@ -502,11 +381,12 @@ public class PartitionDetailsPanel extends JPanel {
 		label11 = new JLabel();
 		panel9 = new JPanel();
 		label4 = new JLabel();
-		scrollPane2 = new JScrollPane();
-		list2 = new JList();
+		scrollPane1 = new JScrollPane();
+		membersTable = new JTable();
 		panel12 = new JPanel();
 		label9 = new JLabel();
 		label6 = new JLabel();
+		progressBar1 = new JProgressBar();
 		panel6 = new JPanel();
 		button1 = new JButton();
 		panel13 = new JPanel();
@@ -530,6 +410,12 @@ public class PartitionDetailsPanel extends JPanel {
 
 		//======== tabbedPane1 ========
 		{
+			tabbedPane1.addChangeListener(new ChangeListener() {
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					tabbedPane1StateChanged(e);
+				}
+			});
 
 			//======== panel0 ========
 			{
@@ -725,11 +611,11 @@ public class PartitionDetailsPanel extends JPanel {
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
-				//======== scrollPane2 ========
+				//======== scrollPane1 ========
 				{
-					scrollPane2.setViewportView(list2);
+					scrollPane1.setViewportView(membersTable);
 				}
-				panel9.add(scrollPane2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
 
@@ -758,6 +644,12 @@ public class PartitionDetailsPanel extends JPanel {
 				panel9.add(label6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 					new Insets(0, 0, 5, 5), 0, 0));
+
+				//---- progressBar1 ----
+				progressBar1.setVisible(false);
+				panel9.add(progressBar1, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
 
 				//======== panel6 ========
 				{
@@ -873,10 +765,11 @@ public class PartitionDetailsPanel extends JPanel {
 		add(tabbedPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JTabbedPane tabbedPane1;
 	private JPanel panel0;
 	private JPanel panel1;
@@ -898,11 +791,12 @@ public class PartitionDetailsPanel extends JPanel {
 	private JLabel label11;
 	private JPanel panel9;
 	private JLabel label4;
-	private JScrollPane scrollPane2;
-	private JList list2;
+	private JScrollPane scrollPane1;
+	private JTable membersTable;
 	private JPanel panel12;
 	private JLabel label9;
 	private JLabel label6;
+	private JProgressBar progressBar1;
 	private JPanel panel6;
 	private JButton button1;
 	private JPanel panel13;
@@ -915,5 +809,77 @@ public class PartitionDetailsPanel extends JPanel {
 	private JPanel panel3;
 	private JButton button6;
 	private JProgressBar pBarW2;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	// JFormDesigner - End of variables declaration //GEN-END:variables
+	class MembersWorker extends SwingWorker<String, WorkSetMember> {
+
+
+		public MembersWorker() {
+			super();
+			while (tableModel.getRowCount() > 0) {
+				tableModel.removeRow(0);
+			}
+		}
+
+		@Override
+		protected String doInBackground() throws Exception {
+			I_TermFactory termFactory = Terms.get();
+			List<PartitionMember> members = partition.getPartitionMembers();
+			label4.setText(partitionMember + " (" + members.size() + ")");
+			Collections.sort(members, new Comparator<PartitionMember>() {
+				public int compare(PartitionMember f1, PartitionMember f2) {
+					return f1.toString().compareTo(f2.toString());
+				}
+			});
+			for (PartitionMember member : members) {
+				tableModel.addRow(new PartitionMember[] { member });
+			}
+			membersTable.revalidate();				
+			return "Done";
+		}
+
+		@Override
+		public void done() {
+			String inboxItems = null;
+			try {
+				inboxItems = get();
+				membersTable.revalidate();
+				membersTable.repaint();
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void process(List<WorkSetMember> chunks) {
+			try {
+				for (WorkSetMember member : chunks) {
+					tableModel.addRow(new Object[] { member });
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+	};
+
+	class ProgressListener implements PropertyChangeListener {
+		// Prevent creation without providing a progress bar.
+		private ProgressListener() {
+		}
+
+		public ProgressListener(JProgressBar progressBar) {
+			this.progressBar = progressBar;
+			this.progressBar.setVisible(true);
+			this.progressBar.setIndeterminate(true);
+		}
+
+		public void propertyChange(PropertyChangeEvent evt) {
+			if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
+				progressBar.setIndeterminate(false);
+				progressBar.setVisible(false);
+			}
+		}
+
+		private JProgressBar progressBar;
+	}
 }

@@ -18,16 +18,21 @@ package org.ihtsdo.project.model;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 /**
  * The Class WorkList.
@@ -49,11 +54,16 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	/** The partition id. */
 	private UUID partitionUUID;
 	
-	/** The destination. */
-	private String destination;
+	private WorkflowDefinition workflowDefinition;
 	
-	/** The business process. */
-	private BusinessProcess businessProcess;
+	private String workflowDefinitionFileName;
+	
+	private List<WfMembership> workflowUserRoles;
+	
+	
+	public WorkList() {
+		super();
+	}
 	
 	/**
 	 * Instantiates a new work list.
@@ -68,19 +78,24 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	 * @throws IOException 
 	 * @throws TerminologyException 
 	 */
-	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID,
-			String destination,
-			BusinessProcess businessProcess) throws TerminologyException, IOException {
+	public WorkList(String name, int id, List<UUID> uids,UUID workSetUUID) throws TerminologyException, IOException {
 		super();
 		this.name = name;
 		if (uids!=null)
 			this.refsetConcept=Terms.get().getConcept(uids);
 		this.id = id;
+		this.refsetId=id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
-		this.destination = destination;
-		this.businessProcess = businessProcess;
 		
+	}
+	
+	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
+		WorkList worklist=new WorkList(worklistMetadata.getName(),worklistMetadata.getId(),worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
+		worklist.setWorkflowDefinition(worklistMetadata.getWorkflowDefinition());
+		worklist.setWorkflowDefinitionFileName(worklistMetadata.getWorkflowDefinitionFileName());
+		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
+		return worklist;
 	}
 	
 	/**
@@ -155,42 +170,6 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	}
 	
 	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public String getDestination() {
-		return destination;
-	}
-	
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination the new destination
-	 */
-	public void setDestination(String destination) {
-		this.destination = destination;
-	}
-	
-	/**
-	 * Gets the business process.
-	 * 
-	 * @return the business process
-	 */
-	public BusinessProcess getBusinessProcess() {
-		return businessProcess;
-	}
-	
-	/**
-	 * Sets the business process.
-	 * 
-	 * @param businessProcess the new business process
-	 */
-	public void setBusinessProcess(BusinessProcess businessProcess) {
-		this.businessProcess = businessProcess;
-	}
-	
-	/**
 	 * Gets the work list members.
 	 * 
 	 * @return the work list members
@@ -239,6 +218,54 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		partition = TerminologyProjectDAO.getPartition(concept, config);
 		return partition;
 	}
+
+	public WorkflowDefinition getWorkflowDefinition() {
+		return workflowDefinition;
+	}
+
+	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
+		this.workflowDefinition = workflowDefinition;
+	}
 	
+	public PromotionAndAssignmentRefset getPromotionRefset(I_ConfigAceFrame config) {
+		try {
+			I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+			I_GetConceptData refsetConcept = getRefsetConcept();
+			if (refsetConcept == null) {
+				return null;
+			}
+	
+			return new PromotionAndAssignmentRefset(getLatestSourceRelationshipTarget(refsetConcept, promotionRel, config));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public List<WfMembership> getWorkflowUserRoles() {
+		return workflowUserRoles;
+	}
+
+	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
+		this.workflowUserRoles = workflowUserRoles;
+	}
+	
+	public List<WfUser> getUsers() {
+		List<WfUser> users = new ArrayList<WfUser>();
+		
+		for (WfMembership loopMembership : getWorkflowUserRoles()) {
+			users.add(loopMembership.getUser());
+		}
+		
+		return users;
+	}
+
+	public String getWorkflowDefinitionFileName() {
+		return workflowDefinitionFileName;
+	}
+
+	public void setWorkflowDefinitionFileName(String workflowDefinitionFileName) {
+		this.workflowDefinitionFileName = workflowDefinitionFileName;
+	}
 	
 }

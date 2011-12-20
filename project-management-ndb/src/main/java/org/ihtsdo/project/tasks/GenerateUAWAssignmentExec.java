@@ -224,95 +224,92 @@ public class GenerateUAWAssignmentExec extends AbstractTask {
 
 						PromotionRefset promoRefset = worklist.getPromotionRefset(config);
 
-						I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-						wfProcess.setDestination(destination);
-						wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
-						wfProcess.setProperty(fastTrackTranslatorInboxPropName, process.getProperty(fastTrackTranslatorInboxPropName));
-						wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
-						wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
-						wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
-						wfProcess.setProperty(superSmeInboxPropName, process.getProperty(superSmeInboxPropName));
-						wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
-
-						workListMember.setActivityStatus(
-								ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-						TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
-
-						termFactory.commit();
-						wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-
-//						TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
+//						I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+//						wfProcess.setDestination(destination);
+//						wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
+//						wfProcess.setProperty(fastTrackTranslatorInboxPropName, process.getProperty(fastTrackTranslatorInboxPropName));
+//						wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
+//						wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
+//						wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
+//						wfProcess.setProperty(superSmeInboxPropName, process.getProperty(superSmeInboxPropName));
+//						wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
+//
+//						workListMember.setActivityStatus(
+//								ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
+//						TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
+//
 //						termFactory.commit();
-						Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+//						wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
+//
+////						TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
+////						termFactory.commit();
+//						Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+//
+//						String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
+//
+//						wfProcess.setSubject(subj);			
+//						wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
+//
+//						if (selfAssign){
+//							//				Stack<I_EncodeBusinessProcess> stack = worker.getProcessStack();
+//							//				Stack<I_EncodeBusinessProcess> nStack=new Stack<I_EncodeBusinessProcess>();
+//
+//
+//							//				tworker.setProcessStack(nStack);
+//							//				wfProcess.execute(tworker);
+//							final I_Work tworker;
+//							if (config.getWorker().isExecuting()) {
+//								tworker = config.getWorker().getTransactionIndependentClone();
+//								tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
+//							} else {
+//								tworker = config.getWorker();
+//								
+//							}
+//
+//							tworker.execute(wfProcess);
+//							//				tworker.setProcessStack(stack);
+//						}else{
+//
+//							ServiceID serviceID = null;
+//							Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
+//							String queueName = config.getUsername().trim() + ".outbox";
+//							Entry[] attrSetTemplates = new Entry[] { new Name(queueName) };
+//							ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
+//							ServiceItemFilter filter = null;
+//							ServiceItem service = null;
+//							try {
+//								service = worker.lookup(template, filter);
+//							} catch (ConfigurationException e1) {
+//								e1.printStackTrace();
+//							}
+//							if (service == null) {
+//								throw new TaskFailedException("No queue with the specified name could be found: "
+//										+  config.getUsername().trim() + ".outbox");
+//							}
+//							I_QueueProcesses q = (I_QueueProcesses) service.service;
+//
+//							destination = (String) process.getProperty(fastTrackTranslatorInboxPropName);
+//							if (destination==null || destination.trim().equals(""))
+//								destination = (String) process.getProperty(translatorInboxPropName);
+//							
+//							wfProcess.setDestination(destination);
+//							worker.getLogger().info(
+//									"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
+//							q.write(wfProcess, worker.getActiveTransaction());
+//							worker.commitTransactionIfActive();
+//							worker.getLogger()
+//							.info("Moved process " + wfProcess.getProcessID() + " to queue: " + destination);
+//
+//							JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+//									"Assignment delivered!", "", JOptionPane.INFORMATION_MESSAGE);
 
-						String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
-
-						wfProcess.setSubject(subj);			
-						wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
-
-						if (selfAssign){
-							//				Stack<I_EncodeBusinessProcess> stack = worker.getProcessStack();
-							//				Stack<I_EncodeBusinessProcess> nStack=new Stack<I_EncodeBusinessProcess>();
-
-
-							//				tworker.setProcessStack(nStack);
-							//				wfProcess.execute(tworker);
-							final I_Work tworker;
-							if (config.getWorker().isExecuting()) {
-								tworker = config.getWorker().getTransactionIndependentClone();
-								tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), config);
-							} else {
-								tworker = config.getWorker();
-								
-							}
-
-							tworker.execute(wfProcess);
-							//				tworker.setProcessStack(stack);
-						}else{
-
-							ServiceID serviceID = null;
-							Class<?>[] serviceTypes = new Class[] { I_QueueProcesses.class };
-							String queueName = config.getUsername().trim() + ".outbox";
-							Entry[] attrSetTemplates = new Entry[] { new Name(queueName) };
-							ServiceTemplate template = new ServiceTemplate(serviceID, serviceTypes, attrSetTemplates);
-							ServiceItemFilter filter = null;
-							ServiceItem service = null;
-							try {
-								service = worker.lookup(template, filter);
-							} catch (ConfigurationException e1) {
-								e1.printStackTrace();
-							}
-							if (service == null) {
-								throw new TaskFailedException("No queue with the specified name could be found: "
-										+  config.getUsername().trim() + ".outbox");
-							}
-							I_QueueProcesses q = (I_QueueProcesses) service.service;
-
-							destination = (String) process.getProperty(fastTrackTranslatorInboxPropName);
-							if (destination==null || destination.trim().equals(""))
-								destination = (String) process.getProperty(translatorInboxPropName);
-							
-							wfProcess.setDestination(destination);
-							worker.getLogger().info(
-									"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
-							q.write(wfProcess, worker.getActiveTransaction());
-							worker.commitTransactionIfActive();
-							worker.getLogger()
-							.info("Moved process " + wfProcess.getProcessID() + " to queue: " + destination);
-
-							JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-									"Assignment delivered!", "", JOptionPane.INFORMATION_MESSAGE);
-
-						}
+//						}
 					} catch (TerminologyException e2) {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					} catch (IOException e2) {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
-					} catch (TaskFailedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					} catch (IllegalArgumentException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

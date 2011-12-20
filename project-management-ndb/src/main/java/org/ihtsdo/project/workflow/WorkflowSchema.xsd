@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/WorkflowSchema" xmlns:tns="http://www.example.org/WorkflowSchema" elementFormDefault="qualified">
+
+    
+    <complexType name="state">
+    	<sequence>
+    		<element name="name" type="string"></element>
+    		<element name="id" type="ID"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="role">
+    	<sequence>
+    		<element name="name" type="string"></element>
+    		<element name="id" type="ID"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="action">
+    	<sequence>
+    		<element name="name" type="string"></element>
+    		<element name="id" type="ID"></element>
+    		<element name="end-state" type="tns:State"></element>
+    	</sequence>
+    </complexType>
+    
+
+
+    
+    <complexType name="rolesList">
+    	<sequence>
+    		<element name="role" type="tns:role" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    
+    <complexType name="statesList">
+    	<sequence>
+    		<element name="state" type="tns:state" maxOccurs="unbounded" minOccurs="1"></element>
+    	</sequence>
+    </complexType>
+
+    
+    <complexType name="transitionsList">
+    	<sequence>
+    		<element name="transition" type="tns:transition"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="transition">
+    	<sequence>
+    		<element name="initial-state" type="tns:state"></element>
+    		<element name="action" type="tns:action"></element>
+    	</sequence>
+    </complexType>
+
+    <element name="workflowDefinition" type="tns:role"></element>
+    
+    <complexType name="workflowDefinition">
+    	<sequence>
+    		<element name="roles" type="tns:rolesList"></element>
+    		<element name="states" type="tns:statesList"></element>
+    		<element name="transitions" type="tns:transitionsList"></element>
+    	</sequence>
+    </complexType>
+</schema>

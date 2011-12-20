@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionScheme;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 
 public class RefsetSplitter {
 
@@ -32,6 +35,8 @@ public class RefsetSplitter {
 							newPartition.getUids().iterator().next(), config);
 				}
 			}
+			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
+			newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 		}
 		//		int total = 0;

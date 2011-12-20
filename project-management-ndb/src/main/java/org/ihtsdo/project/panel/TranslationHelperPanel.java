@@ -143,6 +143,8 @@ public class TranslationHelperPanel {
 	public static final String MEMBER_LOG_TAB_NAME = "Member log";
 
 	public static final String LIST_COMPONENT_VIEWER_NAME = "List component viewer";
+	
+	public static final String WORKFLOWDEFINITION_TAB_NAME="Workflow Definition";
 
 
 	/**

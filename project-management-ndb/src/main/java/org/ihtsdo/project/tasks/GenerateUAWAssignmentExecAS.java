@@ -211,7 +211,8 @@ public class GenerateUAWAssignmentExecAS extends AbstractTask {
 			
 			PromotionRefset promoRefset = worklist.getPromotionRefset(config);
 		
-			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist;
+			//I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
 			
 			wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
 			wfProcess.setProperty(fastTrackTranslatorInboxPropName, process.getProperty(fastTrackTranslatorInboxPropName));

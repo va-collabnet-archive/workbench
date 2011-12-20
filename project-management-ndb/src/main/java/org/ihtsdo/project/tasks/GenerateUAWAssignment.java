@@ -208,36 +208,36 @@ public class GenerateUAWAssignment extends AbstractTask {
 				throw new TaskFailedException("No queue with the specified name could be found: "
 						+ "OUTBOX");
 			}
-			I_QueueProcesses q = (I_QueueProcesses) service.service;
-			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
-			wfProcess.setDestination(destination);
-			wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
-			wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
-			wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
-			wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
-			wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
-
-			workListMember.setActivityStatus(
-					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
-			TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
-			termFactory.commit();
-			wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
-			Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
-			
-			String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
-
-			wfProcess.setSubject(subj);	
-			wfProcess.setSubject(workListMember.getConcept().toString());
-			wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
-			worker.getLogger().info(
-					"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
-			q.write(wfProcess, worker.getActiveTransaction());
-			worker.commitTransactionIfActive();
-			worker.getLogger()
-			.info("Moved process " + wfProcess.getProcessID() + " to queue: " + q.getNodeInboxAddress());
-			//TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
-			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-					"Assignment delivered!", "", JOptionPane.INFORMATION_MESSAGE);
+//			I_QueueProcesses q = (I_QueueProcesses) service.service;
+//			I_EncodeBusinessProcess wfProcess=(I_EncodeBusinessProcess)worklist.getBusinessProcess();
+//			wfProcess.setDestination(destination);
+//			wfProcess.setProperty(translatorInboxPropName, process.getProperty(translatorInboxPropName));
+//			wfProcess.setProperty(reviewer1InboxPropName, process.getProperty(reviewer1InboxPropName));
+//			wfProcess.setProperty(reviewer2InboxPropName, process.getProperty(reviewer2InboxPropName));
+//			wfProcess.setProperty(smeInboxPropName, process.getProperty(smeInboxPropName));
+//			wfProcess.setProperty(editorialBoardInboxPropName, process.getProperty(editorialBoardInboxPropName));
+//
+//			workListMember.setActivityStatus(
+//					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
+//			TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
+//			termFactory.commit();
+//			wfProcess.writeAttachment(ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey(), workListMember);
+//			Long statusTime=promoRefset.getLastStatusTime(workListMember.getId(), config);
+//			
+//			String subj= TerminologyProjectDAO.getItemSubject(workListMember,worklist,project, promoRefset, langRefset, statusId, statusTime);
+//
+//			wfProcess.setSubject(subj);	
+//			wfProcess.setSubject(workListMember.getConcept().toString());
+//			wfProcess.setProcessID(new ProcessID(UUID.randomUUID()));
+//			worker.getLogger().info(
+//					"Moving process " + wfProcess.getProcessID() + " to Queue named: " + queueName);
+//			q.write(wfProcess, worker.getActiveTransaction());
+//			worker.commitTransactionIfActive();
+//			worker.getLogger()
+//			.info("Moved process " + wfProcess.getProcessID() + " to queue: " + q.getNodeInboxAddress());
+//			//TerminologyProjectDAO.promoteLanguageContent(workListMember, config);
+//			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+//					"Assignment delivered!", "", JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new TaskFailedException(e.getMessage());
