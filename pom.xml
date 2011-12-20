@@ -19,7 +19,7 @@
 	<name>translation-module-master-pom</name>
 	<url>http://maven.apache.org</url>
 	<properties>
-		<workbench.version>2.6.0-trek-72-SNAPSHOT</workbench.version>
+		<workbench.version>2.6.0-trek-72</workbench.version>
 	</properties>
 
 	<modules>
@@ -27,8 +27,8 @@
 		<module>issue-management-ndb</module>
 		<module>issue-repository-integration-ndb</module>
 		<!--<module>project-management-ndb</module>
-		--><module>document-management-ndb</module>
-		<!--<module>translation-module-ndb</module>
+		--><!--<module>document-management-ndb</module>
+		--><!--<module>translation-module-ndb</module>
 	--></modules>
 
 	<distributionManagement>
