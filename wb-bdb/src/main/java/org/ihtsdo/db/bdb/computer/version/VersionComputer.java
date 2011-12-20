@@ -419,6 +419,11 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
+            for (Object part : versions) {
+                if (part.getClass().isAssignableFrom(ConceptComponent.Version.class)) {
+                    System.out.println("Opps: " + versions);
+                }
+            }
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {
