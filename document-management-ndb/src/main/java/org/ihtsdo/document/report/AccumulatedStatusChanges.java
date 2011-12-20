@@ -227,8 +227,12 @@ public class AccumulatedStatusChanges implements I_Report {
 											PromotionRefset promotionRefset = wl.getPromotionRefset(config);
 											I_GetConceptData status = promotionRefset.getPromotionStatus(member.getConceptNid(), config);
 											Long statusDate = promotionRefset.getLastStatusTime(member.getConceptNid(), config);
-											workListMember = new WorkListMember(name, member.getConceptNid(), member.getUids(), wl.getUids().iterator().next(), wl.getDestination(), status
-													.getUids().iterator().next(), statusDate);
+											workListMember = new WorkListMember(name,
+													member.getConceptNid(), 
+													member.getUids(), 
+													wl.getUids().iterator().next(), 
+													status.getUids().iterator().next(), 
+													statusDate);
 										}
 									}
 									if (history != null) {
