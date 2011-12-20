@@ -73,6 +73,7 @@ import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
+import org.ihtsdo.project.panel.details.WorkSetDetailsPanel.SourceRefsetMembersWorker;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -258,48 +259,9 @@ public class WorkSetDetailsPanel extends JPanel {
 	}
 
 	private void updateList1Content() {
-		I_TermFactory tf = Terms.get();
-		list1Model = new DefaultListModel();
-		try {
-			if (((I_GetConceptData) list2Model.getElementAt(0)) == null && workSet.getSourceRefset() == null) {
-				throw new Exception("No source refset defined");
-			}
-			if (((I_GetConceptData) list2Model.getElementAt(0)) != null) {
-				if (workSet.getSourceRefset() == null) {
-					I_GetConceptData selectedTargetRefset = ((I_GetConceptData) list2Model.getElementAt(0));
-					workSet.setSourceRefset(selectedTargetRefset);
-				} else if (((I_GetConceptData) list2Model.getElementAt(0)).getNid() != workSet.getSourceRefset().getNid()) {
-					I_GetConceptData selectedTargetRefset = ((I_GetConceptData) list2Model.getElementAt(0));
-					workSet.setSourceRefset(selectedTargetRefset);
-				}
-			}
-
-			List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
-
-			for (I_ExtendByRef member : tf.getRefsetExtensionMembers(workSet.getSourceRefset().getConceptNid())) {
-				int stat = member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
-				if (stat == tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()) || stat == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
-					members.add(tf.getConcept(member.getComponentNid()));
-				}
-			}
-
-			Collections.sort(members, new Comparator<I_GetConceptData>() {
-				public int compare(I_GetConceptData f1, I_GetConceptData f2) {
-					return f1.toString().compareTo(f2.toString());
-				}
-			});
-
-			for (I_GetConceptData member : members) {
-				list1Model.addElement(member);
-			}
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
-		sourceRefsetCounter.setText("(" + list1Model.size() + ")");
-		sourceRefsetCounter.revalidate();
-		list1.setModel(list1Model);
-		list1.validate();
+		SourceRefsetMembersWorker surceRefsetMembersWorker = new SourceRefsetMembersWorker();
+		surceRefsetMembersWorker.addPropertyChangeListener(new ProgressListener(pBarS));
+		surceRefsetMembersWorker.execute();
 	}
 
 	private void textField1KeyTyped(KeyEvent e) {
@@ -1303,7 +1265,7 @@ public class WorkSetDetailsPanel extends JPanel {
 						WorkSetMember workSetMember = TerminologyProjectDAO.getWorkSetMember(member, workset.getId(), config);
 						chunks.add(workSetMember);
 						i++;
-						if(i % 100 == 0){
+						if (i % 100 == 0) {
 							process(chunks);
 							chunks = new ArrayList<WorkSetMember>();
 						}
@@ -1323,7 +1285,7 @@ public class WorkSetDetailsPanel extends JPanel {
 			String inboxItems = null;
 			try {
 				inboxItems = get();
-				if (list1Model != null) {
+				if (list1Model != null && list1Model.getSize() > 0) {
 					worksetMembersCounter.setText("(" + tableModel.getRowCount() + " out of " + list1Model.getSize() + ")");
 				} else {
 					worksetMembersCounter.setText("(" + tableModel.getRowCount() + ")");
@@ -1346,6 +1308,76 @@ public class WorkSetDetailsPanel extends JPanel {
 			}
 		}
 
+	};
+	class SourceRefsetMembersWorker extends SwingWorker<String, WorkSetMember> {
+		
+		private I_ConfigAceFrame config;
+		
+		public SourceRefsetMembersWorker() {
+			super();
+			while (tableModel.getRowCount() > 0) {
+				tableModel.removeRow(0);
+			}
+		}
+		
+		@Override
+		protected String doInBackground() throws Exception {
+			I_TermFactory tf = Terms.get();
+			list1Model = new DefaultListModel();
+
+			try {
+				if (((I_GetConceptData) list2Model.getElementAt(0)) == null && workSet.getSourceRefset() == null) {
+					throw new Exception("No source refset defined");
+				}
+				if (((I_GetConceptData) list2Model.getElementAt(0)) != null) {
+					if (workSet.getSourceRefset() == null) {
+						I_GetConceptData selectedTargetRefset = ((I_GetConceptData) list2Model.getElementAt(0));
+						workSet.setSourceRefset(selectedTargetRefset);
+					} else if (((I_GetConceptData) list2Model.getElementAt(0)).getNid() != workSet.getSourceRefset().getNid()) {
+						I_GetConceptData selectedTargetRefset = ((I_GetConceptData) list2Model.getElementAt(0));
+						workSet.setSourceRefset(selectedTargetRefset);
+					}
+				}
+
+				List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
+
+				for (I_ExtendByRef member : tf.getRefsetExtensionMembers(workSet.getSourceRefset().getConceptNid())) {
+					int stat = member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
+					if (stat == tf.uuidToNative(ArchitectonicAuxiliary.Concept.CURRENT.getUids()) || stat == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+						members.add(tf.getConcept(member.getComponentNid()));
+					}
+				}
+
+				Collections.sort(members, new Comparator<I_GetConceptData>() {
+					public int compare(I_GetConceptData f1, I_GetConceptData f2) {
+						return f1.toString().compareTo(f2.toString());
+					}
+				});
+
+				for (I_GetConceptData member : members) {
+					list1Model.addElement(member);
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(WorkSetDetailsPanel.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
+			sourceRefsetCounter.setText("(" + list1Model.size() + ")");
+			sourceRefsetCounter.revalidate();
+			list1.setModel(list1Model);
+			list1.validate();
+			return "Done";
+		}
+		
+		@Override
+		public void done() {
+			String inboxItems = null;
+			try {
+				inboxItems = get();
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
+			}
+		}
+		
 	};
 
 	class ProgressListener implements PropertyChangeListener {
