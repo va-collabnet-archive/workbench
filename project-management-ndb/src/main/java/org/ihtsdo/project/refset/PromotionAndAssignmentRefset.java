@@ -183,6 +183,13 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 				termFactory.addUncommittedNoChecks(component);
 				//				termFactory.commit();
 			}
+			
+			// new proposal by keith and aimee
+//			RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI) oldStatus;
+//			RefexCAB refexBp = oldStatusCnid.makeBlueprint(config.getViewCoordinate());
+//			refexBp.put(RefexProperty.CNID1, statusConceptId);
+//			tc.construct(refexBp);
+			
 //			RefexCnidCnidVersionBI oldStatusCnid = (RefexCnidCnidVersionBI) oldStatus;
 //			if (oldStatusCnid.getCnid1() != statusConceptId) {
 //				for (PathBI editPath : config.getEditingPathSet()) {
