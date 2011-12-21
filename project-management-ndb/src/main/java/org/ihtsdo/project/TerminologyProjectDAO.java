@@ -4028,6 +4028,8 @@ public class TerminologyProjectDAO {
 		
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		
+		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);
+		
 		return workList;
 	}
 
