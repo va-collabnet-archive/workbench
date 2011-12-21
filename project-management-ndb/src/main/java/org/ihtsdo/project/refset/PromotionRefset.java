@@ -2,24 +2,27 @@ package org.ihtsdo.project.refset;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 public class PromotionRefset extends Refset {
 
@@ -133,25 +136,57 @@ public class PromotionRefset extends Refset {
 		if (oldStatus != null) {
 			RefexCnidVersionBI oldStatusCnid = (RefexCnidVersionBI) oldStatus;
 			if (oldStatusCnid.getCnid1() != statusConceptId) {
-				for (PathBI editPath : config.getEditingPathSet()) {
-					RefexCnidAnalogBI newVersion = 
-						(RefexCnidAnalogBI) oldStatusCnid.makeAnalog(activeValueNid,
-								config.getDbConfig().getUserConcept().getNid(),
-								editPath.getConceptNid(), 
-								Long.MAX_VALUE);
-					newVersion.setCnid1(statusConceptId);
-					oldStatus.getChronicle().getVersions().add(newVersion);
+				I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
+				long lastVersion = Long.MIN_VALUE;
+				I_ExtendByRefPartCid promotionStatusExtensionPart = null;
+				List<? extends I_ExtendByRefPart> loopParts = oldExtension.getMutableParts();
+				for (I_ExtendByRefPart loopPart : loopParts) {
+					if (loopPart.getTime() >= lastVersion) {
+						lastVersion = loopPart.getTime();
+						promotionStatusExtensionPart = (I_ExtendByRefPartCid) loopPart;
+					}
 				}
+				for (PathBI editPath : config.getEditingPathSet()) {
+					I_ExtendByRefPartCid newPromotionStatusPart =(I_ExtendByRefPartCid) 
+					promotionStatusExtensionPart.makeAnalog(
+							SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), 
+							editPath.getConceptNid(), 
+							Long.MAX_VALUE);
+					newPromotionStatusPart.setC1id(statusConceptId);
+					oldExtension.addVersion(newPromotionStatusPart);
+				}
+				//termFactory.addUncommittedNoChecks(refsetConcept);
 				termFactory.addUncommittedNoChecks(component);
+				
+				
+//				for (PathBI editPath : config.getEditingPathSet()) {
+//					RefexCnidAnalogBI newVersion = 
+//						(RefexCnidAnalogBI) oldStatusCnid.makeAnalog(activeValueNid,
+//								config.getDbConfig().getUserConcept().getNid(),
+//								editPath.getConceptNid(), 
+//								Long.MAX_VALUE);
+//					newVersion.setCnid1(statusConceptId);
+//					oldStatus.getChronicle().getVersions().add(newVersion);
+//				}
+//				termFactory.addUncommittedNoChecks(component);
 			}
 		} else {
-			RefexCAB newSpec = new RefexCAB(
-					TK_REFSET_TYPE.CID,
-					componentId,
-					refsetId);
-			newSpec.put(RefexProperty.CNID1, statusConceptId);
-			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-			termFactory.addUncommittedNoChecks(component);
+			I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
+			I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
+
+			refsetHelper.newRefsetExtension(this.refsetId, 
+					componentId, EConcept.REFSET_TYPES.CID, 
+					new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, statusConceptId), config);
+
+			//termFactory.addUncommittedNoChecks(refsetConcept);
+			termFactory.addUncommittedNoChecks(newMemberConcept);
+//			RefexCAB newSpec = new RefexCAB(
+//					TK_REFSET_TYPE.CID,
+//					componentId,
+//					refsetId);
+//			newSpec.put(RefexProperty.CNID1, statusConceptId);
+//			RefexChronicleBI<?> newRefex = tc.construct(newSpec);
+//			termFactory.addUncommittedNoChecks(component);
 		}
 
 		return;

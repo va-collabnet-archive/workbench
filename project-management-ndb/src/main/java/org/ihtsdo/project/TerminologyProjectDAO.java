@@ -2809,8 +2809,9 @@ public class TerminologyProjectDAO {
 						config); 
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = termFactory.getConcept(member.getActivityStatus());
-				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
-				promotionRefset.setDestination(member.getId(), assignedUserId);
+				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
+//				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+//				promotionRefset.setDestination(member.getId(), assignedUserId);
 				//Translation specific concept level promotion refset
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(
