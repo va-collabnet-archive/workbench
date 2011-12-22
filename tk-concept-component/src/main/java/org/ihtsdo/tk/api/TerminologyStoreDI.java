@@ -26,6 +26,10 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public interface TerminologyStoreDI extends TerminologyTransactionDI {
    void addTermChangeListener(TermChangeListener cl);
+   
+   void suspendChangeNotifications();
+
+   void resumeChangeNotifications();
 
    void iterateConceptDataInParallel(ProcessUnfetchedConceptDataBI processor) throws Exception;
 
