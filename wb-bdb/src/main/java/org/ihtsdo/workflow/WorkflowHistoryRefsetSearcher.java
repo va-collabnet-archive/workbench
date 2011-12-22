@@ -23,10 +23,11 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 */
 public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
     private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+    private int adjudicationPath = 0;
 	public WorkflowHistoryRefsetSearcher() throws TerminologyException, IOException
 	{
 		super(workflowHistoryConcept);
+		adjudicationPath = Terms.get().uuidToNative(UUID.fromString("7dfa494a-abde-5bc0-b1e3-2563519130a2"));
 	}
 
 	public boolean isInitialized() {
@@ -93,9 +94,32 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 	public String getMemberWfHxForDatabaseImport(int memberNid) throws IOException, TerminologyException {
 		StringBuffer retStr = new StringBuffer();
 		String[] columns = new String[WorkflowHelper.numberOfColumns];
-		I_ExtendByRef member = Terms.get().getExtension(memberNid);
 		
-		for (I_ExtendByRefVersion tuple : member.getTuples()) {
+		I_ExtendByRef member = Terms.get().getExtension(memberNid);
+		if (member.getRefsetId() != getRefsetNid()) {
+			return "";
+		}
+
+		
+		long devWfTime = 0;
+		boolean adjudicationPathFound = false;
+		
+		for (I_ExtendByRefVersion<?> tuple : member.getTuples()) {
+			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(tuple);
+
+			if (tuple.getPathNid() == adjudicationPath) {
+				adjudicationPathFound = true;
+			} else {
+				devWfTime = bean.getWorkflowTime();
+			}
+		}
+
+		int counter = 0;
+		for (I_ExtendByRefVersion<?> tuple : member.getTuples()) {
+			if (adjudicationPathFound && tuple.getPathNid() != adjudicationPath) {
+				continue;
+			}
+			
 			WorkflowHistoryJavaBean bean = WorkflowHelper.populateWorkflowHistoryJavaBean(tuple);
 
 			// UUIDs for WfId & Concept
@@ -113,7 +137,11 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 			columns[WorkflowHelper.fsnPosition] = bean.getFSN().toString();
 			
 			// Timestamps in 'yyyy-mm-dd hh:mm:ss' format
-			columns[WorkflowHelper.refsetColumnTimeStampPosition] = dateParser.format(bean.getWorkflowTime());
+			if (devWfTime > 0) {
+				columns[WorkflowHelper.refsetColumnTimeStampPosition] = dateParser.format(devWfTime);
+			} else {
+				columns[WorkflowHelper.refsetColumnTimeStampPosition] = dateParser.format(bean.getWorkflowTime());
+			}
 			columns[WorkflowHelper.timeStampPosition] = dateParser.format(bean.getEffectiveTime());
 					 
 			// Write columns to return string tab-delimited
@@ -125,10 +153,10 @@ public class WorkflowHistoryRefsetSearcher extends WorkflowRefsetSearcher {
 					retStr.append("\t");
 				}
 			}
-			
-			retStr.append("\r\n");
 		}
 			 
+		retStr.append("\r\n");
+
 		return retStr.toString().trim();
 	}
 }
