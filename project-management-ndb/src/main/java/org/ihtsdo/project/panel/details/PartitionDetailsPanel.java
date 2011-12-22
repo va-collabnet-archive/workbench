@@ -90,7 +90,7 @@ public class PartitionDetailsPanel extends JPanel {
 	private BusinessProcess businessProcess;
 	private String name;
 	private String partitionMember;
-	private SwingWorker<String, WorkSetMember> membersWorker;
+	private MembersWorker membersWorker;
 
 	public PartitionDetailsPanel(Partition partition, I_ConfigAceFrame config) {
 		initComponents();
@@ -810,7 +810,7 @@ public class PartitionDetailsPanel extends JPanel {
 	private JButton button6;
 	private JProgressBar pBarW2;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
-	class MembersWorker extends SwingWorker<String, WorkSetMember> {
+	class MembersWorker extends SwingWorker<ArrayList<PartitionMember>,String> {
 
 
 		public MembersWorker() {
@@ -821,8 +821,9 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 
 		@Override
-		protected String doInBackground() throws Exception {
+		protected ArrayList<PartitionMember> doInBackground() throws Exception {
 			I_TermFactory termFactory = Terms.get();
+			ArrayList<PartitionMember> result = new ArrayList<PartitionMember>();
 			List<PartitionMember> members = partition.getPartitionMembers();
 			label4.setText(partitionMember + " (" + members.size() + ")");
 			Collections.sort(members, new Comparator<PartitionMember>() {
@@ -831,32 +832,22 @@ public class PartitionDetailsPanel extends JPanel {
 				}
 			});
 			for (PartitionMember member : members) {
-				tableModel.addRow(new PartitionMember[] { member });
+				result.add(member);
 			}
-			membersTable.revalidate();				
-			return "Done";
+			return result;
 		}
 
 		@Override
 		public void done() {
-			String inboxItems = null;
+			ArrayList<PartitionMember> inboxItems = null;
 			try {
 				inboxItems = get();
-				membersTable.revalidate();
-				membersTable.repaint();
-			} catch (Exception ignore) {
-				ignore.printStackTrace();
-			}
-		}
-
-		@Override
-		protected void process(List<WorkSetMember> chunks) {
-			try {
-				for (WorkSetMember member : chunks) {
+				for (PartitionMember member : inboxItems) {
 					tableModel.addRow(new Object[] { member });
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
+				membersTable.revalidate();
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
 			}
 		}
 

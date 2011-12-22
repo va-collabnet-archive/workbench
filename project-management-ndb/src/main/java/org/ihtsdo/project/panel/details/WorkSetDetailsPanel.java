@@ -73,7 +73,6 @@ import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.project.panel.details.WorkSetDetailsPanel.SourceRefsetMembersWorker;
 import org.ihtsdo.project.panel.dnd.ObjectTransferHandler;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -1422,7 +1421,7 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 
 	};
-	class SourceRefsetMembersWorker extends SwingWorker<String, WorkSetMember> {
+	class SourceRefsetMembersWorker extends SwingWorker<List<I_GetConceptData>, WorkSetMember> {
 		
 		public SourceRefsetMembersWorker() {
 			super();
@@ -1432,9 +1431,9 @@ public class WorkSetDetailsPanel extends JPanel {
 		}
 		
 		@Override
-		protected String doInBackground() throws Exception {
+		protected List<I_GetConceptData> doInBackground() throws Exception {
 			I_TermFactory tf = Terms.get();
-			
+			List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
 			try {
 				if (((I_GetConceptData) list2Model.getElementAt(0)) == null && workSet.getSourceRefset() == null) {
 					throw new Exception("No source refset defined");
@@ -1449,7 +1448,7 @@ public class WorkSetDetailsPanel extends JPanel {
 					}
 				}
 
-				List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
+				members = new ArrayList<I_GetConceptData>();
 
 				for (I_ExtendByRef member : tf.getRefsetExtensionMembers(workSet.getSourceRefset().getConceptNid())) {
 					int stat = member.getTuples(null, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()).iterator().next().getStatusNid();
@@ -1464,24 +1463,24 @@ public class WorkSetDetailsPanel extends JPanel {
 					}
 				});
 
-				for (I_GetConceptData member : members) {
-					sourceRefsetTableModel.addRow(new Object[] {member});
-				}
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(WorkSetDetailsPanel.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 			}
-			sourceRefsetCounter.setText("(" + sourceRefsetTableModel.getRowCount() + ")");
-			sourceRefsetCounter.revalidate();
-			return "Done";
+			return members;
 		}
 		
 		@Override
 		public void done() {
-			String inboxItems = null;
+			List<I_GetConceptData> members = null;
 			try {
-				inboxItems = get();
+				members = get();
+				for (I_GetConceptData member : members) {
+					sourceRefsetTableModel.addRow(new Object[] {member});
+				}
 				sourceRefsetMembersTable.revalidate();
+				sourceRefsetCounter.setText("(" + sourceRefsetTableModel.getRowCount() + ")");
+				sourceRefsetCounter.revalidate();
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
