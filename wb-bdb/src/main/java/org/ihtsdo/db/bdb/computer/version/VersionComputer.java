@@ -14,6 +14,12 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.ConceptComponent;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
+import org.ihtsdo.concept.component.description.Description;
+import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
+import org.ihtsdo.concept.component.relationship.Relationship;
+import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
@@ -419,11 +425,6 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
         for (PositionBI p : positions) {
             HashSet<V> partsForPosition = new HashSet<V>();
             PositionMapper mapper = Bdb.getSapDb().getMapper(p);
-            for (Object part : versions) {
-                if (part.getClass().isAssignableFrom(ConceptComponent.Version.class)) {
-                    System.out.println("Opps: " + versions);
-                }
-            }
             nextpart:
             for (V part : versions) {
                 if (part.getTime() == Long.MIN_VALUE) {
