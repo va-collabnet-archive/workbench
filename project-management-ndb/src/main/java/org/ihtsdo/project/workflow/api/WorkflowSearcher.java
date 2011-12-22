@@ -155,12 +155,13 @@ public class WorkflowSearcher {
 				for (WorkSet workSet : worksets) {
 					List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
 					for (WorkList workList : worklists) {
-						
+
 						List<WfUser> users = workList.getUsers();
-						if (true/**users.contains(user)*/) {
+						if (true/** users.contains(user) */) {
 							Integer wlMembersSize = getWlMembersSize(workList, user);
-							if(wlMembersSize > 0)
-							result.put(workList, wlMembersSize);
+							if (wlMembersSize > 0) {
+								result.put(workList, wlMembersSize);
+							}
 						}
 					}
 				}
@@ -173,11 +174,70 @@ public class WorkflowSearcher {
 		return result;
 	}
 
+	/**
+	 * This is the union of getUserWorklists and getUserStatusList.. <BR>
+	 * it takes advantage of the worklist members loop to calculate wl size and states size. 
+	 * @param user
+	 * @return
+	 */
+	public HashMap<Object, Integer> getCountByWorklistAndState(WfUser user) {
+		HashMap<Object, Integer> result = new HashMap<Object, Integer>();
+		I_ConfigAceFrame config;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
+			for (I_TerminologyProject i_TerminologyProject : projects) {
+				List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
+				for (WorkSet workSet : worksets) {
+					List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
+					for (WorkList workList : worklists) {
+						HashMap<I_GetConceptData, Integer> workListMembersStatuses = new HashMap<I_GetConceptData, Integer>();
+						List<WfUser> users = workList.getUsers();
+						if (true/** users.contains(user) */) {
+							List<WorkListMember> allWorkListMembers = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
+							int size = 0;
+							for (WorkListMember workListMember : allWorkListMembers) {
+								if (workListMember.getWfInstance().getDestination().equals(user)) {
+									size++;
+									I_GetConceptData activityStatus = tf.getConcept(workListMember.getActivityStatus());
+									Integer currentCount = workListMembersStatuses.get(activityStatus);
+									if (currentCount == null)
+										currentCount = 0;
+									workListMembersStatuses.put(activityStatus, currentCount + 1);
+								}
+							}
+							
+							Set<I_GetConceptData> keys = workListMembersStatuses.keySet();
+							for (I_GetConceptData wlstatus : keys) {
+								WfState state = provider.statusConceptToWfState(wlstatus);
+								if (result.containsKey(state)) {
+									int current = result.get(state);
+									current += workListMembersStatuses.get(wlstatus);
+									result.put(state, current);
+								} else {
+									result.put(state, workListMembersStatuses.get(wlstatus));
+								}
+							}
+							
+							result.put(workList, size);
+						}
+					}
+				}
+			}
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
 	private Integer getWlMembersSize(WorkList workList, WfUser user) {
 		List<WorkListMember> allWorkListMembers = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
 		int size = 0;
 		for (WorkListMember workListMember : allWorkListMembers) {
-			if(workListMember.getWfInstance().getDestination().equals(user)){
+			if (workListMember.getWfInstance().getDestination().equals(user)) {
 				size++;
 			}
 		}
@@ -211,7 +271,13 @@ public class WorkflowSearcher {
 						Set<I_GetConceptData> keys = workListMembersStatuses.keySet();
 						for (I_GetConceptData wlstatus : keys) {
 							WfState state = provider.statusConceptToWfState(wlstatus);
-							result.put(state, workListMembersStatuses.get(wlstatus));
+							if (result.containsKey(state)) {
+								int current = result.get(state);
+								current += workListMembersStatuses.get(wlstatus);
+								result.put(state, current);
+							} else {
+								result.put(state, workListMembersStatuses.get(wlstatus));
+							}
 						}
 					}
 				}
