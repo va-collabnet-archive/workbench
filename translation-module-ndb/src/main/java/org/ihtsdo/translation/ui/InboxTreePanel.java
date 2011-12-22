@@ -32,6 +32,8 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -129,7 +131,7 @@ public class InboxTreePanel extends JPanel {
 			worklistItemsWorker.cancel(true);
 			worklistItemsWorker = null;
 		}
-		worklistItemsWorker = new WorklistItemsWorker(wNode, sNode, config, searcher, model, user);
+		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode, config, searcher, model, user);
 		worklistItemsWorker.addPropertyChangeListener(new ProgressListener(progressBar));
 		worklistItemsWorker.execute();
 	}
@@ -312,15 +314,17 @@ class InboxTreeItem {
 	}
 }
 
-class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>> {
+class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem> {
 	private DefaultMutableTreeNode wNode;
 	private DefaultMutableTreeNode sNode;
 	private I_ConfigAceFrame config;
 	private WorkflowSearcher searcher;
 	private DefaultTreeModel model;
 	private I_GetConceptData user;
+	private JTree inboxFolderTreee;
 
-	public WorklistItemsWorker(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model, I_GetConceptData user) {
+	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model,
+			I_GetConceptData user) {
 		super();
 		this.wNode = wNode;
 		this.sNode = sNode;
@@ -328,6 +332,7 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 		this.searcher = searcher;
 		this.model = model;
 		this.user = user;
+		this.inboxFolderTreee = inboxFolderTreee;
 	}
 
 	@Override
@@ -335,54 +340,29 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 		List<InboxTreeItem> inboxTreeItems = new ArrayList<InboxTreeItem>();
 		try {
 			if (config != null) {
-				inboxTreeItems = getWorklistsAndSize();
-				List<HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>> chunks = new ArrayList<HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>>();
-				HashMap<DefaultMutableTreeNode, List<InboxTreeItem>> partialRes = new HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>();
-				partialRes.put(wNode, inboxTreeItems);
-				chunks.add(partialRes);
-				process(chunks);
-
-				List<InboxTreeItem> statusTreeItems = getStatusNodesAndSize();
-				chunks = new ArrayList<HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>>();
-				partialRes = new HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>();
-				partialRes.put(sNode, statusTreeItems);
-				chunks.add(partialRes);
-				process(chunks);
+				inboxTreeItems = getWorklistsStatusesAndSize();
+				process(inboxTreeItems);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return inboxTreeItems;
 	}
 
-	private List<InboxTreeItem> getStatusNodesAndSize() {
+	private List<InboxTreeItem> getWorklistsStatusesAndSize() {
 		List<InboxTreeItem> inboxTreeItems = new ArrayList<InboxTreeItem>();
 		try {
 			WfUser wfUser;
 			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
-			HashMap<WfState, Integer> worklists = searcher.getUserStatusList(wfUser);
-			Set<WfState> states = worklists.keySet();
+			HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser);
+			Set<Object> worklistsAndStates = worklists.keySet();
 			inboxTreeItems = new ArrayList<InboxTreeItem>();
-			for (WfState state : states) {
-				InboxTreeItem inboxItem = new InboxTreeItem(state, worklists.get(state));
+			for (Object loopObject : worklistsAndStates) {
+				InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject));
 				inboxTreeItems.add(inboxItem);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		return inboxTreeItems;
-	}
-
-	private List<InboxTreeItem> getWorklistsAndSize() throws IOException {
-		List<InboxTreeItem> inboxTreeItems;
-		WfUser wfUser;
-		wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
-		HashMap<WorkList, Integer> worklists = searcher.getUserWorklists(wfUser);
-		Set<WorkList> wls = worklists.keySet();
-		inboxTreeItems = new ArrayList<InboxTreeItem>();
-		for (WorkList workList : wls) {
-			InboxTreeItem inboxItem = new InboxTreeItem(workList, worklists.get(workList));
-			inboxTreeItems.add(inboxItem);
 		}
 		return inboxTreeItems;
 	}
@@ -392,23 +372,28 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, HashMap<Defau
 		List<InboxTreeItem> inboxItems = null;
 		try {
 			inboxItems = get();
+
+			TreeNode[] path = wNode.getPath();
+			inboxFolderTreee.expandPath(new TreePath(path));
+
+			path = sNode.getPath();
+			inboxFolderTreee.expandPath(new TreePath(path));
 		} catch (Exception ignore) {
 			ignore.printStackTrace();
 		}
 	}
 
 	@Override
-	protected void process(List<HashMap<DefaultMutableTreeNode, List<InboxTreeItem>>> chunks) {
-		for (HashMap<DefaultMutableTreeNode, List<InboxTreeItem>> hashMap : chunks) {
-			Set<DefaultMutableTreeNode> keys = hashMap.keySet();
-			for (DefaultMutableTreeNode parentTreeNode : keys) {
-				List<InboxTreeItem> childInfo = hashMap.get(parentTreeNode);
-				for (InboxTreeItem inboxTreeItem : childInfo) {
-					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
-					parentTreeNode.add(chldNode);
-					model.reload(parentTreeNode);
-				}
+	protected void process(List<InboxTreeItem> chunks) {
+		for (InboxTreeItem inboxTreeItem : chunks) {
+			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+			if (inboxTreeItem.getUserObject() instanceof WorkList) {
+				wNode.add(chldNode);
+			} else if (inboxTreeItem.getUserObject() instanceof WfState) {
+				sNode.add(chldNode);
 			}
+			model.reload(wNode);
+			model.reload(sNode);
 		}
 	}
 

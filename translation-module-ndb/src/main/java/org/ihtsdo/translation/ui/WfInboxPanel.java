@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.*;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -51,7 +52,7 @@ public class WfInboxPanel extends JPanel {
 		initComponents();
 		try {
 			provider = new WfComponentProvider();
-			model = new InboxTableModel();
+			model = new InboxTableModel(progressBar1);
 			inboxTable.setModel(model);
 			filterList = new HashMap<String, WfSearchFilterBI>();
 			if (tf != null) {
@@ -160,6 +161,7 @@ public class WfInboxPanel extends JPanel {
 		stateFilter = new JTextField();
 		filterButton = new JButton();
 		panel2 = new JPanel();
+		progressBar1 = new JProgressBar();
 		splitPane1 = new JSplitPane();
 		inboxTreePanel1 = new InboxTreePanel();
 		scrollPane1 = new JScrollPane();
@@ -229,10 +231,16 @@ public class WfInboxPanel extends JPanel {
 		//======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
 			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
 			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+			//---- progressBar1 ----
+			progressBar1.setVisible(false);
+			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel2, BorderLayout.SOUTH);
 
@@ -263,6 +271,7 @@ public class WfInboxPanel extends JPanel {
 	private JTextField stateFilter;
 	private JButton filterButton;
 	private JPanel panel2;
+	private JProgressBar progressBar1;
 	private JSplitPane splitPane1;
 	private InboxTreePanel inboxTreePanel1;
 	private JScrollPane scrollPane1;
