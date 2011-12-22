@@ -3982,6 +3982,7 @@ public class TerminologyProjectDAO {
 			WorkflowDefinition workflowDefinition,
 			List<WfMembership> workflowUserRoles, 
 			String name, I_ConfigAceFrame config) throws Exception {
+		WfUser user = null;
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
@@ -4014,7 +4015,9 @@ public class TerminologyProjectDAO {
 									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 					instance.setWfDefinition(workflowDefinition);
 					instance.setWorkListId(workList.getUids().iterator().next());
-					WfUser user=interpreter.getNextDestination(instance, workList);
+					if (user == null) {
+						user=interpreter.getNextDestination(instance, workList);
+					}
 					if (user ==null){
 						throw new Exception("Cannot set next destination for component:\n" + workListMember.getConcept().toUserString());
 					}

@@ -165,6 +165,15 @@ public abstract class Refset {
 			}
 
 	public I_GetConceptData getRefsetConcept() {
+		if (refsetConcept == null) {
+			try {
+				refsetConcept = Terms.get().getConcept(refsetId);
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		return refsetConcept;
 	}
 

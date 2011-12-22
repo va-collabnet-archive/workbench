@@ -2,17 +2,10 @@ package org.ihtsdo.project.workflow.api;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.security.auth.login.LoginException;
-
-import net.jini.config.ConfigurationException;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -28,9 +21,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.SNOMED;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -52,32 +43,36 @@ public class WorkflowInterpreter {
 		super();
 		this.wfDefinition = wfDefinition;
 
-		// Crate knowledge base with decision table
-		DecisionTableConfiguration dtableconfiguration =
-			KnowledgeBuilderFactory.newDecisionTableConfiguration();
-		dtableconfiguration.setInputType( DecisionTableInputType.XLS );
+		if (kbase != null && ksession != null) {
+			// kbase and ksession are singletons
+		} else {
+			// Crate knowledge base with decision table
+			DecisionTableConfiguration dtableconfiguration =
+				KnowledgeBuilderFactory.newDecisionTableConfiguration();
+			dtableconfiguration.setInputType( DecisionTableInputType.XLS );
 
-		kbase = KnowledgeBaseFactory.newKnowledgeBase();
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
+			kbase = KnowledgeBaseFactory.newKnowledgeBase();
+			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
 
-		for (String loopXls : wfDefinition.getXlsFileName()) {
-			Resource xlsRes = ResourceFactory.newFileResource(loopXls);
-			kbuilder.add( xlsRes,
-					ResourceType.DTABLE,
-					dtableconfiguration );
+			for (String loopXls : wfDefinition.getXlsFileName()) {
+				Resource xlsRes = ResourceFactory.newFileResource(loopXls);
+				kbuilder.add( xlsRes,
+						ResourceType.DTABLE,
+						dtableconfiguration );
+			}
+
+			for (String loopDrl : wfDefinition.getDrlFileName()) {
+				kbuilder.add(ResourceFactory.newFileResource(loopDrl), 
+						ResourceType.DRL);
+			}
+
+			if ( kbuilder.hasErrors() ) {
+				System.err.print( kbuilder.getErrors() );
+			}
+
+			kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+			ksession = kbase.newStatelessKnowledgeSession();
 		}
-
-		for (String loopDrl : wfDefinition.getDrlFileName()) {
-			kbuilder.add(ResourceFactory.newFileResource(loopDrl), 
-					ResourceType.DRL);
-		}
-
-		if ( kbuilder.hasErrors() ) {
-			System.err.print( kbuilder.getErrors() );
-		}
-
-		kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
-		ksession = kbase.newStatelessKnowledgeSession();
 
 	}
 
@@ -117,7 +112,7 @@ public class WorkflowInterpreter {
 	public WfAction getPreparationAction(WfInstance instance, WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
 		WfComponentProvider cp=new WfComponentProvider();
-		
+
 		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
@@ -230,35 +225,14 @@ public class WorkflowInterpreter {
 				tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
 			} else {
 				tworker = worker;
-				
+
 			}
 
 			tworker.execute(bp);
-			
-			
 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (TaskFailedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (LoginException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (PrivilegedActionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 	}
 
 }

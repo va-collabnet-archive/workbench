@@ -61,7 +61,9 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 			UUID projectUUID) {
 		super();
 		this.name = name;
+		this.refsetName = name;
 		this.id = id;
+		this.refsetId = id;
 		this.uids = uids;
 		this.projectUUID = projectUUID;
 	}
@@ -89,6 +91,7 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 	 */
 	public void setName(String name) {
 		this.name = name;
+		this.refsetName = name;
 	}
 
 	/**
@@ -107,6 +110,7 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 	 */
 	public void setId(int id) {
 		this.id = id;
+		this.refsetId = id;
 	}
 
 	/**
