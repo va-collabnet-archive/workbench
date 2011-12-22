@@ -76,7 +76,6 @@ public abstract class ChangeSetImporter implements ActionListener {
             List<File> changeSetFiles = new ArrayList<File>();
             addAllChangeSetFiles(rootFile, changeSetFiles, suffix, prefix);
             TreeSet<I_ReadChangeSet> readerSet = getSortedReaderSet();
-            TreeSet<I_ReadChangeSet> wfHxReaderSet = getSortedReaderSet();
             for (File csf : changeSetFiles) {
                 I_ReadChangeSet csr = getChangeSetReader(csf);
                 if (validateChangeSets == true && validatorArray.length > 0) {

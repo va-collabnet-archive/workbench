@@ -73,7 +73,7 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
     private JSplitPane topSplit = new JSplitPane();
     private JTabbedPane conceptTabsPane = new JTabbedPane();
     private ConceptPanel c1Panel;
-    private final TerminologyList batchConceptList;
+    private static TerminologyList batchConceptList = null;
     private ViewCoordinate viewCoord;
     private JButton stopButton = new JButton();
     private Arena arena;
@@ -120,8 +120,11 @@ public class ContradictionEditorFrame extends ComponentFrame implements Property
         createRightComponent();
 
         // Setup Left Side
-        TerminologyListModel batchListModel = new TerminologyListModel();
-        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
+        if (batchConceptList == null) {
+	        TerminologyListModel batchListModel = new TerminologyListModel();
+	        batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig); 
+        }
+	     
         createLeftComponent();
 
         topSplit.setLeftComponent(resultsPane);
