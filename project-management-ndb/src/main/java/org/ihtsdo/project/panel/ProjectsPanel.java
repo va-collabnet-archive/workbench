@@ -1000,36 +1000,38 @@ public class ProjectsPanel extends JPanel {
 		scrollPane1 = new JScrollPane();
 		jTree1 = new JTree();
 
-		// ======== this ========
+		//======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-		// ======== panel2 ========
+		//======== panel2 ========
 		{
 			panel2.setBackground(new Color(238, 238, 238));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 20, 0, 0 };
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {20, 0, 0};
+			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-			// ======== panel1 ========
+			//======== panel1 ========
 			{
 				panel1.setBackground(new Color(238, 238, 238));
 				panel1.setLayout(new GridBagLayout());
-				((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 61, 0, 0, 0, 0 };
-				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 61, 0, 0, 0, 0};
+				((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- label1 ----
+				//---- label1 ----
 				label1.setText("Projects");
-				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- button2 ----
+				//---- button2 ----
 				button2.setText("Add Project");
 				button2.addActionListener(new ActionListener() {
 					@Override
@@ -1037,9 +1039,11 @@ public class ProjectsPanel extends JPanel {
 						button2ActionPerformed(e);
 					}
 				});
-				panel1.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(button2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- button1 ----
+				//---- button1 ----
 				button1.setText("Close");
 				button1.setIcon(null);
 				button1.addActionListener(new ActionListener() {
@@ -1048,9 +1052,11 @@ public class ProjectsPanel extends JPanel {
 						button1ActionPerformed(e);
 					}
 				});
-				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel1.add(button1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- label2 ----
+				//---- label2 ----
 				label2.setText("text");
 				label2.addMouseListener(new MouseAdapter() {
 					@Override
@@ -1058,23 +1064,27 @@ public class ProjectsPanel extends JPanel {
 						label2MouseClicked(e);
 					}
 				});
-				panel1.add(label2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel1.add(label2, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			panel2.add(panel1, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
 
-			// ======== panel11 ========
+			//======== panel11 ========
 			{
 				panel11.setBackground(new Color(220, 233, 249));
 				panel11.setLayout(new GridBagLayout());
-				((GridBagLayout) panel11.getLayout()).columnWidths = new int[] { 0, 0 };
-				((GridBagLayout) panel11.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel11.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-				((GridBagLayout) panel11.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
+				((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
+				((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+				((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
 
-				// ======== scrollPane1 ========
+				//======== scrollPane1 ========
 				{
 
-					// ---- jTree1 ----
+					//---- jTree1 ----
 					jTree1.setRootVisible(false);
 					jTree1.addTreeSelectionListener(new TreeSelectionListener() {
 						@Override
@@ -1084,22 +1094,29 @@ public class ProjectsPanel extends JPanel {
 					});
 					jTree1.addTreeWillExpandListener(new TreeWillExpandListener() {
 						@Override
-						public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
+						public void treeWillExpand(TreeExpansionEvent e)
+							throws ExpandVetoException
+						{
 							jTree1TreeWillExpand(e);
 						}
-
 						@Override
-						public void treeWillCollapse(TreeExpansionEvent e) throws ExpandVetoException {
-						}
+						public void treeWillCollapse(TreeExpansionEvent e)
+							throws ExpandVetoException
+						{}
 					});
 					scrollPane1.setViewportView(jTree1);
 				}
-				panel11.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel11.add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel2.add(panel11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(panel11, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		// JFormDesigner - End of component initialization
+		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
@@ -1114,7 +1131,6 @@ public class ProjectsPanel extends JPanel {
 	private JPanel panel11;
 	private JScrollPane scrollPane1;
 	private JTree jTree1;
-
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	public void refreshParentNode() {
