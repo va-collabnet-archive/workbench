@@ -292,7 +292,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
          versions = list;
       }
 
-      return (List<Version>) versions;
+      return Collections.unmodifiableList((List<Version>) versions);
    }
 
    //~--- set methods ---------------------------------------------------------

@@ -553,7 +553,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
             versions = list;
         }
 
-        return versions;
+        return Collections.unmodifiableList(versions);
     }
 
     @Override

@@ -36,11 +36,7 @@ import java.beans.PropertyVetoException;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 
@@ -267,7 +263,7 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
             versions = list;
         }
 
-        return (List<Version>) versions;
+        return Collections.unmodifiableList((List<Version>) versions);
     }
 
     //~--- set methods ---------------------------------------------------------

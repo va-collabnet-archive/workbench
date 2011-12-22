@@ -692,7 +692,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             versions = list;
         }
 
-        return versions;
+        return Collections.unmodifiableList(versions);
     }
 
     @Override

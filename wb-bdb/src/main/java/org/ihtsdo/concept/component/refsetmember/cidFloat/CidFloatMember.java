@@ -290,7 +290,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
          versions = list;
       }
 
-      return (List<Version>) versions;
+      return Collections.unmodifiableList((List<Version>) versions);
    }
 
    //~--- set methods ---------------------------------------------------------

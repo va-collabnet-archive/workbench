@@ -547,7 +547,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             versions = list;
         }
 
-        return (List<Version>) versions;
+        return Collections.unmodifiableList((List<Version>) versions);
     }
 
     @Override

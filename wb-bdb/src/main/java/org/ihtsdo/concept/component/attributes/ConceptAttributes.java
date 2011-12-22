@@ -493,7 +493,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
             versions = list;
         }
 
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
     /*

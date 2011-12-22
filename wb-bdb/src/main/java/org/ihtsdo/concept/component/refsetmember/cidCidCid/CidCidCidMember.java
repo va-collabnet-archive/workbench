@@ -315,7 +315,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
             versions = list;
         }
 
-        return (List<Version>) versions;
+        return Collections.unmodifiableList((List<Version>) versions);
     }
 
     //~--- set methods ---------------------------------------------------------
