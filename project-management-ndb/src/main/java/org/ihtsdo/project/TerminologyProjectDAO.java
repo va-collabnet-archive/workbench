@@ -3987,6 +3987,7 @@ public class TerminologyProjectDAO {
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
 		for (PartitionMember partitionMember: partitionMembers) {
+			sleep(1);
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
 					partitionMember.getId(),
 					partitionMember.getUids(), null,  
@@ -4003,6 +4004,7 @@ public class TerminologyProjectDAO {
 			if(workList != null){
 				WorkflowInterpreter interpreter = new WorkflowInterpreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
+					sleep(1);
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
 					WfInstance instance = new WfInstance();
 					WfComponentProvider prov = new WfComponentProvider();

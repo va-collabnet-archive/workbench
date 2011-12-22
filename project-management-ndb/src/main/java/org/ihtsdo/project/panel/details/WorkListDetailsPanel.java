@@ -15,8 +15,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,14 +22,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.AbstractButton;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -45,18 +39,16 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -67,12 +59,9 @@ import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.model.WorkSet;
-import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * @author Guillermo Reynoso
@@ -178,11 +167,14 @@ public class WorkListDetailsPanel extends JPanel {
 	}
 
 	private void updateMembersTable() {
-		if (membersWorker == null || membersWorker.isDone()) {
-			membersWorker = new WorklistMembersWorker(membersTable, membersTableModel, translProject, workList, config);
-			membersWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
-			membersWorker.execute();
+		
+		if (membersWorker != null && !membersWorker.isDone()) {
+			membersWorker.cancel(true);
+			membersWorker = null;
 		}
+		membersWorker = new WorklistMembersWorker(membersTable, membersTableModel, translProject, workList, config);
+		membersWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
+		membersWorker.execute();
 	}
 
 	private void textField1KeyTyped(KeyEvent e) {

@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultListModel;
@@ -45,19 +47,22 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
@@ -230,6 +235,7 @@ public class PartitionDetailsPanel extends JPanel {
 	List<I_Work> cloneList = new ArrayList<I_Work>();
 	private WorkflowDefinition workflowDefinition;
 	private String noName;
+	private SwingWorker<String, String> worker;
 
 	private void button2ActionPerformed(ActionEvent e) {
 		// generate worklist
@@ -268,9 +274,11 @@ public class PartitionDetailsPanel extends JPanel {
 			}
 		}
 
-		SwingWorker<String, String> worker = new SwingWorker<String, String>() {
+		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
+		worker = new SwingWorker<String, String>() {
 			@Override
 			protected String doInBackground() throws Exception {
+
 				try {
 					TerminologyProjectDAO.generateWorkListFromPartition(partition, workflowDefinition, workflowUserRoles, noName, config);
 				} catch (Exception e1) {
@@ -280,22 +288,41 @@ public class PartitionDetailsPanel extends JPanel {
 				TranslationHelperPanel.refreshProjectPanelNode(config);
 				return null;
 			}
+
 			@Override
 			protected void done() {
 				try {
 					get();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} catch (ExecutionException e) {
+					activity.complete();
+					activity.removeActivityFromViewer();
+					activity.setProgressInfoLower("Done");
+				} catch (CancellationException ce) {
+					activity.setProgressInfoLower("Canceled");
+					try {
+						activity.complete();
+					} catch (ComputationCanceled e) {
+						activity.setProgressInfoLower("Done");
+					}
+				} catch (Exception e){
 					e.printStackTrace();
 				}
-				super.done();
 			}
 
 		};
-
-		worker.addPropertyChangeListener(new ProgressListener(pBarW));
 		worker.execute();
+		activity.addStopActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				worker.cancel(true);
+			}
+		});
+		activity.setValue(0);
+		activity.setIndeterminate(true);
+		try {
+			ActivityViewer.addActivity(activity);
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
 	}
 
 	public static void sleep(int n) {
