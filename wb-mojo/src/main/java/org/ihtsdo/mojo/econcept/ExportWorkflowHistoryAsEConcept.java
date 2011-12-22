@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -28,10 +27,10 @@ import org.dwfa.tapi.impl.LocalFixedTerminology;
 import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetWriter;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * Export the workflow history to initialize the WfHx refset in the database
@@ -102,18 +101,6 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
      * @parameter
      */
 	private String outputFileName = "wfHistory.jbin";
-
-
-    private final int workflowIdPosition = 0;								// 0
-    private final int conceptIdPosition = workflowIdPosition + 1;			// 1
-    private final int modelerPosition = conceptIdPosition + 1;				// 2
-    private final int actionPosition = modelerPosition + 1;					// 3
-    private final int statePosition = actionPosition + 1;					// 4
-    private final int fsnPosition = statePosition + 1;						// 5
-    private final int refsetColumnTimeStampPosition = fsnPosition + 1;		// 6
-    private final int timeStampPosition = refsetColumnTimeStampPosition + 1;	// 7
-    
-    private final int numberOfColumns = timeStampPosition + 1;				// 8
 
 	private BufferedReader inputFile = null;
 	private List<TkRefsetAbstractMember<?>> memberList = null;
@@ -224,7 +211,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		member.setPrimordialComponentUuid(UUID.randomUUID());
 
 		// Ref Comp Id
-		member.setComponentUuid(UUID.fromString(row[conceptIdPosition]));
+		member.setComponentUuid(UUID.fromString(row[WorkflowHelper.conceptIdPosition]));
 
 		// Refset Id
 		member.setRefsetUuid(wfHxRefsetId);
@@ -238,7 +225,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 		// Path writing on
 		member.pathUuid = snomedPathUid;
 
-		member.time = format.parse(row[timeStampPosition]).getTime();
+		member.time = format.parse(row[WorkflowHelper.timeStampPosition]).getTime();
 
 		member.setStrValue(toXml(row, member.time));
 
@@ -261,14 +248,14 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	{
 		try 
 		{
-			UUID modeler = lookupModeler(row[modelerPosition]);
-			UUID action = lookupAction(row[actionPosition]);
-			UUID state = lookupState(row[statePosition]);
+			UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
+			UUID action = lookupAction(row[WorkflowHelper.actionPosition]);
+			UUID state = lookupState(row[WorkflowHelper.statePosition]);
 
-			long wfTimestamp = format.parse(row[refsetColumnTimeStampPosition]).getTime();
+			long wfTimestamp = format.parse(row[WorkflowHelper.refsetColumnTimeStampPosition]).getTime();
 
 			
-			writer.setWorkflowUid(UUID.fromString(row[workflowIdPosition]));
+			writer.setWorkflowUid(UUID.fromString(row[WorkflowHelper.workflowIdPosition]));
 			writer.setPathUid(snomedPath);
 			writer.setModelerUid(modeler);
 			writer.setActionUid(action);
@@ -277,10 +264,10 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 			writer.setEffectiveTime(effectiveTimestamp);
 			writer.setAutoApproved(false);
 			writer.setOverride(false);
-			writer.setFSN(row[fsnPosition]);
+			writer.setFSN(row[WorkflowHelper.fsnPosition]);
 
 			// Setting of Concept in writer is not needed for EConcept, but required for valuesExist() method
-			writer.setConceptUid(UUID.fromString(row[conceptIdPosition]));
+			writer.setConceptUid(UUID.fromString(row[WorkflowHelper.conceptIdPosition]));
 			
 			if (writer.getProperties().valuesExist())
 				return writer.fieldsToRefsetString();
