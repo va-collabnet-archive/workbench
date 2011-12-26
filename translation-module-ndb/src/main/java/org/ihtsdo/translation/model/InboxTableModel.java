@@ -2,7 +2,6 @@ package org.ihtsdo.translation.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,28 +13,28 @@ import java.util.concurrent.FutureTask;
 
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
-public class InboxTableModel extends AbstractTableModel {
+public class InboxTableModel extends DefaultTableModel {
 
 	private static final long serialVersionUID = -3295746462823927132L;
 
-	private static final Integer ROW_NUMBER = 0;
-	private static final Integer COMPONENT = 1;
-	private static final Integer TARGET = 2;
-	private static final Integer WORKLIST = 3;
-	private static final Integer DESTINATION = 4;
-	private static final Integer STATE = 5;
+	public static final Integer ROW_NUMBER = 0;
+	public static final Integer COMPONENT = 1;
+	public static final Integer TARGET = 2;
+	public static final Integer WORKLIST = 3;
+	public static final Integer DESTINATION = 4;
+	public static final Integer STATE = 5;
+	public static final Integer WORKFLOW_ITEM = 6;
 
-	private String[] columnNames = { "#", "Component", "Target", "Worklist", "Destination", "State" };
+	private String[] columnNames = { "#", "Component", "Target", "Worklist", "Destination", "State", "wf item" };
 	private Object[][] data = { { "", "", "", "", "", "" } };
 	private WorkflowSearcher searcher;
 	private ArrayList<String> ids;
@@ -81,7 +80,7 @@ public class InboxTableModel extends AbstractTableModel {
 	}
 
 	public int getColumnCount() {
-		return columnNames.length;
+		return columnNames.length - 1;
 	}
 
 	public int getRowCount() {
@@ -97,6 +96,9 @@ public class InboxTableModel extends AbstractTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
+		if(col == 0){
+			return new Integer(row);
+		}
 		return data[row][col];
 	}
 
@@ -190,6 +192,7 @@ public class InboxTableModel extends AbstractTableModel {
 						row[WORKLIST] = tf.getConcept(wfInstance.getWorkListId()).getInitialText();
 						row[DESTINATION] = wfInstance.getDestination().getUsername();
 						row[STATE] = wfInstance.getState().getName();
+						row[WORKFLOW_ITEM] = wfInstance;
 						data[i] = row;
 						i++;
 					}
