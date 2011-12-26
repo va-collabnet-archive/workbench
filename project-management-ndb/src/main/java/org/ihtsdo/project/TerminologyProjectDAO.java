@@ -110,6 +110,7 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 import com.thoughtworks.xstream.XStream;
@@ -522,6 +523,7 @@ public class TerminologyProjectDAO {
 					current, 0, config);
 
 			I_GetConceptData newPromotionConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+			newPromotionConcept.setAnnotationStyleRefex(true);
 			termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 					name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
 			termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
@@ -1655,27 +1657,29 @@ public class TerminologyProjectDAO {
 		try {
 			termFactory.setActiveAceFrameConfig(config);
 			I_GetConceptData newMemberConcept = termFactory.getConcept(member.getUids());
-			boolean alreadyMember = false;
-			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(newMemberConcept.getConceptNid());
 			I_GetConceptData workSetConcept = termFactory.getConcept(member.getWorkSetUUID());
-			for (I_ExtendByRef extension : extensions) {
-				if (workSetConcept.getConceptNid() == extension.getRefsetId()) {
+			boolean alreadyMember = false;
+			Collection<? extends RefexChronicleBI<?>> members = newMemberConcept.getAnnotations();
+			for (RefexChronicleBI<?> promotionMember : members) {
+				if (promotionMember.getCollectionNid() == workSetConcept.getConceptNid()) {
 					alreadyMember = true;
+					I_ExtendByRef extension = termFactory.getExtension(promotionMember.getNid());
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 					if (isInactive(part.getStatusNid())) {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							I_ExtendByRefPartStr newStringPart = (I_ExtendByRefPartStr) part.makeAnalog(
 									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+									config.getDbConfig().getUserConcept().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							extension.addVersion(newStringPart);
 						}
 						termFactory.addUncommittedNoChecks(workSetConcept);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workSetConcept);
-						//						termFactory.commit();
+						WorkSet workset = TerminologyProjectDAO.getWorkSet(workSetConcept, config);
+						PromotionRefset promRef = workset.getPromotionRefset(config);
+						promRef.setPromotionStatus(newMemberConcept.getNid(), SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+						termFactory.addUncommittedNoChecks(newMemberConcept);
 					}
 				}
 			}
@@ -1687,16 +1691,11 @@ public class TerminologyProjectDAO {
 						newMemberConcept.getConceptNid(),
 						EConcept.REFSET_TYPES.STR,
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), config);
-				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workSetConcept.getConceptNid())) {
-					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-						termFactory.addUncommittedNoChecks(workSetConcept);
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(workSetConcept);
-						//						termFactory.commit();
-					}
-				}
+				WorkSet workset = TerminologyProjectDAO.getWorkSet(workSetConcept, config);
+				termFactory.addUncommittedNoChecks(workSetConcept);
+				PromotionRefset promRef = workset.getPromotionRefset(config);
+				promRef.setPromotionStatus(newMemberConcept.getNid(), SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+				termFactory.addUncommittedNoChecks(newMemberConcept);
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
@@ -1969,19 +1968,17 @@ public class TerminologyProjectDAO {
 
 		try {
 			I_GetConceptData workSetRefset = termFactory.getConcept(worksetId);
-
-			termFactory.getAllExtensionsForComponent(workSetMemberConcept.getConceptNid());
-
-			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(workSetMemberConcept.getConceptNid());//workSetMemberConcept.getExtensions();
-			for (I_ExtendByRef extension : extensions) {
-				if (extension.getRefsetId() == workSetRefset.getConceptNid()) {
-					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
-					I_GetConceptData component = termFactory.getConcept(extension.getComponentNid());
-					workSetMember = new WorkSetMember(component.toString(), component.getConceptNid(),
-							component.getUids(), workSetRefset.getUids().iterator().next());
+			WorkSet workset = TerminologyProjectDAO.getWorkSet(workSetRefset, config);
+			PromotionRefset promRefset = workset.getPromotionRefset(config);
+			
+			Collection<? extends RefexChronicleBI<?>> members = workSetMemberConcept.getAnnotations();
+			for (RefexChronicleBI<?> promotionMember : members) {
+				if (promotionMember.getCollectionNid() == promRefset.getRefsetId()) {
+					workSetMember = new WorkSetMember(workSetMemberConcept.toString(), workSetMemberConcept.getConceptNid(),
+							workSetMemberConcept.getUids(), workSetRefset.getUids().iterator().next());
 				}
 			}
+
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

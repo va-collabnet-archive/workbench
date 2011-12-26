@@ -19,6 +19,7 @@ package org.ihtsdo.project.model;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +28,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 /**
  * The Class WorkSet.
@@ -67,7 +70,7 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		this.uids = uids;
 		this.projectUUID = projectUUID;
 	}
-	
+
 	public WorkSet(String name, UUID projectUUID) {
 		super();
 		this.name = name;
@@ -228,12 +231,11 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 
 	public boolean hasMember(I_GetConceptData concept) throws TerminologyException, IOException {
 		boolean hasMember = false;
-		List<WorkSetMember> workSetMembers = getWorkSetMembers();
-		for (WorkSetMember workSetMember : workSetMembers) {
-			for (UUID loopUUID : workSetMember.getUids()) {
-				if (concept.getUids().contains(loopUUID)) {
-					hasMember = true;
-				}
+		Collection<? extends RefexChronicleBI<?>> members = concept.getAnnotations();
+		PromotionRefset promRefset = getPromotionRefset(Terms.get().getActiveAceFrameConfig());
+		for (RefexChronicleBI<?> promotionMember : members) {
+			if (promotionMember.getCollectionNid() == promRefset.getRefsetId()) {
+				hasMember = true;
 			}
 		}
 
@@ -243,19 +245,19 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 	public List<PartitionScheme> getPartitionSchemes(I_ConfigAceFrame config) {
 		return TerminologyProjectDAO.getAllPartitionSchemesForRefsetConcept(this.getConcept(), config);
 	}
-	
+
 	public void sync(I_ConfigAceFrame config) throws Exception {
 		TerminologyProjectDAO.syncWorksetWithRefsetSpec(this, config);
 	}
-	
+
 	public void addRefsetAsExclusion(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.addRefsetAsExclusion(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
-	
+
 	public void removeRefsetAsExclusion(I_GetConceptData refset) throws TerminologyException, IOException {
 		TerminologyProjectDAO.removeRefsetAsExclusion(this, refset, Terms.get().getActiveAceFrameConfig());
 	}
-	
+
 	public List<I_GetConceptData> getExclusionRefsets() throws TerminologyException, IOException {
 		return TerminologyProjectDAO.getExclusionRefsetsForWorkSet(this, Terms.get().getActiveAceFrameConfig());
 	}
