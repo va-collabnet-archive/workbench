@@ -8,8 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -23,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -31,13 +31,18 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceFrameConfig;
+import org.ihtsdo.project.ContextualizedDescription;
+import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.filters.FilterFactory;
 import org.ihtsdo.project.workflow.filters.WfComponentFilter;
 import org.ihtsdo.project.workflow.filters.WfDestinationFilter;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.translation.model.InboxTableModel;
+import org.ihtsdo.translation.ui.config.InboxItemConfigurationPanel;
 
 public class WfInboxPanel extends JPanel {
 	private static final I_TermFactory tf = Terms.get();
@@ -54,6 +59,7 @@ public class WfInboxPanel extends JPanel {
 			provider = new WfComponentProvider();
 			model = new InboxTableModel(progressBar1);
 			inboxTable.setModel(model);
+			inboxTable.setAutoCreateRowSorter(true);
 			filterList = new HashMap<String, WfSearchFilterBI>();
 			if (tf != null) {
 				config = tf.getActiveAceFrameConfig();
@@ -67,7 +73,7 @@ public class WfInboxPanel extends JPanel {
 				public void propertyChange(PropertyChangeEvent arg0) {
 					WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(arg0.getNewValue());
 					Object oldValue = arg0.getOldValue();
-					if(oldValue != null){
+					if (oldValue != null) {
 						WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
 						filterList.remove(oldFilter.getType());
 					}
@@ -133,17 +139,53 @@ public class WfInboxPanel extends JPanel {
 		} catch (ClassCastException cce) {
 			destinationFilter = user;
 		}
-		WfComponentFilter wfCompFilter = new WfComponentFilter(""); 
+		WfComponentFilter wfCompFilter = new WfComponentFilter("");
 		if (!componentFilter.equals("")) {
 			wfCompFilter = new WfComponentFilter(componentFilter);
 			filterList.put(wfCompFilter.getType(), wfCompFilter);
-		}else{
+		} else {
 			filterList.remove(wfCompFilter.getType());
 		}
 
 		if (destinationFilter != null) {
 			WfDestinationFilter df = new WfDestinationFilter(destinationFilter);
 			filterList.put(df.getType(), df);
+		}
+	}
+
+	private void inboxTableMouseClicked(MouseEvent e) {
+		if (e.getClickCount() == 2) {
+			int selectedIndex = inboxTable.getSelectedRow();
+			if (selectedIndex >= 0) {
+				int modelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
+				WfInstance wfInstance = (WfInstance) model.getValueAt(modelRowNum, InboxTableModel.WORKFLOW_ITEM);
+				JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
+				if (tpc != null) {
+					int tabCount = tpc.getTabCount();
+					TranslationPanel uiPanel = null;
+					for (int i = 0; i < tabCount; i++) {
+						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
+							if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
+								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
+								uiPanel.updateUI(wfInstance, false);
+								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
+								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
+									if (!uiPanel.verifySavePending(null, false)) {
+										return;
+									}
+								}
+								break;
+							}
+						}
+
+					}
+					if (uiPanel == null) {
+						uiPanel = new TranslationPanel();
+						tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+						uiPanel.updateUI(wfInstance, false);
+					}
+				}
+			}
 		}
 	}
 
@@ -167,56 +209,44 @@ public class WfInboxPanel extends JPanel {
 		scrollPane1 = new JScrollPane();
 		inboxTable = new JTable();
 
-		//======== this ========
+		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new BorderLayout(5, 5));
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new BorderLayout(5, 5));
 
-			//---- label2 ----
+			// ---- label2 ----
 			label2.setText("Filters:");
 			panel1.add(label2, BorderLayout.WEST);
 
-			//======== panel3 ========
+			// ======== panel3 ========
 			{
 				panel3.setLayout(new GridBagLayout());
-				((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-				((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0, 0};
-				((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0E-4};
-				((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
+				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 
-				//---- label4 ----
+				// ---- label4 ----
 				label4.setText("Component");
-				panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+				panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-				//---- label5 ----
+				// ---- label5 ----
 				label5.setText("Destination");
-				panel3.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
+				panel3.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-				//---- label6 ----
+				// ---- label6 ----
 				label6.setText("State");
-				panel3.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 0), 0, 0));
-				panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
-				panel3.add(destinationCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
-				panel3.add(stateFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+				panel3.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(destinationCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(stateFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			panel1.add(panel3, BorderLayout.CENTER);
 
-			//---- filterButton ----
+			// ---- filterButton ----
 			filterButton.setText(">>>");
 			filterButton.addActionListener(new ActionListener() {
 				@Override
@@ -228,28 +258,34 @@ public class WfInboxPanel extends JPanel {
 		}
 		add(panel1, BorderLayout.NORTH);
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- progressBar1 ----
+			// ---- progressBar1 ----
 			progressBar1.setVisible(false);
-			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel2, BorderLayout.SOUTH);
 
-		//======== splitPane1 ========
+		// ======== splitPane1 ========
 		{
 			splitPane1.setLeftComponent(inboxTreePanel1);
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
+
+				// ---- inboxTable ----
+				inboxTable.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						inboxTableMouseClicked(e);
+					}
+				});
 				scrollPane1.setViewportView(inboxTable);
 			}
 			splitPane1.setRightComponent(scrollPane1);
