@@ -2028,23 +2028,15 @@ public class TerminologyProjectDAO {
 		try {
 			Collection<? extends I_ExtendByRef> membersExtensions  = 
 				termFactory.getRefsetExtensionMembers(workset.getId());
-			List<I_GetConceptData> members = new ArrayList<I_GetConceptData>();
+			Thread.sleep(100);
 			for (I_ExtendByRef extension : membersExtensions) {
 				I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 				if (isActive(lastPart.getStatusNid())) {
-					members.add(termFactory.getConcept(extension.getComponentNid()));
+					workSetMembers.add(getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config));
 				}
 			}
-			for (I_GetConceptData member : members) {
-				I_ConceptAttributePart lastAttributePart = getLastestAttributePart(member);
-				if (isActive(lastAttributePart.getStatusNid())) {
-					workSetMembers.add(getWorkSetMember(member, workset.getId(), config));
-				}
-			}
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return workSetMembers;
 	}
@@ -3985,7 +3977,7 @@ public class TerminologyProjectDAO {
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
 		for (PartitionMember partitionMember: partitionMembers) {
-			sleep(1);
+			Thread.sleep(1);
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
 					partitionMember.getId(),
 					partitionMember.getUids(), null,  
@@ -4002,7 +3994,7 @@ public class TerminologyProjectDAO {
 			if(workList != null){
 				WorkflowInterpreter interpreter = new WorkflowInterpreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
-					sleep(1);
+					Thread.sleep(1);
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
 					WfInstance instance = new WfInstance();
 					WfComponentProvider prov = new WfComponentProvider();
@@ -4208,12 +4200,11 @@ public class TerminologyProjectDAO {
 	}
 
 	public static void sleep(int n){
-		long t0, t1;
-		t0 =  System.currentTimeMillis();
-		do{
-			t1 = System.currentTimeMillis();
+		try {
+			Thread.sleep(n);
+		} catch (InterruptedException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		}
-		while ((t1 - t0) < (n * 1000));
 	}
 
 	public static boolean promoteWorkListContentToReleaseCandidatePath(I_GetConceptData conflictResolutionPathConcept,
