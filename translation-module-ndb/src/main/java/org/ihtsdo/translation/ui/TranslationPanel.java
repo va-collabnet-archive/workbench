@@ -3753,7 +3753,7 @@ public class TranslationPanel extends JPanel {
 		    I_GetConceptData roleConcept = null;
 		    for (WfRole role:roles){
 		    	for (WfPermission perm:perms){
-		    		if (role.getId().toString().equals(perm.getRole())){
+		    		if (role.toString().equals(perm.getRole().toString())){
 		    			userRole=role;
 		    			bExists = true;
 		    			break;

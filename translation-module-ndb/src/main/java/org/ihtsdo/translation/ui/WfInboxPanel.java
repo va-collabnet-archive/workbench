@@ -167,6 +167,8 @@ public class WfInboxPanel extends JPanel {
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
 							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
+
+								tpc.setSelectedIndex(i);
 								uiPanel.updateUI(wfInstance, false);
 								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
 								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
@@ -182,6 +184,8 @@ public class WfInboxPanel extends JPanel {
 					if (uiPanel == null) {
 						uiPanel = new TranslationPanel();
 						tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+
+						tpc.setSelectedIndex(tpc.getTabCount());
 						uiPanel.updateUI(wfInstance, false);
 					}
 				}
