@@ -165,7 +165,7 @@ public class WfInboxPanel extends JPanel {
 					TranslationPanel uiPanel = null;
 					for (int i = 0; i < tabCount; i++) {
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-							if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
+							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
 								uiPanel.updateUI(wfInstance, false);
 								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
