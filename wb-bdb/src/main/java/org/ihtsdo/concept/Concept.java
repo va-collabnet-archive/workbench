@@ -83,7 +83,6 @@ import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 import org.ihtsdo.tk.api.coordinate.KindOfSpec;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
@@ -505,6 +504,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         if ((eConcept.getRefsetMembers() != null) && !eConcept.getRefsetMembers().isEmpty()) {
             if (c.isAnnotationStyleRefex()) {
                 for (TkRefsetAbstractMember<?> er : eConcept.getRefsetMembers()) {
+        			// Workflow refsets handled with WfRefsetChangeSetReader
+                    if (WorkflowHelper.isWorkflowCapabilityAvailable()) {
+	            		if (WorkflowHelper.getRefsetUidList().contains(er.refsetUuid)) {
+							continue;
+	            		}
+	            	}
+
                     ConceptComponent cc;
                     Object referencedComponent = Ts.get().getComponent(er.getComponentUuid());
                     
@@ -681,6 +687,12 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         data.resetNidData();
     }
     
+    public static void resolveUnresolvedAnnotations(List<TkRefsetAbstractMember<?>> annotations) throws IOException {
+    	unresolvedAnnotations = annotations;
+    	
+    	resolveUnresolvedAnnotations();
+    }
+
     public static void resolveUnresolvedAnnotations() throws IOException {
         List<TkRefsetAbstractMember<?>> cantResolve = new ArrayList<TkRefsetAbstractMember<?>>();
         

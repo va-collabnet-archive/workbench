@@ -33,7 +33,7 @@ import org.dwfa.svn.Svn;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
-import org.ihtsdo.cs.econcept.workflow.WfHxLuceneChangeSetReader;
+import org.ihtsdo.cs.econcept.workflow.WfRefsetChangeSetReader;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbPathManager;
 import org.ihtsdo.time.TimeUtil;
@@ -467,7 +467,7 @@ public class SvnHelper {
                 }
                 @Override
                 public I_ReadChangeSet getChangeSetWfHxReader(File csf) {
-                    WfHxLuceneChangeSetReader wcsr = new WfHxLuceneChangeSetReader();
+                    WfRefsetChangeSetReader wcsr = new WfRefsetChangeSetReader();
                     wcsr.setChangeSetFile(csf);
                     return wcsr;
                 }

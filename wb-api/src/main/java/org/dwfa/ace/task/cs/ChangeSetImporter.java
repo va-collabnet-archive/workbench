@@ -158,8 +158,6 @@ public abstract class ChangeSetImporter implements ActionListener {
 		        finalizeWfHxLuceneIndexReaderSet.add(firstFile);
 		
 		        readNext(finalizeWfHxLuceneIndexReaderSet);
-		
-		        WorkflowHelper.clearChangeSetStorage();
 	        }
 	
 	        if (AceLog.getEditLog().isLoggable(Level.INFO)) {

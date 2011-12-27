@@ -3,12 +3,9 @@ package org.ihtsdo.db.bdb;
 //~--- non-JDK imports --------------------------------------------------------
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentDataCheckSelectionListener;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IterateIds;
-import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.IdentifierSet;
 import org.dwfa.ace.api.Terms;
@@ -82,17 +79,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 
@@ -223,17 +217,16 @@ public class BdbCommitManager {
             singleMemberSet.add(extension);
 
             try {
-                Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(singleMemberSet);
+                Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromExtensions(singleMemberSet);
 
-                if (luceneWriter != null) {
-                    luceneWriterService.execute(luceneWriter);
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
+				if (luceneWriter != null) {
+	               luceneWriterService.execute(luceneWriter);
+	            }
+			} catch (InterruptedException e) {
+	            AceLog.getAppLog().info("Adding uncommitted NO checks on extension: " + extension.toString());
+			}
+       }
+   }
 
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
         Concept c = (Concept) concept;
@@ -518,9 +511,7 @@ public class BdbCommitManager {
                                 Set<I_ExtendByRef> wfMembersToCommit =
                                         uncommittedWfMemberIds.getClass().newInstance();
 
-                                wfMembersToCommit.addAll(uncommittedWfMemberIds);
-
-                                Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(wfMembersToCommit);
+                                Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromExtensions(wfMembersToCommit);
 
                                 if (luceneWriter != null) {
                                     luceneWriterService.execute(luceneWriter);
@@ -715,7 +706,7 @@ public class BdbCommitManager {
 
                     wfMembersToCommit.addAll(uncommittedWfMemberIds);
 
-                    Runnable luceneWriter = WfHxLuceneWriterAccessor.prepareWriterWithExtensions(wfMembersToCommit);
+               		Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromExtensions(wfMembersToCommit);
 
                     if (luceneWriter != null) {
                         luceneWriterService.execute(luceneWriter);

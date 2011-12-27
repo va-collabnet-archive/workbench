@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,29 +19,25 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
-import org.ihtsdo.workflow.refset.history.WorkflowHistoryRefsetReader;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WfHxIndexGenerator extends IndexGenerator {
-	private int memberCounter = 0;
-	private int refsetId = 0;
-    private int feedbackInterval = 100;
 	private ViewCoordinate viewCoord;
 	private static File inputFile = null;
     private static Set<WorkflowHistoryJavaBean> wfHxJavaBeansToWrite  = new HashSet<WorkflowHistoryJavaBean>();
     private static Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap = new HashMap<UUID, WorkflowLuceneSearchResult>();
     private static SortedSet<String> semanticTags = null;
+    private HashSet<UUID> conceptsImported = new HashSet<UUID>();
+    private int membersImported = 0;
     
 	public WfHxIndexGenerator(IndexWriter writer, ViewCoordinate vc) throws IOException, ParseException {
 		super(writer);
@@ -50,21 +45,20 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		viewCoord = vc;
 		
 		try {
+			// Prepare Generator
         	initializeSemTags(vc);
-
-        	WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-	    	int searcherId = searcher.getRefsetNid();
-			this.refsetId = searcherId;
-	    	
-			lastBeanInWfMap.clear();
+        	
+	    	lastBeanInWfMap.clear();
 
 			if (inputFile != null) {
+				// Handle if have WfHx Refset file (wfHx.txt)
 				String currentWfId = new String();
 				String line = null;
 				String[] curLastRow = null;
 				
 	        	BufferedReader reader = new BufferedReader(new FileReader(inputFile));    	
 
+	        	// Read file
 	        	while ((line = reader.readLine()) != null)
 	        	{
 	        		if (line.trim().length() == 0) {
@@ -75,6 +69,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 					String wfId = row[WorkflowHelper.workflowIdPosition];
 					
 					if (curLastRow != null) {
+						// Find latest row of WfId
 						if (!currentWfId.equals(wfId)) {
 							vals = new WorkflowLuceneSearchResult(curLastRow, viewCoord);
 							lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
@@ -82,7 +77,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 							curLastRow = row;
 							currentWfId = wfId;
 						} else {
-							
+							// Existing WfId
 							String curLastRowTime = curLastRow[WorkflowHelper.refsetColumnTimeStampPosition];
 							String curRowTime = row[WorkflowHelper.refsetColumnTimeStampPosition];
 							
@@ -101,46 +96,27 @@ public class WfHxIndexGenerator extends IndexGenerator {
 
 	            vals = new WorkflowLuceneSearchResult(curLastRow, viewCoord);
 	            lastBeanInWfMap.put(UUID.fromString(currentWfId), vals);
+	            inputFile = null;
 	        } else {
-				WorkflowHistoryRefsetReader reader = new WorkflowHistoryRefsetReader();
-		        Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(searcherId);
-		        
-		        AceLog.getAppLog().log(Level.INFO, "WfHx Lucene capability must first be built.");
-				AceLog.getAppLog().log(Level.INFO, "About to process: " + members.size() + " values");
-				int progressMilestone = members.size() / 10;
-				
-				int rowsProcessed = 0;
-				int tenthsProcessed = 0;
-				for (I_ExtendByRef row : members) {
-			    	UUID wfId = UUID.fromString(reader.getWorkflowIdAsString(((I_ExtendByRefPartStr)row).getStringValue()));
-					
-			    	
-			    	if (rowsProcessed++ % progressMilestone == 0) {
-			    		AceLog.getAppLog().log(Level.INFO, "Have completed " + tenthsProcessed++ + "0% of the values");
-			    	}
+				AceLog.getAppLog().log(Level.INFO, "About to process all " + Terms.get().getConceptCount() + " concepts and identify their wfHx based refset members");
+	        	
+				// Iterate over all concepts and identify both refset members and annotations
+				WfHxRefsetMembersProcessor annotationProcessor = new WfHxRefsetMembersProcessor();
+				Terms.get().iterateConcepts(annotationProcessor);
 
-			    	if (!lastBeanInWfMap.containsKey(wfId)) {
-			    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), wfId);
-				    	
-			    		if (latestBean == null) {
-			    			latestBean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-			    		}
-			    		
-			    		vals = new WorkflowLuceneSearchResult(latestBean);
-			    		
-			    		lastBeanInWfMap.put(wfId, vals);
-			    	}
-		        }
-
-				AceLog.getAppLog().log(Level.INFO, "WfHx Initialization completed.");
+				AceLog.getAppLog().log(Level.INFO, "WfHx Initialization completed having imported wfHx members into Lucene");
+				AceLog.getAppLog().log(Level.INFO, "Unique concepts imported: " + conceptsImported.size() + " with " + membersImported + " unique members");
 			}
-			
-		} catch (TerminologyException e) {
-		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #3 on bean: " + vals.toString() + " with error: " + e.getMessage());
+		} catch (Exception e) {
+			if (vals != null) {
+				AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #3 on bean: " + vals.toString() + " with error: " + e.getMessage());
+			} else {
+				AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #3 on bean with null vals with error: " + e.getMessage());
+			}
 		}
 	}
 
-	public static void initializeSemTags(ViewCoordinate vc) {
+	static void initializeSemTags(ViewCoordinate vc) {
 		if (semanticTags == null) {
 			try {
 				I_GetConceptData parentSemTagConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getPrimoridalUid());				
@@ -172,68 +148,26 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			}
 		}
 	}
-	
-	private void updateResults() {
-    	if (++memberCounter % feedbackInterval == 0) {
-            System.out.print(".");
-            if (++lineCounter > 80) {
-                lineCounter = 0;
-                System.out.println();
-                System.out.print("members:" + memberCounter);
-            }
-        }
-	}
 
 	@Override
     public void processConceptData(Concept concept) throws Exception {
 		AceLog.getAppLog().log(Level.WARNING, "Do not use I_ProcessConcept mechanism to load WfHx into Lucene");
     }
 
-    public void initializeWfHxLucene() throws Exception {
-    	
-    	Collection<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionMembers(refsetId);
-    	
-    	if (memberCounter == 0) {
-            System.out.print("WfHx Lucene Import: ");
-    	}
-    	
-        for ( I_ExtendByRef row : members) {
-        	// ADD TO Lucene Doc
-
-        	writer.addDocument(createDoc(row));
-        	updateResults();
-        }
+    public void initializeExistingWorkflow() {
+		ViewCoordinate vc = null;
+		
+		try {
+			if (Terms.get().getActiveAceFrameConfig() != null) {
+				vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+			}
+			
+			WfHxLuceneManager.writeToLuceneNoLock(wfHxJavaBeansToWrite, vc);
+		} catch (Exception e) {
+			e.printStackTrace();	
+		}
     }
     
-    public static Document createDoc(I_ExtendByRef row)
-    	throws IOException 
-    {
-		Document doc = new Document();
-		WorkflowHistoryJavaBean bean = null;
-		try {
-			bean = WorkflowHelper.populateWorkflowHistoryJavaBean(row);
-			
-			if (bean != null) {			
-				WorkflowLuceneSearchResult vals = lastBeanInWfMap.get(bean.getWorkflowId());
-				
-				if (vals == null) {
-					WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-		    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(row.getComponentNid(), bean.getWorkflowId());
-		    		vals = new WorkflowLuceneSearchResult(latestBean);
-		    		lastBeanInWfMap.put(bean.getWorkflowId(), vals);
-				}
-
-				doc = createDoc(bean, vals);
-			} else {
-			    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #1 on bean: " + ((I_ExtendByRefPartStr)row).getStringValue());
-			}
-		} catch (Exception e) {
-		    AceLog.getAppLog().log(Level.WARNING, "Lucene Creation Issues #2 on bean: " + bean.toString() + " with error: " + e.getMessage());
-		}
-
-		return doc;
-    }
-
 	public static Document createDoc(WorkflowHistoryJavaBean bean, WorkflowLuceneSearchResult lastBeanInWf) {
 		Document doc = new Document();
 		
@@ -265,8 +199,6 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		doc.add(new Field("lastModeler", lastBeanInWf.modeler, Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("lastTime", Long.toString(lastBeanInWf.time), Field.Store.YES, Field.Index.NO));
 
-		wfHxJavaBeansToWrite.add(bean);
-		
 		return doc;
     }
 
@@ -278,17 +210,60 @@ public class WfHxIndexGenerator extends IndexGenerator {
 			return "";
 		}
 	}
-
-	public static Set<WorkflowHistoryJavaBean> getMemberNids() {
-    	return wfHxJavaBeansToWrite;
-    }
-
 	public static void setSourceInputFile(File wfHxInputFile) {
 		inputFile = wfHxInputFile;
 	}
 	
-	public WorkflowLuceneSearchResult createLastWfIdLucVals(WorkflowHistoryJavaBean bean) {
-		return new WorkflowLuceneSearchResult(bean);
-	}
+	
+	
+	
+	private class WfHxRefsetMembersProcessor implements I_ProcessConcepts {
 
+		int progressMilestone;
+		int conceptsAdded = 0;
+		int membersAdded = 0;
+
+		WorkflowHistoryRefsetSearcher searcher = null;
+		
+		public WfHxRefsetMembersProcessor() {
+	    	
+			try {
+				progressMilestone = Terms.get().getConceptCount() / 5;
+
+				searcher = new WorkflowHistoryRefsetSearcher();
+			} catch (Exception e ) {
+				e.printStackTrace();
+			}
+		}
+		
+		@Override
+		public void processConcept(I_GetConceptData concept) throws Exception {
+	    	if (conceptsAdded++ % progressMilestone == 0) {
+	    		AceLog.getAppLog().log(Level.INFO, "Have completed " + 2 * (conceptsAdded / progressMilestone) + "0% of the values");
+	    	}
+			
+        	TreeSet<WorkflowHistoryJavaBean> allBeans = WorkflowHelper.getWfHxMembersAsBeans(concept);
+        	membersAdded += allBeans.size();
+			wfHxJavaBeansToWrite.addAll(allBeans);
+    		conceptsImported.add(concept.getPrimUuid());
+
+        	for (WorkflowHistoryJavaBean bean : allBeans) {
+        		membersImported++;
+        		UUID wfId = bean.getWorkflowId();
+
+				if (!lastBeanInWfMap.containsKey(wfId)) {
+		    		WorkflowHistoryJavaBean latestBean = searcher.getLatestBeanForWorkflowId(concept.getConceptNid(), wfId);
+			    	
+		    		if (latestBean == null) {
+		    			latestBean = bean;
+		    		}
+		    		
+		    		WorkflowLuceneSearchResult vals = new WorkflowLuceneSearchResult(latestBean);
+		    		
+		    		lastBeanInWfMap.put(wfId, vals);
+		    	}
+			}
+		}
+	}
 }
+

@@ -45,7 +45,6 @@ import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
@@ -54,6 +53,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @AllowDataCheckSuppression
@@ -325,6 +325,8 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             throws Exception {
 
         access();
+        int activeRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
+        int inactiveRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids()[0]);
         // check subject is not already a member
         for (I_ExtendByRef extension : Terms.get().getAllExtensionsForComponent(conceptId)) {
 
@@ -338,17 +340,26 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     }
                 }
 
+                boolean useRf1 = false;
                 if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
-                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, activeRf2);
+
+                    if (!extProps.validate(latestPart)) {
+                    	useRf1 = true;
+                        extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+                    }
                 }
 
                 if (extProps.validate(latestPart)) {
 
                     // found a member to retire
-
-                	I_ExtendByRefPartStr clone =
-                            (I_ExtendByRefPartStr) latestPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), latestPart
-                                .getPathNid(), Long.MAX_VALUE);
+                	I_ExtendByRefPartStr clone = null;
+                	
+                	if (useRf1) {
+	                	clone = (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart.getPathNid(), Long.MAX_VALUE);
+                	} else {
+	                	clone = (I_ExtendByRefPartStr) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
+                	}
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);

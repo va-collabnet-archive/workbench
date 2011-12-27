@@ -362,9 +362,7 @@ public abstract class LuceneManager {
 	}
 
 	public static void createLuceneIndex(LuceneSearchType type) throws Exception {
-		if (type != LuceneSearchType.WORKFLOW_HISTORY) {
-			createLuceneIndex(type, null);
-		}
+		createLuceneIndex(type, null);
 	}
 
 	public static void createLuceneIndex(LuceneSearchType type, ViewCoordinate viewCoord) throws Exception {
@@ -401,8 +399,9 @@ public abstract class LuceneManager {
 			Bdb.getConceptDb().iterateConceptDataInSequence(descIndexer);
 		} else {
 			wfIndexer = new WfHxIndexGenerator(writer, viewCoord);
+			AceLog.getAppLog().info("All concepts initialized.  Write to Lucene Index with starting time: " + timer.getElapsedTime());
+			wfIndexer.initializeExistingWorkflow();
 			AceLog.getAppLog().info("Starting index time: " + timer.getElapsedTime());
-			wfIndexer.initializeWfHxLucene();
 		}
 
 

@@ -137,9 +137,10 @@ import org.ihtsdo.concept.component.relationship.RelationshipRevision;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
-import org.ihtsdo.cs.econcept.workflow.WfHxLuceneChangeSetReader;
+import org.ihtsdo.cs.econcept.workflow.WfRefsetChangeSetReader;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
+import org.ihtsdo.db.bdb.computer.refset.MarkedParentComputer;
 import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
 import org.ihtsdo.db.bdb.computer.refset.MemberRefsetHelper;
@@ -173,7 +174,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
-import org.ihtsdo.db.bdb.computer.refset.*;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -1166,7 +1166,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
    @Override
    public I_ReadChangeSet newWfHxLuceneChangeSetReader(File changeSetFile) throws IOException {
-      WfHxLuceneChangeSetReader wfcr = new WfHxLuceneChangeSetReader();
+      WfRefsetChangeSetReader wfcr = new WfRefsetChangeSetReader();
 
       wfcr.setChangeSetFile(changeSetFile);
 

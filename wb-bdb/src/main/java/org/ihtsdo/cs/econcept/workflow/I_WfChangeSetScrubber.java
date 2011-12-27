@@ -5,7 +5,7 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
 public interface I_WfChangeSetScrubber {
 
-	boolean identifyMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit);
+	boolean scrubMembers(HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit);
 	
-	HashSet<TkRefsetAbstractMember<?>> processScrubbedMembers();
+	HashSet<TkRefsetAbstractMember<?>> getApprovedMembers();
 }
