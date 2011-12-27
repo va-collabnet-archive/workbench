@@ -155,6 +155,7 @@ public class TranslationPanel extends JPanel {
 	private static final String COMMENT_HEADER_SEP = ": -";
 	private static final Object REFSET_COMMENT_NAME = "Language comment";
 	private static final Object WORKLIST_COMMENT_NAME = "Worklist comment";
+	private static final String ACTION_LAUNCHED = null;
 	private TranslationProject translationProject;
 	private I_GetConceptData synonym;
 	private I_GetConceptData fsn;
@@ -1255,6 +1256,8 @@ public class TranslationPanel extends JPanel {
 			try {
 				worker = Terms.get().getActiveAceFrameConfig().getWorker();
 				workflowInterpreter.doAction(instance, action, worker);
+				WfInstance newWfInstance = worklistMember.getWfInstance();
+				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, instance, newWfInstance);
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(this,
@@ -3739,7 +3742,7 @@ public class TranslationPanel extends JPanel {
 		try {
 			this.instance=instance;
 			workflowDefinition = instance.getWfDefinition();
-			workflowInterpreter=new WorkflowInterpreter(workflowDefinition);
+			workflowInterpreter=WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
 			config = Terms.get().getActiveAceFrameConfig();
 			I_GetConceptData workListConcept = Terms.get().getConcept(wlistId);
 			WorkList worklist = TerminologyProjectDAO.getWorkList(workListConcept, config);
