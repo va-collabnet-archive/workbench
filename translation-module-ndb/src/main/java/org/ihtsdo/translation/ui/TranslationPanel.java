@@ -155,7 +155,7 @@ public class TranslationPanel extends JPanel {
 	private static final String COMMENT_HEADER_SEP = ": -";
 	private static final Object REFSET_COMMENT_NAME = "Language comment";
 	private static final Object WORKLIST_COMMENT_NAME = "Worklist comment";
-	private static final String ACTION_LAUNCHED = null;
+	public static final String ACTION_LAUNCHED = "Action launched";
 	private TranslationProject translationProject;
 	private I_GetConceptData synonym;
 	private I_GetConceptData fsn;
