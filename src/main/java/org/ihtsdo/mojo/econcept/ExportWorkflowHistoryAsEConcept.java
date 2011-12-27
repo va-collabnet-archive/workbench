@@ -376,6 +376,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.getPrimoridalUid();
     	} else if (modeler.equalsIgnoreCase("NHS")) {
     		return ArchitectonicAuxiliary.Concept.NHS.getPrimoridalUid();
+    	} else if (modeler.equalsIgnoreCase("phernan")) {
+    		return ArchitectonicAuxiliary.Concept.PENNI_HERNANDEZ.getPrimoridalUid();
     	}
 
     	
