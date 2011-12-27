@@ -2327,7 +2327,7 @@ public class TerminologyProjectDAO {
 					concept.getConceptNid(),
 					concept.getUids(), workList.getUids().iterator().next(),  
 					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
-			WorkflowInterpreter interpreter = new WorkflowInterpreter(workList.getWorkflowDefinition());
+			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			addConceptAsWorkListMember(workListMember,
 					Terms.get().uuidToNative(interpreter.getNextDestination(
 							workListMember.getWfInstance(), 
@@ -3992,7 +3992,7 @@ public class TerminologyProjectDAO {
 			workList.setWorkflowUserRoles(workflowUserRoles);
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
-				WorkflowInterpreter interpreter = new WorkflowInterpreter(workflowDefinition);
+				WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
 				for (WorkListMember workListMember: workListMembers) {
 					Thread.sleep(1);
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());

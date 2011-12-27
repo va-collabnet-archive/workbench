@@ -99,7 +99,7 @@ public class SetWfInstanceNextDestination extends AbstractTask {
 			
 			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
 			
-			WorkflowInterpreter interpreter = new WorkflowInterpreter(instance.getWfDefinition());
+			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(instance.getWfDefinition());
 			
 			WfUser nextDestination = interpreter.getNextDestination(instance, 
 					TerminologyProjectDAO.getWorkList(Terms.get().getConcept(instance.getWorkListId()), config));

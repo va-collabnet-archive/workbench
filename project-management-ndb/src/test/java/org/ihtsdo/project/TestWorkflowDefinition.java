@@ -66,7 +66,7 @@ public class TestWorkflowDefinition extends TestCase {
 		System.out.println("Deleting test fixture");
 		deleteDirectory(new File("berkeley-db"));
 		System.out.println("Creating test fixture");
-		copyDirectory(new File("/Users/ar/Downloads/wb-bundle/berkeley-db"), new File("berkeley-db"));
+		copyDirectory(new File("/Users/ar/Downloads/editor-standalone-1/berkeley-db"), new File("berkeley-db"));
 		vodbDirectory = new File("berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
 		System.out.println("Opening database");

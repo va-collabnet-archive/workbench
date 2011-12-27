@@ -51,7 +51,7 @@ public class TestInterpreter {
 		workList.setWorkflowDefinition(wfDef);
 		workList.setWorkflowUserRoles(getWorkflowMembers(wfDef));
 		
-		WorkflowInterpreter wfInt = new WorkflowInterpreter(wfDef);
+		WorkflowInterpreter wfInt = WorkflowInterpreter.createWorkflowInterpreter(wfDef);
 		
 		for (WfState loopState : wfDef.getStates()) {
 			for (WfMembership loopMember : workList.getWorkflowUserRoles()) {

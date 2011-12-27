@@ -134,7 +134,7 @@ public class TestWorklistAndWorkflow extends TestCase {
 			Terms.get().commit();
 			WorkListMember member = workList.getWorkListMembers().iterator().next();
 			
-			WorkflowInterpreter wfInt = new WorkflowInterpreter(wfDef);
+			WorkflowInterpreter wfInt = WorkflowInterpreter.createWorkflowInterpreter(wfDef);
 			
 			System.out.println(wfInt.getNextDestination(member.getWfInstance(), workList));
 			//workList.getPromotionRefset(config).setPromotionStatus(member.getId(), statusConceptId)

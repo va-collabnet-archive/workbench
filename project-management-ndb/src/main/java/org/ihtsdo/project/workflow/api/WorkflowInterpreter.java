@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,16 +34,26 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
 public class WorkflowInterpreter {
 
-	private WorkflowDefinition wfDefinition;
+	public static WorkflowInterpreter createWorkflowInterpreter(
+			WorkflowDefinition workflowfDefinition) {
+		if (hWfI.containsKey(workflowfDefinition.getName())){
+			return hWfI.get(workflowfDefinition.getName()) ;
+		}
+			
+		return new WorkflowInterpreter(workflowfDefinition);
+	}
+
+	private static HashMap<String,WorkflowInterpreter> hWfI=new HashMap<String,WorkflowInterpreter>();
+	
+	private static WorkflowDefinition wfDefinition;
 	private KnowledgeBase kbase;
 	private StatelessKnowledgeSession ksession;
 	private List<String> actions;
 	private List<String> prepActions;
-
-	public WorkflowInterpreter(WorkflowDefinition wfDefinition) {
+	private WorkflowInterpreter(WorkflowDefinition wfDefinition) {
 		super();
 		this.wfDefinition = wfDefinition;
-
+		
 		if (kbase != null && ksession != null) {
 			// kbase and ksession are singletons
 		} else {
@@ -72,6 +83,8 @@ public class WorkflowInterpreter {
 
 			kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
 			ksession = kbase.newStatelessKnowledgeSession();
+			hWfI.put(wfDefinition.getName(), this);
+			
 		}
 
 	}
