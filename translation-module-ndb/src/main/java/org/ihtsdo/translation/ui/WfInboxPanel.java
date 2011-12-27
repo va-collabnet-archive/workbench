@@ -185,7 +185,7 @@ public class WfInboxPanel extends JPanel {
 						uiPanel = new TranslationPanel();
 						tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
 
-						tpc.setSelectedIndex(tpc.getTabCount());
+						tpc.setSelectedIndex(tpc.getTabCount()-1);
 						uiPanel.updateUI(wfInstance, false);
 					}
 				}
