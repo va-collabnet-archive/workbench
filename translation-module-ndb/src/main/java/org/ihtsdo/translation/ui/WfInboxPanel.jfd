@@ -337,26 +337,52 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormContainer"> 
-          <string>javax.swing.JScrollPane</string> 
+          <string>javax.swing.JPanel</string> 
           <object class="com.jformdesigner.model.FormLayoutManager"> 
-           <class>javax.swing.JScrollPane</class> 
+           <class>java.awt.BorderLayout</class> 
+           <void method="setProperty"> 
+            <string>hgap</string> 
+            <int>5</int> 
+           </void> 
+           <void method="setProperty"> 
+            <string>vgap</string> 
+            <int>5</int> 
+           </void> 
           </object> 
           <void property="name"> 
-           <string>scrollPane1</string> 
+           <string>panel4</string> 
           </void> 
           <void method="add"> 
-           <object class="com.jformdesigner.model.FormComponent"> 
-            <string>javax.swing.JTable</string> 
+           <object class="com.jformdesigner.model.FormContainer"> 
+            <string>javax.swing.JScrollPane</string> 
+            <object class="com.jformdesigner.model.FormLayoutManager"> 
+             <class>javax.swing.JScrollPane</class> 
+            </object> 
             <void property="name"> 
-             <string>inboxTable</string> 
+             <string>scrollPane1</string> 
             </void> 
-            <void method="addEvent"> 
-             <object class="com.jformdesigner.model.FormEvent"> 
-              <string>java.awt.event.MouseListener</string> 
-              <string>mouseClicked</string> 
-              <string>inboxTableMouseClicked</string> 
-              <boolean>true</boolean> 
+            <void method="add"> 
+             <object class="com.jformdesigner.model.FormComponent"> 
+              <string>javax.swing.JTable</string> 
+              <void property="name"> 
+               <string>inboxTable</string> 
+              </void> 
+              <void method="addEvent"> 
+               <object class="com.jformdesigner.model.FormEvent"> 
+                <string>java.awt.event.MouseListener</string> 
+                <string>mouseClicked</string> 
+                <string>inboxTableMouseClicked</string> 
+                <boolean>true</boolean> 
+               </object> 
+              </void> 
              </object> 
+            </void> 
+           </object> 
+           <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+            <class>java.lang.String</class> 
+            <void method="setProperty"> 
+             <string>value</string> 
+             <string>Center</string> 
             </void> 
            </object> 
           </void> 

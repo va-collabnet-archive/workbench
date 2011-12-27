@@ -3,7 +3,10 @@ package org.ihtsdo.translation.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -26,16 +29,15 @@ public class InboxTableModel extends DefaultTableModel {
 
 	private static final long serialVersionUID = -3295746462823927132L;
 
-	public static final Integer ROW_NUMBER = 0;
-	public static final Integer COMPONENT = 1;
-	public static final Integer TARGET = 2;
-	public static final Integer WORKLIST = 3;
-	public static final Integer DESTINATION = 4;
-	public static final Integer STATE = 5;
-	public static final Integer WORKFLOW_ITEM = 6;
+	public static final Integer COMPONENT = 0;
+	public static final Integer TARGET = 1;
+	public static final Integer WORKLIST = 2;
+	public static final Integer DESTINATION = 3;
+	public static final Integer STATE = 4;
+	public static final Integer WORKFLOW_ITEM = 5;
 
-	private String[] columnNames = { "#", "Component", "Target", "Worklist", "Destination", "State", "wf item" };
-	private Object[][] data = { { "", "", "", "", "", "" } };
+	private static String[] columnNames = { "Component", "Target", "Worklist", "Destination", "State", "wf item" };
+	private LinkedList<Object[]> data = new LinkedList<Object[]>();
 	private WorkflowSearcher searcher;
 	private ArrayList<String> ids;
 	private I_TermFactory tf;
@@ -50,9 +52,17 @@ public class InboxTableModel extends DefaultTableModel {
 		this.searcher = new WorkflowSearcher();
 	}
 
+	public void sortArray(int col, boolean ascending) {
+		Collections.sort(data, new ArrayComparator(col, ascending));
+		System.out.println("data sorted");
+		for (Object[] d : data) {
+			System.out.println(d[0] + " " + d[1] + " " + d[2] + " " + d[3] + " " + d[4]);
+		}
+	}
+
 	public void updateTable(Object[][] data) {
 		int i = 0;
-		this.data = new Object[data.length][columnNames.length];
+		this.data = new LinkedList<Object[]>();
 		for (Object[] objects : data) {
 			Object[] row = new Object[columnNames.length];
 			row[0] = i + 1;
@@ -61,7 +71,7 @@ public class InboxTableModel extends DefaultTableModel {
 				row[j] = obj;
 				j++;
 			}
-			this.data[i] = row;
+			this.data.add(row);
 			i++;
 		}
 		fireTableDataChanged();
@@ -84,8 +94,8 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public int getRowCount() {
-		if (data != null) {
-			return data.length;
+		if (data != null && data.size() > 0) {
+			return data.size();
 		} else {
 			return 0;
 		}
@@ -96,10 +106,7 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
-		if(col == 0){
-			return new Integer(row);
-		}
-		return data[row][col];
+		return data.get(row)[col];
 	}
 
 	/*
@@ -132,13 +139,13 @@ public class InboxTableModel extends DefaultTableModel {
 	 * Don't need to implement this method unless your table's data can change.
 	 */
 	public void setValueAt(Object value, int row, int col) {
-		if (col == 0) {
-			data[row][col] = new Integer(row);
-			fireTableCellUpdated(row, col);
-		} else {
-			data[row][col] = value;
-			fireTableCellUpdated(row, col);
-		}
+		data.get(row)[col] = value;
+		fireTableCellUpdated(row, col);
+	}
+
+	@Override
+	public void setRowCount(int rowCount) {
+		super.setRowCount(data.size());
 	}
 
 	class InboxWorker extends SwingWorker<List<WfInstance>, WorkSetMember> {
@@ -182,18 +189,17 @@ public class InboxTableModel extends DefaultTableModel {
 			try {
 				wfInstances = get();
 				if (!isCancelled()) {
-					data = new Object[wfInstances.size()][columnNames.length];
+					data = new LinkedList<Object[]>();
 					int i = 0;
 					for (WfInstance wfInstance : wfInstances) {
 						Object[] row = new Object[columnNames.length];
-						row[ROW_NUMBER] = i + 1;
 						row[COMPONENT] = tf.getConcept(wfInstance.getComponentId()).getInitialText();
 						row[TARGET] = "";
 						row[WORKLIST] = tf.getConcept(wfInstance.getWorkListId()).getInitialText();
 						row[DESTINATION] = wfInstance.getDestination().getUsername();
 						row[STATE] = wfInstance.getState().getName();
 						row[WORKFLOW_ITEM] = wfInstance;
-						data[i] = row;
+						data.add(row);
 						i++;
 					}
 					fireTableDataChanged();
@@ -225,4 +231,18 @@ class ProgressListener implements PropertyChangeListener {
 	}
 
 	private JProgressBar progressBar;
+}
+
+class ArrayComparator implements Comparator<Object[]> {
+	private final int columnToSort;
+	private final boolean ascending;
+
+	public ArrayComparator(int columnToSort, boolean ascending) {
+		this.columnToSort = columnToSort;
+		this.ascending = ascending;
+	}
+
+	public int compare(Object[] c1, Object[] c2) {
+		return ascending ? c1[columnToSort].toString().compareTo(c2[columnToSort].toString()) : c1[columnToSort].toString().compareTo(c2[columnToSort].toString()) * -1;
+	}
 }

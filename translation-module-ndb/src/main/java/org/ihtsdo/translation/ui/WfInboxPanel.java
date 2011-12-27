@@ -8,24 +8,37 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.*;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
+import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -42,7 +55,7 @@ import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.translation.model.InboxTableModel;
-import org.ihtsdo.translation.ui.config.InboxItemConfigurationPanel;
+import org.ihtsdo.translation.model.PagePanel;
 
 public class WfInboxPanel extends JPanel {
 	private static final I_TermFactory tf = Terms.get();
@@ -52,14 +65,17 @@ public class WfInboxPanel extends JPanel {
 	private WfComponentProvider provider;
 	private WfUser user;
 	protected HashMap<String, WfSearchFilterBI> filterList;
+	private TableRowSorter<InboxTableModel> sorter;
 
 	public WfInboxPanel() {
 		initComponents();
 		try {
 			provider = new WfComponentProvider();
 			model = new InboxTableModel(progressBar1);
+			sorter = new TableRowSorter<InboxTableModel>(model);
 			inboxTable.setModel(model);
-			inboxTable.setAutoCreateRowSorter(true);
+			inboxTable.setRowSorter(sorter);
+
 			filterList = new HashMap<String, WfSearchFilterBI>();
 			if (tf != null) {
 				config = tf.getActiveAceFrameConfig();
@@ -81,11 +97,21 @@ public class WfInboxPanel extends JPanel {
 					model.updatePage(filterList);
 				}
 			});
+			
 			updateDestinationCombo();
 			updateFilters();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private RowFilter filter(final int itemsPerPage, final int target) {
+		return new RowFilter() {
+			public boolean include(Entry entry) {
+				int ei = (Integer) entry.getIdentifier();
+				return (target * itemsPerPage <= ei && ei < target * itemsPerPage + itemsPerPage);
+			}
+		};
 	}
 
 	private void updateDestinationCombo() {
@@ -108,17 +134,22 @@ public class WfInboxPanel extends JPanel {
 		WfInboxPanel newContentPane = new WfInboxPanel();
 		newContentPane.setOpaque(true); // content panes must be opaque
 		frame.setContentPane(newContentPane);
+		frame.addWindowStateListener(new WindowStateListener() {
 
+			@Override
+			public void windowStateChanged(WindowEvent e) {
+				System.out.println("resilze");
+			}
+		});
 		// Display the window.
 		frame.pack();
 		frame.setVisible(true);
 
-		Object[][] data = { { "Comp1", "T1", "worklist3", "User1", "escalated" }, { "another component", "T2", "worklist3", "User1", "rechazado" },
-				{ "distinct", "T3", "worklist3", "User2", "Traducido" }, { "pack", "T4", "worklist4", "Alo", "rechazado" }, { "frame", "T5", "worklist3", "ALE", "Traducido" },
-				{ "content", "T6", "worklist4", "Patrix", "Traducido" }, { "Status", "T7", "worklist4", "manu", "escalated" }, { "pane", "Tt", "worklist4", "fulano", "escalated" },
-				{ "update", "cc", "zorklist 6", "montoto", "rechazado" }, { "table", "dd", "aworklist", "montoya", "Traducido" }, { "init", "T1", "aworklist", "alo", "Traducido" },
-				{ "components", "aworklist", "ale", "User1", "escalated" }, { "GEN", "T1", "bworklist", "Manu", "rechazado" }, { "void", "T1", "bworklist", "montoto", "Traducido" },
-				{ "private", "T1", "bworklist", "Patrix", "rechazado" } };
+		Object[][] data = new Object[43][];
+		for (int i = 0; i < 43; i++) {
+			Object[] row = { "a" + i, "b" + i, "c" + i, "d" + i, "e" + i };
+			data[i] = row;
+		}
 		newContentPane.model.updateTable(data);
 	}
 
@@ -165,10 +196,8 @@ public class WfInboxPanel extends JPanel {
 					TranslationPanel uiPanel = null;
 					for (int i = 0; i < tabCount; i++) {
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
+							if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
 								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
-
-								tpc.setSelectedIndex(i);
 								uiPanel.updateUI(wfInstance, false);
 								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
 								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
@@ -184,8 +213,6 @@ public class WfInboxPanel extends JPanel {
 					if (uiPanel == null) {
 						uiPanel = new TranslationPanel();
 						tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-
-						tpc.setSelectedIndex(tpc.getTabCount()-1);
 						uiPanel.updateUI(wfInstance, false);
 					}
 				}
@@ -210,6 +237,7 @@ public class WfInboxPanel extends JPanel {
 		progressBar1 = new JProgressBar();
 		splitPane1 = new JSplitPane();
 		inboxTreePanel1 = new InboxTreePanel();
+		panel4 = new JPanel();
 		scrollPane1 = new JScrollPane();
 		inboxTable = new JTable();
 
@@ -280,19 +308,25 @@ public class WfInboxPanel extends JPanel {
 		{
 			splitPane1.setLeftComponent(inboxTreePanel1);
 
-			// ======== scrollPane1 ========
+			// ======== panel4 ========
 			{
+				panel4.setLayout(new BorderLayout(5, 5));
 
-				// ---- inboxTable ----
-				inboxTable.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						inboxTableMouseClicked(e);
-					}
-				});
-				scrollPane1.setViewportView(inboxTable);
+				// ======== scrollPane1 ========
+				{
+
+					// ---- inboxTable ----
+					inboxTable.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							inboxTableMouseClicked(e);
+						}
+					});
+					scrollPane1.setViewportView(inboxTable);
+				}
+				panel4.add(scrollPane1, BorderLayout.CENTER);
 			}
-			splitPane1.setRightComponent(scrollPane1);
+			splitPane1.setRightComponent(panel4);
 		}
 		add(splitPane1, BorderLayout.CENTER);
 		// //GEN-END:initComponents
@@ -314,8 +348,23 @@ public class WfInboxPanel extends JPanel {
 	private JProgressBar progressBar1;
 	private JSplitPane splitPane1;
 	private InboxTreePanel inboxTreePanel1;
+	private JPanel panel4;
 	private JScrollPane scrollPane1;
 	private JTable inboxTable;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
+}
+
+class ArrayComparator implements Comparator<Object[]> {
+	private final int columnToSort;
+	private final boolean ascending;
+
+	public ArrayComparator(int columnToSort, boolean ascending) {
+		this.columnToSort = columnToSort;
+		this.ascending = ascending;
+	}
+
+	public int compare(Object[] c1, Object[] c2) {
+		return c1[columnToSort].toString().compareTo(c2[columnToSort].toString());
+	}
 }
