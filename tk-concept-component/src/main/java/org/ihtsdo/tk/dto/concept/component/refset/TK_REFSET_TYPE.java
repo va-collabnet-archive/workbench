@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
@@ -38,6 +39,7 @@ public enum TK_REFSET_TYPE {
     CID_FLOAT(11, RefexCnidFloatVersionBI.class),
     CID_LONG(12, RefexCnidLongVersionBI.class),
     LONG(13, RefexLongVersionBI.class),
+    ARRAY_BYTEARRAY(14, RefexArrayOfBytearrayVersionBI.class),
     UNKNOWN(Byte.MAX_VALUE, null);
     private int externalizedToken;
     private Class<? extends RefexVersionBI> rxc;

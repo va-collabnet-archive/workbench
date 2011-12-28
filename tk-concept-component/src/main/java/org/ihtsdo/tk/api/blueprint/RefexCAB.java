@@ -266,6 +266,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         STRING1,
         LONG1,
         FLOAT1,
+        ARRAY_BYTEARRAY,
     }
 
     public UUID getMemberUuid() {
@@ -331,6 +332,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         properties.put(key, value);
         return this;
     }
+    
+    public RefexCAB with(RefexProperty key, byte[][] arrayOfByteArray) {
+        assert key == RefexProperty.ARRAY_BYTEARRAY;
+        properties.put(key, arrayOfByteArray);
+        return this;
+    }
+    
+    
 
     public boolean hasProperty(RefexProperty key) {
         return properties.containsKey(key);

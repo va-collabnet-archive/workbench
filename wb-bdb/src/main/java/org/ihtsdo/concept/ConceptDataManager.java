@@ -281,7 +281,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
     * @see org.ihtsdo.db.bdb.concept.I_ManageConceptData#getDestRels()
     */
    @Override
-   public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException {
+   public List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException { 
 
       // Need to make sure there are no pending db writes prior calling this method.
       BdbCommitManager.waitTillWritesFinished();

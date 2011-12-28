@@ -81,7 +81,7 @@ public interface I_ManageConceptData {
     */
    List<Relationship> getDestRels() throws IOException;
 
-   List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException;
+   List<Relationship> getDestRels(NidSetBI allowedTypes) throws IOException; 
 
    Set<Integer> getImageNids() throws IOException;
 

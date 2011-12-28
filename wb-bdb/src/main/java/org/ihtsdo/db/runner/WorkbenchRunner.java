@@ -148,6 +148,10 @@ public class WorkbenchRunner {
                 BatchActionEditorPanel.batchEditingDisabled = 
                         (Boolean) jiniConfig.getEntry(this.getClass().getName(), "batchEditingDisabled", Boolean.class,
                         Boolean.FALSE);
+                
+                ChangeSetWriterHandler.writeCommitRecord = 
+                        (Boolean) jiniConfig.getEntry(this.getClass().getName(), "writeCommitRecord", Boolean.class,
+                        Boolean.FALSE);
             } else {
                 wbConfigFile = new File("config/wb.config");
             }

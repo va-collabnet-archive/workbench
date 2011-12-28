@@ -46,6 +46,8 @@ public class Type5UuidFactory {
     public static UUID OPCS_CONCEPT_ID = UUID.fromString("26854022-8bd0-11dc-8314-0800200c9a66");
     public static UUID OPCS_DESC_ID = UUID.fromString("26854023-8bd0-11dc-8314-0800200c9a66");
     public static UUID OPCS_REL_ID = UUID.fromString("26854024-8bd0-11dc-8314-0800200c9a66");
+    
+    public static UUID AUTHOR_TIME_ID = UUID.fromString("c6915290-30fc-11e1-b86c-0800200c9a66");
 
     /*
      * public static UUID READV3_CONCEPT_ID =

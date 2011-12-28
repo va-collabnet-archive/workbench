@@ -54,6 +54,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 
 public class EConcept extends TkConcept implements I_AmChangeSetObject {
    public static final long serialVersionUID = 1;
@@ -207,21 +211,23 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       CID_STR(10, RefsetAuxiliary.Concept.CONCEPT_STRING_EXTENSION, I_ExtendByRefPartStr.class), 
       CID_FLOAT(11, RefsetAuxiliary.Concept.MEASUREMENT_EXTENSION, I_ExtendByRefPartCidFloat.class), 
       CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
-      LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class);
+      LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class),
+      ARRAY_OF_BYTEARRAY(14, RefsetAuxiliary.Concept.ARRAY_OF_BYTEARRAY_EXTENSION, 
+              RefexArrayOfBytearrayVersionBI.class);
 
       private static Map<Integer, REFSET_TYPES> nidTypeMap;
 
       //~--- fields -----------------------------------------------------------
 
       private int                                externalizedToken;
-      private Class<? extends I_ExtendByRefPart> partClass;
+      private Class<? extends RefexVersionBI> partClass;
       private RefsetAuxiliary.Concept            typeConcept;
       private int                                typeNid;
 
       //~--- constructors -----------------------------------------------------
 
       REFSET_TYPES(int externalizedToken, RefsetAuxiliary.Concept typeConcept,
-                   Class<? extends I_ExtendByRefPart> partClass) {
+                   Class<? extends RefexVersionBI> partClass) {
          this.externalizedToken = externalizedToken;
          this.typeConcept       = typeConcept;
          this.partClass         = partClass;
@@ -256,6 +262,8 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
             return LONG;
          } else if (I_ExtendByRefPartStr.class.isAssignableFrom(partType)) {
             return STR;
+         } else if (RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(partType)) {
+            return ARRAY_OF_BYTEARRAY;
          }
 
          throw new UnsupportedOperationException("Unsupported refset type: " + partType);
@@ -325,6 +333,8 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
 
          case 13 :
             return LONG;
+         case 14: 
+             return ARRAY_OF_BYTEARRAY;
          }
 
          throw new UnsupportedOperationException("Can't handle refset type: " + type);
@@ -356,7 +366,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
 
       //~--- get methods ------------------------------------------------------
 
-      public Class<? extends I_ExtendByRefPart> getPartClass() {
+      public Class<? extends RefexVersionBI> getPartClass() {
          return partClass;
       }
 
@@ -450,6 +460,9 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
 
          case CID_STR :
             return new ERefsetCidStrMember(m);
+             
+         case ARRAY_OF_BYTEARRAY:
+             return new TkRefsetArrayOfBytearrayMember((RefexChronicleBI) m);
 
          default :
             throw new UnsupportedOperationException("Cannot handle: " + type);
