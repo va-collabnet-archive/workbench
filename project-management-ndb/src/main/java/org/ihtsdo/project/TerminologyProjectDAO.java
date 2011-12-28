@@ -3705,16 +3705,10 @@ public class TerminologyProjectDAO {
 		return latestTarget;
 	}
 
-	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config) throws Exception {
-		I_ShowActivity activity =
-			Terms.get().newActivityPanel(true, config, "<html>Synchronizing workset from source refset: <br>", true);
-		activity.setIndeterminate(true);
+	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config
+			, I_ShowActivity activity) throws Exception {
+		
 		long startTime = System.currentTimeMillis();
-		try {
-			ActivityViewer.addActivity(activity);
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
 
 		try {
 			if (!workSet.getPartitionSchemes(config).isEmpty()) {
@@ -3732,7 +3726,13 @@ public class TerminologyProjectDAO {
 			List<Integer> includedConcepts = new ArrayList<Integer>();
 
 			List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
-
+			
+			activity.setValue(0);
+			activity.setMaximum(exclusionRefsets.size());
+			activity.setIndeterminate(false);
+			activity.setProgressInfoLower("Loading exlusions...");
+			int counter = 0;
+			
 			for (I_GetConceptData loopRefset : exclusionRefsets) {
 				Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
 					termFactory.getRefsetExtensionMembers(
@@ -3743,10 +3743,19 @@ public class TerminologyProjectDAO {
 						excludedConcepts.add(loopRefsetMember.getComponentNid());
 					}
 				}
+				counter++;
+				activity.setValue(counter);
 			}
-
+			
 			Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
 					refsetConc.getConceptNid());
+			
+			activity.setValue(0);
+			activity.setMaximum(refsetMembers.size());
+			activity.setIndeterminate(false);
+			activity.setProgressInfoLower("Iterating source refset members");
+			counter = 0;
+			
 			int countIncluded = 0;
 			int countExcluded = 0;
 			int countRetired = 0;
@@ -3755,7 +3764,6 @@ public class TerminologyProjectDAO {
 				I_ExtendByRefPart lastPart = getLastExtensionPart(refsetMember);
 				if (isActive(lastPart.getStatusNid())) {
 					I_GetConceptData memberConcept = termFactory.getConcept(refsetMember.getComponentNid());
-					// TODO: Unique in project clause
 					boolean uniqueInProject = true;
 					for (WorkSet loopWorkSet : workSet.getProject(config).getWorkSets(config)) {
 						if (loopWorkSet.getId() != workSet.getId() &&
@@ -3781,9 +3789,21 @@ public class TerminologyProjectDAO {
 						countNotUnique++;
 					}
 				}
+				counter++;
+				activity.setValue(counter);
+				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
+					activity.setProgressInfoLower("Iterating source refset members: " + counter + 
+							" from " + activity.getMaximum());
+				}
 			}
 
 			List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
+			
+			activity.setValue(0);
+			activity.setMaximum(workSetMembers.size());
+			activity.setIndeterminate(false);
+			activity.setProgressInfoLower("Checking exclusions...");
+			counter = 0;
 
 			for (WorkSetMember loopMember : workSetMembers) {
 				if (excludedConcepts.contains(loopMember.getId())) {
@@ -3793,26 +3813,9 @@ public class TerminologyProjectDAO {
 					retireWorkSetMember(loopMember);
 					countRetired++;
 				}
+				counter++;
+				activity.setValue(counter);
 			}
-
-			//		for (WorkSetMember loopMember : workSetMembers) {
-			//			boolean isCurrentMemberOfRefset = false;
-			//			if (!excludedConcepts.contains(loopMember.getId())) {
-			//				I_GetConceptData loopConcept = termFactory.getConcept(loopMember.getId());
-			//				Collection<? extends I_ExtendByRef> conceptExtensions = loopConcept.getExtensions();
-			//				for (I_ExtendByRef extension : conceptExtensions) {
-			//					if (refsetConc.getConceptId() == extension.getRefsetId()) {
-			//						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
-			//						if (isActive(lastPart.getStatusNid())) {
-			//							isCurrentMemberOfRefset = true;
-			//						}
-			//					}
-			//				}
-			//			}
-			//			if (!isCurrentMemberOfRefset) {
-			//				retireWorkSetMember(loopMember);
-			//			}
-			//		}
 
 			termFactory.commit();
 
@@ -3821,13 +3824,7 @@ public class TerminologyProjectDAO {
 			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
 					" , ret = " + countRetired + " , not unique = " + countNotUnique);
-			activity.complete();
 		} catch (Exception e) {
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; Error ");
-			activity.complete();
 			e.printStackTrace();
 		}
 
@@ -3970,12 +3967,15 @@ public class TerminologyProjectDAO {
 	public static WorkList generateWorkListFromPartition(Partition partition, 
 			WorkflowDefinition workflowDefinition,
 			List<WfMembership> workflowUserRoles, 
-			String name, I_ConfigAceFrame config) throws Exception {
+			String name, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
 		WfUser user = null;
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
+		activity.setValue(0);
+		activity.setMaximum(partitionMembers.size());
+		activity.setIndeterminate(false);
 		for (PartitionMember partitionMember: partitionMembers) {
 			Thread.sleep(1);
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
@@ -3993,6 +3993,7 @@ public class TerminologyProjectDAO {
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
 				WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
+				int counter = 0;
 				for (WorkListMember workListMember: workListMembers) {
 					Thread.sleep(1);
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
@@ -4015,9 +4016,15 @@ public class TerminologyProjectDAO {
 					addConceptAsWorkListMember(workListMember, 
 							Terms.get().uuidToNative(instance.getDestination().getId()),
 							config);
+					counter++;
+					activity.setValue(counter);
+					if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
+						activity.setProgressInfoLower("Processed: " + counter + " from " + activity.getMaximum());
+					}
 				}
 			}
 		}
+		
 		Terms.get().commit();
 		
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);

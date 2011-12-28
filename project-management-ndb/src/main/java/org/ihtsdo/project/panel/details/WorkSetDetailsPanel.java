@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -59,15 +60,20 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
@@ -341,8 +347,16 @@ public class WorkSetDetailsPanel extends JPanel {
 
 						Thread appThr = new Thread() {
 							public void run() {
+								I_ShowActivity activity =
+									Terms.get().newActivityPanel(true, config, "<html>Synchronizing workset from source refset: <br>", true);
+								activity.setIndeterminate(true);
 								try {
-									workSet.sync(config);
+									ActivityViewer.addActivity(activity);
+								} catch (Exception e1) {
+									AceLog.getAppLog().alertAndLogException(e1);
+								}
+								try {
+									workSet.sync(config, activity);
 									Terms.get().commit();
 								} catch (Exception e) {
 									e.printStackTrace();
@@ -350,7 +364,22 @@ public class WorkSetDetailsPanel extends JPanel {
 								updateList4Content();
 								pBarS.setVisible(false);
 								JOptionPane.showMessageDialog(WorkSetDetailsPanel.this, "WorkSet synchronized!", "Message", JOptionPane.INFORMATION_MESSAGE);
-
+								
+								activity.setProgressInfoUpper("WorkSet synchronized...");
+								try {
+									activity.complete();
+								} catch (CancellationException ce) {
+									activity.setProgressInfoLower("Canceled");
+									try {
+										activity.complete();
+									} catch (ComputationCanceled e) {
+										activity.setProgressInfoLower("Canceled");
+									}
+								} catch (Exception e){
+									activity.setProgressInfoLower("Canceled with error");
+									e.printStackTrace();
+								}
+								
 								SwingUtilities.invokeLater(new Runnable() {
 									public void run() {
 										TranslationHelperPanel.refreshProjectPanelNode(config);

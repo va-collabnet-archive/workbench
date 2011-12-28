@@ -279,7 +279,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 			assertEquals(refset.getConceptNid(), workSet1.getSourceRefset().getConceptNid());
 
 			assertEquals(0, workSet1.getWorkSetMembers().size());
-			workSet1.sync(config);
+			workSet1.sync(config, Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
 			tf.commit();
 			sleep(1);
 			assertEquals(19, workSet1.getWorkSetMembers().size());
@@ -296,7 +296,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 			tf.commit();
 			sleep(1);
 			assertEquals(20, tf.getRefsetExtensionMembers(refset.getConceptNid()).size());
-			workSet1.sync(config);
+			workSet1.sync(config, Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
 			tf.commit();
 			sleep(1);
 			assertEquals(20, workSet1.getWorkSetMembers().size());
@@ -322,7 +322,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 				}
 			}
 			tf.commit(); sleep(1);
-			workSet1.sync(config);
+			workSet1.sync(config, Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
 			assertEquals(20, workSet1.getWorkSetMembers().size());
 
 			assertEquals(0, workSet1.getPartitionSchemes(config).size());

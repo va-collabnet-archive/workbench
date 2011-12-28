@@ -130,7 +130,8 @@ public class TestWorklistAndWorkflow extends TestCase {
 			Partition partition = TerminologyProjectDAO.getPartition(partitionConcept, config);
 			WorkflowDefinition wfDef = getWfDefinition();
 			WorkList workList = TerminologyProjectDAO.generateWorkListFromPartition(partition, 
-					wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config);
+					wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config,
+					Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
 			Terms.get().commit();
 			WorkListMember member = workList.getWorkListMembers().iterator().next();
 			

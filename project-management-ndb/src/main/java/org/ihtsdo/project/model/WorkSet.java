@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
@@ -246,8 +247,8 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		return TerminologyProjectDAO.getAllPartitionSchemesForRefsetConcept(this.getConcept(), config);
 	}
 
-	public void sync(I_ConfigAceFrame config) throws Exception {
-		TerminologyProjectDAO.syncWorksetWithRefsetSpec(this, config);
+	public void sync(I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
+		TerminologyProjectDAO.syncWorksetWithRefsetSpec(this, config, activity);
 	}
 
 	public void addRefsetAsExclusion(I_GetConceptData refset) throws TerminologyException, IOException {

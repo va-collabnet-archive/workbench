@@ -28,11 +28,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -64,6 +62,7 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
 import org.ihtsdo.project.model.Partition;
@@ -275,12 +274,15 @@ public class PartitionDetailsPanel extends JPanel {
 		}
 
 		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
+		activity.setIndeterminate(true);
+		final Long startTime = System.currentTimeMillis();
 		worker = new SwingWorker<String, String>() {
 			@Override
 			protected String doInBackground() throws Exception {
 
 				try {
-					TerminologyProjectDAO.generateWorkListFromPartition(partition, workflowDefinition, workflowUserRoles, noName, config);
+					TerminologyProjectDAO.generateWorkListFromPartition(partition, workflowDefinition, 
+							workflowUserRoles, noName, config, activity);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(PartitionDetailsPanel.this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -293,17 +295,24 @@ public class PartitionDetailsPanel extends JPanel {
 			protected void done() {
 				try {
 					get();
+					long endTime = System.currentTimeMillis();
+
+					long elapsed = endTime - startTime;
+					String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+
+					activity.setProgressInfoUpper("Worklist created...");
+					activity.setProgressInfoLower("Elapsed: " + elapsedStr);
 					activity.complete();
-					activity.removeActivityFromViewer();
-					activity.setProgressInfoLower("Done");
+
 				} catch (CancellationException ce) {
 					activity.setProgressInfoLower("Canceled");
 					try {
 						activity.complete();
 					} catch (ComputationCanceled e) {
-						activity.setProgressInfoLower("Done");
+						activity.setProgressInfoLower("Canceled");
 					}
 				} catch (Exception e){
+					activity.setProgressInfoLower("Canceled with error");
 					e.printStackTrace();
 				}
 			}
@@ -316,10 +325,15 @@ public class PartitionDetailsPanel extends JPanel {
 				worker.cancel(true);
 			}
 		});
-		activity.setValue(0);
-		activity.setIndeterminate(true);
 		try {
 			ActivityViewer.addActivity(activity);
+		} catch (InterruptedException i1) {
+			// thread canceled, cancel db changes
+			try {
+				Terms.get().cancel();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		} catch (Exception e1) {
 			AceLog.getAppLog().alertAndLogException(e1);
 		}
