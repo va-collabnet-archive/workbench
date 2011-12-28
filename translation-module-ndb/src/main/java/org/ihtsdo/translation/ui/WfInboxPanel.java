@@ -206,7 +206,6 @@ public class WfInboxPanel extends JPanel {
 				if (uiPanel == null) {
 					uiPanel = new TranslationPanel();
 					tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-					tpc.setSelectedIndex(tpc.getTabCount()-1);
 					uiPanel.updateUI(wfInstance, false);
 					uiPanel.addPropertyChangeListener(new PropertyChangeListener() {
 						@Override
@@ -223,12 +222,16 @@ public class WfInboxPanel extends JPanel {
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
 							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
-								tpc.setSelectedIndex(i);
+								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
+								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
+									if (!uiPanel.verifySavePending(null, false)) {
+										return;
+									}
+								}
 								uiPanel.updateUI(wfInstance, false);
 								if (currentRow != null) {
 									model.addRow(currentRow);
 								}
-								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
 								break;
 							}
 						}
