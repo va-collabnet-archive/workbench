@@ -16,7 +16,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -32,12 +31,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.RowSorter.SortKey;
-import javax.swing.SortOrder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.RowSorterEvent;
-import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -54,8 +48,8 @@ import org.ihtsdo.project.workflow.filters.WfDestinationFilter;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.model.InboxTableModel;
-import org.ihtsdo.translation.model.PagePanel;
 
 public class WfInboxPanel extends JPanel {
 	private static final I_TermFactory tf = Terms.get();
@@ -66,8 +60,11 @@ public class WfInboxPanel extends JPanel {
 	private WfUser user;
 	protected HashMap<String, WfSearchFilterBI> filterList;
 	private TableRowSorter<InboxTableModel> sorter;
+	private TranslationPanel uiPanel;
+	private int nextIndex = 0;
 
 	public WfInboxPanel() {
+
 		initComponents();
 		try {
 			provider = new WfComponentProvider();
@@ -97,21 +94,12 @@ public class WfInboxPanel extends JPanel {
 					model.updatePage(filterList);
 				}
 			});
-			
+
 			updateDestinationCombo();
 			updateFilters();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	private RowFilter filter(final int itemsPerPage, final int target) {
-		return new RowFilter() {
-			public boolean include(Entry entry) {
-				int ei = (Integer) entry.getIdentifier();
-				return (target * itemsPerPage <= ei && ei < target * itemsPerPage + itemsPerPage);
-			}
-		};
 	}
 
 	private void updateDestinationCombo() {
@@ -188,17 +176,50 @@ public class WfInboxPanel extends JPanel {
 		if (e.getClickCount() == 2) {
 			int selectedIndex = inboxTable.getSelectedRow();
 			if (selectedIndex >= 0) {
+
+				ConfigTranslationModule cfg = null;
+				try {
+					cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				if ((selectedIndex + 1) < model.getRowCount()) {
+					if (cfg != null && cfg.isAutoOpenNextInboxItem()) {
+						nextIndex = selectedIndex + 1;
+					}
+				}
+
 				int modelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
+				
 				WfInstance wfInstance = (WfInstance) model.getValueAt(modelRowNum, InboxTableModel.WORKFLOW_ITEM);
+				model.getRow(modelRowNum);
 				JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
-				if (tpc != null) {
+				model.removeRow(modelRowNum);
+				inboxTable.setRowSelectionInterval(nextIndex, nextIndex);
+				
+				if (uiPanel == null) {
+					uiPanel = new TranslationPanel();
+					tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+					uiPanel.updateUI(wfInstance, false);
+					uiPanel.addPropertyChangeListener(new PropertyChangeListener() {
+						@Override
+						public void propertyChange(PropertyChangeEvent arg0) {
+							if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
+								arg0.getNewValue();
+								arg0.getOldValue();
+							}
+						}
+					});
+				} else if (tpc != null) {
 					int tabCount = tpc.getTabCount();
-					TranslationPanel uiPanel = null;
 					for (int i = 0; i < tabCount; i++) {
 						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-							if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
+							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
 								uiPanel.updateUI(wfInstance, false);
+								
+								
+								
 								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
 								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
 									if (!uiPanel.verifySavePending(null, false)) {
@@ -209,11 +230,6 @@ public class WfInboxPanel extends JPanel {
 							}
 						}
 
-					}
-					if (uiPanel == null) {
-						uiPanel = new TranslationPanel();
-						tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-						uiPanel.updateUI(wfInstance, false);
 					}
 				}
 			}
