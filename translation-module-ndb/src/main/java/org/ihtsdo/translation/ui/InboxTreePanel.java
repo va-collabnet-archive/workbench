@@ -386,14 +386,16 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	@Override
 	protected void process(List<InboxTreeItem> chunks) {
 		for (InboxTreeItem inboxTreeItem : chunks) {
-			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
-			if (inboxTreeItem.getUserObject() instanceof WorkList) {
-				wNode.add(chldNode);
-			} else if (inboxTreeItem.getUserObject() instanceof WfState) {
-				sNode.add(chldNode);
+			if (inboxTreeItem.getItemSize() > 0) {
+				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+				if (inboxTreeItem.getUserObject() instanceof WorkList) {
+					wNode.add(chldNode);
+				} else if (inboxTreeItem.getUserObject() instanceof WfState) {
+					sNode.add(chldNode);
+				}
+				model.reload(wNode);
+				model.reload(sNode);
 			}
-			model.reload(wNode);
-			model.reload(sNode);
 		}
 	}
 
