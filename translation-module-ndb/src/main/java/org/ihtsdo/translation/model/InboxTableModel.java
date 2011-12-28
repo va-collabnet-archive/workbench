@@ -16,6 +16,7 @@ import java.util.concurrent.FutureTask;
 
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_TermFactory;
@@ -58,6 +59,17 @@ public class InboxTableModel extends DefaultTableModel {
 		for (Object[] d : data) {
 			System.out.println(d[0] + " " + d[1] + " " + d[2] + " " + d[3] + " " + d[4]);
 		}
+	}
+
+	public Object[] getRow(int rowNum) {
+		return data.get(rowNum);
+	}
+
+	@Override
+	public void addRow(Object[] rowData) {
+		int rowIndex = dataVector.size();
+		data.add(rowData);
+		fireTableChanged(new TableModelEvent(this, rowIndex, rowIndex, -1, TableModelEvent.INSERT));
 	}
 
 	public void updateTable(Object[][] data) {
@@ -107,6 +119,12 @@ public class InboxTableModel extends DefaultTableModel {
 
 	public Object getValueAt(int row, int col) {
 		return data.get(row)[col];
+	}
+
+	@Override
+	public void removeRow(int row) {
+		data.remove(row);
+		fireTableRowsDeleted(row, row);
 	}
 
 	/*
