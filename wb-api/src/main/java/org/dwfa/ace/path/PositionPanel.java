@@ -218,7 +218,7 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
         this.selectPositionCheckBox.setSelected(false);
         this.editOnPathCheckBox = new JCheckBox("Edit on this path");
         this.editOnPathCheckBox.setSelected(aceConfig.getEditingPathSet().contains(path));
-        this.promoteToPathCheckBox = new JCheckBox("Promote to this path");
+        this.promoteToPathCheckBox = new JCheckBox("Adjudicate on this path");
         this.promoteToPathCheckBox.setSelected(aceConfig.getPromotionPathSet().contains(path));
 
         this.selectGlue = selectGlue;
@@ -299,11 +299,12 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
             c.gridy++;
             sliderPanel.add(this.selectPositionCheckBox, c);
         }
-        c.gridy++;
         if (selectPositionOnly == false) {
             colorPath.addItemListener(this);
+            c.gridx = c.gridx + c.gridwidth;
             sliderPanel.add(this.colorPath, c);
         }
+        c.gridx = 0;
         c.gridy++;
         JPanel fill = new JPanel();
         fill.setBorder(BorderFactory.createEmptyBorder(2, 2, 1, 1));
@@ -379,7 +380,12 @@ public class PositionPanel extends GridBagPanel implements ChangeListener, ItemL
             this.fineControl.addChangeListener(this);
             c.gridheight = 1;
             c.gridy++;
+            c.weightx = 1.0;
+            c.fill = GridBagConstraints.BOTH;
             sliderPanel.add(this.fineControl, c);
+            
+            c.weightx = 0.0;
+            c.fill = GridBagConstraints.NONE;
 
             c.gridy++;
             dateForLabel = dates.get(0);

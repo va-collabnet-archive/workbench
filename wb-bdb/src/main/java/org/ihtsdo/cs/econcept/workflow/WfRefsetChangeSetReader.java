@@ -39,414 +39,412 @@ import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
- * Read Changeset files already imported searching for WfHx records in the
- * changesets. If found, add changes to WfHxLucene Directory.
+ * Read Changeset files already imported searching for WfHx records in the changesets. If found, add changes
+ * to WfHxLucene Directory.
  *
  * @author Jesse Efron
  */
 public class WfRefsetChangeSetReader implements I_ReadChangeSet {
-	private static final long serialVersionUID = 1L;
 
-	private File changeSetFile;
-	private File csreFile;
-	private File csrcFile;
-	private DataInputStream dataStream;
-	private transient FileWriter csreOut;
-	private transient FileWriter csrcOut;
+    private static final long serialVersionUID = 1L;
+    private File changeSetFile;
+    private File csreFile;
+    private File csrcFile;
+    private DataInputStream dataStream;
+    private transient FileWriter csreOut;
+    private transient FileWriter csrcOut;
+    private I_Count counter;
+    private int count = 0;
+    private int conceptCount = 0;
+    private Long nextCommit;
+    private boolean noCommit = false;
+    private boolean initialized = false;
+    private String nextCommitStr;
+    private final String wfPropertySuffix = "-WF";
+    private static File firstFileRead = null;
+    private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
+    private static HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefsetAbstractMember<?>>();
+    private static List<TkRefsetAbstractMember<?>> unresolvedAnnotations = new ArrayList<TkRefsetAbstractMember<?>>();
+    private static WfConceptToRefsetMembersMap membersMap = new WfConceptToRefsetMembersMap();
 
-	private I_Count counter;
+    @Override
+    public long nextCommitTime() throws IOException, ClassNotFoundException {
+        lazyInit();
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+            return Long.MAX_VALUE;
+        }
 
-	private int count = 0;
-	private int conceptCount = 0;
-	private Long nextCommit;
-	private boolean noCommit = false;
-	private boolean initialized = false;
-	private String nextCommitStr;
-	private final String wfPropertySuffix = "-WF";
-	
-	private static File firstFileRead = null;
-	private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<I_ValidateChangeSetChanges>();
+        if (nextCommit == null) {
+            if (dataStream == null) {
+                nextCommit = Long.MAX_VALUE;
+                nextCommitStr = "end of time";
+            } else {
+                try {
+                    nextCommit = dataStream.readLong();
+                    assert nextCommit != Long.MAX_VALUE;
+                    nextCommitStr = TimeHelper.getFileDateFormat().format(
+                            new Date(nextCommit));
+                } catch (EOFException e) {
+                    AceLog.getAppLog().info(
+                            "No next commit time for file: " + changeSetFile);
+                    nextCommit = Long.MAX_VALUE;
+                    nextCommitStr = "end of time";
+                }
+            }
+        }
+        return nextCommit;
+    }
 
-	private static HashSet<TkRefsetAbstractMember<?>> wfMembersToCommit = new HashSet<TkRefsetAbstractMember<?>>();
-	private static List<TkRefsetAbstractMember<?>> unresolvedAnnotations = new ArrayList<TkRefsetAbstractMember<?>>();
-	private static WfConceptToRefsetMembersMap membersMap = new WfConceptToRefsetMembersMap();
+    @Override
+    public void readUntil(long endTime) throws IOException,
+            ClassNotFoundException {
+        HashSet<TimePathId> values = new HashSet<TimePathId>();
 
-	@Override
-	public long nextCommitTime() throws IOException, ClassNotFoundException {
-		lazyInit();
-		if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
-			return Long.MAX_VALUE;
-		}
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+            // Close previous error files of previous filters (does nothing if logging is off)
+            for (AbstractWfChangeSetFilter scrubber : getPerChangesetWorkflowFilters()) {
+                scrubber.closeErrorFile();
+            }
 
-		if (nextCommit == null) {
-			try {
-				nextCommit = dataStream.readLong();
-				assert nextCommit != Long.MAX_VALUE;
-				nextCommitStr = TimeHelper.getFileDateFormat().format(
-						new Date(nextCommit));
-			} catch (EOFException e) {
-				AceLog.getAppLog().info(
-						"No next commit time for file: " + changeSetFile);
-				nextCommit = Long.MAX_VALUE;
-				nextCommitStr = "end of time";
-			}
-		}
+            // Get All Refset Members found in all Change Set files
+            HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
+            membersToScrub.addAll(membersMap.getAllMembers());
 
-		return nextCommit;
-	}
+            // Filter out based on across-all-changesets filters
+            for (AbstractWfChangeSetFilter scrubber : getAllChangesetsWorkflowFilters()) {
+                if (scrubber.scrubMembers(membersToScrub)) {
+                    membersToScrub = scrubber.getApprovedMembers();
+                }
+                scrubber.closeErrorFile();
+            }
 
-	@Override
-	public void readUntil(long endTime) throws IOException,
-			ClassNotFoundException {
-		HashSet<TimePathId> values = new HashSet<TimePathId>();
+            wfMembersToCommit.clear();
+            wfMembersToCommit.addAll(membersToScrub);
 
-		if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
-	        // Close previous error files of previous filters (does nothing if logging is off)
-        	for (AbstractWfChangeSetFilter scrubber : getPerChangesetWorkflowFilters()) {
-        		scrubber.closeErrorFile();
-        	}
+            // Done Scrubbing, now commit wfMembersToCommit into the workflow refsets
+            importWfRefsetMembers();
 
-			// Get All Refset Members found in all Change Set files
-	        HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
-	        membersToScrub.addAll(membersMap.getAllMembers());
-        	
-        	// Filter out based on across-all-changesets filters
-        	for (AbstractWfChangeSetFilter scrubber : getAllChangesetsWorkflowFilters()) {
-	        	if (scrubber.scrubMembers(membersToScrub)) {
-	        		membersToScrub = scrubber.getApprovedMembers();
-	        	}
-	        	scrubber.closeErrorFile();
-        	}
+            // Update the WfHx Refset based on wfMembersToCommit as well
+            updateWfHxLuceneIndex();
 
-        	wfMembersToCommit.clear();
-        	wfMembersToCommit.addAll(membersToScrub);
-			
-			// Done Scrubbing, now commit wfMembersToCommit into the workflow refsets
-			importWfRefsetMembers();
+            // Clear for future imports
+            unresolvedAnnotations.clear();
+            membersMap.clear();
+            firstFileRead = null;
+            wfMembersToCommit.clear();
 
-			// Update the WfHx Refset based on wfMembersToCommit as well
-			updateWfHxLuceneIndex();
+            return;
+        }
 
-			// Clear for future imports
-			unresolvedAnnotations.clear();
-			membersMap.clear();
-			firstFileRead = null;
-        	wfMembersToCommit.clear();
+        while ((nextCommitTime() <= endTime)
+                && (nextCommitTime() != Long.MAX_VALUE)) {
+            try {
+                EConcept eConcept = new EConcept(dataStream);
+                if (csreOut != null) {
+                    csreOut.append("\n*******************************\n");
+                    csreOut.append(TimeHelper.formatDateForFile(nextCommitTime()));
+                    csreOut.append("\n*******************************\n");
+                    csreOut.append(eConcept.toString());
+                }
 
-        	return;
-		}
+                count++;
+                if (counter != null) {
+                    counter.increment();
+                }
 
-		while ((nextCommitTime() <= endTime)
-				&& (nextCommitTime() != Long.MAX_VALUE)) {
-			try {
-				EConcept eConcept = new EConcept(dataStream);
-				if (csreOut != null) {
-					csreOut.append("\n*******************************\n");
-					csreOut.append(TimeHelper
-							.formatDateForFile(nextCommitTime()));
-					csreOut.append("\n*******************************\n");
-					csreOut.append(eConcept.toString());
-				}
+                // Process EConcept for WF Refset members and scrub them in preparation for all-member scrub/import/lucene gen
+                addToEConceptProcessList(eConcept, nextCommit, values);
 
-				count++;
-				if (counter != null) {
-					counter.increment();
-				}
+                conceptCount++;
+                nextCommit = dataStream.readLong();
+            } catch (EOFException ex) {
+                dataStream.close();
+                if (changeSetFile.length() == 0) {
+                    changeSetFile.delete();
+                }
+                nextCommit = Long.MAX_VALUE;
+                Terms.get().setProperty(
+                        changeSetFile.getName() + wfPropertySuffix,
+                        Long.toString(changeSetFile.length()));
+                Terms.get().setProperty(
+                        BdbProperty.LAST_CHANGE_SET_READ.toString()
+                        + wfPropertySuffix, changeSetFile.getName());
+                if (csreOut != null) {
+                    csreOut.flush();
+                    csreOut.close();
+                    csreFile.delete();
+                }
+                if (csrcOut != null) {
+                    csrcOut.flush();
+                    csrcOut.close();
+                    csrcFile.delete();
+                }
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+        }
 
-				// Process EConcept for WF Refset members and scrub them in preparation for all-member scrub/import/lucene gen
-				addToEConceptProcessList(eConcept, nextCommit, values);
+        if (firstFileRead == null) {
+            firstFileRead = changeSetFile;
+        }
 
-				conceptCount++;
-				nextCommit = dataStream.readLong();
-			} catch (EOFException ex) {
-				dataStream.close();
-				if (changeSetFile.length() == 0) {
-					changeSetFile.delete();
-				}
-				nextCommit = Long.MAX_VALUE;
-				Terms.get().setProperty(
-						changeSetFile.getName() + wfPropertySuffix,
-						Long.toString(changeSetFile.length()));
-				Terms.get().setProperty(
-						BdbProperty.LAST_CHANGE_SET_READ.toString()
-								+ wfPropertySuffix, changeSetFile.getName());
-				if (csreOut != null) {
-					csreOut.flush();
-					csreOut.close();
-					csreFile.delete();
-				}
-				if (csrcOut != null) {
-					csrcOut.flush();
-					csrcOut.close();
-					csrcFile.delete();
-				}
-			} catch (Exception e) {
-				throw new IOException(e);
-			}
-		}
+    }
 
-		if (firstFileRead == null) {
-			firstFileRead = changeSetFile;
-		}
+    private void updateWfHxLuceneIndex() {
+        if (wfMembersToCommit.size() > 0) {
+            try {
+                Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromEConcept(wfMembersToCommit);
 
-	}
+                if (luceneWriter != null) {
+                    luceneWriter.run();
+                }
+            } catch (InterruptedException e) {
+                AceLog.getAppLog().log(Level.WARNING, "Failed to generate WfHx Lucene Index on Change Set Import");
+            }
+        }
+    }
 
+    private void importWfRefsetMembers() {
+        // reconstitute now scrubbed members into membersMap to assist in sorting for alg
+        membersMap.clear();
+        for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
+            membersMap.addNewMember(member);
+        }
 
-	private void updateWfHxLuceneIndex() {
-		if (wfMembersToCommit.size() > 0) {
-			try {
-				Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromEConcept(wfMembersToCommit);
+        try {
+            for (UUID eConUid : membersMap.getKeySet()) {
+                int conceptNid = Bdb.uuidToNid(eConUid);
+                assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
 
-				if (luceneWriter != null) {
-					luceneWriter.run();
-				}
-			} catch (InterruptedException e) {
-				AceLog.getAppLog().log(Level.WARNING,"Failed to generate WfHx Lucene Index on Change Set Import");
-			}
-		}
-	}
+                Concept c = Concept.get(conceptNid);
 
-	private void importWfRefsetMembers() {
-		// reconstitute now scrubbed members into membersMap to assist in sorting for alg
-		membersMap.clear();
-		for (TkRefsetAbstractMember<?> member : wfMembersToCommit) {
-			membersMap.addNewMember(member);
-		}
-		
-		try {
-			for (UUID eConUid : membersMap.getKeySet()) {
-				int conceptNid = Bdb.uuidToNid(eConUid);
-				assert conceptNid != Integer.MAX_VALUE : "no conceptNid for uuids";
+                if (c.isAnnotationStyleRefex()) {
+                    for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                        ConceptComponent<?, ?> cc;
+                        Object referencedComponent = Ts.get().getComponent(
+                                er.getComponentUuid());
 
-				Concept c = Concept.get(conceptNid);
-	
-				if (c.isAnnotationStyleRefex()) {
-					for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
-						ConceptComponent<?, ?> cc;
-						Object referencedComponent = Ts.get().getComponent(
-								er.getComponentUuid());
-	
-						if (referencedComponent != null) {
-							if (referencedComponent instanceof Concept) {
-								cc = ((Concept) referencedComponent)
-										.getConceptAttributes();
-							} else {
-								cc = (ConceptComponent<?, ?>) referencedComponent;
-							}
-	
-							RefsetMember<?, ?> r = (RefsetMember<?, ?>) Ts.get().getComponent(
-									er.getPrimordialComponentUuid());
-	
-							if (r == null) {
-								cc.addAnnotation(RefsetMemberFactory.create(er, Ts
-										.get().getConceptNidForNid(cc.getNid())));
-							} else {
-								r.merge((RefsetMember) RefsetMemberFactory.create(
-										er,
-										Ts.get().getConceptNidForNid(cc.getNid())));
-							}
-						} else {
-							unresolvedAnnotations.add(er);
-						}
-					}
-				} else {
-					if ((c.getRefsetMembers() == null)
-							|| c.getRefsetMembers().isEmpty()) {
-						for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
-							if (!WorkflowHelper.getRefsetUidList().contains(
-									er.refsetUuid)) {
-								continue;
-							}
-							
-							RefsetMember<?, ?> refsetMember = RefsetMemberFactory
-									.create(er, c.getConceptNid());
-							
-							c.getData().add(refsetMember);
-	//						Terms.get().addUncommittedNoChecks(refsetMember);
-						}
-					} else {
-						Set<Integer> currentMemberNids = c.getData()
-								.getMemberNids();
-	
-						for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
-							if (!WorkflowHelper.getRefsetUidList().contains(
-									er.refsetUuid)) {
-								continue;
-							}
-							int rNid = Bdb.uuidToNid(er.primordialUuid);
-							RefsetMember<?, ?> r = c.getRefsetMember(rNid);
-	
-							if (currentMemberNids.contains(rNid) && (r != null)) {
-								r.merge((RefsetMember) RefsetMemberFactory.create(
-										er, c.getNid()));
-							} else {
-								c.getRefsetMembers().add(
-										RefsetMemberFactory.create(er, c.getNid()));
-							}
-						}
-					}
-				}
+                        if (referencedComponent != null) {
+                            if (referencedComponent instanceof Concept) {
+                                cc = ((Concept) referencedComponent).getConceptAttributes();
+                            } else {
+                                cc = (ConceptComponent<?, ?>) referencedComponent;
+                            }
 
-				// Commit Concept
-				BdbCommitManager.addUncommittedNoChecks(c);
-			}
+                            RefsetMember<?, ?> r = (RefsetMember<?, ?>) Ts.get().getComponent(
+                                    er.getPrimordialComponentUuid());
 
-			Concept.resolveUnresolvedAnnotations(unresolvedAnnotations);
-		} catch (Exception e) {
-			AceLog.getEditLog().severe("Failed importing wfMembersToCommit");
-		}
-	}
+                            if (r == null) {
+                                cc.addAnnotation(RefsetMemberFactory.create(er, Ts.get().getConceptNidForNid(cc.getNid())));
+                            } else {
+                                r.merge((RefsetMember) RefsetMemberFactory.create(
+                                        er,
+                                        Ts.get().getConceptNidForNid(cc.getNid())));
+                            }
+                        } else {
+                            unresolvedAnnotations.add(er);
+                        }
+                    }
+                } else {
+                    if ((c.getRefsetMembers() == null)
+                            || c.getRefsetMembers().isEmpty()) {
+                        for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                            if (!WorkflowHelper.getRefsetUidList().contains(
+                                    er.refsetUuid)) {
+                                continue;
+                            }
 
-	private void addToEConceptProcessList(EConcept eConcept, long time,Set<TimePathId> values) 
-		throws IOException, ClassNotFoundException 
-	{
-		try {
-			assert time != Long.MAX_VALUE;
-			ArrayList<TkRefsetAbstractMember<?>> discoveredMembers = new ArrayList<TkRefsetAbstractMember<?>>();
+                            RefsetMember<?, ?> refsetMember = RefsetMemberFactory.create(er, c.getConceptNid());
 
-			// Identify the annotations associated with this concept 
-			if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
-				discoveredMembers.addAll(eConcept.getConceptAttributes().getAnnotations());
-			}
+                            c.getData().add(refsetMember);
+                            //						Terms.get().addUncommittedNoChecks(refsetMember);
+                        }
+                    } else {
+                        Set<Integer> currentMemberNids = c.getData().getMemberNids();
 
-			// If Refset Concept, identify refset members (non annotations)
-			if (eConcept.getRefsetMembers() != null) {
-				discoveredMembers.addAll(eConcept.getRefsetMembers());
-			}
+                        for (TkRefsetAbstractMember<?> er : membersMap.getMembers(eConUid)) {
+                            if (!WorkflowHelper.getRefsetUidList().contains(
+                                    er.refsetUuid)) {
+                                continue;
+                            }
+                            int rNid = Bdb.uuidToNid(er.primordialUuid);
+                            RefsetMember<?, ?> r = c.getRefsetMember(rNid);
 
-			// Process all annotation & non-annotation members
-			if (discoveredMembers.size() > 0) {
-		        HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
-		        membersToScrub.addAll(discoveredMembers);
+                            if (currentMemberNids.contains(rNid) && (r != null)) {
+                                r.merge((RefsetMember) RefsetMemberFactory.create(
+                                        er, c.getNid()));
+                            } else {
+                                c.getRefsetMembers().add(
+                                        RefsetMemberFactory.create(er, c.getNid()));
+                            }
+                        }
+                    }
+                }
 
-				// Filter out based on Single CS Filters
-	        	for (AbstractWfChangeSetFilter scrubber : getPerChangesetWorkflowFilters()) {
-	        		if (membersToScrub.size() > 0) {
-	    				if (scrubber.scrubMembers(membersToScrub)) {
-			        		membersToScrub = scrubber.getApprovedMembers();
-			        	}
-		        	}
-	        	}
-	        	
-	        	for (TkRefsetAbstractMember<?> member : membersToScrub) {
-					if (!membersMap.alreadyProcessed(member)) {
-						membersMap.addNewMember(member);
-					}
-				}
-			}
-		} catch (Exception e) {
-			AceLog.getEditLog().severe(
-					"Error committing bean in change set: " + changeSetFile
-							+ "\nUniversalAceBean:  \n" + eConcept);
-			throw new ToIoException(e);
-		}
-	}
+                // Commit Concept
+                BdbCommitManager.addUncommittedNoChecks(c);
+            }
 
-	@Override
-	public void read() throws IOException, ClassNotFoundException {
-		readUntil(Long.MAX_VALUE);
-	}
+            Concept.resolveUnresolvedAnnotations(unresolvedAnnotations);
+        } catch (Exception e) {
+            AceLog.getEditLog().severe("Failed importing wfMembersToCommit");
+        }
+    }
 
-	private void lazyInit() throws FileNotFoundException, IOException,
-			ClassNotFoundException {
-		String lastImportSize = Terms.get().getProperty(
-				changeSetFile.getName() + wfPropertySuffix);
-		if (lastImportSize != null) {
-			long lastSize = Long.parseLong(lastImportSize);
-			if (lastSize == changeSetFile.length()) {
-				nextCommit = Long.MAX_VALUE;
-				initialized = true;
-			}
-		}
-		if (initialized == false) {
-			FileInputStream fis = new FileInputStream(changeSetFile);
-			BufferedInputStream bis = new BufferedInputStream(fis);
-			dataStream = new DataInputStream(bis);
+    private void addToEConceptProcessList(EConcept eConcept, long time, Set<TimePathId> values)
+            throws IOException, ClassNotFoundException {
+        try {
+            assert time != Long.MAX_VALUE;
+            ArrayList<TkRefsetAbstractMember<?>> discoveredMembers = new ArrayList<TkRefsetAbstractMember<?>>();
 
-			if (EConceptChangeSetWriter.writeDebugFiles) {
-				csreFile = new File(changeSetFile.getParentFile(),
-						changeSetFile.getName() + ".csre");
-				csreOut = new FileWriter(csreFile, true);
-				csrcFile = new File(changeSetFile.getParentFile(),
-						changeSetFile.getName() + ".csrc");
-				csrcOut = new FileWriter(csrcFile, true);
-			}
-			initialized = true;
-		}
-	}
+            // Identify the annotations associated with this concept 
+            if (eConcept.getConceptAttributes() != null && eConcept.getConceptAttributes().getAnnotations() != null) {
+                discoveredMembers.addAll(eConcept.getConceptAttributes().getAnnotations());
+            }
 
-	@Override
-	public File getChangeSetFile() {
-		return changeSetFile;
-	}
+            // If Refset Concept, identify refset members (non annotations)
+            if (eConcept.getRefsetMembers() != null) {
+                discoveredMembers.addAll(eConcept.getRefsetMembers());
+            }
 
-	@Override
-	public void setChangeSetFile(File changeSetFile) {
-		this.changeSetFile = changeSetFile;
-	}
+            // Process all annotation & non-annotation members
+            if (discoveredMembers.size() > 0) {
+                HashSet<TkRefsetAbstractMember<?>> membersToScrub = new HashSet<TkRefsetAbstractMember<?>>();
+                membersToScrub.addAll(discoveredMembers);
 
-	@Override
-	public void setCounter(I_Count counter) {
-		this.counter = counter;
-	}
+                // Filter out based on Single CS Filters
+                for (AbstractWfChangeSetFilter scrubber : getPerChangesetWorkflowFilters()) {
+                    if (membersToScrub.size() > 0) {
+                        if (scrubber.scrubMembers(membersToScrub)) {
+                            membersToScrub = scrubber.getApprovedMembers();
+                        }
+                    }
+                }
 
-	@Override
-	public List<I_ValidateChangeSetChanges> getValidators() {
-		return validators;
-	}
+                for (TkRefsetAbstractMember<?> member : membersToScrub) {
+                    if (!membersMap.alreadyProcessed(member)) {
+                        membersMap.addNewMember(member);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AceLog.getEditLog().severe(
+                    "Error committing bean in change set: " + changeSetFile
+                    + "\nUniversalAceBean:  \n" + eConcept);
+            throw new ToIoException(e);
+        }
+    }
 
-	@Override
-	public boolean isContentMerged() {
-		return true;
-	}
+    @Override
+    public void read() throws IOException, ClassNotFoundException {
+        readUntil(Long.MAX_VALUE);
+    }
 
-	@Override
-	public int availableBytes() throws FileNotFoundException, IOException,
-			ClassNotFoundException {
-		lazyInit();
-		if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
-			return 0;
-		} else {
-			if (dataStream != null) {
-				return dataStream.available();
-			}
-		}
+    private void lazyInit() throws FileNotFoundException, IOException,
+            ClassNotFoundException {
+        String lastImportSize = null;
+        if (changeSetFile != null) {
+            lastImportSize = Terms.get().getProperty(
+                    changeSetFile.getName() + wfPropertySuffix);
+        }
+        if (lastImportSize != null) {
+            long lastSize = Long.parseLong(lastImportSize);
+            if (lastSize == changeSetFile.length()) {
+                nextCommit = Long.MAX_VALUE;
+                initialized = true;
+            }
+        }
+        if (initialized == false) {
+            if (changeSetFile != null) {
+                FileInputStream fis = new FileInputStream(changeSetFile);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                dataStream = new DataInputStream(bis);
 
-		return 0;
-	}
+                if (EConceptChangeSetWriter.writeDebugFiles) {
+                    csreFile = new File(changeSetFile.getParentFile(),
+                            changeSetFile.getName() + ".csre");
+                    csreOut = new FileWriter(csreFile, true);
+                    csrcFile = new File(changeSetFile.getParentFile(),
+                            changeSetFile.getName() + ".csrc");
+                    csrcOut = new FileWriter(csrcFile, true);
+                }
+            }
+            initialized = true;
+        }
+    }
 
-	public boolean isNoCommit() {
-		return noCommit;
-	}
+    @Override
+    public File getChangeSetFile() {
+        return changeSetFile;
+    }
 
-	public void setNoCommit(boolean noCommit) {
-		this.noCommit = noCommit;
-	}
+    @Override
+    public void setChangeSetFile(File changeSetFile) {
+        this.changeSetFile = changeSetFile;
+    }
 
-	private List<AbstractWfChangeSetFilter> getAllChangesetsWorkflowFilters() {
-   		List<AbstractWfChangeSetFilter> retSet = new ArrayList<AbstractWfChangeSetFilter>();
+    @Override
+    public void setCounter(I_Count counter) {
+        this.counter = counter;
+    }
 
-   		// Filter out multiple members with same SAP
-   		retSet.add(new WfDuplicateSapMemberFilter("duplicateSapMember.txt"));
+    @Override
+    public List<I_ValidateChangeSetChanges> getValidators() {
+        return validators;
+    }
 
-   		// Filter out those members that were adjudicated offline and then synced, thus causing conflicts with others that did same
-   		retSet.add(new WfDuplicateAutomatedAdjudicatorSyncFilter("duplicateAdjudicationsFilter.txt"));
+    @Override
+    public boolean isContentMerged() {
+        return true;
+    }
 
-   		return retSet;
-   	}
+    @Override
+    public int availableBytes() throws FileNotFoundException, IOException,
+            ClassNotFoundException {
+        lazyInit();
+        if ((firstFileRead != null) && (firstFileRead.equals(changeSetFile))) {
+            return 0;
+        } else {
+            if (dataStream != null) {
+                return dataStream.available();
+            }
+        }
 
-   	private List<AbstractWfChangeSetFilter> getPerChangesetWorkflowFilters() {
-   		List<AbstractWfChangeSetFilter> retSet = new ArrayList<AbstractWfChangeSetFilter>();
-   		
-   		// Filter out badly-formed eConcepts
-   		retSet.add(new WfBadConceptFilter("badConceptFilter.txt"));
+        return 0;
+    }
 
-   		// Filter out non-Wf Refsets
-   		retSet.add(new WfRefsetFilter("refsetFilter.txt"));
+    public boolean isNoCommit() {
+        return noCommit;
+    }
 
-   		// For wfHxRefsetMembers, filter out members whose date is before the wfHx.txt final date
-   		//retSet.add(new WfPostLastReleaseFilter("releaseDateFilter.txt"));
+    public void setNoCommit(boolean noCommit) {
+        this.noCommit = noCommit;
+    }
 
-   		return retSet;
-   	}
+    private List<AbstractWfChangeSetFilter> getAllChangesetsWorkflowFilters() {
+        List<AbstractWfChangeSetFilter> retSet = new ArrayList<AbstractWfChangeSetFilter>();
+
+        // Filter out multiple members with same SAP
+        retSet.add(new WfDuplicateSapMemberFilter("duplicateSapMember.txt"));
+
+        // Filter out those members that were adjudicated offline and then synced, thus causing conflicts with others that did same
+        retSet.add(new WfDuplicateAutomatedAdjudicatorSyncFilter("duplicateAdjudicationsFilter.txt"));
+
+        return retSet;
+    }
+
+    private List<AbstractWfChangeSetFilter> getPerChangesetWorkflowFilters() {
+        List<AbstractWfChangeSetFilter> retSet = new ArrayList<AbstractWfChangeSetFilter>();
+
+        // Filter out badly-formed eConcepts
+        retSet.add(new WfBadConceptFilter("badConceptFilter.txt"));
+
+        // Filter out non-Wf Refsets
+        retSet.add(new WfRefsetFilter("refsetFilter.txt"));
+
+        // For wfHxRefsetMembers, filter out members whose date is before the wfHx.txt final date
+        //retSet.add(new WfPostLastReleaseFilter("releaseDateFilter.txt"));
+
+        return retSet;
+    }
 }
