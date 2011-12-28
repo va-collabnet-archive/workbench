@@ -562,7 +562,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     public I_GetConceptData getUserConcept() {
         if (userConcept == null) {
-            AceLog.getAppLog().alertAndLogException(new Exception("User concept is null in AceConfig. Substuting generic user. "));
             try {
                 userConcept = (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
             } catch (IOException ex) {
