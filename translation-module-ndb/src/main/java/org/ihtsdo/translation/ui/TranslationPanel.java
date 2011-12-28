@@ -1255,9 +1255,17 @@ public class TranslationPanel extends JPanel {
 			I_Work worker=null;
 			try {
 				worker = Terms.get().getActiveAceFrameConfig().getWorker();
+				WfInstance prevWfInstance=new WfInstance();
+				prevWfInstance.setComponentId(instance.getComponentId());
+				prevWfInstance.setDestination(instance.getDestination());
+				prevWfInstance.setHistory(instance.getHistory());
+				prevWfInstance.setProperties(instance.getProperties());
+				prevWfInstance.setState(instance.getState());
+				prevWfInstance.setWfDefinition(instance.getWfDefinition());
+				prevWfInstance.setWorkListId(instance.getWorkListId());
 				workflowInterpreter.doAction(instance, action, worker);
 				WfInstance newWfInstance = worklistMember.getWfInstance();
-				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, instance, newWfInstance);
+				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(this,

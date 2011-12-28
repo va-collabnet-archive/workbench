@@ -101,8 +101,12 @@ public class HierarchyNavigator extends JPanel {
 			config=Terms.get().getActiveAceFrameConfig();
 			//			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedDestRelTypes=config.getDestRelTypes();
+//			allowedDestRelTypes=Terms.get().newIntSet();
 			//			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-			allowedStatus=config.getAllowedStatus();
+			allowedStatus=Terms.get().newIntSet();
+			allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+//			allowedStatus=config.getAllowedStatus();
 
 			inactive =Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 			retired =Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
