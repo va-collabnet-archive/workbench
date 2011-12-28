@@ -67,9 +67,8 @@ public class InboxTableModel extends DefaultTableModel {
 
 	@Override
 	public void addRow(Object[] rowData) {
-		int rowIndex = dataVector.size();
 		data.add(rowData);
-		fireTableChanged(new TableModelEvent(this, rowIndex, rowIndex, -1, TableModelEvent.INSERT));
+		fireTableDataChanged();
 	}
 
 	public void updateTable(Object[][] data) {
