@@ -224,7 +224,7 @@ public class CreateNewProject extends AbstractTask {
 
 			sleep(1);
 
-			workSet1.sync(config);
+			//workSet1.sync(config);
 
 
 
