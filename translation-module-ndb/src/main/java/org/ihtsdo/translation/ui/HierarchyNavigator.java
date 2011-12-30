@@ -276,9 +276,19 @@ public class HierarchyNavigator extends JPanel {
 			if (c instanceof JTree) {
 				JTree tree = (JTree) c;
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-				I_GetConceptData concept=(I_GetConceptData) node.getUserObject();
 
-				return new ConceptTransferable(concept);
+				Object objvalue=node.getUserObject();
+				I_GetConceptData concept=null;
+				if (objvalue instanceof TreeObj){
+					TreeObj To=(TreeObj) objvalue;
+					if (To.getAtrValue()!=null)
+						concept=(I_GetConceptData)To.getAtrValue();
+				}else if (objvalue instanceof I_GetConceptData){
+					concept=(I_GetConceptData)objvalue;
+				}
+				if (concept!=null ){
+					return new ConceptTransferable(concept);
+				}
 			}
 			return null;
 		}
