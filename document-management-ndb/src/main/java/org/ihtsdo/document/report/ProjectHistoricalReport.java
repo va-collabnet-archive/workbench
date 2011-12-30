@@ -193,7 +193,7 @@ public class ProjectHistoricalReport implements I_Report {
 							if (wlMembers != null) {
 								wlMembersByStatus = new HashMap<String, List<WorkListMember>>();
 								for (WorkListMember wlMember : wlMembers) {
-									I_GetConceptData activitiStatus = tf.getConcept(wlMember.getActivityStatus());
+									I_GetConceptData activitiStatus = wlMember.getActivityStatus();
 									if (wlMembersByStatus.containsKey(activitiStatus.toString())) {
 										wlMembersByStatus.get(activitiStatus.toString()).add(wlMember);
 									} else {

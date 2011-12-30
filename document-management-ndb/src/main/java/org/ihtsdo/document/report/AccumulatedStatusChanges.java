@@ -231,7 +231,7 @@ public class AccumulatedStatusChanges implements I_Report {
 													member.getConceptNid(), 
 													member.getUids(), 
 													wl.getUids().iterator().next(), 
-													status.getUids().iterator().next(), 
+													status, 
 													statusDate);
 										}
 									}

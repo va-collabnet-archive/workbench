@@ -82,9 +82,8 @@ public class WorklistStateTotalsReport implements I_Report {
 								List<WorkListMember> wlMembList = TerminologyProjectDAO
 										.getAllWorkListMembers(workList, config);
 								for (WorkListMember workListMember : wlMembList) {
-									I_GetConceptData activitiStatus = tf
-											.getConcept(workListMember
-													.getActivityStatus());
+									I_GetConceptData activitiStatus = workListMember
+													.getActivityStatus();
 									if (!worklistStates.contains(activitiStatus
 											.toString())) {
 										worklistStates
@@ -118,9 +117,8 @@ public class WorklistStateTotalsReport implements I_Report {
 								List<WorkListMember> wlMembList = TerminologyProjectDAO
 										.getAllWorkListMembers(workList, config);
 								for (WorkListMember workListMember : wlMembList) {
-									I_GetConceptData activitiStatus = tf
-											.getConcept(workListMember
-													.getActivityStatus());
+									I_GetConceptData activitiStatus = workListMember
+													.getActivityStatus();
 									String firstLetterUpperCaseStatus = getFirstLetterToUpperCase(activitiStatus
 											.toString());
 									if (statusMembers
