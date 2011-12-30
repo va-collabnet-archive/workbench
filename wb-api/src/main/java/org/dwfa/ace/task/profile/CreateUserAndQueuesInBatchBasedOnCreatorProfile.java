@@ -286,7 +286,7 @@ public class CreateUserAndQueuesInBatchBasedOnCreatorProfile extends AbstractTas
          while (userLine != null) {
             String[] parts = userLine.split("\t");
 
-            setupUser(parts[0], parts[1], parts[2], parts[3], parts[4]);
+            setupUser(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
             userLine = br.readLine();
          }
       } catch (Exception ex) {
@@ -599,8 +599,8 @@ public class CreateUserAndQueuesInBatchBasedOnCreatorProfile extends AbstractTas
       }
    }
 
-   private boolean setupUser(String fullname, String username, String password, String adminUsername,
-                             String adminPassword)
+   private boolean setupUser(String fullname, String username, String password, String userUuid,
+           String adminUsername, String adminPassword)
            throws TaskFailedException {
       try {
          String userDirStr    = "profiles" + File.separator + username;
@@ -633,8 +633,10 @@ public class CreateUserAndQueuesInBatchBasedOnCreatorProfile extends AbstractTas
          EditOnRootPath rootPathProfile = new EditOnRootPath(creatorConfig);
 
          // Create new concept for user...
-         createUser(newConfig, rootPathProfile);
-
+         if(userUuid == null || userUuid.equals("")){
+             createUser(newConfig, rootPathProfile);
+         }
+         
          // Create new paths for user...
          if (creatorConfig.getPromotionPathSet().size() > 1) {
             throw new TaskFailedException("This task only supports a single promotion path...\nFound: "
