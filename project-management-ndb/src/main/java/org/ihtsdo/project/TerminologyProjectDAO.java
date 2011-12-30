@@ -2326,7 +2326,8 @@ public class TerminologyProjectDAO {
 			WorkListMember workListMember = new WorkListMember(concept.toString(), 
 					concept.getConceptNid(),
 					concept.getUids(), workList.getUids().iterator().next(),  
-					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),new java.util.Date().getTime() );
+					Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()),
+					new java.util.Date().getTime() );
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			addConceptAsWorkListMember(workListMember,
 					Terms.get().uuidToNative(interpreter.getNextDestination(
@@ -2809,7 +2810,7 @@ public class TerminologyProjectDAO {
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), //metadata Removed to minimize changeset footprint
 						config); 
 				termFactory.addUncommittedNoChecks(workListConcept);
-				I_GetConceptData activityStatusConcept = termFactory.getConcept(member.getActivityStatus());
+				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
 //				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
 //				promotionRefset.setDestination(member.getId(), assignedUserId);
@@ -3272,7 +3273,7 @@ public class TerminologyProjectDAO {
 					Long statusDate = promotionRefset.getLastStatusTime(workListMemberConcept.getConceptNid(), 
 							config);
 					workListMember = new WorkListMember(name, workListMemberConcept.getConceptNid(), 
-							workListMemberConcept.getUids(), workList.getUids().iterator().next(), status.getUids().iterator().next(),statusDate);
+							workListMemberConcept.getUids(), workList.getUids().iterator().next(), status,statusDate);
 				}
 			}
 		} catch (TerminologyException e) {
@@ -3327,7 +3328,7 @@ public class TerminologyProjectDAO {
 		List<WorkListMember> members = getAllWorkListMembers(workList, config);
 
 		for (WorkListMember loopMember : members) {
-			I_GetConceptData loopActivityStatus = termFactory.getConcept(loopMember.getActivityStatus());
+			I_GetConceptData loopActivityStatus = loopMember.getActivityStatus();
 			if (activityStatus.getConceptNid() == loopActivityStatus.getConceptNid()) {
 				workListMembers.add(loopMember);
 			}
@@ -3344,7 +3345,7 @@ public class TerminologyProjectDAO {
 		List<WorkListMember> members = getAllWorkListMembers(workList, config);
 
 		for (WorkListMember loopMember : members) {
-			I_GetConceptData activityStatus = tf.getConcept(loopMember.getActivityStatus());
+			I_GetConceptData activityStatus = loopMember.getActivityStatus();
 			Integer currentCount = workListMembersStatuses.get(activityStatus);
 			if (currentCount == null) currentCount = 0;
 			workListMembersStatuses.put(activityStatus, currentCount + 1);
@@ -3477,7 +3478,7 @@ public class TerminologyProjectDAO {
 			//			waiting(1);
 			WorkList workList = getWorkList(workListConcept, config);
 			PromotionRefset promotionRefset = workList.getPromotionRefset(config);
-			I_GetConceptData activityStatusConcept = termFactory.getConcept(workListMemberWithMetadata.getActivityStatus());
+			I_GetConceptData activityStatusConcept = workListMemberWithMetadata.getActivityStatus();
 			promotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 
 			//Translation specific concept level promotion refset
@@ -3993,7 +3994,7 @@ public class TerminologyProjectDAO {
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
 					partitionMember.getId(),
 					partitionMember.getUids(), null,  
-					ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next(),
+					Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()),
 					new java.util.Date().getTime() );
 			workListMembers.add(workListMember);
 		}

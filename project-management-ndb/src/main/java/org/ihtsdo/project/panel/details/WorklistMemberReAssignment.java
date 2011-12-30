@@ -164,8 +164,8 @@ public class WorklistMemberReAssignment extends JPanel {
 			}
 		});
 		for (WorkListMember member : members) {
-			I_GetConceptData activityStatus = Terms.get().getConcept(member
-					.getActivityStatus());
+			I_GetConceptData activityStatus = member
+					.getActivityStatus();
 			model.addRow(new Object[]{member,activityStatus.toString()});
 		}
 	}

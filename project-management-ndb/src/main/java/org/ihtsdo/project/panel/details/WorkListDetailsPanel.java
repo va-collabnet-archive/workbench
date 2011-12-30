@@ -1047,7 +1047,7 @@ class WorklistMembersWorker extends SwingWorker<String, Object[]> {
 				}
 			});
 			for (WorkListMember member : members) {
-				I_GetConceptData activityStatus = Terms.get().getConcept(member.getActivityStatus());
+				I_GetConceptData activityStatus = member.getActivityStatus();
 				WfUser destination = member.getWfInstance().getDestination();
 				publish(new Object[] { member, activityStatus.toString(), destination.toString() });
 			}

@@ -53,7 +53,7 @@ public class WorkListMember implements Serializable {
 	private UUID workListUUID;
 	
 	/** The activity status. */
-	private UUID activityStatus;
+	private I_GetConceptData activityStatus;
 	
 	/** The status last date */
 	private Long statusDate;
@@ -73,7 +73,7 @@ public class WorkListMember implements Serializable {
 	 */
 	public WorkListMember(String name, int id, List<UUID> uids,
 			UUID workListUUID,
-			UUID activityStatus, Long statusDate) {
+			I_GetConceptData activityStatus, Long statusDate) {
 		super();
 		this.name = name;
 		this.id = id;
@@ -179,7 +179,7 @@ public class WorkListMember implements Serializable {
 	 * 
 	 * @return the activity status
 	 */
-	public UUID getActivityStatus() {
+	public I_GetConceptData getActivityStatus() {
 		return activityStatus;
 	}
 	
@@ -188,7 +188,7 @@ public class WorkListMember implements Serializable {
 	 * 
 	 * @param activityStatus the new activity status
 	 */
-	public void setActivityStatus(UUID activityStatus) {
+	public void setActivityStatus(I_GetConceptData activityStatus) {
 		this.activityStatus = activityStatus;
 	}
 	

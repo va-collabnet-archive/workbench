@@ -266,7 +266,7 @@ public class GenerateUAWAssignmentExecAS extends AbstractTask {
 						queueName, config);
 
 				workListMember.setActivityStatus(
-						ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids().iterator().next());
+						Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()));
 				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
 
 				termFactory.commit();

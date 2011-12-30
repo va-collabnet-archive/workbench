@@ -200,7 +200,7 @@ public class WorkflowSearcher {
 							for (WorkListMember workListMember : allWorkListMembers) {
 								if (workListMember.getWfInstance().getDestination().equals(user)) {
 									size++;
-									I_GetConceptData activityStatus = tf.getConcept(workListMember.getActivityStatus());
+									I_GetConceptData activityStatus = workListMember.getActivityStatus();
 									Integer currentCount = workListMembersStatuses.get(activityStatus);
 									if (currentCount == null)
 										currentCount = 0;
@@ -262,7 +262,7 @@ public class WorkflowSearcher {
 
 						for (WorkListMember loopMember : members) {
 							if (loopMember.getWfInstance().getDestination().equals(user)) {
-								I_GetConceptData activityStatus = tf.getConcept(loopMember.getActivityStatus());
+								I_GetConceptData activityStatus = loopMember.getActivityStatus();
 								Integer currentCount = workListMembersStatuses.get(activityStatus);
 								if (currentCount == null)
 									currentCount = 0;
