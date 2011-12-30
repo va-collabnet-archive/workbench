@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.swing.SwingUtilities;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -136,8 +138,18 @@ public class WorkflowSearcher {
 	}
 
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
-		for (WorkList wl : worklist) {
-			WorkflowInterpreter.createWorkflowInterpreter(wl.getWorkflowDefinition());
+		for (final WorkList wl : worklist) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+
+					Thread appThr = new Thread() {
+						public void run() {
+							WorkflowInterpreter.createWorkflowInterpreter(wl.getWorkflowDefinition());
+						}
+					};
+					appThr.start();
+				}
+			});
 			List<WorkListMember> wlMembers = wl.getWorkListMembers();
 			for (WorkListMember workListMember : wlMembers) {
 				result.add(workListMember.getWfInstance());
@@ -207,7 +219,7 @@ public class WorkflowSearcher {
 									workListMembersStatuses.put(activityStatus, currentCount + 1);
 								}
 							}
-							
+
 							Set<I_GetConceptData> keys = workListMembersStatuses.keySet();
 							for (I_GetConceptData wlstatus : keys) {
 								WfState state = provider.statusConceptToWfState(wlstatus);
@@ -219,7 +231,7 @@ public class WorkflowSearcher {
 									result.put(state, workListMembersStatuses.get(wlstatus));
 								}
 							}
-							
+
 							result.put(workList, size);
 						}
 					}

@@ -98,7 +98,6 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
-import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
@@ -2337,7 +2336,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return getWorkListMember(concept, workList.getId(), config);
+		return getWorkListMember(concept, workList, config);
 	}
 
 	/**
@@ -3239,33 +3238,30 @@ public class TerminologyProjectDAO {
 	 * 
 	 * @return the work list member
 	 */
-	public static WorkListMember getWorkListMember(I_GetConceptData workListMemberConcept, int workListId, I_ConfigAceFrame config) {
+	public static WorkListMember getWorkListMember(I_GetConceptData workListMemberConcept, WorkList workList, I_ConfigAceFrame config) {
 		WorkListMember workListMember = null;
 		I_TermFactory termFactory = Terms.get();
 
 		try {
-			I_GetConceptData workListRefset = termFactory.getConcept(workListId);
+			PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 
-			I_IntSet descriptionTypes =  termFactory.newIntSet();
-			descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-
-			List<? extends I_DescriptionTuple> descTuples = workListMemberConcept.getDescriptionTuples(
-					config.getAllowedStatus(), 
-					descriptionTypes, config.getViewPositionSetReadOnly(),
-					Precedence.TIME, config.getConflictResolutionStrategy());
-			String name;
-			if (!descTuples.isEmpty()) {
-				name = descTuples.iterator().next().getText();
-			} else {
-				name = "No FSN!";
-			}
-			WfComponentProvider provider = new WfComponentProvider();
-			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(
-					workListMemberConcept.getConceptNid());
-			for (I_ExtendByRef extension : extensions) {
-				if (extension.getRefsetId() == workListRefset.getConceptNid()) {
-					WorkList workList = getWorkList(workListRefset, config);
-					PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
+//			I_IntSet descriptionTypes =  termFactory.newIntSet();
+//			descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+//			
+//			List<? extends I_DescriptionTuple> descTuples = workListMemberConcept.getDescriptionTuples(
+//					config.getAllowedStatus(), 
+//					descriptionTypes, config.getViewPositionSetReadOnly(),
+//					Precedence.TIME, config.getConflictResolutionStrategy());
+//			String name;
+//			if (!descTuples.isEmpty()) {
+//				name = descTuples.iterator().next().getText();
+//			} else {
+//				name = "No FSN!";
+//			}
+			String name = workListMemberConcept.toString();
+			Collection<? extends RefexChronicleBI<?>> members = workListMemberConcept.getAnnotations();
+			for (RefexChronicleBI<?> promotionMember : members) {
+				if (promotionMember.getCollectionNid() == promotionRefset.getRefsetId()) {
 					I_GetConceptData status = promotionRefset.getPromotionStatus(workListMemberConcept.getConceptNid(), 
 							config);
 					I_GetConceptData destination = promotionRefset.getDestination(workListMemberConcept.getConceptNid(), 
@@ -3308,7 +3304,7 @@ public class TerminologyProjectDAO {
 			for (I_GetConceptData member : members) {
 				I_ConceptAttributePart lastAttributePart = getLastestAttributePart(member);
 				if (isActive(lastAttributePart.getStatusNid())) {
-					workListMembers.add(getWorkListMember(member, workList.getId(), config));
+					workListMembers.add(getWorkListMember(member, workList, config));
 				}
 			}
 
@@ -3489,7 +3485,7 @@ public class TerminologyProjectDAO {
 			languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 			// end	
 
-			workListMember = getWorkListMember(workListMemberWithMetadata.getConcept(), workListConcept.getConceptNid(), config);
+			workListMember = getWorkListMember(workListMemberWithMetadata.getConcept(), workList, config);
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

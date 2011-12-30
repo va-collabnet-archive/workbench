@@ -39,31 +39,33 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
  * The Class WorkList.
  */
 public class WorkList extends WorkflowRefset implements Serializable{
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
-	
+
 	/** The name. */
 	private String name;
-	
+
 	/** The id. */
 	private int id;
-	
+
 	/** The uids. */
 	private List<UUID> uids;
-	
+
 	/** The partition id. */
 	private UUID partitionUUID;
-	
+
 	private WorkflowDefinition workflowDefinition;
-	
+
 	private List<WfMembership> workflowUserRoles;
-	
-	
+
+	private PromotionAndAssignmentRefset promRefset;
+
+
 	public WorkList() {
 		super();
 	}
-	
+
 	/**
 	 * Instantiates a new work list.
 	 * 
@@ -86,16 +88,16 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		this.refsetId=id;
 		this.uids = uids;
 		this.partitionUUID = workSetUUID;
-		
+
 	}
-	
+
 	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
 		WorkList worklist=new WorkList(worklistMetadata.getName(),worklistMetadata.getId(),worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
 		worklist.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(worklistMetadata.getWorkflowDefinitionFileName()));
 		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
 		return worklist;
 	}
-	
+
 	/**
 	 * Gets the name.
 	 * 
@@ -104,7 +106,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public String getName() {
 		return name;
 	}
-	
+
 	/**
 	 * Sets the name.
 	 * 
@@ -113,7 +115,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * Gets the id.
 	 * 
@@ -122,7 +124,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public int getId() {
 		return id;
 	}
-	
+
 	/**
 	 * Sets the id.
 	 * 
@@ -131,7 +133,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	/**
 	 * Gets the uids.
 	 * 
@@ -140,7 +142,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public List<UUID> getUids() {
 		return uids;
 	}
-	
+
 	/**
 	 * Sets the uids.
 	 * 
@@ -149,7 +151,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setUids(List<UUID> uids) {
 		this.uids = uids;
 	}
-	
+
 	/**
 	 * Gets the concept.
 	 * 
@@ -166,7 +168,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 		}
 		return concept;
 	}
-	
+
 	/**
 	 * Gets the work list members.
 	 * 
@@ -177,7 +179,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public List<WorkListMember> getWorkListMembers() throws TerminologyException, IOException {
 		return TerminologyProjectDAO.getAllWorkListMembers(this, Terms.get().getActiveAceFrameConfig());
 	}
-	
+
 	/**
 	 * Gets the work set id.
 	 * 
@@ -186,7 +188,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public UUID getPartitionUUID() {
 		return partitionUUID;
 	}
-	
+
 	/**
 	 * Sets the work set id.
 	 * 
@@ -195,11 +197,11 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setPartitionUUID(UUID partitionUUID) {
 		this.partitionUUID = partitionUUID;
 	}
-	
+
 	public String toString() {
 		return this.name;
 	}
-	
+
 	public Partition getPartition() {
 		Partition partition = null;
 		I_GetConceptData concept = null;
@@ -224,19 +226,24 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
 		this.workflowDefinition = workflowDefinition;
 	}
-	
+
 	public PromotionAndAssignmentRefset getPromotionRefset(I_ConfigAceFrame config) {
-		try {
-			I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
-			I_GetConceptData refsetConcept = getRefsetConcept();
-			if (refsetConcept == null) {
+
+		if (promRefset != null) {
+			return promRefset;
+		} else {
+			try {
+				I_GetConceptData promotionRel = termFactory.getConcept(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+				I_GetConceptData refsetConcept = getRefsetConcept();
+				if (refsetConcept == null) {
+					return null;
+				}
+				promRefset = new PromotionAndAssignmentRefset(getLatestSourceRelationshipTarget(refsetConcept, promotionRel, config));
+				return promRefset;
+			} catch (Exception e) {
+				e.printStackTrace();
 				return null;
 			}
-	
-			return new PromotionAndAssignmentRefset(getLatestSourceRelationshipTarget(refsetConcept, promotionRel, config));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
 		}
 	}
 
@@ -247,14 +254,14 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	public void setWorkflowUserRoles(List<WfMembership> workflowUserRoles) {
 		this.workflowUserRoles = workflowUserRoles;
 	}
-	
+
 	public List<WfUser> getUsers() {
 		List<WfUser> users = new ArrayList<WfUser>();
-		
+
 		for (WfMembership loopMembership : getWorkflowUserRoles()) {
 			users.add(loopMembership.getUser());
 		}
-		
+
 		return users;
 	}
 
@@ -263,6 +270,6 @@ public class WorkList extends WorkflowRefset implements Serializable{
 			return workflowDefinition.getName() + ".wfd";
 		}
 		return null;
-		
+
 	}
 }
