@@ -284,33 +284,6 @@ public class WfComponentProvider {
 	}
 	
 
-	public static WorkflowDefinition readWfDefinition(File file){
-
-		XStream xStream = new XStream(new DomDriver());
-		WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
-		return wfDef;
-
-	}
-
-	public static void writeWfDefinition(WorkflowDefinition wfDefinition){
-
-		XStream xStream = new XStream(new DomDriver());
-
-		FileOutputStream rfos;
-		try {
-			rfos = new FileOutputStream("sampleProcesses/" +  wfDefinition.getName() + ".wfd");
-			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
-			xStream.toXML(wfDefinition,rosw);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
 	private static List<File> loadFiles(File folder,String endFile) {
 		File[] fileList = folder.listFiles();
 		List<File> retFiles=new ArrayList<File>();

@@ -14,6 +14,7 @@ public class WorkflowDefinition implements Serializable{
 	private List<String> xlsFileName;
 	private List<String> drlFileName;
 	private String name ;
+	private String fileName;
 
 	public WorkflowDefinition() {
 		super();
@@ -77,6 +78,14 @@ public class WorkflowDefinition implements Serializable{
 
 	public void setDrlFileName(List<String> drlFileName) {
 		this.drlFileName = drlFileName;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 }

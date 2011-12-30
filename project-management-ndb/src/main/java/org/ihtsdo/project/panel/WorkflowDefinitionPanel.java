@@ -41,6 +41,7 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -269,7 +270,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			}
 			workflowDefinition.setDrlFileName(drlFiles);
 			workflowDefinition.setXlsFileName(xlsFiles);
-			WfComponentProvider.writeWfDefinition(workflowDefinition);
+			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition, workflowDefinition.getName());
 		}
 		else
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");
@@ -297,7 +298,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		});
 		if(fc.showOpenDialog(this)==JFileChooser.CANCEL_OPTION) return;
 		workflowDefinitionFile= fc.getSelectedFile();
-		WorkflowDefinition workflowDefinition = WfComponentProvider.readWfDefinition(workflowDefinitionFile);
+		WorkflowDefinition workflowDefinition = WorkflowDefinitionManager.readWfDefinition(workflowDefinitionFile.getName());
 		workflowNameTextField.setText(workflowDefinition.getName());
 		
 		WfComponentProvider wp= new WfComponentProvider();

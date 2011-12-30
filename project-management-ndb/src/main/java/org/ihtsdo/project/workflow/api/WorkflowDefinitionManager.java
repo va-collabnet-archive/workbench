@@ -24,6 +24,7 @@ public class WorkflowDefinitionManager {
 			File file = new File("sampleProcesses/" + fileName);
 			XStream xStream = new XStream(new DomDriver());
 			WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
+			wfDef.setFileName(fileName);
 			wfDefCache.put(fileName, wfDef);
 			return wfDef;
 		}
@@ -31,6 +32,7 @@ public class WorkflowDefinitionManager {
 	}
 
 	public static void writeWfDefinition(WorkflowDefinition wfDefinition, String fileName){
+		wfDefinition.setFileName(fileName);
 		File outputFile = new File("sampleProcesses/" + fileName);
 		XStream xStream = new XStream(new DomDriver());
 
