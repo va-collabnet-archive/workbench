@@ -2578,7 +2578,7 @@ public class TerminologyProjectDAO {
 	}
 
 	public static Partition createNewPartitionAndMembersFromWorkSet(String name, 
-			WorkSet workSet, I_ConfigAceFrame config) throws TerminologyException, IOException {
+			WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException {
 
 		Partition newPartition = null;
 		try{
@@ -2590,9 +2590,21 @@ public class TerminologyProjectDAO {
 					workSet.getUids().iterator().next(), config);
 			newPartition = TerminologyProjectDAO.createNewPartition(name, 
 					newPartitionScheme.getUids().iterator().next(), config);
-			for (WorkSetMember loopMember : workSet.getWorkSetMembers()) {
+			List<WorkSetMember> members = workSet.getWorkSetMembers();
+			activity.setValue(0);
+			activity.setMaximum(members.size());
+			activity.setIndeterminate(false);
+			activity.setProgressInfoLower("Loading exlusions...");
+			int counter = 0;
+			for (WorkSetMember loopMember : members) {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
 						newPartition.getUids().iterator().next(), config);
+				counter++;
+				activity.setValue(counter);
+				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
+					activity.setProgressInfoLower("Creating partition members: " + counter + 
+							" from " + activity.getMaximum());
+				}
 			}
 			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
 			newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);

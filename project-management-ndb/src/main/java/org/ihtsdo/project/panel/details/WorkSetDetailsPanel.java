@@ -512,7 +512,15 @@ public class WorkSetDetailsPanel extends JPanel {
 						Thread appThr = new Thread() {
 							public void run() {
 								try {
-									if (TerminologyProjectDAO.createNewPartitionAndMembersFromWorkSet(partitionName, workSet, config) != null) {
+									I_ShowActivity activity =
+										Terms.get().newActivityPanel(true, config, "<html>Creting one click partition: <br>", true);
+									activity.setIndeterminate(true);
+									try {
+										ActivityViewer.addActivity(activity);
+									} catch (Exception e1) {
+										AceLog.getAppLog().alertAndLogException(e1);
+									}
+									if (TerminologyProjectDAO.createNewPartitionAndMembersFromWorkSet(partitionName, workSet, config, activity) != null) {
 										Terms.get().commit();
 										updateList5Content();
 										pBarW.setVisible(false);
@@ -523,6 +531,21 @@ public class WorkSetDetailsPanel extends JPanel {
 												TranslationHelperPanel.refreshProjectPanelNode(config);
 											}
 										});
+									}
+									
+									activity.setProgressInfoUpper("One click partition created!");
+									try {
+										activity.complete();
+									} catch (CancellationException ce) {
+										activity.setProgressInfoLower("Canceled");
+										try {
+											activity.complete();
+										} catch (ComputationCanceled e) {
+											activity.setProgressInfoLower("Canceled");
+										}
+									} catch (Exception e){
+										activity.setProgressInfoLower("Canceled with error");
+										e.printStackTrace();
 									}
 								} catch (Exception e) {
 									e.printStackTrace();
