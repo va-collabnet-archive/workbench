@@ -1,6 +1,5 @@
 package org.ihtsdo.project.workflow.model;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +8,16 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 
 public class WfInstance implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private UUID componentId = null;
 	private UUID workListId;
 	private WfUser destination;
@@ -23,6 +25,8 @@ public class WfInstance implements Serializable{
 	private WfState state;
 	private Map<String,Object> properties;
 	private List<WfHistoryEntry> history;
+	private String componentName;
+	private String workListName;
 	
 	public WfInstance() {
 		super();
@@ -112,6 +116,22 @@ public class WfInstance implements Serializable{
 		pormAssigRefset.setDestination(tf.uuidToNative(instance.componentId), 
 				tf.uuidToNative(user.getId()));
 		instance.setDestination(user);
+	}
+
+	public String getComponentName() {
+		return componentName;
+	}
+
+	public void setComponentName(String componentName) {
+		this.componentName = componentName;
+	}
+
+	public String getWorkListName() {
+		return workListName;
+	}
+
+	public void setWorkListName(String workListName) {
+		this.workListName = workListName;
 	}
 
 }

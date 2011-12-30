@@ -263,6 +263,8 @@ public class WorkListMember implements Serializable {
 			wfInstance.setComponentId(tf.nidToUuid(id));
 			wfInstance.setWfDefinition(workList.getWorkflowDefinition());
 			wfInstance.setWorkListId(workListUUID);
+			wfInstance.setComponentName(getName());
+			wfInstance.setWorkListName(workList.getName());
 			
 			PromotionAndAssignmentRefset promAssignRefset = workList.getPromotionRefset(config);
 			
