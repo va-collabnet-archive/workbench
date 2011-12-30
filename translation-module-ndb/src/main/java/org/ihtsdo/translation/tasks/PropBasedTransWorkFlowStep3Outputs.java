@@ -428,7 +428,7 @@ public class PropBasedTransWorkFlowStep3Outputs extends AbstractTask {
 			String[] parsedSubj=TerminologyProjectDAO.getParsedItemSubject(process.getSubject());
 
 			if (selectedNextStatus!=null){
-				workListMember.setActivityStatus(selectedNextStatus.ids[0]);
+				workListMember.setActivityStatus(Terms.get().getConcept(selectedNextStatus.ids[0]));
 				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
 
 				if (parsedSubj.length==TerminologyProjectDAO.subjectIndexes.values().length){

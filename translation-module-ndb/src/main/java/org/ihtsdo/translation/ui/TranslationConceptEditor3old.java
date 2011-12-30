@@ -2379,7 +2379,7 @@ public class TranslationConceptEditor3old extends JPanel {
 				}
 
 				top.add(groupLang);
-				String status=Terms.get().getConcept(worklistMember.getActivityStatus()).toString();
+				String status=worklistMember.getActivityStatus().toString();
 				DefaultMutableTreeNode wListMembStatNode = new DefaultMutableTreeNode(
 						new TreeEditorObjectWrapper("Worklist member status: " + status, TreeEditorObjectWrapper.RELATIONSHIPINFO , null));
 

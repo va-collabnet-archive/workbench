@@ -317,7 +317,7 @@ public class SpecialInboxPanel extends JPanel {
 							if (statusHash.containsKey(member.getActivityStatus().toString())) {
 								status = statusHash.get(member.getActivityStatus().toString());
 							} else {
-								I_GetConceptData statusConcept = Terms.get().getConcept(member.getActivityStatus());
+								I_GetConceptData statusConcept = member.getActivityStatus();
 								status = statusConcept.toString();
 								statusHash.put(member.getActivityStatus().toString(), status);
 								hashFolders.put(status, new HashSet<EntryID>());
@@ -457,7 +457,7 @@ public class SpecialInboxPanel extends JPanel {
 						if (statusHash.containsKey(member.getActivityStatus().toString())) {
 							status = statusHash.get(member.getActivityStatus().toString());
 						} else {
-							I_GetConceptData statusConcept = Terms.get().getConcept(member.getActivityStatus());
+							I_GetConceptData statusConcept = member.getActivityStatus();
 							status = statusConcept.toString();
 							statusHash.put(member.getActivityStatus().toString(), status);
 

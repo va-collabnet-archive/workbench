@@ -301,7 +301,7 @@ public class TranslationWorkFlowStep2Outputs extends AbstractTask {
 			});
 
 			if (returnCondition!=Condition.STOP){
-				workListMember.setActivityStatus(selectedNextStatus.ids[0]);
+				workListMember.setActivityStatus(Terms.get().getConcept(selectedNextStatus.ids[0]));
 				TerminologyProjectDAO.updateWorkListMemberMetadata(workListMember, config);
 
 				process.setDestination(selectedDestination);

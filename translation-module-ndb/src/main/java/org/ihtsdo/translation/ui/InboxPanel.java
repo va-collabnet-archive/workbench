@@ -1990,7 +1990,7 @@ public class InboxPanel extends JPanel {
 					I_GetConceptData statusCon = pRefset.getPreviousPromotionStatus(member.getId(), config);
 					Long statusTime = pRefset.getPreviousStatusTime(member.getId(), config);
 					if (statusCon != null) {
-						member.setActivityStatus(statusCon.getUids().iterator().next());
+						member.setActivityStatus(statusCon);
 						member = TerminologyProjectDAO.updateWorkListMemberMetadata(member, config);
 						try {
 							Terms.get().commit();
