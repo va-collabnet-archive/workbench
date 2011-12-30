@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,7 +37,8 @@ public class NewTagPanel extends JDialog {
 	}
 
 	private InboxTag tag = null;
-
+	private Color color;
+	
 	private void initCustomComponents() {
 	}
 
@@ -55,24 +57,24 @@ public class NewTagPanel extends JDialog {
 
 	private void createButtonActionPerformed(ActionEvent e) {
 		String tagName = tagNameField.getText();
-		String colorText = tagColorField.getText();
-		if(tagName.equals("") || colorText.equals("")){
+		if(tagName.equals("") || color == null){
 			colorLabel.setForeground(Color.RED);
 			colorLabel.setText("Invalid values");
 			return;
 		}
-		InboxTag tag = new InboxTag(tagName, colorText, null);
+		InboxTag tag = new InboxTag(tagName, TagManager.getInstance().getHtmlColor(color), null);
 		close(tag);
-	}
-
-	private void previewButtonActionPerformed(ActionEvent e) {
-		String tagName = tagNameField.getText();
-		String colorText = tagColorField.getText();
-		colorLabel.setText(TagManager.getInstance().getHeader(tagName, colorText));
 	}
 
 	private void cancelActionPerformed(ActionEvent e) {
 		close(null);
+	}
+
+	private void colorChooserActionPerformed(ActionEvent e) {
+		color = JColorChooser.showDialog(this, "TAG Color", Color.GREEN);
+		String tagName = tagNameField.getText();
+		String colorText = TagManager.getInstance().getHtmlColor(color);
+		colorLabel.setText(TagManager.getInstance().getHeader(tagName, colorText));
 	}
 
 	private void initComponents() {
@@ -85,10 +87,9 @@ public class NewTagPanel extends JDialog {
 		label1 = new JLabel();
 		tagNameField = new JTextField();
 		label2 = new JLabel();
-		tagColorField = new JTextField();
-		separator1 = new JSeparator();
-		previewButton = new JButton();
+		colorChooser = new JButton();
 		colorLabel = new JLabel();
+		separator1 = new JSeparator();
 
 		//======== this ========
 		Container contentPane = getContentPane();
@@ -125,10 +126,10 @@ public class NewTagPanel extends JDialog {
 		{
 			panel2.setBorder(new EmptyBorder(5, 5, 5, 5));
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 44, 0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0, 10, 0, 0};
+			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 22, 0, 0};
+			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 26, 5, 0};
 			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
+			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
 			//---- label1 ----
 			label1.setText("Tag Name:");
@@ -144,27 +145,24 @@ public class NewTagPanel extends JDialog {
 			panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
-			panel2.add(tagColorField, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+
+			//---- colorChooser ----
+			colorChooser.setText("<html><body><table><tr><td style=\"background-color: RED; width:12px;height:12px;\" >");
+			colorChooser.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					colorChooserActionPerformed(e);
+				}
+			});
+			panel2.add(colorChooser, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.VERTICAL,
+				new Insets(0, 0, 5, 5), 0, 0));
+			panel2.add(colorLabel, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.VERTICAL,
 				new Insets(0, 0, 5, 0), 0, 0));
 			panel2.add(separator1, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 5, 0), 0, 0));
-
-			//---- previewButton ----
-			previewButton.setText("Preview");
-			previewButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					previewButtonActionPerformed(e);
-				}
-			});
-			panel2.add(previewButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-			panel2.add(colorLabel, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
 		contentPane.add(panel2, BorderLayout.CENTER);
 		pack();
@@ -181,9 +179,8 @@ public class NewTagPanel extends JDialog {
 	private JLabel label1;
 	private JTextField tagNameField;
 	private JLabel label2;
-	private JTextField tagColorField;
-	private JSeparator separator1;
-	private JButton previewButton;
+	private JButton colorChooser;
 	private JLabel colorLabel;
+	private JSeparator separator1;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

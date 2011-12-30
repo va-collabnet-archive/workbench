@@ -40,7 +40,6 @@ public class InboxTableModel extends DefaultTableModel {
 	private static String[] columnNames = { "Component", "Target", "Worklist", "Destination", "State", "wf item" };
 	private LinkedList<Object[]> data = new LinkedList<Object[]>();
 	private WorkflowSearcher searcher;
-	private ArrayList<String> ids;
 	private I_TermFactory tf;
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
@@ -228,12 +227,12 @@ public class InboxTableModel extends DefaultTableModel {
 								}
 							}
 						}
-						String concept = tf.getConcept(wfInstance.getComponentId()).getInitialText();
+						String concept = wfInstance.getComponentName();
 						Object[] row = new Object[columnNames.length];
 						String componentStr = tagStr + concept;
 						row[COMPONENT] = componentStr;
 						row[TARGET] = "";
-						row[WORKLIST] = tf.getConcept(wfInstance.getWorkListId()).getInitialText();
+						row[WORKLIST] = wfInstance.getWorkListName();
 						row[DESTINATION] = wfInstance.getDestination().getUsername();
 						row[STATE] = wfInstance.getState().getName();
 						row[WORKFLOW_ITEM] = wfInstance;

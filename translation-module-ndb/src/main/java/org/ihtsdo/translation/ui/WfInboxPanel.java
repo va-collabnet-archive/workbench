@@ -84,10 +84,21 @@ public class WfInboxPanel extends JPanel {
 			tagManager.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
 				public void propertyChange(PropertyChangeEvent arg0) {
+					InboxTag tag = (InboxTag) arg0.getNewValue();
 					if (arg0.getPropertyName().equals(TagManager.NEW_TAG_ADDED)) {
-						InboxTag createdTag = (InboxTag) arg0.getNewValue();
-						menuItemCache.put(createdTag.toString(), createdTag);
+						menuItemCache.put(tag.toString(), tag);
 						initTagMenu();
+					} else if (arg0.getPropertyName().equals(TagManager.SPECIAL_TAG_ADDED)) {
+						int rows = inboxTable.getRowCount();
+						String uuidAdded = tag.getUuidList().get(0);
+						for (int i = 0; i < rows; i++) {
+							Object[] row = model.getRow(i);
+							WfInstance wfi = (WfInstance) row[InboxTableModel.WORKFLOW_ITEM];
+							if (uuidAdded.equals(wfi.getComponentId())) {
+								model.removeRow(i);
+								break;
+							}
+						}
 					}
 				}
 			});
@@ -134,17 +145,19 @@ public class WfInboxPanel extends JPanel {
 			List<InboxTag> tags = tagManager.getTagNames();
 			if (tags != null) {
 				for (InboxTag tag : tags) {
-					JMenuItem tagMenuItem = new JMenuItem();
-					String tagMenuString = tag.toString();
-					tagMenuItem.setText(tagMenuString);
-					menuItemCache.put(tagMenuString, tag);
-					tagMenuItem.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							tagItemActionPreformed(e);
-						}
-					});
-					menu2.add(tagMenuItem);
+					if (!tag.getTagName().equals("outbox") && !tag.getTagName().equals("todo")) {
+						JMenuItem tagMenuItem = new JMenuItem();
+						String tagMenuString = tag.toString();
+						tagMenuItem.setText(tagMenuString);
+						menuItemCache.put(tagMenuString, tag);
+						tagMenuItem.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								tagItemActionPreformed(e);
+							}
+						});
+						menu2.add(tagMenuItem);
+					}
 				}
 			}
 		} catch (IOException e1) {
@@ -317,8 +330,8 @@ public class WfInboxPanel extends JPanel {
 									}
 								}
 							}
+							break;
 						}
-						break;
 					}
 				}
 				uiPanel.updateUI(wfInstance, false);
@@ -531,11 +544,9 @@ public class WfInboxPanel extends JPanel {
 
 class ArrayComparator implements Comparator<Object[]> {
 	private final int columnToSort;
-	private final boolean ascending;
 
-	public ArrayComparator(int columnToSort, boolean ascending) {
+	public ArrayComparator(int columnToSort) {
 		this.columnToSort = columnToSort;
-		this.ascending = ascending;
 	}
 
 	public int compare(Object[] c1, Object[] c2) {

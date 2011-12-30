@@ -79,7 +79,8 @@ public class InboxTreePanel extends JPanel {
 					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem );
 					cNode.add(chldNode);
 					model.reload(cNode);
-				}else if(evt.getPropertyName().equals(TagManager.ITEM_TAGGED)){
+					model.reload(chldNode);
+				}else if(evt.getPropertyName().equals(TagManager.ITEM_TAGGED) || evt.getPropertyName().equals(TagManager.SPECIAL_TAG_ADDED)){
 					int childCount = cNode.getChildCount();
 					for (int i = 0; i < childCount; i++){
 						DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
@@ -88,11 +89,14 @@ public class InboxTreePanel extends JPanel {
 						if(tag.equals(newTag)){
 							if(!newTag.getUuidList().isEmpty()){
 								treeItem.setItemSize(newTag.getUuidList().size());
+								child.setUserObject(treeItem);
 							}else{
 								model.removeNodeFromParent(child);
 							}
 							break;
 						}
+						model.reload(cNode);
+						model.reload(child);
 					}
 				}
 			}

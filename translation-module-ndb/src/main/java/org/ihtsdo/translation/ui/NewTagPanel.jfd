@@ -92,11 +92,11 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>0, 39, 0:1.0</string> 
+          <string>0, center:17, left:0:1.0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
-          <string>0, 0, 5, 0</string> 
+          <string>0, 21, 5</string> 
          </void> 
          <void method="setProperty"> 
           <string>$hGap</string> 
@@ -177,9 +177,21 @@
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JTextField</string> 
+          <string>javax.swing.JButton</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>&lt;html&gt;&lt;body&gt;&lt;table&gt;&lt;tr&gt;&lt;td style=&quot;background-color: RED; width:12px;height:12px;&quot; &gt;</string> 
+          </void> 
           <void property="name"> 
-           <string>tagColorField</string> 
+           <string>colorChooser</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ActionListener</string> 
+            <string>actionPerformed</string> 
+            <string>colorChooserActionPerformed</string> 
+            <boolean>true</boolean> 
+           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
@@ -192,9 +204,24 @@
            <string>gridy</string> 
            <int>1</int> 
           </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void property="name"> 
+           <string>colorLabel</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
-           <string>gridwidth</string> 
+           <string>gridx</string> 
            <int>2</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>gridy</string> 
+           <int>1</int> 
           </void> 
          </object> 
         </void> 
@@ -213,52 +240,6 @@
           </void> 
           <void method="setProperty"> 
            <string>gridwidth</string> 
-           <int>3</int> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JButton</string> 
-          <void method="setProperty"> 
-           <string>text</string> 
-           <string>Preview</string> 
-          </void> 
-          <void property="name"> 
-           <string>previewButton</string> 
-          </void> 
-          <void method="addEvent"> 
-           <object class="com.jformdesigner.model.FormEvent"> 
-            <string>java.awt.event.ActionListener</string> 
-            <string>actionPerformed</string> 
-            <string>previewButtonActionPerformed</string> 
-            <boolean>true</boolean> 
-           </object> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-          <void method="setProperty"> 
-           <string>gridy</string> 
-           <int>3</int> 
-          </void> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JLabel</string> 
-          <void property="name"> 
-           <string>colorLabel</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-          <void method="setProperty"> 
-           <string>gridx</string> 
-           <int>1</int> 
-          </void> 
-          <void method="setProperty"> 
-           <string>gridy</string> 
            <int>3</int> 
           </void> 
          </object> 
