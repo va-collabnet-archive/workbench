@@ -52,7 +52,6 @@ import net.jini.lookup.entry.Name;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.dwfa.ace.activity.ActivityViewer;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -67,8 +66,8 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -99,6 +98,7 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
@@ -1723,7 +1723,7 @@ public class TerminologyProjectDAO {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
 			WorklistMetadata worklistMetadata=new WorklistMetadata(workListWithMetadata.getName(),workListWithMetadata.getId(),
-					workListWithMetadata.getUids(),workListWithMetadata.getPartitionUUID(),workListWithMetadata.getWorkflowDefinition(),
+					workListWithMetadata.getUids(),workListWithMetadata.getPartitionUUID(),
 					workListWithMetadata.getWorkflowDefinitionFileName(),workListWithMetadata.getWorkflowUserRoles());
 			String metadata =serialize(worklistMetadata);
 
@@ -2431,12 +2431,12 @@ public class TerminologyProjectDAO {
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
 				workListWithMetadata.getPartitionUUID());
-		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
+		workList.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(workListWithMetadata.getWorkflowDefinitionFileName()));
 		workList.setWorkflowDefinitionFileName(workListWithMetadata.getWorkflowDefinitionFileName());
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
 		//		String metadata = serialize(workList);
 		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
-				workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+				workList.getUids(),workList.getPartitionUUID(),
 				workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
 		String metadata =serialize(worklistMetadata);
 
@@ -3374,7 +3374,7 @@ public class TerminologyProjectDAO {
 			if (objectWithMetadata instanceof WorkList){
 				WorkList workList=(WorkList)objectWithMetadata;
 				WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
-						workList.getUids(),workList.getPartitionUUID(),workList.getWorkflowDefinition(),
+						workList.getUids(),workList.getPartitionUUID(),
 						workList.getWorkflowDefinitionFileName(),workList.getWorkflowUserRoles());
 				metadata =serialize(worklistMetadata);
 			}else{

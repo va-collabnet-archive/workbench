@@ -249,7 +249,7 @@ public class PartitionDetailsPanel extends JPanel {
 		for (String key : hsRes.keySet()) {
 			Object val = hsRes.get(key);
 			if (key.equals("WDS")) {
-				workflowDefinition = WorkflowDefinitionManager.readWfDefinition((File) val);
+				workflowDefinition = WorkflowDefinitionManager.readWfDefinition(((File) val).getName());
 				roles = workflowDefinition.getRoles();
 
 			}

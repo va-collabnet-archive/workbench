@@ -104,7 +104,7 @@ public class WizardLauncher {
 		public void notifyThis(WizardFrame wizardFrame, int index,HashMap<String,Object> mapCollector) {
 			if (index==2){
 				File wdff=(File)mapCollector.get("WDS");
-				WorkflowDefinition wd=WorkflowDefinitionManager.readWfDefinition(wdff);
+				WorkflowDefinition wd=WorkflowDefinitionManager.readWfDefinition(wdff.getName());
 				List<WfRole> roles = wd.getRoles();
 				I_fastWizard[] panels = wizardFrame.getPanels();
 				int countPanel=2 + roles.size();

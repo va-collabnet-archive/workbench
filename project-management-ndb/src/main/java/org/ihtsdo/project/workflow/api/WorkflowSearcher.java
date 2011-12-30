@@ -137,6 +137,7 @@ public class WorkflowSearcher {
 
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
 		for (WorkList wl : worklist) {
+			WorkflowInterpreter.createWorkflowInterpreter(wl.getWorkflowDefinition());
 			List<WorkListMember> wlMembers = wl.getWorkListMembers();
 			for (WorkListMember workListMember : wlMembers) {
 				result.add(workListMember.getWfInstance());

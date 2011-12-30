@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
@@ -13,16 +15,23 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class WorkflowDefinitionManager {
 
-	public static WorkflowDefinition readWfDefinition(File file){
+	private static Map<String,WorkflowDefinition> wfDefCache = new HashMap<String,WorkflowDefinition>();
 
-		XStream xStream = new XStream(new DomDriver());
-		WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
-		return wfDef;
+	public static WorkflowDefinition readWfDefinition(String fileName){
+		if (wfDefCache.containsKey(fileName)) {
+			return wfDefCache.get(fileName);
+		} else {
+			File file = new File("sampleProcesses/" + fileName);
+			XStream xStream = new XStream(new DomDriver());
+			WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
+			wfDefCache.put(fileName, wfDef);
+			return wfDef;
+		}
 
 	}
 
-	public static void writeWfDefinition(WorkflowDefinition wfDefinition, File outputFile){
-
+	public static void writeWfDefinition(WorkflowDefinition wfDefinition, String fileName){
+		File outputFile = new File("sampleProcesses/" + fileName);
 		XStream xStream = new XStream(new DomDriver());
 
 		FileOutputStream rfos;
@@ -30,6 +39,7 @@ public class WorkflowDefinitionManager {
 			rfos = new FileOutputStream(outputFile);
 			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
 			xStream.toXML(wfDefinition,rosw);
+			wfDefCache.put(fileName, wfDefinition);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {

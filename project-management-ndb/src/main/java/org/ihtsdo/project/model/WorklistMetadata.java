@@ -20,14 +20,12 @@ public class WorklistMetadata implements Serializable{
 	/** The partition id. */
 	private UUID partitionUUID;
 	
-	private WorkflowDefinition workflowDefinition;
-	
 	private String workflowDefinitionFileName;
 	
 	private List<WfMembership> workflowUserRoles;
 
 	public WorklistMetadata(String name, int id, List<UUID> uids,
-			UUID partitionUUID, WorkflowDefinition workflowDefinition,
+			UUID partitionUUID,
 			String workflowDefinitionFileName,
 			List<WfMembership> workflowUserRoles) {
 		super();
@@ -35,7 +33,6 @@ public class WorklistMetadata implements Serializable{
 		this.id = id;
 		this.uids = uids;
 		this.partitionUUID = partitionUUID;
-		this.workflowDefinition = workflowDefinition;
 		this.workflowDefinitionFileName = workflowDefinitionFileName;
 		this.workflowUserRoles = workflowUserRoles;
 	}
@@ -70,14 +67,6 @@ public class WorklistMetadata implements Serializable{
 
 	public void setPartitionUUID(UUID partitionUUID) {
 		this.partitionUUID = partitionUUID;
-	}
-
-	public WorkflowDefinition getWorkflowDefinition() {
-		return workflowDefinition;
-	}
-
-	public void setWorkflowDefinition(WorkflowDefinition workflowDefinition) {
-		this.workflowDefinition = workflowDefinition;
 	}
 
 	public String getWorkflowDefinitionFileName() {

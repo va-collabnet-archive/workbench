@@ -30,6 +30,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
+import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
@@ -92,7 +93,7 @@ public class WorkList extends WorkflowRefset implements Serializable{
 	
 	public static WorkList getInstanceFromMetadata(WorklistMetadata worklistMetadata) throws TerminologyException, IOException{
 		WorkList worklist=new WorkList(worklistMetadata.getName(),worklistMetadata.getId(),worklistMetadata.getUids(),worklistMetadata.getPartitionUUID());
-		worklist.setWorkflowDefinition(worklistMetadata.getWorkflowDefinition());
+		worklist.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(worklistMetadata.getWorkflowDefinitionFileName()));
 		worklist.setWorkflowDefinitionFileName(worklistMetadata.getWorkflowDefinitionFileName());
 		worklist.setWorkflowUserRoles(worklistMetadata.getWorkflowUserRoles());
 		return worklist;
