@@ -24,16 +24,14 @@ public class WorkflowDefinitionManager {
 			File file = new File("sampleProcesses/" + fileName);
 			XStream xStream = new XStream(new DomDriver());
 			WorkflowDefinition wfDef=(WorkflowDefinition)xStream.fromXML(file);
-			wfDef.setFileName(fileName);
 			wfDefCache.put(fileName, wfDef);
 			return wfDef;
 		}
 
 	}
 
-	public static void writeWfDefinition(WorkflowDefinition wfDefinition, String fileName){
-		wfDefinition.setFileName(fileName);
-		File outputFile = new File("sampleProcesses/" + fileName);
+	public static void writeWfDefinition(WorkflowDefinition wfDefinition){
+		File outputFile = new File("sampleProcesses/" + wfDefinition.getName() + ".wfd");
 		XStream xStream = new XStream(new DomDriver());
 
 		FileOutputStream rfos;
@@ -41,7 +39,7 @@ public class WorkflowDefinitionManager {
 			rfos = new FileOutputStream(outputFile);
 			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
 			xStream.toXML(wfDefinition,rosw);
-			wfDefCache.put(fileName, wfDefinition);
+			wfDefCache.put(wfDefinition.getName() + ".wfd", wfDefinition);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {

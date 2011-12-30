@@ -270,7 +270,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 			}
 			workflowDefinition.setDrlFileName(drlFiles);
 			workflowDefinition.setXlsFileName(xlsFiles);
-			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition, workflowDefinition.getName());
+			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition);
 		}
 		else
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");

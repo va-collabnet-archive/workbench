@@ -2432,8 +2432,8 @@ public class TerminologyProjectDAO {
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
 				workListWithMetadata.getPartitionUUID());
-		workList.setWorkflowDefinition(WorkflowDefinitionManager.readWfDefinition(workListWithMetadata.getWorkflowDefinitionFileName()));
-		workList.setWorkflowDefinitionFileName(workListWithMetadata.getWorkflowDefinitionFileName());
+		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
+		
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
 		//		String metadata = serialize(workList);
 		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
