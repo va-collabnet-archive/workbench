@@ -46,6 +46,8 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagManager;
 
 /**
  * @author Vahram Manukyan
@@ -60,9 +62,41 @@ public class InboxTreePanel extends JPanel {
 	private Object inboxItem;
 	private WorklistItemsWorker worklistItemsWorker;
 	private I_GetConceptData user;
+	TagManager tagManager;
+	private DefaultMutableTreeNode cNode;
 
 	public InboxTreePanel() {
 		initComponents();
+
+		// Tag Manager initialization
+		tagManager = TagManager.getInstance();
+		tagManager.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				InboxTag newTag = (InboxTag)evt.getNewValue();
+				if (evt.getPropertyName().equals(TagManager.NEW_TAG_ADDED)) {
+					InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag,newTag.getUuidList().size());
+					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem );
+					cNode.add(chldNode);
+					model.reload(cNode);
+				}else if(evt.getPropertyName().equals(TagManager.ITEM_TAGGED)){
+					int childCount = cNode.getChildCount();
+					for (int i = 0; i < childCount; i++){
+						DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+						InboxTreeItem treeItem = (InboxTreeItem)child.getUserObject();
+						InboxTag tag = (InboxTag) treeItem.getUserObject();
+						if(tag.equals(newTag)){
+							if(!newTag.getUuidList().isEmpty()){
+								treeItem.setItemSize(newTag.getUuidList().size());
+							}else{
+								model.removeNodeFromParent(child);
+							}
+							break;
+						}
+					}
+				}
+			}
+		});
 		inboxFolderTree.setRootVisible(false);
 		inboxFolderTree.setShowsRootHandles(false);
 		provider = new WfComponentProvider();
@@ -102,7 +136,7 @@ public class InboxTreePanel extends JPanel {
 	}
 
 	private void updateTree() {
-		DefaultMutableTreeNode cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
+		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
 		DefaultMutableTreeNode iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
 		DefaultMutableTreeNode sNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.STATUS_NODE_ROOT, IconUtilities.STATUS_NODE, new FolderMetadata(IconUtilities.STATUS_NODE, true)));
 		// updateStatusNode(sNode);
@@ -123,15 +157,15 @@ public class InboxTreePanel extends JPanel {
 		inboxFolderTree.expandRow(1);
 
 		model.reload();
-		updateWorkflowNodes(wNode, sNode);
+		updateWorkflowNodes(wNode, sNode,cNode);
 	}
 
-	private void updateWorkflowNodes(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode) {
+	private void updateWorkflowNodes(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode) {
 		if (worklistItemsWorker != null && !worklistItemsWorker.isDone()) {
 			worklistItemsWorker.cancel(true);
 			worklistItemsWorker = null;
 		}
-		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode, config, searcher, model, user);
+		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode,cNode, config, searcher, model, user);
 		worklistItemsWorker.addPropertyChangeListener(new ProgressListener(progressBar));
 		worklistItemsWorker.execute();
 	}
@@ -317,17 +351,19 @@ class InboxTreeItem {
 class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem> {
 	private DefaultMutableTreeNode wNode;
 	private DefaultMutableTreeNode sNode;
+	private DefaultMutableTreeNode cNode;
 	private I_ConfigAceFrame config;
 	private WorkflowSearcher searcher;
 	private DefaultTreeModel model;
 	private I_GetConceptData user;
 	private JTree inboxFolderTreee;
 
-	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model,
+	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode, I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model,
 			I_GetConceptData user) {
 		super();
 		this.wNode = wNode;
 		this.sNode = sNode;
+		this.cNode = cNode;
 		this.config = config;
 		this.searcher = searcher;
 		this.model = model;
@@ -337,34 +373,47 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 
 	@Override
 	public List<InboxTreeItem> doInBackground() {
-		List<InboxTreeItem> inboxTreeItems = new ArrayList<InboxTreeItem>();
 		try {
 			if (config != null) {
-				inboxTreeItems = getWorklistsStatusesAndSize();
-				process(inboxTreeItems);
+				getWorklistsStatusesAndSize();
+				getTags();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return inboxTreeItems;
+		return null;
 	}
 
-	private List<InboxTreeItem> getWorklistsStatusesAndSize() {
-		List<InboxTreeItem> inboxTreeItems = new ArrayList<InboxTreeItem>();
+	private void getTags() {
+
+		TagManager tm = TagManager.getInstance();
+		List<InboxTag> tagsContent = new ArrayList<InboxTag>();
+		try {
+			tagsContent = tm.getAllTagsContent();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (tagsContent != null && !tagsContent.isEmpty()) {
+			for (InboxTag tag : tagsContent) {
+				InboxTreeItem inboxItem = new InboxTreeItem(tag, tag.getUuidList().size());
+				publish(inboxItem);
+			}
+		}
+	}
+
+	private void getWorklistsStatusesAndSize() {
 		try {
 			WfUser wfUser;
 			wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
 			HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser);
 			Set<Object> worklistsAndStates = worklists.keySet();
-			inboxTreeItems = new ArrayList<InboxTreeItem>();
 			for (Object loopObject : worklistsAndStates) {
 				InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject));
-				inboxTreeItems.add(inboxItem);
+				publish(inboxItem);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return inboxTreeItems;
 	}
 
 	@Override
@@ -377,6 +426,9 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 			inboxFolderTreee.expandPath(new TreePath(path));
 
 			path = sNode.getPath();
+			inboxFolderTreee.expandPath(new TreePath(path));
+
+			path = cNode.getPath();
 			inboxFolderTreee.expandPath(new TreePath(path));
 		} catch (Exception ignore) {
 			ignore.printStackTrace();
@@ -392,9 +444,12 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 					wNode.add(chldNode);
 				} else if (inboxTreeItem.getUserObject() instanceof WfState) {
 					sNode.add(chldNode);
+				}else if(inboxTreeItem.getUserObject() instanceof InboxTag){
+					cNode.add(chldNode);
 				}
 				model.reload(wNode);
 				model.reload(sNode);
+				model.reload(cNode);
 			}
 		}
 	}

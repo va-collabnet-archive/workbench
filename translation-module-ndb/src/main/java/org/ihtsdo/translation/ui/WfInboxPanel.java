@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -16,6 +17,8 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -25,16 +28,17 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -42,6 +46,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
@@ -51,6 +56,8 @@ import org.ihtsdo.project.workflow.filters.WfDestinationFilter;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagManager;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.model.InboxTableModel;
 
@@ -66,11 +73,24 @@ public class WfInboxPanel extends JPanel {
 	private TranslationPanel uiPanel;
 	private int nextIndex = 0;
 	private Object[] currentRow;
+	private TagManager tagManager;
+	private HashMap<String, InboxTag> menuItemCache = new HashMap<String, InboxTag>();
 
 	public WfInboxPanel() {
 
 		initComponents();
 		try {
+			tagManager = TagManager.getInstance();
+			tagManager.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent arg0) {
+					if (arg0.getPropertyName().equals(TagManager.NEW_TAG_ADDED)) {
+						InboxTag createdTag = (InboxTag) arg0.getNewValue();
+						menuItemCache.put(createdTag.toString(), createdTag);
+						initTagMenu();
+					}
+				}
+			});
 			provider = new WfComponentProvider();
 			model = new InboxTableModel(progressBar1);
 			sorter = new TableRowSorter<InboxTableModel>(model);
@@ -101,11 +121,70 @@ public class WfInboxPanel extends JPanel {
 				}
 			});
 
+			initTagMenu();
 			updateDestinationCombo();
 			updateFilters();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void initTagMenu() {
+		try {
+			List<InboxTag> tags = tagManager.getTagNames();
+			if (tags != null) {
+				for (InboxTag tag : tags) {
+					JMenuItem tagMenuItem = new JMenuItem();
+					String tagMenuString = tag.toString();
+					tagMenuItem.setText(tagMenuString);
+					menuItemCache.put(tagMenuString, tag);
+					tagMenuItem.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							tagItemActionPreformed(e);
+						}
+					});
+					menu2.add(tagMenuItem);
+				}
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void tagItemActionPreformed(ActionEvent e) {
+		try {
+			int tableRowIndex = inboxTable.getSelectedRow();
+			int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
+			Object[] selectedRow = model.getRow(modelRowIndex);
+			WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+			List<String> uuidList = new ArrayList<String>();
+			uuidList.add(wfi.getComponentId().toString());
+			JMenuItem jMenuItem = (JMenuItem) e.getSource();
+			InboxTag tag = menuItemCache.get(jMenuItem.getText());
+			tag.setUuidList(uuidList);
+			TagManager.getInstance().tag(tag);
+			model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxTableModel.COMPONENT], modelRowIndex, InboxTableModel.COMPONENT);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void removeTagMenuItemActionPerformed(ActionEvent e) {
+		try {
+			int tableRowIndex = inboxTable.getSelectedRow();
+			int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
+			Object[] selectedRow = model.getRow(modelRowIndex);
+			WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+			InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
+			TagManager.getInstance().removeTag(tag, wfi.getComponentId().toString());
+			model.setValueAt(tf.getConcept(wfi.getComponentId()).toUserString(), modelRowIndex, InboxTableModel.COMPONENT);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (TerminologyException ex) {
+			ex.printStackTrace();
+		}
+
 	}
 
 	private void updateDestinationCombo() {
@@ -141,7 +220,8 @@ public class WfInboxPanel extends JPanel {
 
 		Object[][] data = new Object[43][];
 		for (int i = 0; i < 43; i++) {
-			Object[] row = { "a" + i, "b" + i, "c" + i, "d" + i, "e" + i };
+			String stringx = "<html><body><table style=\"table-layout:fixed;\"><tr><td style=\"background-color:${COLOR};white-space:nowrap;\">text<td><td style=\"white-space:nowrap;\">RESTO es un texto super larto y la verdad que se va haciendo mas largo";
+			Object[] row = { stringx.replace("${COLOR}", "RED") + i, "b" + i, "c" + i, "d" + i, "e" + i };
 			data[i] = row;
 		}
 		newContentPane.model.updateTable(data);
@@ -179,7 +259,15 @@ public class WfInboxPanel extends JPanel {
 	}
 
 	private void inboxTableMouseClicked(MouseEvent e) {
-		if (e.getClickCount() == 2) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			int xPoint = e.getX();
+			int yPoint = e.getY();
+			int row = inboxTable.rowAtPoint(new Point(xPoint, yPoint));
+			inboxTable.setRowSelectionInterval(row, row);
+			if (row > -1) {
+				popupMenu1.show(inboxTable, xPoint, yPoint);
+			}
+		} else if (e.getClickCount() == 2) {
 			int selectedIndex = inboxTable.getSelectedRow();
 			if (selectedIndex >= 0) {
 
@@ -244,6 +332,26 @@ public class WfInboxPanel extends JPanel {
 		}
 	}
 
+	private void createNewTagActionPerformed(ActionEvent e) {
+		NewTagPanel tagPanel = new NewTagPanel();
+		InboxTag tag = tagPanel.showModalDialog();
+		if (tag != null) {
+			try {
+				int tableRowIndex = inboxTable.getSelectedRow();
+				int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
+				Object[] selectedRow = model.getRow(tableRowIndex);
+				WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+				List<String> uuidList = new ArrayList<String>();
+				uuidList.add(wfi.getComponentId().toString());
+				tag.setUuidList(uuidList);
+				TagManager.getInstance().createTag(tag);
+				model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxTableModel.COMPONENT], modelRowIndex, InboxTableModel.COMPONENT);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -265,6 +373,10 @@ public class WfInboxPanel extends JPanel {
 		scrollPane1 = new JScrollPane();
 		inboxTable = new JTable();
 		currentTranslationItem = new JLabel();
+		popupMenu1 = new JPopupMenu();
+		menu2 = new JMenu();
+		createNewTag = new JMenuItem();
+		removeTagMenuItem = new JMenuItem();
 
 		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -355,6 +467,37 @@ public class WfInboxPanel extends JPanel {
 			splitPane1.setRightComponent(panel4);
 		}
 		add(splitPane1, BorderLayout.CENTER);
+
+		// ======== popupMenu1 ========
+		{
+
+			// ======== menu2 ========
+			{
+				menu2.setText("Tag");
+
+				// ---- createNewTag ----
+				createNewTag.setText("new tag");
+				createNewTag.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						createNewTagActionPerformed(e);
+					}
+				});
+				menu2.add(createNewTag);
+				menu2.addSeparator();
+			}
+			popupMenu1.add(menu2);
+
+			// ---- removeTagMenuItem ----
+			removeTagMenuItem.setText("Remove Tag");
+			removeTagMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					removeTagMenuItemActionPerformed(e);
+				}
+			});
+			popupMenu1.add(removeTagMenuItem);
+		}
 		// //GEN-END:initComponents
 	}
 
@@ -378,6 +521,10 @@ public class WfInboxPanel extends JPanel {
 	private JScrollPane scrollPane1;
 	private JTable inboxTable;
 	private JLabel currentTranslationItem;
+	private JPopupMenu popupMenu1;
+	private JMenu menu2;
+	private JMenuItem createNewTag;
+	private JMenuItem removeTagMenuItem;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 }

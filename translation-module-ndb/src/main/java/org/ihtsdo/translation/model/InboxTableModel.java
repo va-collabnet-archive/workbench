@@ -16,15 +16,15 @@ import java.util.concurrent.FutureTask;
 
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagManager;
 
 public class InboxTableModel extends DefaultTableModel {
 
@@ -43,9 +43,14 @@ public class InboxTableModel extends DefaultTableModel {
 	private ArrayList<String> ids;
 	private I_TermFactory tf;
 	private JProgressBar pBar;
+	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
 
 	private InboxWorker inboxWorker;
 
+	public InboxTag getTagByUuid(String uuid){
+		return tagCache.get(uuid);
+	}
+	
 	public InboxTableModel(JProgressBar pBar) {
 		super();
 		this.tf = Terms.get();
@@ -165,9 +170,10 @@ public class InboxTableModel extends DefaultTableModel {
 		super.setRowCount(data.size());
 	}
 
-	class InboxWorker extends SwingWorker<List<WfInstance>, WorkSetMember> {
+	class InboxWorker extends SwingWorker<List<WfInstance>, WfInstance> {
 		private HashMap<String, WfSearchFilterBI> filterList;
 		private ExecutorService executor;
+		private List<InboxTag> tags;
 
 		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
 			super();
@@ -185,6 +191,7 @@ public class InboxTableModel extends DefaultTableModel {
 				}
 			});
 			executor.execute(future);
+
 			try {
 				// try every 10 seconds
 				while (!future.isDone()) {
@@ -194,6 +201,10 @@ public class InboxTableModel extends DefaultTableModel {
 				if (!future.isCancelled()) {
 					wfInstances = future.get();
 				}
+				tags = TagManager.getInstance().getAllTagsContent();
+				for (WfInstance wfInstance : wfInstances) {
+					publish(wfInstance);
+				}
 			} catch (CancellationException e) {
 			}
 			executor.shutdown();
@@ -201,16 +212,26 @@ public class InboxTableModel extends DefaultTableModel {
 		}
 
 		@Override
-		public void done() {
-			List<WfInstance> wfInstances = null;
+		protected void process(List<WfInstance> wfInstances) {
 			try {
-				wfInstances = get();
 				if (!isCancelled()) {
 					data = new LinkedList<Object[]>();
 					int i = 0;
 					for (WfInstance wfInstance : wfInstances) {
+						String tagStr = "";
+						if (tags != null) {
+							for (InboxTag tag : tags) {
+								if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
+									tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor());
+									tagCache.put(wfInstance.getComponentId().toString(), tag);
+									break;
+								}
+							}
+						}
+						String concept = tf.getConcept(wfInstance.getComponentId()).getInitialText();
 						Object[] row = new Object[columnNames.length];
-						row[COMPONENT] = tf.getConcept(wfInstance.getComponentId()).getInitialText();
+						String componentStr = tagStr + concept;
+						row[COMPONENT] = componentStr;
 						row[TARGET] = "";
 						row[WORKLIST] = tf.getConcept(wfInstance.getWorkListId()).getInitialText();
 						row[DESTINATION] = wfInstance.getDestination().getUsername();
@@ -221,6 +242,16 @@ public class InboxTableModel extends DefaultTableModel {
 					}
 					fireTableDataChanged();
 				}
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
+			}
+		}
+
+		@Override
+		public void done() {
+			List<WfInstance> wfInstances = null;
+			try {
+				wfInstances = get();
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
