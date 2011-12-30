@@ -459,6 +459,12 @@ public class TranslationPanel extends JPanel {
 		if (updateUIThread != null && updateUIThread.isAlive()) {
 			updateUIThread.interrupt();
 		}
+		if (detailsThread != null && detailsThread.isAlive()) {
+			detailsThread.interrupt();
+		}
+		if (hierThread != null && hierThread.isAlive()) {
+			hierThread.interrupt();
+		}
 		verifySavePending(null, false);
 		clearForm(true);
 	}
@@ -1254,18 +1260,20 @@ public class TranslationPanel extends JPanel {
 		if (action!=null){
 			I_Work worker=null;
 			try {
-				worker = Terms.get().getActiveAceFrameConfig().getWorker();
-				WfInstance prevWfInstance=new WfInstance();
-				prevWfInstance.setComponentId(instance.getComponentId());
-				prevWfInstance.setDestination(instance.getDestination());
-				prevWfInstance.setHistory(instance.getHistory());
-				prevWfInstance.setProperties(instance.getProperties());
-				prevWfInstance.setState(instance.getState());
-				prevWfInstance.setWfDefinition(instance.getWfDefinition());
-				prevWfInstance.setWorkListId(instance.getWorkListId());
-				workflowInterpreter.doAction(instance, action, worker);
-				WfInstance newWfInstance = worklistMember.getWfInstance();
-				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
+				if (verifySavePending(null, false)){
+					worker = Terms.get().getActiveAceFrameConfig().getWorker();
+					WfInstance prevWfInstance=new WfInstance();
+					prevWfInstance.setComponentId(instance.getComponentId());
+					prevWfInstance.setDestination(instance.getDestination());
+					prevWfInstance.setHistory(instance.getHistory());
+					prevWfInstance.setProperties(instance.getProperties());
+					prevWfInstance.setState(instance.getState());
+					prevWfInstance.setWfDefinition(instance.getWfDefinition());
+					prevWfInstance.setWorkListId(instance.getWorkListId());
+					workflowInterpreter.doAction(instance, action, worker);
+					WfInstance newWfInstance = worklistMember.getWfInstance();
+					firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
+				}
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(this,
@@ -2273,6 +2281,8 @@ public class TranslationPanel extends JPanel {
 	private WorkflowInterpreter workflowInterpreter;
 	private WfComponentProvider componentProvider;
 	private WfInstance instance;
+	private Thread detailsThread;
+	private Thread hierThread;
 
 	/**
 	 * Gets the concept.
@@ -3274,11 +3284,34 @@ public class TranslationPanel extends JPanel {
 			}
 			populateSourceTree();
 			populateTargetTree();
-			populateDetailsTree();
+			Runnable detailsThr = new Runnable() {
+				public void run() {
+					try {
+						populateDetailsTree();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			};
 
-			hierarchyNavigator1.setContainerPanel(tabbedPane3);
-			hierarchyNavigator1.setFocusConcept(concept);
+			detailsThread = new Thread(detailsThr);
+			detailsThread.start();
 
+			Runnable hierThr = new Runnable() {
+				public void run() {
+					try {
+						hierarchyNavigator1.setContainerPanel(tabbedPane3);
+						hierarchyNavigator1.setFocusConcept(concept);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			};
+
+			hierThread = new Thread(hierThr);
+			hierThread.start();
+			
 			sourceICS = LanguageUtil.getDefaultICS(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
 			if (sourceICS)
 				rbYes.setSelected(true);

@@ -33,17 +33,17 @@ import java.awt.event.WindowEvent;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import javax.swing.*;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
@@ -92,6 +92,10 @@ public class HierarchyNavigator extends JPanel {
 
 		comboBox1.setTransferHandler(new ObjectTransferHandler());
 
+		DefaultMutableTreeNode tmpRoot = new DefaultMutableTreeNode();
+		
+		tree1.setModel(new DefaultTreeModel(tmpRoot));
+		tree2.setModel(new DefaultTreeModel(tmpRoot));
 		tree1.setCellRenderer(new HierarchyIconRenderer());
 		tree2.setCellRenderer(new HierarchyIconRenderer());
 		I_TermFactory termFactory = Terms.get();
@@ -146,6 +150,11 @@ public class HierarchyNavigator extends JPanel {
 		//		applyDNDHack(tree2);
 	}
 	public void setFocusConcept(I_GetConceptData focusConcept){
+		DefaultMutableTreeNode tmpRoot = new DefaultMutableTreeNode();
+		
+		tree1.setModel(new DefaultTreeModel(tmpRoot));
+		tree2.setModel(new DefaultTreeModel(tmpRoot));
+		
 		comboBox1.addItem(focusConcept);
 		comboBox1.setSelectedItem(focusConcept);
 		//		tree1.setModel(getParentsTreeModel(focusConcept));
