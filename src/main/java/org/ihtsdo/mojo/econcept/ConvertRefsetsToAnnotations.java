@@ -88,6 +88,9 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
     void executeMojo(String[] conceptsFileNames, String inputDir)
             throws MojoExecutionException {
         try {
+            if (inputDir.equals(outputDir)) {
+                throw new MojoExecutionException("Input and output directories cannot be the same: " + inputDir);
+            }
             long startTime = System.currentTimeMillis();
 
             HashMap<UUID, ConceptDescriptor> refsetsToConvertMap =
