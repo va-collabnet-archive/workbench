@@ -1986,7 +1986,7 @@ public class InboxPanel extends JPanel {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 					WorkList worklist = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistId), config);
 					PromotionRefset pRefset = worklist.getPromotionRefset(config);
-					WorkListMember member = TerminologyProjectDAO.getWorkListMember(memberCpt, worklistId, config);
+					WorkListMember member = TerminologyProjectDAO.getWorkListMember(memberCpt, worklist, config);
 					I_GetConceptData statusCon = pRefset.getPreviousPromotionStatus(member.getId(), config);
 					Long statusTime = pRefset.getPreviousStatusTime(member.getId(), config);
 					if (statusCon != null) {

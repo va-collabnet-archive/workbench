@@ -3812,7 +3812,7 @@ public class TranslationPanel extends JPanel {
 			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(worklist, config);
 
 			I_GetConceptData component = Terms.get().getConcept(instance.getComponentId());
-			WorkListMember workListMember = TerminologyProjectDAO.getWorkListMember(component, workListConcept.getNid(), config);
+			WorkListMember workListMember = TerminologyProjectDAO.getWorkListMember(component, worklist, config);
 			updateUI(translationProject,workListMember,roleConcept);
 			List<WfAction> actions = workflowInterpreter.getPossibleActions(instance, user);
 			setPossibleActions(actions);
