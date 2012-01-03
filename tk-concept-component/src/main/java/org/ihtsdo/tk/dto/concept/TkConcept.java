@@ -516,7 +516,7 @@ public class TkConcept {
                         break;
                     case ARRAY_BYTEARRAY:
                         refsetMembers.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
-
+                        break;
                     default:
                         throw new UnsupportedOperationException("Can't handle refset type: " + type);
                 }

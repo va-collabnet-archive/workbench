@@ -45,7 +45,7 @@ import org.ihtsdo.tk.hash.Hashcode;
  * @author kec
  */
 public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>
-        implements RefexArrayOfBytearrayAnalogBI<ArrayOfBytearrayRevision> {
+        implements RefexArrayOfBytearrayAnalogBI<ArrayOfBytearrayRevision>, Comparable<RefsetMember> {
 
     private static VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version> computer =
             new VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version>();
@@ -90,6 +90,15 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
     @Override
     protected void addRefsetTypeNids(Set<Integer> allNids) {
         // ;
+    }
+    
+    @Override
+    public final int compareTo(RefsetMember o) {
+        if (getNid() != o.getNid()) {
+            return getNid() - o.getNid();
+        }
+
+        return this.getSapNid() - o.getSapNid();
     }
 
     @Override

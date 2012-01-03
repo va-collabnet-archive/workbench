@@ -357,7 +357,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
                 
             case ARRAY_BYTEARRAY:
                 annotations.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
-
+                break;
             default :
                throw new UnsupportedOperationException("Can't handle refset type: " + type);
             }
