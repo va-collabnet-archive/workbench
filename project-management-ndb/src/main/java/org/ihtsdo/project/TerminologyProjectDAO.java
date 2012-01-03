@@ -58,6 +58,7 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -2850,7 +2851,7 @@ public class TerminologyProjectDAO {
 
 
 	}
-
+	private static I_HelpRefsets helperRefset=null;
 	public static void addConceptAsPartitionMember(PartitionMember member, Partition partition, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -2882,7 +2883,10 @@ public class TerminologyProjectDAO {
 			}
 
 			if (!alreadyMember) {
-				termFactory.getRefsetHelper(config).newRefsetExtension(
+				if (helperRefset==null){
+					helperRefset=termFactory.getRefsetHelper(config);
+				}
+				helperRefset.newRefsetExtension(
 						partitionConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(), 
 						EConcept.REFSET_TYPES.STR, 
