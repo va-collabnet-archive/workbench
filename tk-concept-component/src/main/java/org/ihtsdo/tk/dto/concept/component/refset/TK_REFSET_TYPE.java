@@ -97,6 +97,9 @@ public enum TK_REFSET_TYPE {
         if (RefexVersionBI.class.isAssignableFrom(c)) {
             return MEMBER;
         }
+        if (RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(c)) {
+            return ARRAY_BYTEARRAY;
+        }
         return UNKNOWN;
     }
 
@@ -129,6 +132,8 @@ public enum TK_REFSET_TYPE {
                 return CID_LONG;
             case 13:
                 return LONG;
+            case 14:
+                return ARRAY_BYTEARRAY;
         }
         throw new UnsupportedOperationException("Can't handle type: " + type);
     }

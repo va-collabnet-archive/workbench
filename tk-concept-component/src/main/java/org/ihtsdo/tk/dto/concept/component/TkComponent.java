@@ -39,6 +39,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 
 public abstract class TkComponent<V extends TkRevision> extends TkRevision {
    private static final long serialVersionUID = 1;
@@ -353,6 +354,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
                annotations.add(new TkRefsetLongMember(in, dataVersion));
 
                break;
+                
+            case ARRAY_BYTEARRAY:
+                annotations.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
 
             default :
                throw new UnsupportedOperationException("Can't handle refset type: " + type);

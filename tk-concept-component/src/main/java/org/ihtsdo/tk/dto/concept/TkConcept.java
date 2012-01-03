@@ -56,6 +56,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.api.refex.type_str.RefexStrVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 
 public class TkConcept {
 
@@ -513,6 +514,8 @@ public class TkConcept {
                         refsetMembers.add(new TkRefsetLongMember(in, readDataVersion));
 
                         break;
+                    case ARRAY_BYTEARRAY:
+                        refsetMembers.add(new TkRefsetArrayOfBytearrayMember(in, dataVersion));
 
                     default:
                         throw new UnsupportedOperationException("Can't handle refset type: " + type);

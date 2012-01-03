@@ -216,6 +216,7 @@ public class CidFloatRevision extends RefsetRevision<CidFloatRevision, CidFloatM
       return new TkRefsetCidFloatMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
+    @Override
    protected TK_REFSET_TYPE getTkRefsetType() {
       return TK_REFSET_TYPE.CID_FLOAT;
    }

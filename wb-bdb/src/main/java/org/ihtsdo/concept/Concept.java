@@ -1402,7 +1402,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
     
     @Override
-    public Collection<? extends DescriptionChronicleBI> getDescs() throws IOException {
+    public Collection<Description> getDescs() throws IOException {
         return getDescriptions();
     }
     

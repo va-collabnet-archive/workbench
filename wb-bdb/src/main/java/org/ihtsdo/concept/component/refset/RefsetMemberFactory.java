@@ -35,12 +35,14 @@ import org.ihtsdo.tk.dto.concept.component.refset.str.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.component.refsetmember.array.bytearray.ArrayOfBytearrayMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.dto.concept.component.refset.array.bytearray.TkRefsetArrayOfBytearrayMember;
 
 public class RefsetMemberFactory {
 
@@ -120,7 +122,8 @@ public class RefsetMemberFactory {
                 return new CidLongMember(enclosingConceptNid, input);
             case LONG:
                 return new LongMember(enclosingConceptNid, input);
-
+            case ARRAY_OF_BYTEARRAY:
+                return new ArrayOfBytearrayMember(enclosingConceptNid, input);
             default:
                 throw new UnsupportedOperationException(
                         "Can't handle member type: " + memberType);
@@ -155,7 +158,8 @@ public class RefsetMemberFactory {
                 return new CidLongMember((TkRefsetCidLongMember) refsetMember, enclosingConceptNid);
             case LONG:
                 return new LongMember((TkRefsetLongMember) refsetMember, enclosingConceptNid);
-
+            case ARRAY_BYTEARRAY:
+                return new ArrayOfBytearrayMember((TkRefsetArrayOfBytearrayMember) refsetMember, enclosingConceptNid);
             default:
                 throw new UnsupportedOperationException(
                         "Can't handle member type: " + refsetMember.getType());
@@ -246,6 +250,8 @@ public class RefsetMemberFactory {
                 return new CidLongMember();
             case LONG:
                 return new LongMember();
+            case ARRAY_BYTEARRAY:
+                return new ArrayOfBytearrayMember();
 
             default:
                 throw new UnsupportedOperationException(
