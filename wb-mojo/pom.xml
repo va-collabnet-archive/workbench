@@ -131,7 +131,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-icons</artifactId>
-			<version>${wb-icons-version}</version>
+			<version>${wb-icons.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
