@@ -32,7 +32,7 @@ public class RefsetSplitter {
 			if(newPartition != null){
 				for (I_GetConceptData concept : conceptsSet) {
 					TerminologyProjectDAO.addConceptAsPartitionMember(concept, 
-							newPartition.getUids().iterator().next(), config);
+							newPartition, config);
 				}
 			}
 			Terms.get().addUncommittedNoChecks(newPartition.getConcept());

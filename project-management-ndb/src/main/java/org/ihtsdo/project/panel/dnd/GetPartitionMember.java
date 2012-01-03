@@ -19,7 +19,7 @@ public class GetPartitionMember implements I_GetItemForModel {
 	public Object getItemFromConcept(I_GetConceptData concept) throws Exception {
 
 		TerminologyProjectDAO.addConceptAsPartitionMember(concept, 
-				partition.getUids().iterator().next(), config);	
+				partition, config);	
 		Terms.get().commit();
 		TranslationHelperPanel.setFocusToProjectPanel();
 		return TerminologyProjectDAO.getPartitionMember(concept, partition.getId(), config);

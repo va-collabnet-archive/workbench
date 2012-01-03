@@ -435,10 +435,10 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 				i++;
 				if (i<=5) {
 					TerminologyProjectDAO.addConceptAsPartitionMember(
-							member.getConcept(), partition21.getUids().iterator().next(), config);
+							member.getConcept(), partition21, config);
 				} else {
 					TerminologyProjectDAO.addConceptAsPartitionMember(
-							member.getConcept(), partition22.getUids().iterator().next(), config);
+							member.getConcept(), partition22, config);
 				}
 			}
 			

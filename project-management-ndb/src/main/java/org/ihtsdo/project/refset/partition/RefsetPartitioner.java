@@ -40,7 +40,7 @@ public abstract class RefsetPartitioner {
 			if(newPartition != null){
 				for (I_GetConceptData loopMember : membersToIncludeInNewPartition) {
 					TerminologyProjectDAO.addConceptAsPartitionMember(loopMember, 
-							newPartition.getUids().iterator().next(), config);
+							newPartition, config);
 				}
 				Terms.get().addUncommittedNoChecks(newPartition.getConcept());
 				newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);

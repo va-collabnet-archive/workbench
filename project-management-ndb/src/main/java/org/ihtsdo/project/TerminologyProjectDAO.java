@@ -1585,6 +1585,7 @@ public class TerminologyProjectDAO {
 						partitionConcept.getConceptNid(),
 						partitionConcept.getUids(),
 						scheme.getUids().iterator().next());
+				partition.setConcept(partitionConcept);
 			}
 
 		} catch (TerminologyException e) {
@@ -2326,7 +2327,7 @@ public class TerminologyProjectDAO {
 		try {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
-			addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
+			addConceptAsPartitionMember(concept, workList.getPartition(), config);
 			Terms.get().addUncommitted(workList.getPartition().getConcept());
 			workList.getPartition().getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			WorkListMember workListMember = new WorkListMember(concept.toString(), 
@@ -2532,7 +2533,7 @@ public class TerminologyProjectDAO {
 		for (Partition loopPartition : partitions) {
 			for (PartitionMember loopMember : loopPartition.getPartitionMembers()) {
 				addConceptAsPartitionMember(loopMember.getConcept(), 
-						newPartition.getUids().iterator().next(), config);
+						newPartition, config);
 			}
 
 		}
@@ -2592,7 +2593,7 @@ public class TerminologyProjectDAO {
 		try{
 			if(isConceptDuplicate(name  + " (partition)")){
 				JOptionPane.showMessageDialog(new JDialog(), "Duplicated partition name", "Warning", JOptionPane.WARNING_MESSAGE);
-				throw new Exception("Partition name allready exists.");
+				throw new Exception("Partition name already exists.");
 			}
 			PartitionScheme newPartitionScheme = createNewPartitionScheme(name,
 					workSet.getUids().iterator().next(), config);
@@ -2606,7 +2607,8 @@ public class TerminologyProjectDAO {
 			int counter = 0;
 			for (WorkSetMember loopMember : members) {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
-						newPartition.getUids().iterator().next(), config);
+						newPartition, config);
+				Thread.sleep(10);
 				counter++;
 				activity.setValue(counter);
 				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
@@ -2678,12 +2680,10 @@ public class TerminologyProjectDAO {
 
 			partition = new Partition(partitionWithMetadata.getName(), newConcept.getConceptNid(), 
 					newConcept.getUids(), partitionWithMetadata.getPartitionSchemeUUID());
+			partition.setConcept(newConcept);
 
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.commit();
-			//			promote(newConcept, config);
-			//			termFactory.addUncommittedNoChecks(newConcept);
-			//			termFactory.commit();
 
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -2691,6 +2691,10 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		if (partition != null) {
+			partitionCache.put(newConcept.getPrimUuid(), partition);
 		}
 
 		return partition;
@@ -2844,14 +2848,14 @@ public class TerminologyProjectDAO {
 	}
 
 	public static void addConceptAsPartitionMember(I_GetConceptData partitionMemberConcept, 
-			UUID partitionUUID, I_ConfigAceFrame config) {
+			Partition partition, I_ConfigAceFrame config) {
 		try {
 			PartitionMember partitionMember = new PartitionMember(partitionMemberConcept.toString(), 
 					partitionMemberConcept.getConceptNid(),
 					partitionMemberConcept.getUids(),
-					partitionUUID);
+					partition.getConcept().getPrimUuid());
 			partitionMember.setMemberConcept(partitionMemberConcept);
-			addConceptAsPartitionMember(partitionMember, config);
+			addConceptAsPartitionMember(partitionMember, partition, config);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -2860,13 +2864,12 @@ public class TerminologyProjectDAO {
 
 	}
 
-	public static void addConceptAsPartitionMember(PartitionMember member, I_ConfigAceFrame config) {
+	public static void addConceptAsPartitionMember(PartitionMember member, Partition partition, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
 			termFactory.setActiveAceFrameConfig(config);
 			I_GetConceptData newMemberConcept = member.getMemberConcept();
-			I_GetConceptData partitionConcept = termFactory.getConcept(member.getPartitionUUID());
-			Partition partition = getPartition(partitionConcept, config);
+			I_GetConceptData partitionConcept = partition.getConcept();
 
 			boolean alreadyMember = false;
 			

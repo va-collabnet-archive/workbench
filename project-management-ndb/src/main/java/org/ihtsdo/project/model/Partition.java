@@ -43,6 +43,8 @@ public class Partition implements Serializable{
 
 	/** The WorkSet id. */
 	private UUID partitionSchemeUUID;
+	
+	private I_GetConceptData concept;
 
 	/**
 	 * Instantiates a new work set.
@@ -70,7 +72,9 @@ public class Partition implements Serializable{
 	 * @return the concept
 	 */
 	public I_GetConceptData getConcept() {
-		I_GetConceptData concept = null;
+		if (concept != null) {
+			return concept;
+		}
 		try {
 			concept = Terms.get().getConcept(uids);
 		} catch (TerminologyException e) {
@@ -168,6 +172,10 @@ public class Partition implements Serializable{
 	public I_TerminologyProject getProject() {
 		//TODO: implement
 		return null;
+	}
+
+	public void setConcept(I_GetConceptData concept) {
+		this.concept = concept;
 	}
 
 }
