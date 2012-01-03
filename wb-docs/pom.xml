@@ -99,6 +99,7 @@
 
 						<configuration>
 							<timestampFormat>{0,date,MMMMM dd yyyy}</timestampFormat>
+							<revisionOnScmFailure>UNKNOWN</revisionOnScmFailure>
 						</configuration>
 					</execution>
 				</executions>
