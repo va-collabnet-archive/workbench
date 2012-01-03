@@ -216,12 +216,16 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                      changed.set(true);
 
                      if (eMember == null) {
-                        eMember = v.getERefsetMember();
-
-                        if (eMember != null) {
-                           eRefsetMembers.add(eMember);
-                           setupFirstVersion(eMember, v);
-                        }
+                    	 try {
+ 	                        eMember = v.getERefsetMember();
+ 	
+ 	                        if (eMember != null) {
+ 	                           eRefsetMembers.add(eMember);
+ 	                           setupFirstVersion(eMember, v);
+ 	                        }
+                  		} catch (Exception e) {
+                 	        AceLog.getAppLog().info("Failed in getting Concept for: " + member.toString() + " and " + v.toString());
+                 		}
                      } else {
                         TkRevision eRevision = v.getERefsetRevision();
 

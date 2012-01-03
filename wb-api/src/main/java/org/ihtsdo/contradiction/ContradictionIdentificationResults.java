@@ -44,7 +44,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<ConceptVersionBI> getConflictingConcepts() {
-        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
         try {
             for (Integer i : conflictingConcepts) {
@@ -59,7 +59,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<ConceptVersionBI> getDuplicateEditCompId() {
-        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
         try {
             for (Integer i : duplicateEdit) {
@@ -74,7 +74,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<ConceptVersionBI> getDuplicateNewCompId() {
-        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
         try {
             for (Integer i : duplicateNew) {
@@ -89,7 +89,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<ConceptVersionBI> getSingleConcepts() {
-        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
         try {
             for (Integer i : singleConcepts) {
@@ -104,7 +104,7 @@ public class ContradictionIdentificationResults {
     }
 
     public TreeSet<ConceptVersionBI> getNoneConflictingConcepts() {
-        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+        TreeSet<ConceptVersionBI> sortedConcepts = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createVersionedPreferredTermComparer());
 
         try {
             for (Integer i : nonConflictingConcepts) {

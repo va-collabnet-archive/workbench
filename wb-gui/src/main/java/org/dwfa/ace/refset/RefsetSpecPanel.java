@@ -88,9 +88,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -100,6 +97,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
+import org.ihtsdo.util.swing.GuiUtil;
 
 public class RefsetSpecPanel extends JPanel {
    private static final String COMMENT_VIEW                = "comments";
@@ -316,7 +314,7 @@ public class RefsetSpecPanel extends JPanel {
          column5.setFieldClass(StringWithExtTuple.class);
          column5.setMin(5);
          column5.setPref(150);
-         column5.setMax(150);
+         column5.setMax(450);
          column5.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
          column5.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getPathId"));
          column5.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setPathId", int.class));
@@ -324,15 +322,15 @@ public class RefsetSpecPanel extends JPanel {
          columns.add(column5);
       }
 
-      ReflexiveRefsetCommentTableModel commentTableModel =
+      ReflexiveRefsetCommentTableModel modelForCommentTable =
          new ReflexiveRefsetCommentTableModel(editor,
             columns.toArray(new ReflexiveRefsetFieldData[columns.size()]));
 
-      aceFrameConfig.addPropertyChangeListener("viewPositions", commentTableModel);
-      aceFrameConfig.addPropertyChangeListener("commit", commentTableModel);
-      aceFrameConfig.addPropertyChangeListener("commitEnabled", commentTableModel);
-      aceFrameConfig.addPropertyChangeListener("uncommitted", commentTableModel);
-      editor.getLabel().addTermChangeListener(commentTableModel);
+      aceFrameConfig.addPropertyChangeListener("viewPositions", modelForCommentTable);
+      aceFrameConfig.addPropertyChangeListener("commit", modelForCommentTable);
+      aceFrameConfig.addPropertyChangeListener("commitEnabled", modelForCommentTable);
+      aceFrameConfig.addPropertyChangeListener("uncommitted", modelForCommentTable);
+      editor.getLabel().addTermChangeListener(modelForCommentTable);
 
       int               componentId = Integer.MIN_VALUE;
       I_AmTermComponent component   = editor.getTermComponent();
@@ -341,10 +339,10 @@ public class RefsetSpecPanel extends JPanel {
          componentId = component.getNid();
       }
 
-      commentTableModel.setComponentId(componentId);
-      commentTableModel.getRowCount();
+      modelForCommentTable.setComponentId(componentId);
+      modelForCommentTable.getRowCount();
 
-      JTableWithDragImage commentTable = new JTableWithDragImage(commentTableModel);
+      JTableWithDragImage commentTable = new JTableWithDragImage(modelForCommentTable);
 
       commentTable.getColumnModel().addColumnModelListener(new CommentTableColumnModelListener(commentTable));
       SortClickListener.setupSorter(commentTable);
@@ -405,25 +403,25 @@ public class RefsetSpecPanel extends JPanel {
          return;
       }
 
-      Box horizontalBox = new Box(BoxLayout.X_AXIS);
+      Box horizontalBoxLayout = new Box(BoxLayout.X_AXIS);
       int memberId      = getComponentIdOfCurrentSelection();
 
-      horizontalBox.add(Box.createHorizontalStrut(5));
+      horizontalBoxLayout.add(Box.createHorizontalStrut(5));
 
       JLabel snomedIdLabel = new JLabel("SNOMED ID of selected component: ");
 
-      horizontalBox.add(snomedIdLabel);
-      horizontalBox.add(Box.createHorizontalStrut(5));
+      horizontalBoxLayout.add(snomedIdLabel);
+      horizontalBoxLayout.add(Box.createHorizontalStrut(5));
 
       if (hasSnomedId(memberId)) {
-         horizontalBox.add(new JLabel("" + getSnomedId(memberId)));
+         horizontalBoxLayout.add(new JLabel("" + getSnomedId(memberId)));
       } else {
-         horizontalBox.add(new JLabel("Not available"));
+         horizontalBoxLayout.add(new JLabel("Not available"));
       }
 
-      horizontalBox.add(Box.createHorizontalGlue());
+      horizontalBoxLayout.add(Box.createHorizontalGlue());
       snomedIdPanel.add(Box.createVerticalStrut(5));
-      snomedIdPanel.add(horizontalBox);
+      snomedIdPanel.add(horizontalBoxLayout);
       snomedIdPanel.add(Box.createVerticalStrut(5));
    }
 
@@ -499,21 +497,6 @@ public class RefsetSpecPanel extends JPanel {
       column3.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setStatusId", int.class));
       column3.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
       columns.add(column3);
-
-      ReflexiveRefsetFieldData column4 = new ReflexiveRefsetFieldData();
-
-      column4.setColumnName("promotion status");
-      column4.setCreationEditable(false);
-      column4.setUpdateEditable(false);
-      column4.setFieldClass(StringWithExtTuple.class);
-      column4.setMin(5);
-      column4.setPref(150);
-      column4.setMax(350);
-      column4.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PROMOTION_REFSET_PART);
-      column4.setReadMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("getC1id"));
-      column4.setWriteMethod(REFSET_TYPES.CONCEPT.getPartClass().getMethod("setC1id", int.class));
-      column4.setType(REFSET_FIELD_TYPE.CONCEPT_IDENTIFIER);
-      columns.add(column4);
 
       if (editor.getShowHistory()) {
          ReflexiveRefsetFieldData column5 = new ReflexiveRefsetFieldData();
@@ -670,6 +653,7 @@ public class RefsetSpecPanel extends JPanel {
             scrollPane.setViewportView(refsetTable);
             verticalBox.add(scrollPane);
             verticalBox.add(Box.createVerticalGlue());
+            GuiUtil.tickle(verticalBox);
 
             break;
          }
@@ -996,6 +980,7 @@ public class RefsetSpecPanel extends JPanel {
    //~--- inner classes -------------------------------------------------------
 
    private class ApproveActionListener implements ActionListener {
+        @Override
       public void actionPerformed(ActionEvent e) {
          Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
 
@@ -1085,6 +1070,7 @@ public class RefsetSpecPanel extends JPanel {
 
 
    private class DisapproveActionListener implements ActionListener {
+        @Override
       public void actionPerformed(ActionEvent e) {
          Set<Integer> tupleMemberIds = refsetTableModel.getSelectedTuples();
 
@@ -1110,12 +1096,15 @@ public class RefsetSpecPanel extends JPanel {
 
 
    private class HistoryActionListener implements ActionListener {
+        @Override
       public void actionPerformed(ActionEvent arg0) {
          try {
             commentTableModel = setupCommentTable();
             setupRefsetMemberTable(commentTableModel);
 
             if ((refsetTable != null) && (refsetTable.getParent() != null)) {
+                refsetTableModel.fireTableDataChanged();
+                GuiUtil.tickle(refsetTable);
                refsetTable.getParent().validate();
             }
          } catch (NoSuchMethodException e) {
@@ -1158,6 +1147,7 @@ public class RefsetSpecPanel extends JPanel {
 
 
    private class MouseClickListener extends MouseAdapter {
+        @Override
       public void mouseClicked(MouseEvent mouseEvent) {
          if (getShowPromotionCheckBoxes()) {
             updateCheckBoxes();
@@ -1191,6 +1181,7 @@ public class RefsetSpecPanel extends JPanel {
          activity.setProgressInfoUpper("Changing status of selected members");
          activity.setProgressInfoLower("Setting up...");
          activity.addRefreshActionListener(new ActionListener() {
+                @Override
             public void actionPerformed(ActionEvent e) {
                cancel(false);
             }
@@ -1255,7 +1246,7 @@ public class RefsetSpecPanel extends JPanel {
                         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
                            I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
                            PROMOTION_STATUS     oldStatus     = PROMOTION_STATUS.get(partToPromote.getC1id());
-                           PROMOTION_STATUS     newStatus     = null;
+                           PROMOTION_STATUS     newStatus;
 
                            if (forApproval) {
                               newStatus = getNewStatusForApproval(oldStatus);

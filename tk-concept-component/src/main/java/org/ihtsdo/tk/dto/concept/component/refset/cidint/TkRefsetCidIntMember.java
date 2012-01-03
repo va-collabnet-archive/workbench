@@ -3,7 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidint;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_int.RefexCnidIntVersionBI;
@@ -79,7 +79,7 @@ public class TkRefsetCidIntMember extends TkRefsetAbstractMember<TkRefsetCidIntR
 
    public TkRefsetCidIntMember(RefexCnidIntVersionBI another, NidBitSetBI exclusions,
                                Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
 
       if (mapAll) {

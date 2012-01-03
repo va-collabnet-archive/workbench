@@ -1,5 +1,6 @@
 package org.ihtsdo.db.bdb;
 
+import com.sleepycat.je.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -50,14 +51,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 
-import com.sleepycat.je.CheckpointConfig;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.EnvironmentLockedException;
-import com.sleepycat.je.EnvironmentMutableConfig;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
@@ -164,6 +157,19 @@ public class Bdb {
         }
     }
 
+    static int getAuthorNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getAuthorNid(sapNid);
+    }
+    static int getPathNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getPathNid(sapNid);
+    }
+    static int getStatusNidForSapNid(int sapNid) {
+        return statusAtPositionDb.getStatusNid(sapNid);
+    }
+    static long getTimeForSapNid(int sapNid) {
+        return statusAtPositionDb.getTime(sapNid);
+    }
+
     private enum HeapSize {
 
         HEAP_1200("je-prop-options/1200.je.properties"),
@@ -268,6 +274,9 @@ public class Bdb {
             BdbCommitManager.reset();
             PositionMapper.reset();
             NidDataFromBdb.resetExecutorPool();
+            BdbPathManager.reset();
+            REFSET_TYPES.resetNids();
+            
             for (@SuppressWarnings("unused") OFFSETS o : OFFSETS.values()) {
                 // ensure all OFFSETS are initialized prior to multi-threading. 
             }
@@ -282,6 +291,7 @@ public class Bdb {
 
             inform(activity, "Setting up database environment...");
             mutable = new Bdb(false, new File(bdbDirectory, "mutable"));
+            inform(activity, "Berkeley DB Version: " + JEVersion.CURRENT_VERSION.getVersionString());
             File readOnlyDir = new File(bdbDirectory, "read-only");
             boolean readOnlyExists = readOnlyDir.exists();
             readOnly = new Bdb(readOnlyExists, readOnlyDir);
@@ -301,6 +311,9 @@ public class Bdb {
             conceptDb = new ConceptBdb(readOnly, mutable);
             
            
+            Concept.reset();
+
+            ReferenceConcepts.reset();
             
             inform(activity, "setting up term factory...");
 
@@ -321,9 +334,6 @@ public class Bdb {
             }
             LocalFixedTerminology.setStore(new BdbLegacyFixedFactory());
 
-            REFSET_TYPES.setupNids();
-            ReferenceConcepts.reset();
-            Concept.reset();
 
              inform(activity, "loading cross references...");
             xref = new Xref(readOnly, mutable);
@@ -341,9 +351,6 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
-
-//            watchList.put(Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")), 
-//                            Bdb.uuidToNid(UUID.fromString("95f41098-8391-3f5e-9d61-4b019f1de99d")));
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -377,6 +384,9 @@ public class Bdb {
             envConfig.setSharedCache(true);
             envConfig.setReadOnly(readOnly);
             envConfig.setAllowCreate(!readOnly);
+            //envConfig.setConfigParam(EnvironmentConfig.EVICTOR_LRU_ONLY, "false");
+            envConfig.setConfigParam(EnvironmentConfig.EVICTOR_NODES_PER_SCAN, "4");
+
             /*
              * int primeForLockTable = SieveForPrimeNumbers.largestPrime(
              * Runtime.getRuntime().availableProcessors() - 1);

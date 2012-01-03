@@ -16,8 +16,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.SynonymyType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -54,7 +55,7 @@ public class SetSynonymyAction extends AbstractAction {
         try {
             I_AmPart componentVersion;
             config = Terms.get().getActiveAceFrameConfig();
-            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
             int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
@@ -142,6 +143,8 @@ public class SetSynonymyAction extends AbstractAction {
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        } catch (ContradictionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
 

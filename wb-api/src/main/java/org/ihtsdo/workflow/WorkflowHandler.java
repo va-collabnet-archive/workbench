@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.workflow.WorkflowHandlerBI;
@@ -35,7 +35,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 	}
 
 	@Override
-	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContraditionException {
+	public Collection<? extends WorkflowHistoryJavaBeanBI> getAvailableWorkflowActions(ConceptVersionBI concept, ViewCoordinate vc) throws IOException, ContradictionException {
 		
 		EditorCategoryRefsetSearcher searcher = null;		
 		List<WorkflowHistoryJavaBean> retSet = new ArrayList<WorkflowHistoryJavaBean>();
@@ -57,7 +57,7 @@ public class WorkflowHandler implements WorkflowHandlerBI {
 
 	@Override
 	public boolean hasAction(Collection<? extends WorkflowHistoryJavaBeanBI> beans,ConceptSpec action) 
-		throws IOException, ContraditionException 
+		throws IOException, ContradictionException 
 	{
 		for (WorkflowHistoryJavaBeanBI bean : beans)
 		{

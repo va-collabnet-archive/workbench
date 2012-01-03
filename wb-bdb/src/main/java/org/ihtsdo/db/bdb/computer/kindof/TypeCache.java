@@ -16,7 +16,7 @@ import org.ihtsdo.concept.I_ProcessUnfetchedConceptData;
 import org.ihtsdo.concept.ParallelConceptIterator;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -115,7 +115,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	}
 
 	@Override
-	public void updateCache(ConceptChronicleBI c) throws IOException, ContraditionException {
+	public void updateCache(ConceptChronicleBI c) throws IOException, ContradictionException {
 		boolean inferredChanges = false;
 		
 		ConceptVersion civ = new ConceptVersion((Concept) c, inferredViewCoordinate);
@@ -134,7 +134,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		
 	}
 	
-	protected void updateCacheUsingInferredThenStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
+	protected void updateCacheUsingInferredThenStatedView(ConceptChronicleBI c) throws IOException, ContradictionException {
 		ConceptVersion cv = new ConceptVersion((Concept) c, inferredThenStatedViewCoordinate);
 		NidSet parentSet = new NidSet();
 		for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {
@@ -145,7 +145,7 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		typeMap.put(c.getNid(), parentSet.getSetValues());
 	}
 
-	protected void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContraditionException {
+	protected void updateCacheUsingStatedView(ConceptChronicleBI c) throws IOException, ContradictionException {
 		ConceptVersion cv = new ConceptVersion((Concept) c, statedViewCoordinate);
 		NidSet parentSet = new NidSet();
 		for (RelationshipVersionBI<?> relv : cv.getRelsOutgoingActive()) {

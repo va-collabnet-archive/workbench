@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.ihtsdo.helper.export;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -39,50 +35,52 @@ import java.util.UUID;
  * @author kec
  */
 public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
-   Map<UUID, UUID>       conversionMap;
-   NidBitSetBI           exclusionSet;
-   NidBitSetBI           nidSet;
-   DataOutputStream      out;
-   TerminologySnapshotDI ts;
-   ViewCoordinate        vc;
 
-   //~--- constructors --------------------------------------------------------
+    Map<UUID, UUID> conversionMap;
+    NidBitSetBI exclusionSet;
+    NidBitSetBI nidSet;
+    DataOutputStream out;
+    ViewCoordinate conceptVc;
+    ViewCoordinate descVc;
+    ViewCoordinate relVc;
 
-   public ActiveOnlyExport(ViewCoordinate vc, NidBitSetBI exclusionSet, DataOutputStream out,
-                           Map<UUID, UUID> conversionMap)
-           throws IOException {
-      this.vc            = vc;
-      this.exclusionSet  = exclusionSet;
-      this.nidSet        = Ts.get().getAllConceptNids();
-      this.ts            = Ts.get().getSnapshot(vc);
-      this.out           = out;
-      this.conversionMap = conversionMap;
-   }
+    //~--- constructors --------------------------------------------------------
+    public ActiveOnlyExport(ViewCoordinate conceptVc, ViewCoordinate descVc, ViewCoordinate relVc, 
+            NidBitSetBI exclusionSet, DataOutputStream out,
+            Map<UUID, UUID> conversionMap)
+            throws IOException {
+        this.conceptVc = conceptVc;
+        this.descVc = descVc;
+        this.relVc = relVc;
+        this.exclusionSet = exclusionSet;
+        this.nidSet = Ts.get().getAllConceptNids();
+         this.out = out;
+        this.conversionMap = conversionMap;
+    }
 
-   //~--- methods -------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    @Override
+    public boolean continueWork() {
+        return true;
+    }
 
-   @Override
-   public boolean continueWork() {
-      return true;
-   }
+    @Override
+    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
+        if (!exclusionSet.isMember(cNid)) {
+            ConceptVersionBI conceptVersion = fetcher.fetch(conceptVc);
 
-   @Override
-   public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
-      if (!exclusionSet.isMember(cNid)) {
-         ConceptVersionBI conceptVersion = fetcher.fetch(vc);
+            if ((conceptVersion.getPrimUuid() != null) && conceptVersion.isActive()) {
+                TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, 
+                        conceptVc, descVc, relVc);
 
-         if ((conceptVersion.getPrimUuid() != null) && conceptVersion.isActive(vc)) {
-            TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, vc);
+                tkc.writeExternal(out);
+            }
+        }
+    }
 
-            tkc.writeExternal(out);
-         }
-      }
-   }
-
-   //~--- get methods ---------------------------------------------------------
-
-   @Override
-   public NidBitSetBI getNidSet() throws IOException {
-      return nidSet;
-   }
+    //~--- get methods ---------------------------------------------------------
+    @Override
+    public NidBitSetBI getNidSet() throws IOException {
+        return nidSet;
+    }
 }

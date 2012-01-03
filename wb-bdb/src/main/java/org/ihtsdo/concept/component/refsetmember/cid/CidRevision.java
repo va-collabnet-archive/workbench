@@ -17,7 +17,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember.Version;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -193,7 +193,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
@@ -218,7 +218,7 @@ public class CidRevision extends RefsetRevision<CidRevision, CidMember>
    }
 
    @Override
-   public CidMember.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public CidMember.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return (Version) ((CidMember) primordialComponent).getVersion(c);
    }
 

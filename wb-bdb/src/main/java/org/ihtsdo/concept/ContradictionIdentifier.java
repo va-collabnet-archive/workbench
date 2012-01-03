@@ -36,7 +36,7 @@ import org.ihtsdo.db.bdb.computer.version.PositionMapper;
 import org.ihtsdo.db.bdb.computer.version.PositionMapper.RELATIVE_POSITION;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -361,7 +361,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		        	}
 				}
 	    	}
-		} catch (ContraditionException ce) {
+		} catch (ContradictionException ce) {
 			return ContradictionResult.CONTRADICTION;
 		} 
 		
@@ -400,7 +400,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	private ContradictionResult handleAdjudication(Concept concept, ComponentType compType, ComponentVersionBI latestAdjudicatedVersion, 
 												  ComponentVersionBI latestOriginVersion, Map<Integer, ComponentVersionBI> latestDeveloperVersionMap, 
-												  Set<ComponentVersionBI> foundPositionsVersions) throws TerminologyException, ContraditionException, IOException {
+												  Set<ComponentVersionBI> foundPositionsVersions) throws TerminologyException, ContradictionException, IOException {
 			boolean isContradiction = false;
 			boolean isSingleEdit = false;
 
@@ -678,7 +678,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
     // For a component Type & Nid, get the version corresponding to the View Coordinate 
     private ComponentVersionBI getCurrentVersion(Concept concept, 
-            ComponentType compType, ComponentVersionBI version) throws ContraditionException {
+            ComponentType compType, ComponentVersionBI version) throws ContradictionException {
         ComponentVersionBI currentVersion = null;
         int componentNid = version.getNid();
 		PositionBI developerVersionPosition = getPositionOfVersion(version);
@@ -745,7 +745,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 		return currentVersion;
 	}
 
-	private ComponentVersionBI getAdjudicatorVersion(Concept concept, ComponentType compType, ComponentVersionBI latestAdjudicatedVersion) throws ContraditionException 
+	private ComponentVersionBI getAdjudicatorVersion(Concept concept, ComponentType compType, ComponentVersionBI latestAdjudicatedVersion) throws ContradictionException 
 	{
 		int componentNid = latestAdjudicatedVersion.getNid();
 		PositionBI adjudicatorVersionPosition = getPositionOfVersion(latestAdjudicatedVersion);
@@ -815,7 +815,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
             Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, 
             Iterator<?> versions, 
             int componentNid, 
-            ComponentType compType) throws ContraditionException {
+            ComponentType compType) throws ContradictionException {
         while (versions.hasNext()) {
             ComponentVersionBI v = (ComponentVersionBI) versions.next();
 
@@ -850,7 +850,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
     }
 
-    private ContradictionResult wfHxRefsetMembershipConflictAutomation(Concept concept) throws TerminologyException, IOException, ContraditionException  {
+    private ContradictionResult wfHxRefsetMembershipConflictAutomation(Concept concept) throws TerminologyException, IOException, ContradictionException  {
         ContradictionResult result = ContradictionResult.NONE;
         ComponentVersionBI latestAdjudicatedVersion = null;
         ComponentVersionBI latestOriginVersion = null;
@@ -1058,7 +1058,7 @@ public class ContradictionIdentifier implements ContradictionIdentifierBI {
 
 	private ContradictionResult refsetMembershipConflictFound(
         Concept concept, 
-        Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, int componentNid) throws TerminologyException, IOException, ContraditionException 
+        Map<PositionForSet, HashMap<Integer, ComponentVersionBI>> foundPositionsMap, int componentNid) throws TerminologyException, IOException, ContradictionException 
     {
         boolean isSingleEdit = false;
         boolean isDuplicateEdit = false;

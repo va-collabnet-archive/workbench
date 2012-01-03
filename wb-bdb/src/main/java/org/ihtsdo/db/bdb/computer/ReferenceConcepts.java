@@ -11,6 +11,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public enum ReferenceConcepts {
 
@@ -18,7 +19,13 @@ public enum ReferenceConcepts {
     PATH(ArchitectonicAuxiliary.Concept.PATH.getUids()),
     REFSET_PATH_ORIGINS(RefsetAuxiliary.Concept.REFSET_PATH_ORIGINS.getUids()),
     TERM_AUXILIARY_PATH(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()),
+    /**
+     * @deprecated use SnomedMetadataRfx.getSTATUS_CURRENT_NID()
+     */
     CURRENT(ArchitectonicAuxiliary.Concept.CURRENT.getUids()),
+    /**
+     * @deprecated use SnomedMetadataRfx.getSTATUS_RETIRED_NID()
+     */
     RETIRED(ArchitectonicAuxiliary.Concept.RETIRED.getUids()),
     CONCEPT_EXTENSION(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
     REFSET_MEMBER_PURPOSE(RefsetAuxiliary.Concept.REFSET_MEMBER_PURPOSE.getUids()),

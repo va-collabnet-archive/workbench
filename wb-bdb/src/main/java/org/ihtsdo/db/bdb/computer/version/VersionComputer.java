@@ -449,10 +449,10 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                     }
                 }
             }
-            if (allowedStatus != null) {
+            if (allowedStatus != null && allowedStatus.size() > 0) {
                 List<V> partsToCompare = new ArrayList<V>(partsForPosition);
                 for (V part : partsToCompare) {
-                    if (allowedStatus != null) {
+                    if (allowedStatus != null && allowedStatus.size() > 0) {
                         if (!allowedStatus.contains(part.getStatusNid())) {
                             partsForPosition.remove(part);
                         }
@@ -493,7 +493,7 @@ public class VersionComputer<V extends ConceptComponent<?, ?>.Version> {
                 rejectedVersions.add(part);
                 continue nextpart;
             }
-            if (allowedStatus != null
+            if (allowedStatus != null && allowedStatus.size() > 0
                     && allowedStatus.contains(part.getStatusNid()) == false) {
                 rejectedVersions.add(part);
                 continue nextpart;

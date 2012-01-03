@@ -114,7 +114,8 @@ public class ExportEConceptActiveOnly extends AbstractMojo {
 
          exportVc.setPositionSet(new PositionSet(viewPosition));
 
-         ActiveOnlyExport exporter = new ActiveOnlyExport(exportVc, exclusionSet, out, conversionMap);
+         ActiveOnlyExport exporter = new ActiveOnlyExport(exportVc, exportVc, exportVc, 
+                 exclusionSet, out, conversionMap);
 
          Ts.get().iterateConceptDataInSequence(exporter);
       } catch (Exception ex) {

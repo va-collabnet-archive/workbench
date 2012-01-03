@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.util.swing.GuiUtil;
 
 class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
    private static int count = 0;
@@ -290,6 +291,9 @@ class UpdateTreeSpec extends SwingWorker<RefsetSpecTreeNode, Object> {
             this.refsetSpecEditor.specTreeScroller.getVerticalScrollBar().setValue(specScrollVertValue);
             this.refsetSpecEditor.commentScroller.getHorizontalScrollBar().setValue(commentScrollHorizValue);
             this.refsetSpecEditor.commentScroller.getVerticalScrollBar().setValue(commentScrollVertValue);
+            GuiUtil.tickle(this.refsetSpecEditor.commentScroller);
+            GuiUtil.tickle(this.refsetSpecEditor.specTree);
+            GuiUtil.tickle(this.refsetSpecEditor.specTreeScroller);
          } else {
             this.refsetSpecEditor.commentScroller.getHorizontalScrollBar().setValue(0);
             this.refsetSpecEditor.commentScroller.getVerticalScrollBar().setValue(0);

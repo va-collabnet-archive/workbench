@@ -38,6 +38,7 @@ public class SnoCon implements Comparable<Object> {
         this.isDefined = b;
     }
 
+    @Override
     public int compareTo(Object o) {
         SnoCon other = (SnoCon) o;
         if (this.id > other.id) {

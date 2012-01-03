@@ -35,23 +35,33 @@ package org.dwfa.ace.task.commit;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.dwfa.ace.api.I_DescriptionVersioned;
+import java.util.UUID;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.commit.failureconstraintfactory.AlertToDataConstraintFailureFactory;
 import org.dwfa.ace.task.commit.failureconstraintfactory.SimpleConstraintFailureChooser;
-import org.dwfa.ace.task.commit.validator.ConceptDescriptionFacade;
 import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
 import org.dwfa.ace.task.commit.validator.impl.NotEmptyConceptDataValidator;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * The <code>TestForPreferredTermValue</code> class represents a data constraint
@@ -61,9 +71,10 @@ import org.dwfa.util.bean.Spec;
  * 
  * @author Matthew Edwards
  */
-@BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
-                   @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
+    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
+    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN)})
 public class TestForPreferredTermValue extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
@@ -85,26 +96,76 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit)
             throws TaskFailedException {
         try {
-            I_TermFactory termFactory = getTermFactory();
-
             List<AlertToDataConstraintFailure> alerts = new ArrayList<AlertToDataConstraintFailure>();
-
-            I_GetConceptData requiredConcept = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
-
-            List<I_DescriptionVersioned> descriptions = new ConceptDescriptionFacade(termFactory, this).getAllDescriptions(concept);
+            /*
+             * Use I_TermFactory to get the view coordiate in the active frame.
+             * There is not currently a way to do this using TerminologySnapshotDI.
+             * If there is another way to get the view coordinate, which does not depend
+             * on the active frame, that is preferable
+             */
+            ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            /*
+             * Use SnomedMetadatRfx to get the rf1 or rf2 version of the concept
+             * depending on what the database is using. After getting the concept spec use
+             * getStrict to get either the ConceptChronicle, any ids, or any versioned components.
+             * This will ensure that the the values returned refer to an active concept.
+             */
+            ConceptChronicleBI requiredConcept = SnomedMetadataRfx.getDESC_PREFERRED().getStrict(vc).getChronicle();
+            /*
+             * Getting the ConceptVersion of the concept which was passed in.
+             * Got the version instead of the chronicle because the active
+             * descriptions are needed below. The version already contains the 
+             * information about which components are active.
+             */
+            ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
+            /*
+             * Now getting the active descriptions is easy. Only the active
+             * descriptions are important to test for duplicates, etc.
+             */
+            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
 
             GetConceptDataValidationStrategy validator = new NotEmptyConceptDataValidator(requiredConcept,
-                descriptions, concept);
+                    descsActive, concept);
             try {
                 validator.validate();
             } catch (ValidationException e) {
                 getLogger().info(e.getMessage());
                 alerts.add(getAlertFactory(forCommit).createAlertToDataConstraintFailure(
-                    String.format(ALERT_MESSAGE, requiredConcept.toString()), concept));
+                        String.format(ALERT_MESSAGE, requiredConcept.toString()), concept));
             }
-
-            // return alerts;
-            return new ArrayList<AlertToDataConstraintFailure>();
+            int gbPrefCount = 0;
+            int usPrefCount = 0;
+            /*
+             * Use concept specs to reference.
+             */
+            ConceptSpec EN_GB_LANG =
+                    new ConceptSpec("GB English Dialect Subset",
+                    UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd"));
+            ConceptSpec EN_US_LANG =
+                    new ConceptSpec("US English Dialect Subset",
+                    UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"));
+            
+            for (DescriptionVersionBI desc : descsActive) {
+                /*
+                 * Getting the active status nid and the description type nid
+                 * from the Rfx method. The type nid determins if the description 
+                 * is a FSN or synonym.
+                 */
+                if (desc.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()
+                        && desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
+                    if(this.isPreferredTerm(desc, EN_US_LANG)){
+                        usPrefCount++;
+                    }else if (this.isPreferredTerm(desc, EN_GB_LANG)){
+                        gbPrefCount++;
+                    }
+                }
+            }
+            if (gbPrefCount > 1 || usPrefCount > 1) {
+                alerts.add(getAlertFactory(forCommit).createAlertToDataConstraintFailure(
+                        String.format("<html>More than one PT for dialect in concept",
+                        requiredConcept.toString()), concept));
+            }
+            return alerts;
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
@@ -116,5 +177,49 @@ public class TestForPreferredTermValue extends AbstractConceptTest {
 
     private I_TermFactory getTermFactory() {
         return Terms.get();
+    }
+
+    private boolean isPreferredTerm(DescriptionVersionBI desc, ConceptSpec evalRefset) {
+        boolean isPreferredTerm = false;
+        try {
+            Collection<? extends RefexChronicleBI> refexes =
+                    desc.getCurrentRefexes(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+            /*
+             * Can use getNidForUuids to convert betwee nid and uuid.
+             */
+            int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
+
+            if (refexes != null) {
+                for (RefexChronicleBI refex : refexes) {
+                    if (refex.getCollectionNid() == evalRefsetNid) {
+                        if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
+                            RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
+                            if (RefexCnidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                /*
+                                 * Synonyms are stored in the dialect refexes with either a value
+                                 * of preferred, indicating a preferred term, or acceptable.
+                                 * The type of refex in this case is concept refsex (RefexCnidVersionBI), 
+                                 * and the value of preferred or acceptable is stored in cnid1.
+                                 * See org.ihtsdo.tk.api.refex.type_*
+                                 */
+                                int cnid = ((RefexCnidVersionBI) rv).getCnid1();
+                                if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                    isPreferredTerm = true;
+                                }
+                            } else {
+                                System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);
+                            }
+                        } else {
+                            System.out.println("Can't convert: RefexVersionBI:  " + refex);
+                        }
+                    }
+                }
+            }
+            return isPreferredTerm;
+        } catch (TerminologyException ex) {
+            return isPreferredTerm;
+        } catch (IOException ex) {
+            return isPreferredTerm;
+        }
     }
 }

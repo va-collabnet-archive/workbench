@@ -44,7 +44,7 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -196,7 +196,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 baet.updateExisting(existingParents, existingRefsets, existingRoles, parentLinkages);
             }
 
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);

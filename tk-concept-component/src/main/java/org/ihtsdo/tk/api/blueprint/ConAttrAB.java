@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ihtsdo.tk.api.blueprint;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -31,17 +34,24 @@ public class ConAttrAB extends CreateOrAmendBlueprint {
 
     public ConAttrAB(
             int conceptNid, boolean defined)
-            throws IOException {
+            throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
-                defined);
+                defined, null, null);
     }
 
     public ConAttrAB(
-            UUID componentUuid, boolean defined) throws IOException {
-        super(componentUuid);
-        this.defined = defined;
+            int conceptNid, boolean defined, ConAttrVersionBI conAttr,
+            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        this(Ts.get().getComponent(conceptNid).getPrimUuid(),
+                defined, conAttr, vc);
     }
 
+    public ConAttrAB(
+            UUID componentUuid, boolean defined, ConAttrVersionBI conAttr,
+            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, conAttr, vc);
+        this.defined = defined;
+    }
 
     public boolean validate(ConAttrVersionBI version) throws IOException {
         if (version.getStatusNid() != getStatusNid()) {
@@ -55,6 +65,9 @@ public class ConAttrAB extends CreateOrAmendBlueprint {
         }
         return true;
     }
+
+    @Override
+    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
+        throw new InvalidCAB ("UUID for ConAttrAB is set when concept is created");
+    }
 }
-
-

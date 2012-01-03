@@ -20,7 +20,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidLongMember;
 import org.ihtsdo.etypes.ERefsetCidLongRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -39,6 +39,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
 
 public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
         implements RefexCnidLongAnalogBI<CidLongRevision> {
@@ -133,7 +135,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<CidLongRevision, CidLongMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<CidLongRevision, CidLongMember> obj) {
       if (CidLongMember.class.isAssignableFrom(obj.getClass())) {
          CidLongMember another = (CidLongMember) obj;
 
@@ -142,6 +144,15 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexCnidLongVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexCnidLongVersionBI cv = (RefexCnidLongVersionBI) another;
+            return (this.c1Nid == cv.getCnid1()) && (this.longValue == cv.getLong1());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {
@@ -207,7 +218,7 @@ public class CidLongMember extends RefsetMember<CidLongRevision, CidLongMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidLongMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

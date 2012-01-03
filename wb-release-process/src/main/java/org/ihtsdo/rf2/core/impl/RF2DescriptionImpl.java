@@ -1,12 +1,10 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -88,6 +86,8 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 						if (term.indexOf("\n")>-1){
 							term=term.replaceAll("\n", "");
 						}
+						term=StringEscapeUtils.unescapeHtml(term);
+						
 					}
 					String descriptionstatus = getStatusType(description.getStatusNid());
 					
@@ -108,7 +108,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
 					moduleId = computeModuleId(concept);	
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){			
-						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
+						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
 					}
 					
@@ -118,24 +118,6 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 				
 					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
 						descriptionid=description.getUUIDs().iterator().next().toString();
-						if (descriptionid.contains("-") && updateWbSctId.equals("true")){
-							try {
-								DateFormat df = new SimpleDateFormat("yyyyMMdd");
-								long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();							
-								//get descriptionId by calling web service 
-								String wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
-								if(wbSctId.equals("0")){
-									 wbSctId = getSCTId(getConfig(), UUID.fromString(descriptionid));
-								}							
-								//insert descriptionId in the workbench database 
-								insertSctId(description.getDescId() , getConfig(), wbSctId , description.getPathNid() , description.getStatusNid() , effectiveDate);
-								descriptionid=wbSctId;
-							} catch (NumberFormatException e) {
-								logger.error("NumberFormatException" +e);
-							} catch (Exception e) {
-								logger.error("Exception" +e);
-							}
-						}
 					}					
 					
 					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){

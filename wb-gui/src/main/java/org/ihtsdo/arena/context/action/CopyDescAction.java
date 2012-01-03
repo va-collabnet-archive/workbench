@@ -19,9 +19,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -73,7 +73,7 @@ public class CopyDescAction extends AbstractAction {
                         desc.getLang(), desc.getText(), Terms.get().getConcept(desc.getTypeNid()),
                         config, Terms.get().getConcept(desc.getStatusNid()), Long.MAX_VALUE);
                 newDesc.setInitialCaseSignificant(desc.isInitialCaseSignificant());
-                TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+                TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                         config.getViewCoordinate());
                 int dosNid = SnomedMetadataRfx.getSYNONYMY_REFEX_NID();
                                 for (RefexVersionBI refex : oldRefexes) {
@@ -157,7 +157,7 @@ public class CopyDescAction extends AbstractAction {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InvalidCAB e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContraditionException e1) {
+        } catch (ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 

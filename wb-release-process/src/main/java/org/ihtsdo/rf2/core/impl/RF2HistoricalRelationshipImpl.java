@@ -20,7 +20,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
- * Title: RF2StatedRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 StatedRelationship File Copyright: Copyright (c) 2010
+ * Title: RF2HistoricalRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 HistoricalRelationship File Copyright: Copyright (c) 2010
  * Company: IHTSDO
  * 
  * @author Varsha Parekh
@@ -129,15 +129,19 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 								}
 							}
 						}
-
+						
 						relationshipStatusId = rel.getStatusNid();
 						if (relationshipStatusId == activeNid) { 														
 							active = "1";
-							moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+							moduleId = computeModuleId(sourceConcept);
 						} else if (relationshipStatusId == inactiveNid) { 														
 							active = "0";
-							moduleId = getConceptMetaModuleID(sourceConcept,
-							getDateFormat().format(new Date(rel.getFixedPart().getTime())));
+							moduleId = computeModuleId(sourceConcept);
+						}
+						
+						if(moduleId.equals(I_Constants.META_MOULE_ID)){		
+							logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
+							incrementMetaDataCount();
 						}
 
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));

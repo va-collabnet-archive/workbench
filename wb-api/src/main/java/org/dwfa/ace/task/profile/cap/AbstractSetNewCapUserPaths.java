@@ -26,7 +26,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.swing.SwingWorker;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.utilities.WfComparator;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -54,27 +53,22 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
         }
     }
 
-    protected String[] generatePotentialParentConcepts(ConceptVersionBI parentNode) {
+    protected String[] generatePotentialParentConcepts(I_GetConceptData parentNode) {
 	   try {
-    		Set<ConceptVersionBI> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
+    		Set<I_GetConceptData> potentialParentConcepts = WorkflowHelper.getChildren(parentNode);
     		
-    		SortedSet<ConceptVersionBI> sortedPotentialParents = new TreeSet<ConceptVersionBI>(WfComparator.getInstance().createPreferredTermComparer());
+    		SortedSet<I_GetConceptData> sortedPotentialParents = new TreeSet<I_GetConceptData>(WfComparator.getInstance().createFsnComparer());
 
     		sortedPotentialParents.addAll(potentialParentConcepts);
     		
     		String[] parentConcepts = new String[sortedPotentialParents.size()];
     		
     		int i = 0;
-    		for (ConceptVersionBI con : sortedPotentialParents) {
+    		for (I_GetConceptData con : sortedPotentialParents) {
     			if (con.equals(parentNode)) {
     				initialIndex = i;
     			}
-				String displayStr = con.getPreferredDescription().getText();
-				if (displayStr == null || displayStr.length() == 0) { 
-					displayStr =  con.getFullySpecifiedDescription().getText();
-				}
-
-				parentConcepts[i] = displayStr;
+				parentConcepts[i] = WorkflowHelper.getFsn(con);
 	    		parentIds.add(i++, con.getConceptNid());
     		}
     		
@@ -216,11 +210,7 @@ public abstract class AbstractSetNewCapUserPaths extends PreviousNextOrCancel {
 	    	parentIds = new LinkedList<Integer>();
 	    	I_GetConceptData parentNode = Terms.get().getConcept(getParentNode());
 	    	
-	    	I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
-
-	    	ConceptVersionBI parentVersioned = parentNode.getVersion(newConfig.getViewCoordinate());
-	    	
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentVersioned);
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
 	    	
 	        instruction = getInstruction();
 	        pathList = new JComboBox(potentialParentConcepts);

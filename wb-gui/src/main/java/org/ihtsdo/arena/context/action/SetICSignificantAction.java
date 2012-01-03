@@ -11,7 +11,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
@@ -99,7 +99,7 @@ public class SetICSignificantAction extends AbstractAction {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        } catch(ContraditionException ex){
+        } catch(ContradictionException ex){
             AceLog.getAppLog().alertAndLogException(ex);
         }
 

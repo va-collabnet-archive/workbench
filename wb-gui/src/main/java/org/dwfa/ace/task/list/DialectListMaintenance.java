@@ -45,8 +45,9 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -75,7 +76,7 @@ public class DialectListMaintenance extends AbstractTask {
     ;
     private ConceptChronicleBI dialectRefexColl;
     private ConceptChronicleBI refexColl;
-    private TerminologyConstructorBI tc;
+    private TerminologyBuilderBI tc;
     private ViewCoordinate vc;
     private EditCoordinate ec;
 
@@ -106,7 +107,7 @@ public class DialectListMaintenance extends AbstractTask {
                     vc.getPositionSet().getViewPathNidSet());
             String fileName = (String) process.getProperty(dialectListFileNameProp);
             File icsFile = new File(fileName);
-            tc = Ts.get().getTerminologyConstructor(ec, vc);
+            tc = Ts.get().getTerminologyBuilder(ec, vc);
 
             InputStreamReader isr =
                     new InputStreamReader(new FileInputStream(icsFile),
@@ -195,7 +196,7 @@ public class DialectListMaintenance extends AbstractTask {
         }
     }
 
-    private void addMember(String variant, String word) throws IOException, InvalidCAB {
+    private void addMember(String variant, String word) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB textRefexSpec = new RefexCAB(TK_REFSET_TYPE.STR,
                 refexColl.getNid(), refexColl.getNid());
         textRefexSpec.with(RefexProperty.STRING1, word);

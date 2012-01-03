@@ -1,11 +1,9 @@
 package org.ihtsdo.rf2.core.impl;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -56,10 +54,6 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		String updateWbSctId = "false";
 		
 		try {
-			/*if (concept.getUids().iterator().next().toString().equals("982cdaa1-a5b9-57a6-8d4f-0d1f928d03b4")){
-				boolean bstop=true;
-			}*/
-			
 			if(!getConfig().isUpdateWbSctId().equals(null)){
 				updateWbSctId = getConfig().isUpdateWbSctId();
 			}
@@ -100,56 +94,10 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
 					moduleId = computeModuleId(concept);					
 					if(moduleId.equals(I_Constants.META_MOULE_ID)){
-						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
+						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();
 					}
 				}
-				
-				if (conceptid.contains("-") && updateWbSctId.equals("true")){
-						try {
-							//DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-							DateFormat df = new SimpleDateFormat("yyyyMMdd");
-							long effectiveDate=df.parse(getConfig().getReleaseDate()).getTime();
-							
-							//get conceptId by calling webservice 
-							String wsConceptId = getSCTId(getConfig(), UUID.fromString(conceptid));
-							if(wsConceptId.equals("0")){
-								wsConceptId = getSCTId(getConfig(), UUID.fromString(conceptid));								
-							}
-							conceptid=wsConceptId;
-							
-							//insert conceptId in the workbench database 
-							boolean insertConceptId = insertSctId(concept.getNid() , getConfig(), wsConceptId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
-							if(insertConceptId){
-								//get ctv3Id by calling webservice 
-								String wsCtv3Id = getCTV3ID(getConfig(), UUID.fromString(conceptid));
-								
-								if(wsCtv3Id.equals("0")){
-									wsCtv3Id = getCTV3ID(getConfig(), UUID.fromString(conceptid));
-								}
-								//insert ctv3id if conceptId inserted Successfully
-								boolean insertCtv3Id = insertCtv3Id(concept.getNid() , getConfig(), wsCtv3Id , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
-								
-								//get snomedId by calling webservice 
-								String parentSnomedId = getParentSnomedId(concept);
-								String wsSnomedId = getSNOMEDID(getConfig(), UUID.fromString(conceptid), parentSnomedId);
-								
-								if(wsSnomedId.equals("0")){
-									wsSnomedId = getSNOMEDID(getConfig(), UUID.fromString(conceptid), parentSnomedId);
-								}
-								
-								if(insertCtv3Id){
-									//insert snomedid if conceptId & Ctv3Id inserted Successfully
-									insertSnomedId(concept.getNid() , getConfig(), wsSnomedId , attributes.getPathNid() , attributes.getStatusNid() , effectiveDate);
-									//logger.info("==Id insertion finish==" + insertSnomedId);
-								}
-							}
-						} catch (NumberFormatException e) {
-							logger.error("NumberFormatException" +e);
-						} catch (Exception e) {
-							logger.error("Exception" +e);
-						}
-					}
 				
 				if(getConfig().getRf2Format().equals("false") ){
 					writeRF2TypeLine(conceptid, effectiveTime, active, moduleId, definitionStatusId, authorName);

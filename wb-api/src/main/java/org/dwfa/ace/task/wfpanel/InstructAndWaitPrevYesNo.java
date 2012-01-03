@@ -51,7 +51,7 @@ public class InstructAndWaitPrevYesNo extends PreviousYesOrNo {
 
     private static final int dataVersion = 1;
 
-    private String instruction = "<html>Instruction";
+    protected String instruction = "<html>Instruction";
     private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
 
     private void writeObject(ObjectOutputStream out) throws IOException {

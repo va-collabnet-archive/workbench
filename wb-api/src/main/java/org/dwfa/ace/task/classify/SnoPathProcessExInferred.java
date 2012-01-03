@@ -80,7 +80,8 @@ public class SnoPathProcessExInferred implements I_ProcessConcepts {
         charMap = new LinkedHashMap<Integer, Integer>(); // SCTID, COUNT
 
         this.statusSetPlusInactive = Terms.get().newIntSet();
-        this.statusSetPlusInactive.addAll(statusSet.getSetValues());
+        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
         this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
         this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_AMBIGUOUS_NID());
         this.statusSetPlusInactive.add(SnomedMetadataRfx.getSTATUS_DUPLICATE_NID());

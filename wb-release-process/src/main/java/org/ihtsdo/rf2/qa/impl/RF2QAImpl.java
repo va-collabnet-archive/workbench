@@ -59,9 +59,10 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 		
 		
 		try {
-			
+		
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
-	
+
+			//********Concept Component**********//
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
@@ -74,12 +75,13 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 				
 				if(et.after(PREVIOUSRELEASEDATE)){
 					String authorName = tf.getConcept(attributes.getAuthorNid()).getInitialText();
-					WriteUtil.write(getConfig(), "concept component :" + "\t" + concept.getInitialText() + "\t" + conceptid + "\t" + effectiveTime + "\t" + authorName);
+					WriteUtil.write(getConfig(), "concept :" + "\t" + concept.getInitialText() + "\t" + conceptid + "\t" + effectiveTime + "\t" + authorName);
 					WriteUtil.write(getConfig(), "\r\n");
 				}
 			}
 			
 			
+			//********Description & text-Definition Component**********//
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -89,6 +91,8 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 				
 				if(descriptionEffectiveDate.after(PREVIOUSRELEASEDATE)){
+					String sDescType = getSnomedDescriptionType(description.getTypeNid());
+
 					String descAuthorName = tf.getConcept(description.getAuthorNid()).getInitialText();
 					String descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0"))){
@@ -107,30 +111,20 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 							term=term.replaceAll("\n", "");
 						}
 					}
-						
-					WriteUtil.write(getConfig(), "Description component :" + "\t" +  term + "\t" + descriptionid + "\t" + effectiveTime + "\t" + descAuthorName);
-					WriteUtil.write(getConfig(), "\r\n");
+					if (sDescType.equals("4")) {
+						WriteUtil.write(getConfig(), "Text Definition :" + "\t" +  term + "\t" + descriptionid + "\t" + effectiveTime + "\t" + descAuthorName);
+						WriteUtil.write(getConfig(), "\r\n");
+					}else{
+						WriteUtil.write(getConfig(), "Description :" + "\t" +  term + "\t" + descriptionid + "\t" + effectiveTime + "\t" + descAuthorName);
+						WriteUtil.write(getConfig(), "\r\n");
+					}
 				}	
 			}
 			
+					
 			
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+			//********Stated Relationship Component**********//
 			List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -141,13 +135,12 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 				//effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 				
 				if(relationshipEffectiveDate.after(PREVIOUSRELEASEDATE)){
-					
-				
 					String characteristicTypeId="";
 					I_Identify charId = tf.getId(rel.getCharacteristicId());
 				
 					List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 							snomedIntId);
+					
 					if (idParts != null) {
 						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
 								RelAssertionType.INFERRED_THEN_STATED);
@@ -157,10 +150,8 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 						}
 					}
 				
-					if (characteristicTypeId.equals(I_Constants.STATED) ){
-	
-						String relationshipId = "";
-	
+					if (characteristicTypeId.equals(I_Constants.STATED) ){	
+						String statedRelationshipId = "";	
 						I_Identify  id = tf.getId(rel.getNid());
 						if (id != null) {
 							idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
@@ -170,41 +161,56 @@ public class RF2QAImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 										RelAssertionType.STATED);
 								if (denotation instanceof Long) {
 									Long c = (Long) denotation;
-									if (c != null)  relationshipId = c.toString();
+									if (c != null)  statedRelationshipId = c.toString();
 								}
 							}
 						}	
-
 					
-					
-						if ((relationshipId==null || relationshipId.equals(""))){
-							relationshipId=rel.getUUIDs().iterator().next().toString();						
+						if ((statedRelationshipId==null || statedRelationshipId.equals(""))){
+							statedRelationshipId=rel.getUUIDs().iterator().next().toString();						
 						}
 					
 						String statedAuthorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
-						WriteUtil.write(getConfig(), "Stated Relationship component : " + "\t" +  concept.getInitialText() + "\t" +  relationshipId + "\t" + effectiveTime + "\t" + statedAuthorName);
-						WriteUtil.write(getConfig(), "\r\n");
+						WriteUtil.write(getConfig(), "Stated Relationship : " + "\t" +  concept.getInitialText() + "\t" +  statedRelationshipId + "\t" + effectiveTime + "\t" + statedAuthorName);
+						WriteUtil.write(getConfig(), "\r\n");					
+					}
 					
+					
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  characteristicTypeId = c.toString();
 						}
 					}
+					
+					if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION)){
+						String inferedRelationshipId = "";
+						I_Identify id = tf.getId(rel.getNid());
+						if (id != null) {
+							idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+									snomedIntId);
+							if (idParts != null) {
+								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+										RelAssertionType.INFERRED_THEN_STATED);
+								if (denotation instanceof Long) {
+									Long c = (Long) denotation;
+									if (c != null)  inferedRelationshipId = c.toString();
+								}
+							}
+						}
+						
+						if ((inferedRelationshipId==null || inferedRelationshipId.equals(""))){
+							inferedRelationshipId=rel.getUUIDs().iterator().next().toString();						
+						}
+					
+						String inferredAuthorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
+						WriteUtil.write(getConfig(), "Inferred Relationship : " + "\t" +  concept.getInitialText() + "\t" +  inferedRelationshipId + "\t" + effectiveTime + "\t" + inferredAuthorName);
+						WriteUtil.write(getConfig(), "\r\n");
+					}
 				}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+			}
 			
 			
 		}catch (NullPointerException ne) {

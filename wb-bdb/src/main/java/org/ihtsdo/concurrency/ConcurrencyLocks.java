@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class ConcurrencyLocks {
    private int                      concurrencyLevel = 128;
+
    private int                      sshift           = 0;
    private int                      ssize            = 1;
    private ReentrantReadWriteLock[] locks            = new ReentrantReadWriteLock[concurrencyLevel];
@@ -91,4 +92,9 @@ public class ConcurrencyLocks {
          locks[i].writeLock().lock();
       }
    }
+   
+    public int getConcurrencyLevel() {
+        return concurrencyLevel;
+    }
+
 }

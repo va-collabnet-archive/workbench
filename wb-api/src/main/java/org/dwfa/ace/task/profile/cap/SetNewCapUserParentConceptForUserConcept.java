@@ -69,7 +69,7 @@ public class SetNewCapUserParentConceptForUserConcept extends AbstractSetNewCapU
             I_ConfigAceFrame newConfig = (I_ConfigAceFrame) process.getProperty(newProfilePropName);
 	    	I_GetConceptData parentNode = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 
-	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode, newConfig.getViewCoordinate());
+	    	String[] potentialParentConcepts = generatePotentialParentConcepts(parentNode);
 	    	
 	        instruction = getInstruction();
 	        parentConceptList = new JComboBox(potentialParentConcepts);

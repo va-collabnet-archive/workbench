@@ -19,7 +19,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
 import org.ihtsdo.etypes.ERefsetCidFloatRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -38,6 +38,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_float.RefexCnidFloatVersionBI;
 
 public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMember>
         implements RefexCnidFloatAnalogBI<CidFloatRevision>, I_ExtendByRefPartCidFloat<CidFloatRevision> {
@@ -135,7 +137,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<CidFloatRevision, CidFloatMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<CidFloatRevision, CidFloatMember> obj) {
       if (CidFloatMember.class.isAssignableFrom(obj.getClass())) {
          CidFloatMember another = (CidFloatMember) obj;
 
@@ -144,6 +146,15 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexCnidFloatVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexCnidFloatVersionBI cv = (RefexCnidFloatVersionBI) another;
+            return (this.c1Nid == cv.getCnid1()) && (this.floatValue == cv.getFloat1());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {
@@ -219,7 +230,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidFloatMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

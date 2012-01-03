@@ -38,7 +38,7 @@ import javax.swing.JLabel;
 public class AboutBox {
     private static JDialog setupAbout(JFrame parent) {
 
-        String title = "About the Workflow Bundle";
+        String title = "About the IHTSDO Editor";
 
         if (System.getProperty("org.dwfa.AboutBoxTitle") != null
             && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
@@ -46,7 +46,7 @@ public class AboutBox {
         }
         JDialog aboutBox = new JDialog(parent, title);
 
-        String graphic = "/about-box.gif";
+        String graphic = "config/about-box/ihtsdo_aboutbox.jpg";
         if (System.getProperty("org.dwfa.AboutBoxGraphic") != null
             && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
             graphic = removeQuotes(System.getProperty("org.dwfa.AboutBoxGraphic"));

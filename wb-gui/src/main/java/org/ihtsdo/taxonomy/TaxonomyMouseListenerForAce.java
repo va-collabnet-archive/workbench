@@ -24,7 +24,7 @@ import org.ihtsdo.taxonomy.nodes.SecondaryParentNode;
 import org.ihtsdo.taxonomy.nodes.SecondaryParentNodeRoot;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
@@ -64,7 +64,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
    //~--- methods -------------------------------------------------------------
 
    private void addAllParentsAsExtra(ConceptVersionBI nodeConcept, TaxonomyNode node)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
          for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {

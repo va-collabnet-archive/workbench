@@ -3,7 +3,7 @@ package org.ihtsdo.tk.dto.concept.component.refset.cidlong;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_long.RefexCnidLongVersionBI;
@@ -78,7 +78,7 @@ public class TkRefsetCidLongMember extends TkRefsetAbstractMember<TkRefsetCidLon
 
    public TkRefsetCidLongMember(RefexCnidLongVersionBI another, NidBitSetBI exclusions,
                                 Map<UUID, UUID> conversionMap, long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, exclusions, conversionMap, offset, mapAll, vc);
 
       if (mapAll) {

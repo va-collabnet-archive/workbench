@@ -31,6 +31,7 @@ import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.arena.conceptview.ConceptViewRenderer;
 import org.ihtsdo.thread.NamedThreadFactory;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
 
@@ -55,8 +56,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import java.util.logging.Level;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -73,7 +74,6 @@ import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.tk.Ts;
 
 public class TermTreeHelper extends TermChangeListener implements PropertyChangeListener {
    private static ThreadGroup treeExpansionGroup = new ThreadGroup("Tree expansion ");
@@ -118,10 +118,17 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
    }
 
    @Override
-   public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
+   public void changeNotify(long sequence, 
+                            Set<Integer> originsOfChangedRels,
+                            Set<Integer> destinationsOfChangedRels,
+                            Set<Integer> referencedComponentsOfChangedRefexs,
+                            Set<Integer> changedComponents) {
       if (AceLog.getAppLog().isLoggable(Level.FINE)) {
-         AceLog.getAppLog().info("Term change. Sequence: " + sequence + " changedXrefs: " + changedXrefs
-                                 + " changedComponents: " + changedComponents);
+         AceLog.getAppLog().info("Term change. Sequence: " + sequence + 
+                                 " changed rel origins: " + originsOfChangedRels + 
+                                 " changed rel targets: " + destinationsOfChangedRels + 
+                                 " changed refexesReferencing: " + referencedComponentsOfChangedRefexs + 
+                                 " changedComponents: " + changedComponents);
       }
    }
 
@@ -325,7 +332,6 @@ public class TermTreeHelper extends TermChangeListener implements PropertyChange
        * root pre-expanded, we set askAllowsChildrenafter assigning the new
        * root.
        */
-
       model.setAsksAllowsChildren(true);
       tree.addTreeExpansionListener(new TreeExpansionListener() {
          @Override

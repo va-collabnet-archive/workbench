@@ -22,7 +22,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -37,7 +37,7 @@ public abstract class BatchActionTask {
     public static int CURRENT_NID;
     public static I_IntSet HISTORIC_ROLE_TYPES = null;
     public static TerminologyStoreDI ts;
-    public static TerminologyConstructorBI tsSnapshot;
+    public static TerminologyBuilderBI tsSnapshot;
 
     public enum BatchActionTaskType {
 
@@ -69,7 +69,7 @@ public abstract class BatchActionTask {
         RETIRED_NID = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
         CURRENT_NID = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
         ts = Ts.get();
-        tsSnapshot = ts.getTerminologyConstructor(ec, vc);
+        tsSnapshot = ts.getTerminologyBuilder(ec, vc);
 
         // SETUP HISTORIC ROLE TYPES
         ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();

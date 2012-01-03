@@ -8,7 +8,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<update id="updateIdBase" parameterType="String">
-		update ID_BASE set val=#{id} where Counter_Type='CTV3ID';
+		update ID_BASE set val=#{id} where Counter_Type='CTV3ID'
+	</update>
+	
+	<select id="selectSnomedIdBase" resultType="String">
+		select val from ID_BASE where Counter_Type='SNOMEDID'
+	</select>
+	
+	<update id="updateSnomedIdBase" parameterType="String">
+		update ID_BASE set val=#{id} where Counter_Type='SNOMEDID'
 	</update>
 	
 </mapper>

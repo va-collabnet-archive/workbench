@@ -13,7 +13,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
@@ -22,8 +22,15 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 import java.beans.PropertyVetoException;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RelCAB;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelType;
 
 public class RelationshipRevision extends Revision<RelationshipRevision, Relationship>
         implements I_RelPart<RelationshipRevision>, RelationshipAnalogBI<RelationshipRevision> {
@@ -137,7 +144,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
 
     @Override
     public RelationshipRevision makeAnalog(int statusNid, int authorNid, int pathNid, long time) {
-        
+
         if ((this.getTime() == time) && (this.getPathNid() == pathNid)) {
             this.setStatusNid(statusNid);
             this.setAuthorNid(authorNid);
@@ -151,6 +158,26 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
         this.primordialComponent.addRevision(newR);
 
         return newR;
+    }
+
+    @Override
+    public RelCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+        TkRelType relType = null;
+        if (getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
+                || getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
+            throw new InvalidCAB("Inferred relationships can not be used to make blueprints");
+        } else if (getCharacteristicNid() == SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
+                || getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+            relType = TkRelType.STATED_HIERARCHY;
+        }
+        RelCAB relBp = new RelCAB(getOriginNid(),
+                getTypeNid(),
+                getDestinationNid(),
+                getGroup(),
+                relType,
+                getVersion(vc),
+                vc);
+        return relBp;
     }
 
     @Override
@@ -271,7 +298,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public Relationship.Version getVersion(ViewCoordinate c) throws ContraditionException {
+    public Relationship.Version getVersion(ViewCoordinate c) throws ContradictionException {
         return primordialComponent.getVersion(c);
     }
 

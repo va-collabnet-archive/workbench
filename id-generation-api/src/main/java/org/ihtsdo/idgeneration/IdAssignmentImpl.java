@@ -124,6 +124,8 @@ public class IdAssignmentImpl implements IdAssignmentBI {
 
 	@Override
 	public HashMap<UUID, Long> getSCTIDList(List<UUID> componentUuidList) throws Exception {
+		long soTimeout = 3 * 60 * 1000;
+		idGenStub._getServiceClient().getOptions().setTimeOutInMilliSeconds(soTimeout);
 		SCTIDListRequest request = new SCTIDListRequest();
 		String[] componentUuidArray = new String[componentUuidList.size()];
 		int i = 0;

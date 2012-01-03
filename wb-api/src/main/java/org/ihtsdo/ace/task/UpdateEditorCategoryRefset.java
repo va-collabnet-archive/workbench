@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.ace.task;
 
@@ -42,14 +42,14 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
-@BeanList(specs = { @Spec(directory = "tasks/workflow", type = BeanType.TASK_BEAN) })
+@BeanList(specs = {
+    @Spec(directory = "tasks/workflow", type = BeanType.TASK_BEAN)})
 public class UpdateEditorCategoryRefset extends AbstractTask {
- 
-    /**
-	 * 
-	 */
-    private static final long serialVersionUID = 1L;
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -68,71 +68,65 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
-
     }
-    
-    
-    
-    
+
     /**
      * @TODO use a type 1 uuid generator instead of a random uuid...
      */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException 
-    {
-    	String line = "";
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+        String line = "";
         I_TermFactory tf = Terms.get();
-        
-    	 try {
-    	     ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
-             HashMap<String, ConceptVersionBI> modelers = new HashMap<String, ConceptVersionBI>();
-             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
-             File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
 
-         	 BufferedReader inputFile = new BufferedReader(new FileReader(f));    	
+        try {
+            ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
+            HashMap<String, ConceptVersionBI> modelers = new HashMap<String, ConceptVersionBI>();
+            EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+//             File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
+            File f = new File("../../src/main/users/userPermissionRefset.txt");
 
-          	 WorkflowHelper.updateModelers(vc);
-             modelers = WorkflowHelper.getModelers();
+            BufferedReader inputFile = new BufferedReader(new FileReader(f));
 
+            WorkflowHelper.updateModelers(vc);
+            modelers = WorkflowHelper.getModelers();
 
-         	while ((line = inputFile.readLine()) != null)
-             {
-         		if (line.trim().length() == 0) {
-         			continue;
-         		}
+            String headerLine = inputFile.readLine();
+            while ((line = inputFile.readLine()) != null) {
+                if (line.trim().length() == 0) {
+                    continue;
+                }
 
-         		String[] columns = line.split(",");
-             	//Get rid of "User permission"
-             	columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
-             	//remove ")"
-             	columns[2] = columns[2].trim();
-             	columns[2] = columns[2].substring(0, columns[2].length() - 1);
+                String[] columns = line.split(",");
+                //Get rid of "User permission"
+                columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
+                //remove ")"
+                columns[2] = columns[2].trim();
+                columns[2] = columns[2].substring(0, columns[2].length() - 1);
 
-             	int i = 0;
-             	for (String c : columns) {
-             		columns[i++] = c.split("=")[1].trim();
-             	}
+                int i = 0;
+                for (String c : columns) {
+                    columns[i++] = c.split("=")[1].trim();
+                }
 
-             	writer.setEditor(modelers.get(columns[0]));
-             	writer.setSemanticArea(columns[1]);
+                writer.setEditor(modelers.get(columns[0]));
+                writer.setSemanticArea(columns[1]);
 
-             	writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2], vc));
-             	writer.addMember();
-             }
+                writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2], vc));
+                writer.addMember();
+            }
 
-             Terms.get().commit();
-         } catch (Exception e) {
-        	 AceLog.getAppLog().log(Level.WARNING, line, e);
- 		}
-        
+            Terms.get().commit();
+        } catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, line, e);
+        }
+
         return Condition.CONTINUE;
     }
 
-     public Collection<Condition> getConditions() {
+    public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
     public int[] getDataContainerIds() {
-        return new int[] {};
+        return new int[]{};
     }
-
 }

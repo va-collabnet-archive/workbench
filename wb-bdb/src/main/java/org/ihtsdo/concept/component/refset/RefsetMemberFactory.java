@@ -48,10 +48,10 @@ public class RefsetMemberFactory {
         Concept refexColCon = (Concept) Ts.get().getConcept(res.getRefexColNid());
         member.refsetNid = refexColCon.getNid();
         member.nid = Bdb.uuidToNid(res.getMemberUUID());
+        int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
         if (refexColCon.isAnnotationStyleRefex()) {
-            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
-            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
@@ -170,9 +170,10 @@ public class RefsetMemberFactory {
         int refexNid = Bdb.uuidToNid(res.getMemberUUID());
         member.nid = refexNid;
         if (refexColCon.isAnnotationStyleRefex()) {
-            member.enclosingConceptNid = Ts.get().getConceptNidForNid(res.getRcNid());
+            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
+            member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
-            Ts.get().getComponent(res.getRcNid()).addAnnotation(member);
+            Ts.get().getComponent(res.getRcUuid()).addAnnotation(member);
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, refexNid);
@@ -201,8 +202,9 @@ public class RefsetMemberFactory {
 
         }
         if (refexColCon.isAnnotationStyleRefex()) {
+            int rcNid = Ts.get().getNidForUuids(res.getRcUuid());
             Bdb.getConceptDb().writeConcept(
-                    Bdb.getConcept(Bdb.getNidCNidMap().getCNid(res.getRcNid())));
+                    Bdb.getConcept(Bdb.getNidCNidMap().getCNid(rcNid)));
         } else {
             Bdb.getConceptDb().writeConcept(refexColCon);
         }

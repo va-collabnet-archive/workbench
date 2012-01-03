@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.task.wfpanel;
 
@@ -20,6 +20,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -60,9 +62,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 public class SelectInactiveParent extends PreviousNextOrCancel {
 
     /*
-     * -----------------------
-     * Properties
-     * -----------------------
+     * ----------------------- Properties -----------------------
      */
     // Serialization Properties
     private static final long serialVersionUID = 1;
@@ -77,9 +77,7 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
 
     /*
-     * -----------------------
-     * Serialization Methods
-     * -----------------------
+     * ----------------------- Serialization Methods -----------------------
      */
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -169,11 +167,9 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
     /**
      * This method overrides a method by the same name in the parent class. It
-     * is used
-     * to tell the parent class (PreviousNextOrCancel) whether to show
+     * is used to tell the parent class (PreviousNextOrCancel) whether to show
      * the previous button or not. Since we only want the Next and Cancel
-     * buttons,
-     * this method returns false .
+     * buttons, this method returns false .
      */
     @Override
     protected boolean showPrevious() {
@@ -215,7 +211,7 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
                     for (int i = 0; i < componentsPanel.length; i++) {
                         workflowPanel.remove(componentsPanel[i]);
                     }
-                }else if (Terms.get().getActiveAceFrameConfig().getWorkflowPanel() != null){
+                } else if (Terms.get().getActiveAceFrameConfig().getWorkflowPanel() != null) {
                     JPanel workflowPanel = Terms.get().getActiveAceFrameConfig().getWorkflowPanel();
                     Component[] componentsPanel = workflowPanel.getComponents();
                     for (int i = 0; i < componentsPanel.length; i++) {
@@ -300,9 +296,19 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
         wizardPanel.repaint();
     }
 
+    private class ContinueActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            returnCondition = Condition.CONTINUE;
+            done = true;
+            notifyTaskDone();
+        }
+    }
+
     /**
      * Get the instructions for this task
-     * 
+     *
      * @return The instructions for this task.
      */
     public String getInstruction() {
@@ -311,7 +317,7 @@ public class SelectInactiveParent extends PreviousNextOrCancel {
 
     /**
      * Set the instructions for this task
-     * 
+     *
      * @param instruction The instructions for this task.
      * @return void
      */

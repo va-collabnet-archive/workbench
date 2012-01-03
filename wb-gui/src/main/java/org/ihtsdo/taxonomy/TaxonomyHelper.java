@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -124,10 +126,25 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    }
 
    @Override
-   public void changeNotify(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-      ChangeWorker changeWorker = new ChangeWorker(sequence, changedXrefs, changedComponents);
+   public void changeNotify(long sequence, 
+                            Set<Integer> originsOfChangedRels,
+                            Set<Integer> destinationsOfChangedRels, 
+                            Set<Integer> referencedComponentsOfChangedRefexs, 
+                            Set<Integer> changedComponents) {
+        try {
+            NodeUpdator changeWorker = new NodeUpdator(model, 
+                            sequence, 
+                            originsOfChangedRels,
+                            destinationsOfChangedRels,
+                            referencedComponentsOfChangedRefexs, 
+                            changedComponents,
+                            renderer);
 
-      FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+            FutureHelper.addFuture(ACE.threadPool.submit(changeWorker));
+        } catch (IOException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+      
    }
 
    protected void collapseTree(TreeExpansionEvent evt, I_ConfigAceFrame aceFrameConfig) {
@@ -549,146 +566,6 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
       @Override
       public String toString() {
          return helperName + " change display worker";
-      }
-   }
-
-
-   protected class ChangeWorker extends SwingWorker<List<TaxonomyNode>, NodeChangeRecord> {
-      List<Long>   nodesToChange = new ArrayList<Long>();
-      Set<Integer> changedComponents;
-      Set<Integer> changedXrefs;
-      long         sequence;
-
-      //~--- constructors -----------------------------------------------------
-
-      public ChangeWorker(long sequence, Set<Integer> changedXrefs, Set<Integer> changedComponents) {
-         this.sequence          = sequence;
-         this.changedXrefs      = changedXrefs;
-         this.changedComponents = changedComponents;
-      }
-
-      //~--- methods ----------------------------------------------------------
-
-      @Override
-      protected List<TaxonomyNode> doInBackground() throws Exception {
-         List<TaxonomyNode> contentChangedList = new ArrayList<TaxonomyNode>();
-         IdentifierSet      changedConcepts    = (IdentifierSet) Terms.get().getEmptyIdSet();
-         TerminologyStoreDI ts                 = Ts.get();
-
-         if (model == null) {
-            return contentChangedList;
-         }
-
-         if (changedConcepts != null) {
-            for (int changedComponentNid : changedComponents) {
-               processComponentNid(ts, changedComponentNid, changedConcepts);
-            }
-         }
-
-         if (changedXrefs != null) {
-            for (int changedComponentNid : changedXrefs) {
-               processComponentNid(ts, changedComponentNid, changedConcepts);
-            }
-         }
-
-         if (model != null) {
-            for (Long nodeId : nodesToChange) {
-               TaxonomyNode oldNode = model.getNodeStore().get(nodeId);
-               TaxonomyNode newNode =
-                  model.getNodeFactory().makeNode(model.getTs().getConceptVersion(oldNode.getCnid()),
-                                                  oldNode.getParentNid(),
-                                                  model.getNodeStore().get(oldNode.parentNodeId));
-               boolean childrenChanged = false;
-
-               if (oldNode.childrenAreSet()) {
-                  CountDownLatch latch = model.getNodeFactory().makeChildNodes(newNode);
-
-                  latch.await();
-               }
-
-               boolean contentChanged = !newNode.getText().equals(oldNode.getText());
-               boolean parentsChanged = (newNode.hasExtraParents() != oldNode.hasExtraParents())
-                                        ||!newNode.getExtraParents().equals(oldNode.getExtraParents());
-
-               if (parentsChanged) {
-
-                  //
-               }
-
-               if (childrenChanged) {
-                  NodeChangeRecord changeRec = new NodeChangeRecord(NodeAction.CHILDREN_CHANGED, oldNode,
-                                                  newNode);
-
-                  publish(changeRec);
-
-                  //
-               }
-
-               if (contentChanged) {
-                  contentChangedList.add(newNode);
-               }
-            }
-         }
-
-         return contentChangedList;
-      }
-
-      @Override
-      protected void done() {
-         try {
-            List<TaxonomyNode> contentChangedList = get();
-
-            for (TaxonomyNode node : contentChangedList) {
-               model.valueForPathChanged(NodePath.getTreePath(model, node), node);
-            }
-         } catch (Exception ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         }
-      }
-
-      @Override
-      protected void process(List<NodeChangeRecord> chunks) {
-         for (NodeChangeRecord nodeChangeRec : chunks) {
-            switch (nodeChangeRec.action) {
-            case ADDED_AS_PARENT :
-               break;
-
-            case CHILDREN_CHANGED :
-               int[] removedNodeIndices = new int[nodeChangeRec.oldNode.getChildren().size()];
-
-               for (int i = 0; i < removedNodeIndices.length; i++) {
-                  removedNodeIndices[i] = i;
-               }
-
-               model.treeStructureChanged(NodePath.getTreePath(model, nodeChangeRec.newNode));
-               model.nodesWereInserted(nodeChangeRec.newNode, removedNodeIndices);
-
-               break;
-
-            default :
-               throw new UnsupportedOperationException("Can't handle: " + nodeChangeRec.action);
-            }
-         }
-      }
-
-      private void processComponentNid(TerminologyStoreDI ts, int changedComponentNid,
-                                       IdentifierSet changedConcepts)
-              throws IOException {
-         int cnid = ts.getConceptNidForNid(changedComponentNid);
-
-         if ((cnid > Integer.MIN_VALUE) && (cnid < Integer.MAX_VALUE) && (model != null)) {
-            Collection<Long> nodeIds = model.getNodeStore().getNodeIdsForConcept(cnid);
-
-            if (!nodeIds.isEmpty()) {
-               changedConcepts.setMember(cnid);
-               nodesToChange.addAll(nodeIds);
-            }
-         }
-      }
-
-      @Override
-      public String toString() {
-         return helperName + " change worker";
       }
    }
 

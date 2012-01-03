@@ -68,7 +68,7 @@ public  class SemanticHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 	
 	private Set<String> searchForParentTagBySemTag(String tag) throws Exception 
 	{
-		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, reader.getRefCompConcept().getConceptNid());
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, reader.getRefsetConcept().getConceptNid());
 		Set<String> results = new HashSet<String>();
 		
 		for (int i = 0; i < l.size(); i++)

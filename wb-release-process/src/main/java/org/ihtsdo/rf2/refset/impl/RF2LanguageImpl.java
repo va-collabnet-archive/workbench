@@ -71,8 +71,8 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("Concept : " + conceptid);
-				logger.debug("I_DescriptionVersioned Descriptions size :" + descriptions.size());
+				logger.info("Concept : " + conceptid);
+				logger.info("I_DescriptionVersioned Descriptions size :" + descriptions.size());
 			}
 
 			if (!descriptions.isEmpty() && descriptions.size() > 0) {
@@ -138,7 +138,9 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							if (descriptionid==null || descriptionid.equals("")){
 								logger.error("Unplublished Retired Concept of Lang Refset : " + concept.getUUIDs().iterator().next().toString());
 							}else {
-								refsetuuid = extensionPart.getPrimUuid();
+								
+								refsetuuid = extensionPart.getPrimUuid(); 
+								
 								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
 	
 								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);

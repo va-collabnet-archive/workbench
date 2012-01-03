@@ -26,7 +26,6 @@ import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ManageContradiction;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;

@@ -15,6 +15,7 @@
  */
 package org.ihtsdo.helper.time;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -25,74 +26,97 @@ import java.util.concurrent.TimeUnit;
  */
 public class TimeHelper {
 
-    
-     private static final ThreadLocal <SimpleDateFormat> localDateFormat = 
-         new ThreadLocal < SimpleDateFormat > () {
-             @Override protected SimpleDateFormat initialValue() {
-                 return new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-         }
-     };
- 
-     private static final ThreadLocal <SimpleDateFormat> localFileFormat = 
-         new ThreadLocal < SimpleDateFormat > () {
-             @Override protected SimpleDateFormat initialValue() {
-                 return new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
-         }
-     };
+    private static final ThreadLocal<SimpleDateFormat> localDateFormat =
+            new ThreadLocal< SimpleDateFormat>() {
 
-	public static String getRemainingTimeString(int completedCount, int totalCount, long elapsed) {
-		float conceptCountFloat = totalCount;
-		float completedFloat = completedCount;
-		float percentComplete = completedFloat / conceptCountFloat;
-		float estTotalTime = elapsed / percentComplete;
-		long remaining = (long) (estTotalTime - elapsed);
-		String remainingStr = getElapsedTimeString(remaining);
-		return remainingStr;
-	}
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("MM/dd/yy HH:mm:ss");
+                }
+            };
+    private static final ThreadLocal<SimpleDateFormat> localLongFileFormat =
+            new ThreadLocal< SimpleDateFormat>() {
 
-	public static String getElapsedTimeString(long elapsed) {
-		String elapsedStr = String.format("%d min, %d sec",
-			    TimeUnit.MILLISECONDS.toMinutes(elapsed),
-			    TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-			    TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed))
-			);
-		return elapsedStr;
-	}
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy-MM-dd-HH.mm.ss");
+                }
+            };
 
-	public static SimpleDateFormat getDateFormat() {
-		return localDateFormat.get();
-	}
+    private static final ThreadLocal<SimpleDateFormat> localShortFileFormat =
+            new ThreadLocal< SimpleDateFormat>() {
 
-	public static SimpleDateFormat getFileDateFormat() {
-		return localFileFormat.get();
-	}
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("yyyyMMdd");
+                }
+            };
 
-	public static String formatDateForFile(long time) {
-		return FormatDateForFile(new Date(time));
-	}
+    public static String getRemainingTimeString(int completedCount, int totalCount, long elapsed) {
+        float conceptCountFloat = totalCount;
+        float completedFloat = completedCount;
+        float percentComplete = completedFloat / conceptCountFloat;
+        float estTotalTime = elapsed / percentComplete;
+        long remaining = (long) (estTotalTime - elapsed);
+        String remainingStr = getElapsedTimeString(remaining);
+        return remainingStr;
+    }
 
-   private static String FormatDateForFile(Date date) {
-      if (date.getTime() == Long.MIN_VALUE) {
-         return "beginning of time";
-      }
-      if (date.getTime() == Long.MAX_VALUE) {
-         return "end of time";
-      }
-      return localFileFormat.get().format(date);
-   }
+    public static String getElapsedTimeString(long elapsed) {
+        String elapsedStr = String.format("%d min, %d sec",
+                TimeUnit.MILLISECONDS.toMinutes(elapsed),
+                TimeUnit.MILLISECONDS.toSeconds(elapsed)
+                - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)));
+        return elapsedStr;
+    }
 
-	public static String formatDate(long time) {
-		return formatDate(new Date(time));
-	}
+    public static SimpleDateFormat getDateFormat() {
+        return localDateFormat.get();
+    }
 
-   private static String formatDate(Date date) {
-      if (date.getTime() == Long.MIN_VALUE) {
-         return "beginning of time";
-      }
-      if (date.getTime() == Long.MAX_VALUE) {
-         return "end of time";
-      }
-      return localDateFormat.get().format(date);
-   }
+    public static SimpleDateFormat getFileDateFormat() {
+        return localLongFileFormat.get();
+    }
+
+    public static SimpleDateFormat getShortFileDateFormat() {
+        return localShortFileFormat.get();
+    }
+
+    public static long getTimeFromString(String time, SimpleDateFormat formatter) throws ParseException {
+        if (time.toLowerCase().equals("latest")) {
+            return Long.MAX_VALUE;
+        }
+        if (time.toLowerCase().equals("bot")) {
+            return Long.MIN_VALUE;
+        }
+        return formatter.parse(time).getTime();
+    }
+
+    public static String formatDateForFile(long time) {
+        return FormatDateForFile(new Date(time));
+    }
+
+    private static String FormatDateForFile(Date date) {
+        if (date.getTime() == Long.MIN_VALUE) {
+            return "beginning of time";
+        }
+        if (date.getTime() == Long.MAX_VALUE) {
+            return "end of time";
+        }
+        return localLongFileFormat.get().format(date);
+    }
+
+    public static String formatDate(long time) {
+        return formatDate(new Date(time));
+    }
+
+    private static String formatDate(Date date) {
+        if (date.getTime() == Long.MIN_VALUE) {
+            return "beginning of time";
+        }
+        if (date.getTime() == Long.MAX_VALUE) {
+            return "end of time";
+        }
+        return localDateFormat.get().format(date);
+    }
 }
-

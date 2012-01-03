@@ -23,6 +23,12 @@ public class LeafNodeMultiParent extends LeafNode {
       super(cnid, parentNid, parentNodeId);
    }
 
+   public LeafNodeMultiParent(InternalNodeMultiParent another) {
+      super(another);
+      this.secondaryParentOpened = another.secondaryParentOpened;
+      this.extraParents = another.extraParents;
+   }
+
    //~--- methods -------------------------------------------------------------
 
    @Override

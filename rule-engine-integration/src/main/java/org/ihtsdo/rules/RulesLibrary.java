@@ -87,7 +87,7 @@ import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -1022,7 +1022,7 @@ public class RulesLibrary {
 			sardine.put(pkgUrl, guvnorEnumerationText.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ContraditionException e) {
+		} catch (ContradictionException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
 			e.printStackTrace();

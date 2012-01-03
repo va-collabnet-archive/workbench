@@ -19,6 +19,7 @@ package org.ihtsdo.batch;
 import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -64,7 +65,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
 
     // BatchActionTask
     @Override
-    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB {
+    public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
         int rcNid = c.getNid(); // referenced component
         Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
         boolean changed = false;
@@ -116,7 +117,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     changed = true;
                 } else {
                     // CHECK FILTER
-                    RefexCAB spec = rvbi.getRefexEditSpec();
+                    RefexCAB spec = rvbi.makeBlueprint(vc);
                     boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:

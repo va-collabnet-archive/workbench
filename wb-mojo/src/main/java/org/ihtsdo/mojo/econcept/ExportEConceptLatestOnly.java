@@ -28,6 +28,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -98,27 +99,28 @@ public class ExportEConceptLatestOnly extends AbstractMojo {
             }
          };
          ViewCoordinate vc           = Ts.get().getMetadataVC();
-         ViewCoordinate exportVc     = new ViewCoordinate(vc);
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.DISCOURAGED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.AMBIGUOUS.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.ERRONEOUS.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.MOVED_ELSEWHERE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid());
-         exportVc.getAllowedStatusNids().add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_RETIRED_NID());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_INAPPROPRIATE_NID());
-         exportVc.getAllowedStatusNids().add(SnomedMetadataRfx.getSTATUS_LIMITED_NID());
+         ViewCoordinate conceptVc     = new ViewCoordinate(vc);
+         conceptVc.getAllowedStatusNids().clear();
 
          PathBI         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
          PositionBI     viewPosition = new Position(Long.MAX_VALUE, path);
 
-         exportVc.setPositionSet(new PositionSet(viewPosition));
+         conceptVc.setPositionSet(new PositionSet(viewPosition));
 
-         ActiveOnlyExport exporter = new ActiveOnlyExport(exportVc, exclusionSet, out, conversionMap);
+         ViewCoordinate relVc     = new ViewCoordinate(vc);
+         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
+         viewPosition = new Position(Long.MAX_VALUE, path);
+
+         relVc.setPositionSet(new PositionSet(viewPosition));
+
+         ViewCoordinate descVc     = new ViewCoordinate(vc);
+         path         = Ts.get().getPath(exportPath.getVerifiedConcept().getNid());
+         viewPosition = new Position(Long.MAX_VALUE, path);
+
+         descVc.setPositionSet(new PositionSet(viewPosition));
+         descVc.getAllowedStatusNids().add(Ts.get().getNidForUuids(SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getUuids()));
+         ActiveOnlyExport exporter = new ActiveOnlyExport(conceptVc, descVc, relVc, 
+                 exclusionSet, out, conversionMap);
 
          Ts.get().iterateConceptDataInSequence(exporter);
       } catch (Exception ex) {

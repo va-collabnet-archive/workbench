@@ -65,7 +65,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-				if (!sDescType.equals("4") && !description.getLang().equals("es") && !effectiveTime.contains("1031") && !effectiveTime.contains("0430"))  { // Ignore text-defination & spanish description
+				if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
 					String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 					if (referencedComponentId==null || referencedComponentId.equals("")){

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 
 /**
  *
@@ -91,7 +91,7 @@ public class BatchActionEventReporter {
             }
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -159,7 +159,7 @@ public class BatchActionEventReporter {
             sb.append("</table></html>");
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 

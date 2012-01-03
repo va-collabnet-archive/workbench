@@ -92,12 +92,5 @@ public class DataExtractionTest extends TestCase {
 		System.out.println("=======Admin Username==========" + config.getUsername());
 		assertNotNull(config);
 	}
-
-	public void xtestIsOnPath(int onPath, int nid) {
-		try {
-			_exportUtil.isOnPath(onPath, nid);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
+	
 }

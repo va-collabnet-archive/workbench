@@ -134,6 +134,8 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.taxonomy.path.PathExpander;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.tigris.subversion.javahl.PromptUserPassword3;
 
@@ -675,6 +677,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             sourceRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
             destRelTypes = IntSet.readIntSetIgnoreMapErrors(in);
             allowedStatus = IntSet.readIntSetIgnoreMapErrors(in);
+            allowedStatus.add(Ts.get().getNidForUuids(SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getUuids()));
             descTypes = IntSet.readIntSetIgnoreMapErrors(in);
             viewPositions = Position.readPositionSet(in);
             bounds = (Rectangle) in.readObject();
@@ -3004,6 +3007,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     public void setColorForPath(int pathNid, Color pathColor) {
         vc = null;
         pathColorMap.put(pathNid, pathColor);
+        this.changeSupport.firePropertyChange("viewPositions", null, this.viewPositions);
     }
 
     public Map<Integer, Color> getPathColorMap() {

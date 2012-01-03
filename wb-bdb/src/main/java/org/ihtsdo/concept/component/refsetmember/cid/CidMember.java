@@ -22,7 +22,7 @@ import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -43,6 +43,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidVersionBI;
 
 public class CidMember extends RefsetMember<CidRevision, CidMember>
         implements I_ExtendByRefPartCid<CidRevision>, RefexCnidAnalogBI<CidRevision> {
@@ -145,7 +147,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<CidRevision, CidMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<CidRevision, CidMember> obj) {
       if (CidMember.class.isAssignableFrom(obj.getClass())) {
          CidMember another = (CidMember) obj;
 
@@ -154,6 +156,15 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexCnidVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexCnidVersionBI cv = (RefexCnidVersionBI) another;
+            return (this.c1Nid == cv.getCnid1());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {
@@ -189,7 +200,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    }
 
    @Override
-   public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContraditionException {
+   public String toUserString(TerminologySnapshotDI snapshot) throws IOException, ContradictionException {
       ComponentVersionBI c1Component = snapshot.getComponentVersion(c1Nid);
 
       return super.toUserString(snapshot) + " c1: " + c1Component.toUserString(snapshot);
@@ -220,7 +231,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

@@ -1,6 +1,9 @@
 package org.ihtsdo.db.bdb;
 
 //~--- non-JDK imports --------------------------------------------------------
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.VetoableChangeListener;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
@@ -25,14 +28,13 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.bdb.computer.kindof.IsaCache;
 import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
 import org.ihtsdo.db.bdb.computer.kindof.TypeCache;
-import org.ihtsdo.db.change.LastChange;
-import org.ihtsdo.tk.api.*;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -44,7 +46,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.TermChangeListener;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -76,6 +78,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
 
@@ -102,7 +109,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void addTermChangeListener(TermChangeListener cl) {
-        LastChange.addTermChangeListener(cl);
+        ChangeNotifier.addTermChangeListener(cl);
     }
 
     @Override
@@ -113,6 +120,31 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public void addUncommitted(ConceptVersionBI cv) throws IOException {
         addUncommitted(cv.getChronicle());
+    }
+    
+    @Override
+    public void forget(RelationshipVersionBI rel) throws IOException{
+        BdbCommitManager.forget(rel);
+    }
+    
+    @Override
+    public void forget(DescriptionVersionBI desc) throws IOException{
+        BdbCommitManager.forget(desc);
+    }
+    
+    @Override
+    public void forget(RefexChronicleBI extension) throws IOException{
+        BdbCommitManager.forget(extension);
+    }
+    
+    @Override
+    public void forget(ConAttrVersionBI attr) throws IOException{
+        BdbCommitManager.forget(attr);
+    }
+    
+    @Override
+    public void forget(ConceptChronicleBI concept) throws IOException{
+        BdbCommitManager.forget(concept);
     }
 
     @Override
@@ -162,6 +194,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         Bdb.getConceptDb().iterateConceptDataInSequence(processor);
     }
 
+    
+   @Override
+   public Position newPosition(PathBI path, long time) throws IOException {
+      return new Position(time, path);
+   }
+
     @Override
     public void removeChangeSetGenerator(String key) {
         ChangeSetWriterHandler.removeWriter(key);
@@ -169,7 +207,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public void removeTermChangeListener(TermChangeListener cl) {
-        LastChange.removeTermChangeListener(cl);
+        ChangeNotifier.removeTermChangeListener(cl);
     }
 
     @Override
@@ -267,13 +305,13 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate c, Collection<UUID> uuids)
-            throws IOException, ContraditionException {
+            throws IOException, ContradictionException {
         return getComponentVersion(c, Bdb.uuidsToNid(uuids));
     }
 
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate coordinate, int nid)
-            throws IOException, ContraditionException {
+            throws IOException, ContradictionException {
         ComponentBI component = getComponent(nid);
 
         if (Concept.class.isAssignableFrom(component.getClass())) {
@@ -285,7 +323,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
     @Override
     public ComponentVersionBI getComponentVersion(ViewCoordinate c, UUID... uuids)
-            throws IOException, ContraditionException {
+            throws IOException, ContradictionException {
         return getComponentVersion(c, Bdb.uuidToNid(uuids));
     }
 
@@ -416,7 +454,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
             metadataVC = new ViewCoordinate(Precedence.PATH, positionSet, allowedStatusNids, isaTypeNids,
                     contradictionManager, languageNid, classifierNid,
-                    RelAssertionType.STATED, null,
+                    RelAssertionType.INFERRED_THEN_STATED, null,
                     ViewCoordinate.LANGUAGE_SORT.TYPE_BEFORE_LANG);
         }
 
@@ -533,8 +571,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
-    public TerminologyConstructorBI getTerminologyConstructor(EditCoordinate ec, ViewCoordinate vc) {
-        return new BdbTermConstructor(ec, vc);
+    public TerminologyBuilderBI getTerminologyBuilder(EditCoordinate ec, ViewCoordinate vc) {
+        return new BdbTermBuilder(ec, vc);
     }
 
     @Override
@@ -575,6 +613,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         assert memberUUID != null;
 
         return Bdb.hasUuid(memberUUID);
+    }
+
+    @Override
+    public void addVetoablePropertyChangeListener(CONCEPT_EVENT pce, VetoableChangeListener l) {
+        GlobalPropertyChange.addVetoableChangeListener(pce, l);
+    } 
+
+    @Override
+    public void addPropertyChangeListener(CONCEPT_EVENT pce, PropertyChangeListener l) {
+        GlobalPropertyChange.addPropertyChangeListener(pce, l);
     }
 
     //~--- inner classes -------------------------------------------------------
@@ -657,4 +705,24 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             // TODO Auto-generated method stub
         }
     }
+
+    @Override
+    public int getAuthorNidForSapNid(int sapNid) {
+        return Bdb.getAuthorNidForSapNid(sapNid);
+}
+
+    @Override
+    public int getPathNidForSapNid(int sapNid) {
+         return Bdb.getPathNidForSapNid(sapNid);
+   }
+
+    @Override
+    public int getStatusNidForSapNid(int sapNid) {
+         return Bdb.getStatusNidForSapNid(sapNid);
+   }
+
+    @Override
+    public long getTimeForSapNid(int sapNid) {
+         return Bdb.getTimeForSapNid(sapNid);
+   }
 }

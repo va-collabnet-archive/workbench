@@ -70,6 +70,8 @@ public class SnomedMetadataRfx {
     private static ConceptSpec STATUS_ERRONEOUS;
     private static ConceptSpec STATUS_OUTDATED;
     private static ConceptSpec STATUS_LIMITED;
+    private static ConceptSpec STATUS_CURRENT;
+    private static ConceptSpec STATUS_RETIRED;
 
     //REFEX CONCEPTS
     private static ConceptSpec REFEX_NON_HUMAN;
@@ -187,6 +189,19 @@ public class SnomedMetadataRfx {
             setupSnoRf1Rf2();
         }
         return STATUS_CURRENT_NID;
+    }
+
+    public static ConceptSpec getSTATUS_CURRENT() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_CURRENT;
+    }
+    public static ConceptSpec getSTATUS_RETIRED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_RETIRED;
     }
 
     public static int getSTATUS_LIMITED_NID() throws IOException {
@@ -366,7 +381,7 @@ public class SnomedMetadataRfx {
             ACCEPTABLE_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getUuids());
             PREFERRED_NID = tf.getNidForUuids(
-                    SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getUuids());
+                    SnomedMetadataRf1.PREFERRED_ACCEPTABILITY_RF1.getUuids());
             // RELATIONSHIPS
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
@@ -387,10 +402,12 @@ public class SnomedMetadataRfx {
             REL_MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.MANDATORY_REFINABILITY_TYPE_RF1.getUuids());
             // STATUS: 0 CURRENT, 1 RETIRED
+            STATUS_CURRENT = SnomedMetadataRf1.CURRENT_RF1;
             STATUS_CURRENT_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.CURRENT_RF1.getUuids());
             STATUS_LIMITED_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getUuids());
+            STATUS_RETIRED = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1;
             STATUS_RETIRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
             STATUS_INAPPROPRIATE_NID = tf.getNidForUuids(
@@ -454,10 +471,12 @@ public class SnomedMetadataRfx {
                     SnomedMetadataRf2.NOT_REFINABLE_RF2.getUuids());
             REL_MANDATORY_REFINABILITY_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getUuids());
+            STATUS_CURRENT = SnomedMetadataRf2.ACTIVE_VALUE_RF2;
             STATUS_CURRENT_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids());
             STATUS_LIMITED_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getUuids());
+            STATUS_RETIRED = SnomedMetadataRf2.INACTIVE_VALUE_RF2;
             STATUS_RETIRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.INACTIVE_VALUE_RF2.getUuids());
             STATUS_INAPPROPRIATE_NID = tf.getNidForUuids(

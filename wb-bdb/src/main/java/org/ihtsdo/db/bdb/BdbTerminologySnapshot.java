@@ -20,10 +20,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.dwfa.vodb.types.Position;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
-   private ViewCoordinate      vc;
+
+    private ViewCoordinate      vc;
 
    //~--- constructors --------------------------------------------------------
 
@@ -85,6 +87,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
            File changeSetTempFileName, ChangeSetGenerationPolicy policy) {
       return store.createDtoChangeSetGenerator(changeSetFileName, changeSetTempFileName, policy);
    }
+   
+   @Override
+   public Position newPosition(PathBI path, long time) throws IOException {
+        return store.newPosition(path, time);
+   }
 
    @Override
    public void removeChangeSetGenerator(String key) {
@@ -94,35 +101,40 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    //~--- get methods ---------------------------------------------------------
 
    @Override
-   public TerminologyConstructorBI getAmender(EditCoordinate ec) {
-      return store.getTerminologyConstructor(ec, vc);
+   public TerminologyBuilderBI getAmender(EditCoordinate ec) {
+      return store.getTerminologyBuilder(ec, vc);
+   }
+
+   @Override
+   public TerminologyBuilderBI getBuilder(EditCoordinate ec) {
+      return store.getTerminologyBuilder(ec, vc);
    }
 
    @Override
    public ComponentVersionBI getComponentVersion(Collection<UUID> uuids)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       return store.getComponentVersion(vc, uuids);
    }
 
    @Override
    public ComponentVersionBI getComponentVersion(ComponentContainerBI cc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       return getComponentVersion(cc.getNid());
    }
 
    @Override
-   public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException {
+   public ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException {
       return store.getComponentVersion(vc, nid);
    }
 
    @Override
-   public ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException {
+   public ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException {
       return store.getComponentVersion(vc, uuids);
    }
 
    @Override
    public ConceptVersionBI getConceptForNid(int nid) throws IOException {
-      return getConceptForNid(store.getConceptNidForNid(nid));
+      return store.getConceptVersion(vc, store.getConceptNidForNid(nid));
    }
 
    @Override

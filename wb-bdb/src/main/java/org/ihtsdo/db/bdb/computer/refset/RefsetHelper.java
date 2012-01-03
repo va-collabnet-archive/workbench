@@ -54,6 +54,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @AllowDataCheckSuppression
 public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
@@ -109,7 +110,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             }
 
             // confirm its the right extension value and its status is current
-            if (latestPart != null && latestPart.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
+            if (latestPart != null && latestPart.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
                 return latestPart;
             }
         }
@@ -142,7 +143,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusNid() == ReferenceConcepts.CURRENT.getNid()) {
+                if (latestPart.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
                     result.add((T) latestPart);
                 }
             }
@@ -214,7 +215,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             throws Exception {
         access();
         if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
-            extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+            extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
         }
         return hasRefsetExtension(refsetId, conceptId, extProps);
     }
@@ -292,7 +293,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 }
 
                 if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
-                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                 }
 
                 if (extProps.validate(latestPart)) {
@@ -300,7 +301,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     // found a member to retire
 
                     I_ExtendByRefPartCid clone =
-                            (I_ExtendByRefPartCid) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
+                            (I_ExtendByRefPartCid) latestPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), latestPart
                                 .getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
@@ -338,7 +339,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 }
 
                 if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
-                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
+                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                 }
 
                 if (extProps.validate(latestPart)) {
@@ -346,7 +347,7 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                     // found a member to retire
 
                 	I_ExtendByRefPartStr clone =
-                            (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart
+                            (I_ExtendByRefPartStr) latestPart.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(), latestPart
                                 .getPathNid(), Long.MAX_VALUE);
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {

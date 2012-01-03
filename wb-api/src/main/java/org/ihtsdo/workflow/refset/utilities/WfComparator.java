@@ -3,6 +3,7 @@ package org.ihtsdo.workflow.refset.utilities;
 import java.util.Comparator;
 import java.util.logging.Level;
 
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
@@ -18,11 +19,6 @@ public class WfComparator
         return INSTANCE;
     }
  
-
-	public Comparator<ConceptVersionBI> createFsnComparer() {
-		return new WorkflowFsnComparator();
-	}
-
 	public Comparator<WorkflowHistoryJavaBean> createWfHxJavaBeanComparer() {
 		return new WfHxJavaBeanComparer();
 	}
@@ -33,20 +29,6 @@ public class WfComparator
 
 	public Comparator<WorkflowHistoryJavaBean> createWfHxEarliestFirstTimeComparer() {
 		return new WfHxEarliestFirstTimeComparer();
-	}
-
-	private class WorkflowFsnComparator implements Comparator<ConceptVersionBI> { 
-		
-		public int compare(ConceptVersionBI a, ConceptVersionBI b) {
-			try {
-				return a.getFullySpecifiedDescription().getText().toLowerCase().compareTo(
-						b.getFullySpecifiedDescription().getText().toLowerCase());
-			} catch (Exception e) {
-				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup FSN Comparator", e);
-			}
-			
-			return 0;
-		}
 	}
 
 	private class WfHxJavaBeanComparer implements Comparator<WorkflowHistoryJavaBean> {
@@ -76,15 +58,71 @@ public class WfComparator
 		}
 	}
 
-	public  Comparator<ConceptVersionBI> createPreferredTermComparer() {
+	
+	// FSN
+	public Comparator<ConceptVersionBI> createVersionedFsnComparer() {
+		return new VersionedFsnComparator();
+	}
+
+	public Comparator<I_GetConceptData> createFsnComparer() {
+		return new FsnComparator();
+	}
+
+	private class VersionedFsnComparator implements Comparator<ConceptVersionBI> { 
+		
+		public int compare(ConceptVersionBI a, ConceptVersionBI b) {
+			try {
+				return a.getFullySpecifiedDescription().getText().toLowerCase().compareTo(
+						b.getFullySpecifiedDescription().getText().toLowerCase());
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup FSN Comparator", e);
+			}
+			
+			return 0;
+		}
+	}
+
+	public class FsnComparator implements Comparator<I_GetConceptData> { 
+		public int compare(I_GetConceptData a, I_GetConceptData b) {
+			try {
+				return WorkflowHelper.getFsn(a).toLowerCase().compareTo(
+						WorkflowHelper.getFsn(b).toLowerCase());
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTerm Comparator", e);
+			}
+			
+			return 0;
+		}
+	}
+
+	
+	// Pref Term
+	public  Comparator<ConceptVersionBI> createVersionedPreferredTermComparer() {
+		return new VersionedPreferredTermComparator();
+	}
+
+	public  Comparator<I_GetConceptData> createPreferredTermComparer() {
 		return new PreferredTermComparator();
 	}
 
-	public class PreferredTermComparator implements Comparator<ConceptVersionBI> { 
+	public class VersionedPreferredTermComparator implements Comparator<ConceptVersionBI> { 
 		public int compare(ConceptVersionBI a, ConceptVersionBI b) {
 			try {
 				return a.getPreferredDescription().getText().toLowerCase().compareTo(
 						b.getPreferredDescription().getText().toLowerCase());
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTerm Comparator", e);
+			}
+			
+			return 0;
+		}
+	}
+	
+	public class PreferredTermComparator implements Comparator<I_GetConceptData> { 
+		public int compare(I_GetConceptData a, I_GetConceptData b) {
+			try {
+				return WorkflowHelper.getPrefTerm(a).toLowerCase().compareTo(
+						WorkflowHelper.getPrefTerm(b).toLowerCase());
 			} catch (Exception e) {
 				AceLog.getAppLog().log(Level.WARNING, "Couldn't Setup PreferredTerm Comparator", e);
 			}

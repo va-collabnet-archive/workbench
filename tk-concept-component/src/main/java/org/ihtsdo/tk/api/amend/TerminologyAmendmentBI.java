@@ -16,7 +16,7 @@
 
 package org.ihtsdo.tk.api.amend;
 
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 
 /**
  *
@@ -24,6 +24,6 @@ import org.ihtsdo.tk.api.TerminologyConstructorBI;
  * @deprecated 
  */
 @Deprecated
-public interface TerminologyAmendmentBI extends TerminologyConstructorBI {
+public interface TerminologyAmendmentBI extends TerminologyBuilderBI {
 
 }

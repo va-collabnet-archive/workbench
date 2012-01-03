@@ -369,6 +369,8 @@ public class CheckCyclesMojo extends AbstractMojo {
 
     private String toStringPathPos(List<PositionBI> pathPos, String pStr) {
         // BUILD STRING
+    	logger.info("SnorocketTask PATH ID " + pStr + " & pathPos " + pathPos );    	
+    	  
         StringBuilder s = new StringBuilder();
         s.append("\r\n::: [SnorocketTask] PATH ID -- ").append(pStr).append("\r\n");
         for (PositionBI position : pathPos) {
@@ -381,7 +383,11 @@ public class CheckCyclesMojo extends AbstractMojo {
     private String toStringCNid(int cNid) {
         StringBuilder sb = new StringBuilder();
         try {
+        	logger.info("cNid " + cNid );
+            
             I_GetConceptData c = tf.getConcept(cNid);
+            logger.info("concept " + c.getInitialText() + " uuid " + c.getUids());
+            
             sb.append(c.getUids().iterator().next()).append("\t");
             sb.append(cNid).append("\t");
             sb.append(c.getInitialText());

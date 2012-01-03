@@ -3,7 +3,7 @@ package org.ihtsdo.tk.api.concept;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.conattr.ConAttrChronicleBI;
@@ -69,7 +69,7 @@ public interface ConceptChronicleBI extends ComponentChroncileBI<ConceptVersionB
    Collection<? extends RefexChronicleBI<?>> getRefsetMembers() throws IOException;
 
    Collection<? extends RelGroupVersionBI> getRelGroups(ViewCoordinate vc)
-           throws IOException, ContraditionException;
+           throws IOException, ContradictionException;
 
    Collection<? extends RelationshipChronicleBI> getRelsIncoming() throws IOException;
 

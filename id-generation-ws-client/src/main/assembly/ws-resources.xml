@@ -5,9 +5,10 @@
   <fileSets>
     <fileSet>
       <directory>src/main/resources</directory>
-      <outputDirectory>/refsets</outputDirectory>
+      <outputDirectory>/resources</outputDirectory>
       <includes>
         <include>**/*.wsdl</include>
+        <include>**/*.xml</include>
       </includes>
     </fileSet>
   </fileSets>

@@ -16,13 +16,19 @@
  */
 package org.dwfa.ace.task.commit;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComponent;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class AlertToDataConstraintFailure {
 
@@ -38,9 +44,9 @@ public class AlertToDataConstraintFailure {
 
     private transient JComponent rendererComponent;
 
-    private I_GetConceptData conceptWithAlert;
+    private ConceptChronicleBI conceptWithAlert;
 
-    public AlertToDataConstraintFailure(ALERT_TYPE alertType, String alertMessage, I_GetConceptData conceptWithAlert) {
+    public AlertToDataConstraintFailure(ALERT_TYPE alertType, String alertMessage, ConceptChronicleBI conceptWithAlert) {
         super();
         this.alertType = alertType;
         this.alertMessage = alertMessage;
@@ -67,8 +73,20 @@ public class AlertToDataConstraintFailure {
         this.rendererComponent = rendererComponent;
     }
 
-    public I_GetConceptData getConceptWithAlert() {
+    public ConceptChronicleBI getConceptWithAlert() {
         return conceptWithAlert;
+    }
+    
+    public I_GetConceptData getConceptDataWithAlert() {
+        I_GetConceptData concept = null;
+        try {
+            concept = Terms.get().getConcept(conceptWithAlert.getNid());
+        } catch (TerminologyException ex) {
+            Logger.getLogger(AlertToDataConstraintFailure.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AlertToDataConstraintFailure.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return concept;
     }
 
     @Override

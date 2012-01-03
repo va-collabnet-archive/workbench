@@ -65,7 +65,7 @@ public class RF2HistoricalAssociationRefsetFactory extends RF2AbstractFactory {
 			
 			
 			
-			/*// duplicate references refset
+			// duplicate references refset
 			refset = new Refset();
 			refset.setName("Duplicate References Refset");
 			refset.setId(I_Constants.DUPLICATE_REFERENCES_REFSET_ID);
@@ -112,7 +112,7 @@ public class RF2HistoricalAssociationRefsetFactory extends RF2AbstractFactory {
 			refset.setTermAuxUID(I_Constants.POSSIBLY_EQUIVALENT_REFERENCES_REFSET_UID);
 			refset.setUID(I_Constants.POSSIBLY_EQUIVALENT_REFERENCES_REFSET_UID);
 			refsets.add(refset);
-			*/
+			
 
 			for (int i = 0; i < refsets.size(); i++) {
 				logger.info("Started " + refsets.get(i).getName() + " ...");

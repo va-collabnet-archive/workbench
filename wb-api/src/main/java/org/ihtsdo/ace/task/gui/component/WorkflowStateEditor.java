@@ -41,11 +41,11 @@ public class WorkflowStateEditor extends AbstractComboEditor {
     		TreeSet<? extends ConceptVersionBI> allStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
     		for (ConceptVersionBI state : allStates)
     		{
-				List<RelationshipVersionBI> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
+				List<RelationshipVersionBI<?>> useCaseRels = WorkflowHelper.getWorkflowRelationship(state, ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE);
 
 				boolean foundUseCase = false;
 				{
-					for (RelationshipVersionBI rel : useCaseRels)
+					for (RelationshipVersionBI<?> rel : useCaseRels)
 					if (rel != null &&
 					    (rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_EXISTING_CONCEPT.getPrimoridalUid()).getConceptNid() ||
 						 rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_CONCEPT.getPrimoridalUid()).getConceptNid()))

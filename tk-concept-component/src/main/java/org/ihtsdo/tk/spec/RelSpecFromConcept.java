@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.example.binding.HistoricalRelType;
@@ -60,7 +60,7 @@ public class RelSpecFromConcept {
 			} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}catch (ContraditionException e) {
+		}catch (ContradictionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

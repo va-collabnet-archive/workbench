@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
+import org.ihtsdo.db.change.ChangeNotifier;
 
 /**
  * File format:<br>
@@ -176,6 +177,7 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
              + this.enclosingConcept.toLongString() + "\ndestConcept: "
              + Concept.get(rel.getC2Id()).toLongString();
       Bdb.addXrefPair(rel.getC2Id(), NidPair.getTypeNidRelNidPair(rel.getTypeNid(), rel.getNid()));
+      ChangeNotifier.touchRelTarget(rel.getDestinationNid());
       getSrcRelNids().add(rel.nid);
       modified();
    }

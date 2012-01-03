@@ -37,6 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 
@@ -54,6 +56,7 @@ import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.io.JarExtractor;
+import org.ihtsdo.tk.Ts;
 
 public class AceConfig implements I_ConfigAceDb, Serializable {
 
@@ -558,6 +561,14 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
     }
 
     public I_GetConceptData getUserConcept() {
+        if (userConcept == null) {
+            AceLog.getAppLog().alertAndLogException(new Exception("User concept is null in AceConfig. Substuting generic user. "));
+            try {
+                userConcept = (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         return userConcept;
     }
 

@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.dwfa.ace.api.Terms;
@@ -17,6 +19,7 @@ import org.ihtsdo.cs.I_ComputeEConceptForChangeSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.econcept.transfrom.EConceptTransformerBI;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -25,10 +28,9 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 public class EConceptChangeSetWriter implements I_WriteChangeSet {
 
     public static boolean writeDebugFiles = false;
-    public   static boolean validateAfterWrite = false;
-    
+    public static boolean validateAfterWrite = false;
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private File changeSetFile;
@@ -43,6 +45,11 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
     private ChangeSetGenerationPolicy policy;
     private Semaphore writePermit = new Semaphore(1);
     private boolean timeStampEnabled = true;
+    private List<EConceptTransformerBI> extraWriters = new ArrayList();
+
+    public List<EConceptTransformerBI> getExtraWriters() {
+        return extraWriters;
+    }
 
     public boolean isTimeStampEnabled() {
         return timeStampEnabled;
@@ -159,6 +166,10 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                         changeSetFile.getName());
             }
         }
+        for (EConceptTransformerBI writer : extraWriters) {
+            writer.close();
+        }
+
     }
 
     @Override
@@ -183,25 +194,24 @@ public class EConceptChangeSetWriter implements I_WriteChangeSet {
                         tempOut.writeLong(time);
                     }
                     eC.writeExternal(tempOut);
+                    for (EConceptTransformerBI writer : extraWriters) {
+                        writer.process(eC);
+                    }
                     long writeTime = System.currentTimeMillis() - start - permitTime - computeTime;
                     long totalTime = System.currentTimeMillis() - start;
+
                     /*
-                    if (totalTime > 100000) {
-                    AceLog.getAppLog().info("\n##################################################################\n" +
-                    "Exceptional change set write time for concept: \n" + 
-                    "\nCompute time: " + TimeUtil.getElapsedTimeString(computeTime) + 
-                    "\nPermit time: " + TimeUtil.getElapsedTimeString(permitTime) + 
-                    "\nWrite time: " + TimeUtil.getElapsedTimeString(writeTime) + 
-                    "\nTotal time: " + TimeUtil.getElapsedTimeString(totalTime) + 
-                    "\n\neConcept: " + 
-                    eC +
-                    "\n##################################################################\n" +
-                    "\n\nConcept: " + 
-                    c.toLongString() +
-                    "\n##################################################################\n"
-                    );
-                    }
-                     * 
+                     * if (totalTime > 100000) {
+                     * AceLog.getAppLog().info("\n##################################################################\n"
+                     * + "Exceptional change set write time for concept: \n" + "\nCompute time: " +
+                     * TimeUtil.getElapsedTimeString(computeTime) + "\nPermit time: " +
+                     * TimeUtil.getElapsedTimeString(permitTime) + "\nWrite time: " +
+                     * TimeUtil.getElapsedTimeString(writeTime) + "\nTotal time: " +
+                     * TimeUtil.getElapsedTimeString(totalTime) + "\n\neConcept: " + eC +
+                     * "\n##################################################################\n" +
+                     * "\n\nConcept: " + c.toLongString() +
+                     * "\n##################################################################\n" ); }
+                     *
                      */
                 }
             } catch (Throwable e) {

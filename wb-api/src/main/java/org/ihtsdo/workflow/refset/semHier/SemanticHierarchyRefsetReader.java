@@ -23,10 +23,6 @@ public  class SemanticHierarchyRefsetReader extends WorkflowRefsetReader
 		super(semanticHierarchyConcept);
 	}
 
-	public I_GetConceptData getRefCompConcept() throws TerminologyException, IOException {
-		return Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMANTIC_PARENT_REL.getUids());
-	}
-
 	public String getChildSemanticTag(String props) {
 		return getProp("childSemanticArea", props);
 	}

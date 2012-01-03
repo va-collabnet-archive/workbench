@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdVersion;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.Terms;
@@ -47,8 +48,10 @@ import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -178,18 +181,6 @@ public class ExportUtil {
 		parents = getParentLocal(parents, concept); // check size		
 		String parentSnomedId="";
 		boolean findParentSnomedId = true;
-		/*	
-	  	Iterator iter = parents.iterator();	
-		while (iter.hasNext()) {
-			if(findParentSnomedId){
-				I_GetConceptData parentConcept = (I_GetConceptData) iter.next();
-				parentSnomedId = getSnomedId(parentConcept, getSnomedCorePathNid());	
-				if(!(parentSnomedId.equals("") && parentSnomedId.equals(null))){
-					findParentSnomedId = false;
-				}
-			}
-		}		
-		*/		
 		
 		for (I_GetConceptData loopConcept : parents) {
 			if(findParentSnomedId){
@@ -200,9 +191,9 @@ public class ExportUtil {
 			}
 		}
 			
-		if(findParentSnomedId){
+	/*	if(findParentSnomedId){
 			parentSnomedId="R-10000"; //Default Value
-		}	
+		}*/	
 		
 		return parentSnomedId;
 	}
@@ -260,6 +251,91 @@ public class ExportUtil {
 			return flag;
 	}
 
+	
+
+
+	public static void setupProfile(Config config) throws TerminologyException, IOException{
+		//File changeSetRoot = new File("profiles" + File.separator + "susan-test" + File.separator + "changesets");
+		BdbTermFactory tfb = (BdbTermFactory) getTermFactory();
+		I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+		newDbProfile.setUsername(config.getChangesetUserName());
+		newDbProfile.setUserConcept(getTermFactory().getConcept(UUID.fromString(config.getChangesetUserConcept())));
+		newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+		newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.MUTABLE_ONLY);
+		newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+		File changeSetRoot = new File(config.getChangesetRoot(), "changesets");
+		//File changeSetRoot = new File("profiles" + File.separator + newDbProfile.getUsername() + File.separator + "changesets");				
+		
+		changeSetRoot.mkdirs();
+		String changeSetWriterFileName = config.getChangesetUserName() + "." + "#" + 1 + "#" + UUID.randomUUID().toString() + ".eccs"; 
+		newDbProfile.setChangeSetRoot(changeSetRoot);
+		newDbProfile.setChangeSetWriterFileName(changeSetWriterFileName);
+		String tempKey = UUID.randomUUID().toString();
+		
+		ChangeSetGeneratorBI generator = Ts.get().createDtoChangeSetGenerator(
+					new File(newDbProfile.getChangeSetRoot(),
+							newDbProfile.getChangeSetWriterFileName()), 
+							new File(newDbProfile.getChangeSetRoot(), "#1#"
+									+ newDbProfile.getChangeSetWriterFileName()),
+									ChangeSetGenerationPolicy.MUTABLE_ONLY);
+		
+		ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
+				new CommitLog(new File(newDbProfile.getChangeSetRoot(),
+				"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+						"." + "commitLog.xls")));	
+		
+		 Ts.get().addChangeSetGenerator(tempKey, generator);
+	}
+	
+	
+	
+	
+	public static boolean insertSnomedId(int componentNid , Config config, String wsSnomedId , int pathNid , int statusNid) throws IOException {
+			boolean flag = false;
+			try {	
+					I_Identify i_Identify = getTermFactory().getId(componentNid);
+					flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
+					
+					getTermFactory().addUncommitted(commitedConcept);
+					
+			} catch (NumberFormatException e) {
+					logger.error("NumberFormatException" +e);
+			} catch (TerminologyException e) {
+				logger.error("TerminologyException" +e);
+			} catch (IOException e) {
+				logger.error("IOException" +e);
+			} catch (Exception e) {
+				logger.error("Exception" +e);
+			}	
+			return flag;
+	}
+		
+	public static boolean insertCtv3Id(int componentNid , Config config, String wsCtv3Id , int pathNid , int statusNid) throws IOException {
+			boolean flag = false;
+			try {	
+					I_Identify i_Identify = getTermFactory().getId(componentNid);
+					if (getAceConfig() == null) {
+					   createAceConfig();
+					}
+					  
+					flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+					I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
+					
+					getTermFactory().addUncommitted(commitedConcept);
+				
+			} catch (NumberFormatException e) {
+					logger.error("NumberFormatException" +e);
+			} catch (TerminologyException e) {
+				logger.error("TerminologyException" +e);
+			} catch (IOException e) {
+				logger.error("IOException" +e);
+			} catch (Exception e) {
+				logger.error("Exception" +e);
+			}
+			return flag;
+	}
 	
 	
 	
@@ -326,9 +402,11 @@ public class ExportUtil {
 			return flag;
 	}
 	
-
+	/*
 	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
 		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		System.out.println(snomedConcept.getInitialText() + " & " + conEffectiveTime);
+		
 		moduleId = I_Constants.CORE_MODULE_ID; 
 		if (snomedIntegerId!=null){
 			if (metaHierDAO.isEmpty()) { 
@@ -346,11 +424,88 @@ public class ExportUtil {
 					}else if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0 && active.equals("1")){
 						moduleId = I_Constants.META_MOULE_ID;					
 					}
+					
 				} 
 			}
 		}
 		return moduleId; 
+	}*/
+	
+	 public static Long getLatestActivePart(List<I_RelPart> parts)
+	 throws Exception {
+	  long latestVersion = Integer.MIN_VALUE;
+	  for (I_RelPart rel : parts) {
+		   if (rel.getTime() > latestVersion && rel.getStatusNid()==getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
+		    latestVersion = rel.getTime();
+		   }
+	  }
+	  if (latestVersion>Integer.MIN_VALUE)
+	   return latestVersion;
+	  
+	  return null;	  
+	 }
+	
+	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
+		  String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		  moduleId = I_Constants.CORE_MODULE_ID; 
+		  if (snomedIntegerId!=null){
+			   if (metaHierDAO.isEmpty()) { 
+			    logger.error("Meta Hierarchy DAO Set is empty"); 
+			   } else {  
+			    Iterator iter = metaHierDAO.iterator();
+			    String prevET="00000000";
+			    while (iter.hasNext()) {
+				     ModuleIDDAO  moduleIdDAO = ( ModuleIDDAO ) iter.next();
+				     String conceptid = moduleIdDAO.getConceptid();
+				     String effectivetime = moduleIdDAO.getEffectiveTime();
+				     String active = moduleIdDAO.getActive();
+					     if(snomedIntegerId.equals(conceptid) 
+					    		 && effectivetime.compareTo(conEffectiveTime)<=0 
+					    		 && active.equals("0")
+					    		 && prevET.compareTo(effectivetime)<0){
+					    	 moduleId = I_Constants.CORE_MODULE_ID;
+					    	 prevET=effectivetime;
+					     }else if(snomedIntegerId.equals(conceptid) 
+					    		 && effectivetime.compareTo(conEffectiveTime)<=0 
+					    		 && active.equals("1")
+					    		 && prevET.compareTo(effectivetime)<0){
+					    	 moduleId = I_Constants.META_MOULE_ID;     
+					    	 prevET=effectivetime;
+					     }
+			    	} 
+			   }
+		  }
+		  return moduleId; 
+		 }
+	
+	/*
+	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
+		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		
+		if (metaHierDAO.isEmpty()) { 
+			logger.error("Meta Hierarchy DAO Set is empty"); 
+		} else {  
+			Iterator iter = metaHierDAO.iterator();
+			while (iter.hasNext()) {
+				ModuleIDDAO  moduleIdDAO = ( ModuleIDDAO ) iter.next();
+				String conceptid = moduleIdDAO.getConceptid();
+				String effectivetime = moduleIdDAO.getEffectiveTime();
+				//need to sort effectivetime issue
+				
+				if(snomedIntegerId.equals(conceptid) && effectivetime.compareTo(conEffectiveTime)<=0
+				){
+					moduleId = I_Constants.META_MOULE_ID;
+					break;
+				}
+				else {
+					moduleId = I_Constants.CORE_MODULE_ID; 
+				}
+			} 
+		}
+
+		return moduleId; 
 	}
+		*/
 
 	
 	public static boolean getInactiveConceptList(I_GetConceptData destinationConcept , String destinationId) throws IOException, TerminologyException {	
@@ -567,7 +722,7 @@ public class ExportUtil {
 	}
 	
 
-	public static String getMetaModuleID(I_GetConceptData snomedConcept) {
+	/*public static String getMetaModuleID(I_GetConceptData snomedConcept) {
 		if (metaConceptList.isEmpty()) {
 			logger.error("Meta Hierarchy List is empty");
 		} else if (metaConceptList.contains(snomedConcept)) {
@@ -576,7 +731,33 @@ public class ExportUtil {
 			moduleId = I_Constants.CORE_MODULE_ID;
 		}
 		return moduleId;
-	}
+	}*/
+	
+	
+	public static String getMetaModuleID(I_GetConceptData snomedConcept) throws IOException, TerminologyException {
+		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		if (metaHierDAO.isEmpty()) { 
+			 logger.error("Meta Hierarchy DAO Set is empty"); 
+		 } else {  
+			    Iterator iter = metaHierDAO.iterator();
+			    while (iter.hasNext()) {
+			    	ModuleIDDAO  moduleIdDAO = ( ModuleIDDAO ) iter.next();
+			    	String conceptid = moduleIdDAO.getConceptid();
+			    	String effectivetime = moduleIdDAO.getEffectiveTime();
+			    	//need to sort effectivetime issue
+			    	if(snomedIntegerId.equals(conceptid) //&& effectivetime.equals(effectivetime)
+			    	){
+			    		moduleId = I_Constants.META_MOULE_ID;
+			    		break;
+			    	}
+					else {
+						moduleId = I_Constants.CORE_MODULE_ID; 
+					}
+			    } 
+		 }
+		
+		return moduleId; 
+	 }
 
 	@SuppressWarnings("unchecked")
 	public static Set<I_GetConceptData> initMetaHierarchyIsAList() {
@@ -1483,6 +1664,135 @@ public class ExportUtil {
 		if (conceptId==null) return null;
 
 		return conceptId.toString();
+	}
+	
+	
+	// get the conceptid for the given UUID using Specific namespace and partition values
+	public static String getConceptId(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		
+		long conceptId = 0L;
+				
+		String partitionId = "00";
+		String sctModuleId = "Concept Component";
+		
+		String namespaceId = "0";
+		String releaseId = "20121031";
+		String executionId = "Daily Build";
+		
+		try {
+					
+			conceptId = idGen.getSCTID(uuid);
+		} catch (NullPointerException Ne) {
+			// There is no conceptid in the repository so we are getting NULL
+			if (logger.isDebugEnabled())
+				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
+			
+			try{
+				if(!config.getReleaseId().equals(null)) {
+					namespaceId = config.getNamespaceId();
+					releaseId	= config.getReleaseId();
+					executionId = config.getExecutionId();
+				}
+				conceptId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
+			
+			} catch (Exception Ex) {
+				logger.error("Message : SCTID creation error for UUID :"  + uuid, Ex);
+			}
+			
+		} catch (Exception e) {
+			logger.error("Exception Message : "  + uuid, e);
+		}
+		return String.valueOf(conceptId);
+	}
+	
+	
+	
+	// get the descriptionid for the given UUID using Specific namespace and partition values
+	public static String getDescriptionId(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		
+		long descriptionId = 0L;
+		
+		String partitionId = "01";
+		String sctModuleId = "Description Component";		
+		String namespaceId = "0";
+		String releaseId = "20121031";
+		String executionId = "Daily Build";
+		
+		try {
+			if(!config.getReleaseId().equals(null)) {
+				namespaceId = config.getNamespaceId();
+				releaseId	= config.getReleaseId();
+				executionId = config.getExecutionId();
+			}		
+			descriptionId = idGen.getSCTID(uuid);
+		} catch (NullPointerException Ne) {
+			// There is no descriptionid in the repository so we are getting NULL
+			try{
+				descriptionId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
+			
+			} catch (Exception Ex) {
+				logger.error("Message : SCTID creation error for UUID :"  + uuid, Ex);
+			}
+			
+		} catch (Exception e) {
+			logger.error("Exception Message : "  + uuid, e);
+		}
+		
+		return String.valueOf(descriptionId);
+	}
+	
+	
+	
+	
+	
+	// get the relationshipId for the given UUID using Specific namespace and partition values
+	public static String getRelationshipId(Config config, UUID uuid) {
+		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
+		
+		long relationshipId = 0L;
+		String partitionId = "02";
+		String sctModuleId = "Relationship Component";
+		String namespaceId = "0";
+		String releaseId = "20121031";
+		String executionId = "Daily Build";
+		
+		try {
+			if(!config.getReleaseId().equals(null)) {
+				namespaceId = config.getNamespaceId();
+				releaseId	= config.getReleaseId();
+				executionId = config.getExecutionId();
+			}		
+			relationshipId = idGen.getSCTID(uuid);
+		} catch (NullPointerException Ne) {
+			// There is no relationshipId in the repository so we are getting NULL
+			try{
+				relationshipId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
+			} catch (Exception Ex) {
+				logger.error("Message : SCTID creation error for UUID :"  + uuid, Ex);
+			}
+			
+		} catch (Exception e) {
+			logger.error("Exception Message : "  + uuid, e);
+		}
+		
+		return String.valueOf(relationshipId);
+	}
+	
+	public static boolean insertSctId(int componentNid , Config config, String wsSctId , int pathNid , int statusNid) throws IOException {
+		boolean flag = false;
+		try {	
+				I_Identify i_Identify = getTermFactory().getId(componentNid);	
+				I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
+				flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(), statusNid, pathNid, Long.MAX_VALUE);
+				
+				getTermFactory().addUncommitted(commitedConcept);
+				
+			} catch (Exception ex) {
+				logger.error(ex);
+			}
+			return flag;
 	}
 
 	public static String getPartitionId(String sctId) {

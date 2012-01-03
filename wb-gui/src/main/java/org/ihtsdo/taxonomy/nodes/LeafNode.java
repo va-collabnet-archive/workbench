@@ -14,6 +14,9 @@ import java.util.Collection;
  * @author kec
  */
 public class LeafNode extends TaxonomyNode {
+   public LeafNode(TaxonomyNode node) {
+      super(node);
+   }
    public LeafNode(int cnid, int parentNid, long parentNodeId) {
       super(cnid, parentNid, parentNodeId);
    }

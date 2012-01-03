@@ -52,13 +52,14 @@ import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.bdb.NullComponentFinder;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -284,7 +285,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             ReferenceConcepts.PATH.getNid(),
                             ReferenceConcepts.REFSET_PATHS.getNid());
                     newPathSpec.with(RefexProperty.CNID1, path.getNid());
-                    newPathSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                    newPathSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                     newPathSpec.setMemberContentUuid();
 
                     RefexCAB newOriginSpec =
@@ -293,7 +294,7 @@ public class LoadBdbMulti extends AbstractMojo {
                             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
                     newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
                     newOriginSpec.with(RefexProperty.INTEGER1, Integer.MAX_VALUE);
-                    newOriginSpec.with(RefexProperty.STATUS_NID, ReferenceConcepts.CURRENT.getNid());
+                    newOriginSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                     newOriginSpec.setMemberContentUuid();
 
                     int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
@@ -351,6 +352,28 @@ public class LoadBdbMulti extends AbstractMojo {
                 reporter.reportDupClasses();
 
             }
+            
+            
+               getLog().info("Testing for Null Components Started.");
+
+                Concept.disableComponentsCRHM();
+
+                NullComponentFinder nullComponentFinder = new NullComponentFinder();
+                Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+                System.out.println();
+
+                if (nullComponentFinder.getNullComponent().isEmpty()) {
+                    getLog().info("No Null component found.");
+                } else {
+                    nullComponentFinder.writeNullComponentFile();
+                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+                            + nullComponentFinder.getNullComponent() + "\n");
+                }
+                Concept.enableComponentsCRHM();
+                getLog().info("Testing for Null Components Finished.");
+            
+            
+            
             Concept.enableComponentsCRHM();
             getLog().info("Starting close.");
             Bdb.close();
@@ -404,7 +427,7 @@ public class LoadBdbMulti extends AbstractMojo {
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
-            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
+            TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File df : dialectFiles) {
                 getLog().info("processing dialectFile: " + df.getName());
@@ -497,7 +520,7 @@ public class LoadBdbMulti extends AbstractMojo {
             int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
             int pathNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
             EditCoordinate ec = new EditCoordinate(authorNid, pathNid);
-            TerminologyConstructorBI amender = Ts.get().getTerminologyConstructor(ec, config.getViewCoordinate());
+            TerminologyBuilderBI amender = Ts.get().getTerminologyBuilder(ec, config.getViewCoordinate());
 
             for (File cf : caseFiles) {
                 getLog().info("processing dialectFile: " + cf.getName());

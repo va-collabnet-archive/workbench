@@ -15,7 +15,7 @@ import org.dwfa.util.HashFunction;
 
 import org.ihtsdo.concept.component.refset.RefsetRevision;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember.Version;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -179,7 +179,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetLongMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
@@ -201,7 +201,7 @@ public class LongRevision extends RefsetRevision<LongRevision, LongMember>
    }
 
    @Override
-   public LongMember.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public LongMember.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return (Version) ((LongMember) primordialComponent).getVersion(c);
    }
 

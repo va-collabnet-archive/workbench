@@ -32,6 +32,7 @@
  */
 package org.dwfa.ace.task.commit.validator.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -40,6 +41,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.commit.validator.ConceptDataComparerStrategy;
 import org.dwfa.ace.task.commit.validator.GetConceptDataValidationStrategy;
 import org.dwfa.ace.task.commit.validator.ValidationException;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 /**
  * {@code NotEmptyConceptDataValidator} is an implementation of
@@ -56,9 +59,9 @@ import org.dwfa.ace.task.commit.validator.ValidationException;
  */
 public class NotEmptyConceptDataValidator implements GetConceptDataValidationStrategy {
 
-    private final I_GetConceptData requiredConcept;
-    private final I_GetConceptData conceptToValidate;
-    private final List<I_DescriptionVersioned> descriptions;
+    private final ConceptChronicleBI requiredConcept;
+    private final ConceptChronicleBI conceptToValidate;
+    private final Collection<? extends DescriptionVersionBI> descriptions;
     private final ConceptDataComparerStrategy comparer;
 
     /**
@@ -72,8 +75,8 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      *            requiredConcept
      * @param conceptToValidate the current concept being validated.
      */
-    public NotEmptyConceptDataValidator(final I_GetConceptData requiredConcept,
-            final List<I_DescriptionVersioned> descriptions, final I_GetConceptData conceptToValidate) {
+    public NotEmptyConceptDataValidator(final ConceptChronicleBI requiredConcept,
+            final Collection<? extends DescriptionVersionBI> descriptions, final ConceptChronicleBI conceptToValidate) {
         this(requiredConcept, conceptToValidate, descriptions, new ConceptTypeToDescriptionTypeComparer());
     }
 
@@ -89,8 +92,8 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      *            Description parts of the {@link I_DescriptionVersioned}
      *            objects in the {@code descriptions} List.
      */
-    public NotEmptyConceptDataValidator(I_GetConceptData requiredConcept, I_GetConceptData conceptToValidate,
-            List<I_DescriptionVersioned> descriptions, ConceptDataComparerStrategy comparer) {
+    public NotEmptyConceptDataValidator(ConceptChronicleBI requiredConcept, ConceptChronicleBI conceptToValidate,
+            Collection<? extends DescriptionVersionBI> descriptions, ConceptDataComparerStrategy comparer) {
         this.requiredConcept = requiredConcept;
         this.conceptToValidate = conceptToValidate;
         this.descriptions = descriptions;
@@ -104,14 +107,12 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      * @see NotEmptyConceptDataValidator
      */
     public void validate() throws ValidationException {
-        for (I_DescriptionVersioned<?> description : descriptions) {
-            for (I_DescriptionPart part : description.getMutableParts()) {
-                if (comparer.isPartRequiredConceptType(requiredConcept, part) && !hasValue(part)) {
+        for (DescriptionVersionBI description : descriptions) {
+                if (requiredConcept.getNid() ==  description.getTypeNid() && !hasValue(description)) {
                     throw new ValidationException(String.format("Concept %1$s has empty %2$s",
                         conceptToValidate.getConceptNid(), requiredConcept.toString()));
                 }
             }
-        }
     }
 
     /**
@@ -128,10 +129,10 @@ public class NotEmptyConceptDataValidator implements GetConceptDataValidationStr
      *         a value that not
      *         null or has a length of zero.
      */
-    private boolean hasValue(I_DescriptionPart part) {
-        if (part.getText() == null) {
+    private boolean hasValue(DescriptionVersionBI description) {
+        if (description.getText() == null) {
             return false;
         }
-        return part.getText().length() > 0;
+        return description.getText().length() > 0;
     }
 }

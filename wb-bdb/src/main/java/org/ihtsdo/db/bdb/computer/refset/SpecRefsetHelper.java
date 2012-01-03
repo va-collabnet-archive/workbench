@@ -49,7 +49,10 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChroncileBI;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -68,10 +71,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentRefsetExtension(int,
-     * int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentRefsetExtension(int, int)
      */
     public I_ExtendByRefPartCid getCurrentRefsetExtension(int refsetId,
             int componentNid) throws Exception {
@@ -90,10 +91,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentRefsetExtension(int,
-     * int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentRefsetExtension(int, int, int)
      */
     @Override
     public boolean hasCurrentRefsetExtension(int refsetId, int componentNid,
@@ -115,7 +114,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentStatusIds()
      */
     public Set<Integer> getCurrentStatusIds() {
@@ -167,25 +166,29 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
         }
         return statuses;
     }
-
+    private I_IntSet currentStatusIntSet;
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getCurrentStatusIntSet()
      */
+
     public I_IntSet getCurrentStatusIntSet() {
-        I_IntSet statuses = Terms.get().newIntSet();
-        for (Integer status : getCurrentStatusIds()) {
-            statuses.add(status);
+        if (currentStatusIntSet == null) {
+            I_IntSet statuses = Terms.get().newIntSet();
+            for (Integer status : getCurrentStatusIds()) {
+                statuses.add(status);
+            }
+            currentStatusIntSet = statuses;
         }
-        return statuses;
+        return currentStatusIntSet;
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * hasCurrentConceptConceptRefsetExtension(int, int, int, int, int)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# hasCurrentConceptConceptRefsetExtension(int, int, int,
+     * int, int)
      */
     public boolean hasCurrentConceptConceptRefsetExtension(int refsetId,
             int componentNid, int c1Nid, int c2Nid, int statusId)
@@ -208,10 +211,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentConceptRefsetExtension
-     * (int, int, int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentConceptRefsetExtension (int, int, int, int)
      */
     @SuppressWarnings("unchecked")
     public boolean hasCurrentConceptRefsetExtension(int refsetId,
@@ -291,10 +292,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentIntRefsetExtension
-     * (int, int, int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#hasCurrentIntRefsetExtension (int, int, int, int)
      */
     public boolean hasCurrentIntRefsetExtension(int refsetId, int componentNid,
             int intValue, int statusNid) throws Exception {
@@ -316,10 +315,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * hasCurrentConceptConceptConceptRefsetExtension(int, int, int, int, int,
-     * int)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# hasCurrentConceptConceptConceptRefsetExtension(int, int,
+     * int, int, int, int)
      */
     public boolean hasCurrentConceptConceptConceptRefsetExtension(int refsetId,
             int componentNid, int c1Nid, int c2Nid, int c3Nid, int statusId)
@@ -343,10 +341,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * hasCurrentConceptConceptStringRefsetExtension(int, int, int, int,
-     * java.lang.String, int)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# hasCurrentConceptConceptStringRefsetExtension(int, int,
+     * int, int, java.lang.String, int)
      */
     public boolean hasCurrentConceptConceptStringRefsetExtension(int refsetId,
             int componentNid, int c1Nid, int c2Nid, String stringInput,
@@ -386,9 +383,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int,
-     * int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int, int, int)
      */
     public boolean newRefsetExtension(int refsetNid, int componentNid,
             int memberTypeNid) throws Exception {
@@ -397,9 +393,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int,
-     * int, int, boolean)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRefsetExtension(int, int, int, boolean)
      */
     public boolean newRefsetExtension(int refsetNid, int componentNid,
             int memberTypeNid, boolean checkNotExists) throws Exception {
@@ -430,13 +425,23 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             AceLog.getAppLog().info("Nid has null component: " + componentNid);
         } else {
             UUID memberUuid = generateUuid(Ts.get().getConcept(refsetNid).getPrimUuid(), Ts.get().getComponent(componentNid).getPrimUuid(), Ts.get().getConcept(memberTypeNid).getPrimUuid());
+            if (Ts.get().hasUuid(memberUuid)) {
+                RefexChronicleBI<?> existingMember = (RefexChronicleBI) Ts.get().getComponent(memberUuid);
 
-            RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
-            refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeNid);
-            I_ExtendByRef newExtension = makeMemberAndSetup(refsetNid,
-                    componentNid, REFSET_TYPES.CID, refsetMap, memberUuid);
-            if (isAutocommitActive()) {
-                Terms.get().addUncommittedNoChecks(newExtension);
+                RefexVersionBI<?> existingVersion = existingMember.getVersion(config.getViewCoordinate().getVcWithAllStatusValues());
+                RefexCAB bluePrint = existingVersion.makeBlueprint(config.getViewCoordinate());
+                bluePrint.setStatusUuid(SnomedMetadataRfx.getSTATUS_CURRENT().getUuids()[0]);
+                bluePrint.setMemberUuid(memberUuid);
+                builder.constructIfNotCurrent(bluePrint);
+
+            } else {
+                RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.CID);
+                refsetMap.put(REFSET_PROPERTY.CID_ONE, memberTypeNid);
+                I_ExtendByRef newExtension = makeMemberAndSetup(refsetNid,
+                        componentNid, REFSET_TYPES.CID, refsetMap, memberUuid);
+                if (isAutocommitActive()) {
+                    Terms.get().addUncommittedNoChecks(newExtension);
+                }
             }
         }
 
@@ -445,10 +450,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#generateUuid(java.util.UUID,
-     * java.util.UUID, java.util.UUID)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#generateUuid(java.util.UUID, java.util.UUID,
+     * java.util.UUID)
      */
     public UUID generateUuid(UUID uuid, UUID uuid2, UUID uuid3) {
         try {
@@ -465,11 +469,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptConceptRefsetExtension
-     * (int, int, int, int, java.util.UUID, java.util.UUID, java.util.UUID,
-     * long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptConceptRefsetExtension (int, int, int, int,
+     * java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptRefsetExtension(int refsetId,
             int componentId, int c1Id, int c2Id, UUID memberUuid,
@@ -523,11 +525,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newStringRefsetExtension(int,
-     * int, java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID,
-     * long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newStringRefsetExtension(int, int, java.lang.String,
+     * java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newStringRefsetExtension(int refsetId, int componentId,
             String extString, UUID memberUuid, UUID pathUuid, UUID statusUuid,
@@ -579,11 +579,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newLongRefsetExtension(int,
-     * int, java.lang.Long, java.util.UUID, java.util.UUID, java.util.UUID,
-     * long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newLongRefsetExtension(int, int, java.lang.Long,
+     * java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newLongRefsetExtension(int refsetId, int componentId,
             long extLong, UUID memberUuid, UUID pathUuid, UUID statusUuid,
@@ -635,11 +633,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptStringRefsetExtension
-     * (int, int, int, java.lang.String, java.util.UUID, java.util.UUID,
-     * java.util.UUID, long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptStringRefsetExtension (int, int, int,
+     * java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptStringRefsetExtension(int refsetId,
             int componentId, int c1Id, String extString, UUID memberUuid,
@@ -693,9 +689,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newIntRefsetExtension(int,
-     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newIntRefsetExtension(int, int, int, java.util.UUID,
+     * java.util.UUID, java.util.UUID, long)
      */
     public boolean newIntRefsetExtension(int refsetId, int componentId,
             int value, UUID memberUuid, UUID pathUuid, UUID statusUuid,
@@ -738,10 +734,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptRefsetExtension(int,
-     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptRefsetExtension(int, int, int, java.util.UUID,
+     * java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptRefsetExtension(int refsetId, int componentId,
             int conceptId, UUID memberUuid, UUID pathUuid, UUID statusUuid,
@@ -786,10 +781,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * newConceptConceptConceptRefsetExtension(int, int, int, int, int,
-     * java.util.UUID, java.util.UUID, java.util.UUID, long)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# newConceptConceptConceptRefsetExtension(int, int, int,
+     * int, int, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptConceptRefsetExtension(int refsetId,
             int componentId, int c1Id, int c2Id, int c3Id, UUID memberUuid,
@@ -860,10 +854,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * newConceptConceptStringRefsetExtension(int, int, int, int,
-     * java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID, long)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# newConceptConceptStringRefsetExtension(int, int, int,
+     * int, java.lang.String, java.util.UUID, java.util.UUID, java.util.UUID, long)
      */
     public boolean newConceptConceptStringRefsetExtension(int refsetId,
             int componentId, int c1Id, int c2Id, String stringValue,
@@ -914,9 +907,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#retireRefsetExtension(int,
-     * int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#retireRefsetExtension(int, int, int)
      */
     public boolean retireRefsetExtension(int refsetId, int componentNid,
             int memberTypeId) throws Exception {
@@ -933,7 +925,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                         for (PathBI editPath : getEditPaths()) {
 
                             I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(
-                                    ReferenceConcepts.RETIRED.getNid(),
+                                    SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                                     editPath.getConceptNid(),
                                     Long.MAX_VALUE);
                             extension.addVersion(clone);
@@ -951,10 +943,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllDescendants(org.dwfa.
-     * ace.api.I_GetConceptData,
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllDescendants(org.dwfa. ace.api.I_GetConceptData,
      * org.dwfa.ace.refset.spec.SpecRefsetHelper.Condition)
      */
     public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept,
@@ -964,11 +954,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllDescendants(org.dwfa.
-     * ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData,
-     * org.dwfa.ace.refset.spec.SpecRefsetHelper.Condition)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllDescendants(org.dwfa. ace.api.I_GetConceptData,
+     * org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.refset.spec.SpecRefsetHelper.Condition)
      */
     public Set<I_GetConceptData> getAllDescendants(I_GetConceptData concept,
             I_GetConceptData memberRefset, Condition... conditions)
@@ -1016,10 +1004,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllAncestors(org.dwfa.ace
-     * .api.I_GetConceptData,
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllAncestors(org.dwfa.ace .api.I_GetConceptData,
      * org.dwfa.ace.refset.spec.SpecRefsetHelper.Condition)
      */
     public Set<I_GetConceptData> getAllAncestors(I_GetConceptData concept,
@@ -1066,8 +1052,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     }
 
     /**
-     * @return The view positions from the active config. Returns null if no
-     *         config set or config contains no view positions.
+     * @return The view positions from the active config. Returns null if no config set or config contains no
+     * view positions.
      */
     protected PositionSetReadOnly getViewPositions() throws Exception {
         if (this.viewPositions == null) {
@@ -1086,8 +1072,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     }
 
     /**
-     * @return The edit paths from the active config. Returns null if no config
-     *         set or the config defines no paths for editing.
+     * @return The edit paths from the active config. Returns null if no config set or the config defines no
+     * paths for editing.
      */
     protected Set<PathBI> getEditPaths() throws Exception {
         if (this.editPaths == null) {
@@ -1105,8 +1091,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     }
 
     /**
-     * @return The allowed status from the active config. Returns just "CURRENT"
-     *         if no config set.
+     * @return The allowed status from the active config. Returns just "CURRENT" if no config set.
      */
     protected I_IntSet getAllowedStatuses() throws Exception {
         if (this.allowedStatuses == null) {
@@ -1124,8 +1109,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
     }
 
     /**
-     * @return By default (unless overridden by a subclass) will provide both
-     *         the SNOMED and ArchitectonicAuxiliary IS_A concepts.
+     * @return By default (unless overridden by a subclass) will provide both the SNOMED and
+     * ArchitectonicAuxiliary IS_A concepts.
      */
     protected I_IntSet getIsARelTypes() throws Exception {
         return Terms.get().getActiveAceFrameConfig().getDestRelTypes();
@@ -1133,7 +1118,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getConceptTypeId()
      */
     public int getConceptTypeId() {
@@ -1142,7 +1127,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#setConceptTypeId(int)
      */
     public void setConceptTypeId(int conceptTypeId) {
@@ -1151,23 +1136,19 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptExtensionPart(int,
-     * int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptExtensionPart(int, int, int)
      */
     public boolean newConceptExtensionPart(int refsetId, int componentId,
             int c1Id) throws Exception {
         return newConceptExtensionPart(refsetId, componentId, c1Id,
-                ReferenceConcepts.CURRENT.getNid());
+                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
     }
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptExtensionPart(int,
-     * int, int, int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConceptExtensionPart(int, int, int, int)
      */
     public boolean newConceptExtensionPart(int refsetId, int componentNid,
             int c1Id, int statusId) throws Exception {
@@ -1194,10 +1175,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#retireConceptExtension(int,
-     * int)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#retireConceptExtension(int, int)
      */
     public boolean retireConceptExtension(int refsetId, int componentNid)
             throws Exception {
@@ -1209,7 +1188,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                         && v.getTypeNid() == REFSET_TYPES.CID.getTypeNid()) {
                     // found a member to retire
                     for (PathBI editPath : getEditPaths()) {
-                        I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(ReferenceConcepts.RETIRED.getNid(),
+                        I_ExtendByRefPartCid clone = (I_ExtendByRefPartCid) v.makeAnalog(SnomedMetadataRfx.getSTATUS_RETIRED_NID(),
                                 editPath.getConceptNid(),
                                 Long.MAX_VALUE);
                         extension.addVersion(clone);
@@ -1225,10 +1204,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java
-     * .util.List, org.dwfa.ace.api.I_GetConceptData)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java .util.List,
+     * org.dwfa.ace.api.I_GetConceptData)
      */
     public List<I_GetConceptData> filterListByConceptType(
             Collection<? extends I_ExtendByRef> allExtensions,
@@ -1276,10 +1254,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java
-     * .util.List, org.dwfa.ace.api.I_GetConceptData)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#filterListByConceptType(java .util.List,
+     * org.dwfa.ace.api.I_GetConceptData)
      */
     @Override
     public int countMembersOfType(
@@ -1325,7 +1302,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /**
      * TODO Need to convert to use the version computer, not bypass paths...
-     * 
+     *
      * @param memberExtension
      * @return
      * @throws TerminologyException
@@ -1352,10 +1329,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConcept(org.dwfa.ace.api
-     * .I_ConfigAceFrame, org.dwfa.ace.api.I_GetConceptData)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newConcept(org.dwfa.ace.api .I_ConfigAceFrame,
+     * org.dwfa.ace.api.I_GetConceptData)
      */
     public I_GetConceptData newConcept(I_ConfigAceFrame aceConfig,
             I_GetConceptData status) throws Exception {
@@ -1373,11 +1349,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newDescription(org.dwfa.ace
-     * .api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData,
-     * java.lang.String, org.dwfa.ace.api.I_ConfigAceFrame,
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newDescription(org.dwfa.ace .api.I_GetConceptData,
+     * org.dwfa.ace.api.I_GetConceptData, java.lang.String, org.dwfa.ace.api.I_ConfigAceFrame,
      * org.dwfa.ace.api.I_GetConceptData)
      */
     public void newDescription(I_GetConceptData concept,
@@ -1395,12 +1369,10 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @see
-     * org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRelationship(org.dwfa.ace
-     * .api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData,
-     * org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_ConfigAceFrame,
-     * org.dwfa.ace.api.I_GetConceptData)
+     *
+     * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#newRelationship(org.dwfa.ace .api.I_GetConceptData,
+     * org.dwfa.ace.api.I_GetConceptData, org.dwfa.ace.api.I_GetConceptData,
+     * org.dwfa.ace.api.I_ConfigAceFrame, org.dwfa.ace.api.I_GetConceptData)
      */
     public void newRelationship(I_GetConceptData concept,
             I_GetConceptData relationshipType, I_GetConceptData destination,
@@ -1420,7 +1392,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.dwfa.ace.refset.spec.I_HelpSpecRefset#getAllValidUsers()
      */
     public Set<? extends I_GetConceptData> getAllValidUsers() throws Exception {
@@ -1443,9 +1415,8 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#getInbox(org.dwfa.ace.api.
-     * I_GetConceptData)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#getInbox(org.dwfa.ace.api. I_GetConceptData)
      */
     public String getInbox(I_GetConceptData concept) throws Exception {
         // find the inbox string using the concept's "user inbox" description
@@ -1473,9 +1444,9 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
 
     /*
      * (non-Javadoc)
-     * 
-     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset#
-     * hasConceptRefsetExtensionWithAnyPromotionStatus(int, int)
+     *
+     * @seeorg.dwfa.ace.refset.spec.I_HelpSpecRefset# hasConceptRefsetExtensionWithAnyPromotionStatus(int,
+     * int)
      */
     public boolean hasConceptRefsetExtensionWithAnyPromotionStatus(
             int refsetId, int componentNid) throws IOException {

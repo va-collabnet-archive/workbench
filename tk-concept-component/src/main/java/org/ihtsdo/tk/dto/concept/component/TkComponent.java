@@ -4,7 +4,7 @@ package org.ihtsdo.tk.dto.concept.component;
 
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.id.IdBI;
@@ -126,7 +126,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
    public TkComponent(ComponentVersionBI another, NidBitSetBI exclusions, Map<UUID, UUID> conversionMap,
                       long offset, boolean mapAll, ViewCoordinate vc)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       super(another, conversionMap, offset, mapAll);
 
       Collection<? extends IdBI> anotherAdditionalIds = another.getAdditionalIds();
@@ -138,6 +138,8 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
             for (int nid : id.getAllNidsForId()) {
                if (exclusions.isMember(nid) || (Ts.get().getComponent(nid) == null)) {
                   continue nextId;
+               } else if (Ts.get().getComponent(nid).getVersions(vc).isEmpty()) {
+                   continue nextId;
                }
             }
 
@@ -234,7 +236,7 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
 
    private void processAnnotations(Collection<? extends RefexChronicleBI<?>> annotations, ViewCoordinate vc,
                                    NidBitSetBI exclusions, Map<UUID, UUID> conversionMap)
-           throws IOException, ContraditionException {
+           throws IOException, ContradictionException {
       if ((annotations != null) &&!annotations.isEmpty()) {
          this.annotations = new ArrayList<TkRefsetAbstractMember<?>>(annotations.size());
 
@@ -244,6 +246,8 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
                for (int vNid : v.getAllNidsForVersion()) {
                   if (exclusions.isMember(vNid) || (Ts.get().getComponent(vNid) == null)) {
                      continue nextVersion;
+                  } else if (Ts.get().getComponent(vNid).getVersions(vc).isEmpty()) {
+                      continue nextVersion;
                   }
                }
 

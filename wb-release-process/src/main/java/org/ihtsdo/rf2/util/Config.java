@@ -28,6 +28,10 @@ public class Config {
 	@XmlTransient
 	private String releaseDate;
 	@XmlTransient
+	private String previousReleaseDate;
+	
+
+	@XmlTransient
 	private String fileExtension;
 	@XmlTransient
 	private String outputFolderName;
@@ -41,6 +45,7 @@ public class Config {
 	private Date fromReleaseDate;
 	@XmlTransient
 	private Date toReleaseDate;
+
 	
 	// for accessing the web service
 	@XmlTransient
@@ -57,13 +62,47 @@ public class Config {
 	private String updateWbSctId;
 	
 	
-//Below Parameters are necessary for ID-Generation
+	//Below Parameters are necessary for ID-Generation
 	private String namespaceId;
 	private String partitionId;
 	private String executionId;
 	private String moduleId;
 	private String releaseId;
 	private String componentType;
+	
+	
+	public String getChangesetUserName() {
+		return changesetUserName;
+	}
+
+	public void setChangesetUserName(String changesetUserName) {
+		this.changesetUserName = changesetUserName;
+	}
+
+	public String getChangesetUserConcept() {
+		return changesetUserConcept;
+	}
+
+	public void setChangesetUserConcept(String changesetUserConcept) {
+		this.changesetUserConcept = changesetUserConcept;
+	}
+
+	public String getChangesetRoot() {
+		return changesetRoot;
+	}
+
+	public void setChangesetRoot(String changesetRoot) {
+		this.changesetRoot = changesetRoot;
+	}
+
+	public String getUpdateWbSctId() {
+		return updateWbSctId;
+	}
+
+	// for id insertion
+	private String changesetUserName;
+	private String changesetUserConcept;
+	private String changesetRoot;
 	
 
 	@XmlTransient
@@ -120,6 +159,14 @@ public class Config {
 		this.releaseDate = releaseDate;
 	}
 
+	public String getPreviousReleaseDate() {
+		return previousReleaseDate;
+	}
+
+	public void setPreviousReleaseDate(String previousReleaseDate) {
+		this.previousReleaseDate = previousReleaseDate;
+	}
+	
 	public String getFileExtension() {
 		return fileExtension;
 	}

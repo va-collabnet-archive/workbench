@@ -6,7 +6,7 @@ import org.dwfa.util.id.Type5UuidFactory;
 
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -224,7 +224,7 @@ public class RelGroupChronicle implements RelGroupChronicleBI {
    }
 
    @Override
-   public RelGroupVersionBI getVersion(ViewCoordinate c) throws ContraditionException {
+   public RelGroupVersionBI getVersion(ViewCoordinate c) throws ContradictionException {
       return new RelGroupVersion(this, c);
    }
 

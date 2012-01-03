@@ -75,7 +75,7 @@ import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -529,7 +529,7 @@ public class TermComponentLabel extends JLabel
                     ConceptVersionBI cv;
                     try {
                         cv = cb.getVersion(vc);
-                    } catch (ContraditionException ex) {
+                    } catch (ContradictionException ex) {
                         cv = cb.getVersions(vc).iterator().next();
                     }
                     try {
@@ -558,13 +558,13 @@ public class TermComponentLabel extends JLabel
                     } catch (IOException e) {
                         this.setText(e.getMessage());
                         AceLog.getAppLog().alertAndLogException(e);
-                    } catch (ContraditionException e) {
+                    } catch (ContradictionException e) {
                         try {
                             this.setText(cv.getDescsActive().iterator().next().getText());
                             AceLog.getAppLog().alertAndLogException(e);
                         } catch (IOException ex) {
                             AceLog.getAppLog().alertAndLogException(e);
-                        } catch (ContraditionException ex) {
+                        } catch (ContradictionException ex) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
                     }

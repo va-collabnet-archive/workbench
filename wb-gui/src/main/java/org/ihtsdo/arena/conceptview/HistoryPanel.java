@@ -59,7 +59,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
  * @author kec
  */
 public class HistoryPanel {
-   private static final int HISTORY_LABEL_WIDTH = 12;
+   private static final int HISTORY_LABEL_WIDTH = 14;
    private static final int insetAdjustment     = 3;
    private static final int xStartLoc           = 5;
 
@@ -653,7 +653,7 @@ public class HistoryPanel {
       historyLabel.setSize(HISTORY_LABEL_WIDTH, 1000);
       historyLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 0, 1,
               Color.GRAY), new HistoryBorder(BorderFactory.createEmptyBorder(), hxString,
-                 new Font("monospaced", Font.PLAIN, 10), Color.BLACK)));
+                 new Font("monospaced", Font.PLAIN, 12), Color.BLACK)));
 
       return historyLabel;
    }

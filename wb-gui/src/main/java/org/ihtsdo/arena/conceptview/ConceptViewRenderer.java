@@ -415,7 +415,6 @@ public class ConceptViewRenderer extends JLayeredPane {
                             JButton selectedOverrideButton = ((JButton) e.getSource());
                             
                             try {
-                            	int totalStatesCount = 0;
                                 TreeSet<? extends ConceptVersionBI> wfStates = Terms.get().getActiveAceFrameConfig().getWorkflowStates();
                                 SortedSet<String> possibilities = new TreeSet<String>();
 
@@ -522,9 +521,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 
                         for (final UUID action : availableActions) {
                             I_GetConceptData actionConcept = Terms.get().getConcept(action);
-                            List<RelationshipVersionBI> relList = WorkflowHelper.getWorkflowRelationship(actionConcept.getVersion(viewCoord), ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+                            List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(actionConcept.getVersion(viewCoord), ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
-                            for (RelationshipVersionBI rel : relList) {
+                            for (RelationshipVersionBI<?> rel : relList) {
                                 if (rel != null
                                         && rel.getDestinationNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
                                     JButton advanceWorkflowButton = new JButton();
@@ -815,21 +814,20 @@ public class ConceptViewRenderer extends JLayeredPane {
 
     protected void updateCancelAndCommit() {
         if (settings != null && cancelButton != null && commitButton != null) {
-            if (settings.getConcept() != null
-                    && settings.getConcept().isUncommitted()) {
+            if (settings.getConcept() != null && settings.getConcept().isUncommitted()) {
                 cancelButton.setVisible(true);
                 commitButton.setVisible(true);
             } else {
                 cancelButton.setVisible(false);
                 commitButton.setVisible(false);
                 
-
-                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
-                	if (wfHxDetails.regenerateWfPanel(settings.getConcept(), false)) {
-                	}
-                }
+                if (settings.getConcept() != null) {
+	                if (wfHxDetails.isWfHxDetailsCurrenltyDisplayed()) {
+	                	wfHxDetails.regenerateWfPanel(settings.getConcept(), false);
+	                }
                
-                setWorkflowStatusLabel(settings.getConcept());
+                    setWorkflowStatusLabel(settings.getConcept());
+               }
             }
         }
     }

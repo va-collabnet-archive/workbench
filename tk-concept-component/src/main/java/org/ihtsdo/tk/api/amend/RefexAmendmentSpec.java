@@ -18,6 +18,8 @@ package org.ihtsdo.tk.api.amend;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
@@ -30,11 +32,13 @@ import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 @Deprecated
 public class RefexAmendmentSpec extends RefexCAB {
 
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid, UUID memberUuid) throws IOException {
-        super(memberType, rcNid, collectionNid, memberUuid);
+    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, UUID rcUuid, int collectionNid, UUID memberUuid) 
+            throws IOException, InvalidCAB, ContradictionException {
+        super(memberType, rcUuid, collectionNid, memberUuid, null, null);
     }
 
-    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid) throws IOException, InvalidCAB {
+    public RefexAmendmentSpec(TK_REFSET_TYPE memberType, int rcNid, int collectionNid) 
+            throws IOException, InvalidCAB, ContradictionException {
         super(memberType, rcNid, collectionNid);
     }
 

@@ -1,12 +1,11 @@
 
 /*
-* To change this template, choose Tools | Templates
-* and open the template in the editor.
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
  */
 package org.ihtsdo.taxonomy;
 
 //~--- non-JDK imports --------------------------------------------------------
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -24,7 +23,7 @@ import org.dwfa.vodb.types.IntSet;
 
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -54,10 +53,9 @@ import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -68,6 +66,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicGraphicsUtils;
 import javax.swing.tree.TreeCellRenderer;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
  *
@@ -75,707 +74,745 @@ import javax.swing.tree.TreeCellRenderer;
  */
 public class TaxonomyNodeRenderer extends JLabel
         implements TreeCellRenderer, PropertyChangeListener, I_RenderAndFocusOnBean {
-   protected static final int EXTRA_PARENT_WIDTH = 17;
-   private static final long  serialVersionUID   = 1L;
 
-   //~--- fields --------------------------------------------------------------
+    protected static final int EXTRA_PARENT_WIDTH = 17;
+    private static final long serialVersionUID = 1L;
+    //~--- fields --------------------------------------------------------------
+    private Icon closedIcon = null;
+    private boolean drawsFocusBorderAroundIcon = false;
+    private int labelStart = 0;
+    private IntSet viewerImageTypes = new IntSet();
+    private DescTypeToRender typeToRender = DescTypeToRender.FSN;
+    private boolean selected = false;
+    private I_ConfigAceFrame aceConfig;
+    private Color backgroundNonSelectionColor;
+    private Color backgroundSelectionColor;
+    private Color borderSelectionColor;
+    private boolean drawDashedFocusIndicator;
+    /**
+     * Color to draw the focus indicator in, determined from the background. color.
+     */
+    private Color focusBGColor;
+    private I_GetConceptData focusBean;
+    private boolean hasFocus;
+    private TaxonomyHelper helper;
+    private Boolean highlightConflictsInTaxonomyView;
+    private Icon leafIcon;
+    private Icon openIcon;
+    private I_IntList refsetsToShow;
+    private boolean showPathInfoInTaxonomy;
+    private boolean showRefsetInfoInTaxonomy;
+    private boolean showViewerImagesInTaxonomy;
+    private final Color textNonSelectionColor;
+    private final Color textSelectionColor;
+    /**
+     * Background color of the tree.
+     */
+    private Color treeBGColor;
+    private int viewerImageTypeNid;
 
-   private Icon             closedIcon                 = null;
-   private boolean          drawsFocusBorderAroundIcon = false;
-   private int              labelStart                 = 0;
-   private IntSet           viewerImageTypes           = new IntSet();
-   private DescTypeToRender typeToRender               = DescTypeToRender.FSN;
-   private boolean          selected                   = false;
-   private I_ConfigAceFrame aceConfig;
-   private Color            backgroundNonSelectionColor;
-   private Color            backgroundSelectionColor;
-   private Color            borderSelectionColor;
-   private boolean          drawDashedFocusIndicator;
+    ViewCoordinate getViewCoordinate() {
+        return this.aceConfig.getViewCoordinate();
+    }
 
-   /**
-    * Color to draw the focus indicator in, determined from the background.
-    * color.
-    */
-   private Color            focusBGColor;
-   private I_GetConceptData focusBean;
-   private boolean          hasFocus;
-   private TaxonomyHelper   helper;
-   private Boolean          highlightConflictsInTaxonomyView;
-   private Icon             leafIcon;
-   private Icon             openIcon;
-   private I_IntList        refsetsToShow;
-   private boolean          showPathInfoInTaxonomy;
-   private boolean          showRefsetInfoInTaxonomy;
-   private boolean          showViewerImagesInTaxonomy;
-   private final Color      textNonSelectionColor;
-   private final Color      textSelectionColor;
+    //~--- constant enums ------------------------------------------------------
+    protected enum DescTypeToRender {
 
-   /**
-    * Background color of the tree.
-    */
-   private Color treeBGColor;
-   private int   viewerImageTypeNid;
+        PREFERRED, FSN
+    }
 
-   //~--- constant enums ------------------------------------------------------
+    //~--- constructors --------------------------------------------------------
+    public TaxonomyNodeRenderer(I_ConfigAceFrame aceConfig, TaxonomyHelper helper) throws IOException {
+        super();
+        this.aceConfig = aceConfig;
+        this.helper = helper;
+        showViewerImagesInTaxonomy = this.aceConfig.getShowViewerImagesInTaxonomy();
+        showRefsetInfoInTaxonomy = this.aceConfig.getShowRefsetInfoInTaxonomy();
+        showPathInfoInTaxonomy = this.aceConfig.getShowPathInfoInTaxonomy();
+        highlightConflictsInTaxonomyView = this.aceConfig.getHighlightConflictsInTaxonomyView();
+        this.aceConfig.addPropertyChangeListener(this);
+        refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
+        backgroundSelectionColor = DefaultLookup.getColor(this, ui, "Tree.selectionBackground");
+        backgroundNonSelectionColor = DefaultLookup.getColor(this, ui, "Tree.textBackground");
+        borderSelectionColor = DefaultLookup.getColor(this, ui, "Tree.selectionBorderColor");
+        textSelectionColor = DefaultLookup.getColor(this, ui, "Tree.selectionForeground");
+        textNonSelectionColor = DefaultLookup.getColor(this, ui, "Tree.textForeground");
 
-   protected enum DescTypeToRender { PREFERRED, FSN }
+        Object value = UIManager.get("Tree.drawDashedFocusIndicator");
 
-   //~--- constructors --------------------------------------------------------
+        drawDashedFocusIndicator = ((value != null) && ((Boolean) value).booleanValue());
 
-   public TaxonomyNodeRenderer(I_ConfigAceFrame aceConfig, TaxonomyHelper helper) throws IOException {
-      super();
-      this.aceConfig                   = aceConfig;
-      this.helper                      = helper;
-      showViewerImagesInTaxonomy       = this.aceConfig.getShowViewerImagesInTaxonomy();
-      showRefsetInfoInTaxonomy         = this.aceConfig.getShowRefsetInfoInTaxonomy();
-      showPathInfoInTaxonomy           = this.aceConfig.getShowPathInfoInTaxonomy();
-      highlightConflictsInTaxonomyView = this.aceConfig.getHighlightConflictsInTaxonomyView();
-      this.aceConfig.addPropertyChangeListener(this);
-      refsetsToShow               = this.aceConfig.getRefsetsToShowInTaxonomy();
-      backgroundSelectionColor    = DefaultLookup.getColor(this, ui, "Tree.selectionBackground");
-      backgroundNonSelectionColor = DefaultLookup.getColor(this, ui, "Tree.textBackground");
-      borderSelectionColor        = DefaultLookup.getColor(this, ui, "Tree.selectionBorderColor");
-      textSelectionColor          = DefaultLookup.getColor(this, ui, "Tree.selectionForeground");
-      textNonSelectionColor       = DefaultLookup.getColor(this, ui, "Tree.textForeground");
+        ConceptChronicleBI viewerImageType =
+                Ts.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
 
-      Object value = UIManager.get("Tree.drawDashedFocusIndicator");
+        viewerImageTypes.add(viewerImageType.getConceptNid());
 
-      drawDashedFocusIndicator = ((value != null) && ((Boolean) value).booleanValue());
+        try {
+            viewerImageTypeNid = ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.localize().getNid();
+        } catch (TerminologyException ex) {
+            throw new IOException(ex);
+        }
+    }
 
-      ConceptChronicleBI viewerImageType =
-         Ts.get().getConcept(ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.getUids());
+    //~--- enums ---------------------------------------------------------------
+    public enum NodeIcon {
 
-      viewerImageTypes.add(viewerImageType.getConceptNid());
+        PRIMITIVE_SINGLE_PARENT(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/primitive-single-parent.png"))),
+        PRIMITIVE_MULTI_PARENT_CLOSED(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/primitive-multi-parent-closed.png"))),
+        PRIMITIVE_MULTI_PARENT_OPEN(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/primitive-multi-parent-opened.png"))),
+        DEFINED_SINGLE_PARENT(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/defined-single-parent.png"))),
+        DEFINED_MULTI_PARENT_CLOSED(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/defined-multi-parent-closed.png"))),
+        DEFINED_MULTI_PARENT_OPEN(new ImageIcon(ACE.class.getResource("/16x16/plain/taxonomy/defined-multi-parent-opened.png"))),
+        MULTI_PARENT_ROOT(new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png")));
+        ImageIcon icon;
 
-      try {
-         viewerImageTypeNid = ArchitectonicAuxiliary.Concept.VIEWER_IMAGE.localize().getNid();
-      } catch (TerminologyException ex) {
-         throw new IOException(ex);
-      }
-   }
+        //~--- constructors -----------------------------------------------------
+        private NodeIcon(ImageIcon icon) {
+            this.icon = icon;
+        }
+    }
 
-   //~--- enums ---------------------------------------------------------------
+    //~--- methods -------------------------------------------------------------
+    private void addChildrenToolTipText(ConceptVersionBI cv) throws IOException {
+        StringBuilder toolTipText = new StringBuilder();
 
-   public enum NodeIcon {
-      MULTI_PARENT_CLOSED(new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_green.png"))),
-      MULTI_PARENT_OPEN(new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_green.png"))),
-      FOCUS_MULTI_PARENT_OPEN(new ImageIcon(ACE.class.getResource("/16x16/plain/nav_up_right_blue.png"))),
-      MULTI_PARENT_ROOT(new ImageIcon(ACE.class.getResource("/16x16/plain/pin_green.png")));
+        toolTipText.append("<html>");
 
-      ImageIcon icon;
+        int originCount = 0;
 
-      //~--- constructors -----------------------------------------------------
+        for (PositionBI child : Ts.get().getPath(cv.getConceptNid()).getOrigins()) {
+            originCount++;
+            toolTipText.append("<font color=blue>origin:</font> ");
+            toolTipText.append(child.toString());
+            toolTipText.append("<br>");
+        }
 
-      private NodeIcon(ImageIcon icon) {
-         this.icon = icon;
-      }
-   }
+        if (originCount == 0) {
+            toolTipText.append("no origins<br><br>");
+        } else {
+            toolTipText.append("<br>");
+        }
 
-   //~--- methods -------------------------------------------------------------
+        int childCount = 0;
 
-   private void addChildrenToolTipText(ConceptVersionBI cv) throws IOException {
-      StringBuilder toolTipText = new StringBuilder();
+        for (PathBI child : Ts.get().getPathChildren(cv.getConceptNid())) {
+            childCount++;
+            toolTipText.append("<font color=green>child:</font> ");
+            toolTipText.append(child.toString());
+            toolTipText.append("<br>");
+        }
 
-      toolTipText.append("<html>");
+        if (childCount == 0) {
+            toolTipText.append("no children");
+        }
 
-      int originCount = 0;
+        this.setToolTipText(toolTipText.toString());
+    }
 
-      for (PositionBI child : Ts.get().getPath(cv.getConceptNid()).getOrigins()) {
-         originCount++;
-         toolTipText.append("<font color=blue>origin:</font> ");
-         toolTipText.append(child.toString());
-         toolTipText.append("<br>");
-      }
+    @Override
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+    }
 
-      if (originCount == 0) {
-         toolTipText.append("no origins<br><br>");
-      } else {
-         toolTipText.append("<br>");
-      }
+    @Override
+    public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {
+    }
 
-      int childCount = 0;
+    @Override
+    public void firePropertyChange(String propertyName, char oldValue, char newValue) {
+    }
 
-      for (PathBI child : Ts.get().getPathChildren(cv.getConceptNid())) {
-         childCount++;
-         toolTipText.append("<font color=green>child:</font> ");
-         toolTipText.append(child.toString());
-         toolTipText.append("<br>");
-      }
+    @Override
+    public void firePropertyChange(String propertyName, double oldValue, double newValue) {
+    }
 
-      if (childCount == 0) {
-         toolTipText.append("no children");
-      }
+    @Override
+    public void firePropertyChange(String propertyName, float oldValue, float newValue) {
+    }
 
-      this.setToolTipText(toolTipText.toString());
-   }
+    @Override
+    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
+    }
 
-   @Override
-   public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+    @Override
+    public void firePropertyChange(String propertyName, long oldValue, long newValue) {
+    }
 
-   @Override
-   public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {}
+    @Override
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
 
-   @Override
-   public void firePropertyChange(String propertyName, char oldValue, char newValue) {}
+        // Strings get interned...
+        if ((propertyName == "text")
+                || (((propertyName == "font") || (propertyName == "foreground")) && (oldValue != newValue)
+                && (getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey) != null))) {
+            super.firePropertyChange(propertyName, oldValue, newValue);
+        }
+    }
 
-   @Override
-   public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
+    @Override
+    public void firePropertyChange(String propertyName, short oldValue, short newValue) {
+    }
 
-   @Override
-   public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
+    @Override
+    public void invalidate() {
+    }
 
-   @Override
-   public void firePropertyChange(String propertyName, int oldValue, int newValue) {}
+    /**
+     * Paints the value. The background is filled based on selected.
+     */
+    @Override
+    public void paint(Graphics g) {
+        Color bColor;
 
-   @Override
-   public void firePropertyChange(String propertyName, long oldValue, long newValue) {}
+        if (selected) {
+            bColor = backgroundSelectionColor;
+        } else {
+            bColor = backgroundNonSelectionColor;
 
-   @Override
-   protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-
-      // Strings get interned...
-      if ((propertyName == "text")
-              || (((propertyName == "font") || (propertyName == "foreground")) && (oldValue != newValue)
-                  && (getClientProperty(javax.swing.plaf.basic.BasicHTML.propertyKey) != null))) {
-         super.firePropertyChange(propertyName, oldValue, newValue);
-      }
-   }
-
-   @Override
-   public void firePropertyChange(String propertyName, short oldValue, short newValue) {}
-
-   @Override
-   public void invalidate() {}
-
-   /**
-    * Paints the value. The background is filled based on selected.
-    */
-   @Override
-   public void paint(Graphics g) {
-      Color bColor;
-
-      if (selected) {
-         bColor = backgroundSelectionColor;
-      } else {
-         bColor = backgroundNonSelectionColor;
-
-         if (bColor == null) {
-            bColor = getBackground();
-         }
-      }
-
-      if (bColor != null) {
-         g.setColor(bColor);
-
-         if (getComponentOrientation().isLeftToRight()) {
-            g.fillRect(labelStart, 0, getWidth() - labelStart, getHeight());
-         } else {
-            g.fillRect(0, 0, getWidth() - labelStart, getHeight());
-         }
-      }
-
-      if (hasFocus) {
-         if (getComponentOrientation().isLeftToRight()) {
-            paintFocus(g, labelStart, 0, getWidth() - labelStart, getHeight());
-         } else {
-            paintFocus(g, 0, 0, getWidth() - labelStart, getHeight());
-         }
-      }
-
-      super.paint(g);
-   }
-
-   private void paintFocus(Graphics g, int x, int y, int w, int h) {
-      Color bsColor = borderSelectionColor;
-
-      if ((bsColor != null) && (selected ||!drawDashedFocusIndicator)) {
-         g.setColor(bsColor);
-         g.drawRect(x, y, w - 1, h - 1);
-      }
-
-      if (drawDashedFocusIndicator) {
-         Color color;
-
-         if (selected) {
-            color = backgroundSelectionColor;
-         } else {
-            color = backgroundNonSelectionColor;
-
-            if (color == null) {
-               color = getBackground();
+            if (bColor == null) {
+                bColor = getBackground();
             }
-         }
+        }
 
-         if (treeBGColor != color) {
-            treeBGColor  = color;
-            focusBGColor = new Color(~color.getRGB());
-         }
+        if (bColor != null) {
+            g.setColor(bColor);
 
-         g.setColor(focusBGColor);
-         BasicGraphicsUtils.drawDashedRect(g, x, y, w, h);
-      }
-   }
-
-   @Override
-   public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
-         showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
-      } else if (evt.getPropertyName().equals("highlightConflictsInTaxonomyView")) {
-         highlightConflictsInTaxonomyView = aceConfig.getHighlightConflictsInTaxonomyView();
-      } else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
-         showViewerImagesInTaxonomy = aceConfig.getShowViewerImagesInTaxonomy();
-      } else if (evt.getPropertyName().equals("refsetsToShow")) {
-         refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
-      } else if (evt.getPropertyName().equals("showPathInfoInTaxonomy")) {
-         showPathInfoInTaxonomy = this.aceConfig.getShowPathInfoInTaxonomy();
-      }
-   }
-
-   @Override
-   public void repaint() {}
-
-   @Override
-   public void repaint(Rectangle r) {}
-
-   @Override
-   public void repaint(long tm, int x, int y, int width, int height) {}
-
-   @Override
-   public void revalidate() {}
-
-   public void setupTaxonomyNode(TaxonomyNode node, ConceptVersionBI cv) throws IOException {
-      List<String> htmlPrefixes = new ArrayList<String>();
-      List<String> htmlSuffixes = new ArrayList<String>();
-
-      if (showViewerImagesInTaxonomy) {
-         try {
-            for (MediaVersionBI media : cv.getMediaActive()) {
-               if (media.getTypeNid() == viewerImageTypeNid) {
-                  htmlPrefixes.add("<img src='ace:" + media.getNid() + "$" + media.getConceptNid()
-                                   + "' align=center>");
-               }
-            }
-         } catch (ContraditionException ex) {
-            htmlPrefixes.add("media in conflict");
-         }
-      }
-
-      if (showPathInfoInTaxonomy) {
-         if ((aceConfig.getClassificationRoot() != null)
-                 && (aceConfig.getClassificationRoot().getConceptNid() == node.getCnid())) {
-            htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classification Root]</font>");
-         }
-
-         if ((aceConfig.getClassificationRoleRoot() != null)
-                 && (aceConfig.getClassificationRoleRoot().getConceptNid() == node.getCnid())) {
-            htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Role Root]</font>");
-         }
-
-         showPathInfoInTaxonomy(cv, htmlSuffixes);
-      }
-
-      if (showRefsetInfoInTaxonomy) {
-         showRefsetInfoInTaxonomy(cv, htmlPrefixes, htmlSuffixes);
-      }
-
-      StringBuilder buff = new StringBuilder();
-      String        conceptDesc;
-
-      switch (typeToRender) {
-      case FSN :
-         try {
-            DescriptionVersionBI desc = cv.getFullySpecifiedDescription();
-
-            if (desc != null) {
-               conceptDesc = desc.getText();
-               node.setSortComparable(conceptDesc.toLowerCase());
+            if (getComponentOrientation().isLeftToRight()) {
+                g.fillRect(labelStart, 0, getWidth() - labelStart, getHeight());
             } else {
-               conceptDesc = "no fsn";
-               node.setSortComparable(conceptDesc.toLowerCase());
+                g.fillRect(0, 0, getWidth() - labelStart, getHeight());
             }
-         } catch (ContraditionException ex) {
-            conceptDesc = cv.getFsnDescsActive().iterator().next().getText();
-            node.setSortComparable(conceptDesc.toLowerCase());
-         }
+        }
 
-         break;
-
-      case PREFERRED :
-         try {
-            DescriptionVersionBI desc = cv.getPreferredDescription();
-
-            if (desc != null) {
-               conceptDesc = desc.getText();
-               node.setSortComparable(conceptDesc.toLowerCase());
+        if (hasFocus) {
+            if (getComponentOrientation().isLeftToRight()) {
+                paintFocus(g, labelStart, 0, getWidth() - labelStart, getHeight());
             } else {
-               conceptDesc = "no fsn";
-               node.setSortComparable(conceptDesc.toLowerCase());
+                paintFocus(g, 0, 0, getWidth() - labelStart, getHeight());
+            }
+        }
+
+        super.paint(g);
+    }
+
+    private void paintFocus(Graphics g, int x, int y, int w, int h) {
+        Color bsColor = borderSelectionColor;
+
+        if ((bsColor != null) && (selected || !drawDashedFocusIndicator)) {
+            g.setColor(bsColor);
+            g.drawRect(x, y, w - 1, h - 1);
+        }
+
+        if (drawDashedFocusIndicator) {
+            Color color;
+
+            if (selected) {
+                color = backgroundSelectionColor;
+            } else {
+                color = backgroundNonSelectionColor;
+
+                if (color == null) {
+                    color = getBackground();
+                }
             }
 
-            node.setSortComparable(conceptDesc.toLowerCase());
-         } catch (ContraditionException ex) {
-            conceptDesc = cv.getPrefDescsActive().iterator().next().getText();
-            node.setSortComparable(conceptDesc.toLowerCase());
-         }
+            if (treeBGColor != color) {
+                treeBGColor = color;
+                focusBGColor = new Color(~color.getRGB());
+            }
 
-         break;
+            g.setColor(focusBGColor);
+            BasicGraphicsUtils.drawDashedRect(g, x, y, w, h);
+        }
+    }
 
-      default :
-         throw new UnsupportedOperationException("Can't handle: " + typeToRender);
-      }
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("showRefsetInfoInTaxonomy")) {
+            showRefsetInfoInTaxonomy = aceConfig.getShowRefsetInfoInTaxonomy();
+        } else if (evt.getPropertyName().equals("highlightConflictsInTaxonomyView")) {
+            highlightConflictsInTaxonomyView = aceConfig.getHighlightConflictsInTaxonomyView();
+        } else if (evt.getPropertyName().equals("showViewerImagesInTaxonomy")) {
+            showViewerImagesInTaxonomy = aceConfig.getShowViewerImagesInTaxonomy();
+        } else if (evt.getPropertyName().equals("refsetsToShow")) {
+            refsetsToShow = this.aceConfig.getRefsetsToShowInTaxonomy();
+        } else if (evt.getPropertyName().equals("showPathInfoInTaxonomy")) {
+            showPathInfoInTaxonomy = this.aceConfig.getShowPathInfoInTaxonomy();
+        }
+    }
 
-      if (conceptDesc.toLowerCase().startsWith("<html>")) {
-         conceptDesc = conceptDesc.substring(5);
-      }
+    @Override
+    public void repaint() {
+    }
 
-      if ((htmlPrefixes.size() > 0) || (htmlSuffixes.size() > 0)) {
-         buff.append("<html>");
+    @Override
+    public void repaint(Rectangle r) {
+    }
 
-         for (String prefix : htmlPrefixes) {
-            buff.append(prefix);
-         }
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+    }
 
-         String text = conceptDesc;
+    @Override
+    public void revalidate() {
+    }
 
-         if (text.toLowerCase().startsWith("<html>")) {
-            buff.append(text.substring(5));
-         } else {
-            buff.append(text);
-         }
+    public void setupTaxonomyNode(TaxonomyNode node, ConceptVersionBI cv) throws IOException {
+        List<String> htmlPrefixes = new ArrayList<String>();
+        List<String> htmlSuffixes = new ArrayList<String>();
+        boolean defined = false;
+        try {
+            if (cv.getConAttrsActive() != null) {
+                defined = cv.getConAttrsActive().isDefined();
+            }
+        } catch (ContradictionException ex) {
+            defined = cv.getConAttrs().getVersions(cv.getViewCoordinate()).iterator().next().isDefined();
+        }
+        Set<Color> colors = new HashSet<Color>();
+        for (int sapNid : cv.getAllSapNids()) {
+            colors.add(aceConfig.getColorForPath(Ts.get().getPathNidForSapNid(sapNid)));
+        }
+        List<Color> pathColors = new ArrayList<Color>(colors);
+        node.setPathColors(pathColors);
+        if (showViewerImagesInTaxonomy) {
+            try {
+                for (MediaVersionBI media : cv.getMediaActive()) {
+                    if (media.getTypeNid() == viewerImageTypeNid) {
+                        htmlPrefixes.add("<img src='ace:" + media.getNid() + "$" + media.getConceptNid()
+                                + "' align=center>");
+                    }
+                }
+            } catch (ContradictionException ex) {
+                htmlPrefixes.add("media in conflict");
+            }
+        }
 
-         for (String suffix : htmlSuffixes) {
-            buff.append(suffix);
-         }
-      } else {
-         buff.append(conceptDesc);
-      }
+        if (showPathInfoInTaxonomy) {
+            if ((aceConfig.getClassificationRoot() != null)
+                    && (aceConfig.getClassificationRoot().getConceptNid() == node.getCnid())) {
+                htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classification Root]</font>");
+            }
 
-      node.setText(buff.toString());
+            if ((aceConfig.getClassificationRoleRoot() != null)
+                    && (aceConfig.getClassificationRoleRoot().getConceptNid() == node.getCnid())) {
+                htmlSuffixes.add("<font color='#CC3300'>&nbsp;[Classifier Role Root]</font>");
+            }
 
-      Rectangle iconRect = getIconRect(node.getParentDepth());
+            showPathInfoInTaxonomy(cv, htmlSuffixes);
+        }
 
-      if (node.hasExtraParents() &&!node.isSecondaryParentNode()) {
-         if (node.isSecondaryParentOpened()) {
-            node.setIcon(NodeIcon.MULTI_PARENT_OPEN);
-         } else {
-            node.setIcon(NodeIcon.MULTI_PARENT_CLOSED);
-         }
+        if (showRefsetInfoInTaxonomy) {
+            showRefsetInfoInTaxonomy(cv, htmlPrefixes, htmlSuffixes);
+        }
 
-         this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                 BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, backgroundNonSelectionColor)));
-      } else {
-         if (node.isSecondaryParentNode()) {
+        StringBuilder buff = new StringBuilder();
+        String conceptDesc;
+
+        switch (typeToRender) {
+            case FSN:
+                try {
+                    DescriptionVersionBI desc = cv.getFullySpecifiedDescription();
+
+                    if (desc != null) {
+                        conceptDesc = desc.getText();
+                        node.setSortComparable(conceptDesc.toLowerCase());
+                    } else {
+                        conceptDesc = "no fsn";
+                        node.setSortComparable(conceptDesc.toLowerCase());
+                    }
+                } catch (ContradictionException ex) {
+                    conceptDesc = cv.getFsnDescsActive().iterator().next().getText();
+                    node.setSortComparable(conceptDesc.toLowerCase());
+                }
+
+                break;
+
+            case PREFERRED:
+                try {
+                    DescriptionVersionBI desc = cv.getPreferredDescription();
+
+                    if (desc != null) {
+                        conceptDesc = desc.getText();
+                        node.setSortComparable(conceptDesc.toLowerCase());
+                    } else {
+                        conceptDesc = "no fsn";
+                        node.setSortComparable(conceptDesc.toLowerCase());
+                    }
+
+                    node.setSortComparable(conceptDesc.toLowerCase());
+                } catch (ContradictionException ex) {
+                    conceptDesc = cv.getPrefDescsActive().iterator().next().getText();
+                    node.setSortComparable(conceptDesc.toLowerCase());
+                }
+
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Can't handle: " + typeToRender);
+        }
+
+        if (conceptDesc.toLowerCase().startsWith("<html>")) {
+            conceptDesc = conceptDesc.substring(5);
+        }
+
+        if ((htmlPrefixes.size() > 0) || (htmlSuffixes.size() > 0)) {
+            buff.append("<html>");
+
+            for (String prefix : htmlPrefixes) {
+                buff.append(prefix);
+            }
+
+            String text = conceptDesc;
+
+            if (text.toLowerCase().startsWith("<html>")) {
+                buff.append(text.substring(5));
+            } else {
+                buff.append(text);
+            }
+
+            for (String suffix : htmlSuffixes) {
+                buff.append(suffix);
+            }
+        } else {
+            buff.append(conceptDesc);
+        }
+
+        node.setText(buff.toString());
+
+        if (defined) {
+            node.setIcon(NodeIcon.DEFINED_SINGLE_PARENT);
+        } else {
+            node.setIcon(NodeIcon.PRIMITIVE_SINGLE_PARENT);
+        }
+        Rectangle iconRect = getIconRect(node.getParentDepth());
+
+        if (node.hasExtraParents() && !node.isSecondaryParentNode()) {
+            if (node.isSecondaryParentOpened()) {
+                if (defined) {
+                    node.setIcon(NodeIcon.DEFINED_MULTI_PARENT_OPEN);
+                } else {
+                    node.setIcon(NodeIcon.PRIMITIVE_MULTI_PARENT_OPEN);
+                }
+
+            } else {
+                if (defined) {
+                    node.setIcon(NodeIcon.DEFINED_MULTI_PARENT_CLOSED);
+                } else {
+                    node.setIcon(NodeIcon.PRIMITIVE_MULTI_PARENT_CLOSED);
+                }
+            }
+
             this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
                     BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, backgroundNonSelectionColor)));
+        } else {
+            if (node.isSecondaryParentNode()) {
+                this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
+                        BorderFactory.createMatteBorder(0, iconRect.x, 0, 0, backgroundNonSelectionColor)));
 
-            if (cv.getRelsOutgoingDestinationsNidsActiveIsa().length == 0) {
-               node.setIcon(NodeIcon.MULTI_PARENT_ROOT);
+                if (cv.getRelsOutgoingDestinationsNidsActiveIsa().length == 0) {
+                    node.setIcon(NodeIcon.MULTI_PARENT_ROOT);
+                } else {
+                    if (node.isSecondaryParentOpened()) {
+                        if (defined) {
+                            node.setIcon(NodeIcon.DEFINED_MULTI_PARENT_OPEN);
+                        } else {
+                            node.setIcon(NodeIcon.PRIMITIVE_MULTI_PARENT_OPEN);
+                        }
+                    } else {
+                        if (defined) {
+                            node.setIcon(NodeIcon.DEFINED_MULTI_PARENT_CLOSED);
+                        } else {
+                            node.setIcon(NodeIcon.PRIMITIVE_MULTI_PARENT_CLOSED);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void showPathInfoInTaxonomy(ConceptVersionBI cv, List<String> htmlSuffixes) throws IOException {
+        if (Ts.get().hasPath(cv.getConceptNid())) {
+            addChildrenToolTipText(cv);
+
+            PositionBI latestInheritedViewPosition = null;
+
+            for (PathBI editPath : aceConfig.getEditingPathSet()) {
+                if (editPath.getConceptNid() == cv.getConceptNid()) {
+                    htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");
+                }
+            }
+
+            for (PathBI promotionPath : aceConfig.getPromotionPathSet()) {
+                if (promotionPath.getConceptNid() == cv.getConceptNid()) {
+                    htmlSuffixes.add("<font color='#669900'>&nbsp;[Promotion]</font>");
+                }
+            }
+
+            for (PositionBI viewPosition : aceConfig.getViewPositionSet()) {
+                if (viewPosition.getPath().getConceptNid() == cv.getConceptNid()) {
+                    String version = ThinVersionHelper.format(viewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
+
+                    htmlSuffixes.add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
+                }
+
+                for (PositionBI origin : viewPosition.getPath().getNormalisedOrigins()) {
+                    if (origin.getPath().getConceptNid() == cv.getConceptNid()) {
+                        if ((latestInheritedViewPosition == null)
+                                || (origin.getVersion() > latestInheritedViewPosition.getVersion())) {
+                            latestInheritedViewPosition = origin;
+                        }
+                    }
+                }
+            }
+
+            if (latestInheritedViewPosition != null) {
+                String version = ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
+                        MAX_VALUE_TYPE.LATEST);
+
+                htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version + "]</font>");
+            }
+        } else {
+            setToolTipText(null);
+        }
+    }
+
+    private void showRefsetInfoInTaxonomy(ConceptVersionBI cv, List<String> htmlPrefixes,
+            List<String> htmlSuffixes)
+            throws IOException {
+        Collection<RefexChronicleBI> extensions = new ArrayList<RefexChronicleBI>();
+
+        extensions.addAll(cv.getRefexes());
+
+        HashSet<Integer> refexAlreadyHandled = new HashSet<Integer>();
+
+        for (int i : refsetsToShow.getListArray()) {
+            for (RefexChronicleBI ebr : extensions) {
+                if (!refexAlreadyHandled.contains(i)) {
+                    if ((ebr != null) && (ebr.getCollectionNid() == i)) {
+                        if (ebr instanceof RefexBooleanVersionBI) {
+                            for (RefexVersionBI t : ebr.getCurrentRefexes(cv.getViewCoordinate())) {
+                                boolean extValue = ((RefexBooleanVersionBI) t).getBoolean1();
+
+                                refexAlreadyHandled.add(i);
+
+                                try {
+                                    I_GetConceptData booleanImageBean =
+                                            Terms.get().getConcept(
+                                            RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.getUids());
+
+                                    if (extValue) {
+                                        booleanImageBean = Terms.get().getConcept(
+                                                RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.getUids());
+                                    }
+
+                                    for (I_ImageTuple imageTuple :
+                                            booleanImageBean.getImageTuples(aceConfig.getAllowedStatus(),
+                                            viewerImageTypes, aceConfig.getViewPositionSetReadOnly(),
+                                            aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
+                                        htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
+                                                + imageTuple.getConceptNid() + "' align=center>");
+                                    }
+                                } catch (TerminologyException e) {
+                                    AceLog.getAppLog().alertAndLogException(e);
+                                }
+                            }
+                        } else if (ebr instanceof RefexCnidVersionBI) {
+                            RefexCnidVersionBI extVersion = (RefexCnidVersionBI) ebr;
+                            ConceptVersionBI ebrCb = Ts.get().getConceptVersion(cv.getViewCoordinate(),
+                                    extVersion.getCnid1());
+
+                            refexAlreadyHandled.add(i);
+
+                            try {
+                                for (MediaChronicleBI imageTuple : ebrCb.getMediaActive()) {
+                                    htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
+                                            + imageTuple.getConceptNid() + "' align=center>");
+                        }
+                            } catch (ContradictionException ex) {
+                                for (MediaChronicleBI imageTuple : ebrCb.getMedia()) {
+                                    htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
+                                            + imageTuple.getConceptNid() + "' align=center>");
+                                }
+                            }
+                        } else if (ebr instanceof RefexIntVersionBI) {
+                            int extValue = ((RefexIntVersionBI) ebr).getInt1();
+
+                            htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
+                        } else if (ebr instanceof RefexStrVersionBI) {
+                            String strExt = ((RefexStrVersionBI) ebr).getStr1();
+
+                            refexAlreadyHandled.add(i);
+                            htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void validate() {
+    }
+
+    //~--- get methods ---------------------------------------------------------
+    public Icon getClosedIcon() {
+        return closedIcon;
+    }
+
+    @Override
+    public I_GetConceptData getFocusBean() {
+        return focusBean;
+    }
+
+    @Override
+    public Rectangle getIconRect(int parentDepth) {
+        int indent = (EXTRA_PARENT_WIDTH * parentDepth);
+
+        return new Rectangle(indent, 0, NodeIcon.DEFINED_MULTI_PARENT_OPEN.icon.getIconWidth(),
+                NodeIcon.DEFINED_MULTI_PARENT_OPEN.icon.getIconHeight());
+    }
+
+    public Icon getLeafIcon() {
+        return leafIcon;
+    }
+
+    public Icon getOpenIcon() {
+        return openIcon;
+    }
+
+    public String getOrder(ConceptVersionBI cv) throws IOException {
+        switch (typeToRender) {
+            case FSN:
+                try {
+                    return cv.getFullySpecifiedDescription().getText() + '\u039A';
+                } catch (ContradictionException ex) {
+                    return cv.getFsnDescsActive().iterator().next().getText() + '\u039A';
+                }
+            case PREFERRED:
+                try {
+                    return cv.getPreferredDescription().getText() + '\u039A';
+                } catch (ContradictionException ex) {
+                    return cv.getPrefDescsActive().iterator().next().getText() + '\u039A';
+                }
+            default:
+                throw new UnsupportedOperationException("Can't handle: " + typeToRender);
+        }
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        Dimension retDimension = super.getPreferredSize();
+
+        if (retDimension != null) {
+            retDimension = new Dimension(retDimension.width + 3, retDimension.height);
+        }
+
+        return retDimension;
+    }
+
+    @Override
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+            boolean leaf, int row, boolean hasFocus) {
+        String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
+
+        this.hasFocus = hasFocus;
+        setText(stringValue);
+
+        Color fg = null;
+        JTree.DropLocation dropLocation = tree.getDropLocation();
+
+        if ((dropLocation != null) && (dropLocation.getChildIndex() == -1)
+                && (tree.getRowForPath(dropLocation.getPath()) == row)) {
+            Color col = DefaultLookup.getColor(this, ui, "Tree.dropCellForeground");
+
+            if (col != null) {
+                fg = col;
             } else {
-               if (node.isSecondaryParentOpened()) {
-                  if ((focusBean != null) && (node.getCnid() == focusBean.getConceptNid())) {
-                     node.setIcon(NodeIcon.FOCUS_MULTI_PARENT_OPEN);
-                  } else {
-                     node.setIcon(NodeIcon.MULTI_PARENT_OPEN);
-                  }
-               } else {
-                  if ((focusBean != null) && (node.getCnid() == focusBean.getConceptNid())) {
-                     node.setIcon(NodeIcon.MULTI_PARENT_OPEN);
-                  } else {
-                     node.setIcon(NodeIcon.MULTI_PARENT_CLOSED);
-                  }
-               }
+                fg = textSelectionColor;
             }
-         } else {
-            node.setIcon(null);
-         }
-      }
-   }
-
-   private void showPathInfoInTaxonomy(ConceptVersionBI cv, List<String> htmlSuffixes) throws IOException {
-      if (Ts.get().hasPath(cv.getConceptNid())) {
-         addChildrenToolTipText(cv);
-
-         PositionBI latestInheritedViewPosition = null;
-
-         for (PathBI editPath : aceConfig.getEditingPathSet()) {
-            if (editPath.getConceptNid() == cv.getConceptNid()) {
-               htmlSuffixes.add("<font color=red>&nbsp;[Editing]</font>");
-            }
-         }
-
-         for (PathBI promotionPath : aceConfig.getPromotionPathSet()) {
-            if (promotionPath.getConceptNid() == cv.getConceptNid()) {
-               htmlSuffixes.add("<font color='#669900'>&nbsp;[Promotion]</font>");
-            }
-         }
-
-         for (PositionBI viewPosition : aceConfig.getViewPositionSet()) {
-            if (viewPosition.getPath().getConceptNid() == cv.getConceptNid()) {
-               String version = ThinVersionHelper.format(viewPosition.getVersion(), MAX_VALUE_TYPE.LATEST);
-
-               htmlSuffixes.add("<font color='#007FAE'>&nbsp;[Viewing:" + version + "]</font>");
-            }
-
-            for (PositionBI origin : viewPosition.getPath().getNormalisedOrigins()) {
-               if (origin.getPath().getConceptNid() == cv.getConceptNid()) {
-                  if ((latestInheritedViewPosition == null)
-                          || (origin.getVersion() > latestInheritedViewPosition.getVersion())) {
-                     latestInheritedViewPosition = origin;
-                  }
-               }
-            }
-         }
-
-         if (latestInheritedViewPosition != null) {
-            String version = ThinVersionHelper.format(latestInheritedViewPosition.getVersion(),
-                                MAX_VALUE_TYPE.LATEST);
-
-            htmlSuffixes.add("<font color='#967F49'>&nbsp;[Inherited view:" + version + "]</font>");
-         }
-      } else {
-         setToolTipText(null);
-      }
-   }
-
-   private void showRefsetInfoInTaxonomy(ConceptVersionBI cv, List<String> htmlPrefixes,
-           List<String> htmlSuffixes)
-           throws IOException {
-      Collection<RefexChronicleBI> extensions = new ArrayList<RefexChronicleBI>();
-
-      extensions.addAll(cv.getRefexes());
-
-      HashSet<Integer> refexAlreadyHandled = new HashSet<Integer>();
-
-      for (int i : refsetsToShow.getListArray()) {
-         for (RefexChronicleBI ebr : extensions) {
-            if (!refexAlreadyHandled.contains(i)) {
-               if ((ebr != null) && (ebr.getCollectionNid() == i)) {
-                  if (ebr instanceof RefexBooleanVersionBI) {
-                     for (RefexVersionBI t : ebr.getCurrentRefexes(cv.getViewCoordinate())) {
-                        boolean extValue = ((RefexBooleanVersionBI) t).getBoolean1();
-
-                        refexAlreadyHandled.add(i);
-
-                        try {
-                           I_GetConceptData booleanImageBean =
-                              Terms.get().getConcept(
-                                  RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_FALSE.getUids());
-
-                           if (extValue) {
-                              booleanImageBean = Terms.get().getConcept(
-                                 RefsetAuxiliary.Concept.BOOLEAN_CIRCLE_ICONS_TRUE.getUids());
-                           }
-
-                           for (I_ImageTuple imageTuple :
-                                   booleanImageBean.getImageTuples(aceConfig.getAllowedStatus(),
-                                      viewerImageTypes, aceConfig.getViewPositionSetReadOnly(),
-                                      aceConfig.getPrecedence(), aceConfig.getConflictResolutionStrategy())) {
-                              htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
-                                               + imageTuple.getConceptNid() + "' align=center>");
-                           }
-                        } catch (TerminologyException e) {
-                           AceLog.getAppLog().alertAndLogException(e);
-                        }
-                     }
-                  } else if (ebr instanceof RefexCnidVersionBI) {
-                     RefexCnidVersionBI extVersion = (RefexCnidVersionBI) ebr;
-                     ConceptVersionBI   ebrCb      = Ts.get().getConceptVersion(cv.getViewCoordinate(),
-                                                        extVersion.getCnid1());
-
-                     refexAlreadyHandled.add(i);
-
-                     try {
-                        for (MediaChronicleBI imageTuple : ebrCb.getMediaActive()) {
-                           htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
-                                            + imageTuple.getConceptNid() + "' align=center>");
-                        }
-                     } catch (ContraditionException ex) {
-                        for (MediaChronicleBI imageTuple : ebrCb.getMedia()) {
-                           htmlPrefixes.add("<img src='ace:" + imageTuple.getNid() + "$"
-                                            + imageTuple.getConceptNid() + "' align=center>");
-                        }
-                     }
-                  } else if (ebr instanceof RefexIntVersionBI) {
-                     int extValue = ((RefexIntVersionBI) ebr).getInt1();
-
-                     htmlPrefixes.add("<font color=blue>&nbsp;" + extValue + "&nbsp;</font>");
-                  } else if (ebr instanceof RefexStrVersionBI) {
-                     String strExt = ((RefexStrVersionBI) ebr).getStr1();
-
-                     refexAlreadyHandled.add(i);
-                     htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
-                  }
-               }
-            }
-         }
-      }
-   }
-
-   @Override
-   public void validate() {}
-
-   //~--- get methods ---------------------------------------------------------
-
-   public Icon getClosedIcon() {
-      return closedIcon;
-   }
-
-   @Override
-   public I_GetConceptData getFocusBean() {
-      return focusBean;
-   }
-
-   @Override
-   public Rectangle getIconRect(int parentDepth) {
-      int indent = (EXTRA_PARENT_WIDTH * parentDepth);
-
-      return new Rectangle(indent, 0, NodeIcon.MULTI_PARENT_OPEN.icon.getIconWidth(),
-                           NodeIcon.MULTI_PARENT_OPEN.icon.getIconHeight());
-   }
-
-   public Icon getLeafIcon() {
-      return leafIcon;
-   }
-
-   public Icon getOpenIcon() {
-      return openIcon;
-   }
-
-   public String getOrder(ConceptVersionBI cv) throws IOException {
-      switch (typeToRender) {
-      case FSN :
-         try {
-            return cv.getFullySpecifiedDescription().getText() + '\u039A';
-         } catch (ContraditionException ex) {
-            return cv.getFsnDescsActive().iterator().next().getText() + '\u039A';
-         }
-      case PREFERRED :
-         try {
-            return cv.getPreferredDescription().getText() + '\u039A';
-         } catch (ContraditionException ex) {
-            return cv.getPrefDescsActive().iterator().next().getText() + '\u039A';
-         }
-      default :
-         throw new UnsupportedOperationException("Can't handle: " + typeToRender);
-      }
-   }
-
-   @Override
-   public Dimension getPreferredSize() {
-      Dimension retDimension = super.getPreferredSize();
-
-      if (retDimension != null) {
-         retDimension = new Dimension(retDimension.width + 3, retDimension.height);
-      }
-
-      return retDimension;
-   }
-
-   @Override
-   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-           boolean leaf, int row, boolean hasFocus) {
-      String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
-
-      this.hasFocus = hasFocus;
-      setText(stringValue);
-
-      Color              fg           = null;
-      JTree.DropLocation dropLocation = tree.getDropLocation();
-
-      if ((dropLocation != null) && (dropLocation.getChildIndex() == -1)
-              && (tree.getRowForPath(dropLocation.getPath()) == row)) {
-         Color col = DefaultLookup.getColor(this, ui, "Tree.dropCellForeground");
-
-         if (col != null) {
-            fg = col;
-         } else {
+        } else if (sel) {
             fg = textSelectionColor;
-         }
-      } else if (sel) {
-         fg = textSelectionColor;
-      } else {
-         fg = textNonSelectionColor;
-      }
+        } else {
+            fg = textNonSelectionColor;
+        }
 
-      setForeground(fg);
+        setForeground(fg);
 
-      Icon icon = null;
+        Icon icon = null;
 
-      if (leaf) {
-         icon = getLeafIcon();
-      } else if (expanded) {
-         icon = getOpenIcon();
-      } else {
-         icon = getClosedIcon();
-      }
+        if (leaf) {
+            icon = getLeafIcon();
+        } else if (expanded) {
+            icon = getOpenIcon();
+        } else {
+            icon = getClosedIcon();
+        }
 
-      if (!tree.isEnabled()) {
-         setEnabled(false);
+        if (!tree.isEnabled()) {
+            setEnabled(false);
 
-         LookAndFeel laf          = UIManager.getLookAndFeel();
-         Icon        disabledIcon = laf.getDisabledIcon(tree, icon);
+            LookAndFeel laf = UIManager.getLookAndFeel();
+            Icon disabledIcon = laf.getDisabledIcon(tree, icon);
 
-         if (disabledIcon != null) {
-            icon = disabledIcon;
-         }
-
-         setDisabledIcon(icon);
-      } else {
-         setEnabled(true);
-         setIcon(icon);
-      }
-
-      setComponentOrientation(tree.getComponentOrientation());
-      selected = sel;
-
-      if (value instanceof TaxonomyNode) {
-         TaxonomyNode node = (TaxonomyNode) value;
-
-         labelStart = EXTRA_PARENT_WIDTH * node.getParentDepth();
-         this.setBorder(BorderFactory.createEmptyBorder(1, labelStart, 1, 0));
-
-         try {
-            for (Color pathColor : node.getPathColors()) {
-               this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                       BorderFactory.createMatteBorder(0, 2, 0, 0, pathColor)));
-               this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
-                       BorderFactory.createEmptyBorder(0, 2, 0, 0)));
+            if (disabledIcon != null) {
+                icon = disabledIcon;
             }
 
-            if (node.getIcon() != null) {
-               this.setIcon(node.getIcon().icon);
-            } else {
-               this.setIcon(null);
+            setDisabledIcon(icon);
+        } else {
+            setEnabled(true);
+            setIcon(icon);
+        }
+
+        setComponentOrientation(tree.getComponentOrientation());
+        selected = sel;
+
+        if (value instanceof TaxonomyNode) {
+            TaxonomyNode node = (TaxonomyNode) value;
+
+            labelStart = EXTRA_PARENT_WIDTH * node.getParentDepth();
+            this.setBorder(BorderFactory.createEmptyBorder(1, labelStart, 1, 0));
+
+            try {
+                for (Color pathColor : node.getPathColors()) {
+                    this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
+                            BorderFactory.createMatteBorder(0, 3, 0, 0, pathColor)));
+                    this.setBorder(BorderFactory.createCompoundBorder(this.getBorder(),
+                            BorderFactory.createEmptyBorder(0, 1, 0, 0)));
+                }
+
+                if (node.getIcon() != null) {
+                    this.setIcon(node.getIcon().icon);
+                } else {
+                    this.setIcon(null);
+                }
+            } catch (IOException e) {
+                this.setText(e.toString());
+                AceLog.getAppLog().alertAndLogException(e);
             }
-         } catch (IOException e) {
-            this.setText(e.toString());
-            AceLog.getAppLog().alertAndLogException(e);
-         }
-      }
+        }
 
-      return this;
-   }
+        return this;
+    }
 
-   //~--- set methods ---------------------------------------------------------
+    //~--- set methods ---------------------------------------------------------
+    public void setClosedIcon(Icon closedIcon) {
+        this.closedIcon = closedIcon;
+    }
 
-   public void setClosedIcon(Icon closedIcon) {
-      this.closedIcon = closedIcon;
-   }
+    @Override
+    public void setFocusBean(I_GetConceptData focusBean) {
+        this.focusBean = focusBean;
+    }
 
-   @Override
-   public void setFocusBean(I_GetConceptData focusBean) {
-      this.focusBean = focusBean;
-   }
+    public void setLeafIcon(Icon leafIcon) {
+        this.leafIcon = leafIcon;
+    }
 
-   public void setLeafIcon(Icon leafIcon) {
-      this.leafIcon = leafIcon;
-   }
+    public void setOpenIcon(Icon openIcon) {
+        this.openIcon = openIcon;
+    }
 
-   public void setOpenIcon(Icon openIcon) {
-      this.openIcon = openIcon;
-   }
-
-   protected void setTypeToRender(DescTypeToRender typeToRender) {
-      this.typeToRender = typeToRender;
-   }
+    protected void setTypeToRender(DescTypeToRender typeToRender) {
+        this.typeToRender = typeToRender;
+    }
 }

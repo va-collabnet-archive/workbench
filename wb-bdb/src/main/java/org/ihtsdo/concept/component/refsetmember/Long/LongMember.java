@@ -19,7 +19,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetLongMember;
 import org.ihtsdo.etypes.ERefsetLongRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -38,6 +38,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 
 public class LongMember extends RefsetMember<LongRevision, LongMember>
         implements I_ExtendByRefPartLong<LongRevision>, RefexLongAnalogBI<LongRevision> {
@@ -135,7 +137,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<LongRevision, LongMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<LongRevision, LongMember> obj) {
       if (LongMember.class.isAssignableFrom(obj.getClass())) {
          LongMember another = (LongMember) obj;
 
@@ -144,6 +146,15 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexLongVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexLongVersionBI lv = (RefexLongVersionBI) another;
+            return this.longValue == lv.getLong1();
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {
@@ -196,7 +207,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetLongMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

@@ -29,16 +29,13 @@ import org.ihtsdo.concurrency.ConcurrencyLocks;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbMemoryMonitor.LowMemoryListener;
 import org.ihtsdo.db.bdb.ComponentBdb;
+import org.ihtsdo.tk.api.ComponentBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
 import java.io.IOException;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -148,9 +145,11 @@ public class UuidToNidMapBdb extends ComponentBdb {
          // if can't find, then generate new...
          if (nid == Integer.MIN_VALUE) {
             nid = idSequence.getAndIncrement();
+
             if (nid == 0) {
-                nid = idSequence.getAndIncrement();
+               nid = idSequence.getAndIncrement();
             }
+
             addToDb(key, nid);
          }
 
@@ -334,6 +333,48 @@ public class UuidToNidMapBdb extends ComponentBdb {
       return "Uuid2NidBdb";
    }
 
+   private List<UUID> getFromDb(int nid) {
+      List<UUID> uuids = new ArrayList<UUID>(2);
+
+      for (Map.Entry<UUID, Integer> entry : gen1UuidIntMap.entrySet()) {
+         if (entry.getValue() == nid) {
+            uuids.add(entry.getKey());
+         }
+      }
+
+      for (Map.Entry<UUID, Integer> entry : gen2UuidIntMap.entrySet()) {
+         if (entry.getValue() == nid) {
+            uuids.add(entry.getKey());
+         }
+      }
+
+      if (uuids.size() > 0) {
+         return uuids;
+      }
+
+      for (short i = 0; i < locks.getConcurrencyLevel(); i++) {
+         locks.readLock(i);
+
+         try {
+            for (UuidIntRecord entry : getReadOnlyKeySet(i)) {
+               if (entry.getNid() == nid) {
+                  uuids.add(entry.getUuid());
+               }
+            }
+
+            for (UuidIntRecord entry : getMutableKeySet(i)) {
+               if (entry.getNid() == nid) {
+                  uuids.add(entry.getUuid());
+               }
+            }
+         } finally {
+            locks.unlockRead(i);
+         }
+      }
+
+      return uuids;
+   }
+
    private Integer getFromDb(UUID key, boolean force) {
       Integer theNid = null;
       short   dbKey  = UuidIntRecord.getShortUuidHash(key);
@@ -457,7 +498,13 @@ public class UuidToNidMapBdb extends ComponentBdb {
    }
 
    public List<UUID> getUuidsForNid(int nid) throws IOException {
-      return Bdb.getComponent(nid).getUUIDs();
+      ComponentBI component = Bdb.getComponent(nid);
+
+      if (component != null) {
+         return Bdb.getComponent(nid).getUUIDs();
+      }
+
+      return getFromDb(nid);
    }
 
    public boolean hasUuid(UUID uuid) {

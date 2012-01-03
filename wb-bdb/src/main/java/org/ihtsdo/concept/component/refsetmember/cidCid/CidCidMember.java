@@ -20,7 +20,7 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.etypes.ERefsetCidCidMember;
 import org.ihtsdo.etypes.ERefsetCidCidRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -40,6 +40,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidVersionBI;
 
 public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
         implements I_ExtendByRefPartCidCid<CidCidRevision>, RefexCnidCnidAnalogBI<CidCidRevision> {
@@ -139,7 +141,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    }
 
    @Override
-   protected boolean membersEqual(ConceptComponent<CidCidRevision, CidCidMember> obj) {
+   protected boolean refexFieldsEqual(ConceptComponent<CidCidRevision, CidCidMember> obj) {
       if (CidCidMember.class.isAssignableFrom(obj.getClass())) {
          CidCidMember another = (CidCidMember) obj;
 
@@ -148,6 +150,15 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
 
       return false;
    }
+   
+   @Override
+    public boolean refexFieldsEqual(RefexVersionBI another) {
+        if(RefexCnidCnidVersionBI.class.isAssignableFrom(another.getClass())){
+            RefexCnidCnidVersionBI cv = (RefexCnidCnidVersionBI) another;
+            return (this.c1Nid == cv.getCnid1()) && (this.c2Nid == cv.getCnid2());
+        }
+        return false;
+    }
 
    @Override
    protected void readMemberFields(TupleInput input) {
@@ -225,7 +236,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetCidCidMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 

@@ -28,6 +28,8 @@ import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentBI;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanAnalogBI;
@@ -62,8 +64,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         try {
             return UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
-                    + getPrimoridalUuidStr(RefexProperty.COLLECTION_NID)
-                    + getPrimoridalUuidStr(RefexProperty.RC_NID));
+                    + getPrimUuidStrForNidProp(RefexProperty.COLLECTION_NID)
+                    + getRcUuid().toString());
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
         } catch (UnsupportedEncodingException ex) {
@@ -78,10 +80,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     /**
-     * Use when the 1-1 relationship between a refex and a referenced component does 
-     * not apply. 
-     * @return A <code>UUID</code> based on a Type 5 generator that uses
-     *         the content fields of the refex.
+     * Use when the 1-1 relationship between a refex and a referenced component
+     * does not apply.
+     *
+     * @return A
+     * <code>UUID</code> based on a Type 5 generator that uses the content
+     * fields of the refex.
      * @throws InvalidAmendmentSpec
      * @throws IOException
      */
@@ -93,7 +97,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     case MEMBER_UUID:
                     case STATUS_NID:
                     case COLLECTION_NID:
-                    case RC_NID:
+                    case RC_UUID:
                         break;
                     default:
                         if (properties.get(prop) != null) {
@@ -103,8 +107,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             }
             return UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
-                    + getPrimoridalUuidStr(RefexProperty.COLLECTION_NID)
-                    + getPrimoridalUuidStr(RefexProperty.RC_NID)
+                    + getPrimUuidStrForNidProp(RefexProperty.COLLECTION_NID)
+                    + getPrimUuidStrForNidProp(RefexProperty.RC_UUID)
                     + sb.toString());
         } catch (NoSuchAlgorithmException ex) {
             throw new RuntimeException(ex);
@@ -113,14 +117,26 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    private String getPrimoridalUuidStr(RefexProperty prop)
+    @Override
+    public void recomputeUuid() throws InvalidCAB, IOException, ContradictionException {
+        setComponentUuid(computeMemberReferencedComponentUuid());
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
+            annotBp.setReferencedComponentUuid(getComponentUuid());
+            annotBp.recomputeUuid();
+        }
+    }
+
+    private String getPrimUuidStrForNidProp(RefexProperty prop)
             throws IOException, InvalidCAB {
-        Object nidObj = properties.get(prop);
-        if (nidObj == null) {
+        Object idObj = properties.get(prop);
+        if (idObj == null) {
             throw new InvalidCAB(
                     "No data for: " + prop);
         }
-        int nid = (Integer) nidObj;
+        if (idObj instanceof UUID) {
+            return ((UUID) idObj).toString();
+        }
+        int nid = (Integer) idObj;
         ComponentBI component = Ts.get().getComponent(nid);
         if (component != null) {
             return component.getPrimUuid().toString();
@@ -136,11 +152,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             new EnumMap<RefexProperty, Object>(RefexProperty.class);
 
     /**
-     * This constructor creates a MEMBER_UUID that is computed from 
-     * a type 5 UUID generator that uses a hash of the <code>memberType</code>,
-     * <code>rcNid</code>, and <code>collectionNid</code>. This member ID
-     * is suitable for all refex collections where there should be no more
-     * than one refex per referenced component. 
+     * This constructor creates a MEMBER_UUID that is computed from a type 5
+     * UUID generator that uses a hash of the
+     * <code>memberType</code>,
+     * <code>rcNid</code>, and
+     * <code>collectionNid</code>. This member ID is suitable for all refex
+     * collections where there should be no more than one refex per referenced
+     * component.
+     *
      * @param memberType
      * @param rcNid
      * @param collectionNid
@@ -148,19 +167,29 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @throws InvalidAmendmentSpec
      */
     public RefexCAB(TK_REFSET_TYPE memberType,
-            int rcNid, int collectionNid) throws IOException, InvalidCAB {
-        this(memberType, rcNid, collectionNid, null);
+            int rcNid, int collectionNid) throws IOException, InvalidCAB, ContradictionException {
+        this(memberType, Ts.get().getUuidPrimordialForNid(rcNid), collectionNid, null, null, null);
 
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberReferencedComponentUuid());
     }
 
     public RefexCAB(TK_REFSET_TYPE memberType,
-            int rcNid, int collectionNid,
-            UUID memberUuid) throws IOException {
-        super(memberUuid);
+            UUID rcUuid, int collectionNid, RefexVersionBI refex,
+            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        this(memberType, rcUuid, collectionNid, null, refex, vc);
+
+        this.properties.put(RefexProperty.MEMBER_UUID,
+                computeMemberReferencedComponentUuid());
+    }
+
+    public RefexCAB(TK_REFSET_TYPE memberType,
+            UUID rcUuid, int collectionNid,
+            UUID memberUuid, RefexVersionBI refex,
+            ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
+        super(memberUuid, refex, vc);
         this.memberType = memberType;
-        this.properties.put(RefexProperty.RC_NID, rcNid);
+        this.properties.put(RefexProperty.RC_UUID, rcUuid);
         this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
         this.properties.put(RefexProperty.STATUS_NID,
                 SnomedMetadataRfx.getSTATUS_CURRENT_NID());
@@ -195,6 +224,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
+    protected void setReferencedComponentUuid(UUID rcUuid) {
+        this.properties.put(RefexProperty.RC_UUID, rcUuid);
+    }
+
     @Override
     public UUID getStatusUuid() {
         try {
@@ -223,7 +256,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
         MEMBER_UUID,
         COLLECTION_NID,
-        RC_NID,
+        RC_UUID,
         STATUS_NID,
         CNID1,
         CNID2,
@@ -232,7 +265,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         INTEGER1,
         STRING1,
         LONG1,
-        FLOAT1,}
+        FLOAT1,
+    }
 
     public UUID getMemberUuid() {
         return getComponentUuid();
@@ -240,6 +274,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
 
     public void setMemberUuid(UUID memberUuid) {
         setComponentUuid(memberUuid);
+        properties.put(RefexProperty.MEMBER_UUID, memberUuid);
     }
 
     public boolean containsKey(RefexProperty key) {
@@ -301,11 +336,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return properties.containsKey(key);
     }
 
-    public void writeTo(RefexAnalogBI<?> version) throws PropertyVetoException {
+    public void writeTo(RefexAnalogBI<?> version) throws PropertyVetoException, IOException {
         setProperties(version);
     }
 
-    public void setProperties(RefexAnalogBI<?> version) throws PropertyVetoException {
+    public void setProperties(RefexAnalogBI<?> version) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
                 case MEMBER_UUID:
@@ -315,8 +350,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                         throw new RuntimeException(e);
                     }
                     break;
-                case RC_NID:
-                    version.setReferencedComponentNid((Integer) entry.getValue());
+                case RC_UUID:
+                    version.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
                     break;
                 case BOOLEAN1:
                     RefexBooleanAnalogBI<?> booleanPart = (RefexBooleanAnalogBI<?>) version;
@@ -356,7 +391,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
     }
 
-    public void setPropertiesExceptSap(RefexAnalogBI<?> version) throws PropertyVetoException {
+    public void setPropertiesExceptSap(RefexAnalogBI<?> version) throws PropertyVetoException, IOException {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
                 case MEMBER_UUID:
@@ -376,8 +411,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case COLLECTION_NID:
                     version.setCollectionNid((Integer) entry.getValue());
                     break;
-                case RC_NID:
-                    version.setReferencedComponentNid((Integer) entry.getValue());
+                case RC_UUID:
+                    version.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
                     break;
                 case CNID1:
                     RefexCnidAnalogBI<?> c1part = (RefexCnidAnalogBI<?>) version;
@@ -420,8 +455,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         }
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
-                case RC_NID:
-                    if (!entry.getValue().equals(version.getReferencedComponentNid())) {
+                case RC_UUID:
+                    if (!entry.getValue().equals(version.getPrimUuid())) {
                         return false;
                     }
                     break;
@@ -522,8 +557,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         return getInt(RefexProperty.COLLECTION_NID);
     }
 
-    public int getRcNid() {
-        return getInt(RefexProperty.RC_NID);
+    public UUID getRcUuid() {
+        return (UUID) properties.get(RefexProperty.RC_UUID);
     }
 
     public String getString(RefexProperty key) {
@@ -542,6 +577,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     }
 
     public UUID getMemberUUID() {
+        if (this.getComponentUuid() != null) {
+            return this.getComponentUuid();
+        }
         return (UUID) properties.get(RefexProperty.MEMBER_UUID);
     }
 

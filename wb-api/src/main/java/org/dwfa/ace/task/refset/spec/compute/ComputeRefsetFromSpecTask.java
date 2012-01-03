@@ -98,7 +98,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
             AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
             if (refsetSpec == null) {
-                AceLog.getAppLog().info("Nested refset not a spec refset: " + refset.getInitialText());
+                AceLog.getAppLog().info("Refset not a spec refset: " + refset.getInitialText());
+                if (!refset.getRefsetMembers().isEmpty()) {
+                    AceLog.getAppLog().info("Refset has members. Will compute marked parents for members.");
+                    Terms.get().computeRefset(refset.getNid(), null, configFrame);
+                }
                 return Condition.ITEM_COMPLETE;
             }else{
                 AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));

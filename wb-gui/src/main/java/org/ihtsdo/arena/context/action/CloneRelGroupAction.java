@@ -14,7 +14,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -91,7 +91,7 @@ public class CloneRelGroupAction extends AbstractAction {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContraditionException e1) {
+        } catch (ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }

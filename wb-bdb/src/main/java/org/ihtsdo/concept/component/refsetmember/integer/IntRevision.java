@@ -13,7 +13,7 @@ import org.dwfa.ace.utypes.UniversalAceExtByRefPart;
 import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.refset.RefsetRevision;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -189,7 +189,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
    @Override
    public TkRefsetAbstractMember<?> getTkRefsetMemberActiveOnly(ViewCoordinate vc, NidBitSetBI exclusionSet,
            Map<UUID, UUID> conversionMap)
-           throws ContraditionException, IOException {
+           throws ContradictionException, IOException {
       return new TkRefsetIntMember(this, exclusionSet, conversionMap, 0, true, vc);
    }
 
@@ -211,7 +211,7 @@ public class IntRevision extends RefsetRevision<IntRevision, IntMember>
    }
 
    @Override
-   public IntMember.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public IntMember.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return (IntMember.Version) ((IntMember) primordialComponent).getVersion(c);
    }
 

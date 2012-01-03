@@ -173,6 +173,10 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import org.ihtsdo.db.bdb.computer.refset.*;
+import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
    private int                                         authorNid = Integer.MAX_VALUE;
@@ -295,23 +299,13 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
    @Override
    public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
            throws Exception {
-      AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
-
-      List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
-
-      for (String warning : dangleWarnings) {
-         AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
-      }
-
       Concept                        refsetConcept      = Concept.get(refsetNid);
-      RefsetSpec                     specHelper         = new RefsetSpec(refsetConcept, true, frameConfig);
       Collection<RefsetMember<?, ?>> members            = refsetConcept.getData().getRefsetMembers();
       HashSet<Integer>               currentMembersList = new HashSet<Integer>();
       NidSetBI                       allowedStatus      = frameConfig.getAllowedStatus();
       int                            cidTypeNid         = REFSET_TYPES.CID.getTypeNid();
       int                            normalMemberNid    = ReferenceConcepts.NORMAL_MEMBER.getNid();
-
-      for (RefsetMember<?, ?> m : members) {
+     for (RefsetMember<?, ?> m : members) {
          for (RefsetMember.Version v : m.getVersions(frameConfig.getViewCoordinate())) {
             if (allowedStatus.contains(v.getStatusNid()) && (v.getTypeNid() == cidTypeNid)) {
                if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
@@ -328,8 +322,25 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             }
          }
       }
-
       HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+
+      if (query == null) {
+          MarkedParentComputer mpc = new MarkedParentComputer(refsetConcept, members, frameConfig, activities);
+          mpc.addUncommitted();
+          Ts.get().commit();
+          return Condition.ITEM_COMPLETE;
+       }
+      AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
+
+      List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
+
+      for (String warning : dangleWarnings) {
+         AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
+      }
+
+      RefsetSpec                     specHelper         = new RefsetSpec(refsetConcept, true, frameConfig);
+ 
+ 
       RefsetComputer          computer;
 
       try {
@@ -564,6 +575,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       default :
          throw new UnsupportedOperationException("Can't handle refset type: " + type);
       }
+      ChangeNotifier.touchRefexRC(member.getReferencedComponentNid());
 
       return member;
    }
@@ -589,7 +601,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
    @Override
    public void forget(I_ExtendByRef extension) throws IOException {
-      BdbCommitManager.forget(extension);
+      BdbCommitManager.forget((RefexChronicleBI) extension);
    }
 
    @Override
@@ -1519,7 +1531,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
       member.setPrimordialUuid(primordialUuid);
       member.primordialSapNid = Integer.MIN_VALUE;
 
-      int  statusNid = ReferenceConcepts.CURRENT.getNid();
+      int  statusNid = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
       long time      = Long.MAX_VALUE;
 
       if (propMap.containsKey(REFSET_PROPERTY.TIME)) {

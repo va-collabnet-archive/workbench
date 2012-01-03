@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -47,6 +49,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * Generates the corresponding member refsets for the specification refsets.
@@ -268,7 +271,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                     }
 
                     I_ExtendByRefPart latest = getLatestVersion(member);
-                    if (latest != null && latest.getStatus() == ReferenceConcepts.CURRENT.getNid()) {
+                    if (latest != null && latest.getStatus() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
                         I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) latest;
                         if (part.getC1id() != parent_marker_nid) {
                             addToExistingRefsetMembers(new ConceptRefsetInclusionDetails(member.getComponentId(),
@@ -563,7 +566,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                         if (useNonTxInterface) {
                             nonTxWriter.addToRefset(null, member.getConceptNid(),
                                 getMembershipType(member.getInclusionTypeId()), refset, 
-                                ReferenceConcepts.CURRENT.getNid());
+                                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                         } else {
                             addToMemberSet(member.getConceptNid(), member.getInclusionTypeId(), refset);
                         }
@@ -611,7 +614,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                                 if (useNonTxInterface) {
                                     I_ExtendByRefPartCid latestExtVersion = (I_ExtendByRefPartCid) getLatestVersion(ext);
                                     nonTxWriter.addToRefset(ext.getMemberId(), i.getConceptNid(),
-                                        latestExtVersion.getC1id(), refset, ReferenceConcepts.RETIRED.getNid());
+                                        latestExtVersion.getC1id(), refset, SnomedMetadataRfx.getSTATUS_RETIRED_NID());
                                 } else {
                                     retireLatestExtension(ext);
                                 }
@@ -643,7 +646,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                                 if (useNonTxInterface) {
                                     nonTxWriter.addToRefset(null, parent.getConceptNid(),
                                         ConceptConstants.PARENT_MARKER.localize().getNid(), refset, 
-                                        	ReferenceConcepts.CURRENT.getNid());
+                                        	SnomedMetadataRfx.getSTATUS_CURRENT_NID());
                                 } else {
                                     addToMemberSetAsParent(parent.getConceptNid(), refset);
                                 }
@@ -666,7 +669,7 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
                                     if (useNonTxInterface) {
                                         I_ExtendByRefPartCid latestExtVersion = (I_ExtendByRefPartCid) getLatestVersion(ext);
                                         nonTxWriter.addToRefset(ext.getMemberId(), existingParent.getConceptNid(),
-                                            latestExtVersion.getC1id(), refset, ReferenceConcepts.RETIRED.getNid());
+                                            latestExtVersion.getC1id(), refset, SnomedMetadataRfx.getSTATUS_RETIRED_NID());
                                     } else {
                                         retireLatestExtension(ext);
                                     }
@@ -689,13 +692,17 @@ public class MemberRefsetCalculator extends SpecRefsetHelper implements I_HelpCa
     }
 
     private boolean newestPartRetired(I_ExtendByRef ext) {
-        I_ExtendByRefPart newestPart = null;
-        for (I_ExtendByRefPart part : ext.getMutableParts()) {
-            if (newestPart == null || part.getVersion() > newestPart.getVersion()) {
-                newestPart = part;
+        try {
+            I_ExtendByRefPart newestPart = null;
+            for (I_ExtendByRefPart part : ext.getMutableParts()) {
+                if (newestPart == null || part.getVersion() > newestPart.getVersion()) {
+                    newestPart = part;
+                }
             }
+            return newestPart.getStatus() == SnomedMetadataRfx.getSTATUS_RETIRED_NID();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-        return newestPart.getStatus() == ReferenceConcepts.RETIRED.getNid();
     }
 
     private ClosestDistanceHashSet findParentsToBeMarked(ClosestDistanceHashSet concepts) throws IOException, Exception {

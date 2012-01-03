@@ -5,6 +5,7 @@ package org.ihtsdo.concept.component.image;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
 
+import java.io.IOException;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_ImagePart;
@@ -14,7 +15,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
 import org.ihtsdo.tk.api.media.MediaVersionBI;
@@ -24,6 +25,8 @@ import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.MediaCAB;
 
 public class ImageRevision extends Revision<ImageRevision, Image>
         implements I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -136,6 +139,18 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 
       return newR;
    }
+   
+   @Override
+    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
+        MediaCAB mediaBp = new MediaCAB(getConceptNid(),
+                getTypeNid(),
+                getFormat(),
+                getTextDescription(),
+                getMedia(),
+                getVersion(vc),
+                vc);
+        return mediaBp;
+    }
 
    @Override
    public boolean readyToWriteRevision() {
@@ -247,7 +262,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
    }
 
    @Override
-   public Image.Version getVersion(ViewCoordinate c) throws ContraditionException {
+   public Image.Version getVersion(ViewCoordinate c) throws ContradictionException {
       return primordialComponent.getVersion(c);
    }
 

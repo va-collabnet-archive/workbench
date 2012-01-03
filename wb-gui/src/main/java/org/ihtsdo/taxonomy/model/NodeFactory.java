@@ -23,7 +23,7 @@ import org.ihtsdo.taxonomy.nodes.NodeComparator;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -158,7 +158,7 @@ public class NodeFactory {
     }
     
     public TaxonomyNode makeNode(ConceptVersionBI nodeConcept, int parentCnid, TaxonomyNode parentNode)
-            throws ContraditionException, IOException {
+            throws ContradictionException, IOException {
         if (model.ts.getPossibleChildren(nodeConcept.getNid()).length == 0) {
             boolean multiParent = false;
             
@@ -203,7 +203,7 @@ public class NodeFactory {
     }
     
     private TaxonomyNode makeNodeFromScratch(ConceptVersionBI nodeConcept, TaxonomyNode parentNode)
-            throws Exception, IOException, ContraditionException {
+            throws Exception, IOException, ContradictionException {
         Long nodeId = TaxonomyModel.getNodeId(nodeConcept.getNid(), parentNode.getCnid());
         TaxonomyNode existingNode = model.nodeStore.get(nodeId);
         
@@ -253,7 +253,7 @@ public class NodeFactory {
 
     //~--- set methods ---------------------------------------------------------
     private void setExtraParents(ConceptVersionBI nodeConcept, TaxonomyNode node)
-            throws ContraditionException, IOException {
+            throws ContradictionException, IOException {
         if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
             for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
                 if (parent.getNid() != node.getParentNid()) {

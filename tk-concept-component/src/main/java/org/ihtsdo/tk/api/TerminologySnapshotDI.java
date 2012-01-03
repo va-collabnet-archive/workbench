@@ -16,15 +16,27 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface TerminologySnapshotDI extends TerminologyTransactionDI {
-   TerminologyConstructorBI getAmender(EditCoordinate ec);
+    
+   PositionBI newPosition(PathBI path, long time) throws IOException;
 
-   ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContraditionException;
+   /**
+    * 
+    * @param ec
+    * @return
+    * @deprecated use getBuilder
+    */
+   @Deprecated
+   TerminologyBuilderBI getAmender(EditCoordinate ec);
 
-   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContraditionException;
+   TerminologyBuilderBI getBuilder(EditCoordinate ec);
 
-   ComponentVersionBI getComponentVersion(int nid) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(Collection<UUID> uuids) throws IOException, ContradictionException;
 
-   ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContraditionException;
+   ComponentVersionBI getComponentVersion(ComponentContainerBI cc) throws IOException, ContradictionException;
+
+   ComponentVersionBI getComponentVersion(int nid) throws IOException, ContradictionException;
+
+   ComponentVersionBI getComponentVersion(UUID... uuids) throws IOException, ContradictionException;
 
    ConceptVersionBI getConceptForNid(int nid) throws IOException;
 

@@ -4,18 +4,17 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
-
 import javax.swing.AbstractAction;
-
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.TerminologyConstructorBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -30,10 +29,10 @@ public class MakeAcceptableAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     DescriptionVersionBI desc;
-    String dialect;
+    LANG_CODE dialect;
     I_ConfigAceFrame config;
 
-    public MakeAcceptableAction(String actionName, DescFact fact, String dialect, I_ConfigAceFrame config) {
+    public MakeAcceptableAction(String actionName, DescFact fact, LANG_CODE dialect, I_ConfigAceFrame config) {
         super(actionName);
         this.desc = fact.getComponent();
         this.dialect = dialect;
@@ -44,13 +43,13 @@ public class MakeAcceptableAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         try {
             I_AmPart componentVersion;
-            TerminologyConstructorBI tc = Ts.get().getTerminologyConstructor(config.getEditCoordinate(),
+            TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             ViewCoordinate vc = config.getViewCoordinate();
             Collection<? extends RefexChronicleBI> refexes =
                     desc.getCurrentRefexes(vc);
 
-            if (dialect.equals("en-us")) {
+            if (dialect.equals(LANG_CODE.EN_US)) {
                 int evalRefsetNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
                 
                 int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
@@ -91,7 +90,7 @@ public class MakeAcceptableAction extends AbstractAction {
                         }
                     }
                 }
-            } else if (dialect.equals("en-gb")) {
+            } else if (dialect.equals(LANG_CODE.EN_GB)) {
                 int evalRefsetNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
                 
                 int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();

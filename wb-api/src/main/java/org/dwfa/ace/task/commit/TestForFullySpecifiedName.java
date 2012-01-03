@@ -18,35 +18,38 @@ package org.dwfa.ace.task.commit;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import java.util.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/commit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/precommit", type = BeanType.TASK_BEAN),
                    @Spec(directory = "plugins/commit", type = BeanType.TASK_BEAN) })
+/*
+ * See TestForPreferredTermValue for comments first.
+ */
 public class TestForFullySpecifiedName extends AbstractConceptTest {
 
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
+    private ViewCoordinate vc;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -64,65 +67,67 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
     @Override
     public List<AlertToDataConstraintFailure> test(I_GetConceptData concept, boolean forCommit) throws TaskFailedException {
         try {
-
-            ArrayList<I_DescriptionVersioned> descriptions = new ArrayList<I_DescriptionVersioned>();
-            List<? extends I_DescriptionTuple> descriptionTupleList = getDescriptionTupleList(concept, getFrameConfig());
-            for (I_DescriptionTuple desc : descriptionTupleList) {
-                descriptions.add(desc.getDescVersioned());
+            vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            ConceptVersionBI cv = Ts.get().getConceptVersion(vc, concept.getNid());
+            Collection<? extends DescriptionVersionBI> descsActive = cv.getDescsActive();
+            ArrayList<DescriptionVersionBI> descriptions = new ArrayList<DescriptionVersionBI>();
+            for (DescriptionVersionBI desc : descsActive) {
+                descriptions.add(desc);
             }
-            return testDescriptions(concept, descriptions, forCommit);
+            
+            // only test of concepts have been added to the description. 
+            if (descriptions.size() > 0) {
+                return testDescriptions(cv, descsActive, forCommit);
+            }
+            return new ArrayList<AlertToDataConstraintFailure>();
         } catch (Exception e) {
             throw new TaskFailedException(e);
         }
     }
 
-    private List<? extends I_DescriptionTuple> getDescriptionTupleList(final I_GetConceptData concept,
-            final I_ConfigAceFrame activeProfile) throws IOException {
-
-        PositionSetReadOnly allPositions = null;
-        I_IntSet allTypes = null;
-        return concept.getDescriptionTuples(activeProfile.getAllowedStatus(), allTypes, allPositions, getFrameConfig()
-            .getPrecedence(), getFrameConfig().getConflictResolutionStrategy());
-    }
-
-    private List<AlertToDataConstraintFailure> testDescriptions(I_GetConceptData concept,
-            ArrayList<I_DescriptionVersioned> descriptions, boolean forCommit) throws Exception {
+    private List<AlertToDataConstraintFailure> testDescriptions(ConceptVersionBI cv,
+            Collection<? extends DescriptionVersionBI> descsActive, boolean forCommit) throws Exception {
         ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-        I_GetConceptData fsn_type =
-                getConceptSafe(Terms.get(), ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
-        if (fsn_type == null)
-            return alertList;
         I_IntSet actives = getActiveStatus(Terms.get());
-        HashMap<String, ArrayList<I_DescriptionVersioned>> langs = new HashMap<String, ArrayList<I_DescriptionVersioned>>();
-        for (I_DescriptionVersioned<?> desc : descriptions) {
-            for (I_DescriptionPart part : desc.getMutableParts()) {
-                if (!actives.contains(part.getStatusNid()))
-                    continue;
-                if (part.getTypeNid() == fsn_type.getConceptNid()) {
-                    if (part.getText().matches(".*\\(\\?+\\).*") && part.getTime() == Long.MAX_VALUE) {
+        HashMap<String, ArrayList<DescriptionVersionBI>> langs = new HashMap<String, ArrayList<DescriptionVersionBI>>();
+        
+        NidSet fsnSet = new NidSet();
+        fsnSet.add(SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID());
+        fsnSet.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getConceptNid());
+        fsnSet.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getConceptNid());
+        fsnSet.add(Ts.get().getNidForUuids(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")));
+        
+        for (DescriptionVersionBI<?> desc : descsActive) {
+                if (fsnSet.contains(desc.getTypeNid())) {
+                    if (desc.getText().matches(".*\\(\\?+\\).*") && desc.getTime() == Long.MAX_VALUE) {
                         alertList.add(new AlertToDataConstraintFailure(
                             (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                       : AlertToDataConstraintFailure.ALERT_TYPE.WARNING), "<html>Unedited semantic tag: "
-                                + part.getText(), concept));
+                                + desc.getText(), cv));
                     }
-                    String lang = part.getLang();
+                    String lang = desc.getLang();
                     if (langs.get(lang) != null) {
-                        for (I_DescriptionVersioned d : langs.get(lang)) {
-                            if (d.getDescId() != desc.getDescId()) {
+                        for (DescriptionVersionBI d : langs.get(lang)) {
+                            if (d.getNid() != desc.getNid()) {
                                 alertList.add(new AlertToDataConstraintFailure(
                                     (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                               : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                    "<html>More than one FSN for " + lang, concept));
+                                    "<html>More than one FSN for " + lang, cv));
                             }
                         }
                         langs.get(lang).add(desc);
                     } else {
-                        ArrayList<I_DescriptionVersioned> dl = new ArrayList<I_DescriptionVersioned>();
+                        ArrayList<DescriptionVersionBI> dl = new ArrayList<DescriptionVersionBI>();
                         dl.add(desc);
                         langs.put(lang, dl);
                     }
-                    if (part.getTime() == Long.MAX_VALUE && !part.getText().equals("New Fully Specified Description")) {
-                        String filteredDescription = part.getText();
+                    /*
+                     * If desc.getTime() == Long.MAX_VALUE, it means the description is
+                     * uncommitted. For any component you can use the isUncommitted() method
+                     * instead.
+                     */
+                    if (desc.isUncommitted() && !desc.getText().equals("New Fully Specified Description")) {
+                        String filteredDescription = desc.getText();
                         // new removal using native lucene escaping
                         filteredDescription = QueryParser.escape(filteredDescription);
                         SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
@@ -130,23 +135,25 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                             Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                             int cnid = Integer.parseInt(doc.get("cnid"));
                             int dnid = Integer.parseInt(doc.get("dnid"));
-                            if (cnid == concept.getConceptNid())
+                            if (cnid == cv.getConceptNid())
                                 continue;
                             try {
-                                I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                                /*
+                                 * Using dnid since we want the description not the concept the
+                                 * description is on.
+                                 */
+                                DescriptionVersionBI potential_fsn = (DescriptionVersionBI) Ts.get().getComponentVersion(vc, dnid);
                                 if (potential_fsn != null) {
-                                    for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                                        if (actives.contains(part_search.getStatusNid())
-                                            && part_search.getTypeNid() == fsn_type.getConceptNid()
-                                            && part_search.getText().equals(part.getText())
-                                            && part_search.getLang().equals(part.getLang())) {
+                                        if (actives.contains(potential_fsn.getStatusNid())
+                                            && fsnSet.contains(potential_fsn.getTypeNid())
+                                            && potential_fsn.getText().equals(desc.getText())
+                                            && potential_fsn.getLang().equals(desc.getLang())) {
                                             alertList.add(new AlertToDataConstraintFailure(
                                                 (forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                           : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                                                "<html>FSN already used: " + part.getText(), concept));
+                                                "<html>FSN already used: " + desc.getText(), cv));
                                             break search;
                                         }
-                                    }
                                 }
                             } catch (Exception e) {
                                 AceLog.getAppLog().alertAndLogException(e);
@@ -154,12 +161,12 @@ public class TestForFullySpecifiedName extends AbstractConceptTest {
                         }
                     }
                 }
-            }
+            
         }
         if (langs.get("en") == null)
             alertList.add(new AlertToDataConstraintFailure((forCommit ? AlertToDataConstraintFailure.ALERT_TYPE.ERROR
                                                                      : AlertToDataConstraintFailure.ALERT_TYPE.WARNING),
-                "<html>No FSN for en", concept));
+                "<html>No FSN for en", cv));
         return alertList;
     }
 }

@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.maven.plugin.AbstractMojo;
@@ -127,6 +128,7 @@ public class ConvertRefsetsToAnnotations extends AbstractMojo {
 
                 try {
                     System.out.print(conceptsRead + "-");
+                    System.out.println("REFSETS LISTED IN POM: " + refsetsToConvertMap);
                     while (true) {
                         boolean foundWatchConcept = false;
                         String watchConceptStr = "";

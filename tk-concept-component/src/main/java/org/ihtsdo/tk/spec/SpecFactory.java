@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -18,7 +18,7 @@ public class SpecFactory {
         try {
             return new ConceptSpec(cv.getDescsActive().iterator().next().getText(),
                     concept.getPrimUuid());
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             for (DescriptionChronicleBI desc : concept.getDescs()) {
                 for (DescriptionVersionBI dv : desc.getVersions(vc)) {
                     return new ConceptSpec(dv.getText(),
@@ -33,7 +33,7 @@ public class SpecFactory {
         try {
             return new ConceptSpec(concept.getDescsActive().iterator().next().getText(),
                     concept.getPrimUuid());
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             return new ConceptSpec(
                     concept.getDescs().iterator().next().getVersions().iterator().next().getText(),
                     concept.getPrimUuid());

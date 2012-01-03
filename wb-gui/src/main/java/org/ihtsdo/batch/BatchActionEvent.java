@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 
 /**
@@ -96,7 +96,7 @@ public class BatchActionEvent implements Comparable<BatchActionEvent> {
 
         } catch (IOException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContraditionException ex) {
+        } catch (ContradictionException ex) {
             Logger.getLogger(BatchActionEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
 

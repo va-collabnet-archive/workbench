@@ -16,21 +16,16 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.6.0-trek-58</version>
+        <version>2.6.0-trek-72</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-        <artifactId>tk-helpers</artifactId>
+    <artifactId>tk-helpers</artifactId>
     <name>${branch}: Toolkit Helpers</name>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>tk-concept-component</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-			<groupId>org.ihtsdo</groupId>
-			<artifactId>wb-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+        </dependency>    
+    </dependencies>
 </project>    

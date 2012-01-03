@@ -24,7 +24,7 @@ package org.dwfa.ace.classifier;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.AceTableRenderer;
 
-import org.ihtsdo.tk.api.ContraditionException;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
@@ -75,7 +75,7 @@ public class EquivTableRenderer extends AceTableRenderer {
             this.setText(cc.getVersion(vc).getFullySpecifiedDescription().getText());
          } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-         } catch (ContraditionException ex) {
+         } catch (ContradictionException ex) {
             this.setText(cc.toUserString());
          }
       }
