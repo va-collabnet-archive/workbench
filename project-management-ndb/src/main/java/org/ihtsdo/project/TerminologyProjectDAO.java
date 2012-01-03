@@ -1693,8 +1693,10 @@ public class TerminologyProjectDAO {
 			}
 
 			if (!alreadyMember) {
-				//				String metadata = serialize(member);
-				termFactory.getRefsetHelper(config).newRefsetExtension(
+				if (refsetHelper==null){
+					refsetHelper=termFactory.getRefsetHelper(config);
+				}
+				refsetHelper.newRefsetExtension(
 						workSetConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(),
 						EConcept.REFSET_TYPES.STR,
@@ -2591,6 +2593,7 @@ public class TerminologyProjectDAO {
 
 		Partition newPartition = null;
 		ActivityUpdater updater = new ActivityUpdater(activity, "Creating partition");
+		refsetHelper=Terms.get().getRefsetHelper(config);
 		updater.startActivity();
 		try{
 			if(isConceptDuplicate(name  + " (partition)")){
@@ -2614,6 +2617,7 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		}
 		updater.finish();
+		refsetHelper=null;
 		return newPartition;
 
 	}
@@ -2807,7 +2811,10 @@ public class TerminologyProjectDAO {
 			if (!alreadyMember) {
 				WorkList workList = getWorkList(workListConcept, config);
 				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
-				termFactory.getRefsetHelper(config).newRefsetExtension(
+				if (refsetHelper==null){
+					refsetHelper=termFactory.getRefsetHelper(config);
+				}
+				refsetHelper.newRefsetExtension(
 						workListConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(), 
 						EConcept.REFSET_TYPES.STR, 
@@ -2851,7 +2858,7 @@ public class TerminologyProjectDAO {
 
 
 	}
-	private static I_HelpRefsets helperRefset=null;
+	private static I_HelpRefsets refsetHelper=null;
 	public static void addConceptAsPartitionMember(PartitionMember member, Partition partition, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
@@ -2883,10 +2890,10 @@ public class TerminologyProjectDAO {
 			}
 
 			if (!alreadyMember) {
-				if (helperRefset==null){
-					helperRefset=termFactory.getRefsetHelper(config);
+				if (refsetHelper==null){
+					refsetHelper=termFactory.getRefsetHelper(config);
 				}
-				helperRefset.newRefsetExtension(
+				refsetHelper.newRefsetExtension(
 						partitionConcept.getConceptNid(), 
 						newMemberConcept.getConceptNid(), 
 						EConcept.REFSET_TYPES.STR, 
@@ -3721,6 +3728,7 @@ public class TerminologyProjectDAO {
 
 		ActivityUpdater updater = new ActivityUpdater(activity, "Synchronizing WorkSet");
 		updater.startActivity();
+		refsetHelper=Terms.get().getRefsetHelper(config);
 
 		try {
 			if (!workSet.getPartitionSchemes(config).isEmpty()) {
@@ -3819,6 +3827,7 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		}
 		updater.setTaskMessage("Synchronizing WorkSet");
+		refsetHelper = null;
 		updater.finish();
 
 
@@ -3963,6 +3972,7 @@ public class TerminologyProjectDAO {
 			String name, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
 		long startTime = System.currentTimeMillis();
 		WfUser user = null;
+		refsetHelper=Terms.get().getRefsetHelper(config);
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
@@ -4019,7 +4029,7 @@ public class TerminologyProjectDAO {
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		updater.finish();
 		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
+		refsetHelper = null;
 		return workList;
 	}
 
