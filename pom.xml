@@ -42,7 +42,7 @@
 		<jbpm.version>5.1.0.Final</jbpm.version>
 		<mvel2.version>2.1.0.drools2</mvel2.version>		
                 <org.apache.lucene.version>3.5.0</org.apache.lucene.version>
-		<wb-icons.version>1.0.9</wb-icons-version>
+		<wb-icons.version>1.0.9</wb-icons.version>
 		<je.version>4.1.17</je.version>
 		<svnusername>${relusername}</svnusername>
 		<svnpassword>${relpassword}</svnpassword>
