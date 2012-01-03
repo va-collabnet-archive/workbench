@@ -83,6 +83,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.Partition;
@@ -103,11 +104,9 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -119,8 +118,9 @@ import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
  * The Class TerminologyProjectDAO.
  */
 public class TerminologyProjectDAO {
-	
+
 	public static Map<UUID, WorkList> workListCache = new HashMap<UUID,WorkList>();
+	public static Map<UUID, Partition> partitionCache = new HashMap<UUID,Partition>();
 
 	//I_TerminologyProjects CRUD **********************************
 
@@ -1534,7 +1534,10 @@ public class TerminologyProjectDAO {
 
 	public static Partition getPartition(I_GetConceptData partitionConcept, 
 			I_ConfigAceFrame config) {
-		Partition partition = null;
+		Partition partition = TerminologyProjectDAO.partitionCache.get(partitionConcept.getPrimUuid());
+		if (partition != null) {
+			return partition;
+		}
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -1590,6 +1593,10 @@ public class TerminologyProjectDAO {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+
+		if (partition != null) {
+			TerminologyProjectDAO.partitionCache.put(partitionConcept.getPrimUuid(), partition);
 		}
 		return partition;
 	}
@@ -1969,7 +1976,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData workSetRefset = termFactory.getConcept(worksetId);
 			WorkSet workset = TerminologyProjectDAO.getWorkSet(workSetRefset, config);
 			PromotionRefset promRefset = workset.getPromotionRefset(config);
-			
+
 			Collection<? extends RefexChronicleBI<?>> members = workSetMemberConcept.getAnnotations();
 			for (RefexChronicleBI<?> promotionMember : members) {
 				if (promotionMember.getCollectionNid() == promRefset.getRefsetId()) {
@@ -2210,7 +2217,7 @@ public class TerminologyProjectDAO {
 		if (workList != null) {
 			return workList;
 		}
-		
+
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -2321,7 +2328,7 @@ public class TerminologyProjectDAO {
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
 			addConceptAsPartitionMember(concept, workList.getPartitionUUID(), config);
 			Terms.get().addUncommitted(workList.getPartition().getConcept());
-			workList.getPartition().getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			workList.getPartition().getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			WorkListMember workListMember = new WorkListMember(concept.toString(), 
 					concept.getConceptNid(),
 					concept.getUids(), workList.getUids().iterator().next(),  
@@ -2432,7 +2439,7 @@ public class TerminologyProjectDAO {
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(),
 				workListWithMetadata.getPartitionUUID());
 		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
-		
+
 		workList.setWorkflowUserRoles(workListWithMetadata.getWorkflowUserRoles());
 		//		String metadata = serialize(workList);
 		WorklistMetadata worklistMetadata=new WorklistMetadata(workList.getName(),workList.getId(),
@@ -2530,7 +2537,7 @@ public class TerminologyProjectDAO {
 
 		}
 		Terms.get().addUncommittedNoChecks(newPartition.getConcept());
-		newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+		newPartition.getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 
 		for (Partition loopPartition : partitions) {
@@ -2581,6 +2588,7 @@ public class TerminologyProjectDAO {
 			WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException {
 
 		Partition newPartition = null;
+		long startTime = System.currentTimeMillis();
 		try{
 			if(isConceptDuplicate(name  + " (partition)")){
 				JOptionPane.showMessageDialog(new JDialog(), "Duplicated partition name", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -2594,7 +2602,7 @@ public class TerminologyProjectDAO {
 			activity.setValue(0);
 			activity.setMaximum(members.size());
 			activity.setIndeterminate(false);
-			activity.setProgressInfoLower("Loading exlusions...");
+			activity.setProgressInfoLower("Creating partition members...");
 			int counter = 0;
 			for (WorkSetMember loopMember : members) {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
@@ -2602,12 +2610,17 @@ public class TerminologyProjectDAO {
 				counter++;
 				activity.setValue(counter);
 				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
+					long endTime = System.currentTimeMillis();
+					long elapsed = endTime - startTime;
+
+					long estimation = (activity.getMaximum() * elapsed) / counter;
+					String estimationStr = TimeHelper.getElapsedTimeString(estimation);
 					activity.setProgressInfoLower("Creating partition members: " + counter + 
-							" from " + activity.getMaximum());
+							" from " + activity.getMaximum() + " . Remaining time: " + estimationStr);
 				}
 			}
 			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
-			newPartition.getConcept().commit(ChangeSetGenerationPolicy.OFF, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			newPartition.getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -2811,8 +2824,8 @@ public class TerminologyProjectDAO {
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
-//				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
-//				promotionRefset.setDestination(member.getId(), assignedUserId);
+				//				promotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				//				promotionRefset.setDestination(member.getId(), assignedUserId);
 				//Translation specific concept level promotion refset
 				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(
@@ -2837,7 +2850,9 @@ public class TerminologyProjectDAO {
 					partitionMemberConcept.getConceptNid(),
 					partitionMemberConcept.getUids(),
 					partitionUUID);
+			partitionMember.setMemberConcept(partitionMemberConcept);
 			addConceptAsPartitionMember(partitionMember, config);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -2849,14 +2864,16 @@ public class TerminologyProjectDAO {
 		I_TermFactory termFactory = Terms.get();
 		try {
 			termFactory.setActiveAceFrameConfig(config);
-			I_GetConceptData newMemberConcept = termFactory.getConcept(member.getUids());
+			I_GetConceptData newMemberConcept = member.getMemberConcept();
 			I_GetConceptData partitionConcept = termFactory.getConcept(member.getPartitionUUID());
+			Partition partition = getPartition(partitionConcept, config);
 
 			boolean alreadyMember = false;
-			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(newMemberConcept.getConceptNid());
-			for (I_ExtendByRef extension : extensions) {
-				I_GetConceptData refset = termFactory.getConcept(extension.getRefsetId());
-				if (refset.getUids().contains(member.getPartitionUUID())) {
+			
+			Collection<? extends RefexChronicleBI<?>> extensions = newMemberConcept.getRefexes();
+			for (RefexChronicleBI<?> extensionBI : extensions) {
+				if (extensionBI.getCollectionNid() == partitionConcept.getNid()) {
+					I_ExtendByRef extension = termFactory.getExtension(extensionBI.getNid());
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 					if (isActive(part.getStatusNid())) {
@@ -2865,15 +2882,11 @@ public class TerminologyProjectDAO {
 						for (PathBI editPath : config.getEditingPathSet()) {
 							part.makeAnalog(
 									SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(),
+									config.getDbConfig().getUserConcept().getNid(),
 									editPath.getConceptNid(),
 									Long.MAX_VALUE);
 							extension.addVersion(part);
 						}
-						//						termFactory.commit();
-						//						promote(extension, config);
-						//						termFactory.addUncommittedNoChecks(partitionConcept);
-						//						termFactory.addUncommittedNoChecks(extension);
-						//						termFactory.commit();
 					}
 				}
 			}
@@ -2885,11 +2898,6 @@ public class TerminologyProjectDAO {
 						EConcept.REFSET_TYPES.STR, 
 						new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""),
 						config); 
-				//				for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(partitionConcept.getConceptNid())) {
-				//					if (extension.getComponentNid() == newMemberConcept.getConceptNid() &&
-				//							extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
-				//					}
-				//				}
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
@@ -3245,19 +3253,19 @@ public class TerminologyProjectDAO {
 		try {
 			PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 
-//			I_IntSet descriptionTypes =  termFactory.newIntSet();
-//			descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-//			
-//			List<? extends I_DescriptionTuple> descTuples = workListMemberConcept.getDescriptionTuples(
-//					config.getAllowedStatus(), 
-//					descriptionTypes, config.getViewPositionSetReadOnly(),
-//					Precedence.TIME, config.getConflictResolutionStrategy());
-//			String name;
-//			if (!descTuples.isEmpty()) {
-//				name = descTuples.iterator().next().getText();
-//			} else {
-//				name = "No FSN!";
-//			}
+			//			I_IntSet descriptionTypes =  termFactory.newIntSet();
+			//			descriptionTypes.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+			//			
+			//			List<? extends I_DescriptionTuple> descTuples = workListMemberConcept.getDescriptionTuples(
+			//					config.getAllowedStatus(), 
+			//					descriptionTypes, config.getViewPositionSetReadOnly(),
+			//					Precedence.TIME, config.getConflictResolutionStrategy());
+			//			String name;
+			//			if (!descTuples.isEmpty()) {
+			//				name = descTuples.iterator().next().getText();
+			//			} else {
+			//				name = "No FSN!";
+			//			}
 			String name = workListMemberConcept.toString();
 			Collection<? extends RefexChronicleBI<?>> members = workListMemberConcept.getAnnotations();
 			for (RefexChronicleBI<?> promotionMember : members) {
@@ -3716,7 +3724,7 @@ public class TerminologyProjectDAO {
 
 	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config
 			, I_ShowActivity activity) throws Exception {
-		
+
 		long startTime = System.currentTimeMillis();
 
 		try {
@@ -3735,13 +3743,13 @@ public class TerminologyProjectDAO {
 			List<Integer> includedConcepts = new ArrayList<Integer>();
 
 			List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
-			
+
 			activity.setValue(0);
 			activity.setMaximum(exclusionRefsets.size());
 			activity.setIndeterminate(false);
 			activity.setProgressInfoLower("Loading exlusions...");
 			int counter = 0;
-			
+
 			for (I_GetConceptData loopRefset : exclusionRefsets) {
 				Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
 					termFactory.getRefsetExtensionMembers(
@@ -3755,16 +3763,16 @@ public class TerminologyProjectDAO {
 				counter++;
 				activity.setValue(counter);
 			}
-			
+
 			Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
 					refsetConc.getConceptNid());
-			
+
 			activity.setValue(0);
 			activity.setMaximum(refsetMembers.size());
 			activity.setIndeterminate(false);
 			activity.setProgressInfoLower("Iterating source refset members");
 			counter = 0;
-			
+
 			int countIncluded = 0;
 			int countExcluded = 0;
 			int countRetired = 0;
@@ -3801,13 +3809,19 @@ public class TerminologyProjectDAO {
 				counter++;
 				activity.setValue(counter);
 				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
+					long endTime = System.currentTimeMillis();
+					long elapsed = endTime - startTime;
+
+					long estimation = (activity.getMaximum() * elapsed) / counter;
+					String estimationStr = TimeHelper.getElapsedTimeString(estimation);
+
 					activity.setProgressInfoLower("Iterating source refset members: " + counter + 
-							" from " + activity.getMaximum());
+							" from " + activity.getMaximum() + " . Remaining time: " + estimationStr);
 				}
 			}
 
 			List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
-			
+
 			activity.setValue(0);
 			activity.setMaximum(workSetMembers.size());
 			activity.setIndeterminate(false);
@@ -3830,7 +3844,7 @@ public class TerminologyProjectDAO {
 
 			long endTime = System.currentTimeMillis();
 			long elapsed = endTime - startTime;
-			String elapsedStr = TimeUtil.getElapsedTimeString(elapsed);
+			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
 			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
 					" , ret = " + countRetired + " , not unique = " + countNotUnique);
 		} catch (Exception e) {
@@ -3977,6 +3991,7 @@ public class TerminologyProjectDAO {
 			WorkflowDefinition workflowDefinition,
 			List<WfMembership> workflowUserRoles, 
 			String name, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
+		long startTime = System.currentTimeMillis();
 		WfUser user = null;
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
@@ -4028,18 +4043,25 @@ public class TerminologyProjectDAO {
 					counter++;
 					activity.setValue(counter);
 					if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
-						activity.setProgressInfoLower("Processed: " + counter + " from " + activity.getMaximum());
+						long endTime = System.currentTimeMillis();
+						long elapsed = endTime - startTime;
+
+						long estimation = (activity.getMaximum() * elapsed) / counter;
+						String estimationStr = TimeHelper.getElapsedTimeString(estimation);
+
+						activity.setProgressInfoLower("Processed: " + counter + " from " + 
+								activity.getMaximum() + " . Remaining time: " + estimationStr);
 					}
 				}
 			}
 		}
-		
+
 		Terms.get().commit();
-		
+
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
-		
+
 		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);
-		
+
 		return workList;
 	}
 

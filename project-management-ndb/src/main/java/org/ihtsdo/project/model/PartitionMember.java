@@ -45,6 +45,8 @@ public class PartitionMember implements Serializable {
 	/** The work set id. */
 	private UUID partitionUUID;
 	
+	private I_GetConceptData memberConcept;
+	
 	/**
 	 * Instantiates a new work set member.
 	 * 
@@ -124,6 +126,9 @@ public class PartitionMember implements Serializable {
 	 * @return the concept
 	 */
 	public I_GetConceptData getConcept() {
+		if (memberConcept != null) {
+			return memberConcept;
+		}
 		I_GetConceptData concept = null;
 		try {
 			concept = Terms.get().getConcept(uids);
@@ -145,6 +150,14 @@ public class PartitionMember implements Serializable {
 
 	public void setPartitionUUID(UUID partitionUUID) {
 		this.partitionUUID = partitionUUID;
+	}
+
+	public I_GetConceptData getMemberConcept() {
+		return memberConcept;
+	}
+
+	public void setMemberConcept(I_GetConceptData memberConcept) {
+		this.memberConcept = memberConcept;
 	}
 	
 }
