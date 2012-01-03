@@ -37,6 +37,10 @@ public class BatchActionEventReporter {
 
     private static List<BatchActionEvent> batchActionEventList;
 
+    public static List<BatchActionEvent> getBatchActionEventList() {
+        return batchActionEventList;
+    }
+
     public BatchActionEventReporter() {
     }
 

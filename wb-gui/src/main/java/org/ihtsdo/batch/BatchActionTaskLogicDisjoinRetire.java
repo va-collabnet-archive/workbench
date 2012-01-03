@@ -17,18 +17,13 @@
 package org.ihtsdo.batch;
 
 import java.io.IOException;
-import java.util.Collection;
-import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
 /**
- * BatchActionTaskRefsetRetireMember
+ * BatchActionTaskLogicDisjoinRetire
  * 
  */
 public class BatchActionTaskLogicDisjoinRetire extends BatchActionTask {
@@ -37,11 +32,9 @@ public class BatchActionTaskLogicDisjoinRetire extends BatchActionTask {
     private int collectionNid;
     // FILTER
     private TK_REFSET_TYPE refsetType;
-    private Object matchValue;
 
     public BatchActionTaskLogicDisjoinRetire() {
         this.collectionNid = Integer.MAX_VALUE;
-        this.matchValue = null;
     }
 
     public void setCollectionNid(int collectionNid) {
@@ -52,97 +45,9 @@ public class BatchActionTaskLogicDisjoinRetire extends BatchActionTask {
         this.refsetType = refsetType;
     }
 
-    public void setMatchValue(Object matchValue) {
-        this.matchValue = matchValue;
-    }
-
     // BatchActionTask
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc) throws IOException {
-
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getCurrentRefexes(vc);
-        boolean changed = false;
-        boolean changedReferencedConcept = false;
-        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
-        for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getCollectionNid() == collectionNid) {
-                if (matchValue == null) {
-                    for (int editPath : ec.getEditPaths()) {
-                        rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
-                    }
-                    if (collectionConcept.isAnnotationStyleRefex()) {
-                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                        changedReferencedConcept = true; // pass to BatchActionProcessor
-                    } else {
-                        ts.addUncommitted(collectionConcept);
-                    }
-
-                    changed = true;
-                    BatchActionEventReporter.add(new BatchActionEvent(c,
-                            BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                            BatchActionEventType.EVENT_SUCCESS,
-                            "retired member of: " + nidToName(collectionNid)));
-                } else {
-                    // CHECK FILTER
-                    RefexCAB spec = rvbi.getRefexEditSpec();
-                    boolean matched = false;
-                    switch (refsetType) {
-                        case BOOLEAN:
-                            if ((Boolean) matchValue == spec.getBoolean(RefexCAB.RefexProperty.BOOLEAN1)) {
-                                matched = true;
-                            }
-                            break;
-                        case CID:
-                            if ((Integer) matchValue == spec.getInt(RefexCAB.RefexProperty.CNID1)) {
-                                matched = true;
-                            }
-                            break;
-                        case INT:
-                            if ((Integer) matchValue == spec.getInt(RefexCAB.RefexProperty.INTEGER1)) {
-                                matched = true;
-                            }
-                            break;
-                        case STR:
-                            String valStr = spec.getString(RefexCAB.RefexProperty.STRING1);
-                            if (valStr != null && valStr.equalsIgnoreCase((String) matchValue)) {
-                                matched = true;
-                            }
-                            break;
-                        default:
-                    }
-
-                    if (matched) {
-                        for (int editPath : ec.getEditPaths()) {
-                            rvbi.makeAnalog(RETIRED_NID, ec.getAuthorNid(), editPath, Long.MAX_VALUE);
-                        }
-                        if (collectionConcept.isAnnotationStyleRefex()) {
-                            // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                            changedReferencedConcept = true; // pass to BatchActionProcessor
-                        } else {
-                            ts.addUncommitted(collectionConcept);
-                        }
-
-                        changed = true;
-                        BatchActionEventReporter.add(new BatchActionEvent(c,
-                                BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                                BatchActionEventType.EVENT_SUCCESS,
-                                "retired member of (value matched): " + nidToName(collectionNid)));
-                    }
-                    matched = false;
-                }
-            }
-        }
-
-        if (!changed && matchValue == null) {
-            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                    BatchActionEventType.EVENT_NOOP,
-                    "was not member of: " + nidToName(collectionNid)));
-        } else if (!changed) {
-            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.REFSET_RETIRE_MEMBER,
-                    BatchActionEventType.EVENT_NOOP,
-                    "member not retired (not matched): " + nidToName(collectionNid)));
-        }
-
-        return changedReferencedConcept;
+        return false; // already handled in BatchActionTaskLogicDisjoinRetireUI
     }
 }
