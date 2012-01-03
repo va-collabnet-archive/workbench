@@ -513,7 +513,7 @@ public class WorkSetDetailsPanel extends JPanel {
 							public void run() {
 								try {
 									I_ShowActivity activity =
-										Terms.get().newActivityPanel(true, config, "<html>Creting one click partition: <br>", true);
+										Terms.get().newActivityPanel(true, config, "<html>Creating one click partition: <br>", true);
 									activity.setIndeterminate(true);
 									try {
 										ActivityViewer.addActivity(activity);

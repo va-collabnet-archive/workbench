@@ -2589,7 +2589,8 @@ public class TerminologyProjectDAO {
 			WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException {
 
 		Partition newPartition = null;
-		long startTime = System.currentTimeMillis();
+		ActivityUpdater updater = new ActivityUpdater(activity, "Creating partition");
+		updater.startActivity();
 		try{
 			if(isConceptDuplicate(name  + " (partition)")){
 				JOptionPane.showMessageDialog(new JDialog(), "Duplicated partition name", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -2600,32 +2601,18 @@ public class TerminologyProjectDAO {
 			newPartition = TerminologyProjectDAO.createNewPartition(name, 
 					newPartitionScheme.getUids().iterator().next(), config);
 			List<WorkSetMember> members = workSet.getWorkSetMembers();
-			activity.setValue(0);
-			activity.setMaximum(members.size());
-			activity.setIndeterminate(false);
-			activity.setProgressInfoLower("Creating partition members...");
-			int counter = 0;
+			updater.startCount(members.size());
 			for (WorkSetMember loopMember : members) {
 				TerminologyProjectDAO.addConceptAsPartitionMember(loopMember.getConcept(), 
 						newPartition, config);
-				Thread.sleep(10);
-				counter++;
-				activity.setValue(counter);
-				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
-					long endTime = System.currentTimeMillis();
-					long elapsed = endTime - startTime;
-
-					long estimation = (activity.getMaximum() * elapsed) / counter;
-					String estimationStr = TimeHelper.getElapsedTimeString(estimation);
-					activity.setProgressInfoLower("Creating partition members: " + counter + 
-							" from " + activity.getMaximum() + " . Remaining time: " + estimationStr);
-				}
+				updater.incrementCount();
 			}
 			Terms.get().addUncommittedNoChecks(newPartition.getConcept());
 			newPartition.getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		updater.finish();
 		return newPartition;
 
 	}
@@ -3728,7 +3715,8 @@ public class TerminologyProjectDAO {
 	public static void syncWorksetWithRefsetSpec(WorkSet workSet, I_ConfigAceFrame config
 			, I_ShowActivity activity) throws Exception {
 
-		long startTime = System.currentTimeMillis();
+		ActivityUpdater updater = new ActivityUpdater(activity, "Synchronizing WorkSet");
+		updater.startActivity();
 
 		try {
 			if (!workSet.getPartitionSchemes(config).isEmpty()) {
@@ -3747,11 +3735,8 @@ public class TerminologyProjectDAO {
 
 			List<I_GetConceptData> exclusionRefsets = workSet.getExclusionRefsets();
 
-			activity.setValue(0);
-			activity.setMaximum(exclusionRefsets.size());
-			activity.setIndeterminate(false);
-			activity.setProgressInfoLower("Loading exlusions...");
-			int counter = 0;
+			updater.setTaskMessage("Processing exclusions");
+			updater.startCount(exclusionRefsets.size());
 
 			for (I_GetConceptData loopRefset : exclusionRefsets) {
 				Collection<? extends I_ExtendByRef> loopRefsetMembers  = 
@@ -3763,18 +3748,14 @@ public class TerminologyProjectDAO {
 						excludedConcepts.add(loopRefsetMember.getComponentNid());
 					}
 				}
-				counter++;
-				activity.setValue(counter);
+				updater.incrementCount();
 			}
 
 			Collection<? extends I_ExtendByRef> refsetMembers  = termFactory.getRefsetExtensionMembers(
 					refsetConc.getConceptNid());
 
-			activity.setValue(0);
-			activity.setMaximum(refsetMembers.size());
-			activity.setIndeterminate(false);
-			activity.setProgressInfoLower("Iterating source refset members");
-			counter = 0;
+			updater.startCount(refsetMembers.size());
+			updater.setTaskMessage("Iterating source refset members");
 
 			int countIncluded = 0;
 			int countExcluded = 0;
@@ -3809,27 +3790,12 @@ public class TerminologyProjectDAO {
 						countNotUnique++;
 					}
 				}
-				counter++;
-				activity.setValue(counter);
-				if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
-					long endTime = System.currentTimeMillis();
-					long elapsed = endTime - startTime;
-
-					long estimation = (activity.getMaximum() * elapsed) / counter;
-					String estimationStr = TimeHelper.getElapsedTimeString(estimation);
-
-					activity.setProgressInfoLower("Iterating source refset members: " + counter + 
-							" from " + activity.getMaximum() + " . Remaining time: " + estimationStr);
-				}
+				updater.incrementCount();
 			}
 
 			List<WorkSetMember> workSetMembers = workSet.getWorkSetMembers();
-
-			activity.setValue(0);
-			activity.setMaximum(workSetMembers.size());
-			activity.setIndeterminate(false);
-			activity.setProgressInfoLower("Checking exclusions...");
-			counter = 0;
+			updater.startCount(workSetMembers.size());
+			updater.setTaskMessage("Checking exclusions");
 
 			for (WorkSetMember loopMember : workSetMembers) {
 				if (excludedConcepts.contains(loopMember.getId())) {
@@ -3839,20 +3805,17 @@ public class TerminologyProjectDAO {
 					retireWorkSetMember(loopMember);
 					countRetired++;
 				}
-				counter++;
-				activity.setValue(counter);
+				updater.incrementCount();
 			}
-
+			updater.setTaskMessage("Incl = " + countIncluded + " , excl = " + countExcluded +
+					" , ret = " + countRetired + " , not unique = " + countNotUnique);
 			termFactory.commit();
 
-			long endTime = System.currentTimeMillis();
-			long elapsed = endTime - startTime;
-			String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-			activity.setProgressInfoLower("Elapsed: " + elapsedStr + "; incl = " + countIncluded + " , excl = " + countExcluded +
-					" , ret = " + countRetired + " , not unique = " + countNotUnique);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		updater.setTaskMessage("Synchronizing WorkSet");
+		updater.finish();
 
 
 	}
@@ -4000,9 +3963,9 @@ public class TerminologyProjectDAO {
 				0, null, partition.getUids().iterator().next());
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
-		activity.setValue(0);
-		activity.setMaximum(partitionMembers.size());
-		activity.setIndeterminate(false);
+		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
+		updater.startActivity();
+		updater.startCount(partitionMembers.size());
 		for (PartitionMember partitionMember: partitionMembers) {
 			Thread.sleep(1);
 			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
@@ -4020,7 +3983,6 @@ public class TerminologyProjectDAO {
 			workList = createNewWorkList(workList, config);
 			if(workList != null){
 				WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
-				int counter = 0;
 				for (WorkListMember workListMember: workListMembers) {
 					Thread.sleep(1);
 					workListMember.setWorkListUUID(workList.getUids().iterator().next());
@@ -4043,18 +4005,7 @@ public class TerminologyProjectDAO {
 					addConceptAsWorkListMember(workListMember, 
 							Terms.get().uuidToNative(instance.getDestination().getId()),
 							config);
-					counter++;
-					activity.setValue(counter);
-					if (counter < 100 || counter % 100 == 0 || counter > (activity.getMaximum() - 100)) {
-						long endTime = System.currentTimeMillis();
-						long elapsed = endTime - startTime;
-
-						long estimation = (activity.getMaximum() * elapsed) / counter;
-						String estimationStr = TimeHelper.getElapsedTimeString(estimation);
-
-						activity.setProgressInfoLower("Processed: " + counter + " from " + 
-								activity.getMaximum() + " . Remaining time: " + estimationStr);
-					}
+					updater.incrementCount();
 				}
 			}
 		}
@@ -4062,7 +4013,7 @@ public class TerminologyProjectDAO {
 		Terms.get().commit();
 
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
-
+		updater.finish();
 		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);
 
 		return workList;
