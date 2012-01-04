@@ -287,7 +287,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<LongRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartLong.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartLong<LongRevision> another = (I_ExtendByRefPartLong<LongRevision>) o;
 

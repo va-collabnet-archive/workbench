@@ -8,15 +8,12 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidFloat.CidFloatMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -339,7 +336,7 @@ public class CidIntMember extends RefsetMember<CidIntRevision, CidIntMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidIntRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartCidInt.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartCidInt<CidIntRevision> another = (I_ExtendByRefPartCidInt<CidIntRevision>) o;
 

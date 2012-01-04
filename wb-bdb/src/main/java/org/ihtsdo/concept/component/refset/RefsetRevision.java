@@ -68,7 +68,7 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
     protected abstract void addSpecProperties(RefexCAB rcs);
 
     @Override
-    public final int compareTo(I_ExtendByRefPart<V> o) {
+    public final int compareTo(RefexVersionBI o) {
         return this.toString().compareTo(o.toString());
     }
 

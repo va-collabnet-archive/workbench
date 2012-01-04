@@ -18,7 +18,7 @@ import java.util.UUID;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 
 public interface RefexVersionBI<A extends RefexAnalogBI<A>>
-        extends ComponentVersionBI, RefexChronicleBI<A>, AnalogGeneratorBI<A> {
+        extends ComponentVersionBI, RefexChronicleBI<A>, AnalogGeneratorBI<A>, Comparable<RefexVersionBI<A>> {
 
     @Override
     RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException;
@@ -28,4 +28,6 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
             throws ContradictionException, IOException;
 
     boolean refexFieldsEqual(RefexVersionBI another);
+    
+    
 }

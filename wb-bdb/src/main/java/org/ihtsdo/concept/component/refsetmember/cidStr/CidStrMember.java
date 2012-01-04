@@ -330,7 +330,7 @@ public class CidStrMember extends RefsetMember<CidStrRevision, CidStrMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidStrRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartCidString.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartCidString<CidStrRevision> another =
                (I_ExtendByRefPartCidString<CidStrRevision>) o;

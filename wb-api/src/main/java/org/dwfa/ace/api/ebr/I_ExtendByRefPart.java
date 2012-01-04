@@ -27,7 +27,7 @@ import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 public interface I_ExtendByRefPart<T extends RefexAnalogBI<T>> 
-        extends Comparable<I_ExtendByRefPart<T>>, I_AmPart<T>, RefexVersionBI<T> {
+        extends I_AmPart<T>, RefexVersionBI<T> {
 
     /**
      * @deprecated Use {@link #getStatusNid()}

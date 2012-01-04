@@ -253,7 +253,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<MembershipRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          return super.compareTo(o);
       }
 

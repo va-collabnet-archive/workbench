@@ -289,9 +289,8 @@ public class BooleanMember extends RefsetMember<BooleanRevision, BooleanMember>
         }
 
         //~--- methods ----------------------------------------------------------
-        @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
-        public int compareTo(I_ExtendByRefPart o) {
+        public int compareTo(RefexVersionBI o) {
             if (I_ExtendByRefPartBoolean.class.isAssignableFrom(o.getClass())) {
                 I_ExtendByRefPartBoolean another = (I_ExtendByRefPartBoolean) o;
 

@@ -6,10 +6,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -28,7 +26,6 @@ import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid_cnid.RefexCnidCnidCnidVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -378,7 +375,7 @@ public class CidCidCidMember extends RefsetMember<CidCidCidRevision, CidCidCidMe
 
         //~--- methods ----------------------------------------------------------
         @Override
-        public int compareTo(I_ExtendByRefPart<CidCidCidRevision> o) {
+        public int compareTo(RefexVersionBI o) {
             if (I_ExtendByRefPartCidCidCid.class.isAssignableFrom(o.getClass())) {
                 I_ExtendByRefPartCidCidCid<CidCidCidRevision> another =
                         (I_ExtendByRefPartCidCidCid<CidCidCidRevision>) o;

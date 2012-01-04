@@ -21,7 +21,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 import org.apache.commons.collections.primitives.ArrayIntList;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
@@ -45,7 +44,7 @@ import org.ihtsdo.tk.hash.Hashcode;
  * @author kec
  */
 public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>
-        implements RefexArrayOfBytearrayAnalogBI<ArrayOfBytearrayRevision>, Comparable<RefsetMember> {
+        implements RefexArrayOfBytearrayAnalogBI<ArrayOfBytearrayRevision> {
 
     private static VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version> computer =
             new VersionComputer<RefsetMember<ArrayOfBytearrayRevision, ArrayOfBytearrayMember>.Version>();
@@ -91,16 +90,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
     protected void addRefsetTypeNids(Set<Integer> allNids) {
         // ;
     }
-    
-    @Override
-    public final int compareTo(RefsetMember o) {
-        if (getNid() != o.getNid()) {
-            return getNid() - o.getNid();
-        }
-
-        return this.getSapNid() - o.getSapNid();
-    }
-
+ 
     @Override
     protected void addSpecProperties(RefexCAB rcs) {
         rcs.with(RefexCAB.RefexProperty.ARRAY_BYTEARRAY, arrayOfByteArray);
@@ -299,7 +289,7 @@ public class ArrayOfBytearrayMember extends RefsetMember<ArrayOfBytearrayRevisio
         //~--- methods ----------------------------------------------------------
         @SuppressWarnings({"rawtypes", "unchecked"})
         @Override
-        public int compareTo(I_ExtendByRefPart o) {
+        public int compareTo(RefexVersionBI o) {
             if (RefexArrayOfBytearrayVersionBI.class.isAssignableFrom(o.getClass())) {
                 RefexArrayOfBytearrayVersionBI another = (RefexArrayOfBytearrayVersionBI) o;
 

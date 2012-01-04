@@ -27,8 +27,6 @@ import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefset;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
-import org.ihtsdo.etypes.ERefsetMemberMember;
-import org.ihtsdo.etypes.ERefsetRevision;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
@@ -55,7 +53,6 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
@@ -138,7 +135,8 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         clearAnnotationVersions();
     }
 
-    public final int compareTo(I_ExtendByRefPart<R> o) {
+    @Override
+    public final int compareTo(RefexVersionBI o) {
         if (getNid() != o.getNid()) {
             return getNid() - o.getNid();
         }
@@ -659,7 +657,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public int compareTo(I_ExtendByRefPart<R> o) {
+        public int compareTo(RefexVersionBI o) {
             if (this.getNid() != o.getNid()) {
                 return this.getNid() - o.getNid();
             }

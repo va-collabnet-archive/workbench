@@ -7,7 +7,6 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
@@ -381,7 +380,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidCidStrRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartCidCidString.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartCidCidString<CidCidStrRevision> another =
                (I_ExtendByRefPartCidCidString<CidCidStrRevision>) o;

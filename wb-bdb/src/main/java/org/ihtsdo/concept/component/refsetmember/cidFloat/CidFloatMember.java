@@ -13,7 +13,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidFloat;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.concept.component.refset.RefsetMember;
-import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntRevision;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
@@ -343,7 +342,7 @@ public class CidFloatMember extends RefsetMember<CidFloatRevision, CidFloatMembe
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidFloatRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (this.getCnid1() != ((Version) o).getCnid1()) {
             return this.getCnid1() - ((Version) o).getCnid1();
          }

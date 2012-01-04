@@ -8,7 +8,6 @@ import com.sleepycat.bind.tuple.TupleOutput;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 
@@ -287,7 +286,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<IntRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartInt.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartInt<IntRevision> another = (I_ExtendByRefPartInt<IntRevision>) o;
 

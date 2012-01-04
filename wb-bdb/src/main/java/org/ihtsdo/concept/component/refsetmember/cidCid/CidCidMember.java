@@ -7,10 +7,8 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
@@ -28,7 +26,6 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid_cnid.RefexCnidCnidAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cidcid.TkRefsetCidCidRevision;
 import org.ihtsdo.tk.hash.Hashcode;
@@ -341,7 +338,7 @@ public class CidCidMember extends RefsetMember<CidCidRevision, CidCidMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidCidRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartCidCid.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartCidCid<CidCidRevision> another = (I_ExtendByRefPartCidCid<CidCidRevision>) o;
 

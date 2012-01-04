@@ -29,7 +29,6 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.dto.concept.component.refset.TkRefsetAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refset.cid.TkRefsetCidMember;
@@ -319,7 +318,7 @@ public class CidMember extends RefsetMember<CidRevision, CidMember>
       //~--- methods ----------------------------------------------------------
 
       @Override
-      public int compareTo(I_ExtendByRefPart<CidRevision> o) {
+      public int compareTo(RefexVersionBI o) {
          if (I_ExtendByRefPartCid.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartCid<CidRevision> another = (I_ExtendByRefPartCid<CidRevision>) o;
 
