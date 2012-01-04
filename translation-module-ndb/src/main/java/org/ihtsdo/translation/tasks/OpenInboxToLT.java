@@ -38,6 +38,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.translation.ui.InboxPanel;
+import org.ihtsdo.translation.ui.WfInboxPanel;
 
 /**
  * The Class OpenTranslationForSelectedConcept.
@@ -142,7 +143,7 @@ public class OpenInboxToLT extends AbstractTask {
 					}
 				}
 //				Worker nWorker=new MasterWorker(worker.getJiniConfig());
-		        InboxPanel uiPanel = new InboxPanel(worker,config.getUsername() + ".inbox",new SelectAll());
+		        WfInboxPanel uiPanel = new WfInboxPanel();
 			
 		        tp.addTab(TranslationHelperPanel.TRANSLATION_LEFT_MENU, uiPanel);
 				tp.setSelectedIndex(tabCount);

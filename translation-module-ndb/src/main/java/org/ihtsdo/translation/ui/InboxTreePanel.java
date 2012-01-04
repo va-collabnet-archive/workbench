@@ -8,8 +8,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -17,11 +15,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -42,21 +40,20 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.util.IconUtilities;
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagChange;
 import org.ihtsdo.project.workflow.tag.TagManager;
 
 /**
  * @author Vahram Manukyan
  */
-public class InboxTreePanel extends JPanel {
+public class InboxTreePanel extends JPanel implements Observer {
 	public static final String INBOX_ITEM_SELECTED = "inboxItem";
 	private static final long serialVersionUID = 2726469814051803842L;
 	private DefaultTreeModel model;
-	private WfComponentProvider provider;
 	private WorkflowSearcher searcher;
 	private I_ConfigAceFrame config;
 	private Object inboxItem;
@@ -70,40 +67,10 @@ public class InboxTreePanel extends JPanel {
 
 		// Tag Manager initialization
 		tagManager = TagManager.getInstance();
-		tagManager.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				InboxTag newTag = (InboxTag)evt.getNewValue();
-				if (evt.getPropertyName().equals(TagManager.NEW_TAG_ADDED)) {
-					InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag,newTag.getUuidList().size());
-					DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem );
-					cNode.add(chldNode);
-					model.reload(cNode);
-					model.reload(chldNode);
-				}else if(evt.getPropertyName().equals(TagManager.ITEM_TAGGED) || evt.getPropertyName().equals(TagManager.SPECIAL_TAG_ADDED)){
-					int childCount = cNode.getChildCount();
-					for (int i = 0; i < childCount; i++){
-						DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
-						InboxTreeItem treeItem = (InboxTreeItem)child.getUserObject();
-						InboxTag tag = (InboxTag) treeItem.getUserObject();
-						if(tag.equals(newTag)){
-							if(!newTag.getUuidList().isEmpty()){
-								treeItem.setItemSize(newTag.getUuidList().size());
-								child.setUserObject(treeItem);
-							}else{
-								model.removeNodeFromParent(child);
-							}
-							break;
-						}
-						model.reload(cNode);
-						model.reload(child);
-					}
-				}
-			}
-		});
+		tagManager.addObserver(this);
+
 		inboxFolderTree.setRootVisible(false);
 		inboxFolderTree.setShowsRootHandles(false);
-		provider = new WfComponentProvider();
 		searcher = new WorkflowSearcher();
 		try {
 			I_TermFactory tf = Terms.get();
@@ -119,15 +86,6 @@ public class InboxTreePanel extends JPanel {
 			user = config.getDbConfig().getUserConcept();
 		}
 		updateTree();
-		updateDestinationCombo();
-	}
-
-	private void updateDestinationCombo() {
-		List<WfUser> users = provider.getUsers();
-		userCombo.addItem("");
-		for (WfUser wfUser : users) {
-			userCombo.addItem(wfUser);
-		}
 	}
 
 	public void setInboxItem(Object newInboxItem) {
@@ -161,7 +119,7 @@ public class InboxTreePanel extends JPanel {
 		inboxFolderTree.expandRow(1);
 
 		model.reload();
-		updateWorkflowNodes(wNode, sNode,cNode);
+		updateWorkflowNodes(wNode, sNode, cNode);
 	}
 
 	private void updateWorkflowNodes(DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode) {
@@ -169,7 +127,7 @@ public class InboxTreePanel extends JPanel {
 			worklistItemsWorker.cancel(true);
 			worklistItemsWorker = null;
 		}
-		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode,cNode, config, searcher, model, user);
+		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode, cNode, config, searcher, model, user);
 		worklistItemsWorker.addPropertyChangeListener(new ProgressListener(progressBar));
 		worklistItemsWorker.execute();
 	}
@@ -191,51 +149,19 @@ public class InboxTreePanel extends JPanel {
 		}
 	}
 
-	private void userComboItemStateChanged(ItemEvent e) {
-		if (e.getStateChange() == ItemEvent.SELECTED) {
-			Object item = e.getItem();
-			if (item instanceof WfUser) {
-				WfUser wfUser = (WfUser) item;
-				try {
-					user = Terms.get().getConcept(wfUser.getId());
-				} catch (TerminologyException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-				updateTree();
-			}
-		}
-	}
-
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
-		label1 = new JLabel();
-		userCombo = new JComboBox();
 		scrollPane1 = new JScrollPane();
 		inboxFolderTree = new JTree();
 		progressBar = new JProgressBar();
 
 		// ======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 1.0E-4 };
-
-		// ---- label1 ----
-		label1.setText("Users");
-		add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-
-		// ---- userCombo ----
-		userCombo.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				userComboItemStateChanged(e);
-			}
-		});
-		add(userCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0E-4 };
 
 		// ======== scrollPane1 ========
 		{
@@ -249,19 +175,17 @@ public class InboxTreePanel extends JPanel {
 			});
 			scrollPane1.setViewportView(inboxFolderTree);
 		}
-		add(scrollPane1, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 		// ---- progressBar ----
 		progressBar.setIndeterminate(true);
 		progressBar.setVisible(false);
-		add(progressBar, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(progressBar, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
-	private JLabel label1;
-	private JComboBox userCombo;
 	private JScrollPane scrollPane1;
 	private JTree inboxFolderTree;
 	private JProgressBar progressBar;
@@ -274,6 +198,75 @@ public class InboxTreePanel extends JPanel {
 	public void setTreeMouseListener() {
 		// InboxTreeMouselistener inboxTreeMouselistener) {
 		// this.tree1.addMouseListener(inboxTreeMouselistener);
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		TagChange change = (TagChange) arg;
+		InboxTag newTag = change.getTag();
+		if (change.getType().equals(TagChange.NEW_TAG_ADDED)) {
+			InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size());
+			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+			cNode.add(chldNode);
+			model.reload(cNode);
+			model.reload(chldNode);
+		} else if (change.getType().equals(TagChange.ITEM_TAGGED)) {
+			int childCount = cNode.getChildCount();
+			for (int i = 0; i < childCount; i++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+				InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+				InboxTag tag = (InboxTag) treeItem.getUserObject();
+				if (tag.equals(newTag)) {
+					if (!newTag.getUuidList().isEmpty()) {
+						treeItem.setItemSize(newTag.getUuidList().size());
+						treeItem.setUserObject(newTag);
+						child.setUserObject(treeItem);
+					} else {
+						model.removeNodeFromParent(child);
+					}
+					model.reload(cNode);
+					model.reload(child);
+					break;
+				}
+			}
+		} else if (change.getType().equals(TagChange.SPECIAL_TAG_ADDED)) {
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
+			int childCount = root.getChildCount();
+			for (int i = 0; i < childCount; i++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+				if (child.getUserObject() instanceof InboxTreeItem) {
+					InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+					InboxTag tag = (InboxTag) treeItem.getUserObject();
+					if (tag.equals(newTag)) {
+						treeItem.setItemSize(newTag.getUuidList().size());
+						treeItem.setUserObject(newTag);
+						child.setUserObject(treeItem);
+						model.reload(root);
+						model.reload(child);
+						break;
+					}
+				}
+			}
+		} else if (change.getType().equals(TagChange.TAG_REMOVED)) {
+			int childCount = cNode.getChildCount();
+			for (int i = 0; i < childCount; i++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+				InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+				InboxTag tag = (InboxTag) treeItem.getUserObject();
+				if (tag.equals(newTag)) {
+					if (newTag.getUuidList().isEmpty()) {
+						cNode.remove(child);
+						model.reload(cNode);
+					} else {
+						treeItem.setItemSize(newTag.getUuidList().size());
+						treeItem.setUserObject(newTag);
+						child.setUserObject(treeItem);
+						model.reload(child);
+					}
+					break;
+				}
+			}
+		}
 	}
 
 }
@@ -362,8 +355,8 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	private I_GetConceptData user;
 	private JTree inboxFolderTreee;
 
-	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode, I_ConfigAceFrame config, WorkflowSearcher searcher, DefaultTreeModel model,
-			I_GetConceptData user) {
+	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode, I_ConfigAceFrame config, WorkflowSearcher searcher,
+			DefaultTreeModel model, I_GetConceptData user) {
 		super();
 		this.wNode = wNode;
 		this.sNode = sNode;
@@ -389,7 +382,6 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	}
 
 	private void getTags() {
-
 		TagManager tm = TagManager.getInstance();
 		List<InboxTag> tagsContent = new ArrayList<InboxTag>();
 		try {
@@ -422,9 +414,8 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 
 	@Override
 	public void done() {
-		List<InboxTreeItem> inboxItems = null;
 		try {
-			inboxItems = get();
+			get();
 
 			TreeNode[] path = wNode.getPath();
 			inboxFolderTreee.expandPath(new TreePath(path));
@@ -448,8 +439,16 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 					wNode.add(chldNode);
 				} else if (inboxTreeItem.getUserObject() instanceof WfState) {
 					sNode.add(chldNode);
-				}else if(inboxTreeItem.getUserObject() instanceof InboxTag){
-					cNode.add(chldNode);
+				} else if (inboxTreeItem.getUserObject() instanceof InboxTag) {
+					InboxTag tag = (InboxTag) inboxTreeItem.getUserObject();
+					if (tag.getTagName().equals("outbox") || tag.getTagName().equals("todo")) {
+						DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
+						root.add(chldNode);
+						model.reload(root);
+						model.reload(chldNode);
+					} else {
+						cNode.add(chldNode);
+					}
 				}
 				model.reload(wNode);
 				model.reload(sNode);
@@ -462,6 +461,7 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 
 class ProgressListener implements PropertyChangeListener {
 	// Prevent creation without providing a progress bar.
+	@SuppressWarnings("unused")
 	private ProgressListener() {
 	}
 

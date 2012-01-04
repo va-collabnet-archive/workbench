@@ -12,7 +12,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.translation.ui.config.TranslatorDefaultEditorModePanel;
 
-public class ConfigTranslationModule  implements Serializable{
+public class ConfigTranslationModule implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private boolean autoOpenNextInboxItem;
@@ -32,27 +32,26 @@ public class ConfigTranslationModule  implements Serializable{
 	private IcsGenerationStrategy selectedIcsGenerationStrategy;
 	private List<UUID> projectIssuesRepositoryIds;
 	private List<UUID> sourceIssuesRepositoryIds;
-	
-	
+
 	public ConfigTranslationModule() {
 		super();
 		this.autoOpenNextInboxItem = true;
 		this.enableSpellChecker = true;
-		
+
 		LinkedHashSet<TreeComponent> treeComponentsPreference = new LinkedHashSet<TreeComponent>();
 		treeComponentsPreference.add(TreeComponent.FSN);
 		treeComponentsPreference.add(TreeComponent.PREFERRED);
 		treeComponentsPreference.add(TreeComponent.SYNONYM);
-		
+
 		this.sourceTreeComponents = treeComponentsPreference;
 		this.targetTreeComponents = treeComponentsPreference;
-		
+
 		this.selectedEditorMode = EditorMode.PREFERRED_TERM_EDITOR;
 		this.editingPanelOpenMode = EditingPanelOpenMode.FSN_TERM_MODE;
 		this.defaultSimilaritySearchOption = DefaultSimilaritySearchOption.FSN;
 		this.selectedFsnGenStrategy = FsnGenerationStrategy.COPY_SOURCE_LANGUAGE;
 		this.selectedIcsGenerationStrategy = IcsGenerationStrategy.NONE;
-		
+
 		LinkedHashSet<InboxColumn> columns = new LinkedHashSet<InboxColumn>();
 		columns.add(InboxColumn.SOURCE_PREFERRED);
 		columns.add(InboxColumn.STATUS);
@@ -68,14 +67,11 @@ public class ConfigTranslationModule  implements Serializable{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	public enum FsnGenerationStrategy implements Serializable{
-		NONE("None"), 
-		SAME_AS_PREFERRED("Same as preferred"), 
-		COPY_SOURCE_LANGUAGE("Copy source language"),
-		LINK_SOURCE_LANGUAGE("Link source language");
+	public enum FsnGenerationStrategy implements Serializable {
+		NONE("None"), SAME_AS_PREFERRED("Same as preferred"), COPY_SOURCE_LANGUAGE("Copy source language"), LINK_SOURCE_LANGUAGE("Link source language");
 
 		private final String name;
 
@@ -88,28 +84,24 @@ public class ConfigTranslationModule  implements Serializable{
 		}
 
 	}
-	
-	public enum DefaultSimilaritySearchOption implements Serializable{
-		FSN("FSN"), 
-		PREFERRED("Preferred"), 
-		BOTH("Both");
-		
+
+	public enum DefaultSimilaritySearchOption implements Serializable {
+		FSN("FSN"), PREFERRED("Preferred"), BOTH("Both");
+
 		private final String name;
-		
+
 		private DefaultSimilaritySearchOption(String name) {
 			this.name = name;
 		}
-		
+
 		public String toString() {
 			return this.name;
 		}
-		
+
 	}
-	
-	public enum IcsGenerationStrategy implements Serializable{
-		NONE("None"), 
-		COPY_FROM_SOURCE("Copy from source"), 
-		WORDS_LIST("Words list");
+
+	public enum IcsGenerationStrategy implements Serializable {
+		NONE("None"), COPY_FROM_SOURCE("Copy from source"), WORDS_LIST("Words list");
 
 		private final String name;
 
@@ -122,11 +114,10 @@ public class ConfigTranslationModule  implements Serializable{
 		}
 
 	}
-	
-	public enum EditingPanelOpenMode implements Serializable{
-		FSN_TERM_MODE("FSN term mode"),
-		PREFFERD_TERM_MODE("Prefferd term mode");
-		
+
+	public enum EditingPanelOpenMode implements Serializable {
+		FSN_TERM_MODE("FSN term mode"), PREFFERD_TERM_MODE("Prefferd term mode");
+
 		private final String name;
 
 		private EditingPanelOpenMode(String name) {
@@ -138,12 +129,8 @@ public class ConfigTranslationModule  implements Serializable{
 		}
 	}
 
-	public enum EditorMode implements Serializable{
-		FULL_EDITOR("Full editor"), 
-		PREFERRED_TERM_EDITOR("Preferred term editor"), 
-		SYNONYMS_EDITOR("Synonyms editor"),
-		READ_ONLY("Read only");
-		
+	public enum EditorMode implements Serializable {
+		FULL_EDITOR("Full editor"), PREFERRED_TERM_EDITOR("Preferred term editor"), SYNONYMS_EDITOR("Synonyms editor"), READ_ONLY("Read only");
 
 		private final String name;
 
@@ -157,10 +144,8 @@ public class ConfigTranslationModule  implements Serializable{
 
 	}
 
-	public enum PreferredTermDefault implements Serializable{
-		BLANK("Blank"), 
-		SOURCE("Source"), 
-		BEST_SIMILARITY_MATCH("Best similarity match");
+	public enum PreferredTermDefault implements Serializable {
+		BLANK("Blank"), SOURCE("Source"), BEST_SIMILARITY_MATCH("Best similarity match");
 
 		private final String name;
 
@@ -174,12 +159,8 @@ public class ConfigTranslationModule  implements Serializable{
 
 	}
 
-	public enum TreeComponent implements Serializable{
-		FSN("Fully Specified Name"), 
-		PREFERRED("Preferred"), 
-		SYNONYM("Synonym"),
-		RETIRED("Retired descriptions"),
-		AUTHOR_PATH("Author path");
+	public enum TreeComponent implements Serializable {
+		FSN("Fully Specified Name"), PREFERRED("Preferred"), SYNONYM("Synonym"), RETIRED("Retired descriptions"), AUTHOR_PATH("Author path");
 
 		private final String name;
 
@@ -194,20 +175,29 @@ public class ConfigTranslationModule  implements Serializable{
 	}
 
 	public enum InboxColumn implements Serializable {
-		SOURCE_PREFERRED(String.class,"Source preferred term"),
-		TARGET_PREFERRED(String.class,"Target preferred term"),
-		TARGET_FSN(String.class,"Target FSN term"),
-		STATUS(String.class,"Status"),
-		STATUS_DATE(String.class,"Date");
+		SOURCE_PREFERRED(String.class, "Source preferred",0), 
+		TARGET_PREFERRED(String.class, "Target preferred",2), 
+		TARGET_FSN(String.class, "Target FSN",3), 
+		WORKLIST(String.class, "Worklist",4), 
+		DESTINATION(String.class, "Destination",5), 
+		STATUS(String.class, "Status",6),
+		STATUS_DATE(String.class,"Date",7);
 
 		private final Class editorClass;
 		private final String columnName;
-		InboxColumn(Class editorClass,String columnName) {
+		private final Integer columnNumber;
+
+		InboxColumn(Class editorClass, String columnName, Integer columnNumber) {
 			this.editorClass = editorClass;
-			this.columnName=columnName;
+			this.columnName = columnName;
+			this.columnNumber = columnNumber;
 		}
 
-		public String getColumnName(){
+		public Integer getColumnNumber() {
+			return columnNumber;
+		}
+
+		public String getColumnName() {
 			return columnName;
 		}
 
@@ -216,7 +206,7 @@ public class ConfigTranslationModule  implements Serializable{
 		}
 
 	}
-	
+
 	public boolean isEnableSpellChecker() {
 		return enableSpellChecker;
 	}
@@ -228,61 +218,56 @@ public class ConfigTranslationModule  implements Serializable{
 	public boolean isAutoOpenNextInboxItem() {
 		return autoOpenNextInboxItem;
 	}
-	
+
 	public void setAutoOpenNextInboxItem(boolean autoOpenNextInboxItem) {
 		this.autoOpenNextInboxItem = autoOpenNextInboxItem;
 	}
-	
+
 	public LinkedHashSet<TreeComponent> getSourceTreeComponents() {
 		return sourceTreeComponents;
 	}
-	
-	public void setSourceTreeComponents(
-			LinkedHashSet<TreeComponent> sourceTreeComponents) {
+
+	public void setSourceTreeComponents(LinkedHashSet<TreeComponent> sourceTreeComponents) {
 		this.sourceTreeComponents = sourceTreeComponents;
 	}
-	
+
 	public LinkedHashSet<TreeComponent> getTargetTreeComponents() {
 		return targetTreeComponents;
 	}
-	
-	public void setTargetTreeComponents(
-			LinkedHashSet<TreeComponent> targetTreeComponents) {
+
+	public void setTargetTreeComponents(LinkedHashSet<TreeComponent> targetTreeComponents) {
 		this.targetTreeComponents = targetTreeComponents;
 	}
-	
+
 	public LinkedHashSet<InboxColumn> getColumnsDisplayedInInbox() {
 		return ColumnsDisplayedInInbox;
 	}
-	
-	public void setColumnsDisplayedInInbox(
-			LinkedHashSet<InboxColumn> columnsDisplayedInInbox) {
+
+	public void setColumnsDisplayedInInbox(LinkedHashSet<InboxColumn> columnsDisplayedInInbox) {
 		ColumnsDisplayedInInbox = columnsDisplayedInInbox;
 	}
-	
+
 	public EditorMode getSelectedEditorMode() {
 		return selectedEditorMode;
 	}
-	
+
 	public void setSelectedEditorMode(EditorMode selectedEditorMode) {
 		this.selectedEditorMode = selectedEditorMode;
 	}
-	
+
 	public PreferredTermDefault getSelectedPrefTermDefault() {
 		return selectedPrefTermDefault;
 	}
-	
-	public void setSelectedPrefTermDefault(
-			PreferredTermDefault selectedPrefTermDefault) {
+
+	public void setSelectedPrefTermDefault(PreferredTermDefault selectedPrefTermDefault) {
 		this.selectedPrefTermDefault = selectedPrefTermDefault;
 	}
-	
+
 	public FsnGenerationStrategy getSelectedFsnGenStrategy() {
 		return selectedFsnGenStrategy;
 	}
-	
-	public void setSelectedFsnGenStrategy(
-			FsnGenerationStrategy selectedFsnGenStrategy) {
+
+	public void setSelectedFsnGenStrategy(FsnGenerationStrategy selectedFsnGenStrategy) {
 		this.selectedFsnGenStrategy = selectedFsnGenStrategy;
 	}
 
@@ -290,8 +275,7 @@ public class ConfigTranslationModule  implements Serializable{
 		return selectedIcsGenerationStrategy;
 	}
 
-	public void setSelectedIcsGenerationStrategy(
-			IcsGenerationStrategy selectedIcsGenerationStrategy) {
+	public void setSelectedIcsGenerationStrategy(IcsGenerationStrategy selectedIcsGenerationStrategy) {
 		this.selectedIcsGenerationStrategy = selectedIcsGenerationStrategy;
 	}
 
@@ -342,5 +326,5 @@ public class ConfigTranslationModule  implements Serializable{
 	public EditingPanelOpenMode getEditingPanelOpenMode() {
 		return editingPanelOpenMode;
 	}
-	
+
 }

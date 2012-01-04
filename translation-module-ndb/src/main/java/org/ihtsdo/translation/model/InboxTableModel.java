@@ -38,16 +38,26 @@ public class InboxTableModel extends DefaultTableModel {
 	public static final Integer WORKFLOW_ITEM = 5;
 
 	private static String[] columnNames = { "Component", "Target", "Worklist", "Destination", "State", "wf item" };
+
+	private int columnCount = columnNames.length - 1;
 	private LinkedList<Object[]> data = new LinkedList<Object[]>();
 	private WorkflowSearcher searcher;
 	private I_TermFactory tf;
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
-
+	
 	private InboxWorker inboxWorker;
 
 	public InboxTag getTagByUuid(String uuid){
 		return tagCache.get(uuid);
+	}
+	
+	public void addTagToCache(String uuid, InboxTag tag){
+		tagCache.put(uuid, tag);
+	}
+	
+	public void removeTagFromCache(String uuid){
+		tagCache.remove(uuid);
 	}
 	
 	public InboxTableModel(JProgressBar pBar) {
@@ -104,8 +114,17 @@ public class InboxTableModel extends DefaultTableModel {
 		return morePages;
 	}
 
+	public int getRealColumnSize(){
+		return columnNames.length-1;
+	}
+	
 	public int getColumnCount() {
-		return columnNames.length - 1;
+		return columnCount;
+	}
+	
+	@Override
+	public void setColumnCount(int columnCount) {
+		this.columnCount =  columnCount;
 	}
 
 	public int getRowCount() {
@@ -221,7 +240,7 @@ public class InboxTableModel extends DefaultTableModel {
 						if (tags != null) {
 							for (InboxTag tag : tags) {
 								if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
-									tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor());
+									tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(),tag.getTextColor());
 									tagCache.put(wfInstance.getComponentId().toString(), tag);
 									break;
 								}
