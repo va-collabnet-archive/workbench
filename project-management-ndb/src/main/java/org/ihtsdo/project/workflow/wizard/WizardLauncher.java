@@ -31,14 +31,11 @@ public class WizardLauncher {
 		WorkflowDefinitionSelection wds = new WorkflowDefinitionSelection();
 		wds.setKey("WDS");
 		panels[1]=wds;
-		DataCollectorFromList uc=new DataCollectorFromList();
-		uc.setLabel("Set Users for Role: " );
-		uc.setColumNames(new String[]{"Selected","Default","User"} );
-
+		DataGridCollectorFromList uc=new DataGridCollectorFromList();
 		panels[2]=uc;
 		WizardFrame ww=new WizardFrame(panels, resultWizard,notifier);
 		ww.setModalityType(ModalityType.APPLICATION_MODAL);
-		ww.setSize(500,300);
+		ww.setSize(1000,600);
 		ww.setPanel(0);
 		ww.setVisible(true);
 		
@@ -69,13 +66,7 @@ public class WizardLauncher {
 		WorkflowDefinitionSelection wds = new WorkflowDefinitionSelection();
 		wds.setKey("WDS");
 		panels[1]=wds;
-		DataCollectorFromList uc=new DataCollectorFromList();
-		uc.setColumNames(new String[]{"Selected","Default","User"} );
-		List<Object> ojs=new ArrayList<Object>();
-		for(WfUser user:users){
-		ojs.add(user);
-		}
-		uc.loadObjects(ojs);
+		DataGridCollectorFromList uc=new DataGridCollectorFromList();
 		panels[2]=uc;
 		WizardFrame ww=new WizardFrame(panels, resultWizard,notifier);
 		ww.setSize(500,300);
@@ -107,27 +98,16 @@ public class WizardLauncher {
 				WorkflowDefinition wd=WorkflowDefinitionManager.readWfDefinition(wdff.getName());
 				List<WfRole> roles = wd.getRoles();
 				I_fastWizard[] panels = wizardFrame.getPanels();
-				int countPanel=2 + roles.size();
 				int panelnr=0;
-				I_fastWizard[] newPanels = new I_fastWizard[countPanel];
+				I_fastWizard[] newPanels = new I_fastWizard[3];
 				newPanels[panelnr]=panels[0];
 				panelnr++;
 				newPanels[panelnr]=panels[1];
 				panelnr++;
-				for (WfRole role:roles){
-					DataCollectorFromList uc=new DataCollectorFromList();
-					uc.setLabel("Set Users for Role: " + role.getName());
-					uc.setColumNames(new String[]{"Selected","Default","User"} );
-					uc.setKey(role.getName());
-
-					List<Object> ojs=new ArrayList<Object>();
-					for (WfUser user: users){
-						ojs.add(user);
-					}
-					uc.loadObjects(ojs);
-					newPanels[panelnr]=uc;
-					panelnr++;
-				}
+					DataGridCollectorFromList uc=new DataGridCollectorFromList(roles,users);
+					uc.setLabel("Set Users for Roles:");
+					uc.setKey("roles");
+					newPanels[panelnr++]=uc;
 				wizardFrame.setPanels(newPanels);
 			}
 

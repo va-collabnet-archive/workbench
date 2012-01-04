@@ -246,6 +246,8 @@ public class PartitionDetailsPanel extends JPanel {
 		List<WfRole> roles = null;
 		noName = "no name " + UUID.randomUUID().toString();
 		workflowDefinition = null;
+		final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
+		
 		for (String key : hsRes.keySet()) {
 			Object val = hsRes.get(key);
 			if (key.equals("WDS")) {
@@ -257,22 +259,37 @@ public class PartitionDetailsPanel extends JPanel {
 			if (key.equals("WORKLIST_NAME")) {
 				noName = (String) val;
 			}
-		}
-		final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
-		for (WfRole role : roles) {
-			DefaultTableModel model = (DefaultTableModel) hsRes.get(role.getName());
-
-			for (int i = 0; i < model.getRowCount(); i++) {
-				Boolean sel = (Boolean) model.getValueAt(i, 0);
-				if (sel) {
-					Boolean def = (Boolean) model.getValueAt(i, 1);
-					WfUser user = (WfUser) model.getValueAt(i, 2);
-					WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
-					workflowUserRoles.add(workflowUserRole);
+			if (key.equals("roles")) {
+				roles= wcp.getRoles();
+				users= wcp.getUsers();
+				DefaultTableModel model = (DefaultTableModel) hsRes.get(key);
+				for (int j=1; j<model.getColumnCount();j+=2){
+					WfRole role=null;
+					for (WfRole wfRole : roles) {
+						if(wfRole.getName().equals(model.getColumnName(j))){
+							role=wfRole;
+							break;
+						}
+					}
+					for (int i = 0; i < model.getRowCount(); i++) {
+						Boolean sel = (Boolean) model.getValueAt(i, j);
+						if (sel) {
+							Boolean def = (Boolean) model.getValueAt(i, j+1);
+							WfUser user= null; 
+							for (WfUser wfUser : users) {
+								if(wfUser.getId().equals(((WfUser)model.getValueAt(i, 0)).getId())){
+									user=wfUser;
+									break;
+								}
+							}
+							WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
+							workflowUserRoles.add(workflowUserRole);
+						}
+					}
 				}
 			}
 		}
-
+		
 		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
 		activity.setIndeterminate(true);
 		final Long startTime = System.currentTimeMillis();

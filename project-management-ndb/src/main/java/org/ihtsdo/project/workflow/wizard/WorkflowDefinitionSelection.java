@@ -44,7 +44,7 @@ public class WorkflowDefinitionSelection extends JPanel implements I_fastWizard 
 
 		File businessProcessFile = null;
 		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new File("."));
+		chooser.setCurrentDirectory(new File("./sampleProcesses"));
 
 		chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 			public boolean accept(File f) {
