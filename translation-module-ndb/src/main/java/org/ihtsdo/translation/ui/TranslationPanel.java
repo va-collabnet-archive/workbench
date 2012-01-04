@@ -37,6 +37,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -1272,6 +1273,7 @@ public class TranslationPanel extends JPanel {
 					prevWfInstance.setWorkListId(instance.getWorkListId());
 					workflowInterpreter.doAction(instance, action, worker);
 					WfInstance newWfInstance = worklistMember.getWfInstance();
+					newWfInstance.setActionReport(instance.getActionReport());
 					firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
 				}
 			} catch (TerminologyException e) {
@@ -3831,5 +3833,21 @@ public class TranslationPanel extends JPanel {
 		for (WfAction action:actions){
 			cmbActions.addItem(action);
 		}
+		addDefaultActions();
+	}
+
+	private void addDefaultActions() {
+		WfAction cancAction=new WfAction();
+		cancAction.setBusinessProcess(new File("sampleProcesses/CancelActionWithoutDestination.bp"));
+		cancAction.setId(UUID.randomUUID());
+		cancAction.setName("Cancel");
+		cancAction.setConsequence(null);
+
+		WfAction satdAction=new WfAction();
+		satdAction.setBusinessProcess(new File("sampleProcesses/SaveAsTodoActionWithoutDestination.bp"));
+		satdAction.setId(UUID.randomUUID());
+		satdAction.setName("Save as todo");
+		satdAction.setConsequence(null);
+		
 	}
 }
