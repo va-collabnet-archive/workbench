@@ -62,7 +62,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 	public void setCategory(UUID uid) {
 		((EditorCategoryRSFields)fields).setCategory(uid);
 	}
-
+	
 	
 	
 	public class EditorCategoryRSFields extends WorkflowRefsetFields
@@ -145,5 +145,13 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 			   		"<value>" + getSemanticArea() + "</value>" +
 			   	"</property>" + 
 		   	"</properties>"; 
+	}
+
+	public void retireEditorCategory(ConceptVersionBI mod, String tag, ConceptVersionBI category) {
+        setEditor(mod);
+        setSemanticArea(tag);
+        setCategory(category);
+
+        retireMember();
 	}
 }

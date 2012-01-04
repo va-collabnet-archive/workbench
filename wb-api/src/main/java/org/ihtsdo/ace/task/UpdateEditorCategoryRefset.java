@@ -39,6 +39,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -52,6 +53,9 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
 
+    private EditorCategoryRefsetSearcher searcher = null;
+    private HashMap<String, ConceptVersionBI> modelers = null;
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -79,7 +83,6 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 
         try {
             ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
-            HashMap<String, ConceptVersionBI> modelers = new HashMap<String, ConceptVersionBI>();
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 //             File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
             File f = new File("../../src/main/users/userPermissionRefset.txt");
@@ -88,6 +91,7 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 
             WorkflowHelper.updateModelers(vc);
             modelers = WorkflowHelper.getModelers();
+        	searcher = new EditorCategoryRefsetSearcher();
 
             String headerLine = inputFile.readLine();
             while ((line = inputFile.readLine()) != null) {
@@ -107,11 +111,25 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
                     columns[i++] = c.split("=")[1].trim();
                 }
 
-                writer.setEditor(modelers.get(columns[0]));
-                writer.setSemanticArea(columns[1]);
+                ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
+                ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
+                boolean addingRequired = true;
+                
+                if (oldCategory != null) {
+                	if (!oldCategory.equals(newCategory)) {
+		                writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+	                } else {
+	                	addingRequired = false;
+	                }
+                }
+                
+                if (addingRequired) {
+	                writer.setEditor(modelers.get(columns[0]));
+	                writer.setSemanticArea(columns[1]);
 
-                writer.setCategory(WorkflowHelper.lookupEditorCategory(columns[2], vc));
-                writer.addMember();
+	                writer.setCategory(newCategory);
+	                writer.addMember();
+	            }
             }
 
             Terms.get().commit();
@@ -121,6 +139,16 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
 
         return Condition.CONTINUE;
     }
+
+    private ConceptVersionBI identifyExistingEditorCategory(String[] columns, ViewCoordinate vc) {
+    	try {
+    		return searcher.searchForCategoryByModelerAndTag(modelers.get(columns[0]), columns[1], vc);
+		} catch (Exception e) {
+            AceLog.getAppLog().log(Level.WARNING, "Failed to identify existing categories for mod: " + columns[0] + " and semTag: " + columns[1], e);
+		}
+
+		return null;
+	}
 
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;

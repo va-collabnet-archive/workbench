@@ -16,6 +16,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
@@ -29,12 +30,17 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowRefsetSearcher;
 public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 {
 	EditorCategoryRefsetReader reader = null;
-	
+	private static int activeRf1 = 0;
+	private static int activeRf2 = 0;
+
 	public EditorCategoryRefsetSearcher()
 			throws TerminologyException, IOException
 	{
 		super(editorCategoryConcept);
 		reader = new EditorCategoryRefsetReader();
+		
+		activeRf1 = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
+		activeRf2 = Terms.get().uuidToNative(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]);
 	}
 
 	public boolean isAutomaticApprovalAvailable(ConceptVersionBI modeler, ViewCoordinate vc) throws NumberFormatException, TerminologyException, IOException, Exception {
@@ -113,9 +119,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 	private Set<String> searchForEditorCategoryListByModeler(ConceptVersionBI modeler) throws Exception
 	{
-      if (modeler == null) {
-         return new HashSet<String>();
-      }
+	    if (modeler == null) {
+	       return new HashSet<String>();
+	    }
 		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, modeler.getNid());
 		Set<String> results = new HashSet<String>();
 
@@ -126,5 +132,24 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		}
 
 		return results;
+	}
+	
+	public ConceptVersionBI searchForCategoryByModelerAndTag(ConceptVersionBI modeler, String tag, ViewCoordinate vc) throws Exception {
+		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, modeler.getNid());
+
+		for (int i = 0; i < l.size(); i++)
+		{
+			I_ExtendByRefPartStr<?> props = (I_ExtendByRefPartStr<?>)l.get(i);
+			
+			if (reader.getSemanticTag(props.getStringValue()).equalsIgnoreCase(tag)) {
+				// Found modeler/tag combination already exists
+				if (props.getStatusNid() == activeRf1 || props.getStatusNid() == activeRf2) {
+					// last version is active, return Editor Category
+					return reader.getEditorCategory(props.getStringValue()).getVersion(vc);
+				}
+			}
+		}
+		
+		return null;
 	}
 }
