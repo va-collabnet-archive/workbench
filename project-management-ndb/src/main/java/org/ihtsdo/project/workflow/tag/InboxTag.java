@@ -5,13 +5,23 @@ import java.util.List;
 public class InboxTag {
 	private String tagName;
 	private String color;
+	private String textColor;
 	private List<String> uuidList;
 
-	public InboxTag(String tagName, String color, List<String> uuidList) {
+	public InboxTag(String tagName, String color,String textColor, List<String> uuidList) {
 		super();
 		this.tagName = tagName;
 		this.uuidList = uuidList;
+		this.textColor = textColor;
 		this.color = color;
+	}
+
+	public void setTextColor(String textColor) {
+		this.textColor = textColor;
+	}
+
+	public String getTextColor() {
+		return textColor;
 	}
 
 	public String getTagName() {
@@ -42,13 +52,17 @@ public class InboxTag {
 	public boolean equals(Object obj) {
 		if (obj instanceof InboxTag) {
 			InboxTag t = (InboxTag) obj;
-			return this.tagName.equals(t.getTagName()) && this.getColor().equals(t.getColor());
+			if (this.tagName != null && this.color != null) {
+				return this.tagName.equals(t.getTagName()) && this.getColor().equals(t.getColor());
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}
 	}
-	
-	private String toItemString(){
+
+	private String toItemString() {
 		return "<html><body><table><tr><td style=\"background-color:" + this.color + ";width:10px; height: 10px;\"><td>" + this.tagName;
 	}
 
