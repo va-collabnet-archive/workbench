@@ -3842,12 +3842,13 @@ public class TranslationPanel extends JPanel {
 		cancAction.setId(UUID.randomUUID());
 		cancAction.setName("Cancel");
 		cancAction.setConsequence(null);
-
+		cmbActions.addItem(cancAction);
+		
 		WfAction satdAction=new WfAction();
 		satdAction.setBusinessProcess(new File("sampleProcesses/SaveAsTodoActionWithoutDestination.bp"));
 		satdAction.setId(UUID.randomUUID());
 		satdAction.setName("Save as todo");
 		satdAction.setConsequence(null);
-		
+		cmbActions.addItem(satdAction);
 	}
 }
