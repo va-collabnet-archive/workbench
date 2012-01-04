@@ -78,7 +78,7 @@
         <name>Respond SME consultation</name>
         <id>c04b8e71-e351-4b3e-b8fc-0159b9fc2b7e</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[10]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -87,7 +87,7 @@
         <name>Respond Super SME consultation</name>
         <id>2632bc2a-2a7f-4ace-9a61-fdd3150590bf</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[9]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -96,7 +96,7 @@
         <name>Reject revision with stated reason</name>
         <id>2b18b0b0-dfd3-421e-a2fa-bcd2b554d04c</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -105,7 +105,7 @@
         <name>Escalate</name>
         <id>e800f5b6-8544-4ad5-9e2a-145d591cbbe3</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[6]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -114,7 +114,7 @@
         <name>Consult to SME</name>
         <id>0c62711b-2eb0-449e-8cf7-ba38b4b4b0c1</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[2]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -123,7 +123,7 @@
         <name>Approve</name>
         <id>6bcfee51-6b11-4413-a80e-2af2703a2e3a</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -132,7 +132,7 @@
         <name>Translate</name>
         <id>dc962029-d760-49ae-a142-de8a6c2c223d</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[7]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -141,7 +141,7 @@
         <name>Review</name>
         <id>d69bcef5-084e-4c47-8cd2-f95c091ecc11</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[11]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -150,7 +150,7 @@
         <name>Reject revision</name>
         <id>ea4cffd7-0fdd-4768-9740-3f0e07e1d9b4</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -159,7 +159,7 @@
         <name>Consult to Super SME</name>
         <id>2086369d-fb91-4721-8604-eacc2f2e4006</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[3]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -168,7 +168,7 @@
         <name>Reject translation with stated reason</name>
         <id>c2cb6408-bcce-42b9-bdaf-dff9123925c3</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[4]"/>
-        <businessProcess>sampleProcesses/actionT.bp</businessProcess>
+        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
   </actions>
