@@ -29,6 +29,8 @@ public class WfInstance implements Serializable{
 	private String workListName;
 	private ActionReport actionReport;
 	public enum ActionReport {CANCEL, SAVE_AS_TODO, OUTBOX,COMPLETE};
+	
+	
 	public WfInstance() {
 		super();
 	}
@@ -134,7 +136,7 @@ public class WfInstance implements Serializable{
 	public void setWorkListName(String workListName) {
 		this.workListName = workListName;
 	}
-
+	
 	public ActionReport getActionReport() {
 		return actionReport;
 	}
@@ -142,5 +144,19 @@ public class WfInstance implements Serializable{
 	public void setActionReport(ActionReport actionReport) {
 		this.actionReport = actionReport;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof WfInstance){
+			WfInstance instance = (WfInstance)obj;
+			return instance.getComponentId().equals(this.componentId) &&
+			instance.getComponentName().equals(this.componentName) &&
+			instance.getWorkListId().equals(this.workListId) &&
+			instance.workListName.equals(this.workListName) &&
+			instance.getDestination().equals(this.destination) &&
+			instance.getActionReport().equals(this.actionReport);
+		}else{
+			return false;
+		}
+	}
 }
