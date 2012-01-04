@@ -53,14 +53,20 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 @AllowDataCheckSuppression
 public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
+	
+	int rf1CurrentStatusNid;
+	int rf2ActiveValueNid;
 
     public RefsetHelper(I_ConfigAceFrame config) throws IOException {
         super(config);
+        rf1CurrentStatusNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
+        rf2ActiveValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
     }
 
     public RefsetHelper(I_ConfigAceFrame config, I_IntSet isARelTypes) throws IOException {
@@ -110,7 +116,9 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
             }
 
             // confirm its the right extension value and its status is current
-            if (latestPart != null && latestPart.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+            if (latestPart != null && 
+            		(latestPart.getStatusNid() == rf1CurrentStatusNid ||
+            				latestPart.getStatusNid() == rf2ActiveValueNid)) {
                 return latestPart;
             }
         }
@@ -143,7 +151,8 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
 
                 // confirm its the right extension value and its status is
                 // current
-                if (latestPart.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                if (latestPart.getStatusNid() == rf1CurrentStatusNid ||
+                				latestPart.getStatusNid() == rf2ActiveValueNid) {
                     result.add((T) latestPart);
                 }
             }
