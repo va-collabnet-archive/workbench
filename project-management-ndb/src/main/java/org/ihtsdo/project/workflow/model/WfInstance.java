@@ -27,7 +27,8 @@ public class WfInstance implements Serializable{
 	private List<WfHistoryEntry> history;
 	private String componentName;
 	private String workListName;
-	
+	private ActionReport actionReport;
+	public enum ActionReport {CANCEL, SAVE_AS_TODO, OUTBOX,COMPLETE};
 	public WfInstance() {
 		super();
 	}
@@ -132,6 +133,14 @@ public class WfInstance implements Serializable{
 
 	public void setWorkListName(String workListName) {
 		this.workListName = workListName;
+	}
+
+	public ActionReport getActionReport() {
+		return actionReport;
+	}
+
+	public void setActionReport(ActionReport actionReport) {
+		this.actionReport = actionReport;
 	}
 
 }
