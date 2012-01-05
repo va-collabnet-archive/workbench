@@ -105,7 +105,7 @@ public class InboxTreePanel extends JPanel implements Observer {
 		return inboxItem;
 	}
 
-	private void updateTree() {
+	public void updateTree() {
 		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
 		iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
 		sNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.STATUS_NODE_ROOT, IconUtilities.STATUS_NODE, new FolderMetadata(IconUtilities.STATUS_NODE, true)));
@@ -454,6 +454,7 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	private DefaultTreeModel model;
 	private I_GetConceptData user;
 	private JTree inboxFolderTreee;
+	private List<InboxTag> tagsContent;
 
 	public WorklistItemsWorker(JTree inboxFolderTreee, DefaultMutableTreeNode wNode, DefaultMutableTreeNode sNode, DefaultMutableTreeNode cNode, I_ConfigAceFrame config, WorkflowSearcher searcher,
 			DefaultTreeModel model, I_GetConceptData user) {
@@ -472,8 +473,8 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	public List<InboxTreeItem> doInBackground() {
 		try {
 			if (config != null) {
-				getWorklistsStatusesAndSize();
 				getTags();
+				getWorklistsStatusesAndSize();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -483,7 +484,6 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 
 	private void getTags() {
 		TagManager tm = TagManager.getInstance();
-		List<InboxTag> tagsContent = new ArrayList<InboxTag>();
 		try {
 			tagsContent = tm.getAllTagsContent();
 		} catch (IOException e) {

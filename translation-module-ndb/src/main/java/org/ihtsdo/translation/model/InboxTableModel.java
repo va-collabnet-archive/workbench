@@ -240,11 +240,11 @@ public class InboxTableModel extends DefaultTableModel {
 			try {
 				if (!isCancelled()) {
 					data = new LinkedList<Object[]>();
-					int i = 0;
 					for (WfInstance wfInstance : wfInstances) {
 						Object[] row = createRow(wfInstance);
-						data.add(row);
-						i++;
+						if (row != null) {
+							data.add(row);
+						}
 					}
 					fireTableDataChanged();
 				}
@@ -267,13 +267,16 @@ public class InboxTableModel extends DefaultTableModel {
 
 	public void updateRow(Object[] currentRow, int modelRowNum) {
 		Object[] rowUpdated = null;
-		WfInstance wfInstance = (WfInstance)currentRow[currentRow.length-1];
+		WfInstance wfInstance = (WfInstance) currentRow[currentRow.length - 1];
 		try {
 			WorkList worklist = wfInstance.getWorkList();
-			WfInstance wfInstanceUpdated = TerminologyProjectDAO.getWorkListMember(Terms.get().getConcept(wfInstance.getComponentId()), worklist, Terms.get().getActiveAceFrameConfig()).getWfInstance();
+			WfInstance wfInstanceUpdated = TerminologyProjectDAO.getWorkListMember(Terms.get().getConcept(wfInstance.getComponentId()), worklist, Terms.get().getActiveAceFrameConfig())
+					.getWfInstance();
 			rowUpdated = createRow(wfInstanceUpdated);
 			data.remove(modelRowNum);
-			data.add(modelRowNum, rowUpdated);
+			if (rowUpdated != null) {
+				data.add(modelRowNum, rowUpdated);
+			}
 			fireTableDataChanged();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -283,18 +286,23 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	private Object[] createRow(WfInstance wfInstance) {
+		Object[] row = null;
 		String tagStr = "";
 		if (tags != null) {
 			for (InboxTag tag : tags) {
 				if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
-					tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
-					tagCache.put(wfInstance.getComponentId().toString(), tag);
-					break;
+					if (!tag.getTagName().equals("todo") && !tag.getTagName().equals("outbox")) {
+						tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
+						tagCache.put(wfInstance.getComponentId().toString(), tag);
+						break;
+					} else {
+						return null;
+					}
 				}
 			}
 		}
 		String concept = wfInstance.getComponentName();
-		Object[] row = new Object[columnNames.length];
+		row = new Object[columnNames.length];
 		String componentStr = tagStr + concept;
 		row[COMPONENT] = componentStr;
 		row[TARGET] = "";
