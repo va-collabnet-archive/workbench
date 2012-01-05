@@ -3734,6 +3734,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       }
    }
 
+   public ResizePalettesListener getResizePalettesListener(){
+       return new ResizePalettesListener();
+   }
 
    public class ResizePalettesListener implements ComponentListener {
       @Override
@@ -4033,4 +4036,49 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       @Override
       public void actionPerformed(ActionEvent e) {}
    }
+
+
+public ConceptPanel getC1Panel() {
+    return c1Panel;
+}
+
+public void setC1Panel(ConceptPanel c1Panel) {
+    this.c1Panel = c1Panel;
+}
+
+public ConceptPanel getC2Panel() {
+    return c2Panel;
+}
+
+public void setC2Panel(ConceptPanel c2Panel) {
+    this.c2Panel = c2Panel;
+}
+
+public void setConceptTabs(JTabbedPane conceptTabs) {
+    this.conceptTabs = conceptTabs;
+}
+
+public void setConceptPanels(ArrayList<ConceptPanel> conceptPanels) {
+    this.conceptPanels = conceptPanels;
+}
+
+public static String getTaxonomyTabLabel() {
+    return taxonomyTabLabel;
+}
+
+public int getRefsetTabIndex() {
+    return refsetTabIndex;
+}
+
+public void setRefsetTabIndex(int refsetTabIndex) {
+    this.refsetTabIndex = refsetTabIndex;
+}
+
+public RefsetSpecPanel getRefsetSpecPanel() {
+    return refsetSpecPanel;
+}
+
+public void setRefsetSpecPanel(RefsetSpecPanel refsetSpecPanel) {
+    this.refsetSpecPanel = refsetSpecPanel;
+}
 }
