@@ -73,7 +73,7 @@ public class TestWfInterpreter extends TestCase {
 	
 		instance.setState(state7);
 		instance.setWfDefinition(wfDefinition);
-		instance.setWorkListId(UUID.randomUUID());
+		//instance.setWorkList(UUID.randomUUID());
 		WfPermission loopPermission = new WfPermission();
 		loopPermission.setId(UUID.randomUUID());
 		WfRole role=new WfRole("tsp translator one role",UUID.randomUUID());
