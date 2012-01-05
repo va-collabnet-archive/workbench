@@ -352,23 +352,20 @@ public class RefsetHelper extends RefsetUtilities implements I_HelpRefsets {
                 boolean useRf1 = false;
                 if (!extProps.hasProperty(RefsetPropertyMap.REFSET_PROPERTY.STATUS)) {
                     extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, activeRf2);
-
-                    if (!extProps.validate(latestPart)) {
-                    	useRf1 = true;
-                        extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, ReferenceConcepts.CURRENT.getNid());
-                    }
                 }
 
+                // Try via  activeRf1 first.  If invalid, use activeRf2 as status
+                if (!extProps.validate(latestPart)) {
+                	useRf1 = true;
+                    extProps.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+                }
+
+                
                 if (extProps.validate(latestPart)) {
 
                     // found a member to retire
-                	I_ExtendByRefPartStr clone = null;
+                	I_ExtendByRefPartStr<?> clone = (I_ExtendByRefPartStr<?>) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
                 	
-                	if (useRf1) {
-	                	clone = (I_ExtendByRefPartStr) latestPart.makeAnalog(ReferenceConcepts.RETIRED.getNid(), latestPart.getPathNid(), Long.MAX_VALUE);
-                	} else {
-	                	clone = (I_ExtendByRefPartStr) latestPart.makeAnalog(inactiveRf2, latestPart.getPathNid(), Long.MAX_VALUE);
-                	}
                     extension.addVersion(clone);
                     if (isAutocommitActive()) {
                         Terms.get().addUncommittedNoChecks(extension);
