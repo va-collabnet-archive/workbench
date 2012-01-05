@@ -21,6 +21,89 @@ package org.dwfa.ace;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.beans.IntrospectionException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivilegedActionException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.TransferHandler;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import net.jini.config.Configuration;
 import net.jini.config.ConfigurationException;
 import net.jini.lookup.ServiceItemFilter;
@@ -92,15 +175,14 @@ import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.tasks.editor.CheckboxEditor;
 import org.dwfa.bpa.util.I_DoQuitActions;
 import org.dwfa.bpa.worker.MasterWorker;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.queue.gui.QueueViewerPanel;
 import org.dwfa.svn.Svn;
 import org.dwfa.svn.SvnPanel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
-
 import org.ihtsdo.arena.Arena;
+import org.ihtsdo.config.ConfigServiceBase;
 import org.ihtsdo.objectCache.ObjectCache;
 import org.ihtsdo.statics.CustomStatics;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
@@ -114,97 +196,6 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import java.beans.IntrospectionException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivilegedActionException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Level;
-
-import javax.security.auth.login.LoginException;
-
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import javax.swing.JToggleButton;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
-import javax.swing.TransferHandler;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
    public static final String DATA_CHECK_TAB_LABEL = "data checks";
@@ -2186,15 +2177,27 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    }
 
    private JComponent getContentPanel() throws Exception {
+       
+       JComponent retC = null; 
+  
       String custUI = (String) ObjectCache.INSTANCE.get(CustomStatics.CUSTOM_UI_CLASS);
-
+      
       if ((custUI != null) && (custUI.length() > 0)) {
-         I_ReturnMainPanel cp = (I_ReturnMainPanel) ObjectCache.INSTANCE.get(custUI);
-
-         return cp.getContentPanel(this);
-      } else {
-         return getDefaultContentPanel();
+      ConfigServiceBase csb = (ConfigServiceBase)ObjectCache.INSTANCE.get(CustomStatics.CONFIG_SERVICE);
+      if (csb != null) {
+              I_ReturnMainPanel cp = (I_ReturnMainPanel)csb.getConfigObject(custUI);
+              if(cp != null){
+              retC = cp.getContentPanel(this);
+              }
+           }   
+                   
       }
+ 
+      if(retC == null){
+          retC =  getDefaultContentPanel();
+      }
+      
+      return retC;
    }
 
    public static Set<I_ReadChangeSet> getCsReaders() {
