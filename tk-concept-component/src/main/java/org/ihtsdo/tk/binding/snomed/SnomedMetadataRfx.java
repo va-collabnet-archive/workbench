@@ -36,6 +36,7 @@ public class SnomedMetadataRfx {
     private static int ACCEPTABLE_NID;
     private static int PREFERRED_NID;
     // RELATIONSHIP NIDs
+    private static int REL_CH_ADDITIONAL_CHARACTERISTIC_NID;
     private static int REL_CH_DEFINING_CHARACTERISTIC_NID;
     private static int REL_CH_INFERRED_RELATIONSHIP_NID;
     private static int REL_CH_QUALIFIER_CHARACTERISTIC_NID;
@@ -125,6 +126,13 @@ public class SnomedMetadataRfx {
             setupSnoRf1Rf2();
         }
         return PREFERRED_NID;
+    }
+
+    public static int getREL_CH_ADDITIONAL_CHARACTERISTIC_NID() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return REL_CH_ADDITIONAL_CHARACTERISTIC_NID;
     }
 
     public static int getREL_CH_DEFINING_CHARACTERISTIC_NID() throws IOException {
@@ -401,6 +409,8 @@ public class SnomedMetadataRfx {
             PREFERRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.PREFERRED_ACCEPTABILITY_RF1.getUuids());
             // RELATIONSHIPS
+            REL_CH_ADDITIONAL_CHARACTERISTIC_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.ADDITIONAL_CHARACTERISTIC_TYPE_RF1.getUuids());
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getUuids());
             REL_CH_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(
@@ -480,6 +490,8 @@ public class SnomedMetadataRfx {
             PREFERRED_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.PREFERRED_RF2.getUuids());
             // RELATIONSHIPS
+            REL_CH_ADDITIONAL_CHARACTERISTIC_NID = tf.getNidForUuids(
+                    SnomedMetadataRf2.ADDITIONAL_RELATIONSHIP_RF2.getUuids());
             REL_CH_DEFINING_CHARACTERISTIC_NID = tf.getNidForUuids(
                     SnomedMetadataRf2.DEFINING_RELATIONSHIP_RF2.getUuids());
             REL_CH_INFERRED_RELATIONSHIP_NID = tf.getNidForUuids(

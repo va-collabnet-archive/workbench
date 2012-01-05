@@ -1,18 +1,14 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.dwfa.ace.task.classify;
 
@@ -75,33 +71,24 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
- * SnorocketExTask retrieves concepts and relationship from the stated edit path
- * and load the same to the IHTSDO (Snorocket) classifier.
+ * SnorocketExTask retrieves concepts and relationship from the stated edit path and load the same to the
+ * IHTSDO (Snorocket) classifier.
  *
- * Classification is run and the resulting inferred relationships is written
- * back to the database.
+ * Classification is run and the resulting inferred relationships is written back to the database.
  *
- * <ul>
- * <li>The is-a relationship is unique to the classification. For example, the
- * SNOMED is-a has a different concept id than the ace-auxiliary is-a
- * relationship. So every concept (except the concept root) will have at least
- * one is-a relationship of the proper type.
- * <li>There is a single root concept, and that root is part of the set of
- * included concept
- * <li>Assumes that the versions are linear, independent of path, and therefore
- * the status with the latest date on an allowable path is the latest status.
- * <li>Only current concepts and relationships are to be used and that all other
- * statuses will can be filtered out.
+ * <ul> <li>The is-a relationship is unique to the classification. For example, the SNOMED is-a has a
+ * different concept id than the ace-auxiliary is-a relationship. So every concept (except the concept root)
+ * will have at least one is-a relationship of the proper type. <li>There is a single root concept, and that
+ * root is part of the set of included concept <li>Assumes that the versions are linear, independent of path,
+ * and therefore the status with the latest date on an allowable path is the latest status. <li>Only current
+ * concepts and relationships are to be used and that all other statuses will can be filtered out.
  *
- * <ul>
- * </ol>
- * <p>
- * <p>
- * <ul>
+ * <ul> </ol> <p> <p> <ul>
  */
 @BeanList(specs = {
     @Spec(directory = "tasks/ide/classify", type = BeanType.TASK_BEAN)})
@@ -188,24 +175,18 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     }
 
     /**
-     * <b><font color=blue>ProcessResults</font></b><br>
-     * Retrieves results from classifier.<br>
-     * <br>
-     * <b>First Classification Run</b><br>
-     * <i>The Classifier may create a new part for an existing relationship.<br>
+     * <b><font color=blue>ProcessResults</font></b><br> Retrieves results from classifier.<br> <br> <b>First
+     * Classification Run</b><br> <i>The Classifier may create a new part for an existing relationship.<br>
      * </i> PROCESS:<br>
      * <code>Search for existing concept to get relationship with same origin/dest/type.<br>
      * CASE (search == empty)<br>
      * create new origin/dest/type "inferred" relationship w/ status "current"<br>
      * add part to the new relationship on the TO PATH<br>
      * CASE (search == success)<br>
-     * * add part to the existing "stated" relationship on the TO PATH</code>
-     * <p>
-     * <b>Subsequent Classification Runs</b><br>
-     * Case A. NEW: Create new relationship with status CURRENT. see "new" above
-     * <br>
-     * Case B. SAME: Do nothing.<br>
-     * Case C. ABSENT: WAS in previous, NOT in current. Set status to RETIRED.
+     * * add part to the existing "stated" relationship on the TO PATH</code> <p> <b>Subsequent
+     * Classification Runs</b><br> Case A. NEW: Create new relationship with status CURRENT. see "new" above
+     * <br> Case B. SAME: Do nothing.<br> Case C. ABSENT: WAS in previous, NOT in current. Set status to
+     * RETIRED.
      *
      */
     private class ProcessResults implements I_Callback {
@@ -292,12 +273,10 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     }
 
     /**
-     * POSSIBLE APPROACHES FOR RECIEVING DATA FROM NEW DATABASE<br>
-     * 1. Get List<SnoCon>, use List<SnoCon> as post processing filter.<br>
-     * 2. Get List<SnoCon>, use List<SnoCon> as filter in second pass.<br>
-     * 3. Get List<SnoCon>, use List<SnoCon> in individually get Rels in loop.<br>
-     * 4. Check relationship C2 while processing path.<br>
-     * 5. Modify processConcepts internal.<br>
+     * POSSIBLE APPROACHES FOR RECIEVING DATA FROM NEW DATABASE<br> 1. Get List<SnoCon>, use List<SnoCon> as
+     * post processing filter.<br> 2. Get List<SnoCon>, use List<SnoCon> as filter in second pass.<br> 3. Get
+     * List<SnoCon>, use List<SnoCon> in individually get Rels in loop.<br> 4. Check relationship C2 while
+     * processing path.<br> 5. Modify processConcepts internal.<br>
      */
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
@@ -398,7 +377,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
             if (debugDump) {
                 // FILTER RELATIONSHIPS
-                /* Snorocket_123 is self filtering on C2 */
+                /*
+                 * Snorocket_123 is self filtering on C2
+                 */
                 int last = cEditSnoRels.size();
                 for (int idx = last - 1; idx > -1; idx--) {
                     if (Arrays.binarySearch(cNidArray, cEditSnoRels.get(idx).c2Id) < 0) {
@@ -453,26 +434,21 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 }
             }
 
-            /* ****************
-             * // SnomedMetadata :: RIGHT_IDENTITIES // direct-substance o
-             * has-active-ingredient -> direct-substance // SNOMED IDs
-             * {"363701004", "127489000"}
+            /*
+             * ****************
+             * // SnomedMetadata :: RIGHT_IDENTITIES // direct-substance o has-active-ingredient ->
+             * direct-substance // SNOMED IDs {"363701004", "127489000"}
              *
-             * // SnomedId "363701004" // direct-substance //
-             * 49ee3912-abb7-325c-88ba-a98824b4c47d int nidDirectSubstance =
-             * tf.getId(
-             * UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
+             * // SnomedId "363701004" // direct-substance // 49ee3912-abb7-325c-88ba-a98824b4c47d int
+             * nidDirectSubstance = tf.getId( UUID.fromString("49ee3912-abb7-325c-88ba-a98824b4c47d"))
              * .getNid();
              *
-             * // SnomedId "127489000" // has-active-ingredient //
-             * 65bf3b7f-c854-36b5-81c3-4915461020a8 int nidHasActiveIngredient =
-             * tf.getId(
-             * UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
+             * // SnomedId "127489000" // has-active-ingredient // 65bf3b7f-c854-36b5-81c3-4915461020a8 int
+             * nidHasActiveIngredient = tf.getId( UUID.fromString("65bf3b7f-c854-36b5-81c3-4915461020a8"))
              * .getNid();
              *
-             * int lhsData[] = new int[2]; lhsData[0] = nidDirectSubstance;
-             * lhsData[1] = nidHasActiveIngredient;
-             * rocket_123.addRoleComposition(lhsData, nidDirectSubstance);
+             * int lhsData[] = new int[2]; lhsData[0] = nidDirectSubstance; lhsData[1] =
+             * nidHasActiveIngredient; rocket_123.addRoleComposition(lhsData, nidDirectSubstance);
              * ***************
              */
 
@@ -850,16 +826,12 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
     /**
      *
-     * USE CASE: <b>A</b> = ClassPath (previously inferred), <b>B</b> = Rocket
-     * (newly inferred)<br>
-     * <br>
-     * Differing previously inferred <b>A</b> are retired. Differing new
-     * inferred <b>B</b> are created as CURRENT, NEW VERSION. <br>
-     * <BR>
-     * <font color=#990099> IMPLEMENTATION NOTE: <code>snorelA</code> and
-     * <code>snorelB</code> MUST be pre-sorted in C1-Group-Type-C2 order for
-     * this routine. Pre-sorting is used to provide overall computational
-     * efficiency.</font>
+     * USE CASE: <b>A</b> = ClassPath (previously inferred), <b>B</b> = Rocket (newly inferred)<br> <br>
+     * Differing previously inferred <b>A</b> are retired. Differing new inferred <b>B</b> are created as
+     * CURRENT, NEW VERSION. <br> <BR> <font color=#990099> IMPLEMENTATION NOTE:
+     * <code>snorelA</code> and
+     * <code>snorelB</code> MUST be pre-sorted in C1-Group-Type-C2 order for this routine. Pre-sorting is used
+     * to provide overall computational efficiency.</font>
      *
      * @param <code>List&lt;SnoRel&gt; snorelA // previously inferred</code>
      * @param <code>List&lt;SnoRel&gt; snorelB // currently inferred</code>
@@ -1184,11 +1156,6 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
             throws IOException {
-        if (rel_A.typeId == isaNid) {
-            SnoQuery.isaDropped.add(rel_A);
-        } else {
-            SnoQuery.roleDropped.add(rel_A);
-        }
 
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
@@ -1197,22 +1164,48 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                         cViewPosSet, precedence, contradictionMgr);
 
                 if (rvList.size() == 1) {
+
+                    // :BEGIN:WORKAROUND;
+                    // SUPPRESS RETIREMENT OF EXISTING INFERRED RECORD
+                    // WHEN THE CURRENT RELATIONSHIP IS AN ADDITIONAL CHARACTERISTIC
+                    // SEE ARTF225415
+                    if (rvList.get(0).getCharacteristicNid()
+                            == SnomedMetadataRfx.getREL_CH_ADDITIONAL_CHARACTERISTIC_NID()) {
+                        return;
+                    }
+                    // :END:WORKAROUND:
+
                     // CREATE RELATIONSHIP PART W/ TermFactory
                     rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
-                    // :!!!:TODO: move addUncommittedNoChecks() to more efficient
-                    // location.
+                    // :!!!:TODO: move addUncommittedNoChecks() to more efficient location.
                     // more optimal to only call once per concept.
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
 
+                    if (rel_A.typeId == isaNid) {
+                        SnoQuery.isaDropped.add(rel_A);
+                    } else {
+                        SnoQuery.roleDropped.add(rel_A);
+                    }
+
                 } else if (rvList.isEmpty()) {
-                    logger.log(Level.INFO, "::: [SnorocketExTask] ERROR: writeBackRetired() "
-                            + "empty version list" + "\trelNid=\t{0}\tc1=\t{1}\t{2}",
-                            new Object[]{rel_A.relNid, rel_A.c1Id, tf.getConcept(rel_A.c1Id).toLongString()});
+                    StringBuilder sb = new StringBuilder("::: [SnorocketExTask] WARNING: writeBackRetired() ");
+                    sb.append("empty version list\trelNid=\t");
+                    sb.append(Integer.toString(rel_A.relNid));
+                    sb.append("\tc1=\t");
+                    sb.append(Integer.toString(rel_A.c1Id));
+                    sb.append("\t");
+                    sb.append(tf.getConcept(rel_A.c1Id).toUserString());
+                    logger.log(Level.INFO, sb.toString());
                 } else {
-                    logger.log(Level.INFO, "::: [SnorocketExTask] ERROR: writeBackRetired() "
-                            + "multiple last versions" + "\trelNid=\t{0}\tc1=\t{1}\t{2}",
-                            new Object[]{rel_A.relNid, rel_A.c1Id, tf.getConcept(rel_A.c1Id).toLongString()});
+                    StringBuilder sb = new StringBuilder("::: [SnorocketExTask] WARNING: writeBackRetired() ");
+                    sb.append("multiple last versions\trelNid=\t");
+                    sb.append(Integer.toString(rel_A.relNid));
+                    sb.append("\tc1=\t");
+                    sb.append(Integer.toString(rel_A.c1Id));
+                    sb.append("\t");
+                    sb.append(tf.getConcept(rel_A.c1Id).toUserString());
+                    logger.log(Level.INFO, sb.toString());
                 }
             } else {
                 logger.log(Level.INFO, "::: [SnorocketExTask] ERROR: writeBackRetired() "
@@ -1408,8 +1401,10 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     }
 
     /**
-     * Given the <code>startTime</code>, computes <code>lapsedTime</code> by use
-     * the time of calling <code>toStringTime()</code> as the
+     * Given the
+     * <code>startTime</code>, computes
+     * <code>lapsedTime</code> by use the time of calling
+     * <code>toStringTime()</code> as the
      * <code>stopTime</code>.
      *
      * @param <code>long startTime</code> // in milliseconds
