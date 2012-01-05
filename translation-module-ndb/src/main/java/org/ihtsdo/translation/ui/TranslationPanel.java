@@ -1271,7 +1271,7 @@ public class TranslationPanel extends JPanel {
 					prevWfInstance.setState(instance.getState());
 					prevWfInstance.setWfDefinition(instance.getWfDefinition());
 					prevWfInstance.setWorkList(instance.getWorkList());
-					workflowInterpreter.doAction(instance, action, worker);
+					workflowInterpreter.doAction(instance,wfRole, action, worker);
 					WfInstance newWfInstance = worklistMember.getWfInstance();
 					newWfInstance.setActionReport(instance.getActionReport());
 					firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
@@ -2285,6 +2285,7 @@ public class TranslationPanel extends JPanel {
 	private WfInstance instance;
 	private Thread detailsThread;
 	private Thread hierThread;
+	private WfRole wfRole;
 
 	/**
 	 * Gets the concept.
@@ -3808,7 +3809,7 @@ public class TranslationPanel extends JPanel {
 		    if (bExists){
 		    	roleConcept=Terms.get().getConcept(userRole.getId());
 		    }
-		    
+		    this.wfRole=userRole;
 			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
 
 			I_GetConceptData component = Terms.get().getConcept(instance.getComponentId());

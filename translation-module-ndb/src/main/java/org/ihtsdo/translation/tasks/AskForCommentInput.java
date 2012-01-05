@@ -26,21 +26,19 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.jini.TermEntry;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.refset.CommentsRefset;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.translation.CommentPopUpDialog;
 
 /**
@@ -52,15 +50,10 @@ public class AskForCommentInput extends AbstractTask {
 
 	private static final String HEADER_SEPARATOR = " // ";
 	private static final String COMMENT_HEADER_SEP = ": -";
-	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-	private String worklistMemberPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
-	/** The step role. */
-	private TermEntry stepRole;
-	
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
 
@@ -73,9 +66,6 @@ public class AskForCommentInput extends AbstractTask {
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
-		out.writeObject(profilePropName);
-		out.writeObject(worklistMemberPropName);
-		out.writeObject(stepRole);
 	}
 
 	/**
@@ -90,9 +80,6 @@ public class AskForCommentInput extends AbstractTask {
 	ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
-			profilePropName = (String) in.readObject();
-			worklistMemberPropName = (String) in.readObject();
-			stepRole = (TermEntry) in.readObject();
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);   
 		}
@@ -104,15 +91,17 @@ public class AskForCommentInput extends AbstractTask {
 	 */
 	public Condition evaluate(final I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		I_ConfigAceFrame config;
-		WorkListMember workListMember;
 		I_TermFactory tf = Terms.get();
 		try {
 			config=(I_ConfigAceFrame)Terms.get().getActiveAceFrameConfig();
 			System.out.println("Config null?" + (config==null));
-			workListMember = (WorkListMember) process.readAttachement(getWorklistMemberPropName());
+			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
+			WfRole wfrole = (WfRole) process.readAttachement("WfRole");
 			
-			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(workListMember.getWorkListUUID()), config);
+			I_GetConceptData concept=Terms.get().getConcept(instance.getComponentId());
 			
+			WorkList workList = instance.getWorkList();
+		
 			CommentsRefset commentsRefset = workList.getCommentsRefset(config);
 			I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMENT.getPrimoridalUid());
 			HashMap<I_GetConceptData,String> reason = new CommentPopUpDialog("Enter comment", commentType).showDialog();
@@ -120,9 +109,8 @@ public class AskForCommentInput extends AbstractTask {
 				Set<I_GetConceptData> a = reason.keySet();
 				I_GetConceptData rejReason = a.iterator().next();
 				String fullName= config.getDbConfig().getFullName();
-				I_GetConceptData role=Terms.get().getConcept(stepRole.ids);
-				String comment = role + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
-				commentsRefset.addComment(workListMember.getId(), commentType.getNid() , rejReason.getNid(),comment);
+				String comment = wfrole.getName() + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
+				commentsRefset.addComment(concept.getNid(), commentType.getNid() , rejReason.getNid(),comment);
 				
 			}
 
@@ -155,37 +143,5 @@ public class AskForCommentInput extends AbstractTask {
 		return new int[] {  };
 	}
 	
-	/**
-	 * Gets the step role.
-	 * 
-	 * @return the step role
-	 */
-	public TermEntry getStepRole() {
-		return stepRole;
-	}
 
-	/**
-	 * Sets the step role.
-	 * 
-	 * @param stepRole the new step role
-	 */
-	public void setStepRole(TermEntry stepRole) {
-		this.stepRole = stepRole;
-	}
-
-	public String getProfilePropName() {
-		return profilePropName;
-	}
-
-	public void setProfilePropName(String profilePropName) {
-		this.profilePropName = profilePropName;
-	}
-
-	public String getWorklistMemberPropName() {
-		return worklistMemberPropName;
-	}
-
-	public void setWorklistMemberPropName(String worklistMemberPropName) {
-		this.worklistMemberPropName = worklistMemberPropName;
-	}
 }
