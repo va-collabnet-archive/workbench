@@ -4007,7 +4007,7 @@ public class TerminologyProjectDAO {
 							Terms.get().getConcept(
 									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 					instance.setWfDefinition(workflowDefinition);
-					instance.setWorkListId(workList.getUids().iterator().next());
+					instance.setWorkList(workList);
 					if (user == null) {
 						user=interpreter.getNextDestination(instance, workList);
 					}

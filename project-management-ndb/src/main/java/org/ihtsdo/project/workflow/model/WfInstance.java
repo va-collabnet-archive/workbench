@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 
@@ -19,14 +18,13 @@ public class WfInstance implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	private UUID componentId = null;
-	private UUID workListId;
+	private WorkList workList;
 	private WfUser destination;
 	private WorkflowDefinition wfDefinition;
 	private WfState state;
 	private Map<String,Object> properties;
 	private List<WfHistoryEntry> history;
 	private String componentName;
-	private String workListName;
 	private ActionReport actionReport;
 	public enum ActionReport {CANCEL, SAVE_AS_TODO, OUTBOX,COMPLETE};
 	
@@ -85,12 +83,12 @@ public class WfInstance implements Serializable{
 		this.history = history;
 	}
 
-	public UUID getWorkListId() {
-		return workListId;
+	public WorkList getWorkList() {
+		return workList;
 	}
 
-	public void setWorkListId(UUID workListId) {
-		this.workListId = workListId;
+	public void setWorkList(WorkList workList) {
+		this.workList = workList;
 	}
 
 	public WfUser getDestination() {
@@ -104,7 +102,7 @@ public class WfInstance implements Serializable{
 	public static void updateInstanceState(WfInstance instance, WfState newState) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-		WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.workListId), config);
+		WorkList workList = instance.getWorkList();
 		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
 		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), 
 				tf.uuidToNative(newState.getId()));
@@ -114,7 +112,7 @@ public class WfInstance implements Serializable{
 	public static void updateInstanceUser(WfInstance instance, WfUser user) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
-		WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.workListId), config);
+		WorkList workList = instance.getWorkList();
 		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
 		pormAssigRefset.setDestination(tf.uuidToNative(instance.componentId), 
 				tf.uuidToNative(user.getId()));
@@ -129,14 +127,6 @@ public class WfInstance implements Serializable{
 		this.componentName = componentName;
 	}
 
-	public String getWorkListName() {
-		return workListName;
-	}
-
-	public void setWorkListName(String workListName) {
-		this.workListName = workListName;
-	}
-	
 	public ActionReport getActionReport() {
 		return actionReport;
 	}
@@ -151,8 +141,8 @@ public class WfInstance implements Serializable{
 			WfInstance instance = (WfInstance)obj;
 			return instance.getComponentId().equals(this.componentId) &&
 			instance.getComponentName().equals(this.componentName) &&
-			instance.getWorkListId().equals(this.workListId) &&
-			instance.workListName.equals(this.workListName) &&
+			instance.getWorkList().equals(this.workList) &&
+			instance.workList.getName().equals(this.workList.getName()) &&
 			instance.getDestination().equals(this.destination) &&
 			instance.getActionReport().equals(this.actionReport);
 		}else{

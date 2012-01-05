@@ -16,7 +16,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -45,7 +44,7 @@ public class PromotionRefset extends Refset {
 			if (promotionMember.getCollectionNid() == this.refsetId) {
 				try {
 					return promotionMember.getVersion(config.getViewCoordinate());
-				} catch (ContradictionException e) {
+				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}

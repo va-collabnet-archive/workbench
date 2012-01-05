@@ -17,7 +17,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -56,7 +55,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 				try {
 					RefexVersionBI lastTuple = promotionMember.getVersion(config.getViewCoordinate());
 					return lastTuple;
-				} catch (ContradictionException e) {
+				} catch (Exception e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
 			}

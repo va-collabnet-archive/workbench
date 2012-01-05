@@ -105,7 +105,7 @@ public class TagManager extends Observable {
 	private void removeUuidFromAllTagFiles(String uuidToRemove) throws FileNotFoundException, IOException {
 		File[] tags = tagFolder.listFiles();
 		for (File file : tags) {
-			if (!file.getName().equals("outbox.tag") && !file.isHidden()) {
+			if (!file.isHidden()) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -124,6 +124,7 @@ public class TagManager extends Observable {
 				for (String uuid : uuidList) {
 					pw.println(uuid);
 				}
+				pw.close();
 			}
 		}
 	}
@@ -194,7 +195,7 @@ public class TagManager extends Observable {
 		pw.flush();
 		pw.close();
 		InboxTag nameColorTag = new InboxTag(tag.getTagName(), tag.getColor(), tag.getTextColor(), null);
-		if (nameColorCache.contains(nameColorTag)) {
+		if (!nameColorCache.contains(nameColorTag)) {
 			nameColorCache.add(nameColorTag);
 		}
 		tag.setUuidList(uuidList);

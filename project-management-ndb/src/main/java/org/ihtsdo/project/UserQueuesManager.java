@@ -59,7 +59,7 @@ public class UserQueuesManager {
 
 	public void persistInstanceChanges(WfInstance instance) {
 		try {
-			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.getWorkListId()), config);
+			WorkList workList = instance.getWorkList();
 			PromotionAndAssignmentRefset promDestRefset = workList.getPromotionRefset(config);
 
 			if (!promDestRefset.getDestination(tf.uuidToNative(
@@ -83,7 +83,7 @@ public class UserQueuesManager {
 
 	private void setDestination(WfInstance instance, WfUser destinationUser) {
 		try {
-			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.getWorkListId()), config);
+			WorkList workList = instance.getWorkList();
 			PromotionAndAssignmentRefset promDestRefset = workList.getPromotionRefset(config);
 			promDestRefset.setDestination(tf.uuidToNative(instance.getComponentId()), 
 					tf.uuidToNative(destinationUser.getId()));
@@ -98,7 +98,7 @@ public class UserQueuesManager {
 
 	private void setStatus(WfInstance instance, WfState newStatus) {
 		try {
-			WorkList workList = TerminologyProjectDAO.getWorkList(tf.getConcept(instance.getWorkListId()), config);
+			WorkList workList = instance.getWorkList();
 			PromotionAndAssignmentRefset promDestRefset = workList.getPromotionRefset(config);
 			promDestRefset.setPromotionStatus(tf.uuidToNative(instance.getComponentId()), 
 					tf.uuidToNative(newStatus.getId()));
@@ -134,7 +134,7 @@ public class UserQueuesManager {
 							instance.setComponentId(loopMember.getUids().iterator().next());
 							instance.setState(getState(promDestRefset.getPromotionStatus(loopMember.getId(), config).getNid()));
 							instance.setWfDefinition(deserializedWorkListWithMetadata.getWorkflowDefinition());
-							instance.setWorkListId(deserializedWorkListWithMetadata.getRefsetConcept().getPrimUuid());
+							instance.setWorkList(deserializedWorkListWithMetadata);
 							instance.setDestination(user);
 							items.add(instance);
 						}

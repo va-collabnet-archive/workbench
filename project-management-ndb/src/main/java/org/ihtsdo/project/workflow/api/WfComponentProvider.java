@@ -25,6 +25,8 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -158,7 +160,20 @@ public class WfComponentProvider {
 		return returnRoles;
 
 	}
-
+	
+	public static WfInstance getWfInstance(UUID instanceUUID){
+		WorkList worklist = null;
+		WfInstance wfInstance = null;
+		try {
+			worklist = TerminologyProjectDAO.getWorkList(Terms.get().getConcept(instanceUUID), Terms.get().getActiveAceFrameConfig());
+			wfInstance  = TerminologyProjectDAO.getWorkListMember(Terms.get().getConcept(instanceUUID), worklist, Terms.get().getActiveAceFrameConfig()).getWfInstance();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return wfInstance;
+	}
 
 	public List<WfPermission> getPermissionsForUser(WfUser user) {
 		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();

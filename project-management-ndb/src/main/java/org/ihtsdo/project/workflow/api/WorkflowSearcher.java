@@ -136,7 +136,7 @@ public class WorkflowSearcher {
 		}
 		return result;
 	}
-
+	
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
 		for (final WorkList wl : worklist) {
 			SwingUtilities.invokeLater(new Runnable() {

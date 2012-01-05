@@ -40,22 +40,23 @@ import org.ihtsdo.project.workflow.model.WfUser;
 /**
  * The Class CreateNewProject.
  */
-@BeanList(specs = 
-{ @Spec(directory = "tasks/workflow2", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/workflow2", type = BeanType.TASK_BEAN) })
 public class SetWfInstanceNextDestination extends AbstractTask {
-	
+
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1;
 
 	/** The Constant dataVersion. */
 	private static final int dataVersion = 1;
-	
+
 	/**
 	 * Write object.
 	 * 
-	 * @param out the out
+	 * @param out
+	 *            the out
 	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.writeInt(dataVersion);
@@ -64,76 +65,85 @@ public class SetWfInstanceNextDestination extends AbstractTask {
 	/**
 	 * Read object.
 	 * 
-	 * @param in the in
+	 * @param in
+	 *            the in
 	 * 
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws ClassNotFoundException the class not found exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
 	 */
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-	ClassNotFoundException {
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
 		int objDataVersion = in.readInt();
 		if (objDataVersion == 1) {
 		} else {
-			throw new IOException("Can't handle dataversion: " + objDataVersion);   
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
 
 	}
-	
+
 	/**
 	 * Instantiates a new creates the new project.
 	 * 
-	 * @throws MalformedURLException the malformed url exception
+	 * @throws MalformedURLException
+	 *             the malformed url exception
 	 */
 	public SetWfInstanceNextDestination() throws MalformedURLException {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.
+	 * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
 	 */
-	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
-	throws TaskFailedException {
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 		try {
-			I_ConfigAceFrame config = (I_ConfigAceFrame) worker
-			.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-			
+			I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+
 			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
-			
+
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(instance.getWfDefinition());
-			
-			WfUser nextDestination = interpreter.getNextDestination(instance, 
-					TerminologyProjectDAO.getWorkList(Terms.get().getConcept(instance.getWorkListId()), config));
-			
+
+			WfUser nextDestination = interpreter.getNextDestination(instance, instance.getWorkList());
+
 			WfInstance.updateInstanceUser(instance, nextDestination);
-			
+
 			Terms.get().commit();
-			
+
 			return Condition.CONTINUE;
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.
+	 * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
 	 */
-	public void complete(I_EncodeBusinessProcess process, I_Work worker)
-	throws TaskFailedException {
+	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
 	 */
 	public Collection<Condition> getConditions() {
 		return CONTINUE_CONDITION;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
 	 */
 	public int[] getDataContainerIds() {
-		return new int[] {  };
+		return new int[] {};
 	}
-	
+
 }
