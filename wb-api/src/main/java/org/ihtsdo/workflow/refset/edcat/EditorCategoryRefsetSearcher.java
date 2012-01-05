@@ -10,6 +10,7 @@ import java.util.Set;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -135,17 +136,25 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 	}
 	
 	public ConceptVersionBI searchForCategoryByModelerAndTag(ConceptVersionBI modeler, String tag, ViewCoordinate vc) throws Exception {
-		List<? extends I_ExtendByRef> l = Terms.get().getRefsetExtensionsForComponent(refsetNid, modeler.getNid());
+		List<? extends I_ExtendByRef> allMembers = Terms.get().getRefsetExtensionsForComponent(refsetNid, modeler.getNid());
 
-		for (int i = 0; i < l.size(); i++)
+		for (int i = 0; i < allMembers.size(); i++)
 		{
-			I_ExtendByRefPartStr<?> props = (I_ExtendByRefPartStr<?>)l.get(i);
-			
-			if (reader.getSemanticTag(props.getStringValue()).equalsIgnoreCase(tag)) {
-				// Found modeler/tag combination already exists
-				if (props.getStatusNid() == activeRf1 || props.getStatusNid() == activeRf2) {
-					// last version is active, return Editor Category
-					return reader.getEditorCategory(props.getStringValue()).getVersion(vc);
+			// Identify latest version of extension
+            I_ExtendByRefPart latestPart = null;
+            for (I_ExtendByRefPart part : allMembers.get(i).getMutableParts()) {
+                if ((latestPart == null) || (part.getTime() >= latestPart.getTime())) {
+                    latestPart = part;
+                }
+            }
+
+			I_ExtendByRefPartStr<?> version = (I_ExtendByRefPartStr<?>)latestPart;
+
+			// If has same modeler & semantic tag combination already in refset, ensure is active.  
+			// If so, return existing category
+			if (reader.getSemanticTag(version.getStringValue()).equalsIgnoreCase(tag)) {
+				if (version.getStatusNid() == activeRf1 || version.getStatusNid() == activeRf2) {
+					return reader.getEditorCategory(version.getStringValue()).getVersion(vc);
 				}
 			}
 		}
