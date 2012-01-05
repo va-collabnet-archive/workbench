@@ -96,7 +96,7 @@
         <name>Reject revision with stated reason</name>
         <id>2b18b0b0-dfd3-421e-a2fa-bcd2b554d04c</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
-        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -150,7 +150,7 @@
         <name>Reject revision</name>
         <id>ea4cffd7-0fdd-4768-9740-3f0e07e1d9b4</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[5]"/>
-        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
     <entry>
@@ -168,7 +168,7 @@
         <name>Reject translation with stated reason</name>
         <id>c2cb6408-bcce-42b9-bdaf-dff9123925c3</id>
         <consequence reference="../../../../states/org.ihtsdo.project.workflow.model.WfState[4]"/>
-        <businessProcess>sampleProcesses/GenericActionWithoutDestination.bp</businessProcess>
+        <businessProcess>sampleProcesses/RejectActionWithoutDestination.bp</businessProcess>
       </org.ihtsdo.project.workflow.model.WfAction>
     </entry>
   </actions>
