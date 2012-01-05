@@ -19,7 +19,6 @@ package org.ihtsdo.batch;
 import java.io.IOException;
 import java.util.UUID;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
