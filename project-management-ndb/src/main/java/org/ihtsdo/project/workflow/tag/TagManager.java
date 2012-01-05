@@ -20,8 +20,11 @@ import javax.swing.text.html.StyleSheet;
 import org.dwfa.ace.config.AceConfig;
 
 public class TagManager extends Observable {
-	private static final String TODOCOLOR = "#FE9A2E";
-	private static final String OUTBOXCOLOR = "#3A01DF";
+	public static final String TODO = "todo";
+	public static final String OUTBOX_TEXT_COLOR = "#000000";
+	public static final String OUTBOX = "outbox";
+	public static final String TODOCOLOR = "#FE9A2E";
+	public static final String OUTBOXCOLOR = "#3A01DF";
 
 	private static TagManager instance = null;
 	private File tagFolder;
@@ -35,8 +38,8 @@ public class TagManager extends Observable {
 			tagFolder = new File(userFolder, "tags");
 			tagFolder.mkdir();
 			try {
-				createTag(new InboxTag("outbox", OUTBOXCOLOR, "#000000", new ArrayList<String>()));
-				createTag(new InboxTag("todo", TODOCOLOR, "#000000", new ArrayList<String>()));
+				createTag(new InboxTag(OUTBOX, OUTBOXCOLOR, OUTBOX_TEXT_COLOR, new ArrayList<String>()));
+				createTag(new InboxTag(TODO, TODOCOLOR, OUTBOX_TEXT_COLOR, new ArrayList<String>()));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -86,20 +89,20 @@ public class TagManager extends Observable {
 		removeUuidFromAllTagFiles(outboxUuid);
 		List<String> uuidList = new ArrayList<String>();
 		uuidList.add(outboxUuid);
-		InboxTag tag = new InboxTag("outbox", OUTBOXCOLOR, "#000000", uuidList);
-		persistTag(tag);
+		InboxTag tag = new InboxTag(OUTBOX, OUTBOXCOLOR, OUTBOX_TEXT_COLOR, uuidList);
+		InboxTag result = persistTag(tag);
 		setChanged();
-		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, tag));
+		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, result));
 	}
 
 	public void saveAsToDo(String uuid) throws IOException {
 		removeUuidFromAllTagFiles(uuid);
 		List<String> uuidList = new ArrayList<String>();
 		uuidList.add(uuid);
-		InboxTag tag = new InboxTag("todo", TODOCOLOR, "#000000", uuidList);
-		persistTag(tag);
+		InboxTag tag = new InboxTag(TODO, TODOCOLOR, OUTBOX_TEXT_COLOR, uuidList);
+		InboxTag result = persistTag(tag);
 		setChanged();
-		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, tag));
+		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, result));
 	}
 
 	private void removeUuidFromAllTagFiles(String uuidToRemove) throws FileNotFoundException, IOException {
@@ -237,25 +240,22 @@ public class TagManager extends Observable {
 		notifyObservers(new TagChange(TagChange.TAG_REMOVED, tag));
 	}
 
-	public HashMap<String, List<String>> getTagContent(String tagName) throws IOException {
-		HashMap<String, List<String>> result = null;
+	public InboxTag getTagContent(String tagName) throws IOException {
+		InboxTag result = null;
 		File[] tags = tagFolder.listFiles();
-		if (tags.length > 0) {
-			result = new HashMap<String, List<String>>();
-		} else {
-			return result;
-		}
 		for (File file : tags) {
 			if (file.getName().equals(tagName + ".tag")) {
 				BufferedReader br = new BufferedReader(new FileReader(file));
 				String tagHeader = br.readLine();
+				String color = getHtmlColor(getColorFromHeader(tagHeader));
+				String textColor = getHtmlColor(getTextColorFromHeader(tagHeader));
 				List<String> uuidList = new ArrayList<String>();
 				while (br.ready()) {
 					String uuid = br.readLine();
 					uuidList.add(uuid);
 				}
-				result.put(tagHeader, uuidList);
 				br.close();
+				result = new InboxTag(tagName, color, textColor, uuidList);
 				break;
 			}
 		}

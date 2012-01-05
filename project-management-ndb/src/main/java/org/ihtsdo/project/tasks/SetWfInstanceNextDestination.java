@@ -108,7 +108,7 @@ public class SetWfInstanceNextDestination extends AbstractTask {
 
 			WfUser nextDestination = interpreter.getNextDestination(instance, instance.getWorkList());
 
-			WfInstance.updateInstanceUser(instance, nextDestination);
+			WfInstance.updateDestination(instance, nextDestination);
 
 			Terms.get().commit();
 

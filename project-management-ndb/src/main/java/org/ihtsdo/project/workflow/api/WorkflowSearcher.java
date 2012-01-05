@@ -28,6 +28,8 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorklistPage;
+import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagManager;
 
 public class WorkflowSearcher {
 
@@ -136,7 +138,7 @@ public class WorkflowSearcher {
 		}
 		return result;
 	}
-	
+
 	private void convertWlMembers(List<WorkList> worklist, List<WfInstance> result) throws TerminologyException, IOException {
 		for (final WorkList wl : worklist) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -170,7 +172,8 @@ public class WorkflowSearcher {
 					for (WorkList workList : worklists) {
 
 						List<WfUser> users = workList.getUsers();
-						if (true/** users.contains(user) */) {
+						if (true/** users.contains(user) */
+						) {
 							Integer wlMembersSize = getWlMembersSize(workList, user);
 							if (wlMembersSize > 0) {
 								result.put(workList, wlMembersSize);
@@ -189,14 +192,24 @@ public class WorkflowSearcher {
 
 	/**
 	 * This is the union of getUserWorklists and getUserStatusList.. <BR>
-	 * it takes advantage of the worklist members loop to calculate wl size and states size. 
+	 * it takes advantage of the worklist members loop to calculate wl size and
+	 * states size.
+	 * 
 	 * @param user
+	 * @param tagsContent
 	 * @return
 	 */
 	public HashMap<Object, Integer> getCountByWorklistAndState(WfUser user) {
 		HashMap<Object, Integer> result = new HashMap<Object, Integer>();
 		I_ConfigAceFrame config;
 		try {
+
+			List<String> outboxTodoTaguuids = new ArrayList<String>();
+			InboxTag outboxTag = TagManager.getInstance().getTagContent(TagManager.OUTBOX);
+			InboxTag todoTag = TagManager.getInstance().getTagContent(TagManager.TODO);
+			outboxTodoTaguuids.addAll(outboxTag.getUuidList());
+			outboxTodoTaguuids.addAll(todoTag.getUuidList());
+
 			config = Terms.get().getActiveAceFrameConfig();
 			List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 			for (I_TerminologyProject i_TerminologyProject : projects) {
@@ -206,17 +219,19 @@ public class WorkflowSearcher {
 					for (WorkList workList : worklists) {
 						HashMap<I_GetConceptData, Integer> workListMembersStatuses = new HashMap<I_GetConceptData, Integer>();
 						List<WfUser> users = workList.getUsers();
-						if (true/** users.contains(user) */) {
+						if (users.contains(user)) {
 							List<WorkListMember> allWorkListMembers = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
 							int size = 0;
 							for (WorkListMember workListMember : allWorkListMembers) {
 								if (workListMember.getWfInstance().getDestination().equals(user)) {
-									size++;
-									I_GetConceptData activityStatus = workListMember.getActivityStatus();
-									Integer currentCount = workListMembersStatuses.get(activityStatus);
-									if (currentCount == null)
-										currentCount = 0;
-									workListMembersStatuses.put(activityStatus, currentCount + 1);
+									if (!outboxTodoTaguuids.contains(workListMember.getUids().get(0))) {
+										size++;
+										I_GetConceptData activityStatus = workListMember.getActivityStatus();
+										Integer currentCount = workListMembersStatuses.get(activityStatus);
+										if (currentCount == null)
+											currentCount = 0;
+										workListMembersStatuses.put(activityStatus, currentCount + 1);
+									}
 								}
 							}
 

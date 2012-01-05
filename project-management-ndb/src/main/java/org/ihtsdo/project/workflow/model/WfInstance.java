@@ -109,7 +109,7 @@ public class WfInstance implements Serializable{
 		instance.setState(newState);
 	}
 	
-	public static void updateInstanceUser(WfInstance instance, WfUser user) throws Exception {
+	public static void updateDestination(WfInstance instance, WfUser user) throws Exception {
 		I_TermFactory tf = Terms.get();
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		WorkList workList = instance.getWorkList();
