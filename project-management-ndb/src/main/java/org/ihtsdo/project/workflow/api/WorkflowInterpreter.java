@@ -224,13 +224,14 @@ public class WorkflowInterpreter {
 		return possibleUsers;
 	}
 
-	public void doAction(WfInstance instance, WfAction action, I_Work worker) {
+	public void doAction(WfInstance instance, WfRole role,WfAction action, I_Work worker) {
 		// TODO: decide if should check for action is possible
 		try {
 			BusinessProcess bp;
 			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(action.getBusinessProcess())));
 			bp = (BusinessProcess) ois.readObject();
 			bp.writeAttachment("WfInstance", instance);
+			bp.writeAttachment("WfRole", role);
 			bp.writeAttachment("consequenceState", action.getConsequence());
 			final I_Work tworker;
 			if (worker.isExecuting()) {
