@@ -2,6 +2,7 @@ package org.ihtsdo.translation.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,6 +21,9 @@ import javax.swing.table.DefaultTableModel;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
@@ -45,21 +49,23 @@ public class InboxTableModel extends DefaultTableModel {
 	private I_TermFactory tf;
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
-	
+
 	private InboxWorker inboxWorker;
 
-	public InboxTag getTagByUuid(String uuid){
+	public List<InboxTag> tags;
+
+	public InboxTag getTagByUuid(String uuid) {
 		return tagCache.get(uuid);
 	}
-	
-	public void addTagToCache(String uuid, InboxTag tag){
+
+	public void addTagToCache(String uuid, InboxTag tag) {
 		tagCache.put(uuid, tag);
 	}
-	
-	public void removeTagFromCache(String uuid){
+
+	public void removeTagFromCache(String uuid) {
 		tagCache.remove(uuid);
 	}
-	
+
 	public InboxTableModel(JProgressBar pBar) {
 		super();
 		this.tf = Terms.get();
@@ -114,17 +120,17 @@ public class InboxTableModel extends DefaultTableModel {
 		return morePages;
 	}
 
-	public int getRealColumnSize(){
-		return columnNames.length-1;
+	public int getRealColumnSize() {
+		return columnNames.length - 1;
 	}
-	
+
 	public int getColumnCount() {
 		return columnCount;
 	}
-	
+
 	@Override
 	public void setColumnCount(int columnCount) {
-		this.columnCount =  columnCount;
+		this.columnCount = columnCount;
 	}
 
 	public int getRowCount() {
@@ -154,6 +160,7 @@ public class InboxTableModel extends DefaultTableModel {
 	 * each cell. If we didn't implement this method, then the last column would
 	 * contain text ("true"/"false"), rather than a check box.
 	 */
+	@SuppressWarnings("unchecked")
 	public Class getColumnClass(int c) {
 		if (getValueAt(0, c) != null) {
 			return getValueAt(0, c).getClass();
@@ -191,7 +198,6 @@ public class InboxTableModel extends DefaultTableModel {
 	class InboxWorker extends SwingWorker<List<WfInstance>, WfInstance> {
 		private HashMap<String, WfSearchFilterBI> filterList;
 		private ExecutorService executor;
-		private List<InboxTag> tags;
 
 		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
 			super();
@@ -236,25 +242,7 @@ public class InboxTableModel extends DefaultTableModel {
 					data = new LinkedList<Object[]>();
 					int i = 0;
 					for (WfInstance wfInstance : wfInstances) {
-						String tagStr = "";
-						if (tags != null) {
-							for (InboxTag tag : tags) {
-								if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
-									tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(),tag.getTextColor());
-									tagCache.put(wfInstance.getComponentId().toString(), tag);
-									break;
-								}
-							}
-						}
-						String concept = wfInstance.getComponentName();
-						Object[] row = new Object[columnNames.length];
-						String componentStr = tagStr + concept;
-						row[COMPONENT] = componentStr;
-						row[TARGET] = "";
-						row[WORKLIST] = wfInstance.getWorkListName();
-						row[DESTINATION] = wfInstance.getDestination().getUsername();
-						row[STATE] = wfInstance.getState().getName();
-						row[WORKFLOW_ITEM] = wfInstance;
+						Object[] row = createRow(wfInstance);
 						data.add(row);
 						i++;
 					}
@@ -275,6 +263,46 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		}
 
+	}
+
+	public void updateRow(Object[] currentRow, int modelRowNum) {
+		Object[] rowUpdated = null;
+		WfInstance wfInstance = (WfInstance)currentRow[currentRow.length-1];
+		try {
+			WorkList worklist = wfInstance.getWorkList();
+			WfInstance wfInstanceUpdated = TerminologyProjectDAO.getWorkListMember(Terms.get().getConcept(wfInstance.getComponentId()), worklist, Terms.get().getActiveAceFrameConfig()).getWfInstance();
+			rowUpdated = createRow(wfInstanceUpdated);
+			data.remove(modelRowNum);
+			data.add(modelRowNum, rowUpdated);
+			fireTableDataChanged();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Object[] createRow(WfInstance wfInstance) {
+		String tagStr = "";
+		if (tags != null) {
+			for (InboxTag tag : tags) {
+				if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
+					tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
+					tagCache.put(wfInstance.getComponentId().toString(), tag);
+					break;
+				}
+			}
+		}
+		String concept = wfInstance.getComponentName();
+		Object[] row = new Object[columnNames.length];
+		String componentStr = tagStr + concept;
+		row[COMPONENT] = componentStr;
+		row[TARGET] = "";
+		row[WORKLIST] = wfInstance.getWorkList().getName();
+		row[DESTINATION] = wfInstance.getDestination().getUsername();
+		row[STATE] = wfInstance.getState().getName();
+		row[WORKFLOW_ITEM] = wfInstance;
+		return row;
 	};
 }
 

@@ -29,6 +29,7 @@ import java.util.Observer;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -61,6 +62,7 @@ import org.ihtsdo.project.workflow.filters.WfComponentFilter;
 import org.ihtsdo.project.workflow.filters.WfDestinationFilter;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfInstance.ActionReport;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagChange;
@@ -86,6 +88,7 @@ public class WfInboxPanel extends JPanel implements Observer {
 	private boolean expanded = false;
 	private JDialog d;
 	private ConfigTranslationModule cfg;
+	private int currentModelRowNum;
 
 	public WfInboxPanel() {
 		initComponents();
@@ -104,11 +107,11 @@ public class WfInboxPanel extends JPanel implements Observer {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
-
+			checkBox1.setSelected(cfg.isAutoOpenNextInboxItem());
 			LinkedHashSet<InboxColumn> columns = cfg.getColumnsDisplayedInInbox();
-			model.setColumnCount(columns.size());
+			model.setColumnCount(3);
 			for (InboxColumn inboxColumn : columns) {
-				
+
 			}
 			filterPanel.setVisible(false);
 
@@ -290,65 +293,106 @@ public class WfInboxPanel extends JPanel implements Observer {
 				popupMenu1.show(inboxTable, xPoint, yPoint);
 			}
 		} else if (e.getClickCount() == 2) {
-			int selectedIndex = inboxTable.getSelectedRow();
-			if (selectedIndex >= 0) {
+			openItem();
+		}
+	}
 
-				try {
-					cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-				} catch (Exception ex) {
-					ex.printStackTrace();
+	private void openItem() {
+		int selectedIndex = inboxTable.getSelectedRow();
+		if (selectedIndex >= 0) {
+			try {
+				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			if ((selectedIndex + 1) < model.getRowCount()) {
+				if (cfg != null && cfg.isAutoOpenNextInboxItem()) {
+					nextIndex = selectedIndex + 1;
 				}
-				if ((selectedIndex + 1) < model.getRowCount()) {
-					if (cfg != null && cfg.isAutoOpenNextInboxItem()) {
-						nextIndex = selectedIndex + 1;
-					}
-				}
+			}
 
-				int modelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
-				WfInstance wfInstance = (WfInstance) model.getValueAt(modelRowNum, InboxTableModel.WORKFLOW_ITEM);
-				JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
-				if (model.getRowCount() > 0) {
-					inboxTable.setRowSelectionInterval(nextIndex, nextIndex);
-				}
+			currentModelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
+			WfInstance wfInstance = (WfInstance) model.getValueAt(currentModelRowNum, InboxTableModel.WORKFLOW_ITEM);
+			JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
 
-				if (uiPanel == null) {
-					uiPanel = new TranslationPanel();
-					tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
-					tpc.setSelectedIndex(tpc.getTabCount() - 1);
-					uiPanel.addPropertyChangeListener(new PropertyChangeListener() {
-						@Override
-						public void propertyChange(PropertyChangeEvent arg0) {
-							if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
-								arg0.getNewValue();
-								arg0.getOldValue();
-							}
-						}
-					});
-				} else if (tpc != null) {
-					int tabCount = tpc.getTabCount();
-					for (int i = 0; i < tabCount; i++) {
-						if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
-							if (tpc.getComponentAt(i) instanceof TranslationPanel) {
-								uiPanel = (TranslationPanel) tpc.getComponentAt(i);
-								tpc.setSelectedIndex(i);
-								ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
-								if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
-									if (!uiPanel.verifySavePending(null, false)) {
-										return;
+			if (uiPanel == null) {
+				uiPanel = new TranslationPanel();
+				tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
+				tpc.setSelectedIndex(tpc.getTabCount() - 1);
+				uiPanel.addPropertyChangeListener(new PropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0) {
+						if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
+							Object newValue = arg0.getNewValue();
+							Object oldValue = arg0.getOldValue();
+							if (newValue instanceof WfInstance) {
+								WfInstance newWfInstance = (WfInstance) newValue;
+								WfInstance oldWfInstance = (WfInstance) oldValue;
+								
+								ActionReport actionReport = newWfInstance.getActionReport();
+								if (actionReport != null) {
+									switch (actionReport) {
+									case CANCEL:
+										openItem();
+										break;
+									case COMPLETE:
+										if (newWfInstance.getDestination().equals(user)) {
+											model.updateRow(currentRow, currentModelRowNum);
+											inboxTreePanel1.itemUserAndStateChanged(oldWfInstance,newWfInstance);
+										} else {
+											model.removeRow(currentModelRowNum);
+											inboxTreePanel1.itemStateChanged(oldWfInstance,newWfInstance);
+										}
+										openItem();
+										break;
+									case SAVE_AS_TODO:
+										try {
+											tagManager.saveAsToDo(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+											model.removeRow(currentModelRowNum);
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+										break;
+									case OUTBOX:
+										try {
+											tagManager.sendToOutbox(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+										break;
+									default:
+										break;
 									}
+								} else {
+
 								}
 							}
-							break;
 						}
 					}
+				});
+			} else if (tpc != null) {
+				int tabCount = tpc.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
+						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
+							uiPanel = (TranslationPanel) tpc.getComponentAt(i);
+							tpc.setSelectedIndex(i);
+							ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
+							if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
+								if (!uiPanel.verifySavePending(null, false)) {
+									return;
+								}
+							}
+						}
+						break;
+					}
 				}
-				uiPanel.updateUI(wfInstance, false);
-				if (currentRow != null) {
-					model.addRow(currentRow);
-				}
-				currentRow = model.getRow(modelRowNum);
-				currentTranslationItem.setText(currentRow[InboxTableModel.COMPONENT].toString());
-				model.removeRow(modelRowNum);
+			}
+			uiPanel.updateUI(wfInstance, false);
+			currentRow = model.getRow(currentModelRowNum);
+			currentTranslationItem.setText(currentRow[InboxTableModel.COMPONENT].toString());
+			if (model.getRowCount() > 0) {
+				inboxTable.setRowSelectionInterval(nextIndex, nextIndex);
 			}
 		}
 	}
@@ -408,18 +452,16 @@ public class WfInboxPanel extends JPanel implements Observer {
 			AceFrameConfig config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 			AceFrame ace = config.getAceFrame();
 
-			JTabbedPane tpc = ace.getCdePanel().getConceptTabs();
+			JTabbedPane tpc = ace.getCdePanel().getLeftTabs();
 			if (tpc != null) {
 				int tabCount = tpc.getTabCount();
 				for (int i = 0; i < tabCount; i++) {
-					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
+					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_LEFT_MENU)) {
 						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 							TranslationPanel uiPanel = (TranslationPanel) tpc.getComponentAt(i);
 							if (!uiPanel.verifySavePending(null, false)) {
-								// closing = false;
 								return;
 							}
-							uiPanel.AutokeepInInbox();
 						}
 						tpc.remove(i);
 						tpc.repaint();
@@ -431,6 +473,21 @@ public class WfInboxPanel extends JPanel implements Observer {
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
+		}
+	}
+
+	private void checkBox1ActionPerformed(ActionEvent e) {
+		ConfigTranslationModule cfg = null;
+		try {
+			cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+			cfg.setAutoOpenNextInboxItem(checkBox1.isSelected());
+			LanguageUtil.setTranslationConfig(Terms.get().getActiveAceFrameConfig(), cfg);
+		} catch (IOException ex) {
+
+			ex.printStackTrace();
+		} catch (TerminologyException ex) {
+
+			ex.printStackTrace();
 		}
 	}
 
@@ -458,6 +515,7 @@ public class WfInboxPanel extends JPanel implements Observer {
 		filterButton = new JButton();
 		label1 = new JLabel();
 		currentTranslationItem = new JLabel();
+		checkBox1 = new JCheckBox();
 		closeInbox = new JButton();
 		popupMenu1 = new JPopupMenu();
 		menu2 = new JMenu();
@@ -512,10 +570,10 @@ public class WfInboxPanel extends JPanel implements Observer {
 				{
 					panel1.setBorder(new EmptyBorder(5, 5, 5, 5));
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {89, 0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 6, 0, 0, 0};
+					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
+					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {1.0, 1.0, 1.0, 0.0, 1.0E-4};
 
 					//---- expand ----
 					expand.setText("Zoom in");
@@ -585,7 +643,7 @@ public class WfInboxPanel extends JPanel implements Observer {
 						});
 						filterPanel.add(filterButton, BorderLayout.EAST);
 					}
-					panel1.add(filterPanel, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
+					panel1.add(filterPanel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 5, 0), 0, 0));
 
@@ -593,8 +651,20 @@ public class WfInboxPanel extends JPanel implements Observer {
 					label1.setText("Current item:");
 					panel1.add(label1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
-					panel1.add(currentTranslationItem, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+						new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(currentTranslationItem, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+					//---- checkBox1 ----
+					checkBox1.setText("Automatically open next item in inbox after finishing with current item");
+					checkBox1.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							checkBox1ActionPerformed(e);
+						}
+					});
+					panel1.add(checkBox1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
 						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 						new Insets(0, 0, 0, 0), 0, 0));
 				}
@@ -670,6 +740,7 @@ public class WfInboxPanel extends JPanel implements Observer {
 	private JButton filterButton;
 	private JLabel label1;
 	private JLabel currentTranslationItem;
+	private JCheckBox checkBox1;
 	private JButton closeInbox;
 	private JPopupMenu popupMenu1;
 	private JMenu menu2;
@@ -690,8 +761,8 @@ public class WfInboxPanel extends JPanel implements Observer {
 				Object[] row = model.getRow(i);
 				WfInstance wfi = (WfInstance) row[InboxTableModel.WORKFLOW_ITEM];
 				if (uuidAdded.equals(wfi.getComponentId())) {
-					model.removeRow(i);
-					break;
+					//model.removeRow(i);
+					//break;
 				}
 			}
 		} else if (change.getType().equals(TagChange.TAG_REMOVED)) {

@@ -31,13 +31,11 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.queue.SelectAll;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
-import org.ihtsdo.translation.ui.InboxPanel;
 import org.ihtsdo.translation.ui.WfInboxPanel;
 
 /**

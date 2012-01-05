@@ -114,7 +114,6 @@ import org.dwfa.queue.SelectAll;
 import org.dwfa.queue.bpa.worker.OnDemandOutboxQueueWorker;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.document.report.ReportPanel;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;

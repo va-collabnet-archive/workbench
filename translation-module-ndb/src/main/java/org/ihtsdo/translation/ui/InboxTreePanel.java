@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -38,9 +39,12 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.util.IconUtilities;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
@@ -61,6 +65,9 @@ public class InboxTreePanel extends JPanel implements Observer {
 	private I_GetConceptData user;
 	TagManager tagManager;
 	private DefaultMutableTreeNode cNode;
+	private DefaultMutableTreeNode wNode;
+	private DefaultMutableTreeNode sNode;
+	private DefaultMutableTreeNode iNode;
 
 	public InboxTreePanel() {
 		initComponents();
@@ -71,6 +78,7 @@ public class InboxTreePanel extends JPanel implements Observer {
 
 		inboxFolderTree.setRootVisible(false);
 		inboxFolderTree.setShowsRootHandles(false);
+		inboxFolderTree.setCellRenderer(new IconRenderer());
 		searcher = new WorkflowSearcher();
 		try {
 			I_TermFactory tf = Terms.get();
@@ -99,11 +107,10 @@ public class InboxTreePanel extends JPanel implements Observer {
 
 	private void updateTree() {
 		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
-		DefaultMutableTreeNode iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
-		DefaultMutableTreeNode sNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.STATUS_NODE_ROOT, IconUtilities.STATUS_NODE, new FolderMetadata(IconUtilities.STATUS_NODE, true)));
+		iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
+		sNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.STATUS_NODE_ROOT, IconUtilities.STATUS_NODE, new FolderMetadata(IconUtilities.STATUS_NODE, true)));
 		// updateStatusNode(sNode);
-		DefaultMutableTreeNode wNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.WORKLIST_NODE_ROOT, IconUtilities.WORKLIST_NODE,
-				new FolderMetadata(IconUtilities.WORKLIST_NODE, true)));
+		wNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.WORKLIST_NODE_ROOT, IconUtilities.WORKLIST_NODE, new FolderMetadata(IconUtilities.WORKLIST_NODE, true)));
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 
 		model = new DefaultTreeModel(root);
@@ -205,7 +212,7 @@ public class InboxTreePanel extends JPanel implements Observer {
 		TagChange change = (TagChange) arg;
 		InboxTag newTag = change.getTag();
 		if (change.getType().equals(TagChange.NEW_TAG_ADDED)) {
-			InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size());
+			InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size(), "icons/85.png");
 			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
 			cNode.add(chldNode);
 			model.reload(cNode);
@@ -232,6 +239,13 @@ public class InboxTreePanel extends JPanel implements Observer {
 		} else if (change.getType().equals(TagChange.SPECIAL_TAG_ADDED)) {
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
 			int childCount = root.getChildCount();
+
+			WfInstance wfInst = WfComponentProvider.getWfInstance(UUID.fromString(newTag.getUuidList().get(0)));
+			WfState state = wfInst.getState();
+
+			restFromStateNode(state);
+			restFromWorklistNode(wfInst);
+
 			for (int i = 0; i < childCount; i++) {
 				DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
 				if (child.getUserObject() instanceof InboxTreeItem) {
@@ -246,6 +260,7 @@ public class InboxTreePanel extends JPanel implements Observer {
 						break;
 					}
 				}
+
 			}
 		} else if (change.getType().equals(TagChange.TAG_REMOVED)) {
 			int childCount = cNode.getChildCount();
@@ -267,6 +282,80 @@ public class InboxTreePanel extends JPanel implements Observer {
 				}
 			}
 		}
+	}
+
+	private void restFromWorklistNode(WfInstance wfInst) {
+		try {
+			WorkList worklist = wfInst.getWorkList();
+			int statusChildCount = wNode.getChildCount();
+			for (int i = 0; i < statusChildCount; i++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) wNode.getChildAt(i);
+				InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
+				WorkList childWorklist = (WorkList) childTreeItem.getUserObject();
+				if (childWorklist.getName().equals(worklist.getName())) {
+					childTreeItem.setItemSize(childTreeItem.getItemSize() - 1);
+					if (childTreeItem.getItemSize() > 0) {
+						child.setUserObject(childTreeItem);
+						model.reload(child);
+					} else {
+						wNode.remove(i);
+						model.reload(sNode);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void restFromStateNode(WfState state) {
+		int statusChildCount = sNode.getChildCount();
+		for (int i = 0; i < statusChildCount; i++) {
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) sNode.getChildAt(i);
+			InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
+			WfState childState = (WfState) childTreeItem.getUserObject();
+			if (childState.getName().equals(state.getName())) {
+				childTreeItem.setItemSize(childTreeItem.getItemSize() - 1);
+				if (childTreeItem.getItemSize() > 0) {
+					child.setUserObject(childTreeItem);
+					model.reload(child);
+				} else {
+					sNode.remove(i);
+					model.reload(sNode);
+				}
+			}
+		}
+	}
+
+	private void addToStateNode(WfState state) {
+		int statusChildCount = sNode.getChildCount();
+		for (int i = 0; i < statusChildCount; i++) {
+			DefaultMutableTreeNode child = (DefaultMutableTreeNode) sNode.getChildAt(i);
+			InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
+			WfState childState = (WfState) childTreeItem.getUserObject();
+			if (childState.getName().equals(state.getName())) {
+				childTreeItem.setItemSize(childTreeItem.getItemSize() + 1);
+				if (childTreeItem.getItemSize() > 0) {
+					child.setUserObject(childTreeItem);
+					model.reload(child);
+				} else {
+					sNode.remove(i);
+					model.reload(sNode);
+				}
+			}
+		}
+	}
+
+	public void itemUserAndStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
+		restFromStateNode(oldWfInstance.getState());
+		addToStateNode(newWfInstance.getState());
+		restFromWorklistNode(newWfInstance);
+
+	}
+
+	public void itemStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
+		restFromStateNode(oldWfInstance.getState());
+		addToStateNode(newWfInstance.getState());
 	}
 
 }
@@ -316,11 +405,13 @@ class MyRenderer extends DefaultTreeCellRenderer {
 class InboxTreeItem {
 	private Object userObject;
 	private Integer itemSize;
+	private String icon;
 
-	InboxTreeItem(Object userObject, Integer itemSize) {
+	InboxTreeItem(Object userObject, Integer itemSize, String icon) {
 		super();
 		this.userObject = userObject;
 		this.itemSize = itemSize;
+		this.setIcon(icon);
 	}
 
 	public void setUserObject(Object userObject) {
@@ -343,6 +434,15 @@ class InboxTreeItem {
 	public String toString() {
 		return userObject.toString() + " (" + itemSize + ")";
 	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
 }
 
 class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem> {
@@ -391,7 +491,7 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 		}
 		if (tagsContent != null && !tagsContent.isEmpty()) {
 			for (InboxTag tag : tagsContent) {
-				InboxTreeItem inboxItem = new InboxTreeItem(tag, tag.getUuidList().size());
+				InboxTreeItem inboxItem = new InboxTreeItem(tag, tag.getUuidList().size(), "");
 				publish(inboxItem);
 			}
 		}
@@ -404,7 +504,16 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 			HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser);
 			Set<Object> worklistsAndStates = worklists.keySet();
 			for (Object loopObject : worklistsAndStates) {
-				InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject));
+				String icon = "";
+				if (loopObject instanceof WfState) {
+					icon = IconUtilities.STATUS_NODE;
+				} else if (loopObject instanceof WorkList) {
+					icon = IconUtilities.WORKLIST_NODE;
+				} else if (loopObject instanceof InboxTag) {
+					icon = "icons/85.png";
+				}
+
+				InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject), icon);
 				publish(inboxItem);
 			}
 		} catch (IOException e) {
@@ -433,28 +542,32 @@ class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem
 	@Override
 	protected void process(List<InboxTreeItem> chunks) {
 		for (InboxTreeItem inboxTreeItem : chunks) {
-			if (inboxTreeItem.getItemSize() > 0) {
-				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
-				if (inboxTreeItem.getUserObject() instanceof WorkList) {
+			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+			if (inboxTreeItem.getUserObject() instanceof WorkList) {
+				if (inboxTreeItem.getItemSize() > 0) {
 					wNode.add(chldNode);
-				} else if (inboxTreeItem.getUserObject() instanceof WfState) {
+				}
+			} else if (inboxTreeItem.getUserObject() instanceof WfState) {
+				if (inboxTreeItem.getItemSize() > 0) {
 					sNode.add(chldNode);
-				} else if (inboxTreeItem.getUserObject() instanceof InboxTag) {
-					InboxTag tag = (InboxTag) inboxTreeItem.getUserObject();
-					if (tag.getTagName().equals("outbox") || tag.getTagName().equals("todo")) {
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
-						root.add(chldNode);
-						model.reload(root);
-						model.reload(chldNode);
-					} else {
+				}
+			} else if (inboxTreeItem.getUserObject() instanceof InboxTag) {
+				InboxTag tag = (InboxTag) inboxTreeItem.getUserObject();
+				if (tag.getTagName().equals("outbox") || tag.getTagName().equals("todo")) {
+					DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
+					root.add(chldNode);
+					model.reload(root);
+					model.reload(chldNode);
+				} else {
+					if (inboxTreeItem.getItemSize() > 0) {
 						cNode.add(chldNode);
 					}
 				}
-				model.reload(wNode);
-				model.reload(sNode);
-				model.reload(cNode);
 			}
 		}
+		model.reload(wNode);
+		model.reload(sNode);
+		model.reload(cNode);
 	}
 
 };
@@ -479,4 +592,29 @@ class ProgressListener implements PropertyChangeListener {
 	}
 
 	private JProgressBar progressBar;
+}
+
+class IconRenderer extends DefaultTreeCellRenderer {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+		super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+		if (node != null && (node.getUserObject() instanceof FolderTreeObj)) {
+			FolderTreeObj nodeObject = (FolderTreeObj) node.getUserObject();
+			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getObjType()));
+			FolderMetadata fMData = (FolderMetadata) nodeObject.getAtrValue();
+			setText(fMData.getFolderName());
+		} else if (node.getUserObject() instanceof InboxTreeItem) {
+			InboxTreeItem nodeObject = (InboxTreeItem) node.getUserObject();
+			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getIcon()));
+		}
+		return this;
+	}
+
 }

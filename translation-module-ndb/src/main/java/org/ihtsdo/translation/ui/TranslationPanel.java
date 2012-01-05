@@ -1270,7 +1270,7 @@ public class TranslationPanel extends JPanel {
 					prevWfInstance.setProperties(instance.getProperties());
 					prevWfInstance.setState(instance.getState());
 					prevWfInstance.setWfDefinition(instance.getWfDefinition());
-					prevWfInstance.setWorkListId(instance.getWorkListId());
+					prevWfInstance.setWorkList(instance.getWorkList());
 					workflowInterpreter.doAction(instance, action, worker);
 					WfInstance newWfInstance = worklistMember.getWfInstance();
 					newWfInstance.setActionReport(instance.getActionReport());
@@ -3780,16 +3780,14 @@ public class TranslationPanel extends JPanel {
 
 	public void updateUI(WfInstance instance,boolean readOnlyMode) {
 		setReadOnlyMode(readOnlyMode);
-		UUID wlistId = instance.getWorkListId();
 		I_ConfigAceFrame config;
 		try {
 			this.instance=instance;
 			workflowDefinition = instance.getWfDefinition();
 			workflowInterpreter=WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
 			config = Terms.get().getActiveAceFrameConfig();
-			I_GetConceptData workListConcept = Terms.get().getConcept(wlistId);
-			WorkList worklist = TerminologyProjectDAO.getWorkList(workListConcept, config);
-		    List<WfRole> roles = workflowInterpreter.getNextRole(instance, worklist);
+		    WorkList workList = instance.getWorkList();
+			List<WfRole> roles = workflowInterpreter.getNextRole(instance, workList);
 		    componentProvider=new WfComponentProvider();
 		    
 		    WfUser user=componentProvider.userConceptToWfUser(config.getDbConfig().getUserConcept());
@@ -3811,10 +3809,10 @@ public class TranslationPanel extends JPanel {
 		    	roleConcept=Terms.get().getConcept(userRole.getId());
 		    }
 		    
-			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(worklist, config);
+			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
 
 			I_GetConceptData component = Terms.get().getConcept(instance.getComponentId());
-			WorkListMember workListMember = TerminologyProjectDAO.getWorkListMember(component, worklist, config);
+			WorkListMember workListMember = TerminologyProjectDAO.getWorkListMember(component, workList, config);
 			updateUI(translationProject,workListMember,roleConcept);
 			List<WfAction> actions = workflowInterpreter.getPossibleActions(instance, user);
 			setPossibleActions(actions);
