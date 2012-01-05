@@ -45,40 +45,39 @@ public class SnomedMetadataRfx {
     private static int REL_OPTIONAL_REFINABILITY_NID;
     private static int REL_NOT_REFINABLE_NID;
     private static int REL_MANDATORY_REFINABILITY_NID;
-    // STATUS NIDs
-    private static int STATUS_CURRENT_NID;
-    private static int STATUS_LIMITED_NID;
-    private static int STATUS_RETIRED_NID;
-    private static int STATUS_INAPPROPRIATE_NID;
     // REFEX NIDs
     private static int US_DIALECT_REFEX_NID;
     private static int GB_DIALECT_REFEX_NID;
     private static int SYNONYMY_REFEX_NID;
     private static int REFERS_TO_REFEX_NID;
-
+    // DESCRIPTION CONCEPTSPECS
+    private static ConceptSpec DESC_PREFERRED;
+    private static ConceptSpec DESC_ACCEPTABLE;
+    // STATUS NIDs
+    private static int STATUS_CURRENT_NID;
+    private static int STATUS_RETIRED_NID;
+    private static int STATUS_INAPPROPRIATE_NID;
     private static int STATUS_DUPLICATE_NID;
     private static int STATUS_AMBIGUOUS_NID;
     private static int STATUS_ERRONEOUS_NID;
     private static int STATUS_OUTDATED_NID;
-
-    // DESCRIPTION CONCEPTSPECS
-    private static ConceptSpec DESC_PREFERRED;
-    private static ConceptSpec DESC_ACCEPTABLE;
+    private static int STATUS_LIMITED_NID;
     // STATUS CONCEPTSPECS
+    private static ConceptSpec STATUS_CURRENT;
+    private static ConceptSpec STATUS_RETIRED;
+    private static ConceptSpec STATUS_INAPPROPRIATE;
     private static ConceptSpec STATUS_DUPLICATE;
     private static ConceptSpec STATUS_AMBIGUOUS;
     private static ConceptSpec STATUS_ERRONEOUS;
     private static ConceptSpec STATUS_OUTDATED;
     private static ConceptSpec STATUS_LIMITED;
-    private static ConceptSpec STATUS_CURRENT;
-    private static ConceptSpec STATUS_RETIRED;
-
     //REFEX CONCEPTS
     private static ConceptSpec REFEX_NON_HUMAN;
     private static ConceptSpec REFEX_VTM;
     private static ConceptSpec REFEX_VMP;
     private static ConceptSpec REFEX_SYNONYMY;
 
+    // DESCRIPTION CONCEPTS
     public static int getDES_FULL_SPECIFIED_NAME_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
@@ -100,11 +99,25 @@ public class SnomedMetadataRfx {
         return DES_SYNONYM_NID;
     }
 
+    public static ConceptSpec getDESC_ACCEPTABLE() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return DESC_ACCEPTABLE;
+    }
+
     public static int getDESC_ACCEPTABLE_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return ACCEPTABLE_NID;
+    }
+
+    public static ConceptSpec getDESC_PREFERRED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return DESC_PREFERRED;
     }
 
     public static int getDESC_PREFERRED_NID() throws IOException {
@@ -184,6 +197,14 @@ public class SnomedMetadataRfx {
         return releaseFormat;
     }
 
+    // STATUS CONCEPTS
+    public static ConceptSpec getSTATUS_CURRENT() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_CURRENT;
+    }
+
     public static int getSTATUS_CURRENT_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
@@ -191,17 +212,11 @@ public class SnomedMetadataRfx {
         return STATUS_CURRENT_NID;
     }
 
-    public static ConceptSpec getSTATUS_CURRENT() throws IOException {
+    public static ConceptSpec getSTATUS_LIMITED() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
-        return STATUS_CURRENT;
-    }
-    public static ConceptSpec getSTATUS_RETIRED() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_RETIRED;
+        return STATUS_LIMITED;
     }
 
     public static int getSTATUS_LIMITED_NID() throws IOException {
@@ -211,11 +226,25 @@ public class SnomedMetadataRfx {
         return STATUS_LIMITED_NID;
     }
 
+    public static ConceptSpec getSTATUS_RETIRED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_RETIRED;
+    }
+
     public static int getSTATUS_RETIRED_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return STATUS_RETIRED_NID;
+    }
+
+    public static ConceptSpec getSTATUS_INAPPROPRIATE() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_INAPPROPRIATE;
     }
 
     public static int getSTATUS_INAPPROPRIATE_NID() throws IOException {
@@ -225,11 +254,25 @@ public class SnomedMetadataRfx {
         return STATUS_INAPPROPRIATE_NID;
     }
 
+    public static ConceptSpec getSTATUS_AMBIGUOUS() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_AMBIGUOUS;
+    }
+
     public static int getSTATUS_AMBIGUOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return STATUS_AMBIGUOUS_NID;
+    }
+
+    public static ConceptSpec getSTATUS_DUPLICATE() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_DUPLICATE;
     }
 
     public static int getSTATUS_DUPLICATE_NID() throws IOException {
@@ -239,11 +282,25 @@ public class SnomedMetadataRfx {
         return STATUS_DUPLICATE_NID;
     }
 
+    public static ConceptSpec getSTATUS_ERRONEOUS() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_ERRONEOUS;
+    }
+
     public static int getSTATUS_ERRONEOUS_NID() throws IOException {
         if (isReleaseFormatSetupB == false) {
             setupSnoRf1Rf2();
         }
         return STATUS_ERRONEOUS_NID;
+    }
+
+    public static ConceptSpec getSTATUS_OUTDATED() throws IOException {
+        if (isReleaseFormatSetupB == false) {
+            setupSnoRf1Rf2();
+        }
+        return STATUS_OUTDATED;
     }
 
     public static int getSTATUS_OUTDATED_NID() throws IOException {
@@ -280,55 +337,6 @@ public class SnomedMetadataRfx {
         }
         return REFERS_TO_REFEX_NID;
     }
-    // DESCRIPTION CONCEPTS
-    public static ConceptSpec getSTATUS_DUPLICATE() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_DUPLICATE;
-    }
-    // STATUS CONCEPTS
-    public static ConceptSpec getDESC_PREFERRED() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return DESC_PREFERRED;
-    }
-    
-    public static ConceptSpec getDESC_ACCEPTABLE() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return DESC_ACCEPTABLE;
-    }
-    
-    public static ConceptSpec getSTATUS_AMBIGUOUS() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_AMBIGUOUS;
-    }
-
-    public static ConceptSpec getSTATUS_ERRONEOUS() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_ERRONEOUS;
-    }
-
-    public static ConceptSpec getSTATUS_OUTDATED() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_OUTDATED;
-    }
-
-    public static ConceptSpec getSTATUS_LIMITED() throws IOException {
-        if (isReleaseFormatSetupB == false) {
-            setupSnoRf1Rf2();
-        }
-        return STATUS_LIMITED;
-    }
 
     // REFEX CONCEPTS
     public static ConceptSpec getREFEX_NON_HUMAN() throws IOException {
@@ -357,6 +365,16 @@ public class SnomedMetadataRfx {
             setupSnoRf1Rf2();
         }
         return REFEX_SYNONYMY;
+    }
+
+    public static void setupSnoRf1Rf2(int releaseFormatNumber) throws IOException {
+        if (releaseFormatNumber != 1 || releaseFormatNumber != 2) {
+            throw new IOException("Invalid Release Format Number" + releaseFormatNumber);
+        }
+
+        isReleaseFormatSetupB = true;
+        releaseFormat = releaseFormatNumber;
+        setupSnoRf1Rf2();
     }
 
     private static void setupSnoRf1Rf2() throws IOException {
@@ -425,12 +443,21 @@ public class SnomedMetadataRfx {
             DESC_PREFERRED = SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1;
             DESC_ACCEPTABLE = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1;
             // STATUS CONCEPTSPECS
+            // STATUS: 0 CURRENT, 1 RETIRED
+            STATUS_CURRENT_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.CURRENT_RF1.getUuids());
+            STATUS_LIMITED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getUuids());
+            STATUS_RETIRED_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getUuids());
+            STATUS_INAPPROPRIATE_NID = tf.getNidForUuids(
+                    SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getUuids());
             STATUS_DUPLICATE = SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1;
             STATUS_DUPLICATE_NID = tf.getNidForUuids(STATUS_DUPLICATE.getUuids());
             STATUS_AMBIGUOUS = SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1;
             STATUS_AMBIGUOUS_NID = tf.getNidForUuids(STATUS_AMBIGUOUS.getUuids());
             STATUS_ERRONEOUS = SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1;
-            STATUS_ERRONEOUS_NID  = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
+            STATUS_ERRONEOUS_NID = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
             STATUS_OUTDATED = SnomedMetadataRf1.OUTDATED_INACTIVE_STATUS_RF1;
             STATUS_OUTDATED_NID = tf.getNidForUuids(STATUS_OUTDATED.getUuids());
             STATUS_LIMITED = SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1;
@@ -494,15 +521,22 @@ public class SnomedMetadataRfx {
             DESC_PREFERRED = SnomedMetadataRf2.PREFERRED_RF2;
             DESC_ACCEPTABLE = SnomedMetadataRf2.ACCEPTABLE_RF2;
             // STATUS CONCEPT
+            STATUS_CURRENT = SnomedMetadataRf2.ACTIVE_VALUE_RF2;
+            STATUS_CURRENT_NID = tf.getNidForUuids(STATUS_CURRENT.getUuids());
+            STATUS_RETIRED = SnomedMetadataRf2.INACTIVE_VALUE_RF2;
+            STATUS_RETIRED_NID = tf.getNidForUuids(STATUS_RETIRED.getUuids());
+            STATUS_INAPPROPRIATE = SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2;
+            STATUS_INAPPROPRIATE_NID = tf.getNidForUuids(STATUS_INAPPROPRIATE.getUuids());
             STATUS_DUPLICATE = SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2;
             STATUS_DUPLICATE_NID = tf.getNidForUuids(STATUS_DUPLICATE.getUuids());
             STATUS_AMBIGUOUS = SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2;
             STATUS_AMBIGUOUS_NID = tf.getNidForUuids(STATUS_AMBIGUOUS.getUuids());
             STATUS_ERRONEOUS = SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2;
-            STATUS_ERRONEOUS_NID  = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
+            STATUS_ERRONEOUS_NID = tf.getNidForUuids(STATUS_ERRONEOUS.getUuids());
             STATUS_OUTDATED = SnomedMetadataRf2.OUTDATED_COMPONENT_RF2;
             STATUS_OUTDATED_NID = tf.getNidForUuids(STATUS_OUTDATED.getUuids());
             STATUS_LIMITED = SnomedMetadataRf2.LIMITED_COMPONENT_RF2;
+            STATUS_LIMITED_NID = tf.getNidForUuids(STATUS_LIMITED.getUuids());
             //REFEX CONCEPTS
             REFEX_NON_HUMAN = SnomedMetadataRf2.NON_HUMAN_RF2;
             REFEX_VTM = SnomedMetadataRf2.VTM_RF2;
