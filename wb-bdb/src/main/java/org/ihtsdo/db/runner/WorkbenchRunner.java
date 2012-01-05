@@ -782,6 +782,13 @@ public class WorkbenchRunner {
                     ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPSFN, cpfn);
                     ObjectCache.INSTANCE.put(CustomStatics.CUSTOMPROPS, custProps);
                     
+                    //Add the UI key if there
+                    String uiClass = custProps.getProperty(CustomStatics.CUSTOM_UI_CLASS);
+                    AceLog.getAppLog().info("checkCustom uiClass = " + uiClass);
+                    if (uiClass != null) {
+                        ObjectCache.INSTANCE.put(CustomStatics.CUSTOM_UI_CLASS, uiClass);
+                    }
+                    
                     if (custProps.getProperty(CustomStatics.CONFIG_SERVICE_CLASSNAME) != null) {
                         String custCN = custProps.getProperty(CustomStatics.CONFIG_SERVICE_CLASSNAME);
 
