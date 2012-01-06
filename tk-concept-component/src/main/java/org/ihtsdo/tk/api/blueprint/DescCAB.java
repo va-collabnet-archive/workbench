@@ -78,7 +78,7 @@ public class DescCAB extends CreateOrAmendBlueprint {
         super(componentUuid, dv, vc);
 
         this.conceptUuid = conceptUuid;
-        this.lang = lang.getFormatedLanguageCode();
+        this.lang = lang.getFormatedLanguageNoDialectCode();
         this.text = text;
         this.initialCaseSignificant = initialCaseSignificant;
         this.typeUuid = typeUuid;

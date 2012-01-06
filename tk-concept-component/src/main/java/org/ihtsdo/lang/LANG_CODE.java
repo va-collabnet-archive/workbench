@@ -37,6 +37,11 @@ public enum LANG_CODE {
         }
         return result;
     }
+    public String getFormatedLanguageNoDialectCode() {
+        String name = this.name();
+        String[] nameArray = name.split("_");
+        return nameArray[0].toLowerCase();
+    }
 
     public static LANG_CODE getLangCode(String name) {
         String result = null;
