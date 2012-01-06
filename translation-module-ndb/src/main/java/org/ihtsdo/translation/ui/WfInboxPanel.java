@@ -25,8 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.Set;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -60,6 +59,14 @@ import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
+import org.ihtsdo.project.workflow.event.ItemTaggedEventHandler;
+import org.ihtsdo.project.workflow.event.NewTagEvent;
+import org.ihtsdo.project.workflow.event.NewTagEventHandler;
+import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
+import org.ihtsdo.project.workflow.event.TagRemovedEvent;
+import org.ihtsdo.project.workflow.event.TagRemovedEventHandler;
 import org.ihtsdo.project.workflow.filters.FilterFactory;
 import org.ihtsdo.project.workflow.filters.WfComponentFilter;
 import org.ihtsdo.project.workflow.filters.WfDestinationFilter;
@@ -69,13 +76,12 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfInstance.ActionReport;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
-import org.ihtsdo.project.workflow.tag.TagChange;
 import org.ihtsdo.project.workflow.tag.TagManager;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.model.InboxTableModel;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
 
-public class WfInboxPanel extends JPanel implements Observer {
+public class WfInboxPanel extends JPanel{
 	private static final I_TermFactory tf = Terms.get();
 	private static I_ConfigAceFrame config;
 	private static final long serialVersionUID = -4013056429939416545L;
@@ -93,12 +99,12 @@ public class WfInboxPanel extends JPanel implements Observer {
 	private JDialog d;
 	private ConfigTranslationModule cfg;
 	private int currentModelRowNum;
+	private boolean specialTag;
 
 	public WfInboxPanel() {
 		initComponents();
 		try {
 			tagManager = TagManager.getInstance();
-			tagManager.addObserver(this);
 			provider = new WfComponentProvider();
 			model = new InboxTableModel(progressBar1);
 			sorter = new TableRowSorter<InboxTableModel>(model);
@@ -106,6 +112,8 @@ public class WfInboxPanel extends JPanel implements Observer {
 			inboxTable.setRowSorter(sorter);
 			inboxTable.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 
+			suscribeToEvents();
+			
 			try {
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 			} catch (Exception ex) {
@@ -148,6 +156,48 @@ public class WfInboxPanel extends JPanel implements Observer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void suscribeToEvents() {
+		
+		EventMediator mediator = EventMediator.getInstance();
+		
+		mediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>() {
+			@Override
+			public void handleEvent(NewTagEvent event) {
+				InboxTag tag = event.getTag();
+				JMenuItem tagMenuItem = new JMenuItem();
+				String tagMenuString = tag.toString();
+				tagMenuItem.setText(tagMenuString);
+				menuItemCache.put(tagMenuString, tag);
+				tagMenuItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						tagItemActionPreformed(e);
+					}
+				});
+				menu2.add(tagMenuItem);
+			}
+		});
+		mediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>() {
+			@Override
+			public void handleEvent(TagRemovedEvent event) {
+				InboxTag tag = event.getTag();
+				String tagMenuString = tag.toString();
+				int compCount = menu2.getComponentCount();
+				for (int i = 0; i < compCount; i++) {
+					if(menu2.getComponent(i) instanceof JMenuItem){
+						JMenuItem tagMenu = (JMenuItem)menu2.getComponent(i);
+						if(tagMenu.getText().equals(tagMenuString)){
+							menu2.remove(i);
+							break;
+						}
+					}
+					
+				}
+			}
+		});
+		
 	}
 
 	private void initTagMenu() {
@@ -262,6 +312,18 @@ public class WfInboxPanel extends JPanel implements Observer {
 	}
 
 	private void updateTable() {
+		Set<String> keys = filterList.keySet();
+		for (String key : keys) {
+			WfSearchFilterBI filter = filterList.get(key);
+			if (filter instanceof WfTagFilter) {
+				WfTagFilter tf = (WfTagFilter) filter;
+				if (tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)) {
+					specialTag = true;
+				} else {
+					specialTag = false;
+				}
+			}
+		}
 		model.updatePage(filterList);
 	}
 
@@ -340,11 +402,15 @@ public class WfInboxPanel extends JPanel implements Observer {
 										break;
 									case COMPLETE:
 										if (newWfInstance.getDestination().equals(user)) {
-											model.updateRow(currentRow, currentModelRowNum);
+											model.updateRow(currentRow, currentModelRowNum, specialTag);
 											inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
 										} else {
-											model.removeRow(currentModelRowNum);
-											inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
+											try {
+												tagManager.sendToOutbox(newWfInstance.getComponentId().toString());
+												inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
 										}
 										break;
 									case SAVE_AS_TODO:
@@ -771,30 +837,6 @@ public class WfInboxPanel extends JPanel implements Observer {
 	private JMenuItem removeTagMenuItem;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
-
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		TagChange change = (TagChange) arg1;
-		InboxTag tag = change.getTag();
-		if (change.getType().equals(TagChange.NEW_TAG_ADDED)) {
-			initTagMenu();
-		} else if (change.getType().equals(TagChange.SPECIAL_TAG_ADDED)) {
-			int rows = inboxTable.getRowCount();
-			String uuidAdded = tag.getUuidList().get(0);
-			for (int i = 0; i < rows; i++) {
-				Object[] row = model.getRow(i);
-				WfInstance wfi = (WfInstance) row[InboxTableModel.WORKFLOW_ITEM];
-				if (uuidAdded.equals(wfi.getComponentId())) {
-					// model.removeRow(i);
-					// break;
-				}
-			}
-		} else if (change.getType().equals(TagChange.TAG_REMOVED)) {
-			if (tag.getUuidList().isEmpty()) {
-
-			}
-		}
-	}
 
 }
 

@@ -12,13 +12,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -39,22 +35,33 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.util.IconUtilities;
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
+import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
+import org.ihtsdo.project.workflow.event.ItemStateChangedEvent;
+import org.ihtsdo.project.workflow.event.ItemStateChangedEventHandler;
+import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
+import org.ihtsdo.project.workflow.event.ItemTaggedEventHandler;
+import org.ihtsdo.project.workflow.event.NewTagEvent;
+import org.ihtsdo.project.workflow.event.NewTagEventHandler;
+import org.ihtsdo.project.workflow.event.OutboxContentChangeEvent;
+import org.ihtsdo.project.workflow.event.OutboxContentChangedEventHandler;
+import org.ihtsdo.project.workflow.event.TagRemovedEvent;
+import org.ihtsdo.project.workflow.event.TagRemovedEventHandler;
+import org.ihtsdo.project.workflow.event.TodoContentChangeEvent;
+import org.ihtsdo.project.workflow.event.TodoContentsChangedEventHandler;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
-import org.ihtsdo.project.workflow.tag.TagChange;
 import org.ihtsdo.project.workflow.tag.TagManager;
 
 /**
  * @author Vahram Manukyan
  */
-public class InboxTreePanel extends JPanel implements Observer {
+public class InboxTreePanel extends JPanel {
 	public static final String INBOX_ITEM_SELECTED = "inboxItem";
 	private static final long serialVersionUID = 2726469814051803842L;
 	private DefaultTreeModel model;
@@ -74,8 +81,8 @@ public class InboxTreePanel extends JPanel implements Observer {
 
 		// Tag Manager initialization
 		tagManager = TagManager.getInstance();
-		tagManager.addObserver(this);
 
+		suscribeHandlers();
 		inboxFolderTree.setRootVisible(false);
 		inboxFolderTree.setShowsRootHandles(false);
 		inboxFolderTree.setCellRenderer(new IconRenderer());
@@ -95,6 +102,102 @@ public class InboxTreePanel extends JPanel implements Observer {
 		}
 		updateTree();
 	}
+
+	private void suscribeHandlers() {
+		EventMediator eventMediator = EventMediator.getInstance();
+		eventMediator.suscribe(EventType.OUTBOX_CONTENT_CHANGED, new OutboxContentChangedEventHandler<OutboxContentChangeEvent>() {
+			@Override
+			public void handleEvent(OutboxContentChangeEvent event) {
+				Integer outboxSize = event.getOutboxSize();
+				Object userObj = outbox.getUserObject();
+				InboxTreeItem inboxItem = (InboxTreeItem) userObj;
+				inboxItem.setItemSize(outboxSize);
+				model.reload(outbox);
+			}
+		});
+
+		eventMediator.suscribe(EventType.TODO_CONTENTS_CHANGED, new TodoContentsChangedEventHandler<TodoContentChangeEvent>() {
+			@Override
+			public void handleEvent(TodoContentChangeEvent event) {
+				Integer outboxSize = event.getTodoSize();
+				Object userObj = todo.getUserObject();
+				InboxTreeItem inboxItem = (InboxTreeItem) userObj;
+				inboxItem.setItemSize(outboxSize);
+				model.reload(todo);
+			}
+		});
+
+		eventMediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>() {
+			@Override
+			public void handleEvent(NewTagEvent event) {
+				InboxTag newTag = event.getTag();
+				InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size(), "icons/85.png");
+				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+				cNode.add(chldNode);
+				model.reload(cNode);
+			}
+		});
+
+		eventMediator.suscribe(EventType.ITEM_TAGGED, new ItemTaggedEventHandler<ItemTaggedEvent>() {
+			@Override
+			public void handleEvent(ItemTaggedEvent event) {
+				InboxTag newTag = event.getTag();
+				int childCount = cNode.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+					InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+					InboxTag tag = (InboxTag) treeItem.getUserObject();
+					if (tag.equals(newTag)) {
+						if (!newTag.getUuidList().isEmpty()) {
+							treeItem.setItemSize(newTag.getUuidList().size());
+							treeItem.setUserObject(newTag);
+							child.setUserObject(treeItem);
+						} else {
+							model.removeNodeFromParent(child);
+						}
+						model.reload(cNode);
+						break;
+					}
+				}
+			}
+		});
+		
+		eventMediator.suscribe(EventType.ITEM_STATE_CHANGED, new ItemStateChangedEventHandler<ItemStateChangedEvent>() {
+			@Override
+			public void handleEvent(ItemStateChangedEvent event) {
+				WfInstance wfInstance = event.getWfInstance();
+				WfState state = wfInstance.getState();
+				restFromStateNode(state);
+				restFromWorklistNode(wfInstance);
+			}
+		});
+		
+		eventMediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(){
+			@Override
+			public void handleEvent(TagRemovedEvent event) {
+				InboxTag newTag = event.getTag();
+				int childCount = cNode.getChildCount();
+				for (int i = 0; i < childCount; i++) {
+					DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+					InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+					InboxTag tag = (InboxTag) treeItem.getUserObject();
+					if (tag.equals(newTag)) {
+						if (newTag.getUuidList().isEmpty()) {
+							cNode.remove(child);
+							model.reload(cNode);
+						} else {
+							treeItem.setItemSize(newTag.getUuidList().size());
+							treeItem.setUserObject(newTag);
+							child.setUserObject(treeItem);
+							model.reload(child);
+						}
+						break;
+					}
+				}
+			}
+		});
+	}
+	
 
 	public void setInboxItem(Object newInboxItem) {
 		firePropertyChange(InboxTreePanel.INBOX_ITEM_SELECTED, this.inboxItem, newInboxItem);
@@ -134,7 +237,7 @@ public class InboxTreePanel extends JPanel implements Observer {
 			worklistItemsWorker.cancel(true);
 			worklistItemsWorker = null;
 		}
-		worklistItemsWorker = new WorklistItemsWorker(inboxFolderTree, wNode, sNode, cNode, config, searcher, model, user);
+		worklistItemsWorker = new WorklistItemsWorker();
 		worklistItemsWorker.addPropertyChangeListener(new ProgressListener(progressBar));
 		worklistItemsWorker.execute();
 	}
@@ -196,6 +299,8 @@ public class InboxTreePanel extends JPanel implements Observer {
 	private JScrollPane scrollPane1;
 	private JTree inboxFolderTree;
 	private JProgressBar progressBar;
+	public DefaultMutableTreeNode outbox;
+	public DefaultMutableTreeNode todo;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 	public JTree getTree() {
@@ -205,83 +310,6 @@ public class InboxTreePanel extends JPanel implements Observer {
 	public void setTreeMouseListener() {
 		// InboxTreeMouselistener inboxTreeMouselistener) {
 		// this.tree1.addMouseListener(inboxTreeMouselistener);
-	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-		TagChange change = (TagChange) arg;
-		InboxTag newTag = change.getTag();
-		if (change.getType().equals(TagChange.NEW_TAG_ADDED)) {
-			InboxTreeItem inboxTreeItem = new InboxTreeItem(newTag, newTag.getUuidList().size(), "icons/85.png");
-			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
-			cNode.add(chldNode);
-			model.reload(cNode);
-			model.reload(chldNode);
-		} else if (change.getType().equals(TagChange.ITEM_TAGGED)) {
-			int childCount = cNode.getChildCount();
-			for (int i = 0; i < childCount; i++) {
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
-				InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
-				InboxTag tag = (InboxTag) treeItem.getUserObject();
-				if (tag.equals(newTag)) {
-					if (!newTag.getUuidList().isEmpty()) {
-						treeItem.setItemSize(newTag.getUuidList().size());
-						treeItem.setUserObject(newTag);
-						child.setUserObject(treeItem);
-					} else {
-						model.removeNodeFromParent(child);
-					}
-					model.reload(cNode);
-					model.reload(child);
-					break;
-				}
-			}
-		} else if (change.getType().equals(TagChange.SPECIAL_TAG_ADDED)) {
-			DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
-			int childCount = root.getChildCount();
-
-			WfInstance wfInst = WfComponentProvider.getWfInstance(UUID.fromString(newTag.getUuidList().get(0)));
-			WfState state = wfInst.getState();
-
-			restFromStateNode(state);
-			restFromWorklistNode(wfInst);
-
-			for (int i = 0; i < childCount; i++) {
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
-				if (child.getUserObject() instanceof InboxTreeItem) {
-					InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
-					InboxTag tag = (InboxTag) treeItem.getUserObject();
-					if (tag.equals(newTag)) {
-						treeItem.setItemSize(newTag.getUuidList().size());
-						treeItem.setUserObject(newTag);
-						child.setUserObject(treeItem);
-						model.reload(root);
-						model.reload(child);
-						break;
-					}
-				}
-
-			}
-		} else if (change.getType().equals(TagChange.TAG_REMOVED)) {
-			int childCount = cNode.getChildCount();
-			for (int i = 0; i < childCount; i++) {
-				DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
-				InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
-				InboxTag tag = (InboxTag) treeItem.getUserObject();
-				if (tag.equals(newTag)) {
-					if (newTag.getUuidList().isEmpty()) {
-						cNode.remove(child);
-						model.reload(cNode);
-					} else {
-						treeItem.setItemSize(newTag.getUuidList().size());
-						treeItem.setUserObject(newTag);
-						child.setUserObject(treeItem);
-						model.reload(child);
-					}
-					break;
-				}
-			}
-		}
 	}
 
 	private void restFromWorklistNode(WfInstance wfInst) {
@@ -356,6 +384,119 @@ public class InboxTreePanel extends JPanel implements Observer {
 	public void itemStateChanged(WfInstance oldWfInstance, WfInstance newWfInstance) {
 		restFromStateNode(oldWfInstance.getState());
 		addToStateNode(newWfInstance.getState());
+	}
+
+	class WorklistItemsWorker extends SwingWorker<List<InboxTreeItem>, InboxTreeItem> {
+		private List<InboxTag> tagsContent;
+
+		public WorklistItemsWorker() {
+			super();
+		}
+
+		@Override
+		public List<InboxTreeItem> doInBackground() {
+			try {
+				if (config != null) {
+					getTags();
+					getWorklistsStatusesAndSize();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		private void getTags() {
+			TagManager tm = TagManager.getInstance();
+			try {
+				tagsContent = tm.getAllTagsContent();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if (tagsContent != null && !tagsContent.isEmpty()) {
+				for (InboxTag tag : tagsContent) {
+					InboxTreeItem inboxItem = new InboxTreeItem(tag, tag.getUuidList().size(), "icons/85.png");
+					publish(inboxItem);
+				}
+			}
+		}
+
+		private void getWorklistsStatusesAndSize() {
+			try {
+				WfUser wfUser;
+				wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
+				HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser);
+				Set<Object> worklistsAndStates = worklists.keySet();
+				for (Object loopObject : worklistsAndStates) {
+					String icon = "";
+					if (loopObject instanceof WfState) {
+						icon = IconUtilities.STATUS_NODE;
+					} else if (loopObject instanceof WorkList) {
+						icon = IconUtilities.WORKLIST_NODE;
+					} 
+
+					InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject), icon);
+					publish(inboxItem);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public void done() {
+			try {
+				get();
+
+				TreeNode[] path = wNode.getPath();
+				inboxFolderTree.expandPath(new TreePath(path));
+
+				path = sNode.getPath();
+				inboxFolderTree.expandPath(new TreePath(path));
+
+				path = cNode.getPath();
+				inboxFolderTree.expandPath(new TreePath(path));
+			} catch (Exception ignore) {
+				ignore.printStackTrace();
+			}
+		}
+
+		@Override
+		protected void process(List<InboxTreeItem> chunks) {
+			for (InboxTreeItem inboxTreeItem : chunks) {
+				DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(inboxTreeItem);
+				if (inboxTreeItem.getUserObject() instanceof WorkList) {
+					if (inboxTreeItem.getItemSize() > 0) {
+						wNode.add(chldNode);
+					}
+				} else if (inboxTreeItem.getUserObject() instanceof WfState) {
+					if (inboxTreeItem.getItemSize() > 0) {
+						sNode.add(chldNode);
+					}
+				} else if (inboxTreeItem.getUserObject() instanceof InboxTag) {
+					InboxTag tag = (InboxTag) inboxTreeItem.getUserObject();
+					if (tag.getTagName().equals(TagManager.OUTBOX) || tag.getTagName().equals(TagManager.TODO)) {
+						DefaultMutableTreeNode root = (DefaultMutableTreeNode) cNode.getParent();
+						if (tag.getTagName().equals(TagManager.OUTBOX)) {
+							outbox = chldNode;
+						} else if (tag.getTagName().equals(TagManager.TODO)) {
+							todo = chldNode;
+						}
+						root.add(chldNode);
+						model.reload(root);
+						model.reload(chldNode);
+					} else {
+						if (inboxTreeItem.getItemSize() > 0) {
+							cNode.add(chldNode);
+						}
+					}
+				}
+			}
+			model.reload(wNode);
+			model.reload(sNode);
+			model.reload(cNode);
+		}
+
 	}
 
 }

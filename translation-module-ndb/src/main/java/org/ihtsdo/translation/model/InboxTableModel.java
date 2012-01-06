@@ -9,11 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.Set;
 
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -24,8 +20,10 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
+import org.ihtsdo.project.workflow.filters.WfTagFilter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
@@ -197,41 +195,34 @@ public class InboxTableModel extends DefaultTableModel {
 
 	class InboxWorker extends SwingWorker<List<WfInstance>, WfInstance> {
 		private HashMap<String, WfSearchFilterBI> filterList;
-		private ExecutorService executor;
+		private boolean specialTag;
 
 		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
 			super();
 			this.filterList = filterList;
+			Set<String> keys = filterList.keySet();
+			for (String key : keys) {
+				WfSearchFilterBI filter = filterList.get(key);
+				if(filter instanceof WfTagFilter){
+					WfTagFilter tf = (WfTagFilter)filter;
+					if(tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)){
+						specialTag = true;
+					}else{
+						specialTag = false;
+					}
+				}
+			}
 		}
 
 		@Override
 		protected List<WfInstance> doInBackground() throws Exception {
 			List<WfInstance> wfInstances = new ArrayList<WfInstance>();
-			executor = Executors.newFixedThreadPool(1);
-			FutureTask<List<WfInstance>> future = new FutureTask<List<WfInstance>>(new Callable<List<WfInstance>>() {
-				@Override
-				public List<WfInstance> call() throws Exception {
-					return searcher.searchWfInstances(filterList.values());
-				}
-			});
-			executor.execute(future);
+			wfInstances = searcher.searchWfInstances(filterList.values());
 
-			try {
-				// try every 10 seconds
-				while (!future.isDone()) {
-					System.out.println("Task not yet completed.");
-					Thread.sleep(500);
-				}
-				if (!future.isCancelled()) {
-					wfInstances = future.get();
-				}
-				tags = TagManager.getInstance().getAllTagsContent();
-				for (WfInstance wfInstance : wfInstances) {
-					publish(wfInstance);
-				}
-			} catch (CancellationException e) {
+			tags = TagManager.getInstance().getAllTagsContent();
+			for (WfInstance wfInstance : wfInstances) {
+				publish(wfInstance);
 			}
-			executor.shutdown();
 			return wfInstances;
 		}
 
@@ -241,7 +232,7 @@ public class InboxTableModel extends DefaultTableModel {
 				if (!isCancelled()) {
 					data = new LinkedList<Object[]>();
 					for (WfInstance wfInstance : wfInstances) {
-						Object[] row = createRow(wfInstance);
+						Object[] row = createRow(wfInstance, specialTag);
 						if (row != null) {
 							data.add(row);
 						}
@@ -265,33 +256,26 @@ public class InboxTableModel extends DefaultTableModel {
 
 	}
 
-	public void updateRow(Object[] currentRow, int modelRowNum) {
+	public void updateRow(Object[] currentRow, int modelRowNum, boolean specialTag) {
 		Object[] rowUpdated = null;
 		WfInstance wfInstance = (WfInstance) currentRow[currentRow.length - 1];
-		try {
-			WorkList worklist = wfInstance.getWorkList();
-			WfInstance wfInstanceUpdated = TerminologyProjectDAO.getWorkListMember(Terms.get().getConcept(wfInstance.getComponentId()), worklist, Terms.get().getActiveAceFrameConfig())
-					.getWfInstance();
-			rowUpdated = createRow(wfInstanceUpdated);
-			data.remove(modelRowNum);
-			if (rowUpdated != null) {
-				data.add(modelRowNum, rowUpdated);
-			}
-			fireTableDataChanged();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		WorkList worklist = wfInstance.getWorkList();
+		WfInstance wfInstanceUpdated = WfComponentProvider.getWfInstance(wfInstance.getComponentId());
+		rowUpdated = createRow(wfInstanceUpdated, specialTag);
+		data.remove(modelRowNum);
+		if (rowUpdated != null) {
+			data.add(modelRowNum, rowUpdated);
 		}
+		fireTableDataChanged();
 	}
 
-	private Object[] createRow(WfInstance wfInstance) {
+	private Object[] createRow(WfInstance wfInstance, boolean specialTag) {
 		Object[] row = null;
 		String tagStr = "";
 		if (tags != null) {
 			for (InboxTag tag : tags) {
 				if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
-					if (!tag.getTagName().equals("todo") && !tag.getTagName().equals("outbox")) {
+					if (specialTag) {
 						tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
 						tagCache.put(wfInstance.getComponentId().toString(), tag);
 						break;
