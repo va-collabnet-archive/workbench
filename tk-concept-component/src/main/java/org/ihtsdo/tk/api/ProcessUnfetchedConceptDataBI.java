@@ -24,10 +24,10 @@ import java.io.IOException;
  */
 public interface ProcessUnfetchedConceptDataBI extends ContinuationTrackerBI {
 
-    public void processUnfetchedConceptData(int cNid,
+    void processUnfetchedConceptData(int cNid,
             ConceptFetcherBI fetcher) throws Exception;
 
-    public NidBitSetBI getNidSet() throws IOException;
-
+    NidBitSetBI getNidSet() throws IOException;
+    
 }
 

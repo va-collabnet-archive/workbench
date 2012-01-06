@@ -175,6 +175,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -2280,6 +2281,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         //~--- set methods ------------------------------------------------------
         public void setConcept(Concept concept) {
             this.concept = concept;
+        }
+
+        @Override
+        public void update(ConceptChronicleBI cc) throws Exception {
+            throw new UnsupportedOperationException("Not supported.");
         }
     }
 

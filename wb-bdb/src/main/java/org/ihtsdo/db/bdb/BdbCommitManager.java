@@ -1359,6 +1359,10 @@ public class BdbCommitManager {
         performCreationTests = enabled;
     }
 
+    public static void addUncommittedNid(int cNid) {
+        uncommittedCNidsNoChecks.setMember(cNid);
+    }
+
     //~--- inner classes -------------------------------------------------------
     public static class AskToContinue implements Runnable {
 

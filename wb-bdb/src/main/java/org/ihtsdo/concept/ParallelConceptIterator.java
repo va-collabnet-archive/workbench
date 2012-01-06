@@ -16,7 +16,14 @@ import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
+import java.util.Collection;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
+import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConceptFromCursor {
@@ -43,6 +50,7 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
     private DatabaseEntry mutableFoundData;
     private Thread currentThread;
     private boolean stop = false;
+    private ConceptBinder conceptBinder = new ConceptBinder(); 
 
     public ParallelConceptIterator(int first, int last, int count, ProcessUnfetchedConceptDataBI processor,
             Database readOnly, Database mutable) {
@@ -60,6 +68,42 @@ public class ParallelConceptIterator implements Callable<Boolean>, I_FetchConcep
         mutableFoundData = new DatabaseEntry();
         mutableFoundData.setPartial(false);
         currentThread = Thread.currentThread();
+        conceptBinder = new ConceptBinder();
+    }
+
+    @Override
+    public void update(ConceptChronicleBI cc) throws Exception {
+        Concept concept = (Concept) cc;
+        int cNid = cc.getNid();
+        if (concept.isUncommitted()) {
+            BdbCommitManager.addUncommittedNid(cNid);
+        }
+        concept.modified();
+        ChangeNotifier.touch(concept);
+
+        try {
+            KindOfComputer.updateIsaCache(concept.getNid());
+        } catch (Exception ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+        synchronized (cc) {
+            long writeVersion = Bdb.gVersion.incrementAndGet();
+            if (writeVersion < concept.getDataVersion()) {
+                Bdb.gVersion.set(concept.getDataVersion() + 1);
+                writeVersion = Bdb.gVersion.incrementAndGet();
+            }
+            DatabaseEntry updateData = new DatabaseEntry();
+            conceptBinder.objectToEntry(concept, updateData);
+            concept.resetNidData();
+            mutableCursor.putCurrent(updateData);
+            concept.setLastWrite(writeVersion);
+        }
+        Collection<Integer> nids = concept.getAllNids();
+        NidCNidMapBdb nidCidMap = Bdb.getNidCNidMap();
+        for (int nid : nids) {
+            assert nid != 0 : "nid is 0: " + nids;
+            nidCidMap.setCNidForNid(cNid, nid);
+        }
     }
 
     @Override
