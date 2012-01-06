@@ -60,11 +60,12 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.event.EventMediator;
-import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
-import org.ihtsdo.project.workflow.event.ItemTaggedEventHandler;
+import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
+import org.ihtsdo.project.workflow.event.ItemDestinationChangedEvent;
+import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEvent;
+import org.ihtsdo.project.workflow.event.ItemStateChangedEvent;
 import org.ihtsdo.project.workflow.event.NewTagEvent;
 import org.ihtsdo.project.workflow.event.NewTagEventHandler;
-import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
 import org.ihtsdo.project.workflow.event.TagRemovedEvent;
 import org.ihtsdo.project.workflow.event.TagRemovedEventHandler;
 import org.ihtsdo.project.workflow.filters.FilterFactory;
@@ -403,10 +404,12 @@ public class WfInboxPanel extends JPanel{
 									case COMPLETE:
 										if (newWfInstance.getDestination().equals(user)) {
 											model.updateRow(currentRow, currentModelRowNum, specialTag);
+											EventMediator.getInstance().fireEvent(new ItemStateChangedEvent(newWfInstance));
 											inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
 										} else {
 											try {
 												tagManager.sendToOutbox(newWfInstance.getComponentId().toString());
+												EventMediator.getInstance().fireEvent(new ItemDestinationChangedEvent(newWfInstance));
 												inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
 											} catch (IOException e) {
 												e.printStackTrace();
@@ -416,6 +419,7 @@ public class WfInboxPanel extends JPanel{
 									case SAVE_AS_TODO:
 										try {
 											tagManager.saveAsToDo(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+											EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
 											model.removeRow(currentModelRowNum);
 										} catch (IOException e) {
 											e.printStackTrace();
@@ -424,6 +428,7 @@ public class WfInboxPanel extends JPanel{
 									case OUTBOX:
 										try {
 											tagManager.sendToOutbox(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+											EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
 											model.removeRow(currentModelRowNum);
 										} catch (IOException e) {
 											e.printStackTrace();

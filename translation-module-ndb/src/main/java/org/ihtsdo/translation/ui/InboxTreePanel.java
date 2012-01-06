@@ -40,6 +40,10 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
+import org.ihtsdo.project.workflow.event.ItemDestinationChangedEvent;
+import org.ihtsdo.project.workflow.event.ItemDestinationChangedEventHandler;
+import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEvent;
+import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEventHandler;
 import org.ihtsdo.project.workflow.event.ItemStateChangedEvent;
 import org.ihtsdo.project.workflow.event.ItemStateChangedEventHandler;
 import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
@@ -165,6 +169,24 @@ public class InboxTreePanel extends JPanel {
 		eventMediator.suscribe(EventType.ITEM_STATE_CHANGED, new ItemStateChangedEventHandler<ItemStateChangedEvent>() {
 			@Override
 			public void handleEvent(ItemStateChangedEvent event) {
+				WfInstance wfInstance = event.getWfInstance();
+				WfState state = wfInstance.getState();
+				restFromStateNode(state);
+			}
+		});
+		eventMediator.suscribe(EventType.ITEM_DESTINATION_CHANGED, new ItemDestinationChangedEventHandler<ItemDestinationChangedEvent>() {
+			@Override
+			public void handleEvent(ItemDestinationChangedEvent event) {
+				WfInstance wfInstance = event.getWfInstance();
+				WfState state = wfInstance.getState();
+				restFromStateNode(state);
+				restFromWorklistNode(wfInstance);
+			}
+		});
+		
+		eventMediator.suscribe(EventType.ITEM_SENT_TO_SPECIAL_FOLDER, new ItemSentToSpecialFolderEventHandler<ItemSentToSpecialFolderEvent>() {
+			@Override
+			public void handleEvent(ItemSentToSpecialFolderEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
 				WfState state = wfInstance.getState();
 				restFromStateNode(state);
