@@ -7,19 +7,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Observable;
 
+import javax.naming.event.EventDirContext;
 import javax.swing.text.html.StyleSheet;
 
 import org.dwfa.ace.config.AceConfig;
+import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
+import org.ihtsdo.project.workflow.event.NewTagEvent;
+import org.ihtsdo.project.workflow.event.OutboxContentChangeEvent;
+import org.ihtsdo.project.workflow.event.TagRemovedEvent;
+import org.ihtsdo.project.workflow.event.TodoContentChangeEvent;
 
-public class TagManager extends Observable {
+public class TagManager {
 	public static final String TODO = "todo";
 	public static final String OUTBOX_TEXT_COLOR = "#000000";
 	public static final String OUTBOX = "outbox";
@@ -91,8 +95,7 @@ public class TagManager extends Observable {
 		uuidList.add(outboxUuid);
 		InboxTag tag = new InboxTag(OUTBOX, OUTBOXCOLOR, OUTBOX_TEXT_COLOR, uuidList);
 		InboxTag result = persistTag(tag);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, result));
+		EventMediator.getInstance().fireEvent(new OutboxContentChangeEvent(result.getUuidList().size()));
 	}
 
 	public void saveAsToDo(String uuid) throws IOException {
@@ -101,8 +104,7 @@ public class TagManager extends Observable {
 		uuidList.add(uuid);
 		InboxTag tag = new InboxTag(TODO, TODOCOLOR, OUTBOX_TEXT_COLOR, uuidList);
 		InboxTag result = persistTag(tag);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, result));
+		EventMediator.getInstance().fireEvent(new TodoContentChangeEvent(result.getUuidList().size()));
 	}
 
 	private void removeUuidFromAllTagFiles(String uuidToRemove) throws FileNotFoundException, IOException {
@@ -158,20 +160,17 @@ public class TagManager extends Observable {
 
 	public void tag(InboxTag tag) throws IOException {
 		InboxTag result = persistTag(tag);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.ITEM_TAGGED, result));
+		EventMediator.getInstance().fireEvent(new ItemTaggedEvent(result));
 	}
 
 	public void createSpecialTag(InboxTag tag) throws IOException {
 		InboxTag result = persistTag(tag);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.SPECIAL_TAG_ADDED, result));
+		
 	}
 
 	public void createTag(InboxTag tag) throws IOException {
 		InboxTag result = persistTag(tag);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.NEW_TAG_ADDED, result));
+		EventMediator.getInstance().fireEvent(new NewTagEvent(result));
 	}
 
 	public InboxTag persistTag(InboxTag tag) throws IOException {
@@ -236,8 +235,7 @@ public class TagManager extends Observable {
 			pw.close();
 		}
 		tag.setUuidList(uuidList);
-		setChanged();
-		notifyObservers(new TagChange(TagChange.TAG_REMOVED, tag));
+		EventMediator.getInstance().fireEvent(new TagRemovedEvent(tag));
 	}
 
 	public InboxTag getTagContent(String tagName) throws IOException {

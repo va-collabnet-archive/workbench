@@ -16,7 +16,7 @@ public class WfWorklistFilter implements WfSearchFilterBI {
 
 	@Override
 	public boolean filter(WfInstance instance) {
-		return this.worklistUUID.contains(instance.getWorkList());
+		return this.worklistUUID.contains(instance.getWorkList().getUids().get(0));
 	}
 
 	public List<UUID> getWorklistUUID() {
