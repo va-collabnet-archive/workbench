@@ -513,7 +513,7 @@ public class EditorActions {
                     fc.addChoosableFileFilter(new DefaultFileFilter.ImageFileFilter(
                             mxResources.get("allImages")));
                     fc.setFileFilter(defaultFilter);
-                    int rc = fc.showDialog(null, mxResources.get("save"));
+                    int rc = fc.showSaveDialog(null);
 
                     if (rc != JFileChooser.APPROVE_OPTION) {
                         return;
