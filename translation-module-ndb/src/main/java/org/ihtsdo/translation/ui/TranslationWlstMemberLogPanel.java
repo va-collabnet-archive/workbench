@@ -137,7 +137,7 @@ public class TranslationWlstMemberLogPanel extends JPanel {
 						issueL=cIM.getIssuesForComponentId(concept.getUids().iterator().next().toString());
 						for (Issue issue:issueL){
 							strDate = formatter.format(issue.getLastModifiedDate());
-							addIssueTolist(issue.getUser(),strDate, issue.getTitle() + "\n" + issue.getDescription());
+							addIssueTolist(issue.getExternalUser(),strDate, issue.getTitle() + "\n" + issue.getDescription());
 
 						}
 					} catch (Exception e) {
