@@ -46,6 +46,7 @@ public class ERefsetCidLongMember extends TkRefsetCidLongMember {
       longValue  = part.getLongValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
@@ -59,22 +60,7 @@ public class ERefsetCidLongMember extends TkRefsetCidLongMember {
    }
 
    public ERefsetCidLongMember(I_ExtendByRefVersion m) throws IOException {
-      if (I_Identify.class.isAssignableFrom(m.getClass())) {
-         EConcept.convertId((I_Identify) m, this);
-      } else {
-         EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
-      }
-
-      refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
-      componentUuid = Terms.get().nidToUuid(m.getComponentId());
-
-      I_ExtendByRefPartCidLong part = (I_ExtendByRefPartCidLong) m.getMutablePart();
-
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
-      longValue  = part.getLongValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
-      time       = part.getTime();
+       super(m);
    }
 
    public ERefsetCidLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

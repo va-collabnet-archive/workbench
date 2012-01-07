@@ -7,7 +7,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongMember;
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
@@ -45,6 +44,7 @@ public class ERefsetLongMember extends TkRefsetLongMember {
       longValue  = part.getLongValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
@@ -57,21 +57,7 @@ public class ERefsetLongMember extends TkRefsetLongMember {
    }
 
    public ERefsetLongMember(I_ExtendByRefVersion m) throws IOException {
-      if (I_Identify.class.isAssignableFrom(m.getClass())) {
-         EConcept.convertId((I_Identify) m, this);
-      } else {
-         EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
-      }
-
-      refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
-      componentUuid = Terms.get().nidToUuid(m.getComponentId());
-
-      I_ExtendByRefPartLong part = (I_ExtendByRefPartLong) m.getMutablePart();
-
-      longValue  = part.getLongValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathNid());
-      statusUuid = Terms.get().nidToUuid(part.getStatusNid());
-      time       = part.getTime();
+       super(m);
    }
 
    public ERefsetLongMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

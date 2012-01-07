@@ -47,6 +47,7 @@ public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
       floatValue = (float) part.getMeasurementValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
@@ -60,22 +61,7 @@ public class ERefsetCidFloatMember extends TkRefsetCidFloatMember {
    }
 
    public ERefsetCidFloatMember(I_ExtendByRefVersion m) throws IOException {
-      if (I_Identify.class.isAssignableFrom(m.getClass())) {
-         EConcept.convertId((I_Identify) m, this);
-      } else {
-         EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
-      }
-
-      refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
-      componentUuid = Terms.get().nidToUuid(m.getComponentId());
-
-      I_ExtendByRefPartCidFloat part = (I_ExtendByRefPartCidFloat) m.getMutablePart();
-
-      c1Uuid     = Terms.get().nidToUuid(part.getC1id());
-      floatValue = (float) part.getMeasurementValue();
-      pathUuid   = Terms.get().nidToUuid(part.getPathId());
-      statusUuid = Terms.get().nidToUuid(part.getStatusId());
-      time       = part.getTime();
+       super(m);
    }
 
    public ERefsetCidFloatMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

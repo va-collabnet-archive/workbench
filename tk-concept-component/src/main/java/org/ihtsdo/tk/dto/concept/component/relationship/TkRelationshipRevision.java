@@ -33,15 +33,13 @@ public class TkRelationshipRevision extends TkRevision {
    }
 
    public TkRelationshipRevision(RelationshipVersionBI rv) throws IOException {
+       super(rv);
       TerminologyStoreDI ts = Ts.get();
 
       characteristicUuid = ts.getUuidPrimordialForNid(rv.getCharacteristicNid());
       refinabilityUuid   = ts.getUuidPrimordialForNid(rv.getRefinabilityNid());
       group              = rv.getGroup();
       typeUuid           = ts.getUuidPrimordialForNid(rv.getTypeNid());
-      pathUuid           = ts.getUuidPrimordialForNid(rv.getPathNid());
-      statusUuid         = ts.getUuidPrimordialForNid(rv.getStatusNid());
-      time               = rv.getTime();
    }
 
    public TkRelationshipRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
@@ -128,6 +126,14 @@ public class TkRelationshipRevision extends TkRevision {
       refinabilityUuid   = new UUID(in.readLong(), in.readLong());
       group              = in.readInt();
       typeUuid           = new UUID(in.readLong(), in.readLong());
+      // Inferred = 1290e6ba-48d0-31d2-8d62-e133373c63f5 classifier = 7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9
+      // User = f7495b58-6630-3499-a44e-2052b5fcf06c
+      assert (characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5")) 
+              && 
+              authorUuid.equals(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9")))
+              || 
+              !characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5"))
+              : "bad inferred rel B: " + this;
    }
 
    /**
@@ -162,6 +168,14 @@ public class TkRelationshipRevision extends TkRevision {
       out.writeInt(group);
       out.writeLong(typeUuid.getMostSignificantBits());
       out.writeLong(typeUuid.getLeastSignificantBits());
+      // Inferred = 1290e6ba-48d0-31d2-8d62-e133373c63f5 classifier = 7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9
+      // User = f7495b58-6630-3499-a44e-2052b5fcf06c
+      assert (characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5")) 
+              && 
+              authorUuid.equals(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9")))
+              || 
+              !characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5"))
+              : "bad inferred rel D: " + this;
    }
 
    //~--- get methods ---------------------------------------------------------

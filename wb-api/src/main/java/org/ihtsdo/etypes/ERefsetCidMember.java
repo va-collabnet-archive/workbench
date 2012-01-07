@@ -45,6 +45,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
       c1Uuid     = Terms.get().nidToUuid(part.getC1id());
       pathUuid   = Terms.get().nidToUuid(part.getPathNid());
       statusUuid = Terms.get().nidToUuid(part.getStatusNid());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
 
       if (partCount > 1) {
@@ -61,6 +62,7 @@ public class ERefsetCidMember extends TkRefsetCidMember {
    }
 
    public ERefsetCidMember(I_ExtendByRefVersion m, I_Identify id) throws IOException {
+       
       EConcept.convertId(id, this);
       refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
       componentUuid = Terms.get().nidToUuid(m.getComponentId());

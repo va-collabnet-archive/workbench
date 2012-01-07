@@ -4,7 +4,6 @@ package org.ihtsdo.etypes;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.dto.concept.component.refset.Long.TkRefsetLongRevision;
 
@@ -26,6 +25,7 @@ public class ERefsetLongRevision extends TkRefsetLongRevision {
       longValue  = part.getLongValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
    }
 

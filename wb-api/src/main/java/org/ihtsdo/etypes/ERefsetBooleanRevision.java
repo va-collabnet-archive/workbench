@@ -25,6 +25,7 @@ public class ERefsetBooleanRevision extends TkRefsetBooleanRevision {
       booleanValue = part.getBooleanValue();
       pathUuid     = Terms.get().nidToUuid(part.getPathNid());
       statusUuid   = Terms.get().nidToUuid(part.getStatusNid());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time         = part.getTime();
    }
 

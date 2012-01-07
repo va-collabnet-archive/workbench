@@ -44,6 +44,7 @@ public class ERefsetBooleanMember extends TkRefsetBooleanMember {
       booleanValue = part.getBooleanValue();
       pathUuid     = Terms.get().nidToUuid(part.getPathId());
       statusUuid   = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time         = part.getTime();
 
       if (partCount > 1) {
@@ -56,21 +57,7 @@ public class ERefsetBooleanMember extends TkRefsetBooleanMember {
    }
 
    public ERefsetBooleanMember(I_ExtendByRefVersion m) throws IOException {
-      if (I_Identify.class.isAssignableFrom(m.getClass())) {
-         EConcept.convertId((I_Identify) m, this);
-      } else {
-         EConcept.convertId(Terms.get().getId(m.getMemberId()), this);
-      }
-
-      refsetUuid    = Terms.get().nidToUuid(m.getRefsetId());
-      componentUuid = Terms.get().nidToUuid(m.getComponentId());
-
-      I_ExtendByRefPartBoolean part = (I_ExtendByRefPartBoolean) m.getMutablePart();
-
-      booleanValue = part.getBooleanValue();
-      pathUuid     = Terms.get().nidToUuid(part.getPathId());
-      statusUuid   = Terms.get().nidToUuid(part.getStatusId());
-      time         = part.getTime();
+       super(m);
    }
 
    public ERefsetBooleanMember(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

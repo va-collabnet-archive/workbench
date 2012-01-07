@@ -26,6 +26,7 @@ public class EIdentifierString extends TkIdentifierString {
       authorityUuid = Terms.get().nidToUuid(idp.getAuthorityNid());
       pathUuid      = Terms.get().nidToUuid(idp.getPathNid());
       statusUuid    = Terms.get().nidToUuid(idp.getStatusNid());
+      authorUuid    = Terms.get().nidToUuid(idp.getAuthorNid());
       time          = idp.getTime();
    }
 

@@ -56,11 +56,17 @@ public abstract class TkRevision implements I_VersionExternally {
       this.pathUuid   = Ts.get().getComponent(id.getPathNid()).getPrimUuid();
       this.statusUuid = Ts.get().getComponent(id.getStatusNid()).getPrimUuid();
       this.time       = id.getTime();
+      assert pathUuid != null : id;
+      assert authorUuid != null : id;
+      assert statusUuid != null : id;
    }
 
    public TkRevision(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {
       super();
       readExternal(in, dataVersion);
+      assert pathUuid != null : this;
+      assert authorUuid != null : this;
+      assert statusUuid != null : this;
    }
 
    public TkRevision(ComponentVersionBI another, Map<UUID, UUID> conversionMap, long offset, boolean mapAll)
@@ -94,10 +100,6 @@ public abstract class TkRevision implements I_VersionExternally {
          this.statusUuid = another.statusUuid;
          this.authorUuid = another.authorUuid;
          this.pathUuid   = another.pathUuid;
-      }
-
-      if (pathUuid == null) {
-         System.out.println("ouch");
       }
 
       assert pathUuid != null : another;
@@ -170,6 +172,9 @@ public abstract class TkRevision implements I_VersionExternally {
 
    public static CharSequence informAboutUuid(UUID uuid) {
       if (Ts.get() == null) {
+          if (uuid == null) {
+              return "null uuid";
+          }
          return uuid.toString();
       }
 
@@ -258,16 +263,14 @@ public abstract class TkRevision implements I_VersionExternally {
       if (time == Long.MAX_VALUE) {
          time = Long.MIN_VALUE;
       }
+      assert pathUuid != null : this;
+      assert authorUuid != null : this;
+      assert statusUuid != null : this;
 
       out.writeLong(pathUuid.getMostSignificantBits());
       out.writeLong(pathUuid.getLeastSignificantBits());
       out.writeLong(statusUuid.getMostSignificantBits());
       out.writeLong(statusUuid.getLeastSignificantBits());
-
-      if (authorUuid == null) {
-         authorUuid = unspecifiedUserUuid;
-      }
-
       out.writeLong(authorUuid.getMostSignificantBits());
       out.writeLong(authorUuid.getLeastSignificantBits());
       out.writeLong(time);
@@ -314,6 +317,7 @@ public abstract class TkRevision implements I_VersionExternally {
 
    public void setAuthorUuid(UUID authorUuid) {
       this.authorUuid = authorUuid;
+      assert authorUuid != null : this;
    }
 
    public void setPathUuid(UUID pathUuid) {

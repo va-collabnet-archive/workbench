@@ -21,6 +21,7 @@ public class EImageRevision extends TkMediaRevision {
         typeUuid = Terms.get().nidToUuid(part.getTypeId());
         pathUuid = Terms.get().nidToUuid(part.getPathId());
         statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
         time = part.getTime();
     }
 

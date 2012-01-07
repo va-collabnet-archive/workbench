@@ -28,6 +28,7 @@ public class ERefsetCidFloatRevision extends TkRefsetCidFloatRevision {
       floatValue = (float) part.getMeasurementValue();
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
    }
 

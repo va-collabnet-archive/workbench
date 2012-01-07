@@ -4,7 +4,6 @@ package org.ihtsdo.etypes;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
-import org.dwfa.tapi.TerminologyException;
 
 import org.ihtsdo.tk.dto.concept.component.refset.cidcidcid.TkRefsetCidCidCidRevision;
 
@@ -28,6 +27,7 @@ public class ERefsetCidCidCidRevision extends TkRefsetCidCidCidRevision {
       c3Uuid     = Terms.get().nidToUuid(part.getC3id());
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
    }
 

@@ -37,6 +37,7 @@ public class ERefsetMemberMember extends TkRefsetMember {
         I_ExtendByRefPart part = (I_ExtendByRefPart) m.getMutableParts().get(0);
         pathUuid = Terms.get().nidToUuid(part.getPathId());
         statusUuid = Terms.get().nidToUuid(part.getStatusId());
+        authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
         time = part.getTime();
         if (partCount > 1) {
             revisions = new ArrayList<TkRefsetRevision>(partCount - 1);

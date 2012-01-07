@@ -2,14 +2,9 @@ package org.ihtsdo.etypes;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_ImageVersioned;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
-import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 
 public class EImage extends TkMedia {
 
@@ -20,23 +15,7 @@ public class EImage extends TkMedia {
     }
 
     public EImage(I_ImageVersioned<?> imageVer) throws TerminologyException, IOException {
-        EConcept.convertId(Terms.get().getId(imageVer.getNid()), this);
-        int partCount = imageVer.getMutableParts().size();
-        I_ImagePart part = imageVer.getMutableParts().get(0);
-        conceptUuid = Terms.get().nidToUuid(imageVer.getConceptNid());
-        format = imageVer.getFormat();
-        dataBytes = imageVer.getImage();
-        textDescription = part.getTextDescription();
-        typeUuid = Terms.get().nidToUuid(part.getTypeId());
-        pathUuid = Terms.get().nidToUuid(part.getPathId());
-        statusUuid = Terms.get().nidToUuid(part.getStatusId());
-        time = part.getTime();
-        if (partCount > 1) {
-            revisions = new ArrayList<TkMediaRevision>(partCount - 1);
-            for (int i = 1; i < partCount; i++) {
-                revisions.add(new EImageRevision(imageVer.getMutableParts().get(i)));
-            }
-        }
+        super(imageVer);
     }
 
     public EImage() {

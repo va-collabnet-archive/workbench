@@ -29,15 +29,8 @@ public class EIdentifierUuid extends TkIdentifierUuid {
       authorityUuid = Terms.get().nidToUuid(idp.getAuthorityNid());
       pathUuid      = Terms.get().nidToUuid(idp.getPathNid());
       statusUuid    = Terms.get().nidToUuid(idp.getStatusNid());
+      authorUuid    = Terms.get().nidToUuid(idp.getAuthorNid());
       time          = idp.getTime();
-   }
-
-   public EIdentifierUuid(TkComponent<?> eComponent) {
-      denotation    = eComponent.primordialUuid;
-      authorityUuid = eComponent.getAuthorUuid();
-      pathUuid      = eComponent.getPathUuid();
-      statusUuid    = eComponent.getStatusUuid();
-      time          = eComponent.getTime();
    }
 
    public EIdentifierUuid(DataInput in, int dataVersion) throws IOException, ClassNotFoundException {

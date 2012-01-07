@@ -130,6 +130,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
            throws IOException, TerminologyException {
       UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getPrimoridalUid();
       UUID pathUuid    = ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
+      UUID authorUuid    = ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid();
       long time        = System.currentTimeMillis();
 
       primordialUuid                   = cNoHx.getUids().iterator().next();
@@ -137,6 +138,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       conceptAttributes.defined        = false;
       conceptAttributes.primordialUuid = primordialUuid;
       conceptAttributes.statusUuid     = currentUuid;
+      conceptAttributes.authorUuid = authorUuid;
       conceptAttributes.setPathUuid(pathUuid);
       conceptAttributes.setTime(time);
 
@@ -154,6 +156,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
 
             desc.primordialUuid = descNoHx.getUids().iterator().next();
             desc.statusUuid     = currentUuid;
+            desc.authorUuid = authorUuid;
             desc.setPathUuid(pathUuid);
             desc.setTime(time);
             desc.conceptUuid            = conceptAttributes.primordialUuid;
@@ -175,6 +178,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
 
             rel.primordialUuid = relNoHx.getUids().iterator().next();
             rel.statusUuid     = currentUuid;
+            rel.authorUuid = authorUuid;
             rel.setPathUuid(pathUuid);
             rel.setTime(time);
             rel.c1Uuid             = conceptAttributes.primordialUuid;

@@ -27,6 +27,7 @@ public class ERefsetCidCidRevision extends TkRefsetCidCidRevision {
       c2Uuid     = Terms.get().nidToUuid(part.getC2id());
       pathUuid   = Terms.get().nidToUuid(part.getPathId());
       statusUuid = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time       = part.getTime();
    }
 

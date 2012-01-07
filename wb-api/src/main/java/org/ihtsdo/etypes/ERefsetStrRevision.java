@@ -25,6 +25,7 @@ public class ERefsetStrRevision extends TkRefsetStrRevision {
       stringValue = part.getStringValue();
       pathUuid    = Terms.get().nidToUuid(part.getPathId());
       statusUuid  = Terms.get().nidToUuid(part.getStatusId());
+      authorUuid    = Terms.get().nidToUuid(part.getAuthorNid());
       time        = part.getTime();
    }
 
