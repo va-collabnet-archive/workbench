@@ -150,7 +150,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getNid()));
 
          case STATUS :
-            return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getStatusId()));
+            return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getStatusNid()));
 
          case DEFINED :
             return new StringSelection(swct.getCellText());
@@ -159,7 +159,10 @@ public class JTableWithDragImage extends JTable {
             return new StringSelection(ThinVersionHelper.format(swct.getTuple().getVersion()));
 
          case PATH :
-            return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getPathId()));
+            return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getPathNid()));
+             
+         case AUTHOR:
+            return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getAuthorNid()));
 
          default :
             throw new UnsupportedOperationException("Cana't handle field: " + field);
@@ -227,6 +230,9 @@ public class JTableWithDragImage extends JTable {
 
          case PATH :
             return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getPathId()));
+            
+         case AUTHOR:
+            return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getAuthorNid()));
 
          default :
             throw new UnsupportedOperationException("Cana't handle field: " + field);
@@ -261,14 +267,17 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getCharacteristicId()));
 
          case STATUS :
-            return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getStatusId()));
+            return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getStatusNid()));
 
          case VERSION :
             return new StringSelection(ThinVersionHelper.format(swrt.getTuple().getVersion()));
 
          case PATH :
-            return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getPathId()));
+            return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getPathNid()));
 
+         case AUTHOR:
+            return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getAuthorNid()));
+            
          default :
             throw new UnsupportedOperationException("Cana't handle field: " + field);
          }
@@ -381,6 +390,7 @@ public class JTableWithDragImage extends JTable {
 
             case STRING_VALUE :
                return new StringSelection(swextt.getCellText());
+                
 
             default :
                throw new UnsupportedOperationException("Can't handle field: " + field);
