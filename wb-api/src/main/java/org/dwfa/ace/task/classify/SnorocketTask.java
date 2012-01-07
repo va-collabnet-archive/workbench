@@ -1230,11 +1230,6 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
 
     private void writeBackRetired(SnoRel rel_A, int writeToNid, long versionTime)
             throws IOException {
-        if (rel_A.typeId == isaNid) {
-            SnoQuery.isaDropped.add(rel_A);
-        } else {
-            SnoQuery.roleDropped.add(rel_A);
-        }
 
         try {
             I_RelVersioned rBean = tf.getRelationship(rel_A.relNid);
@@ -1243,6 +1238,17 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                         cViewPosSet, precedence, contradictionMgr);
 
                 if (rvList.size() == 1) {
+
+                    // :BEGIN:WORKAROUND;
+                    // SUPPRESS RETIREMENT OF EXISTING INFERRED RECORD
+                    // WHEN THE CURRENT RELATIONSHIP IS AN ADDITIONAL CHARACTERISTIC
+                    // SEE ARTF225415
+                    if (rvList.get(0).getCharacteristicNid()
+                            == SnomedMetadataRfx.getREL_CH_ADDITIONAL_CHARACTERISTIC_NID()) {
+                        return;
+                    }
+                    // :END:WORKAROUND:
+
                     // CREATE RELATIONSHIP PART W/ TermFactory
                     rvList.get(0).makeAnalog(isRETIRED, snorocketAuthorNid, writeToNid, versionTime);
                     // :!!!:TODO: move addUncommittedNoChecks() to more efficient
@@ -1250,6 +1256,12 @@ public class SnorocketTask extends AbstractTask implements ActionListener {
                     // more optimal to only call once per concept.
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
                     tf.addUncommittedNoChecks(thisC1);
+
+                    if (rel_A.typeId == isaNid) {
+                        SnoQuery.isaDropped.add(rel_A);
+                    } else {
+                        SnoQuery.roleDropped.add(rel_A);
+                    }
 
                 } else if (rvList.isEmpty()) {
                     logger.log(Level.INFO, "::: [SnorocketTask] ERROR: writeBackRetired() "
