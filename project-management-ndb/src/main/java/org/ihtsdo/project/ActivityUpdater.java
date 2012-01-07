@@ -78,7 +78,7 @@ public class ActivityUpdater {
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - overallStartTime;
 		String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-		activity.setProgressInfoLower(taskMessage + ". Finished: " + counter + 
+		activity.setProgressInfoLower(taskMessage + ". Finished: " + activity.getMaximum() + 
 				" from " + activity.getMaximum() + " . Time: " + elapsedStr);
 	}
 

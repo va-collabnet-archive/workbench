@@ -108,7 +108,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -1719,6 +1718,12 @@ public class TerminologyProjectDAO {
 
 	public static void initializeWorkSet(WorkSet workSet, I_ConfigAceFrame config, ActivityUpdater updater) throws Exception {
 		Ts.get().iterateConceptDataInParallel(new WorksetInitializerProcessor(workSet, workSet.getSourceRefset(), config, updater));
+		updater.finish();
+	}
+	public static void initializeWorkList(Partition partition,WorkList workList, 
+			I_ConfigAceFrame config, ActivityUpdater updater) throws Exception {
+		Ts.get().iterateConceptDataInParallel(new WorklistInitializerProcessor(partition,
+				workList, config, updater));
 		updater.finish();
 	}
 
@@ -3880,66 +3885,20 @@ public class TerminologyProjectDAO {
 			WorkflowDefinition workflowDefinition,
 			List<WfMembership> workflowUserRoles, 
 			String name, I_ConfigAceFrame config, I_ShowActivity activity) throws Exception {
-		long startTime = System.currentTimeMillis();
-		WfUser user = null;
-		refsetHelper=Terms.get().getRefsetHelper(config);
 		WorkList workList = new WorkList(name,
 				0, null, partition.getUids().iterator().next());
-		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
-		List<PartitionMember> partitionMembers = partition.getPartitionMembers();
+		workList.setWorkflowDefinition(workflowDefinition);
+		workList.setWorkflowUserRoles(workflowUserRoles);
+		workList = createNewWorkList(workList, config);
 		ActivityUpdater updater = new ActivityUpdater(activity, "Generating WorkList");
-		updater.startActivity();
-		updater.startCount(partitionMembers.size());
-		for (PartitionMember partitionMember: partitionMembers) {
-			Thread.sleep(1);
-			WorkListMember workListMember = new WorkListMember(partitionMember.getName(), 
-					partitionMember.getId(),
-					partitionMember.getUids(), null,  
-					Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()),
-					new java.util.Date().getTime() );
-			workListMembers.add(workListMember);
-		}
-		if (workListMembers.size() == 0) {
-			throw new Exception("No concepts found for the worklist!");
-		} else {
-			workList.setWorkflowDefinition(workflowDefinition);
-			workList.setWorkflowUserRoles(workflowUserRoles);
-			workList = createNewWorkList(workList, config);
-			if(workList != null){
-				WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
-				for (WorkListMember workListMember: workListMembers) {
-					Thread.sleep(1);
-					workListMember.setWorkListUUID(workList.getUids().iterator().next());
-					WfInstance instance = new WfInstance();
-					WfComponentProvider prov = new WfComponentProvider();
-					instance.setComponentId(workListMember.getUids().iterator().next());
-					instance.setState(prov.statusConceptToWfState(
-							Terms.get().getConcept(
-									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
-					instance.setWfDefinition(workflowDefinition);
-					instance.setWorkList(workList);
-					if (user == null) {
-						user=interpreter.getNextDestination(instance, workList);
-					}
-					if (user ==null){
-						throw new Exception("Cannot set next destination for component:\n" + workListMember.getConcept().toUserString());
-					}
-					instance.setDestination(user);
-
-					addConceptAsWorkListMember(workListMember, 
-							Terms.get().uuidToNative(instance.getDestination().getId()),
-							config);
-					updater.incrementCount();
-				}
-			}
+		if(workList != null){
+			initializeWorkList(partition, workList, config, updater);
 		}
 
 		Terms.get().commit();
 
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
-		updater.finish();
 		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);
-		refsetHelper = null;
 		return workList;
 	}
 
