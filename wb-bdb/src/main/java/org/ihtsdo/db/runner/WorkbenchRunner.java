@@ -401,7 +401,10 @@ public class WorkbenchRunner {
 
                     FileIO.copyFile(jeUserPropertiesFile, jeDbPropertiesFile);
                 }
-
+                
+                File test = userProfile;
+                System.out.println("** User profile file on start up: " + test.getAbsolutePath());
+                
                 ObjectInputStream ois =
                         new ObjectInputStream(new BufferedInputStream(new FileInputStream(userProfile)));
 

@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.config;
 
@@ -61,62 +61,41 @@ import org.ihtsdo.tk.Ts;
 public class AceConfig implements I_ConfigAceDb, Serializable {
 
     private static File dbFolderOverride = null;
-
     public static AceConfig config;
-
     /**
-	 * 
-	 */
+     *
+     */
     private static final long serialVersionUID = 1L;
-
     private static final int dataVersion = 10;
-
     private static String DEFAULT_LOGGER_CONFIG_FILE = "logViewer.config";
-
     private static String DEFAULT_ACE_CONFIG_FILE = "ace.config";
-
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
-
     private transient PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
-
     public List<I_ConfigAceFrame> aceFrames = new ArrayList<I_ConfigAceFrame>();
-
     private File dbFolder = new File("berkeley-db");
-
     private String loggerRiverConfigFile = DEFAULT_LOGGER_CONFIG_FILE;
-
     private String aceRiverConfigFile = DEFAULT_ACE_CONFIG_FILE;
-
     private boolean readOnly = false;
-
     // private Long cacheSize = null; removed cacheSize...
-
     // 4
     private String username;
-
     // 5
     private File changeSetRoot;
     private String changeSetWriterFileName;
-
     // 6
     private Collection<String> queueFolders = new HashSet<String>();
-
     // 7
     private Map<String, Object> properties = new HashMap<String, Object>();
-
     // 8
     private I_GetConceptData userConcept;
-
     // 9
     private I_GetConceptData userPath;
     private String fullName;
-    
     //10
     private ChangeSetPolicy userChangesChangeSetPolicy;
     private ChangeSetPolicy classifierChangesChangeSetPolicy;
     private ChangeSetPolicy refsetChangesChangeSetPolicy;
     private ChangeSetWriterThreading changeSetWriterThreading;
- 
     // transient
     private transient File profileFile;
     //The List of User concept UUIDs
@@ -164,6 +143,12 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             if (userPath == null) {
                 userPath = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
             }
+            System.out.println("** Writing user concept: " + userConcept);
+            List<UUID> uuid = Terms.get().nativeToUuid(userConcept.getConceptNid());
+            System.out.println("** User uuids: " + uuid);
+            System.out.println("** User Concept after transform: " +
+                    Terms.get().getConcept(Terms.get().uuidToNative(uuid)));
+            
             out.writeObject(Terms.get().nativeToUuid(userConcept.getConceptNid()));
             out.writeObject(Terms.get().nativeToUuid(userPath.getConceptNid()));
             out.writeObject(fullName);
@@ -201,11 +186,15 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     afc.setMasterConfig(this);
                 }
             }
-            if(username != null && username.length() > 0){
-            	aceFrames.get(0).setUsername(username);
+            if (username != null && username.length() > 0) {
+                if (!aceFrames.isEmpty()) {
+                    aceFrames.get(0).setUsername(username);
+                }
             }
             if (username == null || username.equals("null")) {
-                username = aceFrames.get(0).getUsername();
+                if (!aceFrames.isEmpty()) {
+                    username = aceFrames.get(0).getUsername();
+                }
             }
             if (objDataVersion >= 2) {
                 loggerRiverConfigFile = (String) in.readObject();
@@ -240,19 +229,22 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             }
             try {
                 if (objDataVersion >= 8) {
-                	setUserConcept_UUIDs((List<UUID>) in.readObject());
+                    setUserConcept_UUIDs((List<UUID>) in.readObject());
                     userConcept = Terms.get().getConcept(Terms.get().uuidToNative(getUserConcept_UUIDs()));
+                    System.out.println("** Read uuids " + getUserConcept_UUIDs());
+                    System.out.println("AceConfig 1: " + userConcept);
                 } else {
-                	setUserConcept_UUIDs((List<UUID>)ArchitectonicAuxiliary.Concept.USER.getUids());
+                    setUserConcept_UUIDs((List<UUID>) ArchitectonicAuxiliary.Concept.USER.getUids());
                     userConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
+                    System.out.println("AceConfig 2: " + userConcept);
                 }
                 if (objDataVersion >= 9) {
-                	setUserpath_UUIDs((List<UUID>) in.readObject());
+                    setUserpath_UUIDs((List<UUID>) in.readObject());
                     userPath = Terms.get().getConcept(Terms.get().uuidToNative(getUserpath_UUIDs()));
                     fullName = (String) in.readObject();
                 } else {
-                	setUserpath_UUIDs((List<UUID>)ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
-                	userPath = Terms.get().getConcept(Terms.get().uuidToNative(getUserpath_UUIDs()));
+                    setUserpath_UUIDs((List<UUID>) ArchitectonicAuxiliary.Concept.DEVELOPMENT.getUids());
+                    userPath = Terms.get().getConcept(Terms.get().uuidToNative(getUserpath_UUIDs()));
                     fullName = username;
                 }
             } catch (Exception e) {
@@ -260,7 +252,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                 newEx.initCause(e);
                 throw newEx;
             }
-            
+
             if (objDataVersion >= 10) {
                 userChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
                 classifierChangesChangeSetPolicy = (ChangeSetPolicy) in.readObject();
@@ -270,7 +262,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
                     userChangesChangeSetPolicy = ChangeSetPolicy.INCREMENTAL;
                 }
                 if (classifierChangesChangeSetPolicy == null) {
-                     classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
+                    classifierChangesChangeSetPolicy = ChangeSetPolicy.OFF;
                 }
                 if (refsetChangesChangeSetPolicy == null) {
                     refsetChangesChangeSetPolicy = ChangeSetPolicy.OFF;
@@ -313,7 +305,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         prompter.prompt("config file", "username");
 
         I_ConfigAceFrame profile = NewDefaultProfile.newProfile(prompter.getUsername(), prompter.getUsername(),
-            prompter.getPassword(), "admin", "visit.bend");
+                prompter.getPassword(), "admin", "visit.bend");
         config.setUsername(profile.getUsername());
         config.aceFrames.add(profile);
 
@@ -380,7 +372,6 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             public boolean accept(File pathname) {
                 return pathname.getName().endsWith(".jdb");
             }
-
         });
         return (dbFiles != null && dbFiles.length > 0);
     }
@@ -468,7 +459,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
             if (changeSetFile.length() > maxCSFileSize) {
                 renameChangeSetFile();
                 AceLog.getAppLog().info(
-                    "change set exceeds " + maxCSFileSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
+                        "change set exceeds " + maxCSFileSize + " bytes. Incrementing file to: " + getChangeSetWriterFileName());
             }
         }
         FileOutputStream fos = new FileOutputStream(profileFile);
@@ -515,7 +506,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     /**
      * Currently non-functional stub.
-     * 
+     *
      * @deprecated
      */
     public Long getCacheSize() {
@@ -524,7 +515,7 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
 
     /**
      * Currently non-functional stub.
-     * 
+     *
      * @deprecated
      */
     public void setCacheSize(Long cacheSize) {
@@ -631,29 +622,27 @@ public class AceConfig implements I_ConfigAceDb, Serializable {
         this.userChangesChangeSetPolicy = policy;
     }
 
-	public List<UUID> getUserConcept_UUIDs() {
-		return userConcept_UUIDs;
-	}
+    public List<UUID> getUserConcept_UUIDs() {
+        return userConcept_UUIDs;
+    }
 
-	public void setUserConcept_UUIDs(List<UUID> userConcept_UUIDs) {
-		this.userConcept_UUIDs = userConcept_UUIDs;
-	}
+    public void setUserConcept_UUIDs(List<UUID> userConcept_UUIDs) {
+        this.userConcept_UUIDs = userConcept_UUIDs;
+    }
 
-	public List<UUID> getUserpath_UUIDs() {
-		return userpath_UUIDs;
-	}
+    public List<UUID> getUserpath_UUIDs() {
+        return userpath_UUIDs;
+    }
 
-	public void setUserpath_UUIDs(List<UUID> userpath_UUIDs) {
-		this.userpath_UUIDs = userpath_UUIDs;
-	}
+    public void setUserpath_UUIDs(List<UUID> userpath_UUIDs) {
+        this.userpath_UUIDs = userpath_UUIDs;
+    }
 
-	public int getMaxCSFileSize() {
-		return maxCSFileSize;
-	}
+    public int getMaxCSFileSize() {
+        return maxCSFileSize;
+    }
 
-	public void setMaxCSFileSize(int maxCSFileSize) {
-		this.maxCSFileSize = maxCSFileSize;
-	}
-
-
+    public void setMaxCSFileSize(int maxCSFileSize) {
+        this.maxCSFileSize = maxCSFileSize;
+    }
 }

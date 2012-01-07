@@ -5,7 +5,9 @@ import java.util.UUID;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 public class TermAux {
-
+    public static ConceptSpec AUX_IMAGE =
+            new ConceptSpec ("auxiliary image",
+            UUID.fromString("be72219e-cb1c-3f07-b8b0-ad1d3281090b"));
     public static ConceptSpec IS_A =
             new ConceptSpec("is a (relationship type)",
             UUID.fromString("46bccdc4-8fb6-11db-b606-0800200c9a66"));
