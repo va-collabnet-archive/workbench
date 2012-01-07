@@ -578,10 +578,6 @@ public class TranslationPanel extends JPanel {
 		return bPendTerm;
 	}
 
-	public ContextualizedDescription getDescriptionInEditor() {
-		return descriptionInEditor;
-	}
-
 	private void setReadOnlyMode(boolean readOnly) {
 		this.readOnlyMode = readOnly;
 		rbInact.setEnabled(true && !readOnlyMode);

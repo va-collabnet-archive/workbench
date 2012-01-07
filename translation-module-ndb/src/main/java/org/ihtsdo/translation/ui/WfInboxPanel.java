@@ -452,11 +452,8 @@ public class WfInboxPanel extends JPanel{
 						if (tpc.getComponentAt(i) instanceof TranslationPanel) {
 							uiPanel = (TranslationPanel) tpc.getComponentAt(i);
 							tpc.setSelectedIndex(i);
-							ContextualizedDescription descriptionInEditor = uiPanel.getDescriptionInEditor();
-							if (descriptionInEditor != null && !descriptionInEditor.getText().trim().equals("")) {
-								if (!uiPanel.verifySavePending(null, false)) {
-									return;
-								}
+							if (!uiPanel.verifySavePending(null, false)) {
+								return;
 							}
 						}
 						break;
