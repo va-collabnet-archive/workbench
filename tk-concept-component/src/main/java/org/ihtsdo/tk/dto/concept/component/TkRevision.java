@@ -206,9 +206,12 @@ public abstract class TkRevision implements I_VersionExternally {
          } catch (IOException ex) {
             Logger.getLogger(TkRevision.class.getName()).log(Level.SEVERE, null, ex);
          }
+         sb.append(uuid.toString());
+      } else {
+          sb.append("null uuid");
       }
-
-      sb.append(uuid.toString());
+      
+      
 
       return sb;
    }
