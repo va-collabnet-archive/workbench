@@ -175,7 +175,7 @@ public abstract class TkRevision implements I_VersionExternally {
 
       StringBuilder sb = new StringBuilder();
 
-      if (Ts.get().hasUuid(uuid)) {
+      if (uuid != null && Ts.get().hasUuid(uuid)) {
          try {
             int nid  = Ts.get().getNidForUuids(uuid);
             int cNid = Ts.get().getConceptNidForNid(nid);
