@@ -199,6 +199,9 @@ public class JTableWithDragImage extends JTable {
          case PATH :
             return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getPathId()));
 
+         case AUTHOR :
+            return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getAuthorNid()));
+
          default :
             throw new UnsupportedOperationException("Cana't handle field: " + field);
          }
