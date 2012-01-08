@@ -607,7 +607,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         if (histListA.size() > 0) {
             s.append("\r\n::: \t" + histListA.get(0).toStringHdr());
             for (SnoRel sr : histListA) {
-                s.append("\r\n::: \t" + sr.toString());
+                s.append("\r\n::: \t" + sr.toStringNid());
             }
         } else {
             s.append("\r\n::: no additional on stated path");
@@ -617,7 +617,7 @@ public class SnoTaskComparePaths extends AbstractTask implements ActionListener 
         if (histListB.size() > 0) {
             s.append("\r\n::: \t" + histListB.get(0).toStringHdr());
             for (SnoRel sr : histListB) {
-                s.append("\r\n::: \t" + sr.toString());
+                s.append("\r\n::: \t" + sr.toStringNid());
             }
         } else {
             s.append("\r\n::: no additional on inferred path");

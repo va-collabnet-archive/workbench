@@ -296,7 +296,7 @@ public class SnoTaskCheckRedundant extends AbstractTask implements ActionListene
         if (histListA.size() > 0) {
             s.append("\r\n::: \t" + histListA.get(0).toStringHdr());
             for (SnoRel sr : histListA) {
-                s.append("\r\n::: \t" + sr.toString());
+                s.append("\r\n::: \t" + sr.toStringNid());
             }
         } else {
             s.append("\r\n::: none found on path");

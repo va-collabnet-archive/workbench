@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
+import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.tapi.TerminologyException;
@@ -184,10 +185,10 @@ public class DiffPathPanel extends JPanel {
     }
 
     private JTable updateTable(ArrayList<SnoRel> srl) {
-        String[][] theTableStr = null;
+        Object[][] theTableData = null;
 
         try {
-            theTableStr = getTableStrings(srl);
+            theTableData = getTableData(srl);
         } catch (TerminologyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -198,8 +199,8 @@ public class DiffPathPanel extends JPanel {
             return null;
         }
 
-        DiffTableModel theTableModel = new DiffTableModel(theTableStr, srl);
-        JTable table = new JTable(theTableModel);
+        DiffTableModel theTableModel = new DiffTableModel(theTableData, srl);
+        JTable table = new JTableWithDragImage(theTableModel);
 
         DiffTableRenderer renderer = new DiffTableRenderer(config);
         table.setDefaultRenderer(Object.class, renderer);
@@ -214,41 +215,15 @@ public class DiffPathPanel extends JPanel {
         return table;
     }
 
-    private String[][] getTableStrings(ArrayList<SnoRel> srl) throws TerminologyException, IOException {
+    private Object[][] getTableData(ArrayList<SnoRel> srl) throws TerminologyException, IOException {
         int totalCol = 1;
         int totalRows = srl.size();
-        String tableStrings[][] = new String[totalRows][totalCol];
+        Object tableStrings[][] = new Object[totalRows][totalCol];
 
         for (int i = 0; i < totalRows; i++) {
-            SnoRel sr = srl.get(i);
-            StringBuilder str = new StringBuilder();
-            // CONCEPT_1
-            I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
-            str.append(c1Bean.getInitialText());
-            // ROLE TYPE
-            I_GetConceptData typeBean = tf.getConcept(sr.typeId);
-            str.append(" - " + typeBean.getInitialText());
-            // CONCEPT_2
-            I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
-            str.append(" - " + c2Bean.getInitialText());
-            tableStrings[i][0] = str.toString();
-        }
 
-        
-//        for (int i = 0; i < totalRows; i++) {
-//            SnoRel sr = srl.get(i);
-//            StringBuilder str = new StringBuilder("<html>");
-//            // CONCEPT_1
-//            I_GetConceptData c1Bean = tf.getConcept(sr.c1Id);
-//            str.append(valueFont + c1Bean.getInitialText());
-//            // ROLE TYPE
-//            I_GetConceptData typeBean = tf.getConcept(sr.typeId);
-//            str.append(" - </font>" + typeFont + typeBean.getInitialText());
-//            // CONCEPT_2
-//            I_GetConceptData c2Bean = tf.getConcept(sr.c2Id);
-//            str.append(" - </font>" + valueFont + c2Bean.getInitialText());
-//            tableStrings[i][0] = str.toString();
-//        }
+            tableStrings[i][0] = srl.get(i);
+        }
 
         return tableStrings;
     }

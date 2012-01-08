@@ -14,53 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-
 package org.dwfa.ace.classifier;
 
-//~--- non-JDK imports --------------------------------------------------------
-
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.table.AceTableRenderer;
-
-import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Component;
-
 import java.io.IOException;
-
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.AceTableRenderer;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 public class EquivTableRenderer extends AceTableRenderer {
-
-   /**
-    *
-    */
    private static final long serialVersionUID = 1L;
 
-   //~--- fields --------------------------------------------------------------
-
-   boolean                renderInactive = false;
+   boolean renderInactive = false;
    @SuppressWarnings("unused")
    private ViewCoordinate vc;
-
-   //~--- constructors --------------------------------------------------------
 
    public EquivTableRenderer(ViewCoordinate vc) {
       super();
       setVerticalAlignment(TOP);
       this.vc = vc;
    }
-
-   //~--- get methods ---------------------------------------------------------
 
    @Override
    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,

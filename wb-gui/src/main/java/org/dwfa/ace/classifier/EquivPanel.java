@@ -106,10 +106,10 @@ public class EquivPanel extends JPanel {
          return;
       }
 
-      Object[][] theTableStr = null;
+      Object[][] theTableData = null;
 
       try {
-         theTableStr = getTableData(SnoQuery.getEquiv());
+         theTableData = getTableData(SnoQuery.getEquiv());
       } catch (TerminologyException e) {
          AceLog.getAppLog().alertAndLogException(e);
 
@@ -120,7 +120,7 @@ public class EquivPanel extends JPanel {
          return;
       }
 
-      EquivTableModel    theTableModel = new EquivTableModel(theTableStr, SnoQuery.getEquiv());
+      EquivTableModel    theTableModel = new EquivTableModel(theTableData, SnoQuery.getEquiv());
       JTable             table         = new JTableWithDragImage(theTableModel);
       EquivTableRenderer renderer      = new EquivTableRenderer(config.getViewCoordinate());
 

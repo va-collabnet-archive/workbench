@@ -17,14 +17,13 @@
 package org.dwfa.ace.classifier;
 
 import java.awt.Component;
-
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.AceTableRenderer;
+import org.dwfa.ace.task.classify.SnoRel;
 
 public class DiffTableRenderer extends AceTableRenderer {
     private static final long serialVersionUID = 1L;
@@ -39,6 +38,7 @@ public class DiffTableRenderer extends AceTableRenderer {
         this.frameConfig = frameConfig;
     }
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
             int row, int column) {
         JLabel renderComponent = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
@@ -54,13 +54,13 @@ public class DiffTableRenderer extends AceTableRenderer {
             }
 			renderComponent
 					.setText("<html><font face='Dialog' size='3' color='black'>"
-							+ (String) value);
+							+ ((SnoRel) value).toString());
         } else {
             renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
 			renderComponent
 			.setText("<html><font face='Dialog' size='3' color='white'>"
-					+ (String) value);
+					+ ((SnoRel) value).toString());
         }
 
         setHorizontalAlignment(SwingConstants.LEFT);

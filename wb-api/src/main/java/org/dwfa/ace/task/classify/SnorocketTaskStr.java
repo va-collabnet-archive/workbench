@@ -1437,7 +1437,7 @@ public class SnorocketTaskStr extends AbstractTask implements ActionListener {
 			s.append("\r\n::: \t" + list.get(0).toStringHdr());
 			for (int i = start; i < start + count; i++) {
 				SnoRel sr = list.get(i);
-				s.append("\r\n::: \t" + sr.toString());
+				s.append("\r\n::: \t" + sr.toStringNid());
 			}
 		} else {
 			s.append("\r\n::: *** RANGE ERROR ***");

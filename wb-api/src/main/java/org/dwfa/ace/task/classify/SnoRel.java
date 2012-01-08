@@ -1,18 +1,15 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.task.classify;
 
@@ -30,8 +27,8 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 
-
 public class SnoRel implements Comparable<Object> {
+
     public int relNid;
     public int c1Id; // from I_RelVersioned
     public int c2Id; // from I_RelVersioned
@@ -99,6 +96,33 @@ public class SnoRel implements Comparable<Object> {
 
     @Override
     public String toString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            I_TermFactory terms = Terms.get();
+            if (terms.hasConcept(c1Id)
+                    && terms.hasConcept(typeId)
+                    && terms.hasConcept(c2Id)) {
+                sb.append(terms.getConcept(c1Id).toUserString());
+                sb.append(": ");
+                sb.append(terms.getConcept(typeId).toUserString());
+                sb.append(": ");
+                sb.append(terms.getConcept(c2Id).toUserString());
+                return sb.toString();
+            }
+        } catch (TerminologyException ex) {
+            // Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            // Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                sb.append(c1Id);
+                sb.append(" : ");
+                sb.append(typeId);
+                sb.append(" : ");
+                sb.append(c2Id);
+                return sb.toString();
+    }
+
+    public String toStringNid() {
         return relNid + "\t" + c1Id + "\t" + c2Id + "\t" + typeId + "\t" + group;
     }
 
@@ -114,9 +138,7 @@ public class SnoRel implements Comparable<Object> {
             BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
             if (format == 1) { // RAW NIDs
                 for (SnoRel sr : srl) {
-                    bw
-                            .write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group
-                                    + "\r\n");
+                    bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\r\n");
                 }
             }
             if (format == 2) { // UUIDs
@@ -159,6 +181,7 @@ public class SnoRel implements Comparable<Object> {
             }
             if (format == 5) { // "COMPARE": UUIDs, Initial Text
                 Comparator<SnoRel> compDump = new Comparator<SnoRel>() {
+
                     @Override
                     public int compare(SnoRel o1, SnoRel o2) {
                         int thisMore = 1;
@@ -224,6 +247,5 @@ public class SnoRel implements Comparable<Object> {
             Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-
 } // class SnoRel
 

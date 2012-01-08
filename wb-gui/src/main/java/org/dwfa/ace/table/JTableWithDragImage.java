@@ -89,6 +89,7 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableModel;
+import org.dwfa.ace.task.classify.SnoRel;
 
 public class JTableWithDragImage extends JTable {
 
@@ -539,6 +540,10 @@ public class JTableWithDragImage extends JTable {
             I_GetConceptData cc = (I_GetConceptData) obj;
 
             return new ConceptTransferable(cc);
+         } else if (obj instanceof SnoRel) {
+             int cnid = ((SnoRel) obj).c1Id;
+             I_GetConceptData cc = Terms.get().getConcept(cnid);
+             return new ConceptTransferable(cc);
          } else {
             return new StringSelection(obj.toString());
          }
