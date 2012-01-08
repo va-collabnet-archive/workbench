@@ -3319,7 +3319,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             rev.setStatusUuid(zStatusUuidArray[cRec.status]);
             rev.setPathUuid(zPathArray[cRec.path]);
             rev.setTime(cRec.revTime);
-            caRevisions.add(rev);
+            rev.authorUuid = uuidUser;
+           caRevisions.add(rev);
         }
 
         if (caRevisions.size() > 0) {
@@ -3360,6 +3361,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         did.setPathUuid(zPathArray[dRec.pathIdx]);
                         did.setStatusUuid(uuidCurrent);
                         did.setTime(dRec.revTime);
+                        did.authorUuid = uuidUser;
                         tmpDesAdditionalIds.add(did);
                     }
                     if (dRec.addedIds != null) {
@@ -3384,6 +3386,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     des.setStatusUuid(zStatusUuidArray[dRec.status]);
                     des.setPathUuid(zPathArray[dRec.pathIdx]);
                     des.setTime(dRec.revTime);
+                    des.authorUuid = uuidUser;
                     des.revisions = null;
                 } else {
                     EDescriptionRevision edv = new EDescriptionRevision();
@@ -3394,6 +3397,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     edv.setStatusUuid(zStatusUuidArray[dRec.status]);
                     edv.setPathUuid(zPathArray[dRec.pathIdx]);
                     edv.setTime(dRec.revTime);
+                    edv.authorUuid = uuidUser;
                     revisions.add(edv);
                 }
             }
@@ -3438,6 +3442,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         rid.setPathUuid(zPathArray[rRec.pathIdx]);
                         rid.setStatusUuid(uuidCurrent);
                         rid.setTime(rRec.revTime);
+                        rid.authorUuid = uuidUser;
                         tmpRelAdditionalIds.add(rid);
                     }
                     if (tmpRelAdditionalIds.size() > 0) {
@@ -3577,6 +3582,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setBooleanValue(r.valueBoolean);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
                     }
 
                     if (rsmIdx < rsmMax) { // CHECK REVISIONS
@@ -3594,6 +3601,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             revision.setTime(r.revTime);
                             if (r.authorIdx != -1) {
                                 revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
                             }
                             revisionList.add(revision);
 
@@ -3613,6 +3622,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                         revision.setTime(r.revTime);
                                         if (r.authorIdx != -1) {
                                             revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
                                         }
                                         revisionList.add(revision);
                                     } else {
@@ -3646,6 +3657,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setC1Uuid(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
                     }
 
                     if (rsmIdx < rsmMax) { // CHECK REVISIONS
@@ -3663,6 +3676,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             revision.setTime(r.revTime);
                             if (r.authorIdx != -1) {
                                 revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
                             }
                             revisionList.add(revision);
 
@@ -3683,6 +3698,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                         revision.setTime(r.revTime);
                                         if (r.authorIdx != -1) {
                                             revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
                                         }
                                         revisionList.add(revision);
                                     } else {
@@ -3716,6 +3733,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setIntValue(r.valueInt);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
                     }
 
                     if (rsmIdx < rsmMax) { // CHECK REVISIONS
@@ -3733,6 +3752,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             revision.setTime(r.revTime);
                             if (r.authorIdx != -1) {
                                 revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
                             }
                             revisionList.add(revision);
 
@@ -3752,6 +3773,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                         revision.setTime(r.revTime);
                                         if (r.authorIdx != -1) {
                                             revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
                                         }
                                         revisionList.add(revision);
                                     } else {
@@ -3790,6 +3813,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStrValue(r.valueString);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
                     }
 
                     if (rsmIdx < rsmMax) { // CHECK REVISIONS
@@ -3807,6 +3832,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             revision.setTime(r.revTime);
                             if (r.authorIdx != -1) {
                                 revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
                             }
                             revisionList.add(revision);
 
@@ -3826,6 +3853,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                         revision.setTime(r.revTime);
                                         if (r.authorIdx != -1) {
                                             revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
                                         }
                                         revisionList.add(revision);
                                     } else {
