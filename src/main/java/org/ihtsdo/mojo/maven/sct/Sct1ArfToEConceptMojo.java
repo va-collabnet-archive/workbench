@@ -3269,6 +3269,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             cid.setPathUuid(zPathArray[cRec0.path]);
             cid.setStatusUuid(uuidCurrent);
             cid.setTime(cRec0.revTime);
+            cid.authorUuid = uuidUser;
             tmpAdditionalIds.add(cid);
         }
         // CTV 3 ID, if present
@@ -3279,6 +3280,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             cids.setPathUuid(zPathArray[cRec0.path]);
             cids.setStatusUuid(uuidCurrent);
             cids.setTime(cRec0.revTime);
+            cids.authorUuid = uuidUser;
             tmpAdditionalIds.add(cids);
         }
         // SNOMED RT ID, if present
@@ -3289,6 +3291,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             cids.setPathUuid(zPathArray[cRec0.path]);
             cids.setStatusUuid(uuidCurrent);
             cids.setTime(cRec0.revTime);
+            cids.authorUuid = uuidUser;
             tmpAdditionalIds.add(cids);
         }
         if (cRec0.addedIds != null) {
