@@ -236,10 +236,10 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         typeNid = input.readInt();
 
         int additionalVersionCount = input.readShort();
+        revisions = new RevisionSet<ImageRevision, Image>(additionalVersionCount);
 
         for (int i = 0; i < additionalVersionCount; i++) {
             ImageRevision ir = new ImageRevision(input, this);
-
             if (ir.getTime() != Long.MIN_VALUE) {
                 revisions.add(ir);
             }
