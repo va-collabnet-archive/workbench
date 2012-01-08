@@ -203,14 +203,6 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
       refinabilityUuid   = new UUID(in.readLong(), in.readLong());
       relGroup           = in.readInt();
       typeUuid           = new UUID(in.readLong(), in.readLong());
-      // Inferred = 1290e6ba-48d0-31d2-8d62-e133373c63f5 classifier = 7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9
-      // User = f7495b58-6630-3499-a44e-2052b5fcf06c
-      assert (characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5")) 
-              && 
-              authorUuid.equals(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9")))
-              || 
-              !characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5"))
-              : "bad inferred rel A: " + this;
 
       int versionSize = in.readInt();
 
@@ -263,14 +255,6 @@ public class TkRelationship extends TkComponent<TkRelationshipRevision> implemen
       out.writeInt(relGroup);
       out.writeLong(typeUuid.getMostSignificantBits());
       out.writeLong(typeUuid.getLeastSignificantBits());
-      // Inferred = 1290e6ba-48d0-31d2-8d62-e133373c63f5 classifier = 7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9
-      // User = f7495b58-6630-3499-a44e-2052b5fcf06c
-      assert (characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5")) 
-              && 
-              authorUuid.equals(UUID.fromString("7e87cc5b-e85f-3860-99eb-7a44f2b9e6f9")))
-              || 
-              !characteristicUuid.equals(UUID.fromString("1290e6ba-48d0-31d2-8d62-e133373c63f5"))
-              : "bad inferred rel C: " + this;
 
       if (revisions == null) {
          out.writeInt(0);
