@@ -18,6 +18,7 @@ package org.ihtsdo.ace.task;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -80,14 +81,20 @@ public class UpdateEditorCategoryRefset extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         String line = "";
         I_TermFactory tf = Terms.get();
+        BufferedReader inputFile = null;
 
         try {
             ViewCoordinate vc = tf.getActiveAceFrameConfig().getViewCoordinate();
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
-//             File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
-            File f = new File("../../src/main/users/userPermissionRefset.txt");
-
-            BufferedReader inputFile = new BufferedReader(new FileReader(f));
+            try {
+				// Used when building bundle
+            	File f = new File("../../src/main/users/userPermissionRefset.txt");
+            	inputFile = new BufferedReader(new FileReader(f));
+            } catch (FileNotFoundException e) {
+				// Used during excecution of application via MENU-TASKS-UPDATE_ED_CATEGORY_REFSET
+            	File f= new File("workflow" + File.separatorChar + "userPermissionRefset.txt");
+            	inputFile = new BufferedReader(new FileReader(f));
+            }
 
             WorkflowHelper.updateModelers(vc);
             modelers = WorkflowHelper.getModelers();
