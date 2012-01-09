@@ -46,6 +46,8 @@ import org.ihtsdo.project.workflow.event.NewTagEvent;
 import org.ihtsdo.project.workflow.event.NewTagEventHandler;
 import org.ihtsdo.project.workflow.event.OutboxContentChangeEvent;
 import org.ihtsdo.project.workflow.event.OutboxContentChangedEventHandler;
+import org.ihtsdo.project.workflow.event.SendBackToInboxEvent;
+import org.ihtsdo.project.workflow.event.SendBackToInboxEventHandler;
 import org.ihtsdo.project.workflow.event.TagRemovedEvent;
 import org.ihtsdo.project.workflow.event.TagRemovedEventHandler;
 import org.ihtsdo.project.workflow.event.TodoContentChangeEvent;
@@ -91,6 +93,7 @@ public class InboxTreePanel extends JPanel {
 		inboxFolderTree.setRootVisible(false);
 		inboxFolderTree.setShowsRootHandles(false);
 		inboxFolderTree.setCellRenderer(new IconRenderer());
+		inboxFolderTree.setRowHeight(20);
 		searcher = new WorkflowSearcher();
 		try {
 			I_TermFactory tf = Terms.get();
@@ -217,6 +220,13 @@ public class InboxTreePanel extends JPanel {
 						break;
 					}
 				}
+			}
+		});
+		eventMediator.suscribe(EventType.SEND_BACK_TO_INBOX, new SendBackToInboxEventHandler<SendBackToInboxEvent>(this) {
+			@Override
+			public void handleEvent(SendBackToInboxEvent event) {
+				restFromStateNode(event.getOldState());
+				addToStateNode(event.getNewState());
 			}
 		});
 	}
@@ -754,10 +764,6 @@ class ProgressListener implements PropertyChangeListener {
 }
 
 class IconRenderer extends DefaultTreeCellRenderer {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override

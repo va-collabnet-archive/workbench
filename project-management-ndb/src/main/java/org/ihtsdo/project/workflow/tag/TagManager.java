@@ -19,8 +19,10 @@ import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
 import org.ihtsdo.project.workflow.event.NewTagEvent;
 import org.ihtsdo.project.workflow.event.OutboxContentChangeEvent;
+import org.ihtsdo.project.workflow.event.SendBackToInboxEvent;
 import org.ihtsdo.project.workflow.event.TagRemovedEvent;
 import org.ihtsdo.project.workflow.event.TodoContentChangeEvent;
+import org.ihtsdo.project.workflow.model.WfInstance;
 
 public class TagManager {
 	public static final String TODO = "todo";
@@ -217,6 +219,38 @@ public class TagManager {
 		return tag;
 	}
 
+	public void sendBackToInbox(InboxTag tag, WfInstance wfInstance) throws IOException{
+		File tagFile = new File(tagFolder, tag.getTagName() + ".tag");
+		String header = "";
+		List<String> uuidList = new ArrayList<String>();
+		if (tagFile.exists()) {
+			BufferedReader reader = new BufferedReader(new FileReader(tagFile));
+			header = reader.readLine();
+			while (reader.ready()) {
+				String uuid = reader.readLine();
+				if (!uuid.equals(wfInstance.getComponentId().toString())) {
+					uuidList.add(uuid);
+				}
+			}
+			reader.close();
+		}
+		if (uuidList.isEmpty()) {
+			tagFile.delete();
+			InboxTag nameColorTag = new InboxTag(tag.getTagName(), tag.getColor(), tag.getTextColor(), null);
+			if (nameColorCache.contains(nameColorTag)) {
+				nameColorCache.remove(nameColorTag);
+			}
+		} else {
+			PrintWriter pw = new PrintWriter(tagFile);
+			pw.println(header);
+			for (String uuid : uuidList) {
+				pw.println(uuid);
+			}
+			pw.flush();
+			pw.close();
+		}
+	}
+	
 	public void removeTag(InboxTag tag, String uuidToRemove) throws IOException {
 		File tagFile = new File(tagFolder, tag.getTagName() + ".tag");
 		String header = "";

@@ -179,16 +179,11 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
-		ConfigTranslationModule cfg = null;
-		try {
-			cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		}
-		LinkedHashSet<InboxColumn> columnsToDisplay = cfg.getColumnsDisplayedInInbox();
+		InboxColumn[] columnsToDisplay = InboxColumn.values();
 		int i = 0;
+		if(col == columnsToDisplay.length){
+			return data.get(row)[InboxColumn.values().length];
+		}
 		for (InboxColumn inboxColumn : columnsToDisplay) {
 			if (i == col) {
 				return data.get(row)[inboxColumn.getColumnNumber()];
