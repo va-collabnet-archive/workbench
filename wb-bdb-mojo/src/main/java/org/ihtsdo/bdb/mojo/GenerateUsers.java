@@ -15,12 +15,14 @@
  */
 package org.ihtsdo.bdb.mojo;
 
+import java.awt.Color;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import net.jini.config.Configuration;
+import net.jini.config.ConfigurationException;
 import net.jini.config.ConfigurationProvider;
 import net.jini.core.entry.Entry;
 import org.apache.maven.plugin.AbstractMojo;
@@ -28,10 +30,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.dwfa.ace.api.*;
 import org.dwfa.ace.api.cs.ChangeSetPolicy;
 import org.dwfa.ace.api.cs.ChangeSetWriterThreading;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.ace.task.profile.EditOnRootPath;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.jini.ElectronicAddress;
 import org.dwfa.queue.QueueServer;
@@ -39,6 +39,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -67,15 +68,37 @@ public class GenerateUsers extends AbstractMojo {
      * Berkeley directory.
      *
      * @parameter expression="${project.build.directory}/wb-bundle/berkeley-db"
-     * @required
      */
     private File berkeleyDir;
     /**
-     * User Settings directory.
-     *
-     * @parameter expression="${project.basedir}/src/main/users" @required
+     * @parameter expression="${project.build.directory}/wb-bundle"
      */
-    private File settingsDir;
+    private File wbBundleDir;
+
+    /**
+     *
+     * @parameter expression="${project.build.directory}/users/users.txt"
+     */
+    private File usersFile;
+
+     /**
+     *
+     * @parameter expression="${project.build.directory}/users/userPermissionRefset.txt"
+     */
+    private File wfPermissionsFile;
+
+     /**
+     *
+     * @parameter expression="${project.build.directory}/users/userConfig.txt"
+     */
+    private File defaultUserConfig;
+
+     /**
+     *
+     * @parameter expression="${project.build.directory}/wb-bundle/config"
+     */
+    private File configDir;
+
     private EditorCategoryRefsetSearcher searcher = null;
     private HashMap<String, ConceptVersionBI> modelers = null;
     private Properties configProps = new Properties();
@@ -88,17 +111,17 @@ public class GenerateUsers extends AbstractMojo {
     private ConceptSpec defaultRelChar;
     private ConceptSpec defaultRelRefinability;
     private String visibleRefests;
-    private ConceptSpec editPathSpec;
-    private ConceptSpec viewPathSpec;
+    private String projectDevelopmentPathFsn;
+    private String projectDevelopmentViewPathFsn;
     private I_ConfigAceFrame userConfig;
 
     @Override
     public void execute() throws MojoExecutionException {
-        executeMojo(berkeleyDir, settingsDir);
+        executeMojo();
 
     }
 
-    void executeMojo(File berkeleyDir, File settingsDir) throws MojoExecutionException {
+    void executeMojo() throws MojoExecutionException {
 
         try {
             getLog().info("****************\n Creating new users \n****************\n");
@@ -106,21 +129,6 @@ public class GenerateUsers extends AbstractMojo {
                     berkeleyDir);
 
             Bdb.setup(berkeleyDir.getAbsolutePath());
-            File[] settingsFiles = settingsDir.listFiles();
-
-            File users = null;
-            File config = null;
-            File wfPermissions = null;
-
-            for (File f : settingsFiles) {
-                if (f.toString().endsWith("users.txt")) {
-                    users = f;
-                } else if (f.toString().endsWith("userPermissionRefset.txt")) {
-                    wfPermissions = f;
-                } else if (f.toString().endsWith("userConfig.txt")) {
-                    config = f;
-                }
-            }
 
             //get config properties
 
@@ -130,7 +138,7 @@ public class GenerateUsers extends AbstractMojo {
              * defaultRelType, defaultRelChar, defaultRelRefinability,
              * visibleRefests, editPath, viewPath
              */
-            BufferedReader configReader = new BufferedReader(new FileReader(config));
+            BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig));
             configProps.load(configReader);
             langSortPref = configProps.getProperty("langSortPref");
             langPrefOrder = configProps.getProperty("langPrefOrder");
@@ -141,11 +149,11 @@ public class GenerateUsers extends AbstractMojo {
             defaultRelType = getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
             defaultRelRefinability = getConceptSpecFromPrefs(configProps.getProperty("defaultRelRefinability"));
             visibleRefests = configProps.getProperty("visibleRefests");
-            editPathSpec = getConceptSpecFromPrefs(configProps.getProperty("editPath"));
-            viewPathSpec = getConceptSpecFromPrefs(configProps.getProperty("viewPath"));
+            projectDevelopmentPathFsn = configProps.getProperty("projectDevelopmentPathFsn");
+            projectDevelopmentViewPathFsn = configProps.getProperty("projectDevelopmentViewPathFsn");
 
             //create user based on profile config
-            BufferedReader userReader = new BufferedReader(new FileReader(users));
+            BufferedReader userReader = new BufferedReader(new FileReader(usersFile));
             userReader.readLine();
             String userLine = userReader.readLine();
 
@@ -163,7 +171,7 @@ public class GenerateUsers extends AbstractMojo {
             ViewCoordinate vc = userConfig.getViewCoordinate();
             EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
-            BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissions));
+            BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
 
             WorkflowHelper.updateModelers(vc);
             modelers = WorkflowHelper.getModelers();
@@ -228,27 +236,8 @@ public class GenerateUsers extends AbstractMojo {
             String adminUsername, String adminPassword)
             throws MojoExecutionException {
         try {
-            String userDirStr = "target/wb-bundle/profiles" + File.separator + username; //@akf todo: should be configurable
-            File userDir = new File(userDirStr);
-            File userQueueRoot = new File("target/wb-bundle/queues", username); //@akf todo: should be configurable
-
-//            if (userDir.exists() && userQueueRoot.exists()) { //@akf todo: need a way to load existing profiles
-//                File[] userFiles = userDir.listFiles(new FilenameFilter() {
-//
-//                    @Override
-//                    public boolean accept(File file, String string) {
-//                        return string.endsWith(".wb");
-//                    }
-//                });
-//                for (File f : userFiles) {
-//                    ObjectInputStream ois =
-//                            new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
-//                    AceConfig.config = (AceConfig) ois.readObject();
-//                    List<I_ConfigAceFrame> aceFrames = AceConfig.config.getAceFrames();
-//                    userConfig = aceFrames.get(0);
-//                }
-//                return false;
-//            }
+            File userDir = new File(wbBundleDir, "profiles" + File.separator + username);
+            File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
 
             userConfig = newProfile(fullname, username, password, adminUsername,
                     adminPassword);
@@ -261,8 +250,6 @@ public class GenerateUsers extends AbstractMojo {
             }
 
             userQueueRoot.mkdirs();
-
-            EditOnRootPath rootPathProfile = new EditOnRootPath(userConfig);
 
             // Create new concept for user...
             if (userUuid == null || userUuid.equals("")) {
@@ -287,16 +274,18 @@ public class GenerateUsers extends AbstractMojo {
             changeSetRoot.mkdirs();
 
             I_ConfigAceDb newDbProfile = userConfig.getDbConfig();
+            File absoluteChangeSetRoot = new File(wbBundleDir, "profiles/user-creation-changesets");
 
             newDbProfile.setChangeSetRoot(changeSetRoot);
             System.out.println("** Changeset root from db config: " + newDbProfile.getChangeSetRoot().getAbsolutePath());
+            System.out.println("** absoluteChangeSetRoot: " + absoluteChangeSetRoot.getAbsolutePath());
             newDbProfile.setChangeSetWriterFileName(userConfig.getUsername() + "#1#"
                     + UUID.randomUUID().toString() + ".eccs");
             newDbProfile.setUsername(userConfig.getUsername());
 
             String tempKey = UUID.randomUUID().toString();
             ChangeSetGeneratorBI generator =
-                    Ts.get().createDtoChangeSetGenerator(new File(newDbProfile.getChangeSetRoot(), newDbProfile.getChangeSetWriterFileName()), new File(newDbProfile.getChangeSetRoot(), "#0#"
+                    Ts.get().createDtoChangeSetGenerator(new File(absoluteChangeSetRoot, newDbProfile.getChangeSetWriterFileName()), new File(absoluteChangeSetRoot, "#0#"
                     + newDbProfile.getChangeSetWriterFileName()), ChangeSetGenerationPolicy.MUTABLE_ONLY);
             List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<ChangeSetGeneratorBI>();
 
@@ -358,20 +347,20 @@ public class GenerateUsers extends AbstractMojo {
     }
 
     private void createInbox(I_ConfigAceFrame config, String inboxName, File userQueueRoot,
-            String nodeInboxAddress) {
+            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
         config.getQueueAddressesToShow().add(inboxName);
         createQueue(config, "inbox", inboxName, userQueueRoot, nodeInboxAddress);
     }
 
     private void createOutbox(I_ConfigAceFrame config, String outboxName, File userQueueRoot,
-            String nodeInboxAddress) {
+            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
         config.getQueueAddressesToShow().add(outboxName);
         createQueue(config, "outbox", outboxName, userQueueRoot, nodeInboxAddress);
     }
 
     private void createQueue(I_ConfigAceFrame config, String queueType, String queueName, File userQueueRoot,
-            String nodeInboxAddress) {
-        try {
+            String nodeInboxAddress) throws IOException, ConfigurationException, Exception {
+        
             if (userQueueRoot.exists() == false) {
                 userQueueRoot.mkdirs();
             }
@@ -384,7 +373,7 @@ public class GenerateUsers extends AbstractMojo {
 
             substutionMap.put("**queueName**", queueDirectory.getName());
             substutionMap.put("**inboxAddress**", queueDirectory.getName());
-            substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
+            substutionMap.put("**directory**", FileIO.getPathRelativeToDir(queueDirectory, wbBundleDir).replace('\\', '/'));
             substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
 
             String fileName = "template.queue.config";
@@ -408,7 +397,7 @@ public class GenerateUsers extends AbstractMojo {
                 fileName = "template.queueOutbox.config";
             }
 
-            File queueConfigTemplate = new File("target/wb-bundle/config", fileName); //@akf todo : make based on property
+            File queueConfigTemplate = new File(configDir, fileName); 
             String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
 
             for (String key : substutionMap.keySet()) {
@@ -420,7 +409,7 @@ public class GenerateUsers extends AbstractMojo {
 
             fw.write(configTemplateString);
             fw.close();
-            config.getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
+            config.getDbConfig().getQueues().add(FileIO.getPathRelativeToDir(newQueueConfig, wbBundleDir));
 
             Configuration queueConfig = ConfigurationProvider.getInstance(new String[]{
                         newQueueConfig.getAbsolutePath()});
@@ -443,9 +432,6 @@ public class GenerateUsers extends AbstractMojo {
             } else {
                 new QueueServer(new String[]{newQueueConfig.getCanonicalPath()}, null);
             }
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
     }
 
     private I_GetConceptData createUser()
@@ -547,7 +533,7 @@ public class GenerateUsers extends AbstractMojo {
     }
 
     public I_ConfigAceFrame newProfile(String fullName, String username, String password, String adminUsername,
-            String adminPassword) throws MojoExecutionException, TerminologyException, IOException {
+            String adminPassword) throws MojoExecutionException, TerminologyException, IOException, NoSuchAlgorithmException {
 
         I_ImplementTermFactory tf = (I_ImplementTermFactory) Terms.get();
         I_ConfigAceFrame activeConfig = tf.newAceFrameConfig();
@@ -565,6 +551,7 @@ public class GenerateUsers extends AbstractMojo {
         newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
         newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
         activeConfig.setDbConfig(newDbProfile);
+        newDbProfile.getAceFrames().add(activeConfig);
 
         if (fullName == null || fullName.length() < 2) {
             fullName = "Full Name";
@@ -572,9 +559,6 @@ public class GenerateUsers extends AbstractMojo {
 
         if (username == null || username.length() < 2) {
             username = "username";
-        }
-        if (password == null || password.length() < 2) {
-            password = "sct";
         }
         if (adminUsername == null || adminUsername.length() < 2) {
             adminUsername = "admin";
@@ -600,6 +584,7 @@ public class GenerateUsers extends AbstractMojo {
         activeConfig.setClassificationRoleRoot(tf.getConcept((new ConceptSpec("Concept model attribute (attribute)",
                 UUID.fromString("6155818b-09ed-388e-82ce-caa143423e99"))).getLenient().getUUIDs()));
         activeConfig.setClassifierInputMode(I_ConfigAceFrame.CLASSIFIER_INPUT_MODE_PREF.EDIT_PATH);
+        activeConfig.setClassifierIsaType((I_GetConceptData) Snomed.IS_A.getLenient());
 
         //set up taxonomy view roots
         I_IntSet roots = tf.newIntSet();
@@ -646,14 +631,18 @@ public class GenerateUsers extends AbstractMojo {
         tableDescPrefList.add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid());
 
         //set up paths
-        PathBI editPath = tf.getPath(this.editPathSpec.getLenient().getUUIDs());
+        PathBI editPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentPathFsn));
         activeConfig.addEditingPath(editPath);
 
-        PathBI viewPath = tf.getPath(this.viewPathSpec.getLenient().getUUIDs());
+        PathBI viewPath = tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, this.projectDevelopmentViewPathFsn));
         PositionBI viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
         Set<PositionBI> viewSet = new HashSet<PositionBI>();
         viewSet.add(viewPosition);
         activeConfig.setViewPositions(viewSet);
+        
+        activeConfig.setColorForPath(viewPath.getConceptNid(), new Color(255,84,27));
+        activeConfig.setColorForPath(ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(), new Color(25,178,63));
+        activeConfig.setColorForPath(Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(81,23,255));
 
         //set up toggles
         activeConfig.setSubversionToggleVisible(false);

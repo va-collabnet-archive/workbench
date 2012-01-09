@@ -898,10 +898,10 @@ public class WorkbenchRunner {
                 }
 
                 OpenFrames.removeFrameListener(fl);
-                latch.countDown();
             } catch (TaskFailedException e) {
-                latch.countDown();
                 AceLog.getAppLog().alertAndLogException(e);
+            } finally {
+                latch.countDown();
             }
         }
 

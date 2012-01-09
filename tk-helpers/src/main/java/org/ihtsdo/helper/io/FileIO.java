@@ -581,6 +581,33 @@ public class FileIO {
         relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
         return relativePath.toString();
     }
+    /**
+     * Returns a String of the relative directory of a file, relative to the
+     * <code>user.dir</code> System property.
+     * 
+     * @param f the file to get the relative directory of.
+     * @return a String of the relative directory.
+     */
+    public static String getPathRelativeToDir(File f, File dir) {
+        String startupDirString = dir.getAbsolutePath();
+        String fileAbsolutePath = f.getAbsolutePath();
+        if (fileAbsolutePath.contains(startupDirString)) {
+            return fileAbsolutePath.substring(startupDirString.length() + 1);
+        }
+
+        int depth = 1;
+        File parent = dir.getParentFile();
+        while (fileAbsolutePath.contains(parent.getAbsolutePath()) == false) {
+            depth++;
+            parent = parent.getParentFile();
+        }
+        StringBuilder relativePath = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            relativePath.append("..").append(File.separator);
+        }
+        relativePath.append(fileAbsolutePath.substring(parent.getAbsolutePath().length() + 1));
+        return relativePath.toString();
+    }
 
     public static String getNormalizedRelativePath(File f) {
         return getRelativePath(f).replace('\\', '/');
