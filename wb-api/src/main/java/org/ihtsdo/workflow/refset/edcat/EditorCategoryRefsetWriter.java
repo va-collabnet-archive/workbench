@@ -2,8 +2,10 @@ package org.ihtsdo.workflow.refset.edcat;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -127,6 +129,7 @@ public class EditorCategoryRefsetWriter extends WorkflowRefsetWriter
 				str.append("\nReferencedComponentId:" + getReferencedComponentUid());
 				str.append("\nsemanticArea:" + semanticArea);
 				str.append("\neditorCategory:" + editorCategory);
+	            AceLog.getAppLog().log(Level.WARNING, "Failed to add editor category member with values: " + str.toString());
 			}
 			
 			return retVal;

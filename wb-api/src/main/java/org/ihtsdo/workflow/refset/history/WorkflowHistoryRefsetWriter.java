@@ -2,10 +2,12 @@ package org.ihtsdo.workflow.refset.history;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
 import org.ihtsdo.workflow.refset.WorkflowRefsetFields;
@@ -291,6 +293,7 @@ public class WorkflowHistoryRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nautoApproved:" + autoApproved);
 				str.append("\nworkflowTime:" + workflowTime);
 				str.append("\neffectiveTime:" + effectiveTime);
+	            AceLog.getAppLog().log(Level.WARNING, "Failed to add workflow history member with values: " + str.toString());
 			}
 			
 			return retVal;

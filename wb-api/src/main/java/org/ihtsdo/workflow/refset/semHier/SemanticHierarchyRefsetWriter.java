@@ -2,9 +2,11 @@ package org.ihtsdo.workflow.refset.semHier;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
@@ -109,6 +111,7 @@ public class SemanticHierarchyRefsetWriter extends WorkflowRefsetWriter {
 				str.append("\nReferencedComponentId:" + getReferencedComponentUid());
 				str.append("\nparentSemanticArea:" + parentSemanticArea);
 				str.append("\nchildSemanticArea:" + childSemanticArea);
+	            AceLog.getAppLog().log(Level.WARNING, "Failed to add semantic hierarchy member with values: " + str.toString());
 			}
 			
 			return retVal;
