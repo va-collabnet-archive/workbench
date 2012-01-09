@@ -58,6 +58,8 @@ public class WfHxIndexGenerator extends IndexGenerator {
 				
 	        	BufferedReader reader = new BufferedReader(new FileReader(inputFile));    	
 
+	        	WorkflowLuceneSearchResult.initializePossibleResults();
+	        	
 	        	// Read file
 	        	while ((line = reader.readLine()) != null)
 	        	{

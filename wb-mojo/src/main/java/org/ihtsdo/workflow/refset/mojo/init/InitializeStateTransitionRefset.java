@@ -3,7 +3,8 @@ package org.ihtsdo.workflow.refset.mojo.init;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -11,8 +12,8 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.workflow.refset.stateTrans.StateTransitionRefsetWriter;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 
 /**
@@ -44,6 +45,9 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
     @Override
     public boolean initializeRefset(String resourceFilePath)  {
     	String line = null;
+		Map<String, UUID> categories = new HashMap<String, UUID>();
+		Map<String, UUID> actions = new HashMap<String, UUID>();
+		Map<String, UUID> states = new HashMap<String, UUID>();
 
     	try {
     		File f = new File(resourceFilePath + File.separatorChar + fileName);
@@ -52,7 +56,25 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
 	    	
 	    	writer.setWorkflowType(useType);
 	    	
-	    	while ((line = inputFile.readLine()) != null)
+	    	// initialize categories
+			I_GetConceptData parentCategoryConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getPrimoridalUid());
+			for (I_GetConceptData con : WorkflowHelper.getChildren(parentCategoryConcept)) {
+				categories.put(WorkflowHelper.getPrefTerm(con).toLowerCase(), con.getPrimUuid());
+			}
+
+	    	// initialize states
+			I_GetConceptData parentStatesConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getPrimoridalUid());
+			for (I_GetConceptData con : WorkflowHelper.getChildren(parentStatesConcept)) {
+				states.put(WorkflowHelper.getFsn(con).toLowerCase(), con.getPrimUuid());
+			}
+
+			// initialize actions
+			I_GetConceptData parentActionsConcept = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIONS.getPrimoridalUid());
+			for (I_GetConceptData con : WorkflowHelper.getChildren(parentActionsConcept)) {
+				actions.put(WorkflowHelper.getFsn(con).toLowerCase(), con.getPrimUuid());
+			}
+
+			while ((line = inputFile.readLine()) != null)
 	        {
 	        	if (line.trim().length() == 0) {
 	        		continue;
@@ -62,10 +84,10 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
 	
 	        	if (columns.length == numberOfColumns)
 	        	{
-		        	writer.setCategory(lookupRole(columns[categoryPosition]));
-		        	writer.setInitialState(lookupState(columns[initialStatePosition]));
-		        	writer.setAction(lookupAction(columns[actionPosition]));
-		        	writer.setFinalState(lookupState(columns[finalStatePosition]));
+		        	writer.setCategory(categories.get(columns[categoryPosition].toLowerCase()));
+		        	writer.setInitialState(states.get(columns[initialStatePosition].toLowerCase()));
+		        	writer.setAction(actions.get(columns[actionPosition].toLowerCase()));
+		        	writer.setFinalState(states.get(columns[finalStatePosition].toLowerCase()));
 
 		        	writer.addMember();
 	        	} else {
@@ -79,71 +101,4 @@ public class InitializeStateTransitionRefset implements I_InitializeWorkflowRefs
         	return false;
     	}
     }
-
-
-	public  UUID lookupState(String state) throws TerminologyException, IOException {
-		if (state.equalsIgnoreCase("Approved workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_APPROVED_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Changed workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Changed in batch workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHANGED_IN_BATCH_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("For Chief Terminologist review workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Initial history workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_INITIAL_HISTORY_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Concept creation workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_CONCEPT_CREATION_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("Escalated workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATED_STATE.getPrimoridalUid();
-		} else if ((state.equalsIgnoreCase("New workflow state")) || (state.equalsIgnoreCase("first review")))  {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_NEW_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("For review workflow state") || state.equalsIgnoreCase("review chief term")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_STATE.getPrimoridalUid();
-		} else if (state.equalsIgnoreCase("For discussion workflow state")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSSION_STATE.getPrimoridalUid();
-		} else {
-			return null;		
-		}
-	}
-
-	
-	public  UUID lookupAction(String action) throws TerminologyException, IOException {
-		if (action.equalsIgnoreCase("Accept workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_ACCEPT_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Chief Terminologist review workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_CHIEF_TERMINOLOGIST_REVIEW_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Commit workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Commit in batch workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_COMMIT_IN_BATCH_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Discuss workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_DISCUSS_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Escalate workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_ESCALATE_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Review workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_REVIEW_ACTION.getPrimoridalUid();
-		} else if (action.equalsIgnoreCase("Override workflow action")) {
-			return ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid();
-		}
-		else {
-			return null;
-		} 
-	}
-
-	private UUID lookupRole(String role) throws IOException, TerminologyException {
-	   	if (role.equalsIgnoreCase("Clinical editor role A")) {
-	   		return ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_A.getPrimoridalUid();
-	   	} else if (role.equalsIgnoreCase("Clinical editor role B")) {
-	   		return ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_B.getPrimoridalUid();
-	   	} else if (role.equalsIgnoreCase("Clinical editor role C")) {
-	   		return ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_C.getPrimoridalUid();
-	   	} else if (role.equalsIgnoreCase("Clinical editor role D")) {
-	   		return ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_D.getPrimoridalUid();
-	   	} else if (role.equalsIgnoreCase("Clinical editor role All")) {
-	   		return ArchitectonicAuxiliary.Concept.WORKFLOW_ROLE_ALL.getPrimoridalUid();
-	   	}
-	   	
-	   	return null;
-   	}
 }
