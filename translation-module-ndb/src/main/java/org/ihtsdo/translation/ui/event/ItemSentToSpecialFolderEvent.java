@@ -1,12 +1,13 @@
-package org.ihtsdo.project.workflow.event;
+package org.ihtsdo.translation.ui.event;
 
+import org.ihtsdo.project.workflow.event.GenericEvent;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
-public class ItemDestinationChangedEvent extends GenericEvent {
+public class ItemSentToSpecialFolderEvent extends GenericEvent {
 
 	private WfInstance wfInstance;
 
-	public ItemDestinationChangedEvent(WfInstance wfInstance) {
+	public ItemSentToSpecialFolderEvent(WfInstance wfInstance) {
 		super();
 		this.wfInstance = wfInstance;
 	}
@@ -21,7 +22,7 @@ public class ItemDestinationChangedEvent extends GenericEvent {
 
 	@Override
 	public EventType getAssociatedType() {
-		return EventType.ITEM_STATE_CHANGED;
+		return EventType.ITEM_SENT_TO_SPECIAL_FOLDER;
 	}
 
 }

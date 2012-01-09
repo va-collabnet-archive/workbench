@@ -224,7 +224,7 @@ public class WorkflowSearcher {
 							int size = 0;
 							for (WorkListMember workListMember : allWorkListMembers) {
 								if (workListMember.getWfInstance().getDestination().equals(user)) {
-									if (!outboxTodoTaguuids.contains(workListMember.getUids().get(0))) {
+									if (!outboxTodoTaguuids.contains(workListMember.getUids().get(0).toString())) {
 										size++;
 										I_GetConceptData activityStatus = workListMember.getActivityStatus();
 										Integer currentCount = workListMembersStatuses.get(activityStatus);

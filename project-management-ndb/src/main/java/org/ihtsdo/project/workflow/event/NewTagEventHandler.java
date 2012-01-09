@@ -1,6 +1,10 @@
 package org.ihtsdo.project.workflow.event;
 
-public interface NewTagEventHandler<T> extends EventHandler<NewTagEvent>{
+public abstract class NewTagEventHandler<T> extends EventHandler<NewTagEvent>{
+	public NewTagEventHandler(Object parent) {
+		super(parent);
+	}
+
 	@Override
 	public abstract void handleEvent(NewTagEvent event);
 }

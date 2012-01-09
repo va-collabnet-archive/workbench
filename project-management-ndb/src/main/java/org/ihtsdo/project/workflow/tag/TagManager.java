@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.event.EventDirContext;
 import javax.swing.text.html.StyleSheet;
 
 import org.dwfa.ace.config.AceConfig;
@@ -134,6 +133,20 @@ public class TagManager {
 		}
 	}
 
+	public void emptyOutboxTag() throws IOException {
+		File tagFile = new File(tagFolder, OUTBOX+ ".tag");
+		String header = "";
+		if (tagFile.exists()) {
+			BufferedReader reader = new BufferedReader(new FileReader(tagFile));
+			header = reader.readLine();
+			reader.close();
+		}
+		PrintWriter pw = new PrintWriter(tagFile);
+		pw.println(header);
+		pw.flush();
+		pw.close();
+	}
+
 	public List<InboxTag> getTagNames() throws IOException {
 		List<InboxTag> result = null;
 		File[] tags = tagFolder.listFiles();
@@ -165,7 +178,7 @@ public class TagManager {
 
 	public void createSpecialTag(InboxTag tag) throws IOException {
 		InboxTag result = persistTag(tag);
-		
+
 	}
 
 	public void createTag(InboxTag tag) throws IOException {

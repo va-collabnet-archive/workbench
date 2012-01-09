@@ -63,7 +63,7 @@ public class InboxTag {
 	}
 
 	private String toItemString() {
-		return "<html><body><table><tr><td style=\"background-color:" + this.color + ";width:10px; height: 10px;\"><td>" + this.tagName;
+		return TagManager.getInstance().getHeader(this);
 	}
 
 	@Override

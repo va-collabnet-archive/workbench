@@ -1,5 +1,6 @@
 package org.ihtsdo.project.workflow.event;
 
+
 public class TodoContentChangeEvent extends GenericEvent{
 	
 	private Integer todoSize;

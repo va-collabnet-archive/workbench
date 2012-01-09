@@ -22,7 +22,15 @@ public class EventMediator{
 		}else{
 			handlerList = new ArrayList<EventHandler<GenericEvent>>();
 		}
-		handlerList.add(handler);
+		if(!handlerList.contains(handler)){
+			handlerList.add(handler);
+		}else{
+			handlerList.remove(handler);
+			handlerList.add(handler);
+		}
+		for (EventHandler<GenericEvent> eventHandler : handlerList) {
+			System.out.println(eventHandler.getParent());
+		}
 		eventObservers.put(event, handlerList);
 	}
 	

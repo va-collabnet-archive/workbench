@@ -40,12 +40,6 @@ import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
-import org.ihtsdo.project.workflow.event.ItemDestinationChangedEvent;
-import org.ihtsdo.project.workflow.event.ItemDestinationChangedEventHandler;
-import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEvent;
-import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEventHandler;
-import org.ihtsdo.project.workflow.event.ItemStateChangedEvent;
-import org.ihtsdo.project.workflow.event.ItemStateChangedEventHandler;
 import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
 import org.ihtsdo.project.workflow.event.ItemTaggedEventHandler;
 import org.ihtsdo.project.workflow.event.NewTagEvent;
@@ -61,6 +55,13 @@ import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
+import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
+import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
+import org.ihtsdo.translation.ui.event.ItemDestinationChangedEventHandler;
+import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
+import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEventHandler;
+import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
+import org.ihtsdo.translation.ui.event.ItemStateChangedEventHandler;
 
 /**
  * @author Vahram Manukyan
@@ -71,7 +72,7 @@ public class InboxTreePanel extends JPanel {
 	private DefaultTreeModel model;
 	private WorkflowSearcher searcher;
 	private I_ConfigAceFrame config;
-	private Object inboxItem;
+	private InboxTreeItem inboxItem;
 	private WorklistItemsWorker worklistItemsWorker;
 	private I_GetConceptData user;
 	TagManager tagManager;
@@ -109,7 +110,7 @@ public class InboxTreePanel extends JPanel {
 
 	private void suscribeHandlers() {
 		EventMediator eventMediator = EventMediator.getInstance();
-		eventMediator.suscribe(EventType.OUTBOX_CONTENT_CHANGED, new OutboxContentChangedEventHandler<OutboxContentChangeEvent>() {
+		eventMediator.suscribe(EventType.OUTBOX_CONTENT_CHANGED, new OutboxContentChangedEventHandler<OutboxContentChangeEvent>(this) {
 			@Override
 			public void handleEvent(OutboxContentChangeEvent event) {
 				Integer outboxSize = event.getOutboxSize();
@@ -120,7 +121,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 
-		eventMediator.suscribe(EventType.TODO_CONTENTS_CHANGED, new TodoContentsChangedEventHandler<TodoContentChangeEvent>() {
+		eventMediator.suscribe(EventType.TODO_CONTENTS_CHANGED, new TodoContentsChangedEventHandler<TodoContentChangeEvent>(this) {
 			@Override
 			public void handleEvent(TodoContentChangeEvent event) {
 				Integer outboxSize = event.getTodoSize();
@@ -131,7 +132,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 
-		eventMediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>() {
+		eventMediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>(this) {
 			@Override
 			public void handleEvent(NewTagEvent event) {
 				InboxTag newTag = event.getTag();
@@ -142,7 +143,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 
-		eventMediator.suscribe(EventType.ITEM_TAGGED, new ItemTaggedEventHandler<ItemTaggedEvent>() {
+		eventMediator.suscribe(EventType.ITEM_TAGGED, new ItemTaggedEventHandler<ItemTaggedEvent>(this) {
 			@Override
 			public void handleEvent(ItemTaggedEvent event) {
 				InboxTag newTag = event.getTag();
@@ -166,7 +167,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 		
-		eventMediator.suscribe(EventType.ITEM_STATE_CHANGED, new ItemStateChangedEventHandler<ItemStateChangedEvent>() {
+		eventMediator.suscribe(EventType.ITEM_STATE_CHANGED, new ItemStateChangedEventHandler<ItemStateChangedEvent>(this) {
 			@Override
 			public void handleEvent(ItemStateChangedEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
@@ -174,7 +175,7 @@ public class InboxTreePanel extends JPanel {
 				restFromStateNode(state);
 			}
 		});
-		eventMediator.suscribe(EventType.ITEM_DESTINATION_CHANGED, new ItemDestinationChangedEventHandler<ItemDestinationChangedEvent>() {
+		eventMediator.suscribe(EventType.ITEM_DESTINATION_CHANGED, new ItemDestinationChangedEventHandler<ItemDestinationChangedEvent>(this) {
 			@Override
 			public void handleEvent(ItemDestinationChangedEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
@@ -184,7 +185,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 		
-		eventMediator.suscribe(EventType.ITEM_SENT_TO_SPECIAL_FOLDER, new ItemSentToSpecialFolderEventHandler<ItemSentToSpecialFolderEvent>() {
+		eventMediator.suscribe(EventType.ITEM_SENT_TO_SPECIAL_FOLDER, new ItemSentToSpecialFolderEventHandler<ItemSentToSpecialFolderEvent>(this) {
 			@Override
 			public void handleEvent(ItemSentToSpecialFolderEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
@@ -194,7 +195,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 		
-		eventMediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(){
+		eventMediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(this){
 			@Override
 			public void handleEvent(TagRemovedEvent event) {
 				InboxTag newTag = event.getTag();
@@ -220,16 +221,6 @@ public class InboxTreePanel extends JPanel {
 		});
 	}
 	
-
-	public void setInboxItem(Object newInboxItem) {
-		firePropertyChange(InboxTreePanel.INBOX_ITEM_SELECTED, this.inboxItem, newInboxItem);
-		this.inboxItem = newInboxItem;
-	}
-
-	public Object getInboxItem() {
-		return inboxItem;
-	}
-
 	public void updateTree() {
 		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
 		iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
@@ -276,7 +267,12 @@ public class InboxTreePanel extends JPanel {
 			Object userObject = treeNode.getUserObject();
 			if (userObject instanceof InboxTreeItem) {
 				InboxTreeItem inboxItem = (InboxTreeItem) userObject;
-				setInboxItem(inboxItem.getUserObject());
+				if(this.inboxItem != null){
+					EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem.getUserObject(), inboxItem.getUserObject()));
+				}else{
+					EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem, inboxItem.getUserObject()));
+				}
+				this.inboxItem = inboxItem;;
 			}
 		}
 	}

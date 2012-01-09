@@ -1718,17 +1718,6 @@ public class InboxPanel extends JPanel {
 								return;
 							}
 							uiPanel.AutokeepInInbox();
-							//
-							// synchronized (this) {
-							// while (!uiPanel.getUnloaded()){
-							// try {
-							// wait();
-							// } catch (InterruptedException e1) {
-							// e1.printStackTrace();
-							// break;
-							// }
-							// }
-							// }
 						}
 						tpc.remove(i);
 						tpc.repaint();

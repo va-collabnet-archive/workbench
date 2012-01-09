@@ -1,5 +1,6 @@
 package org.ihtsdo.project.workflow.event;
 
+
 public class OutboxContentChangeEvent extends GenericEvent{
 	
 	private Integer outboxSize;

@@ -1,6 +1,11 @@
 package org.ihtsdo.project.workflow.event;
 
-public interface OutboxContentChangedEventHandler<T> extends EventHandler<OutboxContentChangeEvent>{
+
+public abstract class OutboxContentChangedEventHandler<T> extends EventHandler<OutboxContentChangeEvent>{
+	public OutboxContentChangedEventHandler(Object parent) {
+		super(parent);
+	}
+
 	@Override
-	public void handleEvent(OutboxContentChangeEvent event);
+	public abstract void handleEvent(OutboxContentChangeEvent event);
 }

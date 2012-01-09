@@ -2,7 +2,6 @@ package org.ihtsdo.translation.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,11 +14,6 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
-import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
@@ -44,7 +38,6 @@ public class InboxTableModel extends DefaultTableModel {
 	private int columnCount = columnNames.length - 1;
 	private LinkedList<Object[]> data = new LinkedList<Object[]>();
 	private WorkflowSearcher searcher;
-	private I_TermFactory tf;
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
 
@@ -66,7 +59,6 @@ public class InboxTableModel extends DefaultTableModel {
 
 	public InboxTableModel(JProgressBar pBar) {
 		super();
-		this.tf = Terms.get();
 		this.pBar = pBar;
 		this.searcher = new WorkflowSearcher();
 	}
@@ -158,7 +150,7 @@ public class InboxTableModel extends DefaultTableModel {
 	 * each cell. If we didn't implement this method, then the last column would
 	 * contain text ("true"/"false"), rather than a check box.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Class getColumnClass(int c) {
 		if (getValueAt(0, c) != null) {
 			return getValueAt(0, c).getClass();
@@ -203,11 +195,11 @@ public class InboxTableModel extends DefaultTableModel {
 			Set<String> keys = filterList.keySet();
 			for (String key : keys) {
 				WfSearchFilterBI filter = filterList.get(key);
-				if(filter instanceof WfTagFilter){
-					WfTagFilter tf = (WfTagFilter)filter;
-					if(tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)){
+				if (filter instanceof WfTagFilter) {
+					WfTagFilter tf = (WfTagFilter) filter;
+					if (tf.getTag().getTagName().equals(TagManager.OUTBOX) || tf.getTag().getTagName().equals(TagManager.TODO)) {
 						specialTag = true;
-					}else{
+					} else {
 						specialTag = false;
 					}
 				}
@@ -246,9 +238,8 @@ public class InboxTableModel extends DefaultTableModel {
 
 		@Override
 		public void done() {
-			List<WfInstance> wfInstances = null;
 			try {
-				wfInstances = get();
+				get();
 			} catch (Exception ignore) {
 				ignore.printStackTrace();
 			}
@@ -259,7 +250,6 @@ public class InboxTableModel extends DefaultTableModel {
 	public void updateRow(Object[] currentRow, int modelRowNum, boolean specialTag) {
 		Object[] rowUpdated = null;
 		WfInstance wfInstance = (WfInstance) currentRow[currentRow.length - 1];
-		WorkList worklist = wfInstance.getWorkList();
 		WfInstance wfInstanceUpdated = WfComponentProvider.getWfInstance(wfInstance.getComponentId());
 		rowUpdated = createRow(wfInstanceUpdated, specialTag);
 		data.remove(modelRowNum);
@@ -275,12 +265,14 @@ public class InboxTableModel extends DefaultTableModel {
 		if (tags != null) {
 			for (InboxTag tag : tags) {
 				if (tag.getUuidList().contains(wfInstance.getComponentId().toString())) {
-					if (specialTag) {
+					//wfInstance is tagged
+					if ((tag.getTagName().equals(TagManager.OUTBOX) || tag.getTagName().equals(TagManager.TODO)) && !specialTag) {
+						//Item tag is special, and tree item selected is not specialtag
+						return null;
+					}else{
+						//Item tag isnot special or tree item selected is not outbox o todo
 						tagStr = TagManager.getInstance().getHeader(tag.getTagName(), tag.getColor(), tag.getTextColor());
 						tagCache.put(wfInstance.getComponentId().toString(), tag);
-						break;
-					} else {
-						return null;
 					}
 				}
 			}
@@ -300,6 +292,7 @@ public class InboxTableModel extends DefaultTableModel {
 
 class ProgressListener implements PropertyChangeListener {
 	// Prevent creation without providing a progress bar.
+	@SuppressWarnings("unused")
 	private ProgressListener() {
 	}
 

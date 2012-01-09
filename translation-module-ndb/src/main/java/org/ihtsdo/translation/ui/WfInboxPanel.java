@@ -18,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeListenerProxy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,9 +62,6 @@ import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
-import org.ihtsdo.project.workflow.event.ItemDestinationChangedEvent;
-import org.ihtsdo.project.workflow.event.ItemSentToSpecialFolderEvent;
-import org.ihtsdo.project.workflow.event.ItemStateChangedEvent;
 import org.ihtsdo.project.workflow.event.NewTagEvent;
 import org.ihtsdo.project.workflow.event.NewTagEventHandler;
 import org.ihtsdo.project.workflow.event.TagRemovedEvent;
@@ -81,6 +79,11 @@ import org.ihtsdo.project.workflow.tag.TagManager;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.model.InboxTableModel;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
+import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
+import org.ihtsdo.translation.ui.event.InboxItemSelectedEventHandler;
+import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
+import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
+import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
 
 public class WfInboxPanel extends JPanel{
 	private static final I_TermFactory tf = Terms.get();
@@ -136,21 +139,6 @@ public class WfInboxPanel extends JPanel{
 				I_GetConceptData userConcept = config.getDbConfig().getUserConcept();
 				user = new WfUser(userConcept.getInitialText(), userConcept.getPrimUuid());
 			}
-			inboxTreePanel1.addPropertyChangeListener(InboxTreePanel.INBOX_ITEM_SELECTED, new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent arg0) {
-					currentRow = null;
-					WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(arg0.getNewValue());
-					Object oldValue = arg0.getOldValue();
-					if (oldValue != null) {
-						WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
-						filterList.remove(oldFilter.getType());
-					}
-					filterList.put(filter.getType(), filter);
-					model.updatePage(filterList);
-				}
-			});
-
 			initTagMenu();
 			updateDestinationCombo();
 			updateFilters();
@@ -163,7 +151,7 @@ public class WfInboxPanel extends JPanel{
 		
 		EventMediator mediator = EventMediator.getInstance();
 		
-		mediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>() {
+		mediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>(this) {
 			@Override
 			public void handleEvent(NewTagEvent event) {
 				InboxTag tag = event.getTag();
@@ -180,7 +168,7 @@ public class WfInboxPanel extends JPanel{
 				menu2.add(tagMenuItem);
 			}
 		});
-		mediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>() {
+		mediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(this) {
 			@Override
 			public void handleEvent(TagRemovedEvent event) {
 				InboxTag tag = event.getTag();
@@ -196,6 +184,22 @@ public class WfInboxPanel extends JPanel{
 					}
 					
 				}
+			}
+		});
+		
+		mediator.suscribe(EventType.INBOX_ITEM_SELECTED, new InboxItemSelectedEventHandler<InboxItemSelectedEvent>(this) {
+			@Override
+			public void handleEvent(InboxItemSelectedEvent event) {
+				currentRow = null;
+				WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(event.getInboxItem());
+				Object oldValue = event.getOldInboxItem();
+				if (oldValue != null) {
+					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
+					filterList.remove(oldFilter.getType());
+				}
+				filterList.put(filter.getType(), filter);
+				model.updatePage(filterList);
+				
 			}
 		});
 		
@@ -386,65 +390,7 @@ public class WfInboxPanel extends JPanel{
 				uiPanel = new TranslationPanel();
 				tpc.addTab(TranslationHelperPanel.TRANSLATION_TAB_NAME, uiPanel);
 				tpc.setSelectedIndex(tpc.getTabCount() - 1);
-				uiPanel.addPropertyChangeListener(new PropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent arg0) {
-						if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
-							Object newValue = arg0.getNewValue();
-							Object oldValue = arg0.getOldValue();
-							if (newValue instanceof WfInstance) {
-								WfInstance newWfInstance = (WfInstance) newValue;
-								WfInstance oldWfInstance = (WfInstance) oldValue;
-
-								ActionReport actionReport = newWfInstance.getActionReport();
-								if (actionReport != null) {
-									switch (actionReport) {
-									case CANCEL:
-										break;
-									case COMPLETE:
-										if (newWfInstance.getDestination().equals(user)) {
-											model.updateRow(currentRow, currentModelRowNum, specialTag);
-											EventMediator.getInstance().fireEvent(new ItemStateChangedEvent(newWfInstance));
-											inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
-										} else {
-											try {
-												tagManager.sendToOutbox(newWfInstance.getComponentId().toString());
-												EventMediator.getInstance().fireEvent(new ItemDestinationChangedEvent(newWfInstance));
-												inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
-											} catch (IOException e) {
-												e.printStackTrace();
-											}
-										}
-										break;
-									case SAVE_AS_TODO:
-										try {
-											tagManager.saveAsToDo(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
-											EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
-											model.removeRow(currentModelRowNum);
-										} catch (IOException e) {
-											e.printStackTrace();
-										}
-										break;
-									case OUTBOX:
-										try {
-											tagManager.sendToOutbox(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
-											EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
-											model.removeRow(currentModelRowNum);
-										} catch (IOException e) {
-											e.printStackTrace();
-										}
-										break;
-									default:
-										break;
-									}
-									openItem();
-								} else {
-
-								}
-							}
-						}
-					}
-				});
+				uiPanel.addPropertyChangeListener(new ChangeListener());
 			} else if (tpc != null) {
 				int tabCount = tpc.getTabCount();
 				for (int i = 0; i < tabCount; i++) {
@@ -469,6 +415,66 @@ public class WfInboxPanel extends JPanel{
 		}
 	}
 
+	class ChangeListener implements PropertyChangeListener{
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+			if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
+				Object newValue = arg0.getNewValue();
+				Object oldValue = arg0.getOldValue();
+				if (newValue instanceof WfInstance) {
+					WfInstance newWfInstance = (WfInstance) newValue;
+					WfInstance oldWfInstance = (WfInstance) oldValue;
+
+					ActionReport actionReport = newWfInstance.getActionReport();
+					if (actionReport != null) {
+						switch (actionReport) {
+						case CANCEL:
+							break;
+						case COMPLETE:
+							if (newWfInstance.getDestination().equals(user)) {
+								model.updateRow(currentRow, currentModelRowNum, specialTag);
+								EventMediator.getInstance().fireEvent(new ItemStateChangedEvent(newWfInstance));
+								inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
+							} else {
+								try {
+									tagManager.sendToOutbox(newWfInstance.getComponentId().toString());
+									EventMediator.getInstance().fireEvent(new ItemDestinationChangedEvent(newWfInstance));
+									inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+							break;
+						case SAVE_AS_TODO:
+							try {
+								tagManager.saveAsToDo(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
+								model.removeRow(currentModelRowNum);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							break;
+						case OUTBOX:
+							try {
+								tagManager.sendToOutbox(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
+								model.removeRow(currentModelRowNum);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							break;
+						default:
+							break;
+						}
+						openItem();
+					} else {
+
+					}
+				}
+			}
+		}
+	}
+	
 	private void createNewTagActionPerformed(ActionEvent e) {
 		NewTagPanel tagPanel = new NewTagPanel();
 		InboxTag tag = tagPanel.showModalDialog();
@@ -534,6 +540,26 @@ public class WfInboxPanel extends JPanel{
 							if (!uiPanel.verifySavePending(null, false)) {
 								return;
 							}
+						}
+						tpc.remove(i);
+						tpc.repaint();
+						tpc.revalidate();
+						break;
+					}
+
+				}
+			}
+			if (tpc != null) {
+				tpc = ace.getCdePanel().getConceptTabs();
+				int tabCount = tpc.getTabCount();
+				for (int i = 0; i < tabCount; i++) {
+					if (tpc.getTitleAt(i).equals(TranslationHelperPanel.TRANSLATION_TAB_NAME)) {
+						if (tpc.getComponentAt(i) instanceof TranslationConceptEditor6) {
+							TranslationConceptEditor6 uiPanel = (TranslationConceptEditor6) tpc.getComponentAt(i);
+							if (!uiPanel.verifySavePending(null, false)) {
+								return;
+							}
+							uiPanel.AutokeepInInbox();
 						}
 						tpc.remove(i);
 						tpc.repaint();

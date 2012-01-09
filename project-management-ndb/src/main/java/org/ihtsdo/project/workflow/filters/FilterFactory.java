@@ -1,5 +1,6 @@
 package org.ihtsdo.project.workflow.filters;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,6 +8,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
+import org.ihtsdo.project.workflow.tag.TagManager;
 
 public class FilterFactory {
 	private static FilterFactory instance;
@@ -22,7 +24,14 @@ public class FilterFactory {
 			WorkList wl = (WorkList) obj;
 			filter = new WfWorklistFilter(wl.getUids());
 		} else if (obj instanceof InboxTag) {
-			filter = new WfTagFilter((InboxTag) obj);
+			InboxTag tag = (InboxTag) obj;
+			InboxTag filterTag = null;
+			try {
+				filterTag = TagManager.getInstance().getTagContent(tag.getTagName());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			filter = new WfTagFilter(filterTag);
 		}
 		return filter;
 	}
