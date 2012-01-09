@@ -493,8 +493,9 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
     }
 
     public List<RelCAB> getRelCABs() throws IOException, InvalidCAB, ContradictionException {
-        if (relCABs.isEmpty()) {
-            List<RelCAB> parentCABs = getParentCABs();
+        List<RelCAB> parentCABs = getParentCABs();
+        if (relCABs.size() != parentCABs.size()) {
+            relCABs.clear();
             for (RelCAB parentBp : parentCABs) {
                 relCABs.add(parentBp);
             }
