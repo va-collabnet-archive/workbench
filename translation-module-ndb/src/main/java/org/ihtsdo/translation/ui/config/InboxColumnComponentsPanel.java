@@ -23,11 +23,16 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
+import net.jini.event.EventMailbox;
+
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.project.workflow.event.EventMediator;
+import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
+import org.ihtsdo.translation.ui.config.event.InboxColumnsChangedEvent;
 
 /**
  * @author Guillermo Reynoso
@@ -131,6 +136,7 @@ public class InboxColumnComponentsPanel extends JPanel {
 					} else {
 						confTrans.setColumnsDisplayedInInbox(null);
 					}
+					EventMediator.getInstance().fireEvent(new InboxColumnsChangedEvent());
 				} catch (Exception e) {
 					initializeLists();
 					error.setText("Could not save the configuration, please contact your administrator.");

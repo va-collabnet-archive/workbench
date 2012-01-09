@@ -18,13 +18,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeListenerProxy;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +53,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
@@ -85,7 +82,7 @@ import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
 import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
 import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
 
-public class WfInboxPanel extends JPanel{
+public class WfInboxPanel extends JPanel {
 	private static final I_TermFactory tf = Terms.get();
 	private static I_ConfigAceFrame config;
 	private static final long serialVersionUID = -4013056429939416545L;
@@ -117,18 +114,14 @@ public class WfInboxPanel extends JPanel{
 			inboxTable.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 
 			suscribeToEvents();
-			
+
 			try {
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 			checkBox1.setSelected(cfg.isAutoOpenNextInboxItem());
-			LinkedHashSet<InboxColumn> columns = cfg.getColumnsDisplayedInInbox();
-			model.setColumnCount(3);
-			for (InboxColumn inboxColumn : columns) {
 
-			}
 			filterPanel.setVisible(false);
 
 			filterList = new HashMap<String, WfSearchFilterBI>();
@@ -148,9 +141,9 @@ public class WfInboxPanel extends JPanel{
 	}
 
 	private void suscribeToEvents() {
-		
+
 		EventMediator mediator = EventMediator.getInstance();
-		
+
 		mediator.suscribe(EventType.NEW_TAG_ADDED, new NewTagEventHandler<NewTagEvent>(this) {
 			@Override
 			public void handleEvent(NewTagEvent event) {
@@ -175,18 +168,18 @@ public class WfInboxPanel extends JPanel{
 				String tagMenuString = tag.toString();
 				int compCount = menu2.getComponentCount();
 				for (int i = 0; i < compCount; i++) {
-					if(menu2.getComponent(i) instanceof JMenuItem){
-						JMenuItem tagMenu = (JMenuItem)menu2.getComponent(i);
-						if(tagMenu.getText().equals(tagMenuString)){
+					if (menu2.getComponent(i) instanceof JMenuItem) {
+						JMenuItem tagMenu = (JMenuItem) menu2.getComponent(i);
+						if (tagMenu.getText().equals(tagMenuString)) {
 							menu2.remove(i);
 							break;
 						}
 					}
-					
+
 				}
 			}
 		});
-		
+
 		mediator.suscribe(EventType.INBOX_ITEM_SELECTED, new InboxItemSelectedEventHandler<InboxItemSelectedEvent>(this) {
 			@Override
 			public void handleEvent(InboxItemSelectedEvent event) {
@@ -199,10 +192,10 @@ public class WfInboxPanel extends JPanel{
 				}
 				filterList.put(filter.getType(), filter);
 				model.updatePage(filterList);
-				
+
 			}
 		});
-		
+
 	}
 
 	private void initTagMenu() {
@@ -238,7 +231,7 @@ public class WfInboxPanel extends JPanel{
 			int tableRowIndex = inboxTable.getSelectedRow();
 			int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
 			Object[] selectedRow = model.getRow(modelRowIndex);
-			WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+			WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length + 1];
 			List<String> uuidList = new ArrayList<String>();
 			String uuid = wfi.getComponentId().toString();
 			uuidList.add(uuid);
@@ -247,7 +240,8 @@ public class WfInboxPanel extends JPanel{
 			tag.setUuidList(uuidList);
 			TagManager.getInstance().tag(tag);
 			model.addTagToCache(uuid, tag);
-			model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxTableModel.COMPONENT], modelRowIndex, InboxTableModel.COMPONENT);
+			String taggedComponent = TagManager.getInstance().getHeader(tag) + selectedRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()];
+			model.setValueAt(taggedComponent, modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -258,11 +252,11 @@ public class WfInboxPanel extends JPanel{
 			int tableRowIndex = inboxTable.getSelectedRow();
 			int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
 			Object[] selectedRow = model.getRow(modelRowIndex);
-			WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+			WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length + 1];
 			InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
 			model.removeTagFromCache(wfi.getComponentId().toString());
 			TagManager.getInstance().removeTag(tag, wfi.getComponentId().toString());
-			model.setValueAt(tf.getConcept(wfi.getComponentId()).toUserString(), modelRowIndex, InboxTableModel.COMPONENT);
+			model.setValueAt(tf.getConcept(wfi.getComponentId()).toUserString(), modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (TerminologyException ex) {
@@ -383,7 +377,7 @@ public class WfInboxPanel extends JPanel{
 			}
 
 			currentModelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
-			WfInstance wfInstance = (WfInstance) model.getValueAt(currentModelRowNum, InboxTableModel.WORKFLOW_ITEM);
+			WfInstance wfInstance = (WfInstance) model.getValueAt(currentModelRowNum, InboxColumn.values().length + 1);
 			JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
 
 			if (uiPanel == null) {
@@ -408,14 +402,14 @@ public class WfInboxPanel extends JPanel{
 			}
 			uiPanel.updateUI(wfInstance, false);
 			currentRow = model.getRow(currentModelRowNum);
-			currentTranslationItem.setText(currentRow[InboxTableModel.COMPONENT].toString());
+			currentTranslationItem.setText(currentRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()].toString());
 			if (model.getRowCount() > 0) {
 				inboxTable.setRowSelectionInterval(nextIndex, nextIndex);
 			}
 		}
 	}
 
-	class ChangeListener implements PropertyChangeListener{
+	class ChangeListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			if (arg0.getPropertyName().equals(TranslationPanel.ACTION_LAUNCHED)) {
@@ -447,7 +441,7 @@ public class WfInboxPanel extends JPanel{
 							break;
 						case SAVE_AS_TODO:
 							try {
-								tagManager.saveAsToDo(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+								tagManager.saveAsToDo(((WfInstance) currentRow[InboxColumn.values().length + 1]).getComponentId().toString());
 								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
 								model.removeRow(currentModelRowNum);
 							} catch (IOException e) {
@@ -456,7 +450,7 @@ public class WfInboxPanel extends JPanel{
 							break;
 						case OUTBOX:
 							try {
-								tagManager.sendToOutbox(((WfInstance) currentRow[InboxTableModel.WORKFLOW_ITEM]).getComponentId().toString());
+								tagManager.sendToOutbox(((WfInstance) currentRow[InboxColumn.values().length + 1]).getComponentId().toString());
 								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance));
 								model.removeRow(currentModelRowNum);
 							} catch (IOException e) {
@@ -474,7 +468,7 @@ public class WfInboxPanel extends JPanel{
 			}
 		}
 	}
-	
+
 	private void createNewTagActionPerformed(ActionEvent e) {
 		NewTagPanel tagPanel = new NewTagPanel();
 		InboxTag tag = tagPanel.showModalDialog();
@@ -483,14 +477,14 @@ public class WfInboxPanel extends JPanel{
 				int tableRowIndex = inboxTable.getSelectedRow();
 				int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
 				Object[] selectedRow = model.getRow(tableRowIndex);
-				WfInstance wfi = (WfInstance) selectedRow[InboxTableModel.WORKFLOW_ITEM];
+				WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length + 1];
 				List<String> uuidList = new ArrayList<String>();
 				String uuid = wfi.getComponentId().toString();
 				uuidList.add(uuid);
 				tag.setUuidList(uuidList);
 				TagManager.getInstance().createTag(tag);
 				model.addTagToCache(uuid, tag);
-				model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxTableModel.COMPONENT], modelRowIndex, InboxTableModel.COMPONENT);
+				model.setValueAt(TagManager.getInstance().getHeader(tag) + selectedRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()], modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
@@ -602,6 +596,7 @@ public class WfInboxPanel extends JPanel{
 				WfInstance.updateDestination(instance, nextDestination);
 			}
 			Terms.get().commit();
+			TagManager.getInstance().emptyOutboxTag();
 			inboxTreePanel1.updateTree();
 		} catch (Exception e1) {
 			e1.printStackTrace();

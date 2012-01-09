@@ -31,7 +31,7 @@ public class TagManager {
 
 	private static TagManager instance = null;
 	private File tagFolder;
-	private static final String tagHtml = "<html><body><table \"style=\"table-layout:fixed;\"><tr>" + "<td style=\"" + "background-color:${COLOR}; "
+	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\"><tr>" + "<td style=\"" + "background-color:${COLOR}; "
 			+ "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}<B><td>" + "<td style=\"white-space:nowrap;\">";
 	private List<InboxTag> nameColorCache = new ArrayList<InboxTag>();
 
