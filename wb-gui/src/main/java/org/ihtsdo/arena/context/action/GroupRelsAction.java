@@ -12,6 +12,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -68,19 +69,32 @@ public class GroupRelsAction extends AbstractAction {
             RelationshipVersionBI targetRel = (RelationshipVersionBI) targetComponent;
             RelationshipVersionBI sourceRel = (RelationshipVersionBI) sourceComponent;
 
-            for (PathBI ep : config.getEditingPathSet()) {
-                RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
-                        targetRel.getStatusNid(),
-                        targetRel.getAuthorNid(),
-                        ep.getConceptNid(),
-                        Long.MAX_VALUE);
-                RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
-                        sourceRel.getStatusNid(),
-                        sourceRel.getAuthorNid(),
-                        ep.getConceptNid(),
-                        Long.MAX_VALUE);
+            if (targetRel.isUncommitted()) {
+                RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel;
                 targetAnalog.setGroup(groupNumber);
+            } else {
+                for (PathBI ep : config.getEditingPathSet()) {
+                    RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
+                            targetRel.getStatusNid(),
+                            targetRel.getAuthorNid(),
+                            ep.getConceptNid(),
+                            Long.MAX_VALUE);
+                    targetAnalog.setGroup(groupNumber);
+                }
+            }
+
+            if (sourceRel.isUncommitted()) {
+                RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel;
                 sourceAnalog.setGroup(groupNumber);
+            } else {
+                for (PathBI ep : config.getEditingPathSet()) {
+                    RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
+                            sourceRel.getStatusNid(),
+                            sourceRel.getAuthorNid(),
+                            ep.getConceptNid(),
+                            Long.MAX_VALUE);
+                    sourceAnalog.setGroup(groupNumber);
+                }
             }
             Terms.get().addUncommitted(concept);
         } catch (IOException e1) {

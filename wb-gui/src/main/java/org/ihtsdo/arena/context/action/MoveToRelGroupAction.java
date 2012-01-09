@@ -58,13 +58,18 @@ public class MoveToRelGroupAction extends AbstractAction {
             if (sourceComponent.getConceptNid() == targetComponent.getConceptNid()) {
                 RelationshipVersionBI rel = (RelationshipVersionBI) sourceComponent;
                 RelGroupVersionBI relGroup = (RelGroupVersionBI) targetComponent;
-                for (PathBI ep : config.getEditingPathSet()) {
+                if(rel.isUncommitted()){
+                    RelationshipAnalogBI relAnalog = (RelationshipAnalogBI) rel;
+                    relAnalog.setGroup(relGroup.getRelGroup());
+                }else{
+                    for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI relAnalog = (RelationshipAnalogBI) rel.makeAnalog(
                             SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
                             config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                     relAnalog.setGroup(relGroup.getRelGroup());
+                }
                 }
                 Terms.get().addUncommitted(concept);
             } else {

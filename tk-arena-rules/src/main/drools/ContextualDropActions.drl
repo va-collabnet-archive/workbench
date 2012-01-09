@@ -243,11 +243,10 @@ rule "rule 9.1" #rel (w/o group) onto rel group"
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
                            getRel().getGroup() == 0,
-                           getRel().getTime() != Long.MAX_VALUE,
                            getRel().isStated() == true)
 
    then
-      actions.add(new MoveToRelGroupAction("move rel", $dropObject, $dropTarget, config));
+      actions.add(new MoveToRelGroupAction("add rel", $dropObject, $dropTarget, config));
 end
 
 rule "rule 10" #rel w/group onto different rel group"
@@ -256,7 +255,6 @@ rule "rule 10" #rel w/group onto different rel group"
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
       					   getRel().getGroup() != 0,
-      					   getRel().getTime() != Long.MAX_VALUE,
       					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
          (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelGroup()))
    then
@@ -269,7 +267,6 @@ rule "rule 10.1" #rel w/group onto different rel group"
       $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
       					   getRel().getGroup() != 0,
-      					   getRel().getTime() != Long.MAX_VALUE,
                            getRel().isStated() == true,
       					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
          (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelGroup()))
@@ -450,13 +447,11 @@ rule "rule 21" #rel (w/o group) onto rel (w/o group): create new rel group"
    when
       ViewFact(getView() == View.STATED)
       $dropTarget: RelFact(context == Context.DROP_TARGET,
-      			getRel().getGroup() == 0,
-      			getRel().getTime() != Long.MAX_VALUE)
+      			getRel().getGroup() == 0)
       $dropObject: RelFact(context == Context.DROP_OBJECT,
       			component != $dropTarget.component,
       			getRel().getConceptNid() == $dropTarget.getRel().getConceptNid(),
-                        getRel().getGroup() == 0,
-                        getRel().getTime() != Long.MAX_VALUE)
+                        getRel().getGroup() == 0)
 
    then
       actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget, config));
