@@ -3894,7 +3894,7 @@ public class TerminologyProjectDAO {
 		if(workList != null){
 			initializeWorkList(partition, workList, config, updater);
 		}
-
+		Terms.get().addUncommittedNoChecks(workList.getConcept());
 		Terms.get().commit();
 
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
