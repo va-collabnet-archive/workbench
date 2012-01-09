@@ -200,6 +200,7 @@ public class StateTransitionRefsetWriter extends WorkflowRefsetWriter
 				str.append("\ninitialState:" + initialState);
 				str.append("\naction:" + action);
 				str.append("\nfinalState:" + finalState);
+	            AceLog.getAppLog().log(Level.WARNING, "Failed to Add Member with string: " + str.toString());
 			}
 			
 			return retVal;
