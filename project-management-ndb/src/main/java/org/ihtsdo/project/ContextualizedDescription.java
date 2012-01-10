@@ -164,6 +164,9 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 			}
 		}
 
+		if (this.typeId==SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()
+				&& this.extensionStatusId == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid())
+			this.acceptabilityId=SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
 		boolean extensionPartChanged = false;
 		if (languageExtension != null) {
 			if (this.extensionStatusId != languageExtensionPart.getStatusNid() || 

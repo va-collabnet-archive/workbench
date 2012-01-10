@@ -25,6 +25,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.KindOfCacheBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -180,23 +181,16 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts{
 						reportFileWriter.append("The description " + did + " has not Snomed Description ID, It will be replaced with its UUID." + "\r\n");
 
 					}
-					String dStatus="";
-					if (cdescription.getDescriptionStatusId()==SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid() ||
-						cdescription.getDescriptionStatusId()==ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() ||
-							cdescription.getDescriptionStatusId()==ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid()){
-						dStatus="1";
-					}else{
-						dStatus="0";
-					}
-					if (dStatus=="0"){
+					String dStatus=ExportUtil.getStatusType(cdescription.getDescriptionStatusId());
+					
 
-						if (conceptStatus==CONCEPT_RETIRED){
+						boolean bstop;
 
-							dStatus="8";
-						}else if (conceptStatus==LIMITED){
-							dStatus="6";
+						if (	dStatus.equals("8")){
+						bstop=true;
+						}else if (!dStatus.equals("0")){
+							bstop=true;
 						}
-					}
 
 
 					String lang=cdescription.getLang();
