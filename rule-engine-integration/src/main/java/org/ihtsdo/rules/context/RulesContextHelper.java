@@ -53,6 +53,7 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conattr.ConAttrVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -584,8 +585,15 @@ public class RulesContextHelper {
 				for (I_RelTuple loopTuple : pkgRelTuples) {
 					if (isActive(loopTuple.getStatusNid())) {
 						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
-						ConceptVersionBI conceptVersion = ((ConceptChronicleBI) targetPackage).getVersion(config.getViewCoordinate());
-						if (isActive(conceptVersion.getStatusNid()) && 
+						Long time = Long.MIN_VALUE;
+						int statusId = Integer.MIN_VALUE;
+						for (ConAttrVersionBI loopAttr : targetPackage.getConceptAttributes().getVersions()) {
+							if (loopAttr.getTime() > time) {
+								time = loopAttr.getTime();
+								statusId = loopAttr.getStatusNid();
+							}
+						}
+						if (isActive(statusId) && 
 								!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
 							returnData.add(refHelper.getRulesDeploymentPackageReference(targetPackage));
 						}
