@@ -697,7 +697,7 @@ public class GenerateUsers extends AbstractMojo {
         } else if (statedInferredPolicy.equals("i")) {
             activeConfig.setRelAssertionType(RelAssertionType.INFERRED);
         } else if (statedInferredPolicy.equals("is")) {
-            activeConfig.setRelAssertionType(RelAssertionType.STATED);
+            activeConfig.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
         } else {
             throw new MojoExecutionException("Can't handle value:  " + statedInferredPolicy
                     + " for preference: statedInferredPolicy");
