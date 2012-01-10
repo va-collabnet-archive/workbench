@@ -1586,8 +1586,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                                        aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
       gbc.fill = GridBagConstraints.BOTH;
       gbc.gridy++;
-      checkPanel.add(getCheckboxEditor("rel assertion type in taxonomy view", "setRelAssertionType",
-                                       aceFrameConfig.getShowViewerImagesInTaxonomy(), true), gbc);
       gbc.fill = GridBagConstraints.BOTH;
       gbc.gridy++;
       checkPanel.add(getCheckboxEditor("show refset info in taxonomy view", "showRefsetInfoInTaxonomy",
