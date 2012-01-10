@@ -21,6 +21,16 @@ package org.dwfa.ace.table;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.*;
+import java.awt.event.KeyEvent;
+import java.awt.image.FilteredImageSource;
+import java.io.IOException;
+import java.util.logging.Level;
+import javax.swing.*;
+import javax.swing.table.TableModel;
 import org.dwfa.ace.TermLabelMaker;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -44,52 +54,12 @@ import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
+import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
-
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-
 import sun.awt.dnd.SunDragSourceContextPeer;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Event;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.DragSourceEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.KeyEvent;
-import java.awt.image.FilteredImageSource;
-
-import java.io.IOException;
-
-import java.util.logging.Level;
-
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.InputMap;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.TransferHandler;
-import javax.swing.table.TableModel;
-import org.dwfa.ace.task.classify.SnoRel;
 
 public class JTableWithDragImage extends JTable {
 
@@ -166,7 +136,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swct.getTuple().getAuthorNid()));
 
          default :
-            throw new UnsupportedOperationException("Cana't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
@@ -207,7 +177,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swdt.getTuple().getAuthorNid()));
 
          default :
-            throw new UnsupportedOperationException("Cana't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
@@ -236,7 +206,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(seidt.getTuple().getAuthorNid()));
 
          default :
-            throw new UnsupportedOperationException("Cana't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
@@ -280,10 +250,11 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swrt.getTuple().getAuthorNid()));
             
          default :
-            throw new UnsupportedOperationException("Cana't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
+      @Override
       public void dragGestureRecognized(DragGestureEvent dge) {
          int column = columnAtPoint(dge.getDragOrigin());
          int row    = rowAtPoint(dge.getDragOrigin());
@@ -440,7 +411,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(swit.getTuple().getPathId()));
 
          default :
-            throw new UnsupportedOperationException("Can't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
@@ -468,7 +439,7 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(Terms.get().getConcept(wfct.getTuple().getConceptNid()));
 
          default :
-            throw new UnsupportedOperationException("Cana't handle field: " + field);
+            throw new UnsupportedOperationException("Can not transfer field: " + field);
          }
       }
 
@@ -556,26 +527,31 @@ public class JTableWithDragImage extends JTable {
 
 
    private class TermLabelDragSourceListener implements DragSourceListener {
+      @Override
       public void dragDropEnd(DragSourceDropEvent dsde) {
 
          // TODO Auto-generated method stub
       }
 
+      @Override
       public void dragEnter(DragSourceDragEvent dsde) {
 
          // TODO Auto-generated method stub
       }
 
+      @Override
       public void dragExit(DragSourceEvent dse) {
 
          // TODO Auto-generated method stub
       }
 
+      @Override
       public void dragOver(DragSourceDragEvent dsde) {
 
          // TODO Auto-generated method stub
       }
 
+      @Override
       public void dropActionChanged(DragSourceDragEvent dsde) {
 
          // TODO Auto-generated method stub
