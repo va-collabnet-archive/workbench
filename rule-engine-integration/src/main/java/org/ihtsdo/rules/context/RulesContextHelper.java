@@ -53,6 +53,9 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class RulesContextHelper {
 
@@ -581,7 +584,9 @@ public class RulesContextHelper {
 				for (I_RelTuple loopTuple : pkgRelTuples) {
 					if (isActive(loopTuple.getStatusNid())) {
 						I_GetConceptData targetPackage = termFactory.getConcept(loopTuple.getC2Id());
-						if (!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
+						ConceptVersionBI conceptVersion = ((ConceptChronicleBI) targetPackage).getVersion(config.getViewCoordinate());
+						if (isActive(conceptVersion.getStatusNid()) && 
+								!targetPackage.getPrimUuid().equals(UUID.fromString("00000000-0000-0000-C000-000000000046"))) {
 							returnData.add(refHelper.getRulesDeploymentPackageReference(targetPackage));
 						}
 					}
@@ -759,6 +764,7 @@ public class RulesContextHelper {
 		List<Integer> activeStatuses = new ArrayList<Integer>();
 		try {
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+			activeStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			activeStatuses.add(ArchitectonicAuxiliary.Concept.LIMITED.localize().getNid());
 		} catch (IOException e) {
@@ -775,6 +781,7 @@ public class RulesContextHelper {
 			allowedStatusWithRetired.addAll(config.getAllowedStatus().getSetValues());
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid());
 			allowedStatusWithRetired.add(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
+			allowedStatusWithRetired.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
 
 			I_TermFactory termFactory = Terms.get();
 
