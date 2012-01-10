@@ -457,13 +457,13 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 				Boolean sel=(Boolean)model.getValueAt(i, j-1);
 				if (sel==true)
 					bExists++;
-				if (sel==true && def==true) 
+				if (def==true) 
 					dExists++;
 			}
 			if (bExists==0){
 			throw new Exception(model.getColumnName(j)+" is empty.");
 			}
-			if (bExists!=dExists || dExists>1){
+			if (dExists>1){
 				throw new Exception(model.getColumnName(j-1)+" default must be only one.");
 			}
 		}
