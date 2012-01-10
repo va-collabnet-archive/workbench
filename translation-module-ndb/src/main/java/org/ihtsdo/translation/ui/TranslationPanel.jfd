@@ -1960,7 +1960,7 @@
                    <class>java.awt.GridBagLayout</class> 
                    <void method="setProperty"> 
                     <string>$columnSpecs</string> 
-                    <string>0, right:0, right:0, 0:1.0, right:0, right:0, right:0, right:0:1.0</string> 
+                    <string>0, right:0, right:0, 0:1.0, right:0, right:50, right:50, right:0:1.0</string> 
                    </void> 
                    <void method="setProperty"> 
                     <string>$rowSpecs</string> 
@@ -1998,10 +1998,6 @@
                   <void method="add"> 
                    <object class="com.jformdesigner.model.FormComponent"> 
                     <string>javax.swing.JLabel</string> 
-                    <void method="setProperty"> 
-                     <string>text</string> 
-                     <string>text</string> 
-                    </void> 
                     <void property="name"> 
                      <string>label12</string> 
                     </void> 
@@ -2023,7 +2019,7 @@
                     <string>javax.swing.JLabel</string> 
                     <void method="setProperty"> 
                      <string>text</string> 
-                     <string>Workflow actions:      </string> 
+                     <string>Actions:      </string> 
                     </void> 
                     <void property="name"> 
                      <string>label8</string> 
@@ -2061,7 +2057,7 @@
                     <string>javax.swing.JButton</string> 
                     <void method="setProperty"> 
                      <string>text</string> 
-                     <string>Launch Action</string> 
+                     <string>Save</string> 
                     </void> 
                     <void property="name"> 
                      <string>bLaunch</string> 
@@ -2080,6 +2076,33 @@
                     <void method="setProperty"> 
                      <string>gridx</string> 
                      <int>5</int> 
+                    </void> 
+                   </object> 
+                  </void> 
+                  <void method="add"> 
+                   <object class="com.jformdesigner.model.FormComponent"> 
+                    <string>javax.swing.JButton</string> 
+                    <void method="setProperty"> 
+                     <string>text</string> 
+                     <string>Cancel</string> 
+                    </void> 
+                    <void property="name"> 
+                     <string>button1</string> 
+                    </void> 
+                    <void method="addEvent"> 
+                     <object class="com.jformdesigner.model.FormEvent"> 
+                      <string>java.awt.event.ActionListener</string> 
+                      <string>actionPerformed</string> 
+                      <string>button1ActionPerformed</string> 
+                      <boolean>false</boolean> 
+                     </object> 
+                    </void> 
+                   </object> 
+                   <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+                    <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+                    <void method="setProperty"> 
+                     <string>gridx</string> 
+                     <int>6</int> 
                     </void> 
                    </object> 
                   </void> 

@@ -86,6 +86,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
@@ -179,6 +180,7 @@ public class TranslationPanel extends JPanel {
 	private boolean alreadyVerified;
 	private I_GetConceptData Snomed_Isa;
 	private int inferred;
+	private WfAction cancAction;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -284,6 +286,13 @@ public class TranslationPanel extends JPanel {
 		termZoomDialog.setMaximumSize(dimension);
 		termZoomDialog.setMinimumSize(dimension);
 		termZoomDialog.setSize(dimension);
+		
+		cancAction=new WfAction();
+		cancAction.setBusinessProcess(new File("sampleProcesses/CancelActionWithoutDestination.bp"));
+		cancAction.setId(UUID.randomUUID());
+		cancAction.setName("Cancel");
+		cancAction.setConsequence(null);
+
 	}
 
 	public class SourceTableMouselistener extends MouseAdapter {
@@ -482,34 +491,7 @@ public class TranslationPanel extends JPanel {
 		if (saveDesc) {
 			if (doVerify) {
 				if (targetTextField.getText().equals("") && tabTar.getRowCount() <= 0 && !alreadyVerified && message == null) {
-					alreadyVerified = true;
-					Object[] options = { "Send empty translation", "Cancel" };
-					int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-					bPendTerm = false;
-					if (n == 1) {
-						if (Terms.get().getUncommitted().size() > 0) {
-							try {
-								Terms.get().cancel();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						descriptionInEditor = null;
-						targetTextField.setText("");
-						alreadyVerified = false;
-						return false;
-					} else if (!bPendTerm) {
-						if (saveDescActionPerformed()) {
-
-							descriptionInEditor = null;
-							targetTextField.setText("");
-							return true;
-						} else {
-							return false;
-						}
-
-					}
+					return selectOptionForNullTerms();
 				} else {
 					alreadyVerified = true;
 				}
@@ -576,6 +558,35 @@ public class TranslationPanel extends JPanel {
 			}
 		}
 		return bPendTerm;
+	}
+
+	private boolean selectOptionForNullTerms() {
+		alreadyVerified = true;
+		Object[] options = { "Send empty translation", "Cancel" };
+		int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+		if (n == 1) {
+			if (Terms.get().getUncommitted().size() > 0) {
+				try {
+					Terms.get().cancel();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			descriptionInEditor = null;
+			targetTextField.setText("");
+			alreadyVerified = false;
+			return false;
+		} else {
+			if (saveDescActionPerformed()) {
+
+				descriptionInEditor = null;
+				targetTextField.setText("");
+				return true;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	private void setReadOnlyMode(boolean readOnly) {
@@ -798,7 +809,6 @@ public class TranslationPanel extends JPanel {
 
 			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() ) {
 				descriptionInEditor = (ContextualizedDescription) ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetId, targetLangRefset.getLangCode(config));
-
 			}
 			if (descriptionInEditor != null) {
 				descriptionInEditor.setText(targetTextField.getText());
@@ -818,7 +828,6 @@ public class TranslationPanel extends JPanel {
 				if  (rbInact.isSelected()) {
 					descriptionInEditor.setExtensionStatusId(inactive.getConceptNid());
 					//					descriptionInEditor.setAcceptabilityId(notAcceptable.getConceptNid());
-
 				} else {
 					// TODO: Discuss how to handle retirement and re-activation
 					// in liked descriptions form source language
@@ -844,12 +853,18 @@ public class TranslationPanel extends JPanel {
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+
 			return false;
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+
 			return false;
 		} catch (Exception e1) {
 			e1.printStackTrace();
+			JOptionPane.showOptionDialog(this, e1.getMessage(), "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+
 			return false;
 		}
 
@@ -1257,21 +1272,30 @@ public class TranslationPanel extends JPanel {
 		if (action!=null){
 			I_Work worker=null;
 			try {
-				if (verifySavePending(null, false)){
-					worker = Terms.get().getActiveAceFrameConfig().getWorker();
-					WfInstance prevWfInstance=new WfInstance();
-					prevWfInstance.setComponentId(instance.getComponentId());
-					prevWfInstance.setDestination(instance.getDestination());
-					prevWfInstance.setHistory(instance.getHistory());
-					prevWfInstance.setProperties(instance.getProperties());
-					prevWfInstance.setState(instance.getState());
-					prevWfInstance.setWfDefinition(instance.getWfDefinition());
-					prevWfInstance.setWorkList(instance.getWorkList());
-					workflowInterpreter.doAction(instance,wfRole, action, worker);
-					WfInstance newWfInstance = worklistMember.getWfInstance();
-					newWfInstance.setActionReport(instance.getActionReport());
-					firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
+				if (targetTextField.getText().equals("") && tabTar.getRowCount() <= 0 && !alreadyVerified ) {
+					if (! selectOptionForNullTerms()) return;
 				}
+
+				if (saveDescActionPerformed()) {
+
+					descriptionInEditor = null;
+					targetTextField.setText("");
+				} else {
+					return ;
+				}
+				worker = Terms.get().getActiveAceFrameConfig().getWorker();
+				WfInstance prevWfInstance=new WfInstance();
+				prevWfInstance.setComponentId(instance.getComponentId());
+				prevWfInstance.setDestination(instance.getDestination());
+				prevWfInstance.setHistory(instance.getHistory());
+				prevWfInstance.setProperties(instance.getProperties());
+				prevWfInstance.setState(instance.getState());
+				prevWfInstance.setWfDefinition(instance.getWfDefinition());
+				prevWfInstance.setWorkList(instance.getWorkList());
+				workflowInterpreter.doAction(instance,wfRole, action, worker);
+				WfInstance newWfInstance = worklistMember.getWfInstance();
+				newWfInstance.setActionReport(instance.getActionReport());
+				firePropertyChange(TranslationPanel.ACTION_LAUNCHED, prevWfInstance, newWfInstance);
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(this,
@@ -1287,6 +1311,31 @@ public class TranslationPanel extends JPanel {
 			}
 		}
 	}
+
+	private void button1ActionPerformed() {
+		I_Work worker=null;
+		try {
+
+			worker = Terms.get().getActiveAceFrameConfig().getWorker();
+
+			workflowInterpreter.doAction(instance,wfRole, cancAction, worker);
+			WfInstance newWfInstance =instance;
+			firePropertyChange(TranslationPanel.ACTION_LAUNCHED, instance, newWfInstance);
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this,
+					e.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
+		} catch (IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this,
+					e.getMessage(),
+					"Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+		
 
 	class SelectionListener implements ListSelectionListener {
 
@@ -1415,6 +1464,7 @@ public class TranslationPanel extends JPanel {
 		label8 = new JLabel();
 		cmbActions = new JComboBox();
 		bLaunch = new JButton();
+		button1 = new JButton();
 		tabbedPane3 = new JTabbedPane();
 		scrollPane7 = new JScrollPane();
 		tree3 = new JTree();
@@ -1991,13 +2041,12 @@ public class TranslationPanel extends JPanel {
 							{
 								buttonPanel.setBackground(new Color(238, 238, 238));
 								buttonPanel.setLayout(new GridBagLayout());
-								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0};
+								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 55, 55, 0, 0};
 								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
 								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
 								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
 								//---- label12 ----
-								label12.setText("text");
 								label12.addMouseListener(new MouseAdapter() {
 									@Override
 									public void mouseClicked(MouseEvent e) {
@@ -2009,7 +2058,7 @@ public class TranslationPanel extends JPanel {
 									new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- label8 ----
-								label8.setText("Workflow actions:      ");
+								label8.setText("Actions:      ");
 								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
@@ -2018,7 +2067,7 @@ public class TranslationPanel extends JPanel {
 									new Insets(0, 0, 0, 5), 0, 0));
 
 								//---- bLaunch ----
-								bLaunch.setText("Launch Action");
+								bLaunch.setText("Save");
 								bLaunch.addActionListener(new ActionListener() {
 									@Override
 									public void actionPerformed(ActionEvent e) {
@@ -2026,6 +2075,18 @@ public class TranslationPanel extends JPanel {
 									}
 								});
 								buttonPanel.add(bLaunch, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+									new Insets(0, 0, 0, 5), 0, 0));
+
+								//---- button1 ----
+								button1.setText("Cancel");
+								button1.addActionListener(new ActionListener() {
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										button1ActionPerformed();
+									}
+								});
+								buttonPanel.add(button1, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
 									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 									new Insets(0, 0, 0, 5), 0, 0));
 							}
@@ -2227,6 +2288,7 @@ public class TranslationPanel extends JPanel {
 	private JLabel label8;
 	private JComboBox cmbActions;
 	private JButton bLaunch;
+	private JButton button1;
 	private JTabbedPane tabbedPane3;
 	private JScrollPane scrollPane7;
 	private JTree tree3;
@@ -3310,7 +3372,7 @@ public class TranslationPanel extends JPanel {
 
 			hierThread = new Thread(hierThr);
 			hierThread.start();
-			
+
 			sourceICS = LanguageUtil.getDefaultICS(concept, sourceLangRefsets.iterator().next(), targetLangRefset, config);
 			if (sourceICS)
 				rbYes.setSelected(true);
@@ -3783,29 +3845,29 @@ public class TranslationPanel extends JPanel {
 			workflowDefinition = instance.getWfDefinition();
 			workflowInterpreter=WorkflowInterpreter.createWorkflowInterpreter(workflowDefinition);
 			config = Terms.get().getActiveAceFrameConfig();
-		    WorkList workList = instance.getWorkList();
+			WorkList workList = instance.getWorkList();
 			List<WfRole> roles = workflowInterpreter.getNextRole(instance, workList);
-		    componentProvider=new WfComponentProvider();
-		    
-		    WfUser user=componentProvider.userConceptToWfUser(config.getDbConfig().getUserConcept());
-		    List<WfPermission> perms = componentProvider.getPermissionsForUser(user);
-		    WfRole userRole=null;
-		    boolean bExists=false;
-		    I_GetConceptData roleConcept = null;
-		    for (WfRole role:roles){
-		    	for (WfPermission perm:perms){
-		    		if (role.toString().equals(perm.getRole().toString())){
-		    			userRole=role;
-		    			bExists = true;
-		    			break;
-		    		}
-		    	}
-		    	if (bExists) break;
-		    }
-		    if (bExists){
-		    	roleConcept=Terms.get().getConcept(userRole.getId());
-		    }
-		    this.wfRole=userRole;
+			componentProvider=new WfComponentProvider();
+
+			WfUser user=componentProvider.userConceptToWfUser(config.getDbConfig().getUserConcept());
+			List<WfPermission> perms = componentProvider.getPermissionsForUser(user);
+			WfRole userRole=null;
+			boolean bExists=false;
+			I_GetConceptData roleConcept = null;
+			for (WfRole role:roles){
+				for (WfPermission perm:perms){
+					if (role.toString().equals(perm.getRole().toString())){
+						userRole=role;
+						bExists = true;
+						break;
+					}
+				}
+				if (bExists) break;
+			}
+			if (bExists){
+				roleConcept=Terms.get().getConcept(userRole.getId());
+			}
+			this.wfRole=userRole;
 			this.translationProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
 
 			I_GetConceptData component = Terms.get().getConcept(instance.getComponentId());
@@ -3832,17 +3894,17 @@ public class TranslationPanel extends JPanel {
 	}
 
 	private void addDefaultActions() {
-		WfAction cancAction=new WfAction();
-		cancAction.setBusinessProcess(new File("sampleProcesses/CancelActionWithoutDestination.bp"));
-		cancAction.setId(UUID.randomUUID());
-		cancAction.setName("Cancel");
-		cancAction.setConsequence(null);
-		cmbActions.addItem(cancAction);
-		
+		//		WfAction cancAction=new WfAction();
+		//		cancAction.setBusinessProcess(new File("sampleProcesses/CancelActionWithoutDestination.bp"));
+		//		cancAction.setId(UUID.randomUUID());
+		//		cancAction.setName("Cancel");
+		//		cancAction.setConsequence(null);
+		//		cmbActions.addItem(cancAction);
+
 		WfAction satdAction=new WfAction();
 		satdAction.setBusinessProcess(new File("sampleProcesses/SaveAsTodoActionWithoutDestination.bp"));
 		satdAction.setId(UUID.randomUUID());
-		satdAction.setName("Save as todo");
+		satdAction.setName("Tag as todo");
 		satdAction.setConsequence(null);
 		cmbActions.addItem(satdAction);
 	}
