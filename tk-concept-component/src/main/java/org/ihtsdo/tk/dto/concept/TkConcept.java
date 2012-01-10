@@ -83,7 +83,9 @@ public class TkConcept {
     }
 
     public TkConcept(ConceptChronicleBI c) throws IOException {
+        annotationStyleRefex = c.isAnnotationStyleRefex();
         conceptAttributes = new TkConceptAttributes(c.getConAttrs());
+        primordialUuid = conceptAttributes.primordialUuid;
         relationships = new ArrayList<TkRelationship>(c.getRelsOutgoing().size());
 
         for (RelationshipChronicleBI rel : c.getRelsOutgoing()) {
