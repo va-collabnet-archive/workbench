@@ -1,6 +1,8 @@
 package org.ihtsdo.project.workflow.wizard;
 
 import java.awt.Dialog.ModalityType;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +38,11 @@ public class WizardLauncher {
 		WizardFrame ww=new WizardFrame(panels, resultWizard,notifier);
 		ww.setModalityType(ModalityType.APPLICATION_MODAL);
 		ww.setSize(1000,600);
+		Toolkit tk = Toolkit.getDefaultToolkit();
+	    Dimension screenSize = tk.getScreenSize();
+	    int screenHeight = screenSize.height;
+	    int screenWidth = screenSize.width;
+	    ww.setLocation(screenWidth / 4, screenHeight / 4);
 		ww.setPanel(0);
 		ww.setVisible(true);
 		

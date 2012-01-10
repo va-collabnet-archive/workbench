@@ -10,7 +10,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -32,11 +32,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
@@ -44,10 +42,6 @@ import org.ihtsdo.project.panel.details.ZebraJTable;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
-import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.CheckBoxRenderer;
-import org.ihtsdo.project.workflow.wizard.DataGridCollectorFromList.RadioRenderer;
-import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.wizard.I_fastWizard;
 
 /**
@@ -89,6 +83,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		this.roles=roles;
 		this.users=users;
 		tblObjs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tblObjs.getTableHeader().setReorderingAllowed(false);
 		setColumNames();
 		loadObjects();
 	}
@@ -179,7 +174,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			tblObjs.setModel(model);
 			TableColumnModel cmodel = tblObjs.getColumnModel();
 			CheckBoxRenderer checkBoxRenderer = new CheckBoxRenderer();
-			
+			RadioRenderer rr= new RadioRenderer();
 			cmodel.getColumn(0).setCellRenderer(new DefaultTableCellRenderer());
 			for (int i = 1; i < (columnNames.length); i++) {
 				if(i%2==1){
@@ -187,13 +182,13 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 				cmodel.getColumn(i).setCellEditor(new CheckBoxEditor(new JCheckBox(),new JCheckBox()));
 				}
 				else{
-				cmodel.getColumn(i).setCellRenderer(new RadioRenderer());
+				cmodel.getColumn(i).setCellRenderer(rr);
 				cmodel.getColumn(i).setCellEditor(new RadioEditor(new JCheckBox(),new JRadioButton()));
+				cmodel.getColumn(i).setMaxWidth(0);
+				cmodel.getColumn(i).setMinWidth(0);
 				}
 			}
 			hideColumns();
-			
-			
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -204,10 +199,16 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		this.label1.setText(strLabel);
 	}
 
-	class RadioRenderer implements
+	class RadioRenderer extends DefaultTableCellRenderer implements
 	TableCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		RadioRenderer() {
 			super();
+			setHorizontalAlignment(LEFT);
 		}
 
 		public Component getTableCellRendererComponent(JTable table,
@@ -220,8 +221,13 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		}
 	}
 
-	class CheckBoxRenderer implements
+	class CheckBoxRenderer extends DefaultTableCellRenderer implements
 	TableCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
 		CheckBoxRenderer() {
 			super();
 		}
@@ -232,6 +238,8 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			JCheckBox button = new JCheckBox();
 			Boolean val=(Boolean)value;
 			button.setSelected(val);
+			button.setHorizontalAlignment(JButton.RIGHT);
+			button.setHorizontalTextPosition(JButton.LEFT);
 			return button;
 		}
 	}
@@ -289,6 +297,8 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		public CheckBoxEditor(JCheckBox checkBox, JCheckBox button) {
 			super(checkBox);
 			this.rbutton = button;
+			rbutton.setHorizontalAlignment(JButton.RIGHT);
+			rbutton.setHorizontalTextPosition(JButton.LEFT);
 			this.rbutton.addActionListener(this);
 		}
 
@@ -343,11 +353,9 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			tblObjs.getModel().setValueAt(false,rowModel, column);
 		else
 			tblObjs.getModel().setValueAt(true,rowModel, column);
-	}
-
-	private void tblObjsPropertyChange(PropertyChangeEvent e) {
 		hideColumns();
 	}
+
 	
 	private void hideColumns() {
 		DefaultTableModel model= (DefaultTableModel) tblObjs.getModel();
@@ -379,6 +387,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			}
 		}
 		tblObjs.setModel(model);
+		model.fireTableDataChanged();
 	}
 
 	private void initComponents() {
@@ -406,12 +415,6 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 			//---- tblObjs ----
 			tblObjs.setColumnSelectionAllowed(true);
 			tblObjs.setAutoCreateRowSorter(true);
-			tblObjs.addPropertyChangeListener(new PropertyChangeListener() {
-				@Override
-				public void propertyChange(PropertyChangeEvent e) {
-					tblObjsPropertyChange(e);
-				}
-			});
 			scrollPane1.setViewportView(tblObjs);
 		}
 		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
@@ -447,17 +450,21 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard{
 		
 		
 		for (int j = 2; j < columnNames.length; j+=2) {
-			Boolean bExists = false;
+			int bExists = 0;
+			int dExists = 0;
 			for (int i=0;i<model.getRowCount();i++){
 				Boolean def=(Boolean)model.getValueAt(i, j);
 				Boolean sel=(Boolean)model.getValueAt(i, j-1);
-				if (def==true && sel==true) {
-					bExists=true;
-					break; 
-				}
+				if (sel==true)
+					bExists++;
+				if (sel==true && def==true) 
+					dExists++;
 			}
-			if (!bExists){
-				throw new Exception(model.getColumnName(j-1)+" default doesn't exist.");
+			if (bExists==0){
+			throw new Exception(model.getColumnName(j)+" is empty.");
+			}
+			if (bExists!=dExists || dExists>1){
+				throw new Exception(model.getColumnName(j-1)+" default must be only one.");
 			}
 		}
 		hmRes.put(key,model);	
