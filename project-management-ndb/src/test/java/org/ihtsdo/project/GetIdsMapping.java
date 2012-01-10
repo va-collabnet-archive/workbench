@@ -173,10 +173,11 @@ public class GetIdsMapping extends TestCase {
 					} else if (rel.getPrimordialVersion().getCharacteristicNid() == statedIntId) {
 						type = "RS";
 					}
-					
 				}
 				counter++;
-				writer.println(component.getPrimUuid() + "\t" + sctid + "\t" + type);
+				if (!type.equals("RI") && !type.equals("X")) {
+					writer.println(component.getPrimUuid() + "\t" + sctid + "\t" + type);
+				}
 				//System.out.println(component.getPrimUuid() + "\t" + sctid);
 				if (counter % 1000 == 0) {
 					System.out.println(counter);
