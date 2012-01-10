@@ -53,16 +53,8 @@ import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
@@ -341,6 +333,16 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     config.getViewPositionSetReadOnly(), config.getPrecedence(),
                     config.getConflictResolutionStrategy(), coordinate.getClassifierNid(),
                     coordinate.getRelAssertionType());
+            List<ComponentVersionBI> extra = new ArrayList<ComponentVersionBI>();
+            for(I_RelTuple inferredRel : inferredRels){
+                for(I_RelTuple statedRel : statedRels){
+                    if(inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())){
+                        extra.add(inferredRel);
+                    }
+                }
+            }
+            inferredRels.removeAll(extra);
+            extra.clear();
             removeContradictions(inferredRels);
             activeInferredRelPanels = new ArrayList<DragPanelRel>(inferredRels.size());
 
@@ -357,8 +359,16 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (stop) {
                 return null;
             }
-
+            
             inactiveInferredRels.removeAll(inferredRels);
+            for(I_RelTuple inferredRel : inactiveInferredRels){
+                for(I_RelTuple statedRel : statedRels){
+                    if(inferredRel.getPrimUuid().equals(statedRel.getPrimUuid())){
+                        extra.add(inferredRel);
+                    }
+                }
+            }
+            inactiveInferredRels.removeAll(extra);
             removeContradictions(inactiveInferredRels);
             inactiveInferredRelPanels = new ArrayList<DragPanelRel>(inactiveInferredRels.size());
             setupRels(latch, inactiveInferredRels, inactiveInferredRelPanels, cpr, true);
