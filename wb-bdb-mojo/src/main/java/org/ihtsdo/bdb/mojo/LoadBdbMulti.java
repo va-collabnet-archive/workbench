@@ -594,6 +594,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
         @Override
         public void run() {
+            if (eConcept.isAnnotationStyleRefex()) {
+                System.out.println(" annotation: " + eConcept);
+            }
             if (nidCnidMap == null) {
                 nidCnidMap = Bdb.getNidCNidMap();
             }

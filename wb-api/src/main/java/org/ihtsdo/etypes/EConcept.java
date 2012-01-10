@@ -79,7 +79,9 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
     * @throws TerminologyException
     */
    public EConcept(I_GetConceptData c) throws IOException, TerminologyException {
+      annotationStyleRefex = c.isAnnotationStyleRefex();
       conceptAttributes = new EConceptAttributes(c.getConceptAttributes());
+      primordialUuid = conceptAttributes.primordialUuid;
       EConcept.convertId(c.getIdentifier(), conceptAttributes);
       relationships = new ArrayList<TkRelationship>(c.getSourceRels().size());
 

@@ -334,7 +334,6 @@ public class UUIDChangeBasedOnMapTransformer extends AbstractTransformer {
 	public UUID transformWithMap(UUID uuid) {
             assert uuid != null;
 		if (mapping.containsKey(uuid)) {
-			System.out.println("ID replaced: " + uuid + " to " + mapping.get(uuid));
 			return mapping.get(uuid);
 		} else {
 			return uuid;

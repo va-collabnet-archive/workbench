@@ -113,6 +113,9 @@ public abstract class AbstractTransformer {
 	 * @return true, if should write, according to what's returned in post-process-concept stage
 	 */
 	public boolean transform(EConcept eConcept) {
+            if (eConcept.isAnnotationStyleRefex()) {
+                System.out.println(" annotation: " + eConcept);
+            }
 		transformAttributes(eConcept.conceptAttributes, eConcept);
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {
