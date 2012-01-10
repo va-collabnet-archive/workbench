@@ -72,10 +72,6 @@ public class ActiveOnlyExport implements ProcessUnfetchedConceptDataBI {
             if ((conceptVersion.getPrimUuid() != null) && conceptVersion.isActive()) {
                 TkConcept tkc = new TkConcept(conceptVersion, exclusionSet, conversionMap, 0, true, 
                         conceptVc, descVc, relVc);
-            if (tkc.isAnnotationStyleRefex()) {
-                System.out.println(" annotation: " + tkc);
-            }
-
                 tkc.writeExternal(out);
             }
         }
