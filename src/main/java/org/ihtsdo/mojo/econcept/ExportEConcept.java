@@ -97,7 +97,9 @@ public class ExportEConcept extends AbstractMojo implements ProcessUnfetchedConc
    public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
       if (conceptCount < conceptLimit) {
          TkConcept eC = new TkConcept(fetcher.fetch());
-
+            if (eC.isAnnotationStyleRefex()) {
+                System.out.println(" annotation: " + eC);
+            }
          eC.writeExternal(eConceptDOS);
          conceptCount++;
       }
