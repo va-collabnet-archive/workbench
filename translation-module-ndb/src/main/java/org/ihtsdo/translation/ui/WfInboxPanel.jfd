@@ -185,7 +185,7 @@
              </void> 
              <void method="setProperty"> 
               <string>$rowSpecs</string> 
-              <string>0:1.0, 1:1.0, 0:1.0, 0</string> 
+              <string>11:1.0, 1:1.0, 0:1.0, 0</string> 
              </void> 
              <void method="setProperty"> 
               <string>$hGap</string> 
@@ -242,6 +242,10 @@
               <void method="setProperty"> 
                <string>hAlign</string> 
                <int>2</int> 
+              </void> 
+              <void method="setProperty"> 
+               <string>vAlign</string> 
+               <int>1</int> 
               </void> 
              </object> 
             </void> 

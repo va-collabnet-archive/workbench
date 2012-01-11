@@ -192,8 +192,10 @@ public class InboxTreePanel extends JPanel {
 			@Override
 			public void handleEvent(ItemSentToSpecialFolderEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
-				WfState state = wfInstance.getState();
-				restFromStateNode(state);
+				WfInstance oldInstance = event.getOldInstance();
+				WfState oldState = oldInstance.getState();
+				
+				restFromStateNode(oldState);
 				restFromWorklistNode(wfInstance);
 			}
 		});

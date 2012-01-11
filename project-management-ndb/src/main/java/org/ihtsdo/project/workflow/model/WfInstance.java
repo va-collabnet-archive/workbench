@@ -28,7 +28,6 @@ public class WfInstance implements Serializable{
 	private ActionReport actionReport;
 	public enum ActionReport {CANCEL, SAVE_AS_TODO, OUTBOX,COMPLETE};
 	
-	
 	public WfInstance() {
 		super();
 	}

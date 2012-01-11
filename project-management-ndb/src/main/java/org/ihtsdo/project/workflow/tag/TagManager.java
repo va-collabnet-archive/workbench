@@ -19,22 +19,21 @@ import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.project.workflow.event.ItemTaggedEvent;
 import org.ihtsdo.project.workflow.event.NewTagEvent;
 import org.ihtsdo.project.workflow.event.OutboxContentChangeEvent;
-import org.ihtsdo.project.workflow.event.SendBackToInboxEvent;
 import org.ihtsdo.project.workflow.event.TagRemovedEvent;
 import org.ihtsdo.project.workflow.event.TodoContentChangeEvent;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
 public class TagManager {
 	public static final String TODO = "todo";
-	public static final String OUTBOX_TEXT_COLOR = "#000000";
+	public static final String OUTBOX_TEXT_COLOR = "#ffffff";
 	public static final String OUTBOX = "outbox";
 	public static final String TODOCOLOR = "#FE9A2E";
 	public static final String OUTBOXCOLOR = "#3A01DF";
 
 	private static TagManager instance = null;
 	private File tagFolder;
-	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\"><tr>" + "<td style=\"" + "background-color:${COLOR}; "
-			+ "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}<B><td>" + "<td style=\"white-space:nowrap;\">";
+	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\" cellspacing=\"5\"><tr>" + "<td style=\"" + "background-color:${COLOR}; "
+			+ "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}</B></td>" + "<td style=\"white-space:nowrap;\">";
 	private List<InboxTag> nameColorCache = new ArrayList<InboxTag>();
 
 	private TagManager() {

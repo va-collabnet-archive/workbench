@@ -176,12 +176,12 @@ public class ConfigTranslationModule implements Serializable {
 
 	public enum InboxColumn implements Serializable {
 		SOURCE_PREFERRED(String.class, "Source preferred",0), 
-		TARGET_PREFERRED(String.class, "Target preferred",2), 
-		TARGET_FSN(String.class, "Target FSN",3), 
-		WORKLIST(String.class, "Worklist",4), 
-		DESTINATION(String.class, "Destination",5), 
-		STATUS(String.class, "Status",6),
-		STATUS_DATE(String.class,"Date",7);
+		TARGET_PREFERRED(String.class, "Target preferred",1), 
+		TARGET_FSN(String.class, "Target FSN",2), 
+		WORKLIST(String.class, "Worklist",3), 
+		DESTINATION(String.class, "Destination",4), 
+		STATUS(String.class, "Status",5),
+		STATUS_DATE(String.class,"Date",6);
 
 		private final Class editorClass;
 		private final String columnName;

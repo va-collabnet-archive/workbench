@@ -45,12 +45,29 @@ public class InboxTableModel extends DefaultTableModel {
 	private InboxWorker inboxWorker;
 
 	public List<InboxTag> tags;
+	protected LinkedHashSet<InboxColumn> columns;
 
 	public InboxTableModel(JProgressBar pBar) {
 		super();
 		this.pBar = pBar;
 		this.searcher = new WorkflowSearcher();
+		refreshColumnsStruct();
 		initEventListeners();
+	}
+	
+	/**
+	 * Fire table struct changed after calling this method
+	 */
+	public void refreshColumnsStruct() {
+		ConfigTranslationModule cfg = null;
+		try {
+			cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		columns = cfg.getColumnsDisplayedInInbox();
 	}
 
 	
@@ -58,6 +75,7 @@ public class InboxTableModel extends DefaultTableModel {
 		EventMediator.getInstance().suscribe(EventType.INBOX_COLUMNS_CHANGED, new InboxColumnsChangedEventHandler<InboxColumnsChangedEvent>(this) {
 			@Override
 			public void handleEvent(InboxColumnsChangedEvent event) {
+				columns = event.getInboxColumnComponents();
 				fireTableStructureChanged();
 			}
 		});
@@ -132,19 +150,15 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public int getColumnCount() {
-		ConfigTranslationModule cfg = new ConfigTranslationModule();
-		try {
-			cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		}
-		LinkedHashSet<InboxColumn> columnsToDisplay = cfg.getColumnsDisplayedInInbox();
-		this.columnCount = columnsToDisplay.size();
+		this.columnCount = columns.size();
 		return columnCount;
 	}
 
+	public void setColumns(LinkedHashSet<InboxColumn> columns){
+		this.columns = columns;
+		fireTableStructureChanged();
+	}
+	
 	@Override
 	public void setColumnCount(int columnCount) {
 		this.columnCount = columnCount;
@@ -159,17 +173,8 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public String getColumnName(int col) {
-		ConfigTranslationModule cfg = null;
-		try {
-			cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		}
-		LinkedHashSet<InboxColumn> columnsToDisplay = cfg.getColumnsDisplayedInInbox();
 		int i = 0;
-		for (InboxColumn inboxColumn : columnsToDisplay) {
+		for (InboxColumn inboxColumn : columns) {
 			if (i == col) {
 				return inboxColumn.getColumnName();
 			}
@@ -179,14 +184,13 @@ public class InboxTableModel extends DefaultTableModel {
 	}
 
 	public Object getValueAt(int row, int col) {
-		InboxColumn[] columnsToDisplay = InboxColumn.values();
 		int i = 0;
-		if(col == columnsToDisplay.length){
-			return data.get(row)[InboxColumn.values().length];
-		}
-		for (InboxColumn inboxColumn : columnsToDisplay) {
+		if(data != null && !data.isEmpty())
+		for (InboxColumn inboxColumn : columns) {
 			if (i == col) {
 				return data.get(row)[inboxColumn.getColumnNumber()];
+			}else if(col == InboxColumn.values().length){
+				return data.get(row)[InboxColumn.values().length];
 			}
 			i++;
 		}
@@ -256,6 +260,7 @@ public class InboxTableModel extends DefaultTableModel {
 
 		@Override
 		protected List<WfInstance> doInBackground() throws Exception {
+			data = new LinkedList<Object[]>();
 			List<WfInstance> wfInstances = new ArrayList<WfInstance>();
 			wfInstances = searcher.searchWfInstances(filterList.values());
 
@@ -331,6 +336,8 @@ public class InboxTableModel extends DefaultTableModel {
 		row = new Object[InboxColumn.values().length + 1];
 		String componentStr = tagStr + concept;
 		row[InboxColumn.SOURCE_PREFERRED.getColumnNumber()] = componentStr;
+		row[InboxColumn.TARGET_FSN.getColumnNumber()] = "";
+		row[InboxColumn.STATUS_DATE.getColumnNumber()] = "";
 		row[InboxColumn.TARGET_PREFERRED.getColumnNumber()] = "";
 		row[InboxColumn.WORKLIST.getColumnNumber()] = wfInstance.getWorkList().getName();
 		row[InboxColumn.DESTINATION.getColumnNumber()] = wfInstance.getDestination().getUsername();

@@ -6,10 +6,12 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 public class ItemSentToSpecialFolderEvent extends GenericEvent {
 
 	private WfInstance wfInstance;
+	private WfInstance oldInstance;
 
-	public ItemSentToSpecialFolderEvent(WfInstance wfInstance) {
+	public ItemSentToSpecialFolderEvent(WfInstance wfInstance, WfInstance oldInstance) {
 		super();
 		this.wfInstance = wfInstance;
+		this.setOldInstance(oldInstance);
 	}
 
 	public WfInstance getWfInstance() {
@@ -23,6 +25,14 @@ public class ItemSentToSpecialFolderEvent extends GenericEvent {
 	@Override
 	public EventType getAssociatedType() {
 		return EventType.ITEM_SENT_TO_SPECIAL_FOLDER;
+	}
+
+	public void setOldInstance(WfInstance oldInstance) {
+		this.oldInstance = oldInstance;
+	}
+
+	public WfInstance getOldInstance() {
+		return oldInstance;
 	}
 
 }
