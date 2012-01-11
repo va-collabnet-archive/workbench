@@ -3,6 +3,7 @@ package org.ihtsdo.workflow.refset.utilities;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
+import org.dwfa.ace.api.I_GetConceptData;
 
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.RefsetPropertyMap;
@@ -54,9 +55,9 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                 ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
                 ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
                 if (refset.isAnnotationStyleRefex()) {
-                    Ts.get().addUncommitted(concept);
+                    Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
                 } else {
-                    Ts.get().addUncommitted(refset);
+                    Terms.get().addUncommittedNoChecks((I_GetConceptData) refset);
                 }
             }
         } catch (Exception io) {
@@ -83,9 +84,9 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                     ConceptChronicleBI concept = Ts.get().getConcept(fields.getReferencedComponentUid());
                     ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
                     if (refset.isAnnotationStyleRefex()) {
-                        Ts.get().addUncommitted(concept);
+                        Terms.get().addUncommittedNoChecks((I_GetConceptData) concept);
                     } else {
-                        Ts.get().addUncommitted(refset);
+                        Terms.get().addUncommittedNoChecks((I_GetConceptData) refset);
                     }
                 }
             }
