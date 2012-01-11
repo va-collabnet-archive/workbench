@@ -17,7 +17,6 @@
 package org.dwfa.ace.classifier;
 
 import javax.swing.JPanel;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 
 public class ViewPathPanel extends JPanel {

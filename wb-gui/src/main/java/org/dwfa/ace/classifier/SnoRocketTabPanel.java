@@ -11,12 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -163,6 +161,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             viewPathJPanel.update();
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             updateSubPanels();
@@ -216,7 +215,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
 
             SnoAB.posList = cClassPositionBIList;
             SnoAB.snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
-                    .getUids());;
+                    .getUids());
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {

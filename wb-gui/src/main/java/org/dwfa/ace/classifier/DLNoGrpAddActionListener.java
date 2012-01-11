@@ -18,10 +18,8 @@ package org.dwfa.ace.classifier;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -37,6 +35,7 @@ public class DLNoGrpAddActionListener implements ActionListener {
         this.config = config;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             if (termContainer.getConfig().getClassifierInputPath() == null) {

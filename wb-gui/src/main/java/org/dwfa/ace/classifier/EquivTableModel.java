@@ -17,7 +17,6 @@
 package org.dwfa.ace.classifier;
 
 import javax.swing.table.AbstractTableModel;
-
 import org.dwfa.ace.task.classify.SnoConGrp;
 import org.dwfa.ace.task.classify.SnoConGrpList;
 
@@ -34,18 +33,22 @@ public class EquivTableModel extends AbstractTableModel {
         this.dataList = snoConGrpList;
     }
 
+    @Override
     public int getColumnCount() {
         return columnNames.length;
     }
 
+    @Override
     public String getColumnName(int col) {
         return columnNames[col];
     }
 
+    @Override
     public int getRowCount() {
         return data.length;
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         return data[rowIndex][columnIndex];
     }
@@ -80,6 +83,7 @@ public class EquivTableModel extends AbstractTableModel {
     }
 
     // Override default cell behavior
+    @Override
     public boolean isCellEditable(int row, int col) {
         return false;
     }

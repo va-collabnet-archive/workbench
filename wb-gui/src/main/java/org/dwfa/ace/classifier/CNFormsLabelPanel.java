@@ -21,24 +21,20 @@ package org.dwfa.ace.classifier;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
+import java.util.logging.Level;
+import javax.swing.*;
 import org.apache.commons.collections.primitives.ArrayIntList;
-
 import org.dwfa.ace.I_ImplementActiveLabel;
 import org.dwfa.ace.LabelForTuple;
 import org.dwfa.ace.TermLabelMaker;
-import org.dwfa.ace.api.I_AmPart;
-import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_ConceptAttributeVersioned;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.I_RelPart;
-import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.I_RelVersioned;
-import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.*;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnoGrp;
 import org.dwfa.ace.task.classify.SnoGrpList;
@@ -46,12 +42,7 @@ import org.dwfa.ace.task.classify.SnoRel;
 import org.dwfa.ace.task.classify.SnoTable;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-
-import org.ihtsdo.tk.api.ComponentChroncileBI;
-import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.TerminologySnapshotDI;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.blueprint.ConAttrAB;
 import org.ihtsdo.tk.api.blueprint.RelCAB;
 import org.ihtsdo.tk.api.conattr.ConAttrAnalogBI;
@@ -64,38 +55,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.beans.PropertyVetoException;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
 /**
  * Classifier Normal Form (Label Format) Panel

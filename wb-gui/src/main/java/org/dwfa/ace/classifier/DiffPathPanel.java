@@ -21,16 +21,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -56,7 +51,7 @@ public class DiffPathPanel extends JPanel {
     }
 
     public void update() {
-        JTable table = null;
+        JTable table;
         this.removeAll();
         int rowHeight = 18;
         int tWide = 700;
@@ -88,7 +83,11 @@ public class DiffPathPanel extends JPanel {
             c.weightx = 1;
             c.weighty = 1;
             c.gridy += 1;
-            this.add(new JScrollPane(table), c);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            JScrollPane jscrollpane = new JScrollPane(table);
+            jscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            jscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.add(jscrollpane, c);
             c.fill = GridBagConstraints.NONE;
             c.weightx = 0;
             c.weighty = 0;
@@ -97,9 +96,9 @@ public class DiffPathPanel extends JPanel {
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs added. --"), c);
         }
 
-        // DROPPED ISAs
+        // RETIRED (DROPPED) ISAs
         c.gridy += 1;
-        this.add(new JLabel("Dropped ISAs:"), c);
+        this.add(new JLabel("Retired ISAs:"), c); // Dropped
         if (SnoQuery.getIsaDropped() != null && SnoQuery.getIsaDropped().size() > 0) {
             table = updateTable(SnoQuery.getIsaDropped());
             table.setDragEnabled(false);
@@ -115,13 +114,17 @@ public class DiffPathPanel extends JPanel {
             c.weightx = 1;
             c.weighty = 1;
             c.gridy += 1;
-            this.add(new JScrollPane(table), c);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            JScrollPane jscrollpane = new JScrollPane(table);
+            jscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            jscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.add(jscrollpane, c);
             c.fill = GridBagConstraints.NONE;
             c.weightx = 0;
             c.weighty = 0;
         } else {
             c.gridy += 1;
-            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs dropped. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No ISAs retired. --"), c);
         }
         // ADDED ROLES
         c.gridy += 1;
@@ -141,7 +144,11 @@ public class DiffPathPanel extends JPanel {
             c.weightx = 1;
             c.weighty = 1;
             c.gridy += 1;
-            this.add(new JScrollPane(table), c);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            JScrollPane jscrollpane = new JScrollPane(table);
+            jscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            jscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.add(jscrollpane, c);
             c.fill = GridBagConstraints.NONE;
             c.weightx = 0;
             c.weighty = 0;
@@ -150,9 +157,9 @@ public class DiffPathPanel extends JPanel {
             this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles added. --"), c);
         }
 
-        // DROPPED ROLES
+        // RETIRED (DROPPED) ROLES
         c.gridy += 1;
-        this.add(new JLabel("Dropped Roles:"), c);
+        this.add(new JLabel("Retired Roles:"), c);
         if (SnoQuery.getRoleDropped() != null && SnoQuery.getRoleDropped().size() > 0) {
             c.gridy += 1;
             c.weightx = 0.5;
@@ -171,7 +178,11 @@ public class DiffPathPanel extends JPanel {
             c.weightx = 1;
             c.weighty = 1;
             c.gridy += 1;
-            this.add(new JScrollPane(table), c);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            JScrollPane jscrollpane = new JScrollPane(table);
+            jscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+            jscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+            this.add(jscrollpane, c);
             c.fill = GridBagConstraints.NONE;
             c.weightx = 0;
             c.weighty = 0;
@@ -179,23 +190,20 @@ public class DiffPathPanel extends JPanel {
             c.gridy += 1;
             c.weightx = 0.5;
             c.weighty = 0.5;
-            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles dropped. --"), c);
+            this.add(new JLabel("<HTML><FONT COLOR='gray'><I> -- No roles retired. --"), c);
         }
 
     }
 
     private JTable updateTable(ArrayList<SnoRel> srl) {
-        Object[][] theTableData = null;
-
+        Object[][] theTableData;
         try {
             theTableData = getTableData(srl);
-        } catch (TerminologyException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (TerminologyException ex) {
+            Logger.getLogger(DiffPathPanel.class.getName()).log(Level.SEVERE, null, ex);
             return null;
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(DiffPathPanel.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
 
@@ -208,7 +216,8 @@ public class DiffPathPanel extends JPanel {
 
         // set column widths
         TableColumn tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(400 + 368);
+        // tc.setPreferredWidth(400 + 368);
+        tc.setPreferredWidth(3200);
 
         int totalRowHeight = 18;
         table.setPreferredScrollableViewportSize(new Dimension(900, totalRowHeight));

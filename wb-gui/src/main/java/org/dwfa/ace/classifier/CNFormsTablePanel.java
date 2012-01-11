@@ -25,14 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
 import javax.swing.table.TableColumn;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -79,6 +73,7 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
         this.setBorder(BorderFactory.createTitledBorder("Normal Forms Table: "));
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             setConcept(theCBean, config);
@@ -112,7 +107,7 @@ public class CNFormsTablePanel extends JPanel implements ActionListener {
     public void update() {
         this.removeAll();
 
-        String[][] theTableStr = null;
+        String[][] theTableStr;
         try {
             theTableStr = theSnoTable.getStringData();
         } catch (TerminologyException e) {
