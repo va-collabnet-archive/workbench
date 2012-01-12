@@ -1,32 +1,22 @@
 package org.ihtsdo.project.workflow.event;
 
-import org.ihtsdo.project.workflow.model.WfState;
+import org.ihtsdo.project.workflow.model.WfInstance;
 
 public class SendBackToInboxEvent extends GenericEvent {
 
-	private WfState oldState;
-	private WfState newState;
+	private WfInstance newInstance;
 
-	public SendBackToInboxEvent(WfState oldState, WfState newState) {
+	public SendBackToInboxEvent(WfInstance newInstance) {
 		super();
-		this.oldState = oldState;
-		this.newState = newState;
+		this.newInstance = newInstance;
 	}
 
-	public WfState getOldState() {
-		return oldState;
+	public WfInstance getNewInstance() {
+		return newInstance;
 	}
 
-	public void setOldState(WfState oldState) {
-		this.oldState = oldState;
-	}
-
-	public WfState getNewState() {
-		return newState;
-	}
-
-	public void setNewState(WfState newState) {
-		this.newState = newState;
+	public void setNewInstance(WfInstance newInstance) {
+		this.newInstance = newInstance;
 	}
 
 	@Override

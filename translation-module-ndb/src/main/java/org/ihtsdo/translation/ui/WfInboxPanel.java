@@ -87,6 +87,7 @@ import org.ihtsdo.translation.ui.event.EmptyInboxItemSelectedEventHandler;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEventHandler;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
+import org.ihtsdo.translation.ui.event.ItemRemovedFromTodoEvent;
 import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
 import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
 
@@ -100,7 +101,6 @@ public class WfInboxPanel extends JPanel {
 	protected HashMap<String, WfSearchFilterBI> filterList;
 	private TableRowSorter<InboxTableModel> sorter;
 	private TranslationPanel uiPanel;
-	private int nextIndex = 0;
 	private Object[] currentRow;
 	private TagManager tagManager;
 	private HashMap<String, InboxTag> menuItemCache = new HashMap<String, InboxTag>();
@@ -198,13 +198,6 @@ public class WfInboxPanel extends JPanel {
 				if (oldValue != null) {
 					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
 					filterList.remove(oldFilter.getType());
-				}
-				backToInbox.setEnabled(false);
-				if (filter instanceof WfTagFilter) {
-					WfTagFilter tagFilter = (WfTagFilter) filter;
-					if (tagFilter.getTag().getTagName().equals(TagManager.OUTBOX)) {
-						backToInbox.setEnabled(true);
-					}
 				}
 				filterList.put(filter.getType(), filter);
 				model.updatePage(filterList);
@@ -392,9 +385,17 @@ public class WfInboxPanel extends JPanel {
 				WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length];
 				InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
 				if (tag == null) {
+					menu2.setEnabled(true);
 					removeTagMenuItem.setEnabled(false);
+					backToInbox.setEnabled(false);
+				} else if (tag.getTagName().equals(TagManager.OUTBOX) || tag.getTagName().equals(TagManager.TODO)) {
+					menu2.setEnabled(false);
+					removeTagMenuItem.setEnabled(false);
+					backToInbox.setEnabled(true);
 				} else {
+					menu2.setEnabled(false);
 					removeTagMenuItem.setEnabled(true);
+					backToInbox.setEnabled(false);
 				}
 				popupMenu1.show(inboxTable, xPoint, yPoint);
 			}
@@ -410,11 +411,6 @@ public class WfInboxPanel extends JPanel {
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 			} catch (Exception ex) {
 				ex.printStackTrace();
-			}
-			if ((selectedIndex + 1) < model.getRowCount()) {
-				if (cfg != null && cfg.isAutoOpenNextInboxItem()) {
-					nextIndex = selectedIndex + 1;
-				}
 			}
 
 			currentModelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
@@ -684,21 +680,26 @@ public class WfInboxPanel extends JPanel {
 
 	private void backToInboxActionPerformed(ActionEvent e) {
 		try {
+
 			int tableRowIndex = inboxTable.getSelectedRow();
 			int modelRowIndex = inboxTable.convertRowIndexToModel(tableRowIndex);
 			Object[] selectedRow = model.getRow(modelRowIndex);
 			WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length];
-			WfState actualState = wfi.getState();
-			WorkList workList = wfi.getWorkList();
-			PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
-			I_Identify nid = Terms.get().getId(wfi.getComponentId());
-			I_GetConceptData prevStatus = promotionRefset.getPreviousPromotionStatus(nid.getConceptNid(), config);
-			WfState prevState = new WfComponentProvider().statusConceptToWfState(prevStatus);
-			WfInstance.updateInstanceState(wfi, prevState);
 			InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
+			if (tag.getTagName().equals(TagManager.OUTBOX)) {
+				WorkList workList = wfi.getWorkList();
+				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
+				I_Identify nid = Terms.get().getId(wfi.getComponentId());
+				I_GetConceptData prevStatus = promotionRefset.getPreviousPromotionStatus(nid.getConceptNid(), config);
+				WfState prevState = new WfComponentProvider().statusConceptToWfState(prevStatus);
+				WfInstance.updateInstanceState(wfi, prevState);
+				EventMediator.getInstance().fireEvent(new SendBackToInboxEvent(wfi));
+			} else if (tag.getTagName().equals(TagManager.TODO)) {
+				EventMediator.getInstance().fireEvent(new ItemRemovedFromTodoEvent(wfi));
+			}
+			model.removeRow(modelRowIndex);
 			model.removeTagFromCache(wfi.getComponentId().toString());
 			TagManager.getInstance().removeTag(tag, wfi.getComponentId().toString());
-			EventMediator.getInstance().fireEvent(new SendBackToInboxEvent(actualState, prevState));
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (TerminologyException ex) {

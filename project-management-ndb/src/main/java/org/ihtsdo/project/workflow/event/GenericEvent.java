@@ -15,7 +15,7 @@ public abstract class GenericEvent {
 		INBOX_ITEM_SELECTED, 
 		INBOX_COLUMNS_CHANGED, 
 		SEND_BACK_TO_INBOX, 
-		EMPTY_INBOX_ITEM_SELECTED;
+		EMPTY_INBOX_ITEM_SELECTED, ITEM_REMOVED_FROM_TODO;
 	}
 	public abstract EventType getAssociatedType();
 	

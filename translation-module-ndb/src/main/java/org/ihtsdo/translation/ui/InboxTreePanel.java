@@ -63,6 +63,8 @@ import org.ihtsdo.translation.ui.event.EmptyInboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEventHandler;
+import org.ihtsdo.translation.ui.event.ItemRemovedFromTodoEventHandler;
+import org.ihtsdo.translation.ui.event.ItemRemovedFromTodoEvent;
 import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
 import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEventHandler;
 import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
@@ -231,8 +233,16 @@ public class InboxTreePanel extends JPanel {
 		eventMediator.suscribe(EventType.SEND_BACK_TO_INBOX, new SendBackToInboxEventHandler<SendBackToInboxEvent>(this) {
 			@Override
 			public void handleEvent(SendBackToInboxEvent event) {
-				restFromStateNode(event.getOldState());
-				addToStateNode(event.getNewState());
+				addToStateNode(event.getNewInstance().getState());
+				addToWorklistNode(event.getNewInstance());
+			}
+		});
+		
+		eventMediator.suscribe(EventType.ITEM_REMOVED_FROM_TODO, new ItemRemovedFromTodoEventHandler<ItemRemovedFromTodoEvent>(this) {
+			@Override
+			public void handleEvent(ItemRemovedFromTodoEvent event) {
+				addToStateNode(event.getWfInstance().getState());
+				addToWorklistNode(event.getWfInstance());
 			}
 		});
 	}
@@ -360,6 +370,30 @@ public class InboxTreePanel extends JPanel {
 				WorkList childWorklist = (WorkList) childTreeItem.getUserObject();
 				if (childWorklist.getName().equals(worklist.getName())) {
 					childTreeItem.setItemSize(childTreeItem.getItemSize() - 1);
+					if (childTreeItem.getItemSize() > 0) {
+						child.setUserObject(childTreeItem);
+						model.reload(child);
+					} else {
+						wNode.remove(i);
+						model.reload(sNode);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void addToWorklistNode(WfInstance wfInstance) {
+		try {
+			WorkList worklist = wfInstance.getWorkList();
+			int statusChildCount = wNode.getChildCount();
+			for (int i = 0; i < statusChildCount; i++) {
+				DefaultMutableTreeNode child = (DefaultMutableTreeNode) wNode.getChildAt(i);
+				InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
+				WorkList childWorklist = (WorkList) childTreeItem.getUserObject();
+				if (childWorklist.getName().equals(worklist.getName())) {
+					childTreeItem.setItemSize(childTreeItem.getItemSize() + 1);
 					if (childTreeItem.getItemSize() > 0) {
 						child.setUserObject(childTreeItem);
 						model.reload(child);

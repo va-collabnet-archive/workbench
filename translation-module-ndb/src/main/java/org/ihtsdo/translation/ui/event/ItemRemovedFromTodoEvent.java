@@ -1,17 +1,16 @@
 package org.ihtsdo.translation.ui.event;
 
 import org.ihtsdo.project.workflow.event.GenericEvent;
+import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
-public class ItemSentToSpecialFolderEvent extends GenericEvent {
+public class ItemRemovedFromTodoEvent extends GenericEvent {
 
 	private WfInstance wfInstance;
-	private WfInstance oldInstance;
 
-	public ItemSentToSpecialFolderEvent(WfInstance wfInstance, WfInstance oldInstance) {
+	public ItemRemovedFromTodoEvent(WfInstance wfInstance) {
 		super();
 		this.wfInstance = wfInstance;
-		this.oldInstance = oldInstance;
 	}
 
 	public WfInstance getWfInstance() {
@@ -24,15 +23,7 @@ public class ItemSentToSpecialFolderEvent extends GenericEvent {
 
 	@Override
 	public EventType getAssociatedType() {
-		return EventType.ITEM_SENT_TO_SPECIAL_FOLDER;
-	}
-
-	public void setOldInstance(WfInstance oldInstance) {
-		this.oldInstance = oldInstance;
-	}
-
-	public WfInstance getOldInstance() {
-		return oldInstance;
+		return EventType.ITEM_REMOVED_FROM_TODO;
 	}
 
 }
