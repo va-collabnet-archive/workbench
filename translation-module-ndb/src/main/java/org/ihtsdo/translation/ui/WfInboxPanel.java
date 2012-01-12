@@ -82,6 +82,8 @@ import org.ihtsdo.project.workflow.tag.TagManager;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.model.InboxTableModel;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
+import org.ihtsdo.translation.ui.event.EmptyInboxItemSelectedEvent;
+import org.ihtsdo.translation.ui.event.EmptyInboxItemSelectedEventHandler;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEventHandler;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
@@ -107,6 +109,7 @@ public class WfInboxPanel extends JPanel {
 	private ConfigTranslationModule cfg;
 	private int currentModelRowNum;
 	private boolean specialTag;
+	protected Object newInboxItem;
 
 	public WfInboxPanel() {
 		initComponents();
@@ -172,16 +175,15 @@ public class WfInboxPanel extends JPanel {
 			public void handleEvent(TagRemovedEvent event) {
 				InboxTag tag = event.getTag();
 				String tagMenuString = tag.toString();
-				int compCount = menu2.getComponentCount();
-				for (int i = 0; i < compCount; i++) {
-					if (menu2.getComponent(i) instanceof JMenuItem) {
-						JMenuItem tagMenu = (JMenuItem) menu2.getComponent(i);
+				int compCount = menu2.getItemCount();
+				if (tag.getUuidList().isEmpty()) {
+					for (int i = 0; i < compCount; i++) {
+						JMenuItem tagMenu = menu2.getItem(i);
 						if (tagMenu.getText().equals(tagMenuString)) {
 							menu2.remove(i);
 							break;
 						}
 					}
-
 				}
 			}
 		});
@@ -190,7 +192,8 @@ public class WfInboxPanel extends JPanel {
 			@Override
 			public void handleEvent(InboxItemSelectedEvent event) {
 				currentRow = null;
-				WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(event.getInboxItem());
+				newInboxItem = event.getInboxItem();
+				WfSearchFilterBI filter = FilterFactory.getInstance().createFilterFromObject(newInboxItem);
 				Object oldValue = event.getOldInboxItem();
 				if (oldValue != null) {
 					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
@@ -206,6 +209,13 @@ public class WfInboxPanel extends JPanel {
 				filterList.put(filter.getType(), filter);
 				model.updatePage(filterList);
 
+			}
+		});
+
+		mediator.suscribe(EventType.EMPTY_INBOX_ITEM_SELECTED, new EmptyInboxItemSelectedEventHandler<EmptyInboxItemSelectedEvent>(this) {
+			@Override
+			public void handleEvent(EmptyInboxItemSelectedEvent event) {
+				model.clearTable();
 			}
 		});
 
@@ -269,7 +279,14 @@ public class WfInboxPanel extends JPanel {
 			InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
 			model.removeTagFromCache(wfi.getComponentId().toString());
 			TagManager.getInstance().removeTag(tag, wfi.getComponentId().toString());
-			model.setValueAt(tf.getConcept(wfi.getComponentId()).toUserString(), modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
+			if (newInboxItem instanceof InboxTag) {
+				InboxTag currentTagSelected = (InboxTag) newInboxItem;
+				if (currentTagSelected.getTagName().equals(tag.getTagName())) {
+					model.removeRow(modelRowIndex);
+				}
+			} else {
+				model.setValueAt(tf.getConcept(wfi.getComponentId()).toUserString(), modelRowIndex, InboxColumn.SOURCE_PREFERRED.getColumnNumber());
+			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} catch (TerminologyException ex) {
@@ -369,6 +386,16 @@ public class WfInboxPanel extends JPanel {
 			inboxTable.setRowSelectionInterval(row, row);
 
 			if (row > -1) {
+				// Check if the item is already tagged
+				int modelRowIndex = inboxTable.convertRowIndexToModel(row);
+				Object[] selectedRow = model.getRow(modelRowIndex);
+				WfInstance wfi = (WfInstance) selectedRow[InboxColumn.values().length];
+				InboxTag tag = model.getTagByUuid(wfi.getComponentId().toString());
+				if (tag == null) {
+					removeTagMenuItem.setEnabled(false);
+				} else {
+					removeTagMenuItem.setEnabled(true);
+				}
 				popupMenu1.show(inboxTable, xPoint, yPoint);
 			}
 		} else if (e.getClickCount() == 2) {

@@ -133,6 +133,11 @@ public class InboxTableModel extends DefaultTableModel {
 		fireTableDataChanged();
 	}
 
+	public void clearTable(){
+		data = new LinkedList<Object[]>();
+		fireTableDataChanged();
+	}
+	
 	public boolean updatePage(HashMap<String, WfSearchFilterBI> filterList) {
 		boolean morePages = false;
 		if (inboxWorker != null && !inboxWorker.isDone()) {

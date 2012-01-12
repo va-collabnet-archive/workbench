@@ -32,7 +32,8 @@ public class TagManager {
 
 	private static TagManager instance = null;
 	private File tagFolder;
-	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\" cellspacing=\"5\"><tr>" + "<td style=\"" + "background-color:${COLOR}; "
+	private static final String tagHtml = "<html><body><table style=\"table-layout:fixed;\"><tr>" + 
+				"<td style=\"background-color:${COLOR}; "
 			+ "white-space:nowrap;color:${TEXT_COLOR};\"><B>${TAGNAME}</B></td>" + "<td style=\"white-space:nowrap;\">";
 	private List<InboxTag> nameColorCache = new ArrayList<InboxTag>();
 
@@ -265,7 +266,7 @@ public class TagManager {
 			}
 			reader.close();
 		}
-		if (uuidList.isEmpty()) {
+		if (uuidList.isEmpty() && !tag.getTagName().equals(OUTBOX) && !tag.getTagName().equals(TODO)) {
 			tagFile.delete();
 			InboxTag nameColorTag = new InboxTag(tag.getTagName(), tag.getColor(), tag.getTextColor(), null);
 			if (nameColorCache.contains(nameColorTag)) {

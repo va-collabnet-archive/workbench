@@ -4,6 +4,7 @@
 
 package org.ihtsdo.translation.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,6 +23,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingWorker;
+import javax.swing.border.LineBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -57,6 +59,7 @@ import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
+import org.ihtsdo.translation.ui.event.EmptyInboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.InboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
 import org.ihtsdo.translation.ui.event.ItemDestinationChangedEventHandler;
@@ -94,6 +97,7 @@ public class InboxTreePanel extends JPanel {
 		inboxFolderTree.setShowsRootHandles(false);
 		inboxFolderTree.setCellRenderer(new IconRenderer());
 		inboxFolderTree.setRowHeight(20);
+
 		searcher = new WorkflowSearcher();
 		try {
 			I_TermFactory tf = Terms.get();
@@ -169,7 +173,7 @@ public class InboxTreePanel extends JPanel {
 				}
 			}
 		});
-		
+
 		eventMediator.suscribe(EventType.ITEM_STATE_CHANGED, new ItemStateChangedEventHandler<ItemStateChangedEvent>(this) {
 			@Override
 			public void handleEvent(ItemStateChangedEvent event) {
@@ -187,20 +191,20 @@ public class InboxTreePanel extends JPanel {
 				restFromWorklistNode(wfInstance);
 			}
 		});
-		
+
 		eventMediator.suscribe(EventType.ITEM_SENT_TO_SPECIAL_FOLDER, new ItemSentToSpecialFolderEventHandler<ItemSentToSpecialFolderEvent>(this) {
 			@Override
 			public void handleEvent(ItemSentToSpecialFolderEvent event) {
 				WfInstance wfInstance = event.getWfInstance();
 				WfInstance oldInstance = event.getOldInstance();
 				WfState oldState = oldInstance.getState();
-				
+
 				restFromStateNode(oldState);
 				restFromWorklistNode(wfInstance);
 			}
 		});
-		
-		eventMediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(this){
+
+		eventMediator.suscribe(EventType.TAG_REMOVED, new TagRemovedEventHandler<TagRemovedEvent>(this) {
 			@Override
 			public void handleEvent(TagRemovedEvent event) {
 				InboxTag newTag = event.getTag();
@@ -232,7 +236,7 @@ public class InboxTreePanel extends JPanel {
 			}
 		});
 	}
-	
+
 	public void updateTree() {
 		cNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.CUSTOM_NODE_ROOT, IconUtilities.CUSTOM_NODE, new FolderMetadata(IconUtilities.CUSTOM_NODE, true)));
 		iNode = new DefaultMutableTreeNode(new FolderTreeObj(IconUtilities.INBOX_NODE, IconUtilities.INBOX_NODE, new FolderMetadata(IconUtilities.INBOX_NODE, true)));
@@ -279,12 +283,16 @@ public class InboxTreePanel extends JPanel {
 			Object userObject = treeNode.getUserObject();
 			if (userObject instanceof InboxTreeItem) {
 				InboxTreeItem inboxItem = (InboxTreeItem) userObject;
-				if(this.inboxItem != null){
-					EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem.getUserObject(), inboxItem.getUserObject()));
+				if (inboxItem.getItemSize() > 0) {
+					if (this.inboxItem != null) {
+						EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem.getUserObject(), inboxItem.getUserObject()));
+					} else {
+						EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem, inboxItem.getUserObject()));
+					}
 				}else{
-					EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem, inboxItem.getUserObject()));
+					EventMediator.getInstance().fireEvent(new EmptyInboxItemSelectedEvent());
 				}
-				this.inboxItem = inboxItem;;
+				this.inboxItem = inboxItem;
 			}
 		}
 	}
@@ -463,7 +471,7 @@ public class InboxTreePanel extends JPanel {
 						icon = IconUtilities.STATUS_NODE;
 					} else if (loopObject instanceof WorkList) {
 						icon = IconUtilities.WORKLIST_NODE;
-					} 
+					}
 
 					InboxTreeItem inboxItem = new InboxTreeItem(loopObject, worklists.get(loopObject), icon);
 					publish(inboxItem);
@@ -774,11 +782,15 @@ class IconRenderer extends DefaultTreeCellRenderer {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 		if (node != null && (node.getUserObject() instanceof FolderTreeObj)) {
 			FolderTreeObj nodeObject = (FolderTreeObj) node.getUserObject();
+			
 			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getObjType()));
 			FolderMetadata fMData = (FolderMetadata) nodeObject.getAtrValue();
 			setText(fMData.getFolderName());
 		} else if (node.getUserObject() instanceof InboxTreeItem) {
 			InboxTreeItem nodeObject = (InboxTreeItem) node.getUserObject();
+			if(nodeObject.getUserObject() instanceof InboxTag){
+				setBorder(new LineBorder(Color.WHITE, 1));
+			}
 			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getIcon()));
 		}
 		return this;
