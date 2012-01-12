@@ -77,9 +77,12 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 				descendants = getDescendants(descendants, semtagsRoot);
+				int preferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+				I_IntSet types = tf.newIntSet();
+				types.add(preferred);
 				for (I_GetConceptData semtagConcept : descendants) {
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-							config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
+							types, getMockViewSet(config), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
 						validSemtags.put(tuple.getText(), semtagConcept);
 					}
@@ -106,9 +109,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 				I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 				Set<I_GetConceptData> descendants = new HashSet<I_GetConceptData>();
 				descendants = getDescendants(descendants, semtagsRoot);
+				I_IntSet types = tf.newIntSet();
+				types.add(preferred);
 				for (I_GetConceptData semtagConcept : descendants) {
 					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(),
-							config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
+							types, getMockViewSet(config), config.getPrecedence(),
 							config.getConflictResolutionStrategy())) {
 						if (tuple.getTypeNid() == preferred && !semtagParents.keySet().contains(tuple.getText())) {
 							Set<String> parents = new HashSet<String>();
@@ -203,9 +208,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 			I_GetConceptData originalConcept = Terms.get().getConcept(uuidFromString(conceptUuid));
 			I_DescriptionTuple originalFsn = null;
-
+			int preferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			I_IntSet types = tf.newIntSet();
+			types.add(preferred);
 			for (I_DescriptionTuple loopDescription : originalConcept.getDescriptionTuples(config.getAllowedStatus(), 
-					config.getDescTypes(), getMockViewSet(config), 
+					types, getMockViewSet(config), 
 					config.getPrecedence(), config.getConflictResolutionStrategy())) {
 				if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
 					originalFsn = loopDescription;
@@ -239,9 +246,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 									if (isActive(potentialMatchConcept.getUids().iterator().next().toString())) {
 										I_DescriptionTuple potentialMatchFsn = null;
-
 										for (I_DescriptionTuple loopDescription : potentialMatchConcept.getDescriptionTuples(config.getAllowedStatus(), 
-												config.getDescTypes(), getMockViewSet(config), 
+												types, getMockViewSet(config), 
 												config.getPrecedence(), config.getConflictResolutionStrategy())) {
 											if (loopDescription.getTypeNid() == fsnTypeNid && loopDescription.getLang().toLowerCase().startsWith("en")) {
 												potentialMatchFsn = loopDescription;
@@ -586,8 +592,11 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 			I_GetConceptData focusConcept = tf.getConcept(uuidFromString(conceptUuid));
 			List<String> currentSemtags = new ArrayList<String>();
+			int preferred = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			I_IntSet types = tf.newIntSet();
+			types.add(preferred);
 			for (I_DescriptionTuple tuple : focusConcept.getDescriptionTuples(config.getAllowedStatus(),
-					config.getDescTypes(), getMockViewSet(config), config.getPrecedence(),
+					types, getMockViewSet(config), config.getPrecedence(),
 					config.getConflictResolutionStrategy())) {
 				if (tuple.getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() 
 						&& tuple.getLang().equals("en")) {

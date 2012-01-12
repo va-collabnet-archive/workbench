@@ -279,9 +279,12 @@ public class RulesDeploymentPackageReferenceHelper {
 			//			if (config.getDescTypes().getSetValues().length > 0) {
 			//				localDescTypes = config.getDescTypes();
 			//			}
+			int preferred = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+			I_IntSet types = termFactory.newIntSet();
+			types.add(preferred);
 			List<? extends I_DescriptionTuple> descTuples = concept.getDescriptionTuples(
 					config.getAllowedStatus(), 
-					config.getDescTypes(), config.getViewPositionSetReadOnly(),
+					types, config.getViewPositionSetReadOnly(),
 					config.getPrecedence(), config.getConflictResolutionStrategy());
 
 			for (I_DescriptionTuple tuple : descTuples) {
