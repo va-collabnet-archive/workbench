@@ -211,21 +211,32 @@ public class InboxTreePanel extends JPanel {
 			public void handleEvent(TagRemovedEvent event) {
 				InboxTag newTag = event.getTag();
 				int childCount = cNode.getChildCount();
-				for (int i = 0; i < childCount; i++) {
-					DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
-					InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
-					InboxTag tag = (InboxTag) treeItem.getUserObject();
-					if (tag.equals(newTag)) {
-						if (newTag.getUuidList().isEmpty()) {
-							cNode.remove(child);
-							model.reload(cNode);
-						} else {
-							treeItem.setItemSize(newTag.getUuidList().size());
-							treeItem.setUserObject(newTag);
-							child.setUserObject(treeItem);
-							model.reload(child);
-						}
-						break;
+				if (newTag.getTagName().equals(TagManager.OUTBOX)) {
+					reloadNode(newTag, outbox,true);
+					model.reload(outbox);
+				} else if (newTag.getTagName().equals(TagManager.TODO)) {
+					reloadNode(newTag, todo,true);
+					model.reload(todo);
+				} else {
+					for (int i = 0; i < childCount; i++) {
+						DefaultMutableTreeNode child = (DefaultMutableTreeNode) cNode.getChildAt(i);
+						reloadNode(newTag, child,false);
+						model.reload(child);
+					}
+				}
+			}
+
+			private void reloadNode(InboxTag newTag, DefaultMutableTreeNode child,boolean specialTag) {
+				InboxTreeItem treeItem = (InboxTreeItem) child.getUserObject();
+				InboxTag tag = (InboxTag) treeItem.getUserObject();
+				if (tag.equals(newTag)) {
+					if (newTag.getUuidList().isEmpty() && !specialTag) {
+						DefaultMutableTreeNode parent = (DefaultMutableTreeNode) child.getParent();
+						parent.remove(child);
+					} else {
+						treeItem.setItemSize(newTag.getUuidList().size());
+						treeItem.setUserObject(newTag);
+						child.setUserObject(treeItem);
 					}
 				}
 			}
@@ -237,7 +248,7 @@ public class InboxTreePanel extends JPanel {
 				addToWorklistNode(event.getNewInstance());
 			}
 		});
-		
+
 		eventMediator.suscribe(EventType.ITEM_REMOVED_FROM_TODO, new ItemRemovedFromTodoEventHandler<ItemRemovedFromTodoEvent>(this) {
 			@Override
 			public void handleEvent(ItemRemovedFromTodoEvent event) {
@@ -299,7 +310,7 @@ public class InboxTreePanel extends JPanel {
 					} else {
 						EventMediator.getInstance().fireEvent(new InboxItemSelectedEvent(this.inboxItem, inboxItem.getUserObject()));
 					}
-				}else{
+				} else {
 					EventMediator.getInstance().fireEvent(new EmptyInboxItemSelectedEvent());
 				}
 				this.inboxItem = inboxItem;
@@ -383,7 +394,7 @@ public class InboxTreePanel extends JPanel {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void addToWorklistNode(WfInstance wfInstance) {
 		try {
 			WorkList worklist = wfInstance.getWorkList();
@@ -429,6 +440,7 @@ public class InboxTreePanel extends JPanel {
 
 	private void addToStateNode(WfState state) {
 		int statusChildCount = sNode.getChildCount();
+		boolean added = false;
 		for (int i = 0; i < statusChildCount; i++) {
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode) sNode.getChildAt(i);
 			InboxTreeItem childTreeItem = (InboxTreeItem) child.getUserObject();
@@ -442,7 +454,13 @@ public class InboxTreePanel extends JPanel {
 					sNode.remove(i);
 					model.reload(sNode);
 				}
+				added = true;
 			}
+		}
+		if (!added) {
+			DefaultMutableTreeNode chldNode = new DefaultMutableTreeNode(new InboxTreeItem(state, 1, IconUtilities.STATUS_NODE));
+			sNode.add(chldNode);
+			model.reload(sNode);
 		}
 	}
 
@@ -816,13 +834,13 @@ class IconRenderer extends DefaultTreeCellRenderer {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 		if (node != null && (node.getUserObject() instanceof FolderTreeObj)) {
 			FolderTreeObj nodeObject = (FolderTreeObj) node.getUserObject();
-			
+
 			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getObjType()));
 			FolderMetadata fMData = (FolderMetadata) nodeObject.getAtrValue();
 			setText(fMData.getFolderName());
 		} else if (node.getUserObject() instanceof InboxTreeItem) {
 			InboxTreeItem nodeObject = (InboxTreeItem) node.getUserObject();
-			if(nodeObject.getUserObject() instanceof InboxTag){
+			if (nodeObject.getUserObject() instanceof InboxTag) {
 				setBorder(new LineBorder(Color.WHITE, 1));
 			}
 			setIcon(IconUtilities.getIconForInboxTree(nodeObject.getIcon()));

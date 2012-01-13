@@ -1,7 +1,6 @@
 package org.ihtsdo.translation.ui.event;
 
 import org.ihtsdo.project.workflow.event.GenericEvent;
-import org.ihtsdo.project.workflow.event.GenericEvent.EventType;
 import org.ihtsdo.project.workflow.model.WfInstance;
 
 public class ItemRemovedFromTodoEvent extends GenericEvent {

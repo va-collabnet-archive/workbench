@@ -179,9 +179,11 @@ public class WfInboxPanel extends JPanel {
 				if (tag.getUuidList().isEmpty()) {
 					for (int i = 0; i < compCount; i++) {
 						JMenuItem tagMenu = menu2.getItem(i);
-						if (tagMenu.getText().equals(tagMenuString)) {
-							menu2.remove(i);
-							break;
+						if (tagMenuString != null && tagMenu != null && tagMenu.getText() != null) {
+							if (tagMenu.getText().equals(tagMenuString)) {
+								menu2.remove(i);
+								break;
+							}
 						}
 					}
 				}
@@ -508,8 +510,10 @@ public class WfInboxPanel extends JPanel {
 								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance, oldWfInstance));
 								int currentItemViewIndex = inboxTable.convertRowIndexToView(currentModelRowNum);
 								model.removeRow(currentModelRowNum);
-								if (model.getRowCount() > 0) {
+								if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
 									inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
+								}else if(inboxTable.getRowCount() <= currentItemViewIndex){
+									inboxTable.setRowSelectionInterval(inboxTable.getRowCount() - 1, inboxTable.getRowCount() - 1);
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
@@ -521,8 +525,10 @@ public class WfInboxPanel extends JPanel {
 								EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance, oldWfInstance));
 								int currentItemViewIndex = inboxTable.convertRowIndexToView(currentModelRowNum);
 								model.removeRow(currentModelRowNum);
-								if (model.getRowCount() > 0) {
+								if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
 									inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
+								}else if(inboxTable.getRowCount() <= currentItemViewIndex){
+									inboxTable.setRowSelectionInterval(inboxTable.getRowCount() - 1, inboxTable.getRowCount() - 1);
 								}
 							} catch (IOException e) {
 								e.printStackTrace();
