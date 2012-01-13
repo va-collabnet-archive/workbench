@@ -238,9 +238,8 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
     public ObjectServerCore(String[] args, LifeCycle lc) throws Exception {
         super();
         openServers.add((ObjectServerCore<I_DescribeObject>) this);
-        getLogger().info(
-            "\n*******************\n\n" + "Starting " + this.getClass().getSimpleName() + " with config file: "
-                + Arrays.asList(args) + "\n\n******************\n");
+        getLogger().log(
+            Level.INFO,"\n*******************\n\n" + "Starting {0} with config file: {1}\n\n******************\n", new Object[]{this.getClass().getSimpleName(), Arrays.asList(args)});
         this.config = ConfigurationProvider.getInstance(args, getClass().getClassLoader());
         this.lifeCycle = lc;
         oisGetter =
@@ -248,13 +247,15 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
                     I_GetObjectInputStream.class);
         Boolean readInsteadOfTakeBool =
                 (Boolean) this.config.getEntry(this.getClass().getName(), "readInsteadOfTake", Boolean.class,
-                    new Boolean(false));
+                    Boolean.FALSE);
         this.readInsteadOfTake = readInsteadOfTakeBool.booleanValue();
         this.nodeInboxAddress =
                 (String) this.config.getEntry(this.getClass().getName(), "nodeInboxAddress", String.class);
-        this.directory =
-                (File) this.config.getEntry(this.getClass().getName(), "directory", File.class, new File(args[0])
-                    .getParentFile());
+        File argsFileParent = new File(args[0])
+                    .getParentFile();
+        this.directory = argsFileParent;
+        
+        this.directory = this.directory.getAbsoluteFile();
         this.directory.mkdirs();
         this.logDir = new File(this.directory, ".llog");
         this.logDir.mkdirs();
