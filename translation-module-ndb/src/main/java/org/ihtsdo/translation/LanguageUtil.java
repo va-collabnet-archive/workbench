@@ -75,7 +75,6 @@ import org.ihtsdo.project.panel.PanelHelperFactory;
 import org.ihtsdo.project.panel.TranslationHelperPanel;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.LanguageSpecRefset;
-import org.ihtsdo.project.workflow.event.EventMediator;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.api.PathBI;
@@ -85,7 +84,6 @@ import org.ihtsdo.translation.tasks.PutsDescriptionsInLanguageRefset;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 import org.ihtsdo.translation.ui.TranslationConceptEditor;
-import org.ihtsdo.translation.ui.config.event.InboxColumnsChangedEvent;
 
 /**
  * The Class LanguageUtil.
