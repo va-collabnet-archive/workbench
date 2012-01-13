@@ -155,7 +155,7 @@ public class WfComponentProvider {
 
 	}
 	
-	public List<WfState> getPosibleStatesForUser(WfUser user){
+	public List<WfState> getPossibleStatesForUser(WfUser user){
 		List<WfState> list= new ArrayList<WfState>();
 		WorkflowInterpreter wi= WorkflowInterpreter.createWorkflowInterpreter( new WorkflowDefinition());
 		List<WfState> states= getStates();
