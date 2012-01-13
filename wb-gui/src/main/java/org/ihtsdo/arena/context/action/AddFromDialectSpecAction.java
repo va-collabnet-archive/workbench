@@ -3,12 +3,8 @@ package org.ihtsdo.arena.context.action;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.UUID;
-
 import javax.swing.AbstractAction;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lang.LANG_CODE;
@@ -19,15 +15,16 @@ import org.ihtsdo.tk.api.blueprint.DescCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Language;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescSpecFact;
 import org.ihtsdo.tk.drools.facts.SpecFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 
 public class AddFromDialectSpecAction extends AbstractAction {
@@ -124,10 +121,9 @@ public class AddFromDialectSpecAction extends AbstractAction {
                 newDesc = tc.constructIfNotCurrent(descSpecFsn);
                 newRefex = tc.constructIfNotCurrent(refexSpecFsn);
             }
-            I_GetConceptData desc = Terms.get().getConceptForNid(newDesc.getConceptNid());
-            I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getConceptNid());
-            Ts.get().addUncommitted(desc);
-            Ts.get().addUncommitted(refex);
+            newDesc.addAnnotation(newRefex);
+            ConceptChronicleBI concept = Ts.get().getConceptForNid(newDesc.getConceptNid());
+            Ts.get().addUncommitted(concept);
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
