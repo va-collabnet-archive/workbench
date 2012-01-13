@@ -154,6 +154,11 @@ public class WfComponentProvider {
 		return returnRoles;
 
 	}
+	
+	public List<WfState> getPosibleStatesForUser(WfUser user){
+		List<WfState> list= new ArrayList<WfState>();
+		return list;
+	}
 
 	public static WfInstance getWfInstance(UUID instanceUUID) {
 		WfInstance wfInstance = null;
