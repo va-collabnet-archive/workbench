@@ -237,6 +237,8 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 				for (I_GetConceptData refsetLang : refsetLangs) {
 					try {
 						langCode=ArchitectonicAuxiliary.getLanguageCode(refsetLang.getUids());
+						if (langCode!=null)
+							langCode=ArchitectonicAuxiliary.LANG_CODE.valueOf(langCode).getFormatedLanguageCode();
 						break;
 					} catch (NoSuchElementException e) {
 						e.printStackTrace();
