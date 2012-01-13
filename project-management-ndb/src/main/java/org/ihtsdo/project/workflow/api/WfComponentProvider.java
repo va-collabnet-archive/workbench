@@ -157,6 +157,14 @@ public class WfComponentProvider {
 	
 	public List<WfState> getPosibleStatesForUser(WfUser user){
 		List<WfState> list= new ArrayList<WfState>();
+		WorkflowInterpreter wi= WorkflowInterpreter.createWorkflowInterpreter( new WorkflowDefinition());
+		List<WfState> states= getStates();
+		for (WfState state : states) {
+			WfInstance instance = new WfInstance();
+			instance.setState(state);
+			if(wi.getPossibleActions(instance, user).size()>0)
+				list.add(state);
+		}
 		return list;
 	}
 
