@@ -147,7 +147,6 @@ public class KindOfComputer {
 
 	public static void updateIsaCache(int cNid) throws Exception {
 		I_GetConceptData concept = Terms.get().getConcept(cNid);
-		boolean isClassifierEdit = false;
 		for (IsaCoordinate loopCoordinate : isaCache.keySet()) {
                     if (loopCoordinate.getContradictionMgr() instanceof I_ManageContradiction) {
                         I_ManageContradiction cm = (I_ManageContradiction) loopCoordinate.getContradictionMgr();
@@ -157,23 +156,8 @@ public class KindOfComputer {
                         
                     }
                     
-			List<? extends I_RelTuple> inferredRels = concept.getSourceRelTuples(null, null, 
-					loopCoordinate.getViewPositionSet(), 
-					loopCoordinate.getPrecedence(), 
-					loopCoordinate.getContradictionMgr(), 
-					loopCoordinate.getClassifierNid(), 
-					RelAssertionType.INFERRED); 
-
-			for (I_RelTuple loopRel : inferredRels) {
-				if (loopRel.getTime() == Long.MAX_VALUE) {
-					isClassifierEdit = true;
-				}
-			}
-			if (isClassifierEdit) {
-				isaCache.get(loopCoordinate).updateCache(Terms.get().getConcept(cNid));
-			} else {
-				isaCache.get(loopCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
-			}
+                    isaCache.get(loopCoordinate).updateCache(Terms.get().getConcept(cNid));
+//                    isaCache.get(loopCoordinate).updateCacheUsingStatedView(Terms.get().getConcept(cNid));
 		}
 	}
 

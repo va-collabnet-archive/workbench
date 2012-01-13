@@ -232,13 +232,13 @@ public class BdbCommitManager {
         Concept c = (Concept) concept;
 
         c.modified();
-        ChangeNotifier.touch(c);
 
         try {
             KindOfComputer.updateIsaCache(c.getNid());
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
+        ChangeNotifier.touch(c);
 
         if (Bdb.watchList.containsKey(concept.getNid())) {
             AceLog.getAppLog().info("---@@@ Adding uncommitted NO checks: " + concept.getNid() + " ---@@@ ");

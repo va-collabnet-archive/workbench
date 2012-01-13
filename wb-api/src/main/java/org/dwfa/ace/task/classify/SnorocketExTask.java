@@ -71,6 +71,7 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRelCallback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -281,6 +282,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
+        Ts.get().suspendChangeNotifications();
+        try {
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketExTask] evaluate() -- begin");
 
@@ -797,6 +800,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
 
         return Condition.CONTINUE;
+    } finally {
+    Ts.get().resumeChangeNotifications();
+}
     }
 
     private void getPathOrigins(List<PositionBI> origins, PathBI p) {
