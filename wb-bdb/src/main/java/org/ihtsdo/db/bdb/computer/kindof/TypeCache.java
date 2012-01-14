@@ -121,8 +121,8 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	@Override
 	public void updateCache(ConceptChronicleBI c) throws IOException, ContradictionException {
 		ConceptVersion civ = new ConceptVersion((Concept) c, inferredViewCoordinate);
-		updateCacheUsingInferredThenStatedView(c);
-		//updateCacheUsingStatedView(c);
+		//updateCacheUsingInferredThenStatedView(c);
+		updateCacheUsingStatedView(c);
 		
 	}
 	
