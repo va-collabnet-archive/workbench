@@ -228,6 +228,18 @@ public class BdbCommitManager {
        }
    }
 
+    public static void writeDirect(ConceptChronicleBI concept) {
+        Concept c = (Concept) concept;
+
+        c.modified();
+        ChangeNotifier.touch(c);
+        try {
+            writeUncommitted(c);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void addUncommittedNoChecks(I_GetConceptData concept) {
         Concept c = (Concept) concept;
 

@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.dwfa.vodb.types.Position;
+import org.ihtsdo.db.bdb.computer.kindof.KindOfComputer;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
 
 public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    private BdbTerminologyStore store;
@@ -191,4 +193,20 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    public ViewCoordinate getViewCoordinate() {
       return vc;
    }
+
+    @Override
+    public void writeDirect(ConceptChronicleBI cc) throws IOException {
+        store.writeDirect(cc);
+    }
+
+
+    @Override
+    public void clearInferredIsaCache() {
+        KindOfComputer.clearIsaCache();
+    }
+
+    @Override
+    public void addInferredParents(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException {
+       KindOfComputer.addToIsaCache(vc, isac, cnid, parentNids);
+    }
 }

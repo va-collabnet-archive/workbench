@@ -735,4 +735,21 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public long getTimeForSapNid(int sapNid) {
          return Bdb.getTimeForSapNid(sapNid);
    }
+
+    @Override
+    public void writeDirect(ConceptChronicleBI cc) throws IOException {
+        BdbCommitManager.writeDirect(cc);
+    }
+
+    @Override
+    public void clearInferredIsaCache() {
+        KindOfComputer.clearIsaCache();
+    }
+
+    @Override
+    public void addInferredParents(ViewCoordinate vc, IsaCoordinate isac, int cnid, int[] parentNids) throws IOException {
+       KindOfComputer.addToIsaCache(vc, isac, cnid, parentNids);
+    }
+    
+   
 }

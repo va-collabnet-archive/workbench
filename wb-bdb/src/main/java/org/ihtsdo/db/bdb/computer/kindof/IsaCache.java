@@ -1,9 +1,6 @@
 package org.ihtsdo.db.bdb.computer.kindof;
 
 import java.io.IOException;
-import java.util.UUID;
-
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.ConceptVersion;
 import org.ihtsdo.tk.Ts;
@@ -11,8 +8,6 @@ import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsaCache extends TypeCache {
 
@@ -28,9 +23,6 @@ public class IsaCache extends TypeCache {
 			ConceptFetcherBI fcfc) throws Exception {
 		if (isCancelled() == false) {
 			Concept c = (Concept) fcfc.fetch();
-//                        if (c.getPrimUuid().equals(UUID.fromString("874ec6f1-5e6d-3478-9dbd-11ee47dac99d"))) {
-//                            System.out.println("Found: 874ec6f1-5e6d-3478-9dbd-11ee47dac99d");
-//                        }
 			NidSet parentSet = getParentSet(c);
 			typeMap.put(cNid, parentSet.getSetValues());
 		}

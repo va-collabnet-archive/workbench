@@ -72,7 +72,9 @@ import au.csiro.snorocket.snapi.I_Snorocket_123.I_InternalDataRoleCallback;
 import javax.swing.SwingUtilities;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.coordinate.IsaCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -97,6 +99,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
     private static final long serialVersionUID = 1L;
     private static final int dataVersion = 1;
+    private TerminologyStoreDI ts;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -283,11 +286,13 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         Ts.get().suspendChangeNotifications();
+        
         try {
         logger = worker.getLogger();
         logger.info("\r\n::: [SnorocketExTask] evaluate() -- begin");
 
         try {
+            ts = Ts.get();
             tf = Terms.get();
             config = tf.getActiveAceFrameConfig();
             precedence = config.getPrecedence();
@@ -508,8 +513,8 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
             cEditSnoCons = null; // :MEMORY:
             cEditSnoRels = null; // :MEMORY:
             pcEdit = null; // :MEMORY:
+            Ts.get().clearInferredIsaCache();
             System.gc();
-
             // ** GUI: 2 RUN CLASSIFIER **
             gui = tf.newActivityPanel(true, config, "Classifier 2/5: classify data", true); // in
             // activity
@@ -647,6 +652,25 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 return Condition.CONTINUE;
             }
             System.gc();
+            // add to inferred is-a cache here. 
+            
+            Integer c1Nid = null;
+            NidSet parents = new NidSet();
+            ViewCoordinate vc = config.getViewCoordinate();
+            IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
+            for (SnoRel r: cRocketSnoRels) {
+                if (c1Nid == null) {
+                    c1Nid = r.c1Id;
+                } else if (r.c1Id != c1Nid) {
+                    ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues()); 
+                    c1Nid = r.c1Id;
+                    parents = new NidSet();
+                }
+                if (r.typeId == isaNid) {
+                    parents.add(r.c2Id);
+                }
+            } 
+            ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues()); 
 
             if (debugDump) {
                 dumpSnoRel(cRocketSnoRels, "SnoRelInferData_full.txt", 4);
@@ -1186,7 +1210,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                     // :!!!:TODO: move addUncommittedNoChecks() to more efficient location.
                     // more optimal to only call once per concept.
                     I_GetConceptData thisC1 = tf.getConcept(rel_A.c1Id);
-                    tf.addUncommittedNoChecks(thisC1);
+                    ts.writeDirect(thisC1);
 
                     if (rel_A.typeId == isaNid) {
                         SnoQuery.isaDropped.add(rel_A);
@@ -1240,7 +1264,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
         // :!!!:TODO: [SnorocketExTask] move addUncommittedNoChecks() to more efficient location.
         // more optimal to only call once per concept.
-        tf.addUncommittedNoChecks(thisC1);
+        ts.writeDirect(thisC1);
     }
 
     private int compareSnoRel(SnoRel inR, SnoRel outR) {

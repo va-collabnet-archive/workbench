@@ -23,7 +23,6 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
 public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnable, KindOfCacheBI, Serializable {
@@ -69,17 +68,22 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 	 */
 	@Override
 	public void setup(ViewCoordinate coordinate) throws Exception {
-		this.coordinate = coordinate;
-		this.statedViewCoordinate = new ViewCoordinate(coordinate);
-		this.inferredViewCoordinate = new ViewCoordinate(coordinate);
-		this.inferredThenStatedViewCoordinate = new ViewCoordinate(coordinate);
-		this.statedViewCoordinate.setRelAssertionType(RelAssertionType.STATED);
-		this.inferredViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED);
-		this.inferredThenStatedViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
-		this.types = coordinate.getIsaTypeNids();
-		typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
-		KindOfComputer.kindOfComputerService.execute(this);
+		setupNoIteration(coordinate);
+                KindOfComputer.kindOfComputerService.execute(this);
+
 	}
+
+    public void setupNoIteration(ViewCoordinate coordinate) throws IOException {
+        this.coordinate = coordinate;
+        this.statedViewCoordinate = new ViewCoordinate(coordinate);
+        this.inferredViewCoordinate = new ViewCoordinate(coordinate);
+        this.inferredThenStatedViewCoordinate = new ViewCoordinate(coordinate);
+        this.statedViewCoordinate.setRelAssertionType(RelAssertionType.STATED);
+        this.inferredViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED);
+        this.inferredThenStatedViewCoordinate.setRelAssertionType(RelAssertionType.INFERRED_THEN_STATED);
+        this.types = coordinate.getIsaTypeNids();
+        typeMap = new ConcurrentHashMap<Integer, int[]>(Terms.get().getConceptCount());
+    }
 	private static int cacheCount = 1;
 
 	@Override
@@ -143,6 +147,11 @@ public abstract class TypeCache implements I_ProcessUnfetchedConceptData, Runnab
 		}
 		typeMap.put(c.getNid(), parentSet.getSetValues());
 	}
+        
+        public void setParents(int cnid, int[] parents) {
+            typeMap.put(cnid, parents);
+            
+        }
 
 	public void addParents(int cNid, I_RepresentIdSet parentNidSet) {
 		int[] parents = typeMap.get(cNid);
