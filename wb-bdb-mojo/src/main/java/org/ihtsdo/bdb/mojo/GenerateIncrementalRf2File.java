@@ -16,8 +16,7 @@
 package org.ihtsdo.bdb.mojo;
 
 import java.io.File;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -91,6 +90,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String effectiveDate;
     /**
+     * Refsets to exclude
+     * 
+     * @parameter
+     */
+    private List<ConceptDescriptor> refsetsToExclude;
+    /**
      * output directory.
      *
      * @parameter expression="${project.build.directory}/classes" @required
@@ -102,7 +107,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db" @required
      */
     private File berkeleyDir;
-
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -120,6 +125,14 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                             exportPathFsn)));
                 }
             }
+            
+            IntSet excludedRefsetIds = new IntSet();
+            for (ConceptDescriptor cd : refsetsToExclude) {
+                ConceptSpec spec = new ConceptSpec(cd.getDescription(), UUID.fromString(cd.getUuid()));
+                int validatedNid = spec.getLenient().getNid();
+                excludedRefsetIds.add(validatedNid);
+            }
+            
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
@@ -151,6 +164,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         startDate, new Date(TimeHelper.getTimeFromString(effectiveDate, 
                         TimeHelper.getFileDateFormat())), sapsToWrite.getAsSet(),
                         vc.getVcWithAllStatusValues(),
+                        excludedRefsetIds.getAsSet(),
                         allConcepts);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.close();

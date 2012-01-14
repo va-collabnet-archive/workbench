@@ -85,6 +85,83 @@ public class Rf2File {
       }
    }
    
+   public enum ConRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), CONCEPT("concept", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private ConRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum ConConRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
+      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private ConConRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum ConConConRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
+      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\t"), CONCEPT3("concept", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private ConConConRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum ConConStrRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
+      CONCEPT1("concept", "\t"), CONCEPT2("concept", "\t"), STRING("string", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private ConConStrRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
+   public enum StringRefsetFileFields {
+      ID("id", "\t"), EFFECTIVE_TIME("effectiveTime", "\t"), ACTIVE("active", "\t"), MODULE_ID("moduleId", "\t"),
+      REFSET_ID("refSetId", "\t"), REFERENCED_COMPONENT_ID("referencedComponentId", "\t"), STRING("string", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private StringRefsetFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
    
    public enum ReleaseType {
       DELTA("Delta"), FULL("Full"), SNAPSHOT("Snapshot");
