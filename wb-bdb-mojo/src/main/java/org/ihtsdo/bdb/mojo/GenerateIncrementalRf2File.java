@@ -127,10 +127,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }
             
             IntSet excludedRefsetIds = new IntSet();
-            for (ConceptDescriptor cd : refsetsToExclude) {
-                ConceptSpec spec = new ConceptSpec(cd.getDescription(), UUID.fromString(cd.getUuid()));
-                int validatedNid = spec.getLenient().getNid();
-                excludedRefsetIds.add(validatedNid);
+            if (refsetsToExclude != null) {
+                for (ConceptDescriptor cd : refsetsToExclude) {
+                    ConceptSpec spec = new ConceptSpec(cd.getDescription(), UUID.fromString(cd.getUuid()));
+                    int validatedNid = spec.getLenient().getNid();
+                    excludedRefsetIds.add(validatedNid);
+                }
             }
             
 
