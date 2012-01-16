@@ -4,7 +4,7 @@
 
 package org.ihtsdo.translation.model;
 
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,7 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author Vahram Manukyan

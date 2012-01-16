@@ -21,15 +21,11 @@ package org.ihtsdo.translation.ui;
  */ 
  
 import java.awt.Component;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
  
 /**
  * The Class TextAreaRenderer.

@@ -4,16 +4,20 @@
 
 package org.ihtsdo.translation.ui;
 
-import java.awt.*;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.panel.details.*;
+import org.ihtsdo.project.panel.details.WorklistMemberStatusPanel;
 
 /**
  * @author Guillermo Reynoso

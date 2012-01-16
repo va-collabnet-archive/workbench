@@ -180,8 +180,8 @@ public class ConfigTranslationModule implements Serializable {
 		TARGET_FSN(String.class, "Target FSN",2), 
 		WORKLIST(String.class, "Worklist",3), 
 		DESTINATION(String.class, "Destination",4), 
-		STATUS(String.class, "Status",5),
-		STATUS_DATE(String.class,"Date",6);
+		STATUS(String.class, "Status",5);
+		//STATUS_DATE(String.class,"Date",6);
 
 		private final Class editorClass;
 		private final String columnName;

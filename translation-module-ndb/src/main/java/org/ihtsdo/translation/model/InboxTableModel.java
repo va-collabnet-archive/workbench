@@ -15,8 +15,15 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.ContextualizedDescription;
+import org.ihtsdo.project.I_ContextualizeDescription;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowSearcher;
 import org.ihtsdo.project.workflow.event.EventMediator;
@@ -26,6 +33,7 @@ import org.ihtsdo.project.workflow.filters.WfTagFilter;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.tag.InboxTag;
 import org.ihtsdo.project.workflow.tag.TagManager;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.InboxColumn;
@@ -41,20 +49,32 @@ public class InboxTableModel extends DefaultTableModel {
 	private WorkflowSearcher searcher;
 	private JProgressBar pBar;
 	private HashMap<String, InboxTag> tagCache = new HashMap<String, InboxTag>();
-
+	private I_GetConceptData preferred;
+	private I_GetConceptData fsn;
 	private InboxWorker inboxWorker;
 
 	public List<InboxTag> tags;
 	protected LinkedHashSet<InboxColumn> columns;
 
+	private I_ConfigAceFrame config;
+
 	public InboxTableModel(JProgressBar pBar) {
 		super();
 		this.pBar = pBar;
 		this.searcher = new WorkflowSearcher();
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			preferred = Terms.get().getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
+			fsn = Terms.get().getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		refreshColumnsStruct();
 		initEventListeners();
 	}
-	
+
 	/**
 	 * Fire table struct changed after calling this method
 	 */
@@ -70,7 +90,6 @@ public class InboxTableModel extends DefaultTableModel {
 		columns = cfg.getColumnsDisplayedInInbox();
 	}
 
-	
 	private void initEventListeners() {
 		EventMediator.getInstance().suscribe(EventType.INBOX_COLUMNS_CHANGED, new InboxColumnsChangedEventHandler<InboxColumnsChangedEvent>(this) {
 			@Override
@@ -80,7 +99,6 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		});
 	}
-
 
 	public InboxTag getTagByUuid(String uuid) {
 		return tagCache.get(uuid);
@@ -133,11 +151,11 @@ public class InboxTableModel extends DefaultTableModel {
 		fireTableDataChanged();
 	}
 
-	public void clearTable(){
+	public void clearTable() {
 		data = new LinkedList<Object[]>();
 		fireTableDataChanged();
 	}
-	
+
 	public boolean updatePage(HashMap<String, WfSearchFilterBI> filterList) {
 		boolean morePages = false;
 		if (inboxWorker != null && !inboxWorker.isDone()) {
@@ -159,11 +177,11 @@ public class InboxTableModel extends DefaultTableModel {
 		return columnCount;
 	}
 
-	public void setColumns(LinkedHashSet<InboxColumn> columns){
+	public void setColumns(LinkedHashSet<InboxColumn> columns) {
 		this.columns = columns;
 		fireTableStructureChanged();
 	}
-	
+
 	@Override
 	public void setColumnCount(int columnCount) {
 		this.columnCount = columnCount;
@@ -190,15 +208,15 @@ public class InboxTableModel extends DefaultTableModel {
 
 	public Object getValueAt(int row, int col) {
 		int i = 0;
-		if(data != null && !data.isEmpty())
-		for (InboxColumn inboxColumn : columns) {
-			if (i == col) {
-				return data.get(row)[inboxColumn.getColumnNumber()];
-			}else if(col == InboxColumn.values().length){
-				return data.get(row)[InboxColumn.values().length];
+		if (data != null && !data.isEmpty())
+			for (InboxColumn inboxColumn : columns) {
+				if (i == col) {
+					return data.get(row)[inboxColumn.getColumnNumber()];
+				} else if (col == InboxColumn.values().length) {
+					return data.get(row)[InboxColumn.values().length];
+				}
+				i++;
 			}
-			i++;
-		}
 		return "";
 	}
 
@@ -250,6 +268,7 @@ public class InboxTableModel extends DefaultTableModel {
 			super();
 			this.filterList = filterList;
 			Set<String> keys = filterList.keySet();
+
 			for (String key : keys) {
 				WfSearchFilterBI filter = filterList.get(key);
 				if (filter instanceof WfTagFilter) {
@@ -338,12 +357,36 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		}
 		String concept = wfInstance.getComponentName();
+		String targetFSN = "";
+		String targetPreferred = "";
+		
+		try {
+			I_GetConceptData langRefset = null;
+			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
+			I_TerminologyProject projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
+			TranslationProject translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
+			langRefset = translationProject.getTargetLanguageRefset();
+			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()), langRefset.getConceptNid(), true);
+			for (I_ContextualizeDescription description : descriptions) {
+				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+
+					if (description.getTypeId() == fsn.getConceptNid()) {
+						targetFSN = description.getText();
+					} else if (description.getAcceptabilityId() == preferred.getConceptNid()) {
+						targetPreferred = description.getText();
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		row = new Object[InboxColumn.values().length + 1];
 		String componentStr = tagStr + concept;
 		row[InboxColumn.SOURCE_PREFERRED.getColumnNumber()] = componentStr;
-		row[InboxColumn.TARGET_FSN.getColumnNumber()] = "";
-		row[InboxColumn.STATUS_DATE.getColumnNumber()] = "";
-		row[InboxColumn.TARGET_PREFERRED.getColumnNumber()] = "";
+		row[InboxColumn.TARGET_FSN.getColumnNumber()] = targetFSN;
+	//	row[InboxColumn.STATUS_DATE.getColumnNumber()] = targetPreferred;
+		row[InboxColumn.TARGET_PREFERRED.getColumnNumber()] = targetPreferred;
 		row[InboxColumn.WORKLIST.getColumnNumber()] = wfInstance.getWorkList().getName();
 		row[InboxColumn.DESTINATION.getColumnNumber()] = wfInstance.getDestination().getUsername();
 		row[InboxColumn.STATUS.getColumnNumber()] = wfInstance.getState().getName();

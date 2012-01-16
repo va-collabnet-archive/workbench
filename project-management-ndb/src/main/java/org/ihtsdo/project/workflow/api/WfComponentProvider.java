@@ -154,18 +154,9 @@ public class WfComponentProvider {
 		return returnRoles;
 
 	}
-	
-	public List<WfState> getPossibleStatesForUser(WfUser user){
-		List<WfState> list= new ArrayList<WfState>();
-		WorkflowInterpreter wi= WorkflowInterpreter.createWorkflowInterpreter( new WorkflowDefinition());
-		List<WfState> states= getStates();
-		for (WfState state : states) {
-			WfInstance instance = new WfInstance();
-			instance.setState(state);
-			if(wi.getPossibleActions(instance, user).size()>0)
-				list.add(state);
-		}
-		return list;
+
+	public List<WfState> getAllStates() {
+		return getStates();
 	}
 
 	public static WfInstance getWfInstance(UUID instanceUUID) {
@@ -279,21 +270,6 @@ public class WfComponentProvider {
 		return wfrole;
 	}
 
-	public WfState statusConceptToWfState(I_GetConceptData status) {
-		WfState state = WfComponentProvider.statesCache.get(status.getPrimUuid());
-		if (state != null) {
-			return state;
-		}
-
-		try {
-			state = new WfState(status.getInitialText(), status.getPrimUuid());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		WfComponentProvider.statesCache.put(state.getId(), state);
-		return state;
-	}
-
 	public WfUser userConceptToWfUser(I_GetConceptData user) {
 		WfUser wfUser = WfComponentProvider.usersCache.get(user.getPrimUuid());
 		if (wfUser != null) {
@@ -308,6 +284,21 @@ public class WfComponentProvider {
 
 		WfComponentProvider.usersCache.put(wfUser.getId(), wfUser);
 		return wfUser;
+	}
+
+	public WfState statusConceptToWfState(I_GetConceptData status) {
+		WfState state = WfComponentProvider.statesCache.get(status.getPrimUuid());
+		if (state != null) {
+			return state;
+		}
+
+		try {
+			state = new WfState(status.getInitialText(), status.getPrimUuid());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		WfComponentProvider.statesCache.put(state.getId(), state);
+		return state;
 	}
 
 	private static final String END_FILE = ".wfd";

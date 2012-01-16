@@ -243,9 +243,9 @@ public class SpecialInboxPanel extends JPanel {
 				case STATUS:
 					row[column]= qTO.getStatus();
 					break;
-				case STATUS_DATE:
-					row[column]=formatter.format(qTO.getStatusTime());
-					break;
+//				case STATUS_DATE:
+//					row[column]=formatter.format(qTO.getStatusTime());
+//					break;
 				case TARGET_FSN:
 					row[column]=  qTO.getTargetFSN();
 					break;

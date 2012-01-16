@@ -94,6 +94,8 @@ public class IconUtilities {
 	public static Icon ESP = new ImageIcon("icons/flag_spain.png");
 	public static Icon SVE = new ImageIcon("icons/flag_sweden.png");
 	public static Icon EN_USA = new ImageIcon("icons/flag_usa.png");
+	public static Icon FUNNEL_ADD = new ImageIcon("icons/funnel_add.png");
+	public static Icon FUNNEL_DELETE = new ImageIcon("icons/funnel_delete.png");
 	
 	public static final String CUSTOM_NODE = "Custom";
 	public static final String STATUS_NODE = "Status";
