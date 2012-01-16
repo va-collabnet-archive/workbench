@@ -18,6 +18,7 @@ package org.ihtsdo.tk.api;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,7 +33,8 @@ import org.ihtsdo.tk.Ts;
  *
  * @author kec
  */
-public class NidList implements NidListBI {
+public class NidList implements NidListBI, Serializable {
+   private static final int dataVersion = 1;
 
    private List<Integer> listValues = new ArrayList<Integer>(2);
 
