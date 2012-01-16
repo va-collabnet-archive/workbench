@@ -16,6 +16,9 @@ public class IsaCache extends TypeCache {
 	public IsaCache(NidBitSetBI nidSet) {
 		super();
 		this.nidSet = nidSet;
+                if (nidSet == null) {
+                    this.getLatch().countDown();
+                }
 	}
 
 	@Override
