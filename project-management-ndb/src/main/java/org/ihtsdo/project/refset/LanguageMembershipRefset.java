@@ -75,6 +75,7 @@ public class LanguageMembershipRefset extends WorkflowRefset {
 					current, 0, config);
 			
 			I_GetConceptData newPromotionConcept = tf.newConcept(UUID.randomUUID(), false, config);
+			newPromotionConcept.setAnnotationStyleRefex(true);
 			tf.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 					name + " - promotion refset", 
 					tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid())

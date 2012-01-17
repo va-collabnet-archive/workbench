@@ -100,7 +100,7 @@ public class GetIdsMapping extends TestCase {
 		//		System.out.println("Creating test fixture");
 		//		copyDirectory(new File("src/test/java/org/ihtsdo/project/berkeley-db"), new File("berkeley-db"));
 		//		vodbDirectory = new File("berkeley-db");
-		vodbDirectory = new File("/Applications/SCT UAT ALL 2.1-SNAPSHOT/berkeley-db");
+		vodbDirectory = new File("/Users/alo/Desktop/berkeley-db");
 		dbSetupConfig = new DatabaseSetupConfig();
 		System.out.println("Opening database");
 		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
