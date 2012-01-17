@@ -1154,32 +1154,54 @@ public class WorkflowHelper {
 
 		if (con != null) {
 			if (con.getConAttrs() != null) {
-				// From Annotations
-				Collection<? extends RefexChronicleBI<?>> annotations = con.getConAttrs().getAnnotations();
-				
-				for (RefexChronicleBI<?> annot : annotations) {
-					if (annot.getCollectionNid() == getWorkflowRefsetNid()) {
-						try {
-							RefexStrVersionBI<?> version = (RefexStrVersionBI<?>)annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-			
-							if (version.getStatusNid() == activeNidRf1 || version.getStatusNid() == activeNidRf2) {
+				try {
+					// From Annotations
+					Collection<? extends RefexChronicleBI<?>> annotations = con.getConAttrs().getAnnotations();
+					
+					for (RefexChronicleBI<?> annot : annotations) {
+						if (annot.getCollectionNid() == getWorkflowRefsetNid()) {
+							RefexVersionBI<?> latestVersion = null;
+							SortedSet<WorkflowHistoryJavaBean> allVersions = new TreeSet<WorkflowHistoryJavaBean>(WfComparator.getInstance().createWfHxEarliestFirstTimeComparer());
+						
+							// Setup sorted beans
+							for (RefexVersionBI<?> version : annot.getVersions()) {
 								WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(version);
-								retSet.add(bean);
+								allVersions.add(bean);
 							}
-						} catch (Exception e) {
 							
+							// Identify last version from latest bean
+							WorkflowHistoryJavaBean latestBean = allVersions.last();
+							if (latestBean != null) {
+								for (RefexVersionBI<?> version : annot.getVersions()) {
+									WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(version);
+								
+									if (latestBean.equals(bean)) {
+										latestVersion = version;
+										break;
+									}
+								}
+							
+								// add if latestVersion is active
+								if (latestVersion.getStatusNid() == activeNidRf1 || latestVersion.getStatusNid() == activeNidRf2) {
+									retSet.add(latestBean);
+								}
+							}
 						}
 					}
-				}
-			
-				// From WfHx Concept's Refset Members (till update Import mechanism)
-				List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
-				for (I_ExtendByRef member : members) {
-					I_ExtendByRefPart<?> part = member.getMutableParts().get(member.getTuples().size() - 1);
-					if (part.getStatusNid() == activeNidRf1 || part.getStatusNid() == activeNidRf2) {
-						WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
-						retSet.add(bean);
+				
+					// From WfHx Concept's Refset Members (till update Import mechanism)
+					List<? extends I_ExtendByRef> members = Terms.get().getRefsetExtensionsForComponent(getWorkflowRefsetNid(), con.getConceptNid());
+					for (I_ExtendByRef member : members) {
+						// Get latest Mutable Part
+						I_ExtendByRefPart<?> part = member.getMutableParts().get(member.getTuples().size() - 1);
+
+						if (part.getStatusNid() == activeNidRf1 || part.getStatusNid() == activeNidRf2) {
+							WorkflowHistoryJavaBean bean = populateWorkflowHistoryJavaBean(member);
+							retSet.add(bean);
+						}
 					}
+				} catch (Exception e) {
+		        	AceLog.getAppLog().log(Level.WARNING, "Error retrieving wfHx refset members/annotations: ", e);
 				}
 			}
 		}
@@ -1631,6 +1653,6 @@ public class WorkflowHelper {
 		
 		return null;
 	}
-
+	
 }
  

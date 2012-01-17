@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.ihtsdo.concept.component.refsetmember.cidCid.CidCidRevision;
 
 public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet {
    private int                       minSapNid  = Integer.MIN_VALUE;
@@ -342,7 +343,7 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
                Bdb.getConceptForComponent(member.getReferencedComponentNid());
 
             if ((concept != null) &&!concept.isCanceled()) {
-               for (RefsetMember<?, ?>.Version mv : member.getTuples()) {
+               for (RefsetMember<?, ?>.Version mv : member.getVersions()) {
                   if (mv.sapIsInRange(minSapNid, maxSapNid) && (mv.getTime() != Long.MIN_VALUE)
                           && (mv.getTime() != Long.MAX_VALUE)) {
                      if ((commitSapNids == null) || commitSapNids.contains(mv.getSapNid())) {

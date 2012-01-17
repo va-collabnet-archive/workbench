@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -53,6 +54,7 @@ public class ChangeNotifier {
       new AtomicReference<ConcurrentSkipListSet<Integer>>(new ConcurrentSkipListSet<Integer>());
    private static ConcurrentSkipListSet<WeakReference<TermChangeListener>> changeListenerRefs =
       new ConcurrentSkipListSet<WeakReference<TermChangeListener>>();
+   private static AtomicBoolean active = new AtomicBoolean(true);
 
    //~--- static initializers -------------------------------------------------
 
@@ -72,6 +74,14 @@ public class ChangeNotifier {
 
    public static void removeTermChangeListener(TermChangeListener cl) {
       changeListenerRefs.remove(new ComparableWeakRef(cl));
+   }
+
+   public static void resumeNotifications() {
+      active.set(true);
+   }
+
+   public static void suspendNotifications() {
+      active.set(false);
    }
 
    public static void touch(Concept c) {
@@ -162,39 +172,41 @@ public class ChangeNotifier {
    private static class Notifier extends TimerTask {
       @Override
       public void run() {
-         ConcurrentSkipListSet<Integer> destinationsOfChangedRels =
-            ChangeNotifier.destinationsOfChangedRels.getAndSet(new ConcurrentSkipListSet<Integer>());
-         ConcurrentSkipListSet<Integer> originsOfChangedRels =
-            ChangeNotifier.originsOfChangedRels.getAndSet(new ConcurrentSkipListSet<Integer>());
-         ConcurrentSkipListSet<Integer> referencedComponentsOfChangedRefexs =
-            ChangeNotifier.referencedComponentsOfChangedRefexs.getAndSet(
-                new ConcurrentSkipListSet<Integer>());
-         ConcurrentSkipListSet<Integer> changedComponents =
-            ChangeNotifier.changedComponents.getAndSet(new ConcurrentSkipListSet<Integer>());
-         long sequence = BdbCommitSequence.nextSequence();
+         if (active.get()) {
+            ConcurrentSkipListSet<Integer> destinationsOfChangedRels =
+               ChangeNotifier.destinationsOfChangedRels.getAndSet(new ConcurrentSkipListSet<Integer>());
+            ConcurrentSkipListSet<Integer> originsOfChangedRels =
+               ChangeNotifier.originsOfChangedRels.getAndSet(new ConcurrentSkipListSet<Integer>());
+            ConcurrentSkipListSet<Integer> referencedComponentsOfChangedRefexs =
+               ChangeNotifier.referencedComponentsOfChangedRefexs.getAndSet(
+                   new ConcurrentSkipListSet<Integer>());
+            ConcurrentSkipListSet<Integer> changedComponents =
+               ChangeNotifier.changedComponents.getAndSet(new ConcurrentSkipListSet<Integer>());
+            long sequence = BdbCommitSequence.nextSequence();
 
-         if (!destinationsOfChangedRels.isEmpty() ||!referencedComponentsOfChangedRefexs.isEmpty()
-                 ||!changedComponents.isEmpty()) {
-            List<WeakReference<TermChangeListener>> toRemove =
-               new ArrayList<WeakReference<TermChangeListener>>();
+            if (!destinationsOfChangedRels.isEmpty() ||!referencedComponentsOfChangedRefexs.isEmpty()
+                    ||!changedComponents.isEmpty()) {
+               List<WeakReference<TermChangeListener>> toRemove =
+                  new ArrayList<WeakReference<TermChangeListener>>();
 
-            for (WeakReference<TermChangeListener> clr : changeListenerRefs) {
-               TermChangeListener cl = clr.get();
+               for (WeakReference<TermChangeListener> clr : changeListenerRefs) {
+                  TermChangeListener cl = clr.get();
 
-               if (cl == null) {
-                  toRemove.add(clr);
-               } else {
-                  try {
-                     cl.changeNotify(sequence, originsOfChangedRels, destinationsOfChangedRels,
-                                     referencedComponentsOfChangedRefexs, changedComponents);
-                  } catch (Throwable e) {
-                     e.printStackTrace();
+                  if (cl == null) {
                      toRemove.add(clr);
+                  } else {
+                     try {
+                        cl.changeNotify(sequence, originsOfChangedRels, destinationsOfChangedRels,
+                                        referencedComponentsOfChangedRefexs, changedComponents);
+                     } catch (Throwable e) {
+                        e.printStackTrace();
+                        toRemove.add(clr);
+                     }
                   }
                }
-            }
 
-            changeListenerRefs.removeAll(toRemove);
+               changeListenerRefs.removeAll(toRemove);
+            }
          }
       }
    }

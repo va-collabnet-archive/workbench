@@ -1793,7 +1793,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return sapNids;
     }
-
+    
     public abstract List<? extends Version> getVersions();
 
     public abstract List<? extends Version> getVersions(ViewCoordinate c);

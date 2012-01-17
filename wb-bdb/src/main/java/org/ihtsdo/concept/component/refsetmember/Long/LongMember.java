@@ -258,7 +258,7 @@ public class LongMember extends RefsetMember<LongRevision, LongMember>
          versions = list;
       }
 
-      return (List<Version>) versions;
+      return Collections.unmodifiableList((List<Version>) versions);
    }
 
    //~--- set methods ---------------------------------------------------------

@@ -238,7 +238,7 @@ public class MembershipMember extends RefsetMember<MembershipRevision, Membershi
          versions = list;
       }
 
-      return (List<Version>) versions;
+      return Collections.unmodifiableList((List<Version>) versions);
    }
 
    //~--- inner classes -------------------------------------------------------

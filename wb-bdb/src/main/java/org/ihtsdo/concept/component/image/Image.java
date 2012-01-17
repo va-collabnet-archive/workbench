@@ -533,7 +533,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
             versions = list;
         }
 
-        return versions;
+        return Collections.unmodifiableList(versions);
     }
 
     @Override

@@ -25,12 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,7 +72,8 @@ public class CheckForChildrenUuidList extends AbstractTask {
     private static final int dataVersion = 1;
     private String uuidListListPropName = ProcessAttachmentKeys.UUID_LIST_LIST.getAttachmentKey();
     private WizardBI wizard;
-    private ArrayList<List<UUID>> uuidList;
+    private ArrayList<UUID> uuidList;
+    private ArrayList<UUID> uncommittedUuidList;
     private transient Condition returnCondition;
     protected transient boolean done;
     private I_ConfigAceFrame config;
@@ -163,7 +159,14 @@ public class CheckForChildrenUuidList extends AbstractTask {
             // check return condition for CONTINUE
             if (returnCondition == Condition.PREVIOUS) {
                 //move to list view
-                process.setProperty(uuidListListPropName, uuidList);
+                ArrayList masterList = new ArrayList<List<UUID>>(); 
+                //AddUuidListListToListView needs each concept to be in separate list
+                for(UUID uuid : uuidList){
+                    ArrayList list = new ArrayList<UUID>();
+                    list.add(uuid);
+                    masterList.add(list);
+                }
+                process.setProperty(uuidListListPropName, masterList);
                 wizard.setWizardPanelVisible(false);
             } else {
                 wizard.setWizardPanelVisible(false);
@@ -193,12 +196,12 @@ public class CheckForChildrenUuidList extends AbstractTask {
 
         @Override
         protected void finished() {
-            if (uuidList.isEmpty()) {
+            if (uuidList.isEmpty() && uncommittedUuidList.isEmpty()) {
                 returnCondition = Condition.CONTINUE;
                 wizard.setWizardPanelVisible(false);
                 done = true;
                 notifyTaskDone();
-            } else {
+            } else if(!uuidList.isEmpty() && uncommittedUuidList.isEmpty()) { //only committed children 
                 wizard.setWizardPanelVisible(true);
                 JPanel wizardPanel = wizard.getWizardPanel();
                 //make wizard panel
@@ -217,11 +220,111 @@ public class CheckForChildrenUuidList extends AbstractTask {
 
                 //add concepts
                 c.gridwidth = 2;
-                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept.<br>"), c);
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>Please remove the children of the concept before retiring the concept."), c);
                 c.gridy++;
-                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?<br>"), c);
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>Add concepts to list view for batch editing?"), c);
+                c.gridy++;
                 c.gridy++;
 
+                //add buttons
+                c.gridwidth = 1;
+                c.weightx = 0;
+                c.ipady = 0;
+                JButton updateButton = new JButton("add to list");
+                updateButton.addActionListener(new UpdateActionListener());
+                wizardPanel.add(updateButton, c);
+                c.gridx++;
+                c.weightx = 1;
+                JButton cancelButton = new JButton("cancel");
+                cancelButton.addActionListener(new CancelActionListener());
+                wizardPanel.add(cancelButton, c);
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty = 1;
+                wizardPanel.add(new JLabel(" "), c);
+            } else if(uuidList.isEmpty() && !uncommittedUuidList.isEmpty()){ //only uncommitted children
+                wizard.setWizardPanelVisible(true);
+                JPanel wizardPanel = wizard.getWizardPanel();
+                //make wizard panel
+                Component[] components = wizardPanel.getComponents();
+                for (int i = 0; i < components.length; i++) {
+                    wizardPanel.remove(components[i]);
+                }
+                wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
+
+                //add concepts
+                c.gridwidth = 2;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>There are children concepts which are uncommited."
+                        + "  Please resolve the uncomitted changes before continuing."), c);
+                c.gridy++;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>Add uncomitted children to list view?"
+                        + "  (Uncommitted concepts will be highlighted in yellow.)"), c);
+                c.gridy++;
+
+                //add buttons
+                c.ipady = 0;
+                c.gridwidth = 1;
+                c.weightx = 0;
+                JButton updateButton = new JButton("add to list");
+                updateButton.addActionListener(new UpdateActionListener());
+                wizardPanel.add(updateButton, c);
+                c.gridx++;
+                c.weightx = 1;
+                JButton cancelButton = new JButton("cancel");
+                cancelButton.addActionListener(new CancelActionListener());
+                wizardPanel.add(cancelButton, c);
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty = 1;
+                wizardPanel.add(new JLabel(" "), c);
+                
+                for(UUID uuid : uncommittedUuidList){
+                    if(!uuidList.contains(uuid)){
+                        uuidList.add(uuid);
+                    }
+                }
+                
+                
+            }else if(!uuidList.isEmpty() && !uncommittedUuidList.isEmpty()){ //uncommitted and committed children
+                wizard.setWizardPanelVisible(true);
+                JPanel wizardPanel = wizard.getWizardPanel();
+                //make wizard panel
+                Component[] components = wizardPanel.getComponents();
+                for (int i = 0; i < components.length; i++) {
+                    wizardPanel.remove(components[i]);
+                }
+                wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
+
+                //add concepts
+                c.gridwidth = 2;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>This concept has children which are both committed and uncommitted.  "
+                        + "  Please resolve the uncomitted changes before continuing."), c);
+                c.gridy++;
+                c.ipady = 20;
+                wizardPanel.add(new JLabel("<html>Add uncomitted children to list view?"
+                        + "  (Uncommitted concepts will be highlighted in yellow.)"), c);
+                c.gridy++;
+                c.ipady = 0;
+                
                 //add buttons
                 c.gridwidth = 1;
                 c.weightx = 0;
@@ -237,6 +340,11 @@ public class CheckForChildrenUuidList extends AbstractTask {
                 c.gridy++;
                 c.weighty = 1;
                 wizardPanel.add(new JLabel(" "), c);
+                
+                uuidList.clear();;
+                for(UUID uuid : uncommittedUuidList){
+                        uuidList.add(uuid);
+                }
             }
         }
     }
@@ -247,23 +355,20 @@ public class CheckForChildrenUuidList extends AbstractTask {
 
             Collection<? extends ConceptVersionBI> allRelsIncoming = cv.getRelsIncomingOrigins();
             Collection<? extends ConceptVersionBI> relsIncoming = cv.getRelsIncomingOriginsActiveIsa();
+            uuidList = new ArrayList<UUID>();
+            uncommittedUuidList = new ArrayList<UUID>();
             if (allRelsIncoming != null) {
-                uuidList = new ArrayList<List<UUID>>();
                 for (ConceptVersionBI relConcept : allRelsIncoming) {
                     if (relConcept.isUncommitted()) {
                         UUID uuid = Terms.get().nidToUuid(relConcept.getConceptNid());
-                        List<UUID> list = new ArrayList<UUID>();
-                        list.add(uuid);
-                        uuidList.add(list);
+                        uncommittedUuidList.add(uuid);
                     }
                 }
             }
             if (relsIncoming != null) {
                 for (ConceptVersionBI relConcept : relsIncoming) {
                     UUID uuid = Terms.get().nidToUuid(relConcept.getConceptNid());
-                    List<UUID> list = new ArrayList<UUID>();
-                    list.add(uuid);
-                    uuidList.add(list);
+                    uuidList.add(uuid);
                 }
             }
         } catch (ContradictionException ex) {

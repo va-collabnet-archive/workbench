@@ -108,6 +108,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
 
     @Override
+    public void suspendChangeNotifications() {
+        ChangeNotifier.suspendNotifications();
+    }
+
+    @Override
+    public void resumeChangeNotifications() {
+        ChangeNotifier.resumeNotifications();
+    }
+
+    @Override
     public void addTermChangeListener(TermChangeListener cl) {
         ChangeNotifier.addTermChangeListener(cl);
     }

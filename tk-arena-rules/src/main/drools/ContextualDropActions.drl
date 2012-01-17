@@ -511,7 +511,7 @@ rule "rule 25" #change synonymy from non synonymous
 		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true, config));
 end
 
-rule "rule 26" #proceedure and decendants onto body structure
+rule "rule 26" #procedure and decendants onto body structure
 
    when
       (and
@@ -521,12 +521,12 @@ rule "rule 26" #proceedure and decendants onto body structure
          							 context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
    then
-      actions.add(new CreateRelAction("Proceedure Site", $dropTarget, Snomed.PROCEDURE_SITE, $dropObject, config));
-      actions.add(new CreateRelAction("Proceedure Site - Direct", $dropTarget, Snomed.PROCEDURE_SITE_DIRECT, $dropObject, config));
-      actions.add(new CreateRelAction("Proceedure Site - Indirect", $dropTarget, Snomed.PROCEDURE_SITE_INDIRECT, $dropObject, config));
+      actions.add(new CreateRelAction("Procedure Site", $dropTarget, Snomed.PROCEDURE_SITE, $dropObject, config));
+      actions.add(new CreateRelAction("Procedure Site - Direct", $dropTarget, Snomed.PROCEDURE_SITE_DIRECT, $dropObject, config));
+      actions.add(new CreateRelAction("Procedure Site - Indirect", $dropTarget, Snomed.PROCEDURE_SITE_INDIRECT, $dropObject, config));
 end
 
-rule "rule 27" #proceedure onto morphologic abnormality
+rule "rule 27" #procedure onto morphologic abnormality
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -535,12 +535,12 @@ rule "rule 27" #proceedure onto morphologic abnormality
          						   context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-	actions.add(new CreateRelAction("Proceedure Morphology", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Morphology - Direct", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY_DIRECT, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Morphology - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_MORPHOLOGY, $dropObject, config));
+	actions.add(new CreateRelAction("Procedure Morphology", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Morphology - Direct", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY_DIRECT, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Morphology - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_MORPHOLOGY, $dropObject, config));
 end
 
-rule "rule 28" #proceedure onto physical object
+rule "rule 28" #procedure onto physical object
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -549,14 +549,14 @@ rule "rule 28" #proceedure onto physical object
                         context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-	actions.add(new CreateRelAction("Proceedure Device", $dropTarget, Snomed.PROCEDURE_DEVICE, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Device - Direct", $dropTarget, Snomed.PROCEDURE_DEVICE_DIRECT, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Device - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Device - using access device", $dropTarget, Snomed.PROCCEDURE_ACCESS_DEVICE, $dropObject, config));
-      	actions.add(new CreateRelAction("Proceedure Device - using device", $dropTarget, Snomed.PROCEDURE_USING_DEVICE, $dropObject, config));
+	actions.add(new CreateRelAction("Procedure Device", $dropTarget, Snomed.PROCEDURE_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - Direct", $dropTarget, Snomed.PROCEDURE_DEVICE_DIRECT, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - using access device", $dropTarget, Snomed.PROCCEDURE_ACCESS_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - using device", $dropTarget, Snomed.PROCEDURE_USING_DEVICE, $dropObject, config));
 end
 
-rule "rule 29" #proceedure onto substance
+rule "rule 29" #procedure onto substance
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -569,7 +569,7 @@ rule "rule 29" #proceedure onto substance
       	actions.add(new CreateRelAction("Component", $dropTarget, Snomed.COMPONENT, $dropObject, config));
 end
 
-rule "rule 29.1" #proceedure onto clinical finding
+rule "rule 29.1" #procedure onto clinical finding
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -580,7 +580,7 @@ rule "rule 29.1" #proceedure onto clinical finding
             actions.add(new CreateRelAction("Has Focus", $dropTarget, Snomed.HAS_FOCUS, $dropObject, config));
 end
 
-rule "rule 30" #proceedure onto specimen
+rule "rule 30" #procedure onto specimen
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -591,7 +591,7 @@ rule "rule 30" #proceedure onto specimen
 		actions.add(new CreateRelAction("Has Specimen", $dropTarget, Snomed.HAS_SPECIMEN, $dropObject, config));
 end
 
-rule "rule 30.1" #proceedure onto procedure
+rule "rule 30.1" #procedure onto procedure
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -602,7 +602,7 @@ rule "rule 30.1" #proceedure onto procedure
 		actions.add(new CreateRelAction("Measurement Method", $dropTarget, Snomed.MEASUREMENT_METHOD, $dropObject, config));
 end
 
-rule "rule 31" #proceedure onto social concept
+rule "rule 31" #procedure onto social concept
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -614,7 +614,7 @@ rule "rule 31" #proceedure onto social concept
 		actions.add(new CreateRelAction("Recipient Category", $dropTarget, Snomed.RECIPIENT_CATEGORY, $dropObject, config));
 end
 
-rule "rule 31.1" #proceedure onto physical force
+rule "rule 31.1" #procedure onto physical force
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -625,7 +625,7 @@ rule "rule 31.1" #proceedure onto physical force
 		actions.add(new CreateRelAction("Using Energy", $dropTarget, Snomed.USING_ENERGY, $dropObject, config));
 end
 
-rule "rule 32" #proceedure onto qualifier value
+rule "rule 32" #procedure onto qualifier value
 	when
 	(and
          (ViewFact(getView() == View.STATED))

@@ -204,16 +204,34 @@ public class CheckForConceptsInList extends AbstractTask implements ActionListen
                     wizardPanel.remove(components[i]);
                 }
                 
-                //add concepts
-                wizardPanel.add(new JLabel("<html>There are concepts in the listview<br>Do you want to replace them?<br>"));
+                 wizardPanel.setLayout(new GridBagLayout());
+                GridBagConstraints c = new GridBagConstraints();
+                c.fill = GridBagConstraints.BOTH;
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 0;
+                c.anchor = GridBagConstraints.EAST;
                 
+                c.gridwidth = 2;
+                //add concepts
+                wizardPanel.add(new JLabel("<html>There are concepts in the listview<br>Do you want to replace them?<br>"), c);
+                
+                c.gridwidth = 1;
+                c.gridy++;
+                c.weightx = 0;
                 //add buttons
                 JButton updateButton = new JButton("replace");
                 updateButton.addActionListener(new updateActionListener());
                 wizardPanel.add(updateButton);
                 JButton continueButton = new JButton("cancel");
-                wizardPanel.add(continueButton);
                 continueButton.addActionListener(CheckForConceptsInList.this);
+                wizardPanel.add(continueButton);
+                
+                c.gridx = 0;
+                c.gridy++;
+                c.weighty = 1;
+                wizardPanel.add(new JLabel(" "), c);
         	}else{
         		wizard.setWizardPanelVisible(false);
         	}

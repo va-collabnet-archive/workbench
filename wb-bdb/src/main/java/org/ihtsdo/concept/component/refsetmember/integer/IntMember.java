@@ -258,7 +258,7 @@ public class IntMember extends RefsetMember<IntRevision, IntMember>
          versions = list;
       }
 
-      return (List<Version>) versions;
+      return Collections.unmodifiableList((List<Version>) versions);
    }
 
    //~--- set methods ---------------------------------------------------------
