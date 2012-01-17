@@ -356,6 +356,7 @@ public class WorklistStateTotalsReport implements I_Report {
 						null, csvDataSource);
 
 				jviewer = new JasperViewer(print, false);
+				jviewer.setTitle("Worklist state totals");
 			}
 
 		} catch (JRException e) {

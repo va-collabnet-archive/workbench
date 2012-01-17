@@ -272,7 +272,7 @@ public class WorklistMemberByStatusReport implements I_Report {
 			JasperPrint print = JasperFillManager.fillReport(fileName, null, csvDataSource);
 
 			jviewer = new JasperViewer(print, false);
-
+			jviewer.setTitle("Worklist members by status");
 		} catch (JRException e) {
 			e.printStackTrace();
 			throw e;
