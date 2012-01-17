@@ -33,8 +33,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
-import org.ihtsdo.project.workflow.api.WorkflowSearcher;
-import org.ihtsdo.project.workflow.filters.WfSearchFilterBI;
 
 /**
  * @author Guillermo Reynoso
@@ -316,9 +314,8 @@ public class WorklistMemberStatusPanel extends JPanel {
 
 		@Override
 		public void done() {
-			String inboxItems = null;
 			try {
-				inboxItems = get();
+				get();
 				list5.validate();
 				list1.validate();
 			} catch (Exception ignore) {
