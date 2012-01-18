@@ -38,6 +38,7 @@ import org.ihtsdo.tk.spec.ValidationException;
 public class UuidToSctIdMapper {
 
     String namespace;
+    String module;
     File directory;
     Writer conceptsWriter;
     Writer descriptionsWriter;
@@ -65,8 +66,9 @@ public class UuidToSctIdMapper {
     int descCounter = 1;
     int relCounter = 1;
 
-    public UuidToSctIdMapper(String namespace, File directory) {
+    public UuidToSctIdMapper(String namespace, String module, File directory) {
         this.namespace = namespace;
+        this.module = module;
         this.directory = directory;
         this.store = Ts.get();
     }
@@ -319,7 +321,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        conceptsWriter.write(namespace + field.seperator);
+                        conceptsWriter.write(module + field.seperator);
 
                         break;
                 }
@@ -360,7 +362,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        descriptionsWriter.write(namespace + field.seperator);
+                        descriptionsWriter.write(module + field.seperator);
 
                         break;
 
@@ -448,7 +450,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        relationshipsWriter.write(namespace + field.seperator);
+                        relationshipsWriter.write(module + field.seperator);
 
                         break;
 
@@ -557,7 +559,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        identifiersWriter.write(namespace + field.seperator);
+                        identifiersWriter.write(module + field.seperator);
 
                         break;
 
@@ -601,7 +603,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(namespace + field.seperator);
+                        conRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -669,7 +671,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        conConRefsetsWriter.write(namespace + field.seperator);
+                        conConRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -749,7 +751,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        conConConRefsetsWriter.write(namespace + field.seperator);
+                        conConConRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -841,7 +843,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        conConStrRefsetsWriter.write(namespace + field.seperator);
+                        conConStrRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -933,7 +935,7 @@ public class UuidToSctIdMapper {
                         break;
 
                     case MODULE_ID:
-                        stringRefsetsWriter.write(namespace + field.seperator);
+                        stringRefsetsWriter.write(module + field.seperator);
 
                         break;
 

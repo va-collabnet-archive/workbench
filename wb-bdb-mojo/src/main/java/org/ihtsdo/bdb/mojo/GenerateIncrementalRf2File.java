@@ -97,6 +97,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String namespace;
     /**
+     * Project module, as fsn
+     *
+     * @parameter @required
+     */
+    private String module;
+    /**
      * country code
      *
      * @parameter @required
@@ -177,6 +183,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         LANG_CODE.EN,
                         countryCode,
                         namespace,
+                        module,
                         new Date(TimeHelper.getTimeFromString(effectiveDate, 
                         TimeHelper.getFileDateFormat())),
                         sapsToWrite.getAsSet(),
@@ -187,7 +194,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 exporter.close();
             }
             
-            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, output);
+            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, module, output);
             mapper.map();
             mapper.close();
             

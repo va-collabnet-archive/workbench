@@ -68,6 +68,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     Writer identifiersWriter;
     LANG_CODE language;
     String namespace;
+    String module;
     Writer relationshipsWriter;
     ReleaseType releaseType;
     Set<Integer> sapNids;
@@ -84,7 +85,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
     //~--- constructors --------------------------------------------------------
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
-            String namespace, Date effectiveDate, Set<Integer> sapNids, ViewCoordinate vc,
+            String namespace, String module, Date effectiveDate, Set<Integer> sapNids, ViewCoordinate vc,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess)
             throws IOException {
         directory.mkdirs();
@@ -93,6 +94,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         this.language = language;
         this.country = country;
         this.namespace = namespace;
+        this.module = module;
         this.sapNids = sapNids;
         this.store = Ts.get();
         this.vc = vc;
@@ -289,7 +291,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                 break;
 
                             case MODULE_ID:
-                                conceptsWriter.write(namespace + field.seperator);
+                                conceptsWriter.write(module + field.seperator);
 
                                 break;
                         }
@@ -322,7 +324,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                 break;
 
                             case MODULE_ID:
-                                descriptionsWriter.write(namespace + field.seperator);
+                                descriptionsWriter.write(module + field.seperator);
 
                                 break;
 
@@ -382,7 +384,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                 break;
 
                             case MODULE_ID:
-                                relationshipsWriter.write(namespace + field.seperator);
+                                relationshipsWriter.write(module + field.seperator);
 
                                 break;
 
@@ -454,7 +456,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             break;
 
                         case MODULE_ID:
-                            identifiersWriter.write(namespace + field.seperator);
+                            identifiersWriter.write(module + field.seperator);
 
                             break;
 
@@ -548,7 +550,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(namespace + field.seperator);
+                        conRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -591,7 +593,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case MODULE_ID:
-                        conConRefsetsWriter.write(namespace + field.seperator);
+                        conConRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -639,7 +641,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case MODULE_ID:
-                        conConConRefsetsWriter.write(namespace + field.seperator);
+                        conConConRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -692,7 +694,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case MODULE_ID:
-                        conConStrRefsetsWriter.write(namespace + field.seperator);
+                        conConStrRefsetsWriter.write(module + field.seperator);
 
                         break;
 
@@ -745,7 +747,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case MODULE_ID:
-                        stringRefsetsWriter.write(namespace + field.seperator);
+                        stringRefsetsWriter.write(module + field.seperator);
 
                         break;
 
