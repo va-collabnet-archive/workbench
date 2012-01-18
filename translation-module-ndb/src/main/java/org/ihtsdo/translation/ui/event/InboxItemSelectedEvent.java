@@ -33,4 +33,5 @@ public class InboxItemSelectedEvent extends GenericEvent {
 	public Object getOldInboxItem() {
 		return oldInboxItem;
 	}
+
 }

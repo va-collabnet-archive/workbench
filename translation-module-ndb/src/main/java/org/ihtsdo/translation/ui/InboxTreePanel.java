@@ -115,7 +115,6 @@ public class InboxTreePanel extends JPanel {
 		}
 		updateTree();
 	}
-
 	private void suscribeHandlers() {
 		EventMediator eventMediator = EventMediator.getInstance();
 		eventMediator.suscribe(EventType.OUTBOX_CONTENT_CHANGED, new OutboxContentChangedEventHandler<OutboxContentChangeEvent>(this) {

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;

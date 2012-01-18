@@ -260,14 +260,15 @@ public class InboxTableModel extends DefaultTableModel {
 		super.setRowCount(data.size());
 	}
 
-	class InboxWorker extends SwingWorker<List<WfInstance>, WfInstance> {
+	class InboxWorker extends SwingWorker<String, Object[]> {
 		private HashMap<String, WfSearchFilterBI> filterList;
 		private boolean specialTag;
-
+		
 		public InboxWorker(HashMap<String, WfSearchFilterBI> filterList) {
 			super();
 			this.filterList = filterList;
 			Set<String> keys = filterList.keySet();
+			
 
 			for (String key : keys) {
 				WfSearchFilterBI filter = filterList.get(key);
@@ -283,25 +284,25 @@ public class InboxTableModel extends DefaultTableModel {
 		}
 
 		@Override
-		protected List<WfInstance> doInBackground() throws Exception {
+		protected String doInBackground() throws Exception {
 			data = new LinkedList<Object[]>();
 			List<WfInstance> wfInstances = new ArrayList<WfInstance>();
 			wfInstances = searcher.searchWfInstances(filterList.values());
-
+			
 			tags = TagManager.getInstance().getAllTagsContent();
 			for (WfInstance wfInstance : wfInstances) {
-				publish(wfInstance);
+				Object[] row = createRow(wfInstance, specialTag);
+				publish(row);
 			}
-			return wfInstances;
+			return "DONE";
 		}
+		
 
 		@Override
-		protected void process(List<WfInstance> wfInstances) {
+		protected void process(List<Object[]> rows) {
 			try {
 				if (!isCancelled()) {
-					data = new LinkedList<Object[]>();
-					for (WfInstance wfInstance : wfInstances) {
-						Object[] row = createRow(wfInstance, specialTag);
+					for (Object[] row : rows) {
 						if (row != null) {
 							data.add(row);
 						}

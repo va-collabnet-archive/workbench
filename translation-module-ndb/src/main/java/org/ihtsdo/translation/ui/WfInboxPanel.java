@@ -4,7 +4,14 @@
 
 package org.ihtsdo.translation.ui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -221,7 +228,6 @@ public class WfInboxPanel extends JPanel {
 					filterList.put(filter.getType(), filter);
 				}
 				model.updatePage(filterList);
-
 			}
 		});
 
