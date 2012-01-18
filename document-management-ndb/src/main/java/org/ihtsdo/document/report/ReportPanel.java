@@ -12,6 +12,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -21,6 +22,8 @@ import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -54,6 +57,8 @@ public class ReportPanel extends JPanel {
 	private static final String NO_DATA = "No data found to report";
 
 	private static final String EXCEPTION = "Exception creating report, check log for more details.";
+	private static final String EXEL_SIZE_EXCEDED_EXCEPTION = "Data size is outside excel allowable range (0..65535). Please choos smaller interval.";
+	
 	private JFileChooser chooser;
 	private ButtonGroup buttonGroup1;
 
@@ -165,7 +170,12 @@ public class ReportPanel extends JPanel {
 				} else {
 					showError(NO_DATA);
 				}
-			} catch (Exception e1) {
+			}catch (IllegalArgumentException e2){
+				Icon icon = new ImageIcon("icons/technical-difficulties.jpg");
+				technicalDificulties.setIcon(icon );
+				technicalDificulties.setVisible(true);
+				showError(EXEL_SIZE_EXCEDED_EXCEPTION);
+			}catch (Exception e1) {
 				showError(EXCEPTION);
 			}
 		} else {
@@ -263,6 +273,10 @@ public class ReportPanel extends JPanel {
 		}
 	}
 
+	private void technicalDificultiesMouseClicked(MouseEvent e) {
+		technicalDificulties.setVisible(false);
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
@@ -271,6 +285,7 @@ public class ReportPanel extends JPanel {
 		label2 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		reportList = new JList();
+		technicalDificulties = new JLabel();
 		previewButton = new JRadioButton();
 		excelButton = new JRadioButton();
 		csvButton = new JRadioButton();
@@ -283,9 +298,9 @@ public class ReportPanel extends JPanel {
 		//======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {434, 0, 0, 0};
+		((GridBagLayout)getLayout()).columnWidths = new int[] {434, 0, 0, 0, 0};
 		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0, 0.0, 1.0E-4};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 0.0, 1.0E-4};
 		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
 
 		//---- label1 ----
@@ -298,13 +313,13 @@ public class ReportPanel extends JPanel {
 		//---- label3 ----
 		label3.setText("Report type");
 		label3.setFont(label3.getFont().deriveFont(Font.PLAIN, label3.getFont().getSize() + 2f));
-		add(label3, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+		add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- label2 ----
 		label2.setVerticalAlignment(SwingConstants.TOP);
-		add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+		add(label2, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 0), 0, 0));
 
@@ -316,21 +331,33 @@ public class ReportPanel extends JPanel {
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
+		//---- technicalDificulties ----
+		technicalDificulties.setVisible(false);
+		technicalDificulties.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				technicalDificultiesMouseClicked(e);
+			}
+		});
+		add(technicalDificulties, new GridBagConstraints(1, 1, 1, 4, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 5), 0, 0));
+
 		//---- previewButton ----
 		previewButton.setText("Preview");
-		add(previewButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
+		add(previewButton, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- excelButton ----
 		excelButton.setText("Excel");
-		add(excelButton, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+		add(excelButton, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
 		//---- csvButton ----
 		csvButton.setText("Csv");
-		add(csvButton, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+		add(csvButton, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 5, 5), 0, 0));
 
@@ -372,7 +399,7 @@ public class ReportPanel extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel3, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0,
+		add(panel3, new GridBagConstraints(0, 5, 4, 1, 0.0, 0.0,
 			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 			new Insets(0, 0, 0, 0), 0, 0));
 
@@ -391,6 +418,7 @@ public class ReportPanel extends JPanel {
 	private JLabel label2;
 	private JScrollPane scrollPane1;
 	private JList reportList;
+	private JLabel technicalDificulties;
 	private JRadioButton previewButton;
 	private JRadioButton excelButton;
 	private JRadioButton csvButton;
