@@ -15,14 +15,8 @@
  */
 package org.ihtsdo.bdb.mojo;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +34,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.attributes.ConceptAttributesBinder;
@@ -55,11 +51,17 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.bdb.NullComponentFinder;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.DescCAB;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -67,6 +69,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.example.binding.CaseSensitive;
@@ -75,59 +78,63 @@ import org.ihtsdo.tk.spec.PathSpec;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
- * 
+ *
  * @goal load-econcepts-multi
- * 
+ *
  * @phase process-sources
  */
 public class LoadBdbMulti extends AbstractMojo {
 
     /**
      * concepts file names.
-     * 
-     * @parameter default-value={"eConcepts.jbin"}
-     * @required
+     *
+     * @parameter default-value={"eConcepts.jbin"} @required
      */
     private String[] conceptsFileNames;
     /**
      * rsta file names.
-     * 
+     *
      * @parameter
      */
     private String[] rstaFileNames;
     /**
+     * concepts to generate file names.
+     *
+     * @parameter
+     */
+    private String[] newConceptsFileNames;
+    /**
      * Generated resources directory.
-     * 
+     *
      * @parameter expression="${project.build.directory}/generated-resources"
      */
     private String generatedResources;
     /**
      * Berkeley directory.
-     * 
-     * @parameter expression="${project.build.directory}/berkeley-db"
-     * @required
+     *
+     * @parameter expression="${project.build.directory}/berkeley-db" @required
      */
     private File berkeleyDir;
     /**
-     * 
+     *
      * @parameter default-value=true
      */
     private boolean moveToReadOnly;
     /**
      * Paths to add to initial database.
-     * 
+     *
      * @parameter
      */
     private PathSpec[] initialPaths;
     /**
      * Annotation index concepts
-     * 
+     *
      * @parameter
      */
     private List<ConceptDescriptor> annotationIndexes;
     /**
      * Watch concepts that will be printed to log when encountered.
-     * 
+     *
      * @parameter
      */
     private String[] watchConceptUuids;
@@ -330,6 +337,8 @@ public class LoadBdbMulti extends AbstractMojo {
             loadVariants();
             getLog().info("Loading case sensitive words.");
             loadCaseSensitiveWords();
+            getLog().info("Generating new concepts.");
+            generateNewConcepts();
             getLog().info("Starting db sync.");
             Bdb.sync();
             getLog().info("Finished db sync, starting generate lucene index.");
@@ -352,28 +361,28 @@ public class LoadBdbMulti extends AbstractMojo {
                 reporter.reportDupClasses();
 
             }
-            
-            
-               getLog().info("Testing for Null Components Started.");
 
-                Concept.disableComponentsCRHM();
 
-                NullComponentFinder nullComponentFinder = new NullComponentFinder();
-                Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
-                System.out.println();
+            getLog().info("Testing for Null Components Started.");
 
-                if (nullComponentFinder.getNullComponent().isEmpty()) {
-                    getLog().info("No Null component found.");
-                } else {
-                    nullComponentFinder.writeNullComponentFile();
-                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
-                            + nullComponentFinder.getNullComponent() + "\n");
-                }
-                Concept.enableComponentsCRHM();
-                getLog().info("Testing for Null Components Finished.");
-            
-            
-            
+            Concept.disableComponentsCRHM();
+
+            NullComponentFinder nullComponentFinder = new NullComponentFinder();
+            Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
+            System.out.println();
+
+            if (nullComponentFinder.getNullComponent().isEmpty()) {
+                getLog().info("No Null component found.");
+            } else {
+                nullComponentFinder.writeNullComponentFile();
+                getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
+                        + nullComponentFinder.getNullComponent() + "\n");
+            }
+            Concept.enableComponentsCRHM();
+            getLog().info("Testing for Null Components Finished.");
+
+
+
             Concept.enableComponentsCRHM();
             getLog().info("Starting close.");
             Bdb.close();
@@ -580,6 +589,64 @@ public class LoadBdbMulti extends AbstractMojo {
         }
     }
 
+    // fsn, prefTem, parent(uuid) , make annotation, path, author(uuid)(blank = user) //@afk todo: make parent to be conept spec
+    private void generateNewConcepts() throws IOException, NoSuchAlgorithmException,
+            TerminologyException, InvalidCAB, ContradictionException {
+
+        if (newConceptsFileNames != null) {
+            for (String conceptFile : newConceptsFileNames) {
+                I_ConfigAceFrame config = DefaultConfig.newProfile();
+                int authorNid = Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.USER.getUids());
+                TerminologyStoreDI store = Ts.get();
+
+                BufferedReader conceptsReader = new BufferedReader(new FileReader(conceptFile));
+                String line = conceptsReader.readLine();
+                line = conceptsReader.readLine();
+                while (line != null) {
+                    String[] parts = line.split("\t");
+                    String fsn = parts[0];
+                    String pref = parts[1];
+                    String parent = parts[2];
+                    String path = parts[3];
+                    String makeAnnotation = parts[3];
+                    String author = null;
+                    if (parts.length == 6) {
+                        author = parts[5];
+                        authorNid = store.getNidForUuids(UUID.fromString(author));
+                    }
+                    UUID parentUuid = UUID.fromString(parent);
+                    UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, path);
+
+                    EditCoordinate ec = new EditCoordinate(authorNid, store.getNidForUuids(pathUuid));
+                    TerminologyBuilderBI builder = store.getTerminologyBuilder(ec, config.getViewCoordinate());
+
+                    ConceptCB conceptBp = new ConceptCB(fsn,
+                            pref,
+                            LANG_CODE.EN,
+                            Snomed.IS_A.getLenient().getPrimUuid(),
+                            parentUuid);
+                    List<DescCAB> fsnCABs = conceptBp.getFsnCABs();
+                    List<DescCAB> prefCABs = conceptBp.getPrefCABs();
+                    for (DescCAB f : fsnCABs) {
+                        conceptBp.addFsn(f, LANG_CODE.EN);
+                    }
+
+                    for (DescCAB p : prefCABs) {
+                        conceptBp.addFsn(p, LANG_CODE.EN);
+                    }
+                    ConceptChronicleBI concept = builder.constructIfNotCurrent(conceptBp);
+                    if(makeAnnotation.equalsIgnoreCase("true")){
+                        concept.setAnnotationStyleRefex(true);
+                    }
+                    BdbCommitManager.addUncommitted(concept);
+
+                    line = conceptsReader.readLine();
+                }
+            }
+        }
+
+    }
+
     private interface I_ProcessEConcept extends Runnable {
 
         public void setEConcept(EConcept eConcept) throws Throwable;
@@ -624,7 +691,7 @@ public class LoadBdbMulti extends AbstractMojo {
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see
          * org.ihtsdo.db.bdb.I_ProcessEConcept#setEConcept(org.ihtsdo.etypes
          * .EConcept)

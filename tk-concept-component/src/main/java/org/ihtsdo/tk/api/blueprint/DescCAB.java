@@ -142,7 +142,7 @@ public class DescCAB extends CreateOrAmendBlueprint {
         this.conceptUuid = conceptNewUuid;
     }
     
-    protected void setText(String newText){
+    public void setText(String newText){
         this.text = newText;
     }
 
