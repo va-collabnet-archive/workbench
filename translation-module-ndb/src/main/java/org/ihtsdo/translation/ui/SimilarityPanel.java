@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -41,10 +42,12 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -87,6 +90,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 	private int similarityHitsCount = 0;
 	private int transMemoryHitsCount = 0;
 	private int lingGuidelinesHitsCount = 0;
+	private SimilarityWorker similarityWorker = null;
 
 	public SimilarityPanel() {
 		initComponents();
@@ -242,68 +246,120 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		table2.revalidate();
 	}
 
-	/**
-	 * Update similarity table.
-	 * 
-	 * @param query
-	 *            the query
-	 */
+
 	private void updateSimilarityTable(String query) {
-		List<Integer> types = new ArrayList<Integer>();
-		if (rbFSN.isSelected())
-			types.add(fsn.getConceptNid());
-		else if (rbPref.isSelected())
-			types.add(preferred.getConceptNid());
-		else {
-			types.add(fsn.getConceptNid());
-			types.add(preferred.getConceptNid());
+		if (similarityWorker != null && !similarityWorker.isDone()) {
+			similarityWorker.cancel(true);
+			similarityWorker = null;
+		}
+		similarityWorker = new SimilarityWorker(query);
+		similarityWorker.addPropertyChangeListener(new ProgressListener(progressBar1));
+		similarityWorker.execute();
+	}
+	
+	class SimilarityWorker extends SwingWorker<String, Object[]>{
+		private String query;
+		private DefaultTableModel tableModel;
+		
+		public SimilarityWorker(String query) {
+			super();
+			this.query = query;
 		}
 
-		List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types);
-		setSimilarityHitsCount(results.size());
-		String[] columnNames;
-		columnNames = new String[] { "Source Text", "Target Text", "Status", "Item" };
-		String[][] data = null;
-		DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
-			private static final long serialVersionUID = 1L;
-
-			public boolean isCellEditable(int x, int y) {
-				return false;
+		@Override
+		protected void process(List<Object[]> chunks) {
+			for (Object[] objects : chunks) {
+				tableModel.addRow(objects);
 			}
-		};
-		similarityTable.setModel(tableModel);
-		columnModel = new CustomTableColumnModel();
-		similarityTable.setColumnModel(columnModel);
-		similarityTable.createDefaultColumnsFromModel();
-
-		TableColumn column = columnModel.getColumnByModelIndex(3);
-		columnModel.setColumnVisible(column, false);
-
-		if (results.isEmpty()) {
-			tableModel.addRow(new String[] { query, "No matches found" });
-		} else {
-			for (SimilarityMatchedItem item : results) {
-				I_GetConceptData transStatus = null;
-				try {
-					I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(project, config);
-					LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
-					transStatus = targetLangRefset.getPromotionRefset(config).getPromotionStatus(item.getConceptId(), config);
-				} catch (Exception e) {
-					e.printStackTrace();
+		}
+		
+		@Override
+		protected String doInBackground() throws Exception {
+			updateSimilarityTable();
+			return "DONE";
+		}
+		
+		@Override
+		protected void done() {
+			try {
+				get();
+			} catch (InterruptedException e) {
+			} catch (ExecutionException e) {
+			}
+		}
+		
+		/**
+		 * Update similarity table.
+		 * 
+		 * @param query
+		 *            the query
+		 */
+		private void updateSimilarityTable() {
+			List<Integer> types = new ArrayList<Integer>();
+			if (rbFSN.isSelected())
+				types.add(fsn.getConceptNid());
+			else if (rbPref.isSelected())
+				types.add(preferred.getConceptNid());
+			else {
+				types.add(fsn.getConceptNid());
+				types.add(preferred.getConceptNid());
+			}
+			
+			List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types,this);
+			setSimilarityHitsCount(results.size());
+			String[] columnNames;
+			columnNames = new String[] { "Source Text", "Target Text", "Status", "Item" };
+			String[][] data = null;
+			tableModel = new DefaultTableModel(data, columnNames) {
+				private static final long serialVersionUID = 1L;
+				public boolean isCellEditable(int x, int y) {
+					return false;
 				}
-				String highlightedSourceText = "<html><body>" + item.getSourceText().toLowerCase();
-				
-				for (String word : query.toLowerCase().split("\\W")) {
-					if (!word.isEmpty()) {
-					highlightedSourceText = highlightedSourceText.replace(word, "<font style='background-color: yellow;'>" + word + "</font>");
+			};
+			similarityTable.setModel(tableModel);
+			columnModel = new CustomTableColumnModel();
+			similarityTable.setColumnModel(columnModel);
+			similarityTable.createDefaultColumnsFromModel();
+			
+			TableColumn column = columnModel.getColumnByModelIndex(3);
+			columnModel.setColumnVisible(column, false);
+			
+			if (results.isEmpty()) {
+				tableModel.addRow(new String[] { query, "No matches found" });
+			} else {
+				List<Object[]> partial = new ArrayList<Object[]>();
+				int i = 0;
+				for (SimilarityMatchedItem item : results) {
+					if(isCancelled()){
+						break;
 					}
+					I_GetConceptData transStatus = null;
+					try {
+						I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(project, config);
+						LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
+						transStatus = targetLangRefset.getPromotionRefset(config).getPromotionStatus(item.getConceptId(), config);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					String highlightedSourceText = "<html><body>" + item.getSourceText().toLowerCase();
+					
+					for (String word : query.toLowerCase().split("\\W")) {
+						if (!word.isEmpty()) {
+							highlightedSourceText = highlightedSourceText.replace(word, "<font style='background-color: yellow;'>" + word + "</font>");
+						}
+					}
+					partial.add(new Object[] { highlightedSourceText, item.getTargetText(), transStatus, item });
+					if(i % 10 == 0){
+						process(partial);
+						partial = new ArrayList<Object[]>();
+					}
+					i++;
 				}
-				
-				tableModel.addRow(new Object[] { highlightedSourceText, item.getTargetText(), transStatus, item });
+				process(partial);
 			}
+			
+			similarityTable.revalidate();
 		}
-
-		similarityTable.revalidate();
 	}
 
 	private void searchButtonActionPreformed(ActionEvent e) {
@@ -613,6 +669,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		refinePanel = new JPanel();
 		searchTextField = new JTextField();
 		searchButton = new JButton();
+		progressBar1 = new JProgressBar();
 		scrollPane2 = new JScrollPane();
 		similarityTable = new ZebraJTable();
 		panel13 = new JPanel();
@@ -656,9 +713,9 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				new EmptyBorder(5, 5, 5, 5)));
 			similarityPanel.setLayout(new GridBagLayout());
 			((GridBagLayout)similarityPanel.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)similarityPanel.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+			((GridBagLayout)similarityPanel.getLayout()).rowHeights = new int[] {0, 0, 15, 0, 0, 0};
 			((GridBagLayout)similarityPanel.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 1.0E-4};
+			((GridBagLayout)similarityPanel.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
 
 			//======== panel2 ========
 			{
@@ -729,6 +786,15 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
+			//---- progressBar1 ----
+			progressBar1.setMinimumSize(new Dimension(10, 10));
+			progressBar1.setMaximumSize(new Dimension(32767, 10));
+			progressBar1.setPreferredSize(new Dimension(146, 10));
+			progressBar1.setVisible(false);
+			similarityPanel.add(progressBar1, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 5, 0), 0, 0));
+
 			//======== scrollPane2 ========
 			{
 
@@ -745,7 +811,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				});
 				scrollPane2.setViewportView(similarityTable);
 			}
-			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			similarityPanel.add(scrollPane2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 0), 0, 0));
 
@@ -754,9 +820,9 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				panel13.setBackground(new Color(238, 238, 238));
 				panel13.setLayout(new GridBagLayout());
 				((GridBagLayout)panel13.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
-				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0, 0};
+				((GridBagLayout)panel13.getLayout()).rowHeights = new int[] {0, 0, 10, 0};
 				((GridBagLayout)panel13.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel13.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
 
 				//---- rbFSN ----
 				rbFSN.setText("FSN");
@@ -815,7 +881,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				});
 				panel13.add(expandButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 5), 0, 0));
+					new Insets(0, 0, 5, 5), 0, 0));
 
 				//---- newSimilarityButton ----
 				newSimilarityButton.setText("Open new similarity search");
@@ -827,9 +893,9 @@ public class SimilarityPanel extends JPanel implements Serializable{
 				});
 				panel13.add(newSimilarityButton, new GridBagConstraints(1, 1, 3, 1, 0.0, 0.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 0, 0), 0, 0));
+					new Insets(0, 0, 5, 0), 0, 0));
 			}
-			similarityPanel.add(panel13, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+			similarityPanel.add(panel13, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
@@ -1018,6 +1084,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 	private JPanel refinePanel;
 	private JTextField searchTextField;
 	private JButton searchButton;
+	private JProgressBar progressBar1;
 	private JScrollPane scrollPane2;
 	private ZebraJTable similarityTable;
 	private JPanel panel13;

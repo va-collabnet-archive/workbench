@@ -4,8 +4,12 @@ import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfUser;
 
 public class WfDestinationFilter implements WfSearchFilterBI {
-	private final String TYPE = "WF_DESTIANTION_FILTER";
+	public final String TYPE = "WF_DESTIANTION_FILTER";
 	private WfUser destination;
+	
+	public WfDestinationFilter() {
+		super();
+	}
 
 	public WfDestinationFilter(WfUser destination) {
 		super();

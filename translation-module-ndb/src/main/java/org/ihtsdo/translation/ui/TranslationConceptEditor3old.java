@@ -2768,7 +2768,7 @@ public class TranslationConceptEditor3old extends JPanel {
 				types.add(preferred.getConceptNid());
 			}
 
-		List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types);
+		List<SimilarityMatchedItem> results = LanguageUtil.getSimilarityResults(query, sourceIds, targetId, types,null);
 		String[] columnNames = {"Source Text",
 		"Target Text"};
 		String[][] data = null;

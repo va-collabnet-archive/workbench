@@ -43,6 +43,7 @@ import java.util.UUID;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingWorker;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -352,7 +353,6 @@ public class LanguageUtil {
 				int cnid = Integer.parseInt(doc.get("cnid"));
 				int dnid = Integer.parseInt(doc.get("dnid"));
 				float score = results.topDocs.scoreDocs[i].score;
-
 				I_DescriptionVersioned<?> matchedDescription = tf.getDescription(dnid, cnid);
 				sourceText = matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText();
 
@@ -411,7 +411,7 @@ public class LanguageUtil {
 	 * 
 	 * @return the similarity results
 	 */
-	public static List<SimilarityMatchedItem> getSimilarityResults(String query, List<Integer> sourceLangRefsetIds, int targetLangRefsetId, List<Integer> descTypes) {
+	public static List<SimilarityMatchedItem> getSimilarityResults(String query, List<Integer> sourceLangRefsetIds, int targetLangRefsetId, List<Integer> descTypes, SwingWorker worker) {
 		if (query.contains("(")) {
 			query = query.substring(0, query.indexOf("(") - 1).trim();
 		}
@@ -441,6 +441,9 @@ public class LanguageUtil {
 			// 200 similarity matches cut off - previously
 			// results.topDocs.scoreDocs.length
 			for (int i = 0; i < 500 && matches.size() < 100 && i < results.topDocs.scoreDocs.length; i++) {
+				if(worker != null && worker.isCancelled()){
+					break;
+				}
 				Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
 				String sourceText = "";
 				String targetText = "";
@@ -456,11 +459,17 @@ public class LanguageUtil {
 				ContextualizedDescription sourceDesc = null;
 				boolean isMemberOfSource = false;
 				for (I_ExtendByRef extension : extensions) {
+					if(worker != null && worker.isCancelled()){
+						break;
+					}
 					if (sourceLangRefsetIds.contains(extension.getRefsetId())) {
 						// Is member of language refset
 						extensionUsed = extension;
 						long lastVersion = Long.MIN_VALUE;
 						for (I_ExtendByRefVersion loopTuple : extension.getTuples(config.getConflictResolutionStrategy())) {
+							if(worker != null && worker.isCancelled()){
+								break;
+							}
 							if (loopTuple.getTime() >= lastVersion) {
 								lastVersion = loopTuple.getTime();
 								languageExtensionPart = (I_ExtendByRefPartCid) loopTuple.getMutablePart();
@@ -492,6 +501,9 @@ public class LanguageUtil {
 
 					List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(cnid, targetLangRefsetId, true);
 					for (I_ContextualizeDescription targetDesc : descriptions) {
+						if(worker != null && worker.isCancelled()){
+							break;
+						}
 						targetDescriptionId = null;
 						if (targetDesc.getLanguageExtension() != null) {
 							if (descTypes.contains(fsn) && targetDesc.getTypeId() == fsn && (targetDesc.getAcceptabilityId() == preferred || targetDesc.getAcceptabilityId() == fsn)) {

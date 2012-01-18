@@ -5,13 +5,6 @@
 package org.ihtsdo.translation.ui;
 
 import java.awt.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -97,6 +90,8 @@ import org.ihtsdo.translation.ui.event.ItemDestinationChangedEvent;
 import org.ihtsdo.translation.ui.event.ItemRemovedFromTodoEvent;
 import org.ihtsdo.translation.ui.event.ItemSentToSpecialFolderEvent;
 import org.ihtsdo.translation.ui.event.ItemStateChangedEvent;
+import org.ihtsdo.translation.workflow.filters.WfTargetFsnFilter;
+import org.ihtsdo.translation.workflow.filters.WfTargetPreferredFilter;
 
 public class WfInboxPanel extends JPanel {
 	private static final I_TermFactory tf = Terms.get();
@@ -148,7 +143,7 @@ public class WfInboxPanel extends JPanel {
 				I_GetConceptData userConcept = config.getDbConfig().getUserConcept();
 				user = new WfUser(userConcept.getInitialText(), userConcept.getPrimUuid());
 			}
-			if(user != null){
+			if (user != null) {
 				WfDestinationFilter df = new WfDestinationFilter(user);
 				filterList.put(df.getType(), df);
 			}
@@ -218,9 +213,13 @@ public class WfInboxPanel extends JPanel {
 				Object oldValue = event.getOldInboxItem();
 				if (oldValue != null) {
 					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
-					filterList.remove(oldFilter.getType());
+					if(oldFilter != null){
+						filterList.remove(oldFilter.getType());
+					}
 				}
-				filterList.put(filter.getType(), filter);
+				if (filter != null) {
+					filterList.put(filter.getType(), filter);
+				}
 				model.updatePage(filterList);
 
 			}
@@ -229,6 +228,16 @@ public class WfInboxPanel extends JPanel {
 		mediator.suscribe(EventType.EMPTY_INBOX_ITEM_SELECTED, new EmptyInboxItemSelectedEventHandler<EmptyInboxItemSelectedEvent>(this) {
 			@Override
 			public void handleEvent(EmptyInboxItemSelectedEvent event) {
+				Set<String> keys = filterList.keySet();
+				List<String> filtersToRemove = new ArrayList<String>();
+				for (String string : keys) {
+					if(string != new WfDestinationFilter().getType()){
+						filtersToRemove.add(string);
+					}
+				}
+				for (String string2 : filtersToRemove) {
+					filterList.remove(string2);
+				}
 				model.clearTable();
 			}
 		});
@@ -383,19 +392,35 @@ public class WfInboxPanel extends JPanel {
 			filterList.remove(wfCompFilter.getType());
 		}
 
-		WfState state= null;
-		if(statusFilterCombo.getSelectedItem() instanceof WfState){
-			state =(WfState) statusFilterCombo.getSelectedItem();  
-		}
-	
-		WfStateFilter wfStateFilter  = new WfStateFilter(state);
-
-		if(state != null){
-			filterList.put(wfStateFilter.getType(), wfStateFilter);
+		WfTargetPreferredFilter targetFilter = new WfTargetPreferredFilter("");
+		if(!targetPreferredFilter.getText().trim().equals("")){
+			targetFilter = new WfTargetPreferredFilter(targetPreferredFilter.getText());
+			filterList.put(targetFilter.getType(), targetFilter);
 		}else{
-			filterList.remove(wfStateFilter.getType());
+			filterList.remove(targetFilter.getType());
+		}
+
+		WfTargetFsnFilter fsnFilter = new WfTargetFsnFilter("");
+		if(!targetFsnFilter.getText().trim().equals("")){
+			fsnFilter = new WfTargetFsnFilter(targetFsnFilter.getText());
+			filterList.put(fsnFilter.getType(), fsnFilter);
+		}else{
+			filterList.remove(fsnFilter.getType());
 		}
 		
+		WfState state = null;
+		if (statusFilterCombo.getSelectedItem() instanceof WfState) {
+			state = (WfState) statusFilterCombo.getSelectedItem();
+		}
+
+		WfStateFilter wfStateFilter = new WfStateFilter(state);
+
+		if (state != null) {
+			filterList.put(wfStateFilter.getType(), wfStateFilter);
+		} else {
+			filterList.remove(wfStateFilter.getType());
+		}
+
 	}
 
 	private void inboxTableMouseClicked(MouseEvent e) {
@@ -594,7 +619,7 @@ public class WfInboxPanel extends JPanel {
 	}
 
 	private void expandActionPerformed(ActionEvent e) {
-		
+
 	}
 
 	private void closeInboxActionPerformed(ActionEvent e) {
@@ -693,7 +718,7 @@ public class WfInboxPanel extends JPanel {
 				WorkList workList = wfi.getWorkList();
 				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 				I_Identify nid = Terms.get().getId(wfi.getComponentId());
- 				I_GetConceptData prevStatus = promotionRefset.getPreviousPromotionStatus(nid.getConceptNid(), config);
+				I_GetConceptData prevStatus = promotionRefset.getPreviousPromotionStatus(nid.getConceptNid(), config);
 				WfState prevState = new WfComponentProvider().statusConceptToWfState(prevStatus);
 				WfInstance.updateInstanceState(wfi, prevState);
 				EventMediator.getInstance().fireEvent(new SendBackToInboxEvent(wfi));
@@ -786,40 +811,38 @@ public class WfInboxPanel extends JPanel {
 		removeTagMenuItem = new JMenuItem();
 		backToInbox = new JMenuItem();
 
-		//======== this ========
+		// ======== this ========
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(new BorderLayout(5, 5));
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- progressBar1 ----
+			// ---- progressBar1 ----
 			progressBar1.setVisible(false);
-			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel2.add(progressBar1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel2, BorderLayout.SOUTH);
 
-		//======== splitPanel ========
+		// ======== splitPanel ========
 		{
 			splitPanel.setOrientation(JSplitPane.VERTICAL_SPLIT);
 			splitPanel.setResizeWeight(0.5);
 			splitPanel.setTopComponent(inboxTreePanel1);
 
-			//======== inboxItems ========
+			// ======== inboxItems ========
 			{
 				inboxItems.setLayout(new BorderLayout(5, 5));
 
-				//======== scrollPane1 ========
+				// ======== scrollPane1 ========
 				{
 
-					//---- inboxTable ----
+					// ---- inboxTable ----
 					inboxTable.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -830,25 +853,25 @@ public class WfInboxPanel extends JPanel {
 				}
 				inboxItems.add(scrollPane1, BorderLayout.CENTER);
 
-				//======== panel1 ========
+				// ======== panel1 ========
 				{
 					panel1.setBorder(new EmptyBorder(5, 5, 5, 5));
 					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {35, 0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {15, 6, 0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0, 0.0, 1.0E-4};
+					((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 35, 0, 0, 0 };
+					((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 15, 6, 0, 0, 0 };
+					((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 1.0E-4 };
+					((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0, 0.0, 1.0E-4 };
 
-					//======== panel6 ========
+					// ======== panel6 ========
 					{
 						panel6.setLayout(new BoxLayout(panel6, BoxLayout.X_AXIS));
 
-						//---- separator2 ----
+						// ---- separator2 ----
 						separator2.setMaximumSize(new Dimension(40, 10));
 						separator2.setPreferredSize(new Dimension(35, 12));
 						panel6.add(separator2);
 
-						//---- label5 ----
+						// ---- label5 ----
 						label5.setText("+ Detache");
 						label5.setForeground(new Color(0, 0, 204));
 						label5.setVerticalAlignment(SwingConstants.TOP);
@@ -866,111 +889,83 @@ public class WfInboxPanel extends JPanel {
 						});
 						panel6.add(label5);
 
-						//---- separator3 ----
+						// ---- separator3 ----
 						separator3.setMaximumSize(new Dimension(32767, 10));
 						panel6.add(separator3);
 					}
-					panel1.add(panel6, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(panel6, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-					//======== filterPanel ========
+					// ======== filterPanel ========
 					{
 						filterPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 						filterPanel.setLayout(new BorderLayout(5, 5));
 
-						//======== panel3 ========
+						// ======== panel3 ========
 						{
 							panel3.setLayout(new GridBagLayout());
-							((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0};
-							((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0, 0};
-							((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {1.0, 1.0, 1.0, 1.0, 1.0E-4};
-							((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
+							((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0 };
+							((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0, 0 };
+							((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0E-4 };
+							((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 
-							//---- label4 ----
+							// ---- label4 ----
 							label4.setText("Source preferred");
-							panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label2 ----
+							// ---- label2 ----
 							label2.setText("Target preferred");
-							panel3.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label3 ----
+							// ---- label3 ----
 							label3.setText("Target FSN");
-							panel3.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+							panel3.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
-							//---- label6 ----
+							// ---- label6 ----
 							label6.setText("Status");
-							panel3.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
-							panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetPreferredFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetFsnFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(statusFilterCombo, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 0, 0), 0, 0));
+							panel3.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+							panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(targetPreferredFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(targetFsnFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+							panel3.add(statusFilterCombo, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						filterPanel.add(panel3, BorderLayout.CENTER);
 
-						//======== panel5 ========
+						// ======== panel5 ========
 						{
 							panel5.setLayout(new GridBagLayout());
-							((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 0, 0};
-							((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
-							((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
-							((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+							((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+							((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0 };
+							((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+							((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
-							//---- filterButton ----
+							// ---- filterButton ----
 							filterButton.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent e) {
 									filterButtonActionPerformed(e);
 								}
 							});
-							panel5.add(filterButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.EAST, GridBagConstraints.NONE,
-								new Insets(0, 0, 0, 5), 0, 0));
+							panel5.add(filterButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
 
-							//---- removeFilters ----
+							// ---- removeFilters ----
 							removeFilters.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(ActionEvent e) {
 									removeFiltersActionPerformed(e);
 								}
 							});
-							panel5.add(removeFilters, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 0, 0), 0, 0));
+							panel5.add(removeFilters, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						filterPanel.add(panel5, BorderLayout.SOUTH);
 					}
-					panel1.add(filterPanel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(filterPanel, new GridBagConstraints(0, 1, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-					//---- label1 ----
+					// ---- label1 ----
 					label1.setText("Current item:");
-					panel1.add(label1, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-					panel1.add(currentTranslationItem, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+					panel1.add(label1, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+					panel1.add(currentTranslationItem, new GridBagConstraints(2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
-					//---- checkBox1 ----
+					// ---- checkBox1 ----
 					checkBox1.setText("Automatically open next item in inbox after finishing with current item");
 					checkBox1.addActionListener(new ActionListener() {
 						@Override
@@ -978,9 +973,7 @@ public class WfInboxPanel extends JPanel {
 							checkBox1ActionPerformed(e);
 						}
 					});
-					panel1.add(checkBox1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+					panel1.add(checkBox1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 				}
 				inboxItems.add(panel1, BorderLayout.NORTH);
 			}
@@ -988,15 +981,15 @@ public class WfInboxPanel extends JPanel {
 		}
 		add(splitPanel, BorderLayout.CENTER);
 
-		//======== panel4 ========
+		// ======== panel4 ========
 		{
 			panel4.setLayout(new GridBagLayout());
-			((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0};
-			((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+			((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0 };
+			((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0E-4 };
+			((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			//---- closeInbox ----
+			// ---- closeInbox ----
 			closeInbox.setText("Close");
 			closeInbox.addActionListener(new ActionListener() {
 				@Override
@@ -1004,11 +997,9 @@ public class WfInboxPanel extends JPanel {
 					closeInboxActionPerformed(e);
 				}
 			});
-			panel4.add(closeInbox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 5), 0, 0));
+			panel4.add(closeInbox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
-			//---- sendToOutbox ----
+			// ---- sendToOutbox ----
 			sendToOutbox.setText("Send");
 			sendToOutbox.addActionListener(new ActionListener() {
 				@Override
@@ -1016,20 +1007,18 @@ public class WfInboxPanel extends JPanel {
 					sendToOutboxActionPerformed(e);
 				}
 			});
-			panel4.add(sendToOutbox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			panel4.add(sendToOutbox, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel4, BorderLayout.NORTH);
 
-		//======== popupMenu1 ========
+		// ======== popupMenu1 ========
 		{
 
-			//======== menu2 ========
+			// ======== menu2 ========
 			{
 				menu2.setText("Tag");
 
-				//---- createNewTag ----
+				// ---- createNewTag ----
 				createNewTag.setText("new tag");
 				createNewTag.addActionListener(new ActionListener() {
 					@Override
@@ -1042,7 +1031,7 @@ public class WfInboxPanel extends JPanel {
 			}
 			popupMenu1.add(menu2);
 
-			//---- removeTagMenuItem ----
+			// ---- removeTagMenuItem ----
 			removeTagMenuItem.setText("Remove Tag");
 			removeTagMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -1052,7 +1041,7 @@ public class WfInboxPanel extends JPanel {
 			});
 			popupMenu1.add(removeTagMenuItem);
 
-			//---- backToInbox ----
+			// ---- backToInbox ----
 			backToInbox.setText("Send back to inbox");
 			backToInbox.setEnabled(false);
 			backToInbox.addActionListener(new ActionListener() {
