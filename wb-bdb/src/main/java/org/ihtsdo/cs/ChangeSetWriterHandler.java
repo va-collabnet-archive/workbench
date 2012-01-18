@@ -77,11 +77,17 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
         writerListForHandler = new ArrayList<ChangeSetGeneratorBI>(writerMap.values());
         if (writeCommitRecord) {
             commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
-            int firstSapNid = sapNidsFromCommit.getMin();
-            int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-            this.commitRecordSapNid = Bdb.getSapNid(statusNid, Bdb.getSapDb().getAuthorNid(firstSapNid),
-                Bdb.getSapDb().getPathNid(firstSapNid),
-                commitTime);
+            for (int sapNid : sapNidsFromCommit.getSetValues()) {
+                if (Bdb.getSapDb().getAuthorNid(sapNid) != Integer.MIN_VALUE
+                        && Bdb.getSapDb().getPathNid(sapNid) != Integer.MIN_VALUE) {
+                    int statusNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+                    this.commitRecordSapNid = Bdb.getSapNid(statusNid, Bdb.getSapDb().getAuthorNid(sapNid),
+                            Bdb.getSapDb().getPathNid(sapNid),
+                            commitTime);
+                    break;
+                }
+            }
+            
         }
     }
 
@@ -169,7 +175,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     for (int i = 0; i < arrayOfAuthorTime.length; i++) {
                         arrayOfAuthorTime[i] = authorTimeHashItr.next();
                     }
-                    
+
                     ArrayOfBytearrayMember newCommitRecord = new ArrayOfBytearrayMember();
                     UUID primoridalUuid = UUID.randomUUID();
                     newCommitRecord.nid = Bdb.uuidToNid(primoridalUuid);
@@ -180,8 +186,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
                     newCommitRecord.referencedComponentNid = c.getConceptNid();
                     newCommitRecord.setArrayOfByteArray(arrayOfAuthorTime);
                     newCommitRecord.primordialSapNid = this.commitRecordSapNid;
-                    
-                    c.addAnnotation(newCommitRecord); 
+
+                    c.addAnnotation(newCommitRecord);
                     Bdb.getConceptDb().writeConcept(c);
                 }
             }
