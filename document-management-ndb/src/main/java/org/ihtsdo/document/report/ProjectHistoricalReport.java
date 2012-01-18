@@ -62,12 +62,25 @@ public class ProjectHistoricalReport implements I_Report {
 		FileReader input;
 		CSVReader reader;
 		File excelRep = new File("reports/templates/project_history_report.xls");
+		File reportCopy = null;
 		try {
 			input = new FileReader(csvFile);
 			reader = new CSVReader(input, '|');
 			if (excelRep.exists()) {
-				Workbook wb = ExcelReportUtil.readFile(excelRep);
-				FileOutputStream out = new FileOutputStream(excelRep);
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
+				Date date = new Date();
+				reportCopy = new File("reports/" + sdf.format(date) + "_project_history_report.xls");
+				
+				try {
+					ExcelReportUtil.copyFile(excelRep, reportCopy);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw e;
+				}
+				
+				Workbook wb = ExcelReportUtil.readFile(reportCopy);
+				FileOutputStream out = new FileOutputStream(reportCopy);
 
 				wb.removeSheetAt(1);
 				wb.createSheet("Data");
@@ -133,16 +146,6 @@ public class ProjectHistoricalReport implements I_Report {
 			throw e;
 		}
 		
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
-		Date date = new Date();
-		File reportCopy = new File("reports/" + sdf.format(date) + "_project_history_report.xls");
-		
-		try {
-			ExcelReportUtil.copyFile(excelRep, reportCopy);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw e;
-		}
 		return reportCopy;
 	}
 

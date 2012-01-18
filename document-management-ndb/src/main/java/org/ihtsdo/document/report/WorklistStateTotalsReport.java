@@ -237,12 +237,26 @@ public class WorklistStateTotalsReport implements I_Report {
 		FileReader input;
 		CSVReader reader;
 		File excelRep = new File("reports/templates/worklist_state_totals.xls");
+		File reportCopy = null;
 		try {
 			input = new FileReader(csvFile);
 			reader = new CSVReader(input, '|');
 			if (excelRep.exists()) {
-				Workbook wb = ExcelReportUtil.readFile(excelRep);
-				FileOutputStream out = new FileOutputStream(excelRep);
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
+				Date date = new Date();
+				reportCopy = new File("reports/" + sdf.format(date)
+						+ "_worklist_state_totals.xls");
+
+				try {
+					ExcelReportUtil.copyFile(excelRep, reportCopy);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw e;
+				}
+				
+				Workbook wb = ExcelReportUtil.readFile(reportCopy);
+				FileOutputStream out = new FileOutputStream(reportCopy);
 
 				wb.removeSheetAt(1);
 				wb.createSheet("Data");
@@ -310,18 +324,6 @@ public class WorklistStateTotalsReport implements I_Report {
 				out.close();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-hh-mm");
-		Date date = new Date();
-		File reportCopy = new File("reports/" + sdf.format(date)
-				+ "_worklist_state_totals.xls");
-
-		try {
-			ExcelReportUtil.copyFile(excelRep, reportCopy);
-		} catch (IOException e) {
 			e.printStackTrace();
 			throw e;
 		}
