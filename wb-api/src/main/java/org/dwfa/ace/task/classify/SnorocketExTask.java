@@ -128,6 +128,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     private static int workbenchAuxPath = Integer.MIN_VALUE;
     private static int snorocketAuthorNid = Integer.MIN_VALUE;
     // NID SETS
+    NidSet equivalentSet = new NidSet();
     I_IntSet statusSet = null;
     PositionSetReadOnly cViewPosSet = null;
     PositionSetReadOnly cEditPosSet = null;
@@ -226,8 +227,14 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
         @Override
         public void equivalent(ArrayList<Integer> equivalentConcepts) {
+            if (equivalentConcepts != null) {
+            for (Integer eqNid: equivalentConcepts) {
+                equivalentSet.add(eqNid);
+            }
+            
             SnoQuery.equivCon.add(new SnoConGrp(equivalentConcepts));
             countConSet += 1;
+            }
         }
     }
 
@@ -297,7 +304,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
             config = tf.getActiveAceFrameConfig();
             precedence = config.getPrecedence();
             contradictionMgr = config.getConflictResolutionStrategy();
-
+            equivalentSet = new NidSet();
             SnoQuery.initAll();
 
             if (setupCoreNids().equals(Condition.STOP)) {
@@ -659,9 +666,13 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
             ViewCoordinate vc = config.getViewCoordinate();
             IsaCoordinate isac = vc.getIsaCoordinates().iterator().next();
             for (SnoRel r: cRocketSnoRels) {
+                if (equivalentSet.contains(r.c1Id)) {
+                    System.out.println("EQ REL: " + r);
+                }
                 if (c1Nid == null) {
                     c1Nid = r.c1Id;
                 } else if (r.c1Id != c1Nid) {
+                    
                     ts.addInferredParents(vc, isac, c1Nid, parents.getSetValues()); 
                     c1Nid = r.c1Id;
                     parents = new NidSet();

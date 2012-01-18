@@ -87,7 +87,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>, C extends ConceptC
                     }
                 }
                 try {
-                    conceptComponent.merge(factory.create(enclosingConcept, input));
+                    conceptComponent.merge(factory.create(enclosingConcept, input), false);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -105,7 +105,7 @@ public class ConceptComponentBinder<V extends Revision<V, C>, C extends ConceptC
                             }
                         }
                     } else {
-                        conceptComponent.merge(factory.create(enclosingConcept, input));
+                        conceptComponent.merge(factory.create(enclosingConcept, input), false);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

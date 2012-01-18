@@ -186,6 +186,69 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
     }
 
+    public ConceptComponent<R, C> merge(C another, boolean notify) {
+        Set<Integer> versionSapNids = getVersionSapNids();
+
+        // merge versions
+        for (ConceptComponent<R, C>.Version v : another.getVersions()) {
+            if ((v.getSapNid() != -1) && !versionSapNids.contains(v.getSapNid())) {
+                if (notify) {
+                    addRevision((R) v.getRevision());
+                } else {
+                    addRevision((R) v.getRevision(), false);
+                }
+                
+            }
+        }
+
+        Set<Integer> identifierSapNids = getIdSapNids();
+
+        // merge identifiers
+        if (another.additionalIdVersions != null) {
+            if (this.additionalIdVersions == null) {
+                this.additionalIdVersions = another.additionalIdVersions;
+            } else {
+                for (IdentifierVersion idv : another.additionalIdVersions) {
+                    if ((idv.getSapNid() != -1) && !identifierSapNids.contains(idv.getSapNid())) {
+                        this.additionalIdVersions.add(idv);
+                    }
+                }
+            }
+        }
+
+        Set<Integer> annotationSapNids = getAnnotationSapNids();
+
+        // merge annotations
+        if (another.annotations != null) {
+            if (this.annotations == null) {
+                this.annotations = another.annotations;
+            } else {
+                HashMap<Integer, RefsetMember<?, ?>> anotherAnnotationMap = new HashMap<Integer, RefsetMember<?, ?>>();
+
+                for (RefexChronicleBI annotation : another.annotations) {
+                    anotherAnnotationMap.put(annotation.getNid(), (RefsetMember<?, ?>) annotation);
+                }
+
+                for (RefsetMember annotation : this.annotations) {
+                    RefsetMember<?, ?> anotherAnnotation = anotherAnnotationMap.remove(annotation.getNid());
+
+                    if (anotherAnnotation != null) {
+                        for (RefsetMember.Version annotationVersion : anotherAnnotation.getVersions()) {
+                            if ((annotationVersion.getSapNid() != -1)
+                                    && !annotationSapNids.contains(annotationVersion.getSapNid())) {
+                                annotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
+                            }
+                        }
+                    }
+                }
+
+                this.annotations.addAll(anotherAnnotationMap.values());
+            }
+        }
+
+        return this;
+    }
+
     //~--- enums ---------------------------------------------------------------
     public enum IDENTIFIER_PART_TYPES {
 
@@ -326,6 +389,11 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
     @SuppressWarnings("unchecked")
     public final boolean addRevision(R r) {
+        return addRevision(r, true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public final boolean addRevision(R r, boolean notify) {
         assert r != null;
 
         boolean returnValue;
@@ -341,9 +409,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         }
 
         r.primordialComponent = (C) this;
-        c.modified();
+        if (notify) {
+            c.modified();
+        }
         clearVersions();
-        addRevisionHook(returnValue, r);
+        if (notify) {
+            addRevisionHook(returnValue, r);
+        }
         return returnValue;
     }
     
@@ -740,61 +812,8 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     }
 
     public ConceptComponent<R, C> merge(C another) throws IOException {
-        Set<Integer> versionSapNids = getVersionSapNids();
 
-        // merge versions
-        for (ConceptComponent<R, C>.Version v : another.getVersions()) {
-            if ((v.getSapNid() != -1) && !versionSapNids.contains(v.getSapNid())) {
-                addRevision((R) v.getRevision());
-            }
-        }
-
-        Set<Integer> identifierSapNids = getIdSapNids();
-
-        // merge identifiers
-        if (another.additionalIdVersions != null) {
-            if (this.additionalIdVersions == null) {
-                this.additionalIdVersions = another.additionalIdVersions;
-            } else {
-                for (IdentifierVersion idv : another.additionalIdVersions) {
-                    if ((idv.getSapNid() != -1) && !identifierSapNids.contains(idv.getSapNid())) {
-                        this.additionalIdVersions.add(idv);
-                    }
-                }
-            }
-        }
-
-        Set<Integer> annotationSapNids = getAnnotationSapNids();
-
-        // merge annotations
-        if (another.annotations != null) {
-            if (this.annotations == null) {
-                this.annotations = another.annotations;
-            } else {
-                HashMap<Integer, RefsetMember<?, ?>> anotherAnnotationMap = new HashMap<Integer, RefsetMember<?, ?>>();
-
-                for (RefexChronicleBI annotation : another.annotations) {
-                    anotherAnnotationMap.put(annotation.getNid(), (RefsetMember<?, ?>) annotation);
-                }
-
-                for (RefsetMember annotation : this.annotations) {
-                    RefsetMember<?, ?> anotherAnnotation = anotherAnnotationMap.remove(annotation.getNid());
-
-                    if (anotherAnnotation != null) {
-                        for (RefsetMember.Version annotationVersion : anotherAnnotation.getVersions()) {
-                            if ((annotationVersion.getSapNid() != -1)
-                                    && !annotationSapNids.contains(annotationVersion.getSapNid())) {
-                                annotation.addVersion((I_ExtendByRefPart) annotationVersion.getRevision());
-                            }
-                        }
-                    }
-                }
-
-                this.annotations.addAll(anotherAnnotationMap.values());
-            }
-        }
-
-        return this;
+        return merge(another, true);
     }
 
     /**
