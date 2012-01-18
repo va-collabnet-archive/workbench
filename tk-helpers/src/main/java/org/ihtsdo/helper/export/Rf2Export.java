@@ -101,40 +101,40 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         this.excludedRefsetIds = excludedRefsetIds;
 
         File conceptsFile = new File(directory,
-                "sct2_Concept_" + releaseType.suffix + "_"
+                "sct2_Concept_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descriptionsFile = new File(directory,
-                "sct2_Description_" + releaseType.suffix + "-"
+                "sct2_Description_UUID_" + releaseType.suffix + "-"
                 + language.getFormatedLanguageCode() + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsFile = new File(directory,
-                "sct2_Relationship_" + releaseType.suffix + "_"
+                "sct2_Relationship_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File identifiersFile = new File(directory,
-                "sct2_Identifier_" + releaseType.suffix + "_"
+                "sct2_Identifier_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File conRefsetsFile = new File(directory,
-                "sct2_ConceptRefset_" + releaseType.suffix + "_"
+                "sct2_ConceptRefset_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File conConRefsetsFile = new File(directory,
-                "sct2_ConceptConceptRefset_" + releaseType.suffix + "_"
+                "sct2_ConceptConceptRefset_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File conConConRefsetsFile = new File(directory,
-                "sct2_ConceptConceptConceptRefset_" + releaseType.suffix + "_"
+                "sct2_ConceptConceptConceptRefset_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File conConStrRefsetsFile = new File(directory,
-                "sct2_ConceptConceptStringRefset_" + releaseType.suffix + "_"
+                "sct2_ConceptConceptStringRefset_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File stringRefsetsFile = new File(directory,
-                "sct2_StringRefset_" + releaseType.suffix + "_"
+                "sct2_StringRefset_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
@@ -434,7 +434,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
                     switch (field) {
                         case IDENTIFIER_SCHEME_ID:
-                            identifiersWriter.write(uuidIdScheme + field.seperator);
+                            identifiersWriter.write(uuidIdScheme.getLenient().getPrimUuid() + field.seperator);
 
                             break;
 
@@ -543,7 +543,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACTIVE:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getStatusNid()) + field.seperator);
+                        conRefsetsWriter.write(store.getComponent(r.getStatusNid()).getPrimUuid() + field.seperator);
 
                         break;
 
@@ -553,17 +553,17 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case REFSET_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCollectionNid()) + field.seperator);
+                        conRefsetsWriter.write(store.getComponent(r.getCollectionNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getReferencedComponentNid()) + field.seperator);
+                        conRefsetsWriter.write(store.getComponent(r.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid1()) + field.seperator);
+                        conRefsetsWriter.write(store.getComponent(r.getCnid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -576,42 +576,42 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             for (Rf2File.ConConRefsetFileFields field : Rf2File.ConConRefsetFileFields.values()) {
                 switch (field) {
                     case ID:
-                        conRefsetsWriter.write(r.getPrimUuid() + field.seperator);
+                        conConRefsetsWriter.write(r.getPrimUuid() + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        conRefsetsWriter.write(effectiveDateString + field.seperator);
+                        conConRefsetsWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getStatusNid()) + field.seperator);
+                        conConRefsetsWriter.write(store.getComponent(r.getStatusNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(namespace + field.seperator);
+                        conConRefsetsWriter.write(namespace + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCollectionNid()) + field.seperator);
+                        conConRefsetsWriter.write(store.getComponent(r.getCollectionNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getReferencedComponentNid()) + field.seperator);
+                        conConRefsetsWriter.write(store.getComponent(r.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT1:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid1()) + field.seperator);
+                        conConRefsetsWriter.write(store.getComponent(r.getCnid1()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT2:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid2()) + field.seperator);
+                        conConRefsetsWriter.write(store.getComponent(r.getCnid2()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -624,47 +624,47 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             for (Rf2File.ConConConRefsetFileFields field : Rf2File.ConConConRefsetFileFields.values()) {
                 switch (field) {
                     case ID:
-                        conRefsetsWriter.write(r.getPrimUuid() + field.seperator);
+                        conConConRefsetsWriter.write(r.getPrimUuid() + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        conRefsetsWriter.write(effectiveDateString + field.seperator);
+                        conConConRefsetsWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getStatusNid()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getStatusNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(namespace + field.seperator);
+                        conConConRefsetsWriter.write(namespace + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCollectionNid()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getCollectionNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getReferencedComponentNid()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT1:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid1()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getCnid1()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT2:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid2()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getCnid2()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT3:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid3()) + field.seperator);
+                        conConConRefsetsWriter.write(store.getComponent(r.getCnid3()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -677,47 +677,47 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             for (Rf2File.ConConStrRefsetFileFields field : Rf2File.ConConStrRefsetFileFields.values()) {
                 switch (field) {
                     case ID:
-                        conRefsetsWriter.write(r.getPrimUuid() + field.seperator);
+                        conConStrRefsetsWriter.write(r.getPrimUuid() + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        conRefsetsWriter.write(effectiveDateString + field.seperator);
+                        conConStrRefsetsWriter.write(effectiveDateString + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getStatusNid()) + field.seperator);
+                        conConStrRefsetsWriter.write(store.getComponent(r.getStatusNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        conRefsetsWriter.write(namespace + field.seperator);
+                        conConStrRefsetsWriter.write(namespace + field.seperator);
 
                         break;
 
                     case REFSET_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCollectionNid()) + field.seperator);
+                        conConStrRefsetsWriter.write(store.getComponent(r.getCollectionNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getReferencedComponentNid()) + field.seperator);
+                        conConStrRefsetsWriter.write(store.getComponent(r.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT1:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid1()) + field.seperator);
+                        conConStrRefsetsWriter.write(store.getComponent(r.getCnid1()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case CONCEPT2:
-                        conRefsetsWriter.write(store.getUuidsForNid(r.getCnid2()) + field.seperator);
+                        conConStrRefsetsWriter.write(store.getComponent(r.getCnid2()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case STRING:
-                        conRefsetsWriter.write(r.getStr1() + field.seperator);
+                        conConStrRefsetsWriter.write(r.getStr1() + field.seperator);
 
                         break;
                 }
@@ -740,7 +740,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACTIVE:
-                        stringRefsetsWriter.write(store.getUuidsForNid(r.getStatusNid()) + field.seperator);
+                        stringRefsetsWriter.write(store.getComponent(r.getStatusNid()).getPrimUuid() + field.seperator);
 
                         break;
 
@@ -750,12 +750,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case REFSET_ID:
-                        stringRefsetsWriter.write(store.getUuidsForNid(r.getCollectionNid()) + field.seperator);
+                        stringRefsetsWriter.write(store.getComponent(r.getCollectionNid()).getPrimUuid() + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        stringRefsetsWriter.write(store.getUuidsForNid(r.getReferencedComponentNid()) + field.seperator);
+                        stringRefsetsWriter.write(store.getComponent(r.getReferencedComponentNid()).getPrimUuid() + field.seperator);
 
                         break;
 

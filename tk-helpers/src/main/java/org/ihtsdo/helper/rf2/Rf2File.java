@@ -163,6 +163,20 @@ public class Rf2File {
       }
    }
    
+   public enum UuidToSctMapFileFields {
+      SCT("sctId", "\t"), UUID("uuid", "\n");
+
+      public final String headerText;
+      public final String seperator;
+
+      //~--- constructors -----------------------------------------------------
+
+      private UuidToSctMapFileFields(String headerText, String seperator) {
+         this.headerText = headerText;
+         this.seperator = seperator;
+      }
+   }
+   
    public enum ReleaseType {
       DELTA("Delta"), FULL("Full"), SNAPSHOT("Snapshot");
 

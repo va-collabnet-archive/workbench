@@ -20,9 +20,19 @@ package org.ihtsdo.country;
  * @author kec
  */
 public enum COUNTRY_CODE {
-    US, ZZ;
+    AU, CA, CY, DK, EE, ES, GB,
+    IS, LT, MT, NL, NZ,
+    PL, SE, SG, SK, SI, US, ZZ;
     
     public String getFormatedCountryCode() {
-        return US.name();
+        String result = "";
+        String name = this.name();
+        String[] nameArray = name.split("_");
+        if (nameArray.length == 1) {
+            result = nameArray[0].toLowerCase();
+        } else if (nameArray.length == 2) {
+            result = nameArray[0].toLowerCase() + "-" + nameArray[1].toUpperCase();
+        }
+        return result;
     }
 }

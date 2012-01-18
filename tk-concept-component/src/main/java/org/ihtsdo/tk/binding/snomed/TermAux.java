@@ -41,4 +41,7 @@ public class TermAux {
     public static ConceptSpec REL_OPTIONALLY_REFINABLE =
             new ConceptSpec("optional (refinability type)",
             UUID.fromString("c3d997d3-b0a4-31f8-846f-03fa874f5479"));
+    public static ConceptSpec SCT_ID_AUTHORITY =
+            new ConceptSpec("SNOMED integer id",
+            UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9"));
 }

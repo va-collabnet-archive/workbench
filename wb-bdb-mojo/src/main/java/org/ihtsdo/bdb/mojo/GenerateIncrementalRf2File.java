@@ -27,6 +27,7 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
 import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.helper.transform.UuidToSctIdMapper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
@@ -89,6 +90,18 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @parameter @required
      */
     private String effectiveDate;
+    /**
+     * Project ID namespace, as SCT id
+     *
+     * @parameter @required
+     */
+    private String namespace;
+    /**
+     * country code
+     *
+     * @parameter @required
+     */
+    private COUNTRY_CODE countryCode;
     /**
      * Refsets to exclude
      * 
@@ -162,15 +175,22 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
                         LANG_CODE.EN,
-                        COUNTRY_CODE.ZZ,
-                        startDate, new Date(TimeHelper.getTimeFromString(effectiveDate, 
-                        TimeHelper.getFileDateFormat())), sapsToWrite.getAsSet(),
+                        countryCode,
+                        namespace,
+                        new Date(TimeHelper.getTimeFromString(effectiveDate, 
+                        TimeHelper.getFileDateFormat())),
+                        sapsToWrite.getAsSet(),
                         vc.getVcWithAllStatusValues(),
                         excludedRefsetIds.getAsSet(),
                         allConcepts);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.close();
             }
+            
+            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, output);
+            mapper.map();
+            mapper.close();
+            
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
