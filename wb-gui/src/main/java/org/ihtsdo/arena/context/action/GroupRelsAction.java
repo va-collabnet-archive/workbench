@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.PathBI;
@@ -76,7 +75,7 @@ public class GroupRelsAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI targetAnalog = (RelationshipAnalogBI) targetRel.makeAnalog(
                             targetRel.getStatusNid(),
-                            targetRel.getAuthorNid(),
+                            config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                     targetAnalog.setGroup(groupNumber);
@@ -90,7 +89,7 @@ public class GroupRelsAction extends AbstractAction {
                 for (PathBI ep : config.getEditingPathSet()) {
                     RelationshipAnalogBI sourceAnalog = (RelationshipAnalogBI) sourceRel.makeAnalog(
                             sourceRel.getStatusNid(),
-                            sourceRel.getAuthorNid(),
+                            config.getDbConfig().getUserConcept().getNid(),
                             ep.getConceptNid(),
                             Long.MAX_VALUE);
                     sourceAnalog.setGroup(groupNumber);

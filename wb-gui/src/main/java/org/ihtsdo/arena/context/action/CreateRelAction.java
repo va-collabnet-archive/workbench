@@ -54,7 +54,8 @@ public class CreateRelAction extends AbstractAction {
                     Long.MAX_VALUE);
 
             while (pathItr.hasNext()) {
-                newRel.makeAnalog(newRel.getStatusNid(), newRel.getAuthorNid(), pathItr.next().getConceptNid(), Long.MAX_VALUE);
+                newRel.makeAnalog(newRel.getStatusNid(), config.getDbConfig().getUserConcept().getNid(), 
+                        pathItr.next().getConceptNid(), Long.MAX_VALUE);
             }
             Terms.get().addUncommitted(originConcept);
 
