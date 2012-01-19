@@ -3119,9 +3119,9 @@ import org.ihtsdo.translation.ui.ConfigTranslationModule.TreeComponent;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			if (config==null)
-				issueListPanel=new IssuesListPanel2();
+				issueListPanel=new IssuesListPanel2(false);
 			else
-				issueListPanel=new IssuesListPanel2(config);
+				issueListPanel=new IssuesListPanel2(config,false);
 
 			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
 					GridBagConstraints.CENTER, GridBagConstraints.BOTH,

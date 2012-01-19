@@ -82,6 +82,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
@@ -180,6 +182,8 @@ public class TranslationPanel extends JPanel {
 	private I_GetConceptData Snomed_Isa;
 	private int inferred;
 	private WfAction cancAction;
+	
+	private boolean targetTextChanged;
 
 	/**
 	 * Instantiates a new translation concept editor.
@@ -219,6 +223,21 @@ public class TranslationPanel extends JPanel {
 		cmbTarComm.addItem(REFSET_COMMENT_NAME);
 		cmbTarComm.addItem(WORKLIST_COMMENT_NAME);
 
+		targetTextField.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				targetTextChanged = true;
+			}
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				targetTextChanged = true;
+			}
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+				targetTextChanged = true;
+			}
+		});
+		
 		label10.setIcon(IconUtilities.helpIcon);
 		label10.setText("");
 		label12.setIcon(IconUtilities.helpIcon);
@@ -233,8 +252,8 @@ public class TranslationPanel extends JPanel {
 
 		// bDescIssue.setEnabled(false);
 		DefaultComboBoxModel comboBoxModel = new DefaultComboBoxModel();
-		comboBoxModel.addElement(fsn);
 		comboBoxModel.addElement(synonym);
+		comboBoxModel.addElement(fsn);
 
 		comboBox1.setModel(comboBoxModel);
 		comboBox1.setSelectedIndex(1);
@@ -259,7 +278,7 @@ public class TranslationPanel extends JPanel {
 		mAddDesc.setEnabled(true && !readOnlyMode);
 		mAddPref.setEnabled(true && !readOnlyMode);
 		label4.setVisible(false);
-
+		
 		tabSou.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tabSou.setModel(new DefaultTableModel());
@@ -592,6 +611,10 @@ public class TranslationPanel extends JPanel {
 		this.readOnlyMode = readOnly;
 		rbInact.setEnabled(true && !readOnlyMode);
 		rbYes.setEnabled(true && !readOnlyMode);
+		bLaunch.setEnabled(true && !readOnlyMode);
+		cmbActions.setEnabled(true && !readOnlyMode);
+		bAddComent.setEnabled(true && !readOnlyMode);
+		cmbTarComm.setEnabled(true && !readOnlyMode);
 	}
 
 	/**
@@ -802,8 +825,9 @@ public class TranslationPanel extends JPanel {
 			config = Terms.get().getActiveAceFrameConfig();
 			ConfigTranslationModule confTransMod = LanguageUtil.getTranslationConfig(config);
 			System.out.println(confTransMod.isEnableSpellChecker());
-			if (confTransMod.isEnableSpellChecker()) {
+			if (confTransMod.isEnableSpellChecker() && targetTextChanged) {
 				targetTextField.setText(DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config)));
+				targetTextChanged = false;
 			}
 
 			if (descriptionInEditor == null && !targetTextField.getText().trim().equals("") && rbAct.isSelected() ) {
@@ -1411,7 +1435,6 @@ public class TranslationPanel extends JPanel {
 		label15 = new JLabel();
 		label16 = new JLabel();
 		label10 = new JLabel();
-		panel10 = new JPanel();
 		splitPane2 = new JSplitPane();
 		splitPane4 = new JSplitPane();
 		panel9 = new JPanel();
@@ -1480,11 +1503,7 @@ public class TranslationPanel extends JPanel {
 
 		//======== this ========
 		setBackground(new Color(238, 238, 238));
-		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {0, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {35, 0, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+		setLayout(new BorderLayout());
 
 		//======== panel1 ========
 		{
@@ -1657,472 +1676,455 @@ public class TranslationPanel extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, BorderLayout.NORTH);
 
-		//======== panel10 ========
+		//======== splitPane2 ========
 		{
-			panel10.setLayout(new GridBagLayout());
-			((GridBagLayout)panel10.getLayout()).columnWidths = new int[] {0, 0};
-			((GridBagLayout)panel10.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel10.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-			((GridBagLayout)panel10.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+			splitPane2.setToolTipText("Drag to resize");
+			splitPane2.setBackground(new Color(238, 238, 238));
+			splitPane2.setOneTouchExpandable(true);
 
-			//======== splitPane2 ========
+			//======== splitPane4 ========
 			{
-				splitPane2.setToolTipText("Drag to resize");
-				splitPane2.setBackground(new Color(238, 238, 238));
-				splitPane2.setResizeWeight(0.5);
-				splitPane2.setOneTouchExpandable(true);
+				splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				splitPane4.setOneTouchExpandable(true);
 
-				//======== splitPane4 ========
+				//======== panel9 ========
 				{
-					splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
-					splitPane4.setOneTouchExpandable(true);
+					panel9.setBackground(new Color(238, 238, 238));
+					panel9.setLayout(new GridBagLayout());
+					((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {20, 90, 0};
+					((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-					//======== panel9 ========
+					//---- label9 ----
+					label9.setText("Source Language");
+					panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+					//======== scrollPane1 ========
 					{
-						panel9.setBackground(new Color(238, 238, 238));
-						panel9.setLayout(new GridBagLayout());
-						((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {20, 90, 0};
-						((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-						//---- label9 ----
-						label9.setText("Source Language");
-						panel9.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						//---- tabSou ----
+						tabSou.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+						tabSou.setBorder(LineBorder.createBlackLineBorder());
+						tabSou.setAutoCreateRowSorter(true);
+						scrollPane1.setViewportView(tabSou);
+					}
+					panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+				}
+				splitPane4.setTopComponent(panel9);
+
+				//======== tabbedPane2 ========
+				{
+
+					//======== panel16 ========
+					{
+						panel16.setLayout(new GridBagLayout());
+						((GridBagLayout)panel16.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel16.getLayout()).rowHeights = new int[] {0, 0, 0};
+						((GridBagLayout)panel16.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel16.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
+
+						//======== panel17 ========
+						{
+							panel17.setLayout(new GridBagLayout());
+							((GridBagLayout)panel17.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+							((GridBagLayout)panel17.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel17.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
+							((GridBagLayout)panel17.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+							//---- bAddComent ----
+							bAddComent.setText("[A]dd Comment");
+							bAddComent.setMnemonic('A');
+							bAddComent.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									bAddComentActionPerformed();
+								}
+							});
+							panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
+							panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
+
+							//---- label17 ----
+							label17.setText("text");
+							label17.addMouseListener(new MouseAdapter() {
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									label17MouseClicked(e);
+								}
+							});
+							panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+								new Insets(0, 0, 0, 0), 0, 0));
+						}
+						panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 5, 0), 0, 0));
 
-						//======== scrollPane1 ========
+						//======== tabbedPane1 ========
 						{
 
-							//---- tabSou ----
-							tabSou.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-							tabSou.setBorder(LineBorder.createBlackLineBorder());
-							tabSou.setAutoCreateRowSorter(true);
-							scrollPane1.setViewportView(tabSou);
+							//======== scrollPane9 ========
+							{
+
+								//---- tblComm ----
+								tblComm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+								tblComm.addMouseListener(new MouseAdapter() {
+									@Override
+									public void mouseClicked(MouseEvent e) {
+										tblCommMouseClicked(e);
+									}
+								});
+								scrollPane9.setViewportView(tblComm);
+							}
+							tabbedPane1.addTab("Comments", scrollPane9);
+
+
+							//======== scrollPane8 ========
+							{
+
+								//---- refTable ----
+								refTable.setEditable(false);
+								refTable.addHyperlinkListener(new HyperlinkListener() {
+									@Override
+									public void hyperlinkUpdate(HyperlinkEvent e) {
+										refTableHyperlinkUpdate(e);
+									}
+								});
+								scrollPane8.setViewportView(refTable);
+							}
+							tabbedPane1.addTab("Web references", scrollPane8);
+
 						}
-						panel9.add(scrollPane1, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+						panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 							new Insets(0, 0, 0, 0), 0, 0));
 					}
-					splitPane4.setTopComponent(panel9);
+					tabbedPane2.addTab("Comments", panel16);
 
-					//======== tabbedPane2 ========
+
+					//======== panel11 ========
+					{
+						panel11.setBackground(Color.white);
+						panel11.setLayout(new GridBagLayout());
+						((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
+						((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
+						((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+						((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+					}
+					tabbedPane2.addTab("Issues", panel11);
+					tabbedPane2.setMnemonicAt(1, 'U');
+				}
+				splitPane4.setBottomComponent(tabbedPane2);
+			}
+			splitPane2.setLeftComponent(splitPane4);
+
+			//======== splitPane1 ========
+			{
+				splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				splitPane1.setOneTouchExpandable(true);
+
+				//======== panel8 ========
+				{
+					panel8.setBackground(new Color(238, 238, 238));
+					panel8.setLayout(new GridBagLayout());
+					((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0};
+					((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 105, 0, 34, 0};
+					((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+					((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
+
+					//---- label11 ----
+					label11.setText("Target Language");
+					label11.setBackground(new Color(238, 238, 238));
+					panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+					//======== scrollPane6 ========
 					{
 
-						//======== panel16 ========
+						//---- tabTar ----
+						tabTar.setAutoCreateRowSorter(true);
+						tabTar.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+						tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+						tabTar.setBorder(LineBorder.createBlackLineBorder());
+						scrollPane6.setViewportView(tabTar);
+					}
+					panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+					//======== panel2 ========
+					{
+						panel2.setBorder(LineBorder.createBlackLineBorder());
+						panel2.setBackground(new Color(238, 238, 238));
+						panel2.setLayout(new GridBagLayout());
+						((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 5, 0};
+						((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {13, 26, 23, 23, 33, 0, 0, 0};
+						((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4};
+						((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+
+						//---- label2 ----
+						label2.setText("Term:");
+						panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 10, 5, 5), 0, 0));
+
+						//======== scrollPane5 ========
 						{
-							panel16.setLayout(new GridBagLayout());
-							((GridBagLayout)panel16.getLayout()).columnWidths = new int[] {0, 0};
-							((GridBagLayout)panel16.getLayout()).rowHeights = new int[] {0, 0, 0};
-							((GridBagLayout)panel16.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-							((GridBagLayout)panel16.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
 
-							//======== panel17 ========
-							{
-								panel17.setLayout(new GridBagLayout());
-								((GridBagLayout)panel17.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-								((GridBagLayout)panel17.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel17.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0E-4};
-								((GridBagLayout)panel17.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+							//---- targetTextField ----
+							targetTextField.setRows(2);
+							targetTextField.setLineWrap(true);
+							targetTextField.addMouseListener(new MouseAdapter() {
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									targetTextFieldMouseClicked(e);
+								}
+							});
+							scrollPane5.setViewportView(targetTextField);
+						}
+						panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							new Insets(0, 0, 5, 5), 0, 0));
 
-								//---- bAddComent ----
-								bAddComent.setText("[A]dd Comment");
-								bAddComent.setMnemonic('A');
-								bAddComent.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										bAddComentActionPerformed();
-									}
-								});
-								panel17.add(bAddComent, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-								panel17.add(cmbTarComm, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
+						//---- label1 ----
+						label1.setText("Term Type:");
+						panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 10, 5, 5), 0, 0));
 
-								//---- label17 ----
-								label17.setText("text");
-								label17.addMouseListener(new MouseAdapter() {
-									@Override
-									public void mouseClicked(MouseEvent e) {
-										label17MouseClicked(e);
-									}
-								});
-								panel17.add(label17, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 0), 0, 0));
-							}
-							panel16.add(panel17, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+						//======== panel7 ========
+						{
+							panel7.setBackground(new Color(238, 238, 238));
+							panel7.setLayout(new FlowLayout(FlowLayout.LEFT));
+							panel7.add(label4);
+							panel7.add(comboBox1);
+						}
+						panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
+
+						//======== panel5 ========
+						{
+							panel5.setBackground(new Color(238, 238, 238));
+							panel5.setLayout(new GridBagLayout());
+							((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {15, 0, 0, 0};
+							((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+
+							//---- label5 ----
+							label5.setText("Acceptability:");
+							panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 0), 0, 0));
-
-							//======== tabbedPane1 ========
-							{
-
-								//======== scrollPane9 ========
-								{
-
-									//---- tblComm ----
-									tblComm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-									tblComm.addMouseListener(new MouseAdapter() {
-										@Override
-										public void mouseClicked(MouseEvent e) {
-											tblCommMouseClicked(e);
-										}
-									});
-									scrollPane9.setViewportView(tblComm);
-								}
-								tabbedPane1.addTab("Comments", scrollPane9);
-
-
-								//======== scrollPane8 ========
-								{
-
-									//---- refTable ----
-									refTable.setEditable(false);
-									refTable.addHyperlinkListener(new HyperlinkListener() {
-										@Override
-										public void hyperlinkUpdate(HyperlinkEvent e) {
-											refTableHyperlinkUpdate(e);
-										}
-									});
-									scrollPane8.setViewportView(refTable);
-								}
-								tabbedPane1.addTab("Web references", scrollPane8);
-
-							}
-							panel16.add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+								new Insets(0, 0, 0, 5), 0, 0));
+							panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 								new Insets(0, 0, 0, 0), 0, 0));
 						}
-						tabbedPane2.addTab("Comments", panel16);
+						panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
 
+						//---- label3 ----
+						label3.setText("Is case significant ?");
+						panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 10, 5, 5), 0, 0));
 
-						//======== panel11 ========
+						//======== panel4 ========
 						{
-							panel11.setBackground(Color.white);
-							panel11.setLayout(new GridBagLayout());
-							((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {0, 0};
-							((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {0, 0};
-							((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-							((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
-						}
-						tabbedPane2.addTab("Issues", panel11);
-						tabbedPane2.setMnemonicAt(1, 'U');
-					}
-					splitPane4.setBottomComponent(tabbedPane2);
-				}
-				splitPane2.setLeftComponent(splitPane4);
+							panel4.setBackground(new Color(238, 238, 238));
+							panel4.setLayout(new GridBagLayout());
+							((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
+							((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				//======== splitPane1 ========
-				{
-					splitPane1.setOrientation(JSplitPane.VERTICAL_SPLIT);
-					splitPane1.setOneTouchExpandable(true);
-
-					//======== panel8 ========
-					{
-						panel8.setBackground(new Color(238, 238, 238));
-						panel8.setLayout(new GridBagLayout());
-						((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {0, 0};
-						((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 105, 0, 34, 0};
-						((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 0.0, 1.0E-4};
-
-						//---- label11 ----
-						label11.setText("Target Language");
-						label11.setBackground(new Color(238, 238, 238));
-						panel8.add(label11, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
-
-						//======== scrollPane6 ========
-						{
-
-							//---- tabTar ----
-							tabTar.setAutoCreateRowSorter(true);
-							tabTar.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-							tabTar.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-							tabTar.setBorder(LineBorder.createBlackLineBorder());
-							scrollPane6.setViewportView(tabTar);
-						}
-						panel8.add(scrollPane6, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
-
-						//======== panel2 ========
-						{
-							panel2.setBorder(LineBorder.createBlackLineBorder());
-							panel2.setBackground(new Color(238, 238, 238));
-							panel2.setLayout(new GridBagLayout());
-							((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 5, 0};
-							((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {13, 26, 23, 23, 33, 0, 0, 0};
-							((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 1.0, 1.0, 0.0, 1.0E-4};
-							((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-
-							//---- label2 ----
-							label2.setText("Term:");
-							panel2.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+							//---- rbYes ----
+							rbYes.setText("Yes");
+							rbYes.setBackground(new Color(238, 238, 238));
+							panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+								new Insets(0, 0, 0, 5), 0, 0));
 
-							//======== scrollPane5 ========
-							{
+							//---- label6 ----
+							label6.setText("    ");
+							panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- targetTextField ----
-								targetTextField.setRows(2);
-								targetTextField.setLineWrap(true);
-								targetTextField.addMouseListener(new MouseAdapter() {
-									@Override
-									public void mouseClicked(MouseEvent e) {
-										targetTextFieldMouseClicked(e);
-									}
-								});
-								scrollPane5.setViewportView(targetTextField);
-							}
-							panel2.add(scrollPane5, new GridBagConstraints(1, 1, 3, 3, 0.0, 0.0,
+							//---- rbNo ----
+							rbNo.setSelected(true);
+							rbNo.setText("No");
+							rbNo.setBackground(new Color(238, 238, 238));
+							panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
+						}
+						panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
+
+						//======== panel14 ========
+						{
+							panel14.setBackground(new Color(238, 238, 238));
+							panel14.setLayout(new GridBagLayout());
+							((GridBagLayout)panel14.getLayout()).columnWidths = new int[] {15, 0, 0, 0, 0, 0, 0};
+							((GridBagLayout)panel14.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel14.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout)panel14.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+
+							//---- label7 ----
+							label7.setText("Status:");
+							panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 5), 0, 0));
+
+							//---- rbAct ----
+							rbAct.setText("Active");
+							rbAct.setSelected(true);
+							rbAct.setBackground(new Color(238, 238, 238));
+							panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 5), 0, 0));
+
+							//---- rbInact ----
+							rbInact.setText("Inactive");
+							rbInact.setBackground(new Color(238, 238, 238));
+							panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+								new Insets(0, 0, 0, 0), 0, 0));
+						}
+						panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+							new Insets(0, 0, 5, 5), 0, 0));
+
+						//======== panel3 ========
+						{
+							panel3.setBackground(new Color(238, 238, 238));
+							panel3.setLayout(new GridBagLayout());
+							((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+							((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+							((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+
+							//---- label13 ----
+							label13.setText("text");
+							label13.addMouseListener(new MouseAdapter() {
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									label13MouseClicked(e);
+								}
+							});
+							panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
 								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-								new Insets(0, 0, 5, 5), 0, 0));
+								new Insets(0, 0, 0, 0), 0, 0));
+						}
+						panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
+							GridBagConstraints.EAST, GridBagConstraints.NONE,
+							new Insets(0, 0, 0, 5), 0, 0));
+					}
+					panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
 
-							//---- label1 ----
-							label1.setText("Term Type:");
-							panel2.add(label1, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+					//======== panel6 ========
+					{
+						panel6.setBorder(LineBorder.createBlackLineBorder());
+						panel6.setLayout(new BoxLayout(panel6, BoxLayout.Y_AXIS));
 
-							//======== panel7 ========
-							{
-								panel7.setBackground(new Color(238, 238, 238));
-								panel7.setLayout(new FlowLayout(FlowLayout.LEFT));
-								panel7.add(label4);
-								panel7.add(comboBox1);
-							}
-							panel2.add(panel7, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+						//======== buttonPanel ========
+						{
+							buttonPanel.setBackground(new Color(238, 238, 238));
+							buttonPanel.setLayout(new GridBagLayout());
+							((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 55, 55, 0, 0};
+							((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
+							((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
+							((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-							//======== panel5 ========
-							{
-								panel5.setBackground(new Color(238, 238, 238));
-								panel5.setLayout(new GridBagLayout());
-								((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {15, 0, 0, 0};
-								((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
+							//---- label12 ----
+							label12.addMouseListener(new MouseAdapter() {
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									label12MouseClicked(e);
+								}
+							});
+							buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
 
-								//---- label5 ----
-								label5.setText("Acceptability:");
-								panel5.add(label5, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-								panel5.add(cmbAccep, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
-							}
-							panel2.add(panel5, new GridBagConstraints(3, 4, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
+							//---- label8 ----
+							label8.setText("Actions:      ");
+							buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+								new Insets(0, 0, 0, 5), 0, 0));
+							buttonPanel.add(cmbActions, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+								new Insets(0, 0, 0, 5), 0, 0));
 
-							//---- label3 ----
-							label3.setText("Is case significant ?");
-							panel2.add(label3, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 10, 5, 5), 0, 0));
+							//---- bLaunch ----
+							bLaunch.setText("Save");
+							bLaunch.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									bLaunchActionPerformed();
+								}
+							});
+							buttonPanel.add(bLaunch, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
+								new Insets(0, 0, 0, 5), 0, 0));
 
-							//======== panel4 ========
-							{
-								panel4.setBackground(new Color(238, 238, 238));
-								panel4.setLayout(new GridBagLayout());
-								((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 0};
-								((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-								//---- rbYes ----
-								rbYes.setText("Yes");
-								rbYes.setBackground(new Color(238, 238, 238));
-								panel4.add(rbYes, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- label6 ----
-								label6.setText("    ");
-								panel4.add(label6, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- rbNo ----
-								rbNo.setSelected(true);
-								rbNo.setText("No");
-								rbNo.setBackground(new Color(238, 238, 238));
-								panel4.add(rbNo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
-							}
-							panel2.add(panel4, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
-
-							//======== panel14 ========
-							{
-								panel14.setBackground(new Color(238, 238, 238));
-								panel14.setLayout(new GridBagLayout());
-								((GridBagLayout)panel14.getLayout()).columnWidths = new int[] {15, 0, 0, 0, 0, 0, 0};
-								((GridBagLayout)panel14.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel14.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel14.getLayout()).rowWeights = new double[] {1.0, 1.0E-4};
-
-								//---- label7 ----
-								label7.setText("Status:");
-								panel14.add(label7, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- rbAct ----
-								rbAct.setText("Active");
-								rbAct.setSelected(true);
-								rbAct.setBackground(new Color(238, 238, 238));
-								panel14.add(rbAct, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- rbInact ----
-								rbInact.setText("Inactive");
-								rbInact.setBackground(new Color(238, 238, 238));
-								panel14.add(rbInact, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-									new Insets(0, 0, 0, 0), 0, 0));
-							}
-							panel2.add(panel14, new GridBagConstraints(3, 5, 1, 1, 0.0, 0.0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-								new Insets(0, 0, 5, 5), 0, 0));
-
-							//======== panel3 ========
-							{
-								panel3.setBackground(new Color(238, 238, 238));
-								panel3.setLayout(new GridBagLayout());
-								((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-								((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-								((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-								//---- label13 ----
-								label13.setText("text");
-								label13.addMouseListener(new MouseAdapter() {
-									@Override
-									public void mouseClicked(MouseEvent e) {
-										label13MouseClicked(e);
-									}
-								});
-								panel3.add(label13, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 0), 0, 0));
-							}
-							panel2.add(panel3, new GridBagConstraints(3, 6, 1, 1, 0.0, 0.0,
-								GridBagConstraints.EAST, GridBagConstraints.NONE,
+							//---- button1 ----
+							button1.setText("Cancel");
+							button1.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									button1ActionPerformed();
+								}
+							});
+							buttonPanel.add(button1, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
+								GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
 								new Insets(0, 0, 0, 5), 0, 0));
 						}
-						panel8.add(panel2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 5, 0), 0, 0));
-
-						//======== panel6 ========
-						{
-							panel6.setBorder(LineBorder.createBlackLineBorder());
-							panel6.setLayout(new BoxLayout(panel6, BoxLayout.Y_AXIS));
-
-							//======== buttonPanel ========
-							{
-								buttonPanel.setBackground(new Color(238, 238, 238));
-								buttonPanel.setLayout(new GridBagLayout());
-								((GridBagLayout)buttonPanel.getLayout()).columnWidths = new int[] {0, 0, 0, 0, 0, 55, 55, 0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).rowHeights = new int[] {0, 0};
-								((GridBagLayout)buttonPanel.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4};
-								((GridBagLayout)buttonPanel.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-								//---- label12 ----
-								label12.addMouseListener(new MouseAdapter() {
-									@Override
-									public void mouseClicked(MouseEvent e) {
-										label12MouseClicked(e);
-									}
-								});
-								buttonPanel.add(label12, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- label8 ----
-								label8.setText("Actions:      ");
-								buttonPanel.add(label8, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-								buttonPanel.add(cmbActions, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- bLaunch ----
-								bLaunch.setText("Save");
-								bLaunch.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										bLaunchActionPerformed();
-									}
-								});
-								buttonPanel.add(bLaunch, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-
-								//---- button1 ----
-								button1.setText("Cancel");
-								button1.addActionListener(new ActionListener() {
-									@Override
-									public void actionPerformed(ActionEvent e) {
-										button1ActionPerformed();
-									}
-								});
-								buttonPanel.add(button1, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0,
-									GridBagConstraints.EAST, GridBagConstraints.VERTICAL,
-									new Insets(0, 0, 0, 5), 0, 0));
-							}
-							panel6.add(buttonPanel);
-						}
-						panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
+						panel6.add(buttonPanel);
 					}
-					splitPane1.setTopComponent(panel8);
+					panel8.add(panel6, new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0,
+						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+				}
+				splitPane1.setTopComponent(panel8);
 
-					//======== tabbedPane3 ========
+				//======== tabbedPane3 ========
+				{
+
+					//======== scrollPane7 ========
 					{
 
-						//======== scrollPane7 ========
-						{
-
-							//---- tree3 ----
-							tree3.setVisibleRowCount(4);
-							scrollPane7.setViewportView(tree3);
-						}
-						tabbedPane3.addTab("Concept Details", scrollPane7);
-
-						tabbedPane3.addTab("Hierarchy", hierarchyNavigator1);
-						tabbedPane3.setMnemonicAt(1, 'H');
+						//---- tree3 ----
+						tree3.setVisibleRowCount(4);
+						scrollPane7.setViewportView(tree3);
 					}
-					splitPane1.setBottomComponent(tabbedPane3);
+					tabbedPane3.addTab("Concept Details", scrollPane7);
+
+					tabbedPane3.addTab("Hierarchy", hierarchyNavigator1);
+					tabbedPane3.setMnemonicAt(1, 'H');
 				}
-				splitPane2.setRightComponent(splitPane1);
+				splitPane1.setBottomComponent(tabbedPane3);
 			}
-			panel10.add(splitPane2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+			splitPane2.setRightComponent(splitPane1);
 		}
-		add(panel10, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 0, 0), 0, 0));
+		add(splitPane2, BorderLayout.CENTER);
 
 		//======== popupMenu1 ========
 		{
@@ -2235,7 +2237,6 @@ public class TranslationPanel extends JPanel {
 	private JLabel label15;
 	private JLabel label16;
 	private JLabel label10;
-	private JPanel panel10;
 	private JSplitPane splitPane2;
 	private JSplitPane splitPane4;
 	private JPanel panel9;
@@ -3544,9 +3545,9 @@ public class TranslationPanel extends JPanel {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			if (config == null)
-				issueListPanel = new IssuesListPanel2();
+				issueListPanel = new IssuesListPanel2(readOnlyMode);
 			else
-				issueListPanel = new IssuesListPanel2(config);
+				issueListPanel = new IssuesListPanel2(config, readOnlyMode);
 
 			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		} catch (TerminologyException e) {
@@ -3876,10 +3877,8 @@ public class TranslationPanel extends JPanel {
 			setPossibleActions(actions);
 
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

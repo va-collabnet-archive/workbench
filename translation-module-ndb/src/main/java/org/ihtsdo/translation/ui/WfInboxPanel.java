@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.beans.PropertyChangeEvent;
@@ -220,7 +221,7 @@ public class WfInboxPanel extends JPanel {
 				Object oldValue = event.getOldInboxItem();
 				if (oldValue != null) {
 					WfSearchFilterBI oldFilter = FilterFactory.getInstance().createFilterFromObject(oldValue);
-					if(oldFilter != null){
+					if (oldFilter != null) {
 						filterList.remove(oldFilter.getType());
 					}
 				}
@@ -237,7 +238,7 @@ public class WfInboxPanel extends JPanel {
 				Set<String> keys = filterList.keySet();
 				List<String> filtersToRemove = new ArrayList<String>();
 				for (String string : keys) {
-					if(string != new WfDestinationFilter().getType()){
+					if (string != new WfDestinationFilter().getType()) {
 						filtersToRemove.add(string);
 					}
 				}
@@ -399,21 +400,21 @@ public class WfInboxPanel extends JPanel {
 		}
 
 		WfTargetPreferredFilter targetFilter = new WfTargetPreferredFilter("");
-		if(!targetPreferredFilter.getText().trim().equals("")){
+		if (!targetPreferredFilter.getText().trim().equals("")) {
 			targetFilter = new WfTargetPreferredFilter(targetPreferredFilter.getText());
 			filterList.put(targetFilter.getType(), targetFilter);
-		}else{
+		} else {
 			filterList.remove(targetFilter.getType());
 		}
 
 		WfTargetFsnFilter fsnFilter = new WfTargetFsnFilter("");
-		if(!targetFsnFilter.getText().trim().equals("")){
+		if (!targetFsnFilter.getText().trim().equals("")) {
 			fsnFilter = new WfTargetFsnFilter(targetFsnFilter.getText());
 			filterList.put(fsnFilter.getType(), fsnFilter);
-		}else{
+		} else {
 			filterList.remove(fsnFilter.getType());
 		}
-		
+
 		WfState state = null;
 		if (statusFilterCombo.getSelectedItem() instanceof WfState) {
 			state = (WfState) statusFilterCombo.getSelectedItem();
@@ -495,7 +496,14 @@ public class WfInboxPanel extends JPanel {
 					}
 				}
 			}
-			uiPanel.updateUI(wfInstance, false);
+			boolean readOnly = false;
+			try {
+				InboxTag outboxContent = tagManager.getTagContent(TagManager.OUTBOX);
+				readOnly = outboxContent.getUuidList().contains(wfInstance.getComponentId().toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			uiPanel.updateUI(wfInstance, readOnly);
 			currentRow = model.getRow(currentModelRowNum);
 			currentTranslationItem.setText(currentRow[InboxColumn.SOURCE_PREFERRED.getColumnNumber()].toString());
 		} else {
@@ -761,20 +769,29 @@ public class WfInboxPanel extends JPanel {
 			d.setVisible(true);
 			d.pack();
 			d.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			d.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					atachToInboxPanel();
+				}
+			});
 			expanded = true;
 			label5.setText("- Atach");
 			label5.setToolTipText("Click to atach back to inbox.");
 		} else {
-			filterPanel.setVisible(false);
-			model.refreshColumnsStruct();
-			splitPanel.setResizeWeight(0.5d);
-			label5.setText("+ Detache");
-			label5.setToolTipText("Click to detach and view filters.");
-			splitPanel.setBottomComponent(d.getContentPane());
-			d.dispose();
-			expanded = false;
+			atachToInboxPanel();
 		}
 		model.fireTableStructureChanged();
+	}
+
+	private void atachToInboxPanel() {
+		filterPanel.setVisible(false);
+		model.refreshColumnsStruct();
+		splitPanel.setResizeWeight(0.5d);
+		label5.setText("+ Detache");
+		label5.setToolTipText("Click to detach and view filters.");
+		splitPanel.setBottomComponent(d.getContentPane());
+		d.dispose();
+		expanded = false;
 	}
 
 	private void initComponents() {

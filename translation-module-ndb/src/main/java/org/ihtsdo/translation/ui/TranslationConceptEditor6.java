@@ -3441,9 +3441,9 @@ public class TranslationConceptEditor6 extends JPanel {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			if (config == null)
-				issueListPanel = new IssuesListPanel2();
+				issueListPanel = new IssuesListPanel2(false);
 			else
-				issueListPanel = new IssuesListPanel2(config);
+				issueListPanel = new IssuesListPanel2(config,false);
 
 			panel11.add(issueListPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		} catch (TerminologyException e) {
