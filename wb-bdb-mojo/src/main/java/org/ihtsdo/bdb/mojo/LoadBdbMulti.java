@@ -589,7 +589,7 @@ public class LoadBdbMulti extends AbstractMojo {
         }
     }
 
-    // fsn, prefTem, parent(uuid) , make annotation, path, author(uuid)(blank = user) //@afk todo: make parent to be conept spec
+    // fsn, prefTem, parent(uuid), path, make annotation, author(uuid)(blank = user) //@afk todo: make parent to be conept spec
     private void generateNewConcepts() throws IOException, NoSuchAlgorithmException,
             TerminologyException, InvalidCAB, ContradictionException {
 
@@ -608,7 +608,7 @@ public class LoadBdbMulti extends AbstractMojo {
                     String pref = parts[1];
                     String parent = parts[2];
                     String path = parts[3];
-                    String makeAnnotation = parts[3];
+                    String makeAnnotation = parts[4];
                     String author = null;
                     if (parts.length == 6) {
                         author = parts[5];
