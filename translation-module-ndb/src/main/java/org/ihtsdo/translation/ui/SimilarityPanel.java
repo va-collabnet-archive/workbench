@@ -390,7 +390,7 @@ public class SimilarityPanel extends JPanel implements Serializable{
 		button1.setVisible(false);
 		similarityDialog = new JDialog();
 		similarityDialog.setContentPane(similarityPanel);
-		similarityDialog.setModal(true);
+		similarityDialog.setAlwaysOnTop(true);
 		similarityDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		similarityDialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
