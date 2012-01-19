@@ -87,6 +87,14 @@ public class UuidToSctIdMapper {
     public void map() throws IOException {
         setup();
 
+        String moduleId = module;
+        module = getExistingSctId(module);
+        if (module == null) {
+            module = SctIdGenerator.generate(conceptCounter, namespace, SctIdGenerator.TYPE.CONCEPT);
+            conceptCounter++;
+            uuidToSctMap.put(UUID.fromString(moduleId), module);
+        }
+
         String conceptLine = conceptsReader.readLine();
         conceptLine = conceptsReader.readLine();
         while (conceptLine != null) {
@@ -149,9 +157,9 @@ public class UuidToSctIdMapper {
             processStringRefsets(strRefLine);
             strRefLine = stringRefsetsReader.readLine();
         }
-        
+
         processUuidToSctMap();
-        
+
         close();
     }
 
@@ -1016,8 +1024,8 @@ public class UuidToSctIdMapper {
             return inactive;
         } else if (status.equals(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid())) {
             return active;
-        } 
-        
+        }
+
         return null;
     }
 
@@ -1035,14 +1043,18 @@ public class UuidToSctIdMapper {
         }
         if (!idExists) {
             ComponentChroncileBI component = store.getComponent(conceptUuid);
-            Collection<IdBI> ids = (Collection<IdBI>) component.getAdditionalIds();
-            if (ids != null) {
-                for (IdBI id : ids) {
-                    if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
-                        conceptSctId = id.getDenotation().toString();
-                        this.uuidToExistingSctMap.put(conceptUuid, conceptSctId);
-                        return conceptSctId;
+            if (component != null) {
+                Collection<IdBI> ids = (Collection<IdBI>) component.getAdditionalIds();
+                if (ids != null) {
+                    for (IdBI id : ids) {
+                        if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
+                            conceptSctId = id.getDenotation().toString();
+                            this.uuidToExistingSctMap.put(conceptUuid, conceptSctId);
+                            return conceptSctId;
+                        }
                     }
+                } else {
+                    return null;
                 }
             } else {
                 return null;

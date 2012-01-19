@@ -153,7 +153,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
-            
+            UUID moduleId =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
@@ -183,7 +183,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         LANG_CODE.EN,
                         countryCode,
                         namespace,
-                        module,
+                        moduleId.toString(),
                         new Date(TimeHelper.getTimeFromString(effectiveDate, 
                         TimeHelper.getFileDateFormat())),
                         sapsToWrite.getAsSet(),
@@ -194,7 +194,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 exporter.close();
             }
             
-            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, module, output);
+            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(), output);
             mapper.map();
             mapper.close();
             
