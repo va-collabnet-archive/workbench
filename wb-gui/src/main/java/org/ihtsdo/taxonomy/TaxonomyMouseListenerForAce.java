@@ -65,6 +65,7 @@ public class TaxonomyMouseListenerForAce extends MouseAdapter {
 
    private void addAllParentsAsExtra(ConceptVersionBI nodeConcept, TaxonomyNode node)
            throws ContradictionException, IOException {
+      node.getExtraParents().clear();
       if (node.getParentNid() != Integer.MAX_VALUE) {    // test if root
          for (ConceptVersionBI parent : nodeConcept.getRelsOutgoingDestinationsActiveIsa()) {
             if (parent.getNid() != node.getParentNid()) {

@@ -464,7 +464,9 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    }
 
    public ViewCoordinate getViewCoordinate() {
-      return this.aceFrameConfig.getViewCoordinate();
+       ViewCoordinate vc = new ViewCoordinate(this.aceFrameConfig.getViewCoordinate());
+       vc.setRelAssertionType(assertionType);
+       return vc;
    }
 
    //~--- set methods ---------------------------------------------------------
