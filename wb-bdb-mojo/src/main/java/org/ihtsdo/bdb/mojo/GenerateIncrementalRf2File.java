@@ -59,16 +59,16 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String[] exportPathFsns;
     /**
-     * Concept for the view path used for export. 
-     * 
+     * Concept for the view path used for export.
+     *
      * @parameter
      */
     private ConceptSpec viewPathConceptSpec;
     /**
-     * Text of view path concept's FSN, to be used when only the FSN is known, and the path concept was
-     * generated with the proper type 5 UUID algorithm using the Type5UuidFactory.PATH_ID_FROM_FS_DESC
-     * namespace.
-     * 
+     * Text of view path concept's FSN, to be used when only the FSN is known,
+     * and the path concept was generated with the proper type 5 UUID algorithm
+     * using the Type5UuidFactory.PATH_ID_FROM_FS_DESC namespace.
+     *
      * @parameter
      */
     private String viewPathConceptSpecFsn;
@@ -110,7 +110,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
     private COUNTRY_CODE countryCode;
     /**
      * Refsets to exclude
-     * 
+     *
      * @parameter
      */
     private List<ConceptDescriptor> refsetsToExclude;
@@ -123,10 +123,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
     /**
      * Directory of the berkeley database to export from.
      *
-     * @parameter expression="${project.build.directory}/generated-resources/berkeley-db" @required
+     * @parameter
+     * expression="${project.build.directory}/generated-resources/berkeley-db"
+     * @required
      */
     private File berkeleyDir;
-    
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -144,7 +146,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                             exportPathFsn)));
                 }
             }
-            
+
             IntSet excludedRefsetIds = new IntSet();
             if (refsetsToExclude != null) {
                 for (ConceptDescriptor cd : refsetsToExclude) {
@@ -153,7 +155,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
-            UUID moduleId =  Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
+            UUID moduleId = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, module);
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
@@ -164,15 +166,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             } else {
                 throw new MojoExecutionException("No view path specified.");
             }
-            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds, 
+            IntSet sapsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
                     TimeHelper.getFileDateFormat().parse(startDate).getTime(),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
 
             ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataVC());
-            
-            
+
+
             PathBI path = Ts.get().getPath(viewPathNid);
-            PositionBI position = Ts.get().newPosition(path, 
+            PositionBI position = Ts.get().newPosition(path,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
             getLog().info("Criterion matches " + sapsToWrite.size() + " sapNids: " + sapsToWrite);
@@ -184,7 +186,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         countryCode,
                         namespace,
                         moduleId.toString(),
-                        new Date(TimeHelper.getTimeFromString(effectiveDate, 
+                        new Date(TimeHelper.getTimeFromString(effectiveDate,
                         TimeHelper.getFileDateFormat())),
                         sapsToWrite.getAsSet(),
                         vc.getVcWithAllStatusValues(),
@@ -192,12 +194,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                         allConcepts);
                 Ts.get().iterateConceptDataInSequence(exporter);
                 exporter.close();
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(), output);
+                mapper.map();
+                mapper.close();
             }
-            
-            UuidToSctIdMapper mapper = new UuidToSctIdMapper(namespace, moduleId.toString(), output);
-            mapper.map();
-            mapper.close();
-            
+
+
+
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
