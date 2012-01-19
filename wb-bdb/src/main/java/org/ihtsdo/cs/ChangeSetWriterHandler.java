@@ -53,8 +53,8 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
     private Timer timer;
     private Semaphore permit;
     private List<ChangeSetGeneratorBI> writerListForHandler;
-    private int commitRecordSapNid;
-    private int commitRecRefsetNid;
+    private int commitRecordSapNid = 0;
+    private int commitRecRefsetNid = 0;
 
     public ChangeSetWriterHandler(I_RepresentIdSet cNidsToWrite,
             long commitTime, NidSetBI sapNidsFromCommit, ChangeSetGenerationPolicy changeSetPolicy,
@@ -159,7 +159,7 @@ public class ChangeSetWriterHandler implements Runnable, I_ProcessUnfetchedConce
             Concept c = (Concept) fcfc.fetch();
 
             Set<byte[]> authorTimeHash = new HashSet<byte[]>();
-            if (writeCommitRecord) {
+            if (writeCommitRecord && commitRecordSapNid != 0) {
                 for (Integer sap : c.getAllSapNids()) {
                     if (sap > Bdb.getSapDb().getReadOnlyMax()) {
                         Concept authorConcept = Concept.get(Bdb.getSapDb().getAuthorNid(sap));
