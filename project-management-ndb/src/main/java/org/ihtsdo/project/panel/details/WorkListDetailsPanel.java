@@ -135,7 +135,7 @@ public class WorkListDetailsPanel extends JPanel {
 				textField1.setEditable(false);
 			}
 
-			WorklistMemberReAssignment reassigPanel = new WorklistMemberReAssignment(workList, config, worker);
+			WorklistMemberReAssignment reassigPanel = new WorklistMemberReAssignment(workList, config);
 
 			tabbedPane1.addTab("Re assign", reassigPanel);
 			reassigPanel.revalidate();

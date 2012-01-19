@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -17,7 +17,7 @@
        </void> 
        <void method="setProperty"> 
         <string>$rowSpecs</string> 
-        <string>0, 0:1.0, 0, 0</string> 
+        <string>0, 0:1.0, 0, 16</string> 
        </void> 
        <void method="setProperty"> 
         <string>$hGap</string> 
@@ -232,7 +232,7 @@
          <class>java.awt.GridBagLayout</class> 
          <void method="setProperty"> 
           <string>$columnSpecs</string> 
-          <string>0, 0, 0, 0, 0, 0, right:0</string> 
+          <string>0:1.0, 0, 0, 0, 0, 0, 0, 0, right:0</string> 
          </void> 
          <void method="setProperty"> 
           <string>$rowSpecs</string> 
@@ -274,33 +274,22 @@
            </object> 
           </void> 
           <void property="name"> 
-           <string>button1</string> 
+           <string>refreshButton</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
             <string>java.awt.event.ActionListener</string> 
             <string>actionPerformed</string> 
-            <string>button1ActionPerformed</string> 
+            <string>refreshButtonActionPerformed</string> 
             <boolean>true</boolean> 
            </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
-         </object> 
-        </void> 
-        <void method="add"> 
-         <object class="com.jformdesigner.model.FormComponent"> 
-          <string>javax.swing.JComboBox</string> 
-          <void property="name"> 
-           <string>comboBox2</string> 
-          </void> 
-         </object> 
-         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
-          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
-           <string>gridx</string> 
-           <int>1</int> 
+           <string>hAlign</string> 
+           <int>2</int> 
           </void> 
          </object> 
         </void> 
@@ -319,7 +308,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>3</int> 
+           <int>4</int> 
           </void> 
          </object> 
         </void> 
@@ -327,14 +316,56 @@
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JComboBox</string> 
           <void property="name"> 
-           <string>comboBox1</string> 
+           <string>destinationCombo</string> 
+          </void> 
+          <void method="addEvent"> 
+           <object class="com.jformdesigner.model.FormEvent"> 
+            <string>java.awt.event.ItemListener</string> 
+            <string>itemStateChanged</string> 
+            <string>destinationItemStateChanged</string> 
+            <boolean>true</boolean> 
+           </object> 
           </void> 
          </object> 
          <object class="com.jformdesigner.model.FormLayoutConstraints"> 
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>4</int> 
+           <int>5</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JLabel</string> 
+          <void method="setProperty"> 
+           <string>text</string> 
+           <string>Status:</string> 
+          </void> 
+          <void property="name"> 
+           <string>label1</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>6</int> 
+          </void> 
+         </object> 
+        </void> 
+        <void method="add"> 
+         <object class="com.jformdesigner.model.FormComponent"> 
+          <string>javax.swing.JComboBox</string> 
+          <void property="name"> 
+           <string>statusCombo</string> 
+          </void> 
+         </object> 
+         <object class="com.jformdesigner.model.FormLayoutConstraints"> 
+          <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
+          <void method="setProperty"> 
+           <string>gridx</string> 
+           <int>7</int> 
           </void> 
          </object> 
         </void> 
@@ -346,13 +377,13 @@
            <string>Send</string> 
           </void> 
           <void property="name"> 
-           <string>button3</string> 
+           <string>sendButton</string> 
           </void> 
           <void method="addEvent"> 
            <object class="com.jformdesigner.model.FormEvent"> 
             <string>java.awt.event.ActionListener</string> 
             <string>actionPerformed</string> 
-            <string>button3ActionPerformed</string> 
+            <string>sendButtonActionPerformed</string> 
             <boolean>false</boolean> 
            </object> 
           </void> 
@@ -361,7 +392,7 @@
           <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
           <void method="setProperty"> 
            <string>gridx</string> 
-           <int>6</int> 
+           <int>8</int> 
           </void> 
          </object> 
         </void> 
@@ -375,10 +406,6 @@
         <void method="setProperty"> 
          <string>gridwidth</string> 
          <int>3</int> 
-        </void> 
-        <void method="setProperty"> 
-         <string>hAlign</string> 
-         <int>4</int> 
         </void> 
        </object> 
       </void> 
@@ -396,12 +423,12 @@
        <object class="com.jformdesigner.model.FormLayoutConstraints"> 
         <class>com.jformdesigner.runtime.GridBagConstraintsEx</class> 
         <void method="setProperty"> 
-         <string>gridx</string> 
-         <int>2</int> 
-        </void> 
-        <void method="setProperty"> 
          <string>gridy</string> 
          <int>3</int> 
+        </void> 
+        <void method="setProperty"> 
+         <string>gridx</string> 
+         <int>2</int> 
         </void> 
        </object> 
       </void> 
@@ -418,8 +445,8 @@
       <void method="setProperty"> 
        <string>size</string> 
        <object class="java.awt.Dimension"> 
-        <int>500</int> 
-        <int>300</int> 
+        <int>875</int> 
+        <int>405</int> 
        </object> 
       </void> 
      </object> 
