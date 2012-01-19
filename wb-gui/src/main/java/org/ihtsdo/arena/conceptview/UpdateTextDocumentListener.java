@@ -33,8 +33,10 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
@@ -130,7 +132,12 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            doAction();
+            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
+                doAction();
+            } else {
+                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                Terms.get().addUncommitted(concept);
+            }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (TerminologyException ex) {
@@ -141,75 +148,77 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (UnsupportedDialectOrLanguage ex) {
             AceLog.getAppLog().alertAndLogException(ex);
-        }catch (ContradictionException ex) {
+        } catch (ContradictionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
-    
-    private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException{
+
+    private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException {
         config = Terms.get().getActiveAceFrameConfig();
-            tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
-                    config.getViewCoordinate());
-            if (update) { //create new
+        tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
+                config.getViewCoordinate());
+        if (update) { //create new
+            if(desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())){
                 
-                refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
-                int type = desc.getTypeNid();
-                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+            refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
+            int type = desc.getTypeNid();
+            int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
-                //get rf1/rf2 concept
-                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
+            //get rf1/rf2 concept
+            gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+            usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+            acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+            prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
-                //set initial word case sensitivity
-                String descText = text;
-                String initialWord = null;
-                if (descText.indexOf(" ") != -1) {
-                    initialWord = descText.substring(0, descText.indexOf(" "));
-                } else {
-                    initialWord = descText;
-                }
-                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
-                        && desc.isInitialCaseSignificant() == false) {
-                    desc.setInitialCaseSignificant(true);
-                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
-                        && desc.isInitialCaseSignificant() == true) {
-                    desc.setInitialCaseSignificant(false);
-                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
-                        && desc.isInitialCaseSignificant() == false) {
-                    desc.setInitialCaseSignificant(false);
-                }
-
-                if (refexes.isEmpty()) { //check for previous changes
-                    if (type == fsn) {
-                        doFsnUpdate();
-                    } else {
-                        doSynUpdate();
-                    }
-
-                } else { //TODO modify uncomitted version
-                    RefexCnidAnalogBI gbRefex = null;
-                    RefexCnidAnalogBI usRefex = null;
-                    for (RefexChronicleBI<?> descRefex : refexes) {
-                        if (descRefex.isUncommitted()) {
-                            if (descRefex.getCollectionNid() == gbConcept.getNid()) {
-                                gbRefex = (RefexCnidAnalogBI) descRefex;;
-                            } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
-                                usRefex = (RefexCnidAnalogBI) descRefex;
-                            }
-                        }
-                    }
-                        if (type == fsn) {
-                            doFsnUpdate(gbRefex, usRefex);
-                        } else {
-                            doSynUpdate(gbRefex, usRefex);
-                        }
-                }
-                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-                Terms.get().addUncommitted(concept);
+            //set initial word case sensitivity
+            String descText = text;
+            String initialWord = null;
+            if (descText.indexOf(" ") != -1) {
+                initialWord = descText.substring(0, descText.indexOf(" "));
+            } else {
+                initialWord = descText;
             }
-            update = false;
+            if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
+                    && desc.isInitialCaseSignificant() == false) {
+                desc.setInitialCaseSignificant(true);
+            } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
+                    && desc.isInitialCaseSignificant() == true) {
+                desc.setInitialCaseSignificant(false);
+            } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
+                    && desc.isInitialCaseSignificant() == false) {
+                desc.setInitialCaseSignificant(false);
+            }
+
+            if (refexes.isEmpty()) { //check for previous changes
+                if (type == fsn) {
+                    doFsnUpdate();
+                } else {
+                    doSynUpdate();
+                }
+
+            } else { //TODO modify uncomitted version
+                RefexCnidAnalogBI gbRefex = null;
+                RefexCnidAnalogBI usRefex = null;
+                for (RefexChronicleBI<?> descRefex : refexes) {
+                    if (descRefex.isUncommitted()) {
+                        if (descRefex.getCollectionNid() == gbConcept.getNid()) {
+                            gbRefex = (RefexCnidAnalogBI) descRefex;;
+                        } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
+                            usRefex = (RefexCnidAnalogBI) descRefex;
+                        }
+                    }
+                }
+                if (type == fsn) {
+                    doFsnUpdate(gbRefex, usRefex);
+                } else {
+                    doSynUpdate(gbRefex, usRefex);
+                }
+            }
+            }
+            I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+            Terms.get().addUncommitted(concept);
+        }
+        update = false;
     }
 
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage,
@@ -358,9 +367,14 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     }
 
     @Override
-    public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException{
+    public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
         try {
+            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                 doAction();
+            } else {
+                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                Terms.get().addUncommitted(concept);
+            }
         } catch (IOException ex) {
             throw new PropertyVetoException(ex.toString(), pce);
         } catch (TerminologyException ex) {
