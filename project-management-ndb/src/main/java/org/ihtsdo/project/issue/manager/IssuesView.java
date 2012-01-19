@@ -384,7 +384,7 @@ public class IssuesView extends JPanel {
 				issuesPanel1.setInitEdition(issue, iRepo);
 				issuesPanel1.revalidate();
 				issuesPanel1.repaint();
-				issueCommentsPanel1.setInit(issue, iRepo,null, config.getUsername());
+				issueCommentsPanel1.setInit(issue, iRepo,null, config.getUsername(),false);
 				issueCommentsPanel1.revalidate();
 				issueCommentsPanel1.repaint();
 			} catch (Exception e) {

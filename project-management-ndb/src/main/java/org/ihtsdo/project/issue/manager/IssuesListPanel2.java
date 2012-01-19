@@ -73,7 +73,7 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	private I_GetConceptData concept;
 
 	private IssueRepoRegistration regis;
-
+	private boolean readOnlyMode;
 	
 	
 	/**
@@ -81,8 +81,9 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	 * 
 	 * @throws Exception the exception
 	 */
-	public IssuesListPanel2() throws Exception {
+	public IssuesListPanel2(boolean readOnlyMode) throws Exception {
 		initComponents();
+		this.readOnlyMode = readOnlyMode;
 		config=Terms.get().getActiveAceFrameConfig();
 		Dimension minimumSize = new Dimension(3, 3);
 		Dimension maximumSize = new Dimension(350, 350);
@@ -93,6 +94,8 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 		splitPane1.getRightComponent().setPreferredSize(minimumSize);
 		splitPane1.getRightComponent().setMaximumSize(maximumSize);
 		addListeners();
+		
+		initCustomComponents();
 	}
 	
 	/**
@@ -102,14 +105,19 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 	 * 
 	 * @throws Exception the exception
 	 */
-	public IssuesListPanel2(I_ConfigAceFrame config) throws Exception {
+	public IssuesListPanel2(I_ConfigAceFrame config,boolean readOnlyMode) throws Exception {
 		//this.termFactory=termFactory;
 		initComponents();
+		this.readOnlyMode = readOnlyMode;
 		this.config=config;
-		
 		this.config.addPropertyChangeListener("commit", this);
 //		loadRepos(null);
 		addListeners();
+		initComponents();
+	}
+	
+	private void initCustomComponents() {
+		bCreateIssue.setEnabled(true && !readOnlyMode);
 	}
 	
 	/**
@@ -185,7 +193,7 @@ public class IssuesListPanel2 extends JPanel implements PropertyChangeListener {
 //            					pBar.setVisible(false);
 //								message("Sorry, cannot set the issue on panel");
 //							}
-            				issueCommentsPanel1.setInit(issue, issueRepo, regis,config.getUsername());
+            				issueCommentsPanel1.setInit(issue, issueRepo, regis,config.getUsername(), readOnlyMode);
 //        					pBar.setIndeterminate(false);
 //        					pBar.setVisible(false);
             			}

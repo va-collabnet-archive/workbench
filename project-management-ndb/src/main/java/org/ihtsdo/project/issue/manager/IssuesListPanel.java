@@ -184,7 +184,7 @@ public class IssuesListPanel extends JPanel {
             					pBar.setVisible(false);
 								message("Sorry, cannot set the issue on panel");
 							}
-            				issueCommentsPanel1.setInit(issue, issueRepo, null, config.getUsername());
+            				issueCommentsPanel1.setInit(issue, issueRepo, null, config.getUsername(),false);
         					pBar.setIndeterminate(false);
         					pBar.setVisible(false);
             			}

@@ -58,7 +58,7 @@ public class IssueCommentsPanel extends JPanel {
 	
 	/** The user name. */
 	private String userName;
-
+	private boolean readOnlyMode;
 	private IssueRepoRegistration regis;
 	
 	/**
@@ -77,13 +77,14 @@ public class IssueCommentsPanel extends JPanel {
 	 * @param regis 
 	 * @param userName the user name
 	 */
-	public void setInit(Issue issue,IssueRepository issueRepo,IssueRepoRegistration regis, String userName){
+	public void setInit(Issue issue,IssueRepository issueRepo,IssueRepoRegistration regis, String userName, boolean readOnlyMode){
 		this.issue=issue;
 		this.issueRepo=issueRepo;
 		this.regis=regis;
 		this.userName=userName;
-		
+		this.readOnlyMode = readOnlyMode;
 		loadComments();
+		bSend.setEnabled(true && !readOnlyMode);
 	}
 	public void clear(){
 		txtComm.setText("");
