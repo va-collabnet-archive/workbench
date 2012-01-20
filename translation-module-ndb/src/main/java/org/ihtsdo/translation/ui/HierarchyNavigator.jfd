@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<java version="1.6.0_22" class="java.beans.XMLDecoder"> 
+<java version="1.6.0_26" class="java.beans.XMLDecoder"> 
  <object class="com.jformdesigner.model.FormModel"> 
   <void property="contentType"> 
    <string>form/swing</string> 
@@ -36,6 +36,20 @@
         <boolean>true</boolean> 
        </void> 
       </object> 
+      <void method="setProperty"> 
+       <string>preferredSize</string> 
+       <object class="java.awt.Dimension"> 
+        <int>10</int> 
+        <int>20</int> 
+       </object> 
+      </void> 
+      <void method="setProperty"> 
+       <string>minimumSize</string> 
+       <object class="java.awt.Dimension"> 
+        <int>10</int> 
+        <int>20</int> 
+       </object> 
+      </void> 
       <void property="name"> 
        <string>this</string> 
       </void> 
@@ -54,6 +68,14 @@
           <void method="setProperty"> 
            <string>visibleRowCount</string> 
            <int>5</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object id="Font0" class="java.awt.Font"> 
+            <string>Lucida Grande</string> 
+            <int>0</int> 
+            <int>11</int> 
+           </object> 
           </void> 
           <void property="name"> 
            <string>tree1</string> 
@@ -95,12 +117,30 @@
           <boolean>true</boolean> 
          </void> 
         </object> 
+        <void method="setProperty"> 
+         <string>minimumSize</string> 
+         <object class="java.awt.Dimension"> 
+          <int>10</int> 
+          <int>50</int> 
+         </object> 
+        </void> 
+        <void method="setProperty"> 
+         <string>preferredSize</string> 
+         <object class="java.awt.Dimension"> 
+          <int>10</int> 
+          <int>50</int> 
+         </object> 
+        </void> 
         <void property="name"> 
          <string>panel1</string> 
         </void> 
         <void method="add"> 
          <object class="com.jformdesigner.model.FormComponent"> 
           <string>javax.swing.JComboBox</string> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
+          </void> 
           <void property="name"> 
            <string>comboBox1</string> 
           </void> 
@@ -147,6 +187,20 @@
             <boolean>true</boolean> 
            </void> 
           </object> 
+          <void method="setProperty"> 
+           <string>minimumSize</string> 
+           <object class="java.awt.Dimension"> 
+            <int>10</int> 
+            <int>23</int> 
+           </object> 
+          </void> 
+          <void method="setProperty"> 
+           <string>preferredSize</string> 
+           <object class="java.awt.Dimension"> 
+            <int>10</int> 
+            <int>23</int> 
+           </object> 
+          </void> 
           <void property="name"> 
            <string>panel2</string> 
           </void> 
@@ -166,6 +220,10 @@
             <void method="setProperty"> 
              <string>selected</string> 
              <boolean>true</boolean> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
             </void> 
             <void property="name"> 
              <string>rInfer</string> 
@@ -195,6 +253,10 @@
              <object class="com.jformdesigner.model.FormReference"> 
               <string>buttonGroup1</string> 
              </object> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
             </void> 
             <void property="name"> 
              <string>rStat</string> 
@@ -226,6 +288,10 @@
             <void method="setProperty"> 
              <string>mnemonic</string> 
              <int>69</int> 
+            </void> 
+            <void method="setProperty"> 
+             <string>font</string> 
+             <object idref="Font0"/> 
             </void> 
             <void property="name"> 
              <string>expandButton</string> 
@@ -280,6 +346,10 @@
           <void method="setProperty"> 
            <string>visibleRowCount</string> 
            <int>5</int> 
+          </void> 
+          <void method="setProperty"> 
+           <string>font</string> 
+           <object idref="Font0"/> 
           </void> 
           <void property="name"> 
            <string>tree2</string> 
