@@ -12,6 +12,10 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -33,16 +37,15 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.lang.LANG_CODE;
+import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_cnid.RefexCnidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -51,6 +54,10 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
  */
 public class UpdateTextDocumentListener implements DocumentListener, ActionListener, VetoableChangeListener {
 
+    private static ThreadGroup updateTextThreadGroup =
+            new ThreadGroup("updateTextThreadGroup");
+    private static ExecutorService updateDocListenrService = Executors.newFixedThreadPool(1,
+            new NamedThreadFactory(updateTextThreadGroup, "updateTextThread"));
     FixedWidthJEditorPane editorPane;
     DescriptionAnalogBI desc;
     Timer t;
@@ -110,9 +117,11 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         }
         update = true;
     }
+    long lastChange = Long.MIN_VALUE;
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+        lastChange++;
         text = editorPane.extractText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
@@ -128,29 +137,52 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         }
         update = true;
     }
+    long lastAction = Long.MIN_VALUE;
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
+        if (lastAction < lastChange) {
+            lastAction = lastChange;
+
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
-                doAction();
+                updateDocListenrService.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            doAction();
+                        } catch (IOException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvalidCAB ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (UnsupportedDialectOrLanguage ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (TerminologyException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ContradictionException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+
             } else {
-                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-                Terms.get().addUncommitted(concept);
+                updateDocListenrService.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                            Terms.get().addUncommitted(concept);
+                        } catch (IOException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (PropertyVetoException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (UnsupportedDialectOrLanguage ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (ContradictionException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
         }
+
     }
 
     private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException {
@@ -158,62 +190,62 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
         if (update) { //create new
-            if(desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())){
-                
-            refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
-            int type = desc.getTypeNid();
-            int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
 
-            //get rf1/rf2 concept
-            gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-            usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-            acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-            prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
+                refexes = desc.getCurrentAnnotationMembers(config.getViewCoordinate());
+                int type = desc.getTypeNid();
+                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
 
-            //set initial word case sensitivity
-            String descText = text;
-            String initialWord = null;
-            if (descText.indexOf(" ") != -1) {
-                initialWord = descText.substring(0, descText.indexOf(" "));
-            } else {
-                initialWord = descText;
-            }
-            if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
-                    && desc.isInitialCaseSignificant() == false) {
-                desc.setInitialCaseSignificant(true);
-            } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
-                    && desc.isInitialCaseSignificant() == true) {
-                desc.setInitialCaseSignificant(false);
-            } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
-                    && desc.isInitialCaseSignificant() == false) {
-                desc.setInitialCaseSignificant(false);
-            }
+                //get rf1/rf2 concept
+                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
-            if (refexes.isEmpty()) { //check for previous changes
-                if (type == fsn) {
-                    doFsnUpdate();
+                //set initial word case sensitivity
+                String descText = text;
+                String initialWord = null;
+                if (descText.indexOf(" ") != -1) {
+                    initialWord = descText.substring(0, descText.indexOf(" "));
                 } else {
-                    doSynUpdate();
+                    initialWord = descText;
+                }
+                if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == true
+                        && desc.isInitialCaseSignificant() == false) {
+                    desc.setInitialCaseSignificant(true);
+                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()) == false
+                        && desc.isInitialCaseSignificant() == true) {
+                    desc.setInitialCaseSignificant(false);
+                } else if (CsWordsHelper.isIcTypeSignificant(initialWord, CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) == true
+                        && desc.isInitialCaseSignificant() == false) {
+                    desc.setInitialCaseSignificant(false);
                 }
 
-            } else { //TODO modify uncomitted version
-                RefexCnidAnalogBI gbRefex = null;
-                RefexCnidAnalogBI usRefex = null;
-                for (RefexChronicleBI<?> descRefex : refexes) {
-                    if (descRefex.isUncommitted()) {
-                        if (descRefex.getCollectionNid() == gbConcept.getNid()) {
-                            gbRefex = (RefexCnidAnalogBI) descRefex;;
-                        } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
-                            usRefex = (RefexCnidAnalogBI) descRefex;
+                if (refexes.isEmpty()) { //check for previous changes
+                    if (type == fsn) {
+                        doFsnUpdate();
+                    } else {
+                        doSynUpdate();
+                    }
+
+                } else { //TODO modify uncomitted version
+                    RefexCnidAnalogBI gbRefex = null;
+                    RefexCnidAnalogBI usRefex = null;
+                    for (RefexChronicleBI<?> descRefex : refexes) {
+                        if (descRefex.isUncommitted()) {
+                            if (descRefex.getCollectionNid() == gbConcept.getNid()) {
+                                gbRefex = (RefexCnidAnalogBI) descRefex;;
+                            } else if (descRefex.getCollectionNid() == usConcept.getNid()) {
+                                usRefex = (RefexCnidAnalogBI) descRefex;
+                            }
                         }
                     }
+                    if (type == fsn) {
+                        doFsnUpdate(gbRefex, usRefex);
+                    } else {
+                        doSynUpdate(gbRefex, usRefex);
+                    }
                 }
-                if (type == fsn) {
-                    doFsnUpdate(gbRefex, usRefex);
-                } else {
-                    doSynUpdate(gbRefex, usRefex);
-                }
-            }
             }
             I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
             Terms.get().addUncommitted(concept);

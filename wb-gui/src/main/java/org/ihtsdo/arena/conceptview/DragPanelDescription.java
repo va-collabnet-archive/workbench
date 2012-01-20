@@ -180,6 +180,13 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                             sb.append(" <font color='blue'>GB</font>");
                         }
                     }
+                } else {
+                    for (RefexVersionBI<?> v : refex.getVersions(getSettings().getConfig().getViewCoordinate())) {
+                        RefexCnidVersionBI cv = (RefexCnidVersionBI) v;
+                        if (cv.getCnid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                            sb.append(" <font color='blue'> </font>");
+                        }
+                    }
                 }
             }
         }
