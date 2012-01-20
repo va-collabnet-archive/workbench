@@ -23,7 +23,7 @@ import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
-public class NewLangPrefTermAction extends AbstractAction {
+public class NewLangSynonymAction extends AbstractAction {
 
     private static final long serialVersionUID = 1L;
     ConceptSpec refex;
@@ -31,7 +31,7 @@ public class NewLangPrefTermAction extends AbstractAction {
     LANG_CODE lang;
     DescriptionVersionBI desc;
 
-    public NewLangPrefTermAction(String actionName, ConceptSpec refex, LANG_CODE lang,
+    public NewLangSynonymAction(String actionName, ConceptSpec refex, LANG_CODE lang,
             DescFact desc, I_ConfigAceFrame config) {
         super(actionName);
         this.refex = refex;
@@ -49,7 +49,7 @@ public class NewLangPrefTermAction extends AbstractAction {
             DescCAB descBp = new DescCAB(desc.getConceptNid(), 
                     SnomedMetadataRfx.getDES_SYNONYM_NID(),
                     lang,
-                    lang + " PT",
+                    lang + " SYN",
                     false);
             descBp.setComponentUuidNoRecompute(UUID.randomUUID());
             DescriptionChronicleBI dc = builder.construct(descBp);
@@ -57,7 +57,7 @@ public class NewLangPrefTermAction extends AbstractAction {
             RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,
                     dv.getNid(), 
                     refex.getStrict(config.getViewCoordinate()).getConceptNid());
-            refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
+            refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
             RefexChronicleBI<?> newRefex = builder.construct(refexBp);
             ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
             cv.addAnnotation(newRefex);
