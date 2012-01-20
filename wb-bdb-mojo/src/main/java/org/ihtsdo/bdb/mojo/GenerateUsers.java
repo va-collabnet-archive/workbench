@@ -81,7 +81,8 @@ public class GenerateUsers extends AbstractMojo {
     private File usersFile;
     /**
      *
-     * @parameter expression="${project.build.directory}/users/userPermissionRefset.txt"
+     * @parameter
+     * expression="${project.build.directory}/users/userPermissionRefset.txt"
      */
     private File wfPermissionsFile;
     /**
@@ -109,6 +110,7 @@ public class GenerateUsers extends AbstractMojo {
     private String projectDevelopmentPathFsn;
     private String projectDevelopmentViewPathFsn;
     private I_ConfigAceFrame userConfig;
+    private Boolean create = true;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -128,9 +130,10 @@ public class GenerateUsers extends AbstractMojo {
             //get config properties
 
             /*
-             * LIST OF CONFIG PROPERTIES: langSortPref, langPrefOrder, statedInferredPolicy, defaultStatus,
-             * defaultDescType, defaultRelType, defaultRelChar, defaultRelRefinability, visibleRefests,
-             * editPath, viewPath
+             * LIST OF CONFIG PROPERTIES: langSortPref, langPrefOrder,
+             * statedInferredPolicy, defaultStatus, defaultDescType,
+             * defaultRelType, defaultRelChar, defaultRelRefinability,
+             * visibleRefests, editPath, viewPath
              */
             BufferedReader configReader = new BufferedReader(new FileReader(defaultUserConfig));
             configProps.load(configReader);
@@ -159,65 +162,67 @@ public class GenerateUsers extends AbstractMojo {
                 userLine = userReader.readLine();
             }
 
+            if (create) {
 
-            //add users to wf permissions refset
-            I_TermFactory tf = Terms.get();
+                //add users to wf permissions refset
+                I_TermFactory tf = Terms.get();
 
-            ViewCoordinate vc = userConfig.getViewCoordinate();
-            EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+                ViewCoordinate vc = userConfig.getViewCoordinate();
+                EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
-            BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
+                BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
 
-            WorkflowHelper.updateModelers(vc);
-            modelers = WorkflowHelper.getModelers();
-            searcher = new EditorCategoryRefsetSearcher();
+                WorkflowHelper.updateModelers(vc);
+                modelers = WorkflowHelper.getModelers();
+                searcher = new EditorCategoryRefsetSearcher();
 
-            wfReader.readLine();
-            String wfLine = wfReader.readLine();
-            while (wfLine != null) {
-                if (wfLine.trim().length() == 0) {
-                    continue;
-                }
-
-                String[] columns = wfLine.split(",");
-
-                if (columns.length >= 3) {
-                    //Get rid of "User permission"
-                    columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
-                    //remove ")"
-                    columns[2] = columns[2].trim();
-                    columns[2] = columns[2].substring(0, columns[2].length() - 1);
-
-                    int i = 0;
-                    for (String c : columns) {
-                        columns[i++] = c.split("=")[1].trim();
+                wfReader.readLine();
+                String wfLine = wfReader.readLine();
+                while (wfLine != null) {
+                    if (wfLine.trim().length() == 0) {
+                        continue;
                     }
 
-                    ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
-                    ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
-                    boolean addingRequired = true;
+                    String[] columns = wfLine.split(",");
 
-                    if (oldCategory != null) {
-                        if (!oldCategory.equals(newCategory)) {
-                            writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
-                        } else {
-                            addingRequired = false;
+                    if (columns.length >= 3) {
+                        //Get rid of "User permission"
+                        columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
+                        //remove ")"
+                        columns[2] = columns[2].trim();
+                        columns[2] = columns[2].substring(0, columns[2].length() - 1);
+
+                        int i = 0;
+                        for (String c : columns) {
+                            columns[i++] = c.split("=")[1].trim();
+                        }
+
+                        ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
+                        ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
+                        boolean addingRequired = true;
+
+                        if (oldCategory != null) {
+                            if (!oldCategory.equals(newCategory)) {
+                                writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+                            } else {
+                                addingRequired = false;
+                            }
+                        }
+
+                        if (addingRequired) {
+                            writer.setEditor(modelers.get(columns[0]));
+                            writer.setSemanticArea(columns[1]);
+
+                            writer.setCategory(newCategory);
+                            writer.addMember();
                         }
                     }
 
-                    if (addingRequired) {
-                        writer.setEditor(modelers.get(columns[0]));
-                        writer.setSemanticArea(columns[1]);
-
-                        writer.setCategory(newCategory);
-                        writer.addMember();
-                    }
+                    wfLine = wfReader.readLine();
                 }
 
-                wfLine = wfReader.readLine();
+                Terms.get().commit();
             }
-
-            Terms.get().commit();
 
             getLog().info("Starting close.");
             Bdb.close();
@@ -236,7 +241,8 @@ public class GenerateUsers extends AbstractMojo {
         try {
             File userDir = new File(wbBundleDir, "profiles" + File.separator + username);
             File userProfile = new File(userDir, username + ".wb");
-            if (!userProfile.exists()) {
+            create = !userProfile.exists();
+            if (create) {
                 File userQueueRoot = new File(wbBundleDir, "queues" + File.separator + username);
 
                 userConfig = newProfile(fullname, username, password, adminUsername,
@@ -668,8 +674,8 @@ public class GenerateUsers extends AbstractMojo {
         //set up vewing preferences
 
         /*
-         * langSortPref preference options are: rf2 refex (rf2), language refex (lr), type before language
-         * (tl), language before type (lt)
+         * langSortPref preference options are: rf2 refex (rf2), language refex
+         * (lr), type before language (tl), language before type (lt)
          */
         if (langSortPref.equals("rf2")) {
             activeConfig.setLanguageSortPref(I_ConfigAceFrame.LANGUAGE_SORT_PREF.RF2_LANG_REFEX);
@@ -692,7 +698,8 @@ public class GenerateUsers extends AbstractMojo {
         }
 
         /*
-         * statedInferredPolicy preference options: stated (s), inferred (i), inferred then stated (is)
+         * statedInferredPolicy preference options: stated (s), inferred (i),
+         * inferred then stated (is)
          */
         if (statedInferredPolicy.equals("s")) {
             activeConfig.setRelAssertionType(RelAssertionType.STATED);
