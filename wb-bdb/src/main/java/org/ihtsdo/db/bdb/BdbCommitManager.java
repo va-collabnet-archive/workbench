@@ -103,7 +103,6 @@ public class BdbCommitManager {
     private static boolean performCreationTests = true;
     private static boolean performCommitTests = true;
     private static Semaphore luceneWriterPermit = new Semaphore(PERMIT_COUNT);
-    private static AtomicReference<Concept> lastUncommitted = new AtomicReference<Concept>();
     private static long lastDoUpdate = Long.MIN_VALUE;
     private static long lastCommit = Bdb.gVersion.incrementAndGet();
     private static long lastCancel = Integer.MIN_VALUE;
@@ -256,22 +255,12 @@ public class BdbCommitManager {
             AceLog.getAppLog().info("---@@@ Adding uncommitted NO checks: " + concept.getNid() + " ---@@@ ");
         }
 
-        c = null;
-
         if (concept.isUncommitted()) {
             uncommittedCNidsNoChecks.setMember(concept.getNid());
-            c = lastUncommitted.getAndSet((Concept) concept);
-
-            if (c == concept) {
-                c = null;
-            }
         } else {
-            c = (Concept) concept;
-
             if (Bdb.watchList.containsKey(concept.getNid())) {
                 AceLog.getAppLog().info("--- Removing uncommitted concept: " + concept.getNid() + " --- ");
             }
-
             removeUncommitted(c);
         }
 
@@ -375,7 +364,6 @@ public class BdbCommitManager {
                         } catch (PropertyVetoException ex) {
                             return false;
                         }
-                        flushUncommitted();
 
                         int errorCount = 0;
                         int warningCount = 0;
@@ -857,14 +845,6 @@ public class BdbCommitManager {
                 }
             }
         });
-    }
-
-    private static void flushUncommitted() throws InterruptedException {
-        Concept c = lastUncommitted.getAndSet(null);
-
-        if (c != null) {
-            writeUncommitted(c);
-        }
     }
 
     public static boolean forget(ConAttrVersionBI attr) throws IOException {
