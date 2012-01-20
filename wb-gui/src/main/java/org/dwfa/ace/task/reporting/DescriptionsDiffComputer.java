@@ -1,23 +1,26 @@
 package org.dwfa.ace.task.reporting;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.reporting.DiffBase;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
@@ -25,10 +28,15 @@ import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.PositionSet;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refset.TK_REFSET_TYPE;
 
-public class DescriptionsDiffComputer extends DiffBase {
+public class DescriptionsDiffComputer {
 
 	I_GetConceptData addedConceptsRefset;
 	I_GetConceptData addedDescriptionsRefset;
@@ -38,107 +46,55 @@ public class DescriptionsDiffComputer extends DiffBase {
 	TerminologyBuilderBI tb;
 	I_TermFactory tf;
 	TerminologyStoreDI ts;
+	UUID path1Uuid;
+	UUID path2Uuid;
+	String time1;
+	String time2;
+	ViewCoordinate v1;
+	ViewCoordinate v2;
+	I_GetConceptData snomedRoot;
+	int activeNid;
+	NidSet relTypeNids;
 
-	public DescriptionsDiffComputer(String v1, String v2, String path1_uuid,
-			String path2_uuid,
-			List<Integer> v1_relationship_characteristic_filter_int,
-			List<Integer> v2_relationship_characteristic_filter_int,
-			List<Integer> v1_concept_status_filter_int,
-			List<Integer> v2_concept_status_filter_int,
-			List<Integer> v1_description_status_filter_int,
-			List<Integer> v2_description_status_filter_int,
-			List<Integer> v1_relationship_status_filter_int,
-			List<Integer> v2_relationship_status_filter_int,
-			boolean added_concepts, boolean deleted_concepts,
-			boolean added_concepts_refex, boolean changed_concepts_refex,
-			boolean changed_concept_status, boolean changed_concept_author,
-			boolean changed_description_author, boolean changed_rel_author,
-			boolean changed_refex_author, List<Integer> author1,
-			List<Integer> author2, boolean changed_defined,
-			boolean added_descriptions, boolean deleted_descriptions,
-			boolean changed_description_status,
-			boolean changed_description_term, boolean changed_description_type,
-			boolean changed_description_language,
-			boolean changed_description_case, boolean added_relationships,
-			boolean deleted_relationships, boolean changed_relationship_status,
-			boolean changed_relationship_characteristic,
-			boolean changed_relationship_refinability,
-			boolean changed_relationship_type,
-			boolean changed_relationship_group, I_ConfigAceFrame config,
-			boolean noDescendantsV1, boolean noDescendantsV2) {
-		super(v1, v2, path1_uuid, path2_uuid,
-				v1_relationship_characteristic_filter_int,
-				v2_relationship_characteristic_filter_int,
-				v1_concept_status_filter_int, v2_concept_status_filter_int,
-				v1_description_status_filter_int, v2_description_status_filter_int,
-				v1_relationship_status_filter_int, v2_relationship_status_filter_int,
-				added_concepts, deleted_concepts, added_concepts_refex,
-				changed_concepts_refex, changed_concept_status, changed_concept_author,
-				changed_description_author, changed_rel_author, changed_refex_author,
-				author1, author2, changed_defined, added_descriptions,
-				deleted_descriptions, changed_description_status,
-				changed_description_term, changed_description_type,
-				changed_description_language, changed_description_case,
-				added_relationships, deleted_relationships,
-				changed_relationship_status, changed_relationship_characteristic,
-				changed_relationship_refinability, changed_relationship_type,
-				changed_relationship_group, config, noDescendantsV1, noDescendantsV2);
+	public DescriptionsDiffComputer(I_ConfigAceFrame config, String refsetNamePrefix,
+			String initialTime1, String laterTime2, UUID path1Uuid, UUID path2Uuid) throws Exception {
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss z");
+		
+		if (TimeHelper.getTimeFromString(laterTime2, dateFormat) <= 
+			TimeHelper.getTimeFromString(initialTime1, dateFormat)) throw new Exception("Later time should be greater than initial time.");
+		
 		this.config = config;
+
+		tf = Terms.get();
+		ts = Ts.get();
+		tb = ts.getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+
+		this.refsetNamePrefix = refsetNamePrefix + UUID.randomUUID().toString();
+		this.time1 = initialTime1;
+		this.time2 = laterTime2;
+		this.path1Uuid = path1Uuid;
+		this.path2Uuid = path2Uuid;
+		v1 = new ViewCoordinate(config.getViewCoordinate());
+		PositionSet posSet1 = new PositionSet(ts.newPosition(ts.getPath(ts.getNidForUuids(path1Uuid)), TimeHelper.getTimeFromString(initialTime1, dateFormat)));
+		v1.setPositionSet(posSet1);
+		v2 = new ViewCoordinate(config.getViewCoordinate());
+		PositionSet posSet2 = new PositionSet(ts.newPosition(ts.getPath(ts.getNidForUuids(path2Uuid)), TimeHelper.getTimeFromString(laterTime2, dateFormat)));
+		v2.setPositionSet(posSet2);
+		snomedRoot = tf.getConcept(SNOMED.Concept.ROOT.getUids());
+		activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
+		relTypeNids = new NidSet();
+		relTypeNids.add(SNOMED.Concept.IS_A.localize().getNid());
 	}
 
-	@Override
-	protected void changedDescriptionCase(I_GetConceptData c,
-			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
-		super.changedDescriptionCase(c, d1, d2);
-		addToRefset(c,changedDescriptionsRefset, this.description_case_change);
-	}
 
-	protected void changedDescriptionLang(I_GetConceptData c,
-			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
-		super.changedDescriptionLang(c, d1, d2);
-		addToRefset(c, changedDescriptionsRefset, this.description_language_change);
-	}
-
-	@Override
-	protected void changedDescriptionStatus(I_GetConceptData c,
-			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
-		super.changedDescriptionStatus(c, d1, d2);
-		addToRefset(c, changedDescriptionsRefset, this.description_status_change);
-	}
-
-	@Override
-	protected void changedDescriptionTerm(I_GetConceptData c,
-			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
-		super.changedDescriptionTerm(c, d1, d2);
-		addToRefset(c, changedDescriptionsRefset, this.description_term_change);
-	}
-
-	@Override
-	protected void changedDescriptionType(I_GetConceptData c,
-			I_DescriptionTuple d1, I_DescriptionTuple d2) throws Exception {
-		super.changedDescriptionType(c, d1, d2);
-		addToRefset(c, changedDescriptionsRefset, this.description_type_change);
-	}
-
-	@Override
-	protected void addedDescription(I_GetConceptData c, I_DescriptionTuple d)
-	throws Exception {
-		addToRefset(c, addedDescriptionsRefset, this.added_description_change);
-	}
-
-	@Override
-	protected void addedConcept(I_GetConceptData c) throws Exception {
-		addToRefset(c, addedConceptsRefset, this.added_concept_change);
-
-	}
-
-	private void addToRefset(I_GetConceptData member, I_GetConceptData refset, int changeType) {
+	private void addToRefset(I_GetConceptData member, I_GetConceptData refset) {
 		try {
 			RefexCAB newSpec = new RefexCAB(
 					TK_REFSET_TYPE.CID,
 					member.getNid(),
 					refset.getNid());
-			newSpec.put(RefexProperty.CNID1, changeType);
+			newSpec.put(RefexProperty.CNID1, activeNid);
 			RefexChronicleBI<?> newRefex = tb.construct(newSpec);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -182,12 +138,7 @@ public class DescriptionsDiffComputer extends DiffBase {
 		this.refsetNamePrefix = refsetNamePrefix;
 	}
 
-	public void setup(String refsetNamePrefix) throws IOException, InvalidCAB, ContradictionException, TerminologyException {
-		this.refsetNamePrefix = refsetNamePrefix;
-		tf = Terms.get();
-		ts = Ts.get();
-		tb = ts.getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-
+	public void setup() throws IOException, InvalidCAB, ContradictionException, TerminologyException {
 		ConceptCB addedConceptsCB = new ConceptCB(refsetNamePrefix + " Added Concepts (refset)", 
 				refsetNamePrefix + " Added Concepts",
 				LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
@@ -213,53 +164,137 @@ public class DescriptionsDiffComputer extends DiffBase {
 		tf.addUncommittedNoChecks(changedDescriptionsRefset);
 	}
 
-	protected void processConcepts() throws Exception {
-		I_TermFactory tf = Terms.get();
-		AceLog.getAppLog().info("Getting concepts in DFS order.");
-		//ArrayList<Integer> all_concepts = getAllConcepts();
-		ArrayList<Integer> all_concepts = 
-			getAllConceptsForParent(tf.uuidToNative(SNOMED.Concept.ROOT.getPrimoridalUid()));
-		AceLog.getAppLog().info("Processing: " + all_concepts.size());
-		long beg = System.currentTimeMillis();
-		int i = 0;
-		for (int id : all_concepts) {
-			I_GetConceptData c = tf.getConcept(id);
-			i++;
-			processConcept(c, i, beg);
-		}
-		Terms.get().addUncommittedNoChecks(this.addedConceptsRefset);
-		Terms.get().addUncommittedNoChecks(this.addedDescriptionsRefset);
-		Terms.get().addUncommittedNoChecks(this.changedDescriptionsRefset);
+	public void run() throws Exception {
+		Processor p = new Processor();
+		ts.iterateConceptDataInSequence(p);
+		Terms.get().addUncommittedNoChecks(addedConceptsRefset);
+		Terms.get().addUncommittedNoChecks(addedDescriptionsRefset);
+		Terms.get().addUncommittedNoChecks(changedDescriptionsRefset);
 		tf.commit();
 	}
-	
-	protected ArrayList<Integer> getAllConceptsForParent(int parentConceptNid) throws Exception {
-        ArrayList<Integer> all_concepts;
-        I_TermFactory tf = Terms.get();
-        if (!test_p) {
-            all_concepts = getDescendants(
-                    parentConceptNid,
-                    this.allowed_position2);
-            AceLog.getAppLog().info("Retrieved hierarchical: " + all_concepts.size());
-            return all_concepts;
-        } else {
-            all_concepts = super.getAllConcepts();
-            // for (int id : test_concepts) {
-            // UUID uuid = Type3UuidFactory.fromSNOMED(id);
-            // I_GetConceptData c = tf.getConcept(uuid);
-            // all_concepts.add(0, c.getConceptNid());
-            // }
-        }
-        return all_concepts;
-    }
 
-	protected void processConcept(I_GetConceptData c, int i, long beg)
-	throws Exception {
-		compareDescriptions(c);
-		if (i % 10000 == 0) {
-			System.out.println("Processed: " + i + " "
-					+ ((System.currentTimeMillis() - beg) / 1000));
+	private class Processor implements ProcessUnfetchedConceptDataBI {
+		int countIterated;
+		int countCompared;
+		int countDiff;
+
+		public Processor() {
+			super();
+			countIterated=0;
+			countCompared=0;
+			countDiff=0;
 		}
+
+		@Override
+		public boolean continueWork() {
+			return true;
+		}
+
+		@Override
+		public NidBitSetBI getNidSet() throws IOException {
+			return Ts.get().getAllConceptNids();
+		}
+
+		@Override
+		public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher)
+		throws Exception {
+			countIterated++;
+			ConceptChronicleBI concept = fetcher.fetch();
+
+			if (snomedRoot.isParentOfOrEqualTo((I_GetConceptData) concept, 
+					config.getAllowedStatus(), 
+					config.getDestRelTypes(), config.getViewPositionSetReadOnly(), 
+					config.getPrecedence(), 
+					config.getConflictResolutionStrategy())) {
+				
+				countCompared++;
+				
+				boolean diff = false;
+				boolean changeDiffFound = false;
+
+				ConceptVersionBI version1 = concept.getVersion(v1);
+				ConceptVersionBI version2 = concept.getVersion(v2);
+
+				if (version1.getConAttrs().getVersion(v1) == null &&
+						version2.getConAttrs().getVersion(v2) != null) {
+					// New concept
+					diff = true;
+					addToRefset((I_GetConceptData) concept, addedConceptsRefset);
+				}
+				
+				HashMap<UUID, DescriptionVersionBI> v1Descs = new HashMap<UUID,DescriptionVersionBI>();
+				for (DescriptionVersionBI loopDesc : version1.getDescsActive()) {
+					v1Descs.put(loopDesc.getPrimUuid(), loopDesc);
+				}
+				
+				HashMap<UUID, DescriptionVersionBI> v2Descs = new HashMap<UUID,DescriptionVersionBI>();
+				for (DescriptionVersionBI loopDesc : version2.getDescsActive()) {
+					v2Descs.put(loopDesc.getPrimUuid(), loopDesc);
+				}
+				
+				for (UUID loopDescUuid : v1Descs.keySet()) {
+					if (!v2Descs.keySet().contains(loopDescUuid)) {
+						// Retired desc
+						changeDiffFound = true;
+					}
+				}
+				
+				for (UUID loopDescUuid : v2Descs.keySet()) {
+					if (!v1Descs.keySet().contains(loopDescUuid)) {
+						// New desc
+						diff = true;
+						addToRefset((I_GetConceptData) concept, addedDescriptionsRefset);
+					}
+				}
+				
+				for (UUID loopDescUuid : v1Descs.keySet()) {
+					if (v2Descs.keySet().contains(loopDescUuid)) {
+						DescriptionVersionBI d1 = v1Descs.get(loopDescUuid);
+						DescriptionVersionBI d2 = v2Descs.get(loopDescUuid);
+						
+						if (d1.getStatusNid() != d2.getStatusNid()) {
+							// Changed Status
+							changeDiffFound = true;
+						}
+						
+						if (d1.getTypeNid() != d2.getTypeNid()) {
+							// Changed Type
+							changeDiffFound = true;
+						}
+						
+						if (d1.getText() != d2.getText()) {
+							// Changed Text
+							changeDiffFound = true;
+						}
+						
+						if (d1.getLang() != d2.getLang()) {
+							// Changed Lang
+							changeDiffFound = true;
+						}
+						
+						if (d1.isInitialCaseSignificant() != d2.isInitialCaseSignificant()) {
+							// Changed ics
+							changeDiffFound = true;
+						}
+					}
+				}
+				
+				if (changeDiffFound) {
+					diff = true;
+					addToRefset((I_GetConceptData) concept, changedDescriptionsRefset);
+				}
+				
+				if (diff) {
+					countDiff++;
+				}
+			}
+
+			if (countIterated % 10000 == 0) {
+				System.out.println("Iterated: " + countIterated + " Compared: " + countCompared + " Diffs found: " + countDiff);
+			}
+
+		}
+
 	}
 
 }

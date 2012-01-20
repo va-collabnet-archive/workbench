@@ -21,6 +21,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -72,20 +73,15 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            DescriptionsDiffComputer diff = new DescriptionsDiffComputer(
-            		"2011.07.31 00:00:00 CST", 
-            		"2012.01.31 23:59:00 CST",
-            		"8c230474-9f11-30ce-9cad-185a96fd03a2", "8c230474-9f11-30ce-9cad-185a96fd03a2",
-            		new ArrayList<Integer>(),new ArrayList<Integer>(),new ArrayList<Integer>(),
-            		new ArrayList<Integer>(),new ArrayList<Integer>(),new ArrayList<Integer>(),
-            		new ArrayList<Integer>(),new ArrayList<Integer>(),
-            		true,true,true,true,true,true,true,true,true,
-            		new ArrayList<Integer>(),new ArrayList<Integer>(),
-            		true,true,true,true,true,true,true,true,true,true,true,true,true,true,
-            		true, config,false,false
+            DescriptionsDiffComputer diff = new DescriptionsDiffComputer(config,
+            		"Comparison Jan 12 to Jul 11",
+            		"2011.07.31 23:59:59 CST", 
+            		"2012.01.31 23:59:59 CST",
+            		UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"), 
+            		UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")
             		);
-            diff.setup("Comparison Jul-11 Jan-12");
-            diff.processConcepts();
+            diff.setup();
+            diff.run();
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
