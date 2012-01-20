@@ -162,67 +162,67 @@ public class GenerateUsers extends AbstractMojo {
                 userLine = userReader.readLine();
             }
 
-            if (create) {
+            //add users to wf permissions refset
+            I_TermFactory tf = Terms.get();
+            if (userConfig == null) {
+                userConfig = newProfile(null, null, null, null, null);
+                tf.setActiveAceFrameConfig(userConfig);
+            }
+            ViewCoordinate vc = userConfig.getViewCoordinate();
+            EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 
-                //add users to wf permissions refset
-                I_TermFactory tf = Terms.get();
+            BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
 
-                ViewCoordinate vc = userConfig.getViewCoordinate();
-                EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+            WorkflowHelper.updateModelers(vc);
+            modelers = WorkflowHelper.getModelers();
+            searcher = new EditorCategoryRefsetSearcher();
 
-                BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
-
-                WorkflowHelper.updateModelers(vc);
-                modelers = WorkflowHelper.getModelers();
-                searcher = new EditorCategoryRefsetSearcher();
-
-                wfReader.readLine();
-                String wfLine = wfReader.readLine();
-                while (wfLine != null) {
-                    if (wfLine.trim().length() == 0) {
-                        continue;
-                    }
-
-                    String[] columns = wfLine.split(",");
-
-                    if (columns.length >= 3) {
-                        //Get rid of "User permission"
-                        columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
-                        //remove ")"
-                        columns[2] = columns[2].trim();
-                        columns[2] = columns[2].substring(0, columns[2].length() - 1);
-
-                        int i = 0;
-                        for (String c : columns) {
-                            columns[i++] = c.split("=")[1].trim();
-                        }
-
-                        ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
-                        ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
-                        boolean addingRequired = true;
-
-                        if (oldCategory != null) {
-                            if (!oldCategory.equals(newCategory)) {
-                                writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
-                            } else {
-                                addingRequired = false;
-                            }
-                        }
-
-                        if (addingRequired) {
-                            writer.setEditor(modelers.get(columns[0]));
-                            writer.setSemanticArea(columns[1]);
-
-                            writer.setCategory(newCategory);
-                            writer.addMember();
-                        }
-                    }
-
-                    wfLine = wfReader.readLine();
+            wfReader.readLine();
+            String wfLine = wfReader.readLine();
+            while (wfLine != null) {
+                if (wfLine.trim().length() == 0) {
+                    continue;
                 }
 
-                Terms.get().commit();
+                String[] columns = wfLine.split(",");
+
+                if (columns.length >= 3) {
+                    //Get rid of "User permission"
+                    columns[0] = (String) columns[0].subSequence("User permission (".length(), columns[0].length());
+                    //remove ")"
+                    columns[2] = columns[2].trim();
+                    columns[2] = columns[2].substring(0, columns[2].length() - 1);
+
+                    int i = 0;
+                    for (String c : columns) {
+                        columns[i++] = c.split("=")[1].trim();
+                    }
+
+                    ConceptVersionBI newCategory = WorkflowHelper.lookupEditorCategory(columns[2], vc);
+                    ConceptVersionBI oldCategory = identifyExistingEditorCategory(columns, vc);
+                    boolean addingRequired = true;
+
+                    if (oldCategory != null) {
+                        if (!oldCategory.equals(newCategory)) {
+                            writer.retireEditorCategory(modelers.get(columns[0]), columns[1], oldCategory);
+                        } else {
+                            addingRequired = false;
+                        }
+                    }
+
+                    if (addingRequired) {
+                        writer.setEditor(modelers.get(columns[0]));
+                        writer.setSemanticArea(columns[1]);
+
+                        writer.setCategory(newCategory);
+                        writer.addMember();
+                    }
+                }
+
+                wfLine = wfReader.readLine();
             }
+
+            Terms.get().commit();
 
             getLog().info("Starting close.");
             Bdb.close();
