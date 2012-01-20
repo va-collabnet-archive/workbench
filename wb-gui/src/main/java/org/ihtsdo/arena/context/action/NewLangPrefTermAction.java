@@ -2,6 +2,7 @@ package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.UUID;
 import javax.swing.AbstractAction;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
@@ -50,6 +51,7 @@ public class NewLangPrefTermAction extends AbstractAction {
                     lang,
                     "new " + lang + " pref term",
                     false);
+            descBp.setComponentUuidNoRecompute(UUID.randomUUID());
             DescriptionChronicleBI dc = builder.construct(descBp);
             DescriptionVersionBI dv = dc.getVersion(config.getViewCoordinate());
             RefexCAB refexBp = new RefexCAB(TK_REFSET_TYPE.CID,

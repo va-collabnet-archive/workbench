@@ -140,6 +140,10 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         this.componentUuid = componentUuid;
         pcs.firePropertyChange("componentUuid", oldUuid, this.componentUuid);
     }
+    
+    public void setComponentUuidNoRecompute(UUID componentUuid) {
+        this.componentUuid = componentUuid;
+    }
 
     public int getComponentNid() throws IOException {
         return Ts.get().getNidForUuids(componentUuid);
