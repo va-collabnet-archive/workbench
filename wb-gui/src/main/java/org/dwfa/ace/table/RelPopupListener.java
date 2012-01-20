@@ -257,7 +257,7 @@ public class RelPopupListener extends MouseAdapter {
                   I_RelPart currentPart = (I_RelPart) selectedObject.getTuple().getMutablePart();
 
                   newPart = (I_RelPart) currentPart.makeAnalog(currentPart.getStatusNid(),
-                          config.getDbConfig().getUserConcept().getNid(), currentPart.getPathNid(),
+                          config.getDbConfig().getUserConcept().getNid(), p.getConceptNid(),
                           Long.MAX_VALUE);
                   srcRel.addVersion(newPart);
                } else {
