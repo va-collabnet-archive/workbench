@@ -131,7 +131,7 @@ public class TestForSpecifcDate extends AbstractConceptTest {
             
             if (found) {
             	AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(ALERT_TYPE.WARNING, 
-            			"Concept with Versions in last release", concept);
+            			"Warning: Concept with Versions in last release", concept);
                 alerts.add(alert);
             }
 
