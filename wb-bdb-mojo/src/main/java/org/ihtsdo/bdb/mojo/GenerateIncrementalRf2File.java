@@ -107,7 +107,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      *
      * @parameter @required
      */
-    private COUNTRY_CODE countryCode;
+    private String countryCode;
     /**
      * Refsets to exclude
      *
@@ -183,7 +183,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 Rf2Export exporter = new Rf2Export(output,
                         Rf2File.ReleaseType.DELTA,
                         LANG_CODE.EN,
-                        countryCode,
+                        COUNTRY_CODE.valueOf(countryCode),
                         namespace,
                         moduleId.toString(),
                         new Date(TimeHelper.getTimeFromString(effectiveDate,
