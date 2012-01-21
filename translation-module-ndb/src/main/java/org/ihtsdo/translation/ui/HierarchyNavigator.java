@@ -4,6 +4,7 @@
 
 package org.ihtsdo.translation.ui;
 
+import java.awt.*;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -100,28 +101,30 @@ public class HierarchyNavigator extends JPanel {
 		tree1.setCellRenderer(new HierarchyIconRenderer());
 		tree2.setCellRenderer(new HierarchyIconRenderer());
 		I_TermFactory termFactory = Terms.get();
-		allowedDestRelTypes = termFactory.newIntSet();
-		allowedStatus = termFactory.newIntSet();
-		try {
-			config = Terms.get().getActiveAceFrameConfig();
-			// allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
-			allowedDestRelTypes = config.getDestRelTypes();
-			// allowedDestRelTypes=Terms.get().newIntSet();
-			// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
-			allowedStatus = Terms.get().newIntSet();
-			allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
-			allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			// allowedStatus=config.getAllowedStatus();
+		if (termFactory != null) {
+			allowedDestRelTypes = termFactory.newIntSet();
+			allowedStatus = termFactory.newIntSet();
+			try {
+				config = termFactory.getActiveAceFrameConfig();
+				// allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+				allowedDestRelTypes = config.getDestRelTypes();
+				// allowedDestRelTypes=Terms.get().newIntSet();
+				// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+				allowedStatus = Terms.get().newIntSet();
+				allowedStatus.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+				allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+				// allowedStatus=config.getAllowedStatus();
 
-			inactive = Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
-			retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
-			// allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-			// allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
-			// config.setAllowedStatus(allowedStatus);
-		} catch (TerminologyException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+				inactive = Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
+				retired = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.RETIRED.getUids());
+				// allowedStatus.add(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
+				// allowedStatus.add(ArchitectonicAuxiliary.Concept.ACTIVE.localize().getNid());
+				// config.setAllowedStatus(allowedStatus);
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		tree1.setTransferHandler(new ObjectTransferHandler());
 		tree1.setRootVisible(false);
@@ -354,7 +357,7 @@ public class HierarchyNavigator extends JPanel {
 					I_GetConceptData childCpt = Terms.get().getConcept(child.getC1Id());
 					I_ConceptAttributeTuple attributes = childCpt.getConceptAttributeTuples(config.getPrecedence(), config.getConflictResolutionStrategy()).get(0);
 					String sizeStr = "";
-					if(getChildren(childCpt).size() > 0){
+					if (getChildren(childCpt).size() > 0) {
 						sizeStr = " (" + getChildren(childCpt).size() + ")";
 					}
 					if (attributes.getStatusNid() == inactive.getNid() || attributes.getStatusNid() == retired.getNid()) {
@@ -364,8 +367,8 @@ public class HierarchyNavigator extends JPanel {
 					} else {
 						newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.PRIMITIVE), childCpt.toString() + sizeStr, childCpt));
 					}
-					
-					if(getChildren(childCpt).size() > 0){
+
+					if (getChildren(childCpt).size() > 0) {
 						newChild.add(new DefaultMutableTreeNode("Loading..."));
 					}
 					top.add(newChild);
@@ -634,117 +637,148 @@ public class HierarchyNavigator extends JPanel {
 		scrollPane2 = new JScrollPane();
 		tree2 = new JTree();
 
-		// ======== this ========
+		//======== this ========
+		setPreferredSize(new Dimension(10, 20));
+		setMinimumSize(new Dimension(10, 20));
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 424, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 0.0, 1.0, 0.0, 1.0E-4 };
+		((GridBagLayout)getLayout()).columnWidths = new int[] {424, 0};
+		((GridBagLayout)getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0};
+		((GridBagLayout)getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
+		((GridBagLayout)getLayout()).rowWeights = new double[] {1.0, 0.0, 1.0, 0.0, 1.0E-4};
 
-		// ======== scrollPane1 ========
+		//======== scrollPane1 ========
 		{
 
-			// ---- tree1 ----
+			//---- tree1 ----
 			tree1.setVisibleRowCount(5);
+			tree1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			tree1.addTreeWillExpandListener(new TreeWillExpandListener() {
 				@Override
-				public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
+				public void treeWillExpand(TreeExpansionEvent e)
+					throws ExpandVetoException
+				{
 					tree1TreeWillExpand(e);
 				}
-
 				@Override
-				public void treeWillCollapse(TreeExpansionEvent e) throws ExpandVetoException {
-				}
+				public void treeWillCollapse(TreeExpansionEvent e)
+					throws ExpandVetoException
+				{}
 			});
 			scrollPane1.setViewportView(tree1);
 		}
-		add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(scrollPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== panel1 ========
+		//======== panel1 ========
 		{
+			panel1.setMinimumSize(new Dimension(10, 50));
+			panel1.setPreferredSize(new Dimension(10, 50));
 			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 197, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+			((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {197, 0, 0};
+			((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0};
+			((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
+			((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0E-4};
 
-			// ---- comboBox1 ----
+			//---- comboBox1 ----
+			comboBox1.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			comboBox1.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					comboBox1ActionPerformed(e);
 				}
 			});
-			panel1.add(comboBox1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(comboBox1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 
-			// ======== panel2 ========
+			//======== panel2 ========
 			{
+				panel2.setMinimumSize(new Dimension(10, 23));
+				panel2.setPreferredSize(new Dimension(10, 23));
 				panel2.setLayout(new GridBagLayout());
-				((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-				((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
-				((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
-				((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				((GridBagLayout)panel2.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
+				((GridBagLayout)panel2.getLayout()).rowHeights = new int[] {0, 0};
+				((GridBagLayout)panel2.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
+				((GridBagLayout)panel2.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
 
-				// ---- rInfer ----
+				//---- rInfer ----
 				rInfer.setText("Inferred");
 				rInfer.setSelected(true);
+				rInfer.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				rInfer.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						radioButton1ActionPerformed();
 					}
 				});
-				panel2.add(rInfer, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(rInfer, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- rStat ----
+				//---- rStat ----
 				rStat.setText("Stated");
+				rStat.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				rStat.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						rStatActionPerformed();
 					}
 				});
-				panel2.add(rStat, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(rStat, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 5), 0, 0));
 
-				// ---- expandButton ----
+				//---- expandButton ----
 				expandButton.setText("Expand");
 				expandButton.setMnemonic('E');
+				expandButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 				expandButton.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						expandButtonActionPerformed(e);
 					}
 				});
-				panel2.add(expandButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+				panel2.add(expandButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
+					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 0, 0), 0, 0));
 			}
-			panel1.add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+				new Insets(0, 0, 0, 0), 0, 0));
 		}
-		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(panel1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ======== scrollPane2 ========
+		//======== scrollPane2 ========
 		{
 
-			// ---- tree2 ----
+			//---- tree2 ----
 			tree2.setVisibleRowCount(5);
+			tree2.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			tree2.addTreeWillExpandListener(new TreeWillExpandListener() {
 				@Override
-				public void treeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
+				public void treeWillExpand(TreeExpansionEvent e)
+					throws ExpandVetoException
+				{
 					tree2TreeWillExpand(e);
 				}
-
 				@Override
-				public void treeWillCollapse(TreeExpansionEvent e) throws ExpandVetoException {
-				}
+				public void treeWillCollapse(TreeExpansionEvent e)
+					throws ExpandVetoException
+				{}
 			});
 			scrollPane2.setViewportView(tree2);
 		}
-		add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(scrollPane2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+			new Insets(0, 0, 5, 0), 0, 0));
 
-		// ---- buttonGroup1 ----
+		//---- buttonGroup1 ----
 		ButtonGroup buttonGroup1 = new ButtonGroup();
 		buttonGroup1.add(rInfer);
 		buttonGroup1.add(rStat);
-		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
 
