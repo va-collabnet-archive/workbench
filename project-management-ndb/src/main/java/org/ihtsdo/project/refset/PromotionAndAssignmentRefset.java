@@ -122,6 +122,29 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 		return null;
 	}
 
+	public I_GetConceptData getPreviousUser(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
+		I_GetConceptData component = termFactory.getConcept(componentId);
+		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
+		for (RefexChronicleBI<?> promotionMember : members) {
+			if (promotionMember.getCollectionNid() == this.refsetId) {
+				RefexCnidCnidVersionBI promotionExtensionPart = null;
+				Collection<? extends RefexVersionBI> versions = promotionMember.getVersions();
+
+				long last = Long.MIN_VALUE;
+				for (RefexVersionBI loopPart : versions) {
+					if (loopPart.getTime() > last) {
+						last = loopPart.getTime();
+						promotionExtensionPart = (RefexCnidCnidVersionBI) loopPart;
+					}
+				}
+				if (promotionExtensionPart != null) {
+					return termFactory.getConcept(promotionExtensionPart.getAuthorNid());
+				}
+			}
+		}
+		return null;
+	}
+
 	public Long getPreviousStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
 		I_GetConceptData component = termFactory.getConcept(componentId);
 		Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -167,8 +190,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			if (promotionStatusExtensionPart != null && (promotionStatusExtensionPart.getStatusNid() != activeValueNid || promotionStatusExtensionPart.getC1id() != statusConceptId)) {
 
 				for (PathBI editPath : config.getEditingPathSet()) {
-					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config
-							.getDbConfig().getUserConcept().getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config.getDbConfig().getUserConcept().getNid(),
+							editPath.getConceptNid(), Long.MAX_VALUE);
 					newPromotionStatusPart.setC1id(statusConceptId);
 					oldExtension.addVersion(newPromotionStatusPart);
 				}
@@ -246,8 +269,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			}
 			if (promotionStatusExtensionPart != null && (promotionStatusExtensionPart.getStatusNid() != activeValueNid || promotionStatusExtensionPart.getC2id() != destinationUserConceptId)) {
 				for (PathBI editPath : config.getEditingPathSet()) {
-					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config
-							.getDbConfig().getUserConcept().getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config.getDbConfig().getUserConcept().getNid(),
+							editPath.getConceptNid(), Long.MAX_VALUE);
 					newPromotionStatusPart.setC2id(destinationUserConceptId);
 					oldExtension.addVersion(newPromotionStatusPart);
 				}
@@ -316,8 +339,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
 			if (promotionStatusExtensionPart != null
 					&& (promotionStatusExtensionPart.getStatusNid() != activeValueNid || promotionStatusExtensionPart.getC2id() != destinationUserConceptId || promotionStatusExtensionPart.getC1id() != statusConceptId)) {
 				for (PathBI editPath : config.getEditingPathSet()) {
-					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config
-							.getDbConfig().getUserConcept().getNid(), editPath.getConceptNid(), Long.MAX_VALUE);
+					I_ExtendByRefPartCidCid newPromotionStatusPart = (I_ExtendByRefPartCidCid) promotionStatusExtensionPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), config.getDbConfig().getUserConcept().getNid(),
+							editPath.getConceptNid(), Long.MAX_VALUE);
 					newPromotionStatusPart.setC1id(statusConceptId);
 					newPromotionStatusPart.setC2id(destinationUserConceptId);
 					oldExtension.addVersion(newPromotionStatusPart);
